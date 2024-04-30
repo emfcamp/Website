@@ -18,6 +18,9 @@
         </div>
     </noscript>
 
+    <h2>Pick your shifts</h2>
+    <p>Select a day to sign up for shifts. To change which roles you're interested in, <a href="{{ url_for('.choose_role') }}">click here</a>.</p>
+
     {% if untrained_roles %}
         <div class="alert alert-info">
             You still need training before starting a shift for the following roles:
