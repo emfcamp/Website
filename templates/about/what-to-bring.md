@@ -42,4 +42,4 @@ title: What to Bring
 ## Things Not to Bring
 * Glass bottles: broken glass is a pain to clean up.
 * Pets: The site does not allow dogs or, indeed, any other animals.
-* Things that are on fire: Unless you've cleared them with us beforehand.
+
