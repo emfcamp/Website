@@ -53,6 +53,8 @@ def redirect_next_or_schedule(message: str | None = None):
 def schedule():
     if datetime.utcnow() < config_date("EVENT_START"):
         default_day = "wed"
+    elif datetime.utcnow() > config_date("EVENT_END"):
+        default_day = "mon"
     else:
         default_day = pendulum.now().strftime("%a").lower()
     active_day = request.args.get("day", default=default_day)
