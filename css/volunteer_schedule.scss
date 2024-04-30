@@ -1,3 +1,5 @@
+@use "./_variables.scss" as *;
+
 .modal {
   color: black;
 }
@@ -10,5 +12,5 @@ table.shifts-table tr,
 table.shifts-table th,
 table.shifts-table td {
   // !important because I'm a terrible (and very lazy) person
-  border-color: #630047 !important;
+  border-color: $highlight-2-border !important;
 }

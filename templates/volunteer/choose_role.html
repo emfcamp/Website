@@ -11,25 +11,27 @@
 <form method="post">
     {{ form.hidden_tag() }}
 
+    <fieldset>
     <p>Select the roles you're interested in and click the button at the bottom of the page. You can change this at any time.</p>
     <p>Before your first shift please read the <a href="{{ url_for('.info') }}">info</a> pages.</p>
     {% for f in form.roles %}
         <div class="well">
             <div class="form-group">
                 {{ f.hidden_tag() }}
-                <div class="checkbox ">
-                    <label for="{{ f.signup.name }}">
-                        {{ f.signup()| safe }}
-                        <strong>{{ f._role.name }}</strong>
-                    </label>
-                </div>
-                {{ f._role.full_description() }}
+                {{ f.signup(class_="big-checkbox") }}
+                <label for="{{ f.signup.id }}" class="big-checkbox">
+                    <strong>{{ f._role.name }}</strong>
+                </label>
             </div>
+            {{ f._role.full_description() }}
         </div>
     {% endfor %}
+    </fieldset>
 
+    <fieldset>
     <div class="form-group">
         {{ form.submit(class_="btn btn-primary debounce") }}
     </div>
+    </fieldset>
 </form>
 {% endblock %}
