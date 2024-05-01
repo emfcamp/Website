@@ -161,6 +161,7 @@ def attendee_content_edit(id):
         return redirect(url_for("schedule.attendee_content"))
 
     form = ContentForm(obj=proposal)
+    form.day.data = proposal.scheduled_time.strftime("%Y-%m-%d")
     form.populate_choices(current_user)
     if request.method == "POST" and form.validate():
         populate(proposal, form)
