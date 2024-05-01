@@ -1,4 +1,4 @@
-""" Views for attendees to manage their own content."""
+"""Views for attendees to manage their own content."""
 
 from models.cfp import PYTHON_CFP_TYPES, Proposal, Venue, AGE_RANGE_OPTIONS
 from sqlalchemy import or_
@@ -38,9 +38,7 @@ def venues_for_user(user):
     if user.village:
         venues.extend(user.village.venues)
 
-    public_venues = Venue.query.filter_by(
-        village_id=None, scheduled_content_only=False
-    ).all()
+    public_venues = Venue.query.filter_by(village_id=None, scheduled_content_only=False).all()
     venues.extend(public_venues)
 
     return venues
@@ -103,9 +101,9 @@ def populate(proposal, form):
     proposal.attendees = form.attendees.data
     proposal.cost = proposal.published_cost = form.cost.data
     proposal.age_range = proposal.published_age_range = form.age_range.data
-    proposal.participant_equipment = (
-        proposal.published_participant_equipment
-    ) = form.participant_equipment.data
+    proposal.participant_equipment = proposal.published_participant_equipment = (
+        form.participant_equipment.data
+    )
 
 
 @schedule.route("/attendee-content", methods=["GET", "POST"])
@@ -116,9 +114,7 @@ def attendee_content():
 
     content = Proposal.query.filter(
         Proposal.user_id == current_user.id,
-        or_(
-            Proposal.user_scheduled is True, Proposal.scheduled_venue_id.in_(venue_ids)
-        ),
+        or_(Proposal.user_scheduled is True, Proposal.scheduled_venue_id.in_(venue_ids)),
         Proposal.is_accepted,
     ).all()
 
@@ -160,12 +156,12 @@ def attendee_content():
 def attendee_content_edit(id):
     proposal = Proposal.query.filter_by(id=id).first()
     if not proposal or (
-        proposal.user_id != current_user.id
-        and proposal.scheduled_venue.village_id != current_user.village.id
+        proposal.user_id != current_user.id and proposal.scheduled_venue.village_id != current_user.village.id
     ):
         return redirect(url_for("schedule.attendee_content"))
 
     form = ContentForm(obj=proposal)
+    form.day.data = proposal.scheduled_time.strftime("%Y-%m-%d")
     form.populate_choices(current_user)
     if request.method == "POST" and form.validate():
         populate(proposal, form)
