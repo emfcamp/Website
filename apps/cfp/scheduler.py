@@ -59,7 +59,7 @@ class Scheduler(object):
 
         capacity_by_type = defaultdict(dict)
         for venue in Venue.query.all():  # TODO(lukegb): filter to emf venues
-            for type in venue.default_for_types:
+            for type in venue.default_for_types or []:
                 capacity_by_type[type][venue.id] = venue.capacity
 
         proposal_data = []
