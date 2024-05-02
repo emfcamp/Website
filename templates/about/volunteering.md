@@ -38,7 +38,7 @@ If you’re on site for setup/teardown you have to help with everything - not ju
 </div>
 
 
-## Volunteer Kitchen
+## <span id="volunteer-kitchen">Volunteer Kitchen</span>
 The volunteer kitchen runs from buildup, during the event, and into teardown and provides volunteers with three hot meals a day as a thank you for helping out: each shift worked grants a volunteer one hot meal.
 Our chefs cook a variety of delicious dishes from all around the world, suitable for a large range of dietaries, and will do their best to accommodate special requirements. If you have any dietary concerns, please let them know and they will work with you to find you something you can eat.
 
