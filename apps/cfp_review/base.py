@@ -130,6 +130,9 @@ def filter_proposal_request() -> tuple[list[Proposal], bool]:
     if show_user_scheduled is None or show_user_scheduled is False:
         filtered = False
         proposal_query = proposal_query.filter_by(user_scheduled=False)
+    else:
+        filtered = True
+        proposal_query = proposal_query.filter_by(user_scheduled=True)
 
     # This block has to be last because it will join to the user table
     needs_ticket = request.args.get("needs_ticket", type=bool_qs)
