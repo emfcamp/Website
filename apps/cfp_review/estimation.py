@@ -1,12 +1,16 @@
+from collections import defaultdict
 from dataclasses import dataclass
 from datetime import timedelta
 from models.cfp import (
+    PROPOSAL_TIMESLOTS,
     Proposal,
     Venue,
-    get_available_proposal_minutes,
     get_days_map,
     ROUGH_LENGTHS,
     EVENT_SPACING,
+    SLOT_LENGTH,
+    make_periods_contiguous,
+    timeslot_to_period,
 )
 
 
@@ -22,14 +26,26 @@ class CFPEstimate:
     venues: list[Venue]
 
 
-# TODO: move this somewhere more sensible
-CHANGEOVER_PERIOD = timedelta(minutes=10)
+def get_available_proposal_minutes():
+    minutes = defaultdict(int)
+    venue_names_by_type = Venue.emf_venue_names_by_type()
+    for type, slots in PROPOSAL_TIMESLOTS.items():
+        periods = make_periods_contiguous(
+            [timeslot_to_period(ts, type=type) for ts in slots]
+        )
+        for period in periods:
+            minutes[type] += int(
+                (period.end - period.start).total_seconds() / 60
+            ) * len(venue_names_by_type[type])
+    return minutes
 
 
 def get_cfp_estimate(proposal_type: str) -> CFPEstimate:
     """Calculate estimated scheduling capacity statistics for a given proposal type."""
     if proposal_type not in ["talk", "workshop", "performance", "youthworkshop"]:
         raise ValueError(f"Invalid proposal type: {proposal_type}")
+
+    changeover_time = SLOT_LENGTH * EVENT_SPACING[proposal_type]
 
     accepted_proposals = (
         Proposal.query_accepted().filter(Proposal.type == proposal_type).all()
@@ -49,8 +65,7 @@ def get_cfp_estimate(proposal_type: str) -> CFPEstimate:
                 unknown_lengths += 1
                 continue
 
-        # add changeover period
-        allocated_time += length + (CHANGEOVER_PERIOD * EVENT_SPACING[proposal.type])
+        allocated_time += length + changeover_time
 
     num_days = len(get_days_map().items())
 
@@ -59,13 +74,8 @@ def get_cfp_estimate(proposal_type: str) -> CFPEstimate:
     ).all()
 
     # Correct for changeover period not being needed at the end of the day
-    # Amount of minutes per venue * number of venues - (slot changeover period) from the end
-    changeover_correction = (
-        (CHANGEOVER_PERIOD * EVENT_SPACING[proposal_type])
-        * num_days
-        * len(available_venues)
-    )
-    # This can go negative if there aren't many proposals scheduled, so clamp to 0
+    # This can go negative if there aren't many proposals accepted yet, so clamp to 0
+    changeover_correction = changeover_time * num_days * len(available_venues)
     allocated_time = max(allocated_time - changeover_correction, timedelta(0))
 
     available_minutes = get_available_proposal_minutes()
