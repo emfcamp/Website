@@ -1041,6 +1041,9 @@ class Venue(BaseModel):
         db.Integer, db.ForeignKey("village.id"), nullable=True, default=None
     )
     name = db.Column(db.String, nullable=False)
+
+    # Which type of proposals are allowed to be scheduled in this venue.
+    # (This is not really used yet.)
     allowed_types = db.Column(
         MutableList.as_mutable(ARRAY(db.String)),
         nullable=False,
@@ -1048,6 +1051,9 @@ class Venue(BaseModel):
             r"'{}'::varchar[]"
         ),  # TODO(jayaddison): array([], type_=db.String)
     )
+
+    # What type of proposals are the default for this venue.
+    # These are where the automatic scheduler will put proposals.
     default_for_types = db.Column(
         MutableList.as_mutable(ARRAY(db.String)),
         nullable=False,
@@ -1098,7 +1104,8 @@ class Venue(BaseModel):
 
     @classmethod
     def emf_venue_names_by_type(cls):
-        unnest = db.func.unnest(cls.allowed_types).table_valued()
+        """ Return a map of proposal type to official EMF venues."""
+        unnest = db.func.unnest(cls.default_for_types).table_valued()
         return {
             type: venue_names
             for venue_names, type in db.engine.execute(
