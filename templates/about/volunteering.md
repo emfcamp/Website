@@ -10,7 +10,6 @@ We’d like everyone to consider volunteering to help the event run smoothly, ev
   {{ contact_form("volunteer") }}
 </div>
 
-
 ## Before the event
 
 Running an event like EMF requires a huge amount of planning to make sure the event runs smoothly. This starts a year or more in advance.
@@ -21,7 +20,7 @@ Running an event like EMF requires a huge amount of planning to make sure the ev
 
 During the event, there are plenty of roles which need to be filled, from construction to cooking for volunteers.
 
-Closer to the event, you’ll be able to log in to the volunteer system which allows you to sign up for shifts. Volunteers who complete a shift will receive a delicious free meal from our volunteer kitchen.
+Closer to the event, you’ll be able to log in to the volunteer system which allows you to sign up for shifts. Volunteers who complete a shift will receive a [delicious free meal from our volunteer kitchen](#volunteer-kitchen).
 
 ## Setup & teardown
 
@@ -37,3 +36,12 @@ If you’re on site for setup/teardown you have to help with everything - not ju
   <p>To be notified when we start looking for help with setup & teardown please subscribe to the volunteering mailing list:</p>
   {{ contact_form("volunteer") }}
 </div>
+
+
+## <span id="volunteer-kitchen">Volunteer Kitchen</span>
+The volunteer kitchen runs from buildup, during the event, and into teardown and provides volunteers with three hot meals a day as a thank you for helping out: each shift worked grants a volunteer one hot meal.
+Our chefs cook a variety of delicious dishes from all around the world, suitable for a large range of dietaries, and will do their best to accommodate special requirements. If you have any dietary concerns, please let them know and they will work with you to find you something you can eat.
+
+The kitchen is particularly in need of volunteers during buildup to help with cooking the meals for the buildup crew and preparing for the EMF rush. If you want to help out, please contact us!
+
+To find out what is on the menu, check out the [Kitchen Social page](https://social.emfcamp.org/@kitchen).

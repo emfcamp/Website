@@ -39,6 +39,26 @@ table > tfoot:last-child > tr:last-child > td:last-child {
     border-bottom-right-radius: 4px;
 }
 
+table.table-bordered > thead:first-child > tr:first-child > th:first-child,
+table.table-bordered > tbody:first-child > tr:first-child > td:first-child {
+    border-top-left-radius: 0;
+}
+
+table.table-bordered > thead:first-child > tr:first-child > th:last-child,
+table.table-bordered > tbody:first-child > tr:first-child > td:last-child {
+    border-top-right-radius: 0;
+}
+
+table.table-bordered > tbody:last-child > tr:last-child > td:first-child,
+table.table-bordered > tfoot:last-child > tr:last-child > td:first-child {
+    border-bottom-left-radius: 0;
+}
+
+table.table-bordered > tbody:last-child > tr:last-child > td:last-child,
+table.table-bordered > tfoot:last-child > tr:last-child > td:last-child {
+    border-bottom-right-radius: 0;
+}
+
 th,
 tfoot > tr > td {
     color: $highlight-background-text;

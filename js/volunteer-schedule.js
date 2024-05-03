@@ -1,401 +1,191 @@
-window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
-    var current_day = active_day;
+const { verified } = require("@primer/octicons");
 
-    function render(){
-        var filters = get_filters(),
-            days_data = data[current_day],
-            day_ele = $('#tbody-'+current_day);
+function saveFilters() {
+    localStorage.setItem("volunteer-filters:v2", JSON.stringify(getFilters()))
+}
 
-        day_ele.empty();
-
-        $.each(days_data, function(hour, hours_shifts) {
-            var n_shifts = hours_shifts.length,
-                rows = [];
-
-            $.each(hours_shifts, function(index, shift) {
-                if (fails_filters(filters, shift)) {
-                    return;
-                }
-                rows.push(make_row(shift));
-            });
-
-            if (rows.length > 0) {
-                prepend_hour_cell(rows[0], hour, rows.length);
-                day_ele.append(rows);
-            }
-        });
-
-        save_filters();
+function loadFilters() {
+    let savedFilters = localStorage.getItem("volunteer-filters:v2");
+    if (savedFilters === null) {
+        return
     }
 
-    function prepend_hour_cell(row, hour, rowspan) {
-        var cell = make_cell(hour);
-        cell.attr('rowspan', rowspan);
-        row.prepend(cell);
-        return row;
+    let filters = JSON.parse(savedFilters)
+    document.querySelectorAll("input[data-role-id]").forEach(node => {
+        node.checked = filters.role_ids.includes(node.getAttribute("data-role-id"))
+    })
+    document.getElementById("show_past").checked = filters.show_finished_shifts;
+    document.getElementById("show_signed_up_only").checked = filters.signed_up
+    document.getElementById("hide_full").checked = filters.hide_full
+    document.getElementById("is_understaffed").checked = filters.hide_staffed
+    document.getElementById("colourful_mode").checked = filters.colourful_mode
+    updateRowDisplay();
+}
+
+function getFilters() {
+    let filters = {
+        "role_ids": Array.from(document.querySelectorAll('input[data-role-id]:checked')).map(node => node.getAttribute('data-role-id')),
+        "show_finished_shifts": document.getElementById("show_past").checked,
+        "signed_up": document.getElementById("show_signed_up_only").checked,
+        "hide_full": document.getElementById("hide_full").checked,
+        "hide_staffed": document.getElementById("is_understaffed").checked,
+        "colourful_mode": document.getElementById("colourful_mode").checked,
     }
+    return filters
+}
 
-    function make_row(shift) {
-        var row_ele = $(document.createElement('tr'));
-        const cells = [
-                make_cell(shift.end_time),
-                make_cell(shift.venue.name),
-                make_cell(shift.role.name),
-                make_cell(shift.current_count + '/' + shift.max_needed),
-                make_cell(make_details_button(shift))
-            ];
-
-        row_ele.append(cells);
-        row_ele.addClass(row_class(shift));
-        row_ele.attr('id', 'shift-'+shift.id);
-        row_ele.click(make_open_modal_fn(shift));
-        return row_ele;
+function getNodeData(node) {
+    return {
+        "start": node.getAttribute("data-shift-start"),
+        "end": node.getAttribute("data-shift-end"),
+        "role_id": node.getAttribute("data-role-id"),
+        "staffed": node.getAttribute("data-staffed") == "True",
+        "signed_up": node.getAttribute("data-signed-up") == "True",
+        "full": node.getAttribute("data-full") == "True",
+        "min_staff": parseInt(node.getAttribute("data-min-staff")),
+        "max_staff": parseInt(node.getAttribute("data-max-staff")),
+        "current_staff": parseInt(node.getAttribute("data-current-staff")),
     }
+}
 
-    function row_class(shift) {
-        if (!$('#colourful_mode').prop('checked')) {
-            return;
+function shouldDisplayNode(node_data, filters) {
+    // Yes, there are more efficient ways, but this makes debugging why
+    // a row was filtered easier.
+    let filter_reasons = [];
+    if (!filters["role_ids"].includes(node_data["role_id"])) {
+        filter_reasons.push("role_id");
+    }
+    if (filters["hide_full"] && node_data["full"]) {
+        filter_reasons.push("full");
+    }
+    if (filters["hide_staffed"] && node_data["staffed"]) {
+        filter_reasons.push("staffed");
+    }
+    if (filters["signed_up"] && !node_data["signed_up"]) {
+        filter_reasons.push("signed_up");
+    }
+    if (!filters["show_past"]) {
+        let now = new Date().toISOString()
+        if (now > node_data["end"]) {
+            filter_reasons.push("in_past")
         }
+    }
+    return filter_reasons.length === 0;
+}
 
-        if (shift.min_needed == shift.max_needed) {
-            return shift.current_count < shift.min_needed ? 'danger' : 'info';
-        }
 
-        if (shift.current_count < shift.min_needed) {
-            return 'danger';
-        }
-        if (shift.current_count == shift.max_needed) {
-            return 'info';
-        }
+function spanStartTimeCell(firstNodeOfHour, rowCount) {
+    if (firstNodeOfHour !== null) {
+        let start_time_cell = firstNodeOfHour.querySelector(".start_time");
+        start_time_cell.setAttribute("rowspan", rowCount);
+        start_time_cell.classList.remove("hidden")
+    }
+}
 
-        return 'warning';
+function rowClass(node_data) {
+    if (node_data.current_staff < node_data.min_staff) {
+        return 'danger';
     }
 
-    function make_cell(inner) {
-        return make_ele('td', inner);
+    if (node_data.current_staff == node_data.max_staff) {
+        return 'info';
     }
 
-    function make_details_button(shift) {
-        var content = shift.is_user_shift ? 'Cancel' : 'Sign Up';
-        var cls = shift.is_user_shift ? 'btn-danger' : 'btn-success';
+    return 'warning';
+}
 
-        return `<button id="shift-signup-${shift.id}" class="btn btn-block ${cls}">${content}</button>`;
-    }
+function colourise_row(node, node_data, colourful_mode) {
+    ["danger", "warning", "info"].forEach(className => node.classList.remove(className))
 
-    function make_open_modal_fn(shift) {
-        return function open_modal() {
-            $('#modal-role').html(shift.role.name);
-            $('#modal-time').html(shift.start_time);
+    if (!colourful_mode) { return }
 
-            $('#modal-start-time').html(shift.start_time);
-            $('#modal-end-time').html(shift.end_time);
-            $('#modal-location').html(shift.venue.name);
+    node.classList.add(rowClass(node_data))
+}
 
-            var role_id = shift.role.name.toLowerCase().replace(/[^\w]+/g, '-');
-            $('#modal-description').html($(`#role-description-${role_id}`).clone().show());
+function updateRowDisplay() {
+    let filters = getFilters();
 
-            $('#signUp #signup-grp').empty();
-            $('#signUp #signup-grp').append(make_modal_buttons(shift));
+    // Hackery to do row spans.
+    let currentHour = "null";
+    let firstNodeOfHour = null;
+    let rowCount = 0;
 
+    // Iterate over each row (representing a shift), and choose which ones to
+    // display.
+    var rows = document.querySelectorAll("table.shifts-table tbody tr");
+    rows.forEach((node, idx) => {
+        let node_data = getNodeData(node);
 
-            if (is_admin) {
-                var override_btn = $('#signUp #override-sign-up-btn');
-                override_btn.click(make_override_signup_fn(override_btn, shift));
-                $('#contact-link').attr('href', 'shift/'+shift.id+'/contact');
-                $('#shift-link').attr('href', 'shift/'+shift.id);
-            }
+        if (shouldDisplayNode(node_data, filters)) {
+            if (node.getAttribute("data-shift-start") != currentHour) {
+                // When we transition to a new hour we calculate how many rows
+                // are shown for that hour, and span the first start time cell
+                // over all of them.
+                spanStartTimeCell(firstNodeOfHour, rowCount)
 
-            $('#signUp').modal();
-        };
-    }
-
-    function make_modal_buttons(shift) {
-        var close_btn = make_button('default', 'Close'),
-            submit_btn = make_button('primary', (shift.is_user_shift) ? 'Cancel shift': 'Sign up');
-
-        close_btn.attr('data-dismiss', 'modal');
-        submit_btn.attr('id', 'sign-up-'+shift.id);
-        submit_btn.addClass('debouce');
-        submit_btn.click(make_sign_up_fn(submit_btn, shift));
-
-        return [close_btn, submit_btn];
-    }
-
-    function make_button(btn_class, inner) {
-        var btn = make_ele('btn', inner);
-        btn.addClass('btn btn-'+btn_class);
-        btn.attr('type', 'button');
-        return $(btn);
-    }
-
-    function make_sign_up_fn(ele, shift) {
-        return function (){
-            var modal_body = $('#signUp .modal-body');
-            ele.attr('disabled', true);
-
-            $.post(shift.sign_up_url+'.json')
-             .done(make_post_callback_fn(modal_body, ele, shift.id, "alert-info"))
-             .fail(make_post_callback_fn(modal_body, ele, shift.id, "alert-danger"));
-        };
-    }
-
-    function make_override_signup_fn(btn_ele, shift) {
-        return function () {
-            var override_user = $('#override-user').val(),
-                modal_body = $('#signUp .modal-body');
-
-            btn_ele.attr('disabled', true);
-
-            $.post(shift.sign_up_url + '.json?override_user=' + override_user)
-             .done(make_post_callback_fn(modal_body, btn_ele, shift.id, "alert-info", true))
-             .fail(make_post_callback_fn(modal_body, btn_ele, shift.id, "alert-danger", true));
-        };
-    }
-
-    function make_post_callback_fn(append_ele, btn_ele, shift_id, alert_type, override_user) {
-        return function(resp) {
-            var main_msg = (override_user ? resp.user: '') + resp.message,
-                alert = make_alert(alert_type, main_msg);
-            append_ele.prepend(alert);
-
-            if (resp.warning) {
-                alert = make_alert('alert-warning', resp.warning);
-                append_ele.prepend(alert);
+                firstNodeOfHour = node
+                rowCount = 0
+                currentHour = node.getAttribute("data-shift-start")
+            } else {
+                // Otherwise we hide the start time cell.
+                node.querySelector(".start_time").classList.add("hidden")
             }
 
-            var shift = get_shift(shift_id);
-            if (resp.operation == 'add') {
-                shift.current_count++;
-                if (!override_user) {
-                    shift.is_user_shift = true;
-                }
-            } else if (resp.operation == 'delete') {
-                shift.current_count--;
-                if (!override_user) {
-                    shift.is_user_shift = false;
-                }
-            }
-            update_shift(shift_id, shift);
-            $('#signUp #signup-grp').empty();
-            $('#signUp #signup-grp').append(make_modal_buttons(shift));
-        };
-    }
+            colourise_row(node, node_data, filters.colourful_mode);
 
-    function make_alert(alert_type, msg) {
-        var alert = $(document.createElement('div'));
-        alert.addClass('alert alert-dismissible fade in '+alert_type);
-        alert.attr('role', 'alert');
-        // Dismiss button must be the first child
-        alert.html('<button type="button" class="close" data-dismiss="alert" aria-label="Close">'+
-                        '<span aria-hidden="true">×</span>'+
-                    '</button>'+
-                    msg);
-        return $(alert);
-    }
+            rowCount += 1;
 
-    function make_ele(type, inner) {
-        var new_ele = document.createElement(type);
-        new_ele.innerHTML = inner;
-        return $(new_ele);
-    }
-
-    function get_shift(shift_id) {
-        var res;
-        $.each(data, function(_, day) {
-            $.each(day, function(_, hour) {
-                $.each(hour, function(_, shift) {
-                    if (shift_id === shift.id) {
-                        res = shift;
-                    }
-                });
-            });
-        });
-        return res;
-    }
-
-    function update_shift(shift_id, shift) {
-        var day_index, hour_index, arr_index;
-        $.each(data, function(day, day_shifts) {
-            $.each(day_shifts, function(hour, hour_shifts) {
-                $.each(hour_shifts, function(index, shift) {
-                    if (shift_id === shift.id) {
-                        day_index = day;
-                        hour_index = hour;
-                        arr_index = index;
-                    }
-                });
-            });
-        });
-        data[day_index][hour_index][arr_index] = shift;
-    }
-
-    function fails_filters(filters, shift) {
-        let role_ids = filters.role_ids.map(id => parseInt(id));
-        if (role_ids.length > 0 && role_ids.indexOf(shift.role_id) == -1) {
-            return true;
+            node.classList.remove("hidden");
+        } else {
+            node.classList.add("hidden");
         }
 
-        let venue_ids = filters.venue_ids.map(id => parseInt(id));
-        if (venue_ids.length > 0 && venue_ids.indexOf(shift.venue_id) == -1) {
-            return true;
-        }
+        if (idx == rows.length - 1) { spanStartTimeCell(firstNodeOfHour, rowCount); }
+    });
+}
 
-        if (!filters.show_past && new Date(shift.end) < new Date()) {
-            return true;
-        }
-
-        if (filters.show_signed_up_only && !shift.is_user_shift) {
-            return true;
-        }
-
-        if (filters.hide_full && shift.current_count == shift.max_needed) {
-            return true;
-        }
-
-        if (filters.understaffed_only && shift.current_count >= shift.min_needed) {
-            return true;
-        }
-
-        return false;
-    }
-
-    function get_filters() {
-        var show_past = $('#show_past').prop('checked'),
-            show_signed_up_only = $('#show_signed_up_only').prop('checked'),
-            hide_full = $('#hide_full').prop('checked'),
-            understaffed_only = $('#is_understaffed').prop('checked'),
-            role_ids = $('#role-select').val() || [],
-            venue_ids = $('#venue-select').val() || [];
-
-        return {
-            role_ids: role_ids,
-            venue_ids: venue_ids,
-            show_past: show_past,
-            hide_full: hide_full,
-            understaffed_only: understaffed_only,
-            show_signed_up_only: show_signed_up_only,
-        };
-    }
-
-    function set_roles() {
-        var is_interested = $('#is_interested').prop('checked'),
-            is_trained = $('#is_trained').prop('checked');
-
-        $.each(all_roles, function(_, role) {
-            let selected = true;
-
-            if (is_interested && !role.is_interested) {
-                selected = false;
-            }
-
-            if (is_trained && (role.requires_training && !role.is_trained)) {
-                selected = false;
-            }
-
-            $('#role-opt-'+role.id).prop('selected', selected);
-        });
-
-        render();
-    }
-
-    function clear_filters() {
-        $('#role-select > option').each(function(_, ele) {
-            $(ele).attr('selected', false);
-        });
-        $('#venue-select > option').each(function(_, ele) {
-            $(ele).attr('selected', false);
-        });
-        $('#show_past').prop('checked', false);
-        $('#hide_full').prop('checked', false);
-        $('#show_signed_up_only').prop('checked', false);
-        $('#is_interested').prop('checked', false);
-        $('#is_trained').prop('checked', false);
-        $('#is_understaffed').prop('checked', false);
-        $('#colourful_mode').prop('checked', false);
-        render();
-    }
-
-    function save_filters() {
-        let filters = {
-            role_ids: $('#role-select').val(),
-            venue_ids: $('#venue-select').val(),
-            show_past: $('#show_past').prop('checked'),
-            hide_full: $('#hide_full').prop('checked'),
-            show_signed_up_only: $('#show_signed_up_only').prop('checked'),
-            is_trained: $('#is_trained').prop('checked'),
-            is_interested: $('#is_interested').prop('checked'),
-            is_understaffed: $('#is_understaffed').prop('checked'),
-            colourful_mode: $('#colourful_mode').prop('checked'),
-        }
-
-        localStorage.setItem('volunteer-filters:v1', JSON.stringify(filters));
-    }
-
-    function load_filters() {
-        let raw_saved_filters = localStorage.getItem('volunteer-filters:v1');
-        if (raw_saved_filters == null) { return; }
-        let filters = JSON.parse(raw_saved_filters);
-
-        $('#role-select').val(filters.role_ids);
-        $('#venue-select').val(filters.venue_ids);
-        $('#show_past').prop('checked', filters.show_past);
-        $('#hide_full').prop('checked', filters.hide_full);
-        $('#show_signed_up_only').prop('checked', filters.show_signed_up_only);
-        $('#is_interested').prop('checked', filters.is_interested);
-        $('#is_trained').prop('checked', filters.is_trained);
-        $('#is_understaffed').prop('checked', filters.is_understaffed);
-        $('#colourful_mode').prop('checked', filters.colourful_mode);
-    }
-
-    // When explicitly selecting roles turn off the filters that would override
-    // that selection.
-    function roles_selected() {
-        $('#is_interested').prop('checked', false);
-        $('#is_trained').prop('checked', false);
-    }
-
-    function venues_selected() {
-        // Don't do anything currently
-    }
-
-
-    ////////////////////////////////////
-    //
-    //
-    // Set up events
-    //
-    ////////////////////////////////////
-
-    // On tab change
-    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-        current_day = $(e.target).attr('data-day');
-        render();
-
-        // Clear the old stuff
-        var prev_day = $(e.relatedTarget).attr('data-day');
-        $('#tbody-'+prev_day).empty();
+function init_volunteer_schedule() {
+    loadFilters();
+    document.getElementById('filters').style.display = "";
+    document.getElementById('filters-toggle').addEventListener("click", () => {
+        $('#filters-body').toggle()
     });
 
-    // Filter buttons
-    $('#clear-btn').click(clear_filters);
+    ['show_past', 'show_signed_up_only', 'hide_full', 'is_understaffed', 'colourful_mode'].forEach(id => {
+        document.getElementById(id).addEventListener("change", () => {
+            saveFilters()
+            updateRowDisplay()
+        });
+    });
 
-    $('#signUp').on('hide.bs.modal', render);
-    $('#is_interested').prop('checked', true);
-    load_filters();
-    set_roles();
-    render();
+    document.querySelectorAll('input[data-role-id]').forEach(node => node.addEventListener("change", () => {
+        saveFilters()
+        updateRowDisplay()
+    }));
 
-    let searchParams = new URLSearchParams(window.location.search);
-    if(searchParams.has('signedup')){
-        $('#show_signed_up_only').prop('checked', true);
-        render();
-    } else {
-        $('#show_signed_up_only').prop('checked', false);
-        render();
-    }
-
-    $('#role-select').on('change', roles_selected);
-    $('#venue-select').on('change', venues_selected);
-    $('.shift-filter').on('change', render);
-    $('.role-filter').on('change', set_roles);
+    document.getElementById('select-all-roles').addEventListener("click", () => {
+        document.querySelectorAll('input[data-role-id]').forEach((checkbox) => checkbox.checked = true)
+        saveFilters()
+        updateRowDisplay()
+    });
+    document.getElementById('select-no-roles').addEventListener("click", () => {
+        document.querySelectorAll('input[data-role-id]').forEach((checkbox) => checkbox.checked = false)
+        saveFilters()
+        updateRowDisplay()
+    });
+    document.getElementById('select-interested-roles').addEventListener("click", () => {
+        document.querySelectorAll('input[data-role-id]').forEach((checkbox) => checkbox.checked = checkbox.getAttribute('data-interested') == 'True')
+        saveFilters()
+        updateRowDisplay()
+    });
+    document.getElementById('select-trained-roles').addEventListener("click", () => {
+        document.querySelectorAll('input[data-role-id]').forEach((checkbox) => checkbox.checked = checkbox.getAttribute('data-trained') == 'True')
+        saveFilters()
+        updateRowDisplay()
+    });
+    document.getElementById('select-day').addEventListener("change", (ev) => {
+        document.location.replace(ev.target.value)
+    });
 };
+
+init_volunteer_schedule()

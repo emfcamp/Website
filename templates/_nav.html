@@ -78,7 +78,11 @@
       </li>
       {% endif %}
       <li role="presentation">
+      {% if feature_enabled('SPONSORS_IN_NAV') %}
+        <a role="menuitem" href="{{ url_for('base.sponsors') }}">Sponsors</a>
+      {% else %}
         <a role="menuitem" href="{{ url_for('base.sponsor') }}">Sponsor</a>
+      {% endif %}
       </li>
       {% if session.basket_purchase_ids %}
       <li role="presentation">

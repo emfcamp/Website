@@ -36,8 +36,8 @@ class Scheduler(object):
                 continue
 
             app.logger.info(
-                'Set duration for talk "%s" to "%s"'
-                % (proposal.title, proposal.scheduled_duration)
+                'Set duration for talk "%s" (%s) to %s'
+                % (proposal.title, proposal.id, proposal.scheduled_duration)
             )
 
         db.session.commit()

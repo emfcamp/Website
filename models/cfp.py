@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, time
-from collections import namedtuple, defaultdict
+from collections import namedtuple
 from typing import Optional
 from dateutil.parser import parse as parse_date
 import re
@@ -9,7 +9,7 @@ from geoalchemy2.shape import to_shape
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.mutable import MutableList
 
-from sqlalchemy import UniqueConstraint, func, select
+from sqlalchemy import UniqueConstraint, func, select, text
 from sqlalchemy.orm import column_property
 from slugify import slugify_unicode
 from models import (
@@ -220,6 +220,9 @@ EVENT_SPACING = {
     "installation": 0,
 }
 
+# The size of a scheduling slot
+SLOT_LENGTH = timedelta(minutes=10)
+
 cfp_period = namedtuple("cfp_period", "start end")
 
 # List of submission types which are manually reviewed rather than through
@@ -295,20 +298,6 @@ def make_periods_contiguous(time_periods):
 
         contiguous_periods.append(time_period)
     return contiguous_periods
-
-
-def get_available_proposal_minutes():
-    minutes = defaultdict(int)
-    venue_names_by_type = Venue.emf_venue_names_by_type()
-    for type, slots in PROPOSAL_TIMESLOTS.items():
-        periods = make_periods_contiguous(
-            [timeslot_to_period(ts, type=type) for ts in slots]
-        )
-        for period in periods:
-            minutes[type] += int(
-                (period.end - period.start).total_seconds() / 60
-            ) * len(venue_names_by_type[type])
-    return minutes
 
 
 class CfpStateException(Exception):
@@ -440,6 +429,13 @@ class Proposal(BaseModel):
     video_recording_lost = db.Column(db.Boolean, default=False)
 
     __mapper_args__ = {"polymorphic_on": type}
+
+    @classmethod
+    def query_accepted(cls, include_user_scheduled=False):
+        query = cls.query.filter(cls.is_accepted)
+        if not include_user_scheduled:
+            query = query.filter(cls.user_scheduled.is_(False))
+        return query
 
     @classmethod
     def get_export_data(cls):
@@ -1045,8 +1041,20 @@ class Venue(BaseModel):
         db.Integer, db.ForeignKey("village.id"), nullable=True, default=None
     )
     name = db.Column(db.String, nullable=False)
-    allowed_types = db.Column(MutableList.as_mutable(ARRAY(db.String)))
-    default_for_types = db.Column(MutableList.as_mutable(ARRAY(db.String)))
+    allowed_types = db.Column(
+        MutableList.as_mutable(ARRAY(db.String)),
+        nullable=False,
+        server_default=text(
+            r"'{}'::varchar[]"
+        ),  # TODO(jayaddison): array([], type_=db.String)
+    )
+    default_for_types = db.Column(
+        MutableList.as_mutable(ARRAY(db.String)),
+        nullable=False,
+        server_default=text(
+            r"'{}'::varchar[]"
+        ),  # TODO(jayaddison): array([], type_=db.String)
+    )
     priority = db.Column(db.Integer, nullable=True, default=0)
     capacity = db.Column(db.Integer, nullable=True)
     location = db.Column(Geometry("POINT", srid=4326))
@@ -1127,7 +1135,6 @@ __all__ = [
     "proposal_slug",
     "timeslot_to_period",
     "make_periods_contiguous",
-    "get_available_proposal_minutes",
     "CfpStateException",
     "InvalidVenueException",
     "FavouriteProposal",

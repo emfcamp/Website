@@ -1,13 +1,17 @@
-{% macro item(name, view_name) -%}
+{% macro item(label, view_name) -%}
 <li{% if request.endpoint == view_name %} class="active"{%endif%}>
-  <a href="{{url_for(view_name)}}">{{name}}</a>
+  <a href="{{url_for(view_name)}}">{{label}}</a>
 </li>
 {%- endmacro %}
-
+{% macro page(label, page) -%}
+<li{% if request.endpoint == "volunteer.info_page" and page_name == page %} class="active"{%endif%}>
+  <a href="{{url_for('volunteer.info_page', page_name=page)}}">{{label}}</a>
+</li>
+{%- endmacro %}
 <ul role="navigation list" aria-label="Volunteering Handbook">
   {{item("Intro", "volunteer.info")}}
-  {{item("Emergency", "volunteer.info_emergency")}}
-  {{item("Lost Child", "volunteer.info_lost_child")}}
-  {{item("Safeguarding", "volunteer.safeguarding")}}
-  {{item("Food", "volunteer.info_food")}}
+  {{page("Emergency", "emergency")}}
+  {{page("Lost Child", "lost_child")}}
+  {{page("Safeguarding", "safeguarding")}}
+  {{page("Food", "food")}}
 </ul>

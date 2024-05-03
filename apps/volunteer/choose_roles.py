@@ -21,7 +21,7 @@ from models.volunteer.volunteer import Volunteer as VolunteerUser
 from models.volunteer.shift import Shift, ShiftEntry
 
 from . import volunteer, v_user_required
-from ..common import feature_flag
+from ..common import feature_enabled, feature_flag
 from ..common.forms import Form
 from ..common.fields import HiddenIntegerField
 
@@ -83,7 +83,10 @@ def choose_role():
 
         db.session.commit()
         flash("Your role list has been updated", "info")
-        return redirect(url_for(".choose_role"))
+        if feature_enabled("VOLUNTEERS_SCHEDULE"):
+            return redirect(url_for(".schedule"))
+        else:
+            return redirect(url_for(".choose_role"))
 
     current_roles = current_volunteer.interested_roles.all()
     if current_roles:

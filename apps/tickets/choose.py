@@ -294,6 +294,14 @@ def tickets_clear(flow: Optional[str] = None):
     return redirect(url_for("tickets.main", flow=flow))
 
 
+@tickets.route("/tickets/voucher/clear")
+def tickets_voucher_clear():
+    if "ticket_voucher" in session:
+        del session["ticket_voucher"]
+
+    return redirect(url_for("tickets.main"))
+
+
 @tickets.route("/tickets/voucher/")
 @tickets.route("/tickets/voucher/<voucher_code>")
 def tickets_voucher(voucher_code: Optional[str] = None):

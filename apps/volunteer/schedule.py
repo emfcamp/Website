@@ -1,24 +1,25 @@
 # coding=utf-8
 import pendulum
 from datetime import datetime
-from flask import render_template, request, redirect, url_for, flash, jsonify, session
+from flask import render_template, request, redirect, url_for, flash, session
 from collections import defaultdict
 from flask_login import current_user
 
 from main import db
-
 from models.user import User
+
 from models.volunteer.role import Role
 from models.volunteer.venue import VolunteerVenue
 from models.volunteer.shift import Shift, ShiftEntry
 from models.volunteer.volunteer import Volunteer
 from models import config_date
 
+from ..users import get_next_url
 from ..common import feature_flag
 from . import volunteer, v_user_required, v_admin_required
 
 
-def _get_interested_roles(user):
+def _get_roles_with_user_data(user):
     roles = Role.get_all()
     volunteer = Volunteer.get_for_user(user)
     res = []
@@ -33,29 +34,44 @@ def _get_interested_roles(user):
     return res
 
 
+def redirect_next_or_schedule(message: str | None = None):
+    """
+    Set the flash if `message` is set, then redirect either to the URL in the
+    `next` form field, or if that doesn't exist to the schedule page.
+    """
+    if message is not None:
+        flash(message)
+
+    next = get_next_url(url_for(".schedule"))
+
+    return redirect(next)
+
+
 @volunteer.route("/schedule")
 @feature_flag("VOLUNTEERS_SCHEDULE")
 @v_user_required
 def schedule():
-    shifts = Shift.get_all()
-    by_time = defaultdict(lambda: defaultdict(list))
-
-    if current_user.has_permission("volunteer:admin"):
-        all_volunteers = Volunteer.query.order_by(Volunteer.nickname).all()
+    if datetime.utcnow() < config_date("EVENT_START"):
+        default_day = "wed"
+    elif datetime.utcnow() > config_date("EVENT_END"):
+        default_day = "mon"
     else:
-        all_volunteers = []
+        default_day = pendulum.now().strftime("%a").lower()
+    active_day = request.args.get("day", default=default_day)
+
+    shifts = Shift.get_all_for_day(active_day)
+
+    by_time = defaultdict(lambda: [])
 
     for s in shifts:
-        day_key = s.start.strftime("%a").lower()
         hour_key = s.start.strftime("%H:%M")
 
         to_add = s.to_localtime_dict()
         to_add["sign_up_url"] = url_for(".shift", shift_id=to_add["id"])
         to_add["is_user_shift"] = current_user in s.volunteers
+        by_time[hour_key].append(to_add)
 
-        by_time[day_key][hour_key].append(to_add)
-
-    roles = _get_interested_roles(current_user)
+    roles = _get_roles_with_user_data(current_user)
     venues = VolunteerVenue.get_all()
 
     untrained_roles = [
@@ -63,11 +79,6 @@ def schedule():
         for r in roles
         if r["is_interested"] and r["requires_training"] and not r["is_trained"]
     ]
-    if datetime.utcnow() < config_date("EVENT_START"):
-        def_day = "thu"
-    else:
-        def_day = pendulum.now().strftime("%a").lower()
-    active_day = request.args.get("day", default=def_day)
 
     return render_template(
         "volunteer/schedule.html",
@@ -75,84 +86,80 @@ def schedule():
         venues=venues,
         all_shifts=by_time,
         active_day=active_day,
-        all_volunteers=all_volunteers,
         untrained_roles=untrained_roles,
     )
 
 
-def _toggle_shift_entry(user, shift):
-    res = {}
+@volunteer.route("/shift/<shift_id>", methods=["GET"])
+@feature_flag("VOLUNTEERS_SCHEDULE")
+@v_admin_required
+def shift(shift_id):
+    shift = Shift.query.get_or_404(shift_id)
+    all_volunteers = Volunteer.query.order_by(Volunteer.nickname).all()
+
+    return render_template(
+        "volunteer/shift.html", shift=shift, all_volunteers=all_volunteers
+    )
+
+
+@volunteer.route("/shift/<shift_id>/sign-up", methods=["POST"])
+@feature_flag("VOLUNTEERS_SCHEDULE")
+@v_user_required
+def shift_sign_up(shift_id):
+    shift = Shift.query.get_or_404(shift_id)
+    if current_user.has_permission("volunteer:admin") and request.form["user_id"]:
+        user = User.query.get(request.form["user_id"])
+    else:
+        user = current_user
+
     shift_entry = ShiftEntry.query.filter_by(user_id=user.id, shift_id=shift.id).first()
+    if shift_entry:
+        # User is already signed up for this shift, so just redirect back saying
+        # they've been signed up.
+        return redirect_next_or_schedule(f"Signed up for {shift.role.name} shift")
+
+    if shift.current_count >= shift.max_needed:
+        return redirect_next_or_schedule(
+            "This shift is already full. You have not been signed up."
+        )
 
     if (
         shift.role.requires_training
         and shift.role not in Volunteer.get_for_user(current_user).trained_roles
     ):
-        return {
-            "warning": "Missing required training",
-            "message": "You must complete training before you can sign up for this shift",
-        }
+        return redirect_next_or_schedule(
+            "You must complete training before you can sign up for this shift."
+        )
 
-    if shift_entry:
-        db.session.delete(shift_entry)
-        res["operation"] = "delete"
-        res["message"] = "Cancelled %s shift" % shift.role.name
-    else:
-        for v_shift in user.shift_entries:
-            if shift.is_clash(v_shift.shift):
-                res["warning"] = "WARNING: Clashes with an existing shift"
-                res["message"] = "You've not been signed up for this shift"
-                return res
-        if shift.current_count >= shift.max_needed:
-            res["warning"] = "WARNING: Shift is already full"
-            res["message"] = "You've not been signed up for this shift"
-            return res
+    for shift_entry in user.shift_entries:
+        if shift.is_clash(shift_entry.shift):
+            clashing_shift = shift_entry.shift
+            clash_role = clashing_shift.role.name
+            clash_time = clashing_shift.start.strftime("%H:%M")
 
-        shift.entries.append(ShiftEntry(user=user, shift=shift))
-        res["operation"] = "add"
-        res["message"] = "Signed up for %s shift" % shift.role.name
+            return redirect_next_or_schedule(
+                f"This shift clashes with your {clash_role} shift at {clash_time}, you have not been signed up."
+            )
 
-    return res
+    shift.entries.append(ShiftEntry(user=user, shift=shift))
+    db.session.commit()
+
+    return redirect_next_or_schedule(f"Signed up {shift.role.name} shift")
 
 
-@volunteer.route("/shift/<shift_id>", methods=["GET", "POST"])
-@feature_flag("VOLUNTEERS_SCHEDULE")
-@v_admin_required
-def shift(shift_id):
-    shift = Shift.query.get_or_404(shift_id)
-
-    if request.method == "POST":
-        msg = _toggle_shift_entry(current_user, shift)
-
-        db.session.commit()
-        flash(msg["message"])
-        return redirect(url_for(".schedule"))
-
-    return render_template("volunteer/shift.html", shift=shift)
-
-
-@volunteer.route("/shift/<shift_id>.json", methods=["GET", "POST"])
+@volunteer.route("/shift/<shift_id>/cancel", methods=["POST"])
 @feature_flag("VOLUNTEERS_SCHEDULE")
 @v_user_required
-def shift_json(shift_id):
+def shift_cancel(shift_id):
     shift = Shift.query.get_or_404(shift_id)
 
-    if request.method == "POST":
-        override_user_id = request.args.get("override_user", default=None)
-        if (
-            current_user.has_permission("volunteer:admin")
-            and override_user_id is not None
-        ):
-            override_user = User.query.get_or_404(override_user_id)
-            msg = _toggle_shift_entry(override_user, shift)
-            msg["user"] = Volunteer.get_for_user(override_user).nickname
-        else:
-            msg = _toggle_shift_entry(current_user, shift)
-
+    user = current_user
+    shift_entry = ShiftEntry.query.filter_by(user_id=user.id, shift_id=shift.id).first()
+    if shift_entry:
+        db.session.delete(shift_entry)
         db.session.commit()
-        return jsonify(msg)
 
-    return jsonify(shift)
+    redirect_next_or_schedule(f"{shift.role.name} shift cancelled")
 
 
 @volunteer.route("/shift/<shift_id>/contact", methods=["GET"])
