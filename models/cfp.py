@@ -1096,11 +1096,11 @@ class Venue(BaseModel):
 
     @property
     def is_emf_venue(self):
-        return bool(self.allowed_types)
+        return bool(self.default_for_types)
 
     @classmethod
     def emf_venues(cls):
-        return cls.query.filter(db.func.array_length(cls.allowed_types, 1) > 0).all()
+        return cls.query.filter(db.func.array_length(cls.default_for_types, 1) > 0).all()
 
     @classmethod
     def emf_venue_names_by_type(cls):
