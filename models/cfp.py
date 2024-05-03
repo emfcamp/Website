@@ -1045,15 +1045,17 @@ class Venue(BaseModel):
         db.Integer, db.ForeignKey("village.id"), nullable=True, default=None
     )
     name = db.Column(db.String, nullable=False)
+    # the two columns below are affected by an array() method signature type-hint issue
+    # ref: https://github.com/dropbox/sqlalchemy-stubs/pull/191
     allowed_types = db.Column(
         MutableList.as_mutable(ARRAY(db.String)),
         nullable=False,
-        server_default=array([], type_=db.String),
+        server_default=array([], type_=db.String),  # type: ignore[call-overload]
     )
     default_for_types = db.Column(
         MutableList.as_mutable(ARRAY(db.String)),
         nullable=False,
-        server_default=array([], type_=db.String),
+        server_default=array([], type_=db.String),  # type: ignore[call-overload]
     )
     priority = db.Column(db.Integer, nullable=True, default=0)
     capacity = db.Column(db.Integer, nullable=True)
