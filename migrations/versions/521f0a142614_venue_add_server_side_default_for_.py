@@ -19,10 +19,15 @@ def upgrade():
     op.execute(sa.text(
         r"""
         UPDATE venue
-        SET
-            allowed_types = '{}'::varchar[],
-            default_for_types = '{}'::varchar[]
+        SET allowed_types = '{}'::varchar[]
         WHERE allowed_types IS NULL
+        """
+    ))  # jayaddison: manual edit
+    op.execute(sa.text(
+        r"""
+        UPDATE venue
+        SET default_for_types = '{}'::varchar[]
+        WHERE default_for_types IS NULL
         """
     ))  # jayaddison: manual edit
     op.alter_column('venue', 'allowed_types',
