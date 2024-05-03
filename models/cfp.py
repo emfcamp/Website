@@ -6,10 +6,10 @@ import re
 from itertools import groupby
 from geoalchemy2 import Geometry
 from geoalchemy2.shape import to_shape
-from sqlalchemy.dialects.postgresql import ARRAY, array
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.mutable import MutableList
 
-from sqlalchemy import UniqueConstraint, func, select
+from sqlalchemy import UniqueConstraint, func, select, text
 from sqlalchemy.orm import column_property
 from slugify import slugify_unicode
 from models import (
@@ -1048,12 +1048,12 @@ class Venue(BaseModel):
     allowed_types = db.Column(
         MutableList.as_mutable(ARRAY(db.String)),
         nullable=False,
-        server_default=array([], type_=db.String),
+        server_default=text(r"'{}'::varchar[]"),  # TODO(jayaddison): array([], type_=db.String)
     )
     default_for_types = db.Column(
         MutableList.as_mutable(ARRAY(db.String)),
         nullable=False,
-        server_default=array([], type_=db.String),
+        server_default=text(r"'{}'::varchar[]"),  # TODO(jayaddison): array([], type_=db.String)
     )
     priority = db.Column(db.Integer, nullable=True, default=0)
     capacity = db.Column(db.Integer, nullable=True)
