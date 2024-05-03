@@ -51,6 +51,8 @@ class VillageForm(Form):
         self.noise.data = requirements.noise
         self.structures.data = requirements.structures
 
+    def validate_name(form, field):
+        field.data = field.data.strip()
 
 class AdminVillageForm(VillageForm):
     latlon = StringField("Location", [Optional()])
