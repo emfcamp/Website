@@ -22,6 +22,10 @@ class CFPEstimate:
     venues: list[Venue]
 
 
+# TODO: move this somewhere more sensible
+CHANGEOVER_PERIOD = 10  # minutes
+
+
 def get_cfp_estimate(proposal_type: str) -> CFPEstimate:
     """Calculate estimated scheduling capacity statistics for a given proposal type."""
     if proposal_type not in ["talk", "workshop", "performance", "youthworkshop"]:
@@ -46,19 +50,24 @@ def get_cfp_estimate(proposal_type: str) -> CFPEstimate:
                 continue
 
         # +10 for changeover period
-        allocated_minutes += length + (10 * EVENT_SPACING[proposal.type])
+        allocated_minutes += length + (CHANGEOVER_PERIOD * EVENT_SPACING[proposal.type])
 
-    # Correct for changeover period not being needed at the end of the day
     num_days = len(get_days_map().items())
 
     available_venues = Venue.query.filter(
         Venue.default_for_types.any(proposal_type)
     ).all()
 
+    # Correct for changeover period not being needed at the end of the day
     # Amount of minutes per venue * number of venues - (slot changeover period) from the end
     allocated_minutes = allocated_minutes - (
-        (10 * EVENT_SPACING[proposal_type]) * num_days * len(available_venues)
+        (CHANGEOVER_PERIOD * EVENT_SPACING[proposal_type])
+        * num_days
+        * len(available_venues)
     )
+    if allocated_minutes < 0:
+        # If there are few slots allocated, stop this from going negative.
+        allocated_minutes = 0
 
     available_minutes = get_available_proposal_minutes()
     remaining_minutes = available_minutes[proposal_type] - allocated_minutes
