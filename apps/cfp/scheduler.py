@@ -49,6 +49,9 @@ class Scheduler(object):
             Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
             .filter(Proposal.is_accepted)
             .filter(Proposal.type.in_(type))
+            .filter(
+                Proposal.user_scheduled.is_(False)
+            )  # NOTE: This ignores all village-scheduled content
             .order_by(Proposal.favourite_count.desc())
             .all()
         )
@@ -58,7 +61,7 @@ class Scheduler(object):
             proposals_by_type[proposal.type].append(proposal)
 
         capacity_by_type = defaultdict(dict)
-        for venue in Venue.query.all():  # TODO(lukegb): filter to emf venues
+        for venue in Venue.query.all():
             for type in venue.default_for_types:
                 capacity_by_type[type][venue.id] = venue.capacity
 
