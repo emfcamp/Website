@@ -52,12 +52,12 @@ var emf_scheduler = {};
   var scheduleData = {{ schedule_data | tojson }},
     venues = {{ shown_venues | tojson }},
     is_anonymous = {% if current_user.is_anonymous -%} true {%- else -%} false {%- endif %},
-    // THE MONTH ON THESE DATE OBJECTS IS OFFSET BY ONE
+    // THE MONTH ON THESE DATE OBJECTS IS OFFSET BY MINUS ONE
     // WHAT THE FUCK
-    // HEY THE DAY NEEDS TO BE +1 TOO
+    // HEY THE END DAY NEEDS TO BE +1 TOO (as not included)
     // WHAT THE FUCK
-    start_date = new Date(2022, 5, 3),
-    end_date = new Date(2022, 5, 6),
+    start_date = new Date(2024, 4, 31),
+    end_date = new Date(2024, 5, 3),
     venue_dict = {},
     day_format = "%D, %j",   // e.g. Friday, 5th
     day_formatter = scheduler.date.date_to_str(day_format),
