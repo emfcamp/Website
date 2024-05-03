@@ -1084,7 +1084,7 @@ def potential_schedule_changes():
 def scheduler():
     proposals = (
         Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
-        .filter(Proposal.state.is_accepted)
+        .filter(Proposal.is_accepted)
         .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]))
         .all()
     )
