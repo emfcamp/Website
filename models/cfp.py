@@ -6,7 +6,7 @@ import re
 from itertools import groupby
 from geoalchemy2 import Geometry
 from geoalchemy2.shape import to_shape
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, array
 from sqlalchemy.ext.mutable import MutableList
 
 from sqlalchemy import UniqueConstraint, func, select
@@ -1045,8 +1045,16 @@ class Venue(BaseModel):
         db.Integer, db.ForeignKey("village.id"), nullable=True, default=None
     )
     name = db.Column(db.String, nullable=False)
-    allowed_types = db.Column(MutableList.as_mutable(ARRAY(db.String)))
-    default_for_types = db.Column(MutableList.as_mutable(ARRAY(db.String)))
+    allowed_types = db.Column(
+        MutableList.as_mutable(ARRAY(db.String)),
+        nullable=False,
+        server_default=array([], type_=db.String),
+    )
+    default_for_types = db.Column(
+        MutableList.as_mutable(ARRAY(db.String)),
+        nullable=False,
+        server_default=array([], type_=db.String),
+    )
     priority = db.Column(db.Integer, nullable=True, default=0)
     capacity = db.Column(db.Integer, nullable=True)
     location = db.Column(Geometry("POINT", srid=4326))
