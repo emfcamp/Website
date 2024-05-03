@@ -13,7 +13,7 @@
   {% for proposal in proposals %}
   <tr class="{{- loop.cycle('odd', 'even') }}">
     <td>
-      <h4>{{ proposal.title }} {% if proposal.is_editable %}<a href="{{ url_for('.edit_proposal', proposal_id=proposal.id) }}">[edit]{% endif %}</a></h4>
+      <h4>{{ proposal.title }} <a href="{{ url_for('.edit_proposal', proposal_id=proposal.id) }}">{% if proposal.is_editable %}[edit]{% else %}[view]{% endif %}</a></h4>
       <p>
         {{ proposal.human_type | title }}
         {% if proposal.state != "withdrawn" %}
