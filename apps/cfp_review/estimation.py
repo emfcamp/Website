@@ -23,7 +23,7 @@ class CFPEstimate:
 
 
 # TODO: move this somewhere more sensible
-CHANGEOVER_PERIOD = 10  # minutes
+CHANGEOVER_PERIOD = timedelta(minutes=10)
 
 
 def get_cfp_estimate(proposal_type: str) -> CFPEstimate:
@@ -35,22 +35,22 @@ def get_cfp_estimate(proposal_type: str) -> CFPEstimate:
         Proposal.query_accepted().filter(Proposal.type == proposal_type).all()
     )
 
-    allocated_minutes: int = 0
+    allocated_time = timedelta()
     unknown_lengths: int = 0
 
     for proposal in accepted_proposals:
         length = None
         if proposal.scheduled_duration:
-            length = proposal.scheduled_duration
+            length = timedelta(minutes=proposal.scheduled_duration)
         else:
             if proposal.length in ROUGH_LENGTHS:
-                length = ROUGH_LENGTHS[proposal.length]
+                length = timedelta(minutes=ROUGH_LENGTHS[proposal.length])
             else:
                 unknown_lengths += 1
                 continue
 
-        # +10 for changeover period
-        allocated_minutes += length + (CHANGEOVER_PERIOD * EVENT_SPACING[proposal.type])
+        # add changeover period
+        allocated_time += length + (CHANGEOVER_PERIOD * EVENT_SPACING[proposal.type])
 
     num_days = len(get_days_map().items())
 
@@ -60,24 +60,23 @@ def get_cfp_estimate(proposal_type: str) -> CFPEstimate:
 
     # Correct for changeover period not being needed at the end of the day
     # Amount of minutes per venue * number of venues - (slot changeover period) from the end
-    allocated_minutes = allocated_minutes - (
+    changeover_correction = (
         (CHANGEOVER_PERIOD * EVENT_SPACING[proposal_type])
         * num_days
         * len(available_venues)
     )
-    if allocated_minutes < 0:
-        # If there are few slots allocated, stop this from going negative.
-        allocated_minutes = 0
+    # This can go negative if there aren't many proposals scheduled, so clamp to 0
+    allocated_time = max(allocated_time - changeover_correction, timedelta(0))
 
     available_minutes = get_available_proposal_minutes()
-    remaining_minutes = available_minutes[proposal_type] - allocated_minutes
+    available_time = timedelta(minutes=available_minutes[proposal_type])
 
     return CFPEstimate(
         proposal_type=proposal_type,
         accepted_count=len(accepted_proposals),
-        available_time=timedelta(minutes=available_minutes[proposal_type]),
-        allocated_time=timedelta(minutes=allocated_minutes),
-        remaining_time=timedelta(minutes=remaining_minutes),
+        available_time=available_time,
+        allocated_time=allocated_time,
+        remaining_time=available_time - allocated_time,
         unknown_lengths=unknown_lengths,
         venues=available_venues,
     )
