@@ -26,20 +26,17 @@ from sqlalchemy import func, exists, select
 from sqlalchemy.orm import joinedload
 
 from main import db, external_url
+from .estimation import get_cfp_estimate
 from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
     CFPMessage,
     CFPVote,
-    EVENT_SPACING,
     FavouriteProposal,
-    get_available_proposal_minutes,
-    get_days_map,
     InvalidVenueException,
     LightningTalkProposal,
     MANUAL_REVIEW_TYPES,
     ORDERED_STATES,
     Proposal,
-    ROUGH_LENGTHS,
     Venue,
 )
 from models.cfp_tag import Tag
@@ -1041,45 +1038,10 @@ def rank():
         elif form.cancel.data and "min_score" in session:
             del session["min_score"]
 
-    accepted_proposals = Proposal.query.filter(Proposal.is_accepted)
-    accepted_counts = defaultdict(int)
-    for proposal in accepted_proposals:
-        accepted_counts[proposal.type] += 1
-
-    allocated_minutes = defaultdict(int)
-    unknown_lengths = defaultdict(int)
-
-    accepted_proposals = Proposal.query.filter(Proposal.is_accepted).all()
-    for proposal in accepted_proposals:
-        length = None
-        if proposal.scheduled_duration:
-            length = proposal.scheduled_duration
-        else:
-            if proposal.length in ROUGH_LENGTHS:
-                length = ROUGH_LENGTHS[proposal.length]
-            else:
-                unknown_lengths[proposal.type] += 1
-                continue
-
-        # +10 for changeover period
-        allocated_minutes[proposal.type] += length + (10 * EVENT_SPACING[proposal.type])
-
-    # Correct for changeover period not being needed at the end of the day
-    num_days = len(get_days_map().items())
-
-    for type, amount in allocated_minutes.items():
-        num_venues = Venue.query.filter(
-            Venue.default_for_types.any(type)
-        ).count()  # TODO(lukegb): filter to emf venues
-        # Amount of minutes per venue * number of venues - (slot changeover period) from the end
-        allocated_minutes[type] = amount - (
-            (10 * EVENT_SPACING[type]) * num_days * num_venues
-        )
-
-    available_minutes = get_available_proposal_minutes()
-    remaining_minutes = {
-        type: available_minutes[type] - allocated_minutes[type]
-        for type in allocated_minutes.keys()
+    proposal_types = ["talk", "workshop", "performance", "youthworkshop"]
+    estimates = {
+        proposal_type: get_cfp_estimate(proposal_type)
+        for proposal_type in proposal_types
     }
 
     return render_template(
@@ -1087,13 +1049,10 @@ def rank():
         form=form,
         preview=preview,
         proposals=scored_proposals,
-        accepted_counts=accepted_counts,
-        available_minutes=available_minutes,
-        remaining_minutes=remaining_minutes,
-        allocated_minutes=allocated_minutes,
-        unknown_lengths=unknown_lengths,
+        estimates=estimates,
         min_score=session.get("min_score"),
         types=types,
+        proposal_types=proposal_types,
     )
 
 

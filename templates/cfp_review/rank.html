@@ -2,43 +2,35 @@
 {% block body %}
 
 <h2>Current allocations</h2>
+<p>This shows an estimate of the amount of time remaining for scheduling proposals.</p>
 <table class="table table-condensed table-striped">
-    <th></th><th>Talk</th><th>Workshop</th><th>Youth Workshop</th><th>Performance</th>
+    <thead>
     <tr>
-        <td><strong>Num accepted</strong></td>
-        <td>{{accepted_counts.get('talk')}}</td>
-        <td>{{accepted_counts.get('workshop')}}</td>
-        <td>{{accepted_counts.get('youthworkshop')}}</td>
-        <td>{{accepted_counts.get('performance')}}</td>
+        <th>Type</th>
+        <th>Total accepted</th>
+        <th>Missing durations</th>
+        <th>Available</th>
+        <th>Allocated</th>
+        <th>Remaining</th>
+        <th>Available venues</th>
     </tr>
+    </thead>
+    <tbody>
+    {% for type in proposal_types%}
     <tr>
-        <td><strong>Missing durations</strong></td>
-        <td>{{unknown_lengths.get('talk')}}</td>
-        <td>{{unknown_lengths.get('workshop')}}</td>
-        <td>{{unknown_lengths.get('youthworkshop')}}</td>
-        <td>{{unknown_lengths.get('performance')}}</td>
+        <th>{{type}}</th>
+        <td><a href="{{url_for('cfp_review.proposals', type=type, state=['accepted', 'finalised'])}}">
+                {{estimates[type].accepted_count}}
+            </a>
+        </td>
+        <td>{{estimates[type].unknown_lengths}}</td>
+        <td style="white-space:nowrap">{{estimates[type].available_time}}</td>
+        <td style="white-space:nowrap">{{estimates[type].allocated_time}}</td>
+        <td style="white-space:nowrap">{{estimates[type].remaining_time}}</td>
+        <td>{% for v in estimates[type].venues %}{{v.name}}{% if not loop.last %}, {% endif %}{% endfor %}</td>
     </tr>
-    <tr>
-        <td><strong>Available mins</strong></td>
-        <td>{{available_minutes.get('talk')}}</td>
-        <td>{{available_minutes.get('workshop')}}</td>
-        <td>{{available_minutes.get('youthworkshop')}}</td>
-        <td>{{available_minutes.get('performance')}}</td>
-    </tr>
-    <tr>
-        <td><strong>Allocated mins</strong></td>
-        <td>{{allocated_minutes.get('talk')}}</td>
-        <td>{{allocated_minutes.get('workshop')}}</td>
-        <td>{{allocated_minutes.get('youthworkshop')}}</td>
-        <td>{{allocated_minutes.get('performance')}}</td>
-    </tr>
-    <tr>
-        <td><strong>Remaining mins</strong></td>
-        <td>{{remaining_minutes.get('talk')}}</td>
-        <td>{{remaining_minutes.get('workshop')}}</td>
-        <td>{{remaining_minutes.get('youthworkshop')}}</td>
-        <td>{{remaining_minutes.get('performance')}}</td>
-    </tr>
+    {% endfor %}
+    </tbody>
 </table>
 
 <h2>Ranked proposals</h2>

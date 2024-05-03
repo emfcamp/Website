@@ -442,6 +442,13 @@ class Proposal(BaseModel):
     __mapper_args__ = {"polymorphic_on": type}
 
     @classmethod
+    def query_accepted(cls, include_user_scheduled=False):
+        query = cls.query.filter(cls.is_accepted)
+        if not include_user_scheduled:
+            query = query.filter(cls.user_scheduled.is_(False))
+        return query
+
+    @classmethod
     def get_export_data(cls):
         if cls.__name__ == "Proposal":
             # Export stats for each proposal type separately
@@ -1048,12 +1055,16 @@ class Venue(BaseModel):
     allowed_types = db.Column(
         MutableList.as_mutable(ARRAY(db.String)),
         nullable=False,
-        server_default=text(r"'{}'::varchar[]"),  # TODO(jayaddison): array([], type_=db.String)
+        server_default=text(
+            r"'{}'::varchar[]"
+        ),  # TODO(jayaddison): array([], type_=db.String)
     )
     default_for_types = db.Column(
         MutableList.as_mutable(ARRAY(db.String)),
         nullable=False,
-        server_default=text(r"'{}'::varchar[]"),  # TODO(jayaddison): array([], type_=db.String)
+        server_default=text(
+            r"'{}'::varchar[]"
+        ),  # TODO(jayaddison): array([], type_=db.String)
     )
     priority = db.Column(db.Integer, nullable=True, default=0)
     capacity = db.Column(db.Integer, nullable=True)
