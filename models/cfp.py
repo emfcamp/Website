@@ -865,8 +865,17 @@ class WorkshopProposal(Proposal):
     total_tickets = db.Column(db.Integer, nullable=True)
     non_lottery_tickets = db.Column(db.Integer, default=5, nullable=True)
 
+    def get_total_capacity(self):
+        return self.total_tickets - len(self.tickets)
+
     def has_ticket_capacity(self):
-        return (self.total_tickets - len(self.tickets)) > 0
+        return self.get_total_capacity() > 0
+
+    def get_lottery_capacity(self):
+        return self.get_total_capacity() - self.non_lottery_tickets
+
+    def has_lottery_capacity(self):
+        return self.get_lottery_capacity() > 0
 
 
 class YouthWorkshopProposal(WorkshopProposal):
