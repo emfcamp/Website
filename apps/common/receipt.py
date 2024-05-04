@@ -1,12 +1,9 @@
 import io
-from lxml import etree
 import asyncio
 
 from flask import render_template
 from markupsafe import Markup
 from playwright.async_api import async_playwright
-import barcode
-from barcode.writer import ImageWriter, SVGWriter
 import segno
 
 from main import external_url
@@ -46,7 +43,6 @@ def render_receipt(user, png=False, pdf=False):
         "receipt.html",
         user=user,
         format_inline_qr=format_inline_qr,
-        format_inline_barcode=format_inline_barcode,
         admissions=admissions,
         parking_tickets=parking_tickets,
         campervan_tickets=campervan_tickets,
@@ -117,34 +113,6 @@ def format_inline_qr(data):
 def make_qr_png(url):
     return make_qrfile(url, kind="png", scale=3)
 
-
-def format_inline_barcode(data):
-    barcodefile = io.BytesIO()
-
-    # data is written into the SVG without a CDATA, so base64 encode it
-    code128 = barcode.get("code128", data, writer=SVGWriter())
-    code128.write(barcodefile, {"write_text": False})
-    barcodefile.seek(0)
-
-    root = etree.XML(barcodefile.read())
-    # Allow us to scale it with CSS
-    root.attrib["viewBox"] = "0 0 %s %s" % (root.attrib["width"], root.attrib["height"])
-    del root.attrib["width"]
-    del root.attrib["height"]
-    root.attrib["preserveAspectRatio"] = "none"
-
-    return Markup(etree.tostring(root).decode("utf-8"))
-
-
-def make_barcode_png(data, **options):
-    barcodefile = io.BytesIO()
-
-    code128 = barcode.get("code128", data, writer=ImageWriter())
-    # Sizes here are the ones used in the PDF
-    code128.write(barcodefile, {"write_text": False, "module_height": 8})
-    barcodefile.seek(0)
-
-    return barcodefile
 
 
 def attach_tickets(msg, user):

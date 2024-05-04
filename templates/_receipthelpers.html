@@ -22,14 +22,3 @@
 </div>
 {% endmacro -%}
 
-{% macro render_barcode(user) %}
-<div class="barcode">
-  {% if png %}
-    <img src="{{ url_for('tickets.tickets_barcode', checkin_code=user.checkin_code) }}">
-  {% else %}
-    {# Preferred format is SVG because it scales and we don't pass the checkin code back #}
-    {{ format_inline_barcode(user.checkin_code) }}
-  {% endif %}
-</div>
-{% endmacro -%}
-

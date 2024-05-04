@@ -39,7 +39,6 @@ from ..common import (
 from ..common.email import from_email
 from ..common.receipt import (
     make_qr_png,
-    make_barcode_png,
     render_pdf,
     render_receipt,
     attach_tickets,
@@ -216,15 +215,6 @@ def tickets_qrcode(checkin_code):
 
     qrfile = make_qr_png(url)
     return send_file(qrfile, mimetype="image/png")
-
-
-@tickets.route("/receipt/<checkin_code>/barcode")
-def tickets_barcode(checkin_code):
-    if not re.match("%s$" % checkin_code_re, checkin_code):
-        abort(404)
-
-    barcodefile = make_barcode_png(checkin_code)
-    return send_file(barcodefile, mimetype="image/png")
 
 
 def get_product_view(flow):

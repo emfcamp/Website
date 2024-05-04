@@ -94,10 +94,6 @@ def user_from_code(query):
         re.escape(app.config.get("CHECKIN_BASE")) + "(%s)$" % checkin_code_re, query
     )
     if not match:
-        # Barcode
-        match = re.match("(%s)$" % checkin_code_re, query)
-
-    if not match:
         return None
 
     code = match.group(1)
