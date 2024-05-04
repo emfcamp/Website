@@ -23,7 +23,7 @@ from flask_login import current_user
 from flask_mailman import EmailMessage
 from models.permission import Permission
 from sqlalchemy import func, exists, select
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, undefer
 
 from main import db, external_url
 from .estimation import get_cfp_estimate
@@ -164,8 +164,11 @@ def filter_proposal_request() -> tuple[list[Proposal], bool]:
         )
 
     sort_dict = get_proposal_sort_dict(request.args)
-    proposal_query = proposal_query.options(joinedload(Proposal.user)).options(
-        joinedload("user.owned_tickets")
+    proposal_query = (proposal_query
+        .options(joinedload(Proposal.user))
+        .options(joinedload("user.owned_tickets"))
+        .options(joinedload(Proposal.tags))
+        .options(undefer(Proposal.favourite_count))
     )
     proposals = proposal_query.all()
     proposals.sort(**sort_dict)
