@@ -204,8 +204,8 @@ def proposals():
 def export(format: str):
     fields = [
         "id",
-        "email",
-        "name",
+        "user.email",
+        "user.name",
         "created",
         "modified",
         "state",
@@ -220,6 +220,13 @@ def export(format: str):
         "tags",
         "favourite_count",
     ]
+    # Do not call this with untrusted field values
+    def get_field(proposal, field_path):
+        val = proposal
+        for field in field_path.split('.'):
+            val = getattr(val, field)
+        return val
+
     proposals, _ = filter_proposal_request()
     if format == "csv":
         mime = "text/csv"
@@ -228,12 +235,18 @@ def export(format: str):
         # Header row
         w.writerow(fields)
         for p in proposals:
-            w.writerow([getattr(p, a) for a in fields])
+            cells = []
+            for field in fields:
+                cell = get_field(p, field)
+                if field == 'tags':
+                    cell = ','.join(t.tag for t in cell)
+                cells.append(cell)
+            w.writerow(cells)
         out = buf.getvalue()
     elif format == "json":
         mime = "application/json"
         out = json.dumps(
-            [{a: getattr(p, a) for a in fields} for p in proposals],
+            [{a: get_field(p, a) for a in fields} for p in proposals],
             default=str,
         )
     else:
