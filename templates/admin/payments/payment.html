@@ -10,7 +10,7 @@
 {{ purchase_table(payment) }}
 
 <div class="btn-group">
-<a class="btn btn-info" href="{{ url_for('payments.invoice', payment_id=payment.id, pdf=1) }}">View PDF Invoice</a>
+<a class="btn btn-info" href="{{ url_for('payments.invoice', payment_id=payment.id, fmt='pdf') }}">View PDF Invoice</a>
 {% if payment.state == "new" or (payment.provider == "banktransfer" and payment.state == "inprogress") %}
 <a class="btn btn-success" href="{{url_for('.change_currency', payment_id=payment.id)}}">Change Currency</a>
 {% endif %}
