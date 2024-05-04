@@ -15,6 +15,10 @@ EVENT_TICKET_STATES = {
 }
 
 
+class EventTicketException(Exception):
+    pass
+
+
 class EventTicket(BaseModel):
     __tablename__ = "event_ticket"
 
@@ -25,10 +29,46 @@ class EventTicket(BaseModel):
     rank = db.Column(db.Integer, nullable=True)
 
     def __init__(self, user_id, proposal_id, state, rank=None):
+        if state not in EVENT_TICKET_STATES:
+            raise EventTicketException(f"invalid ticket state {state}")
+
+        if state == "entered-lottery" and rank:
+            raise EventTicketException("lottery tickets must have a rank")
+
+        if state == "entered-lottery" and rank and rank <= 0:
+            raise EventTicketException("rank must be greater than 0")
+
         self.user_id = user_id
         self.proposal_id = proposal_id
         self.state = state
         self.rank = rank
+
+    def is_in_lottery_round(self, round_rank):
+        return self.state == "entered-lottery" and self.rank == round_rank
+
+    def change_state(self, new_state):
+        if new_state == "entered-lottery" and not self.rank:
+            raise EventTicketException("lottery tickets must have a rank")
+
+        if new_state not in EVENT_TICKET_STATES[self.state]:
+            raise EventTicketException(
+                f"invalid state transition {self.state} -> {new_state}"
+            )
+
+        self.state = new_state
+        return self
+
+    def won_lottery_and_cancel_others(self):
+        self.change_state("ticket")
+        # Now cancel other tickets
+        for other_ticket in self.user.event_tickets:
+            if other_ticket.state == "entered-lottery":
+                other_ticket.change_state("cancelled")
+
+        return self
+
+    def lost_lottery(self):
+        return self.change_state("lost-lottery")
 
 
 def create_ticket(user, proposal):
