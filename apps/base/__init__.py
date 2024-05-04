@@ -113,7 +113,7 @@ def raise_500():
 
 @base.route("/network")
 def network():
-    return redirect("https://wiki.emfcamp.org/wiki/Network")
+    return redirect("/about/internet")
 
 
 @base.route("/phones")
