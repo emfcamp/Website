@@ -180,9 +180,11 @@ def transfer(ticket_id):
 
 
 @tickets.route("/tickets/receipt")
+@tickets.route("/tickets/receipt.<format>")
 @tickets.route("/tickets/<int:user_id>/receipt")
+@tickets.route("/tickets/<int:user_id>/receipt.<format>")
 @login_required
-def receipt(user_id=None):
+def receipt(user_id=None, format=None):
     if current_user.has_permission("admin") and user_id is not None:
         user = User.query.get(user_id)
     else:
@@ -192,7 +194,9 @@ def receipt(user_id=None):
         abort(404)
 
     png = bool(request.args.get("png"))
-    pdf = bool(request.args.get("pdf"))
+    pdf = False
+    if format == 'pdf':
+        pdf = True
 
     page = render_receipt(user, png, pdf)
     if pdf:
