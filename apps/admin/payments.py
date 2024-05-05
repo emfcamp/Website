@@ -572,7 +572,7 @@ def refund(payment_id):
 
     for f in form.purchases:
         purchase = purchases_dict[f.purchase_id.data]
-        update_refund_purchase_form_details(f, purchase)
+        update_refund_purchase_form_details(f, purchase, ignore_event_refund_state=True)
         if purchase.refund_request and not purchase.refund:
             f.refund.data = True
 
