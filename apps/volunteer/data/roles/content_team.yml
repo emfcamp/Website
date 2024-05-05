@@ -1,0 +1,12 @@
+name: Content Team
+description: Member of Content at the Green Room
+full_description_md: >-
+  This is an internal role for the Content Team to schedule the folks who will
+  be in the Green Room helping manage the schedule.
+  
+  It requires access to the backend of the CfP, and training on how to use it.
+  
+  If you're interested in helping us out next year, please shoot us an email
+  at <content@emfcamp.org>!
+requires_training: true
+role_notes: Content Team only

@@ -16,7 +16,7 @@ from models.volunteer import (
     Shift,
     ShiftEntry,
 )
-from .init_data import venue_list, role_list, shift_list
+from .init_data import load_initial_venues, load_initial_roles, shift_list
 
 
 @volunteer.route("/")
@@ -45,14 +45,14 @@ def info():
 @volunteer.route("/init_shifts")
 @v_admin_required
 def init_shifts():
-    for v in venue_list:
+    for v in load_initial_venues():
         venue = VolunteerVenue.get_by_name(v["name"])
         if not venue:
             db.session.add(VolunteerVenue(**v))
         else:
             venue.mapref = v["mapref"]
 
-    for r in role_list:
+    for r in load_initial_roles():
         role = Role.get_by_name(r["name"])
         if not role:
             db.session.add(Role(**r))
@@ -80,7 +80,6 @@ def init_shifts():
                 continue
 
             for shift_range in shift_list[shift_role][shift_venue]:
-
                 shifts = Shift.generate_for(
                     role=role,
                     venue=venue,
