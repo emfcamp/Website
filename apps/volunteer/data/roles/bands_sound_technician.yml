@@ -1,0 +1,10 @@
+name: "Bands: Sound Technician"
+description: "Assist with sound setup and mixing for performances"
+full_description_md: >-
+  Sound technicians assist the sound operator and stage crew in micing up bands
+  and performers, doing sound checks, and live mixing.
+
+  **You'll need to attend one of our training sessions before your shift, these
+  will be run daily, and are a great opportunity to learn more about how sound
+  mixing for live performances works.**
+requires_training: true
