@@ -1,0 +1,11 @@
+name: "Workshop Ticket Inspector"
+description: ""
+full_description_md: >-
+  Ticket inspectors manage the queue for workshops, checking that the people
+  arriving have a ticket, and making sure there aren't more people waiting for
+  last minute seats than will be able to get one.
+
+  **You will need to be approved, and taught how to check tickets before any
+  shifts. Please email <workshops@emfcamp.org> or speak to a member of the
+  workshop team.**
+requires_training: true

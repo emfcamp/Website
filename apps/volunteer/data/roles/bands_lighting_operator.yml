@@ -1,0 +1,9 @@
+name: "Bands: Lighting Operator"
+description: ""
+full_description_md: >-
+  Lighting operators control the stage lighting desk for live performances.
+
+  **You'll need to attend one of our training sessions before your shift, these
+  will be run daily, and are a great opportunity to learn more about how lighting
+  for live performances works.**
+requires_training: true
