@@ -60,7 +60,7 @@ def sign_up():
     form = VolunteerSignUpForm()
 
     if current_user.is_authenticated and VolunteerUser.get_for_user(current_user):
-        return redirect(url_for(".schedule"))
+        return redirect(url_for(".choose_role"))
 
     if request.method != "POST" and current_user.is_authenticated:
         form.volunteer_email.data = current_user.email
