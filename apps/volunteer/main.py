@@ -21,12 +21,16 @@ from .init_data import load_initial_venues, load_initial_roles, shift_list
 
 @volunteer.route("/")
 def main():
-    if (
-        feature_enabled("VOLUNTEERS_SCHEDULE")
-        and current_user.is_authenticated
-        and Volunteer.get_for_user(current_user)
-    ):
-        return redirect(url_for(".schedule"))
+    if current_user.is_authenticated and Volunteer.get_for_user(current_user):
+        volunteer = Volunteer.get_for_user(current_user)
+        if volunteer is None:
+            return redirect(url_for(".info"))
+
+        if feature_enabled("VOLUNTEERS_SCHEDULE") and len(volunteer.interested_roles) > 0:
+            return redirect(url_for(".schedule"))
+
+        return redirect(url_for(".choose_role"))
+
     return redirect(url_for(".info"))
 
 
