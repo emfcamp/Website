@@ -431,7 +431,7 @@ def refund(payment_id):
             purchases = [
                 purchases_dict[f.purchase_id.data]
                 for f in form.purchases
-                if f.refund.data and purchases_dict[f.purchase_id.data].is_refundable()
+                if f.refund.data and purchases_dict[f.purchase_id.data].is_refundable(ignore_event_refund_state=True)
             ]
 
             total = sum(
