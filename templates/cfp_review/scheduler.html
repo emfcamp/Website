@@ -8,6 +8,10 @@
         color: #000000!important;
         background-color: #ff944d!important;
     }
+    .attendee div {
+        color: #000000!important;
+        background-color: #e34646!important;
+    }
     .dhx_scale_hour {
         height: 131px !important;
     }
@@ -170,7 +174,9 @@ var emf_scheduler = {};
 
   scheduler.templates.event_class=function(start,end,event){
     var res = [];
-    if (event.is_potential ) {
+    if (event.is_attendee) {
+      res.push('attendee');
+    } else if (event.is_potential) {
       res.push('potential');
     }
     return res.join(' ');
