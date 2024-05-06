@@ -19,12 +19,8 @@ from models.cfp import Proposal
 
 metrics = Blueprint("metric", __name__)
 
-request_duration = Histogram(
-    "emf_request_duration_seconds", "Request duration", ["endpoint", "method"]
-)
-request_total = Counter(
-    "emf_request_total", "Total request count", ["endpoint", "method", "http_status"]
-)
+request_duration = Histogram("emf_request_duration_seconds", "Request duration", ["endpoint", "method"])
+request_total = Counter("emf_request_total", "Total request count", ["endpoint", "method", "http_status"])
 
 
 def gauge_groups(gauge, query, *entities):
@@ -43,21 +39,11 @@ class ExternalMetrics:
         emf_purchases = GaugeMetricFamily(
             "emf_purchases", "Tickets purchased", labels=["product", "state", "type"]
         )
-        emf_payments = GaugeMetricFamily(
-            "emf_payments", "Payments received", labels=["provider", "state"]
-        )
-        emf_attendees = GaugeMetricFamily(
-            "emf_attendees", "Attendees", labels=["checked_in", "badged_up"]
-        )
-        emf_proposals = GaugeMetricFamily(
-            "emf_proposals", "CfP Submissions", labels=["type", "state"]
-        )
-        emf_email_jobs = GaugeMetricFamily(
-            "emf_emails", "Email recipients", labels=["sent"]
-        )
-        emf_vouchers = GaugeMetricFamily(
-            "emf_vouchers", "Vouchers", labels=["product_view", "state"]
-        )
+        emf_payments = GaugeMetricFamily("emf_payments", "Payments received", labels=["provider", "state"])
+        emf_attendees = GaugeMetricFamily("emf_attendees", "Attendees", labels=["checked_in", "badged_up"])
+        emf_proposals = GaugeMetricFamily("emf_proposals", "CfP Submissions", labels=["type", "state"])
+        emf_email_jobs = GaugeMetricFamily("emf_emails", "Email recipients", labels=["sent"])
+        emf_vouchers = GaugeMetricFamily("emf_vouchers", "Vouchers", labels=["product_view", "state"])
 
         gauge_groups(
             emf_purchases,
