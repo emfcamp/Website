@@ -26,7 +26,7 @@ def main():
         if volunteer is None:
             return redirect(url_for(".info"))
 
-        if feature_enabled("VOLUNTEERS_SCHEDULE") and len(volunteer.interested_roles) > 0:
+        if feature_enabled("VOLUNTEERS_SCHEDULE") and volunteer.interested_roles.count() > 0:
             return redirect(url_for(".schedule"))
 
         return redirect(url_for(".choose_role"))
