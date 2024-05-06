@@ -394,7 +394,10 @@ class Proposal(BaseModel):
     content_note = db.Column(db.String, nullable=True)
 
     # Fields for scheduling
+    # hide_from_schedule -- do not display this item
     hide_from_schedule = db.Column(db.Boolean, default=False, nullable=False)
+    # manually_scheduled -- make the scheduler ignore this
+    manually_scheduled = db.Column(db.Boolean, default=False, nullable=False)
     allowed_venues = db.relationship(
         "Venue",
         secondary=ProposalAllowedVenues,
@@ -1094,11 +1097,13 @@ class Venue(BaseModel):
 
     @classmethod
     def emf_venues(cls):
-        return cls.query.filter(db.func.array_length(cls.default_for_types, 1) > 0).all()
+        return cls.query.filter(
+            db.func.array_length(cls.default_for_types, 1) > 0
+        ).all()
 
     @classmethod
     def emf_venue_names_by_type(cls):
-        """ Return a map of proposal type to official EMF venues."""
+        """Return a map of proposal type to official EMF venues."""
         unnest = db.func.unnest(cls.default_for_types).table_valued()
         return {
             type: venue_names
