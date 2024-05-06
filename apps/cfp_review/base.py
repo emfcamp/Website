@@ -164,8 +164,8 @@ def filter_proposal_request() -> tuple[list[Proposal], bool]:
         )
 
     sort_dict = get_proposal_sort_dict(request.args)
-    proposal_query = (proposal_query
-        .options(joinedload(Proposal.user))
+    proposal_query = (
+        proposal_query.options(joinedload(Proposal.user))
         .options(joinedload("user.owned_tickets"))
         .options(joinedload(Proposal.tags))
         .options(undefer(Proposal.favourite_count))
@@ -226,7 +226,7 @@ def export(format: str):
     # Do not call this with untrusted field values
     def get_field(proposal, field_path):
         val = proposal
-        for field in field_path.split('.'):
+        for field in field_path.split("."):
             val = getattr(val, field)
         return val
 
@@ -241,8 +241,8 @@ def export(format: str):
             cells = []
             for field in fields:
                 cell = get_field(p, field)
-                if field == 'tags':
-                    cell = ','.join(t.tag for t in cell)
+                if field == "tags":
+                    cell = ",".join(t.tag for t in cell)
                 cells.append(cell)
             w.writerow(cells)
         out = buf.getvalue()
@@ -1124,6 +1124,7 @@ def scheduler():
             "id": proposal.id,
             "duration": proposal.scheduled_duration,
             "is_potential": False,
+            "is_attendee": False,
             "speakers": [proposal.user.id],
             "text": proposal.display_title,
             "valid_venues": [v.id for v in proposal.get_allowed_venues()],
@@ -1132,6 +1133,9 @@ def scheduler():
                 for p in proposal.get_allowed_time_periods_with_default()
             ],
         }
+
+        if proposal.user_scheduled:
+            export["is_attendee"] = True
 
         if proposal.scheduled_venue:
             export["venue"] = proposal.scheduled_venue_id
