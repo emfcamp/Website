@@ -183,15 +183,9 @@ PROPOSAL_TIMESLOTS = {
 
 PREFERRED_TIMESLOTS = {
     "workshop": (
-        "fri_10_13",
         "fri_13_16",
-        "fri_16_20",
-        "sat_10_13",
         "sat_13_16",
-        "sat_16_20",
-        "sun_10_13",
         "sun_13_16",
-        "sun_16_20",
     )
 }
 
