@@ -71,7 +71,7 @@ class UpdateProposalForm(Form):
     family_friendly = BooleanField("Family Friendly")
 
     hide_from_schedule = BooleanField("Hide from schedule")
-    manually_scheduled = BooleanField("Scheduler should ignore this")
+    manually_scheduled = BooleanField("Manually scheduled")
     allowed_venues = SelectMultipleField("Allowed Venues", coerce=int)
     allowed_times = TextAreaField("Allowed Time Periods")
     scheduled_duration = StringField("Duration")
