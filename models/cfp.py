@@ -677,8 +677,12 @@ class Proposal(BaseModel):
         # If we've not overridden it, use the user-specified periods
         if not time_periods and self.available_times:
             for p in self.available_times.split(","):
-                if p:
-                    time_periods.append(timeslot_to_period(p.strip(), type=self.type))
+                # Filter out timeslots the user selected that are not valid.
+                # This can happen if a proposal is converted between types, or
+                # if we remove timeslots after the proposal has been finalised
+                p = p.strip()
+                if p in PROPOSAL_TIMESLOTS[self.type]:
+                    time_periods.append(timeslot_to_period(p, type=self.type))
 
         time_periods = self.fix_hard_time_limits(time_periods)
         return make_periods_contiguous(time_periods)
