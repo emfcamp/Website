@@ -82,10 +82,14 @@ def choose_role():
                 current_volunteer.interested_roles.remove(r._role)
 
         db.session.commit()
-        flash("Your role list has been updated", "info")
         if feature_enabled("VOLUNTEERS_SCHEDULE"):
+            flash("Your role list has been updated", "info")
             return redirect(url_for(".schedule"))
         else:
+            flash(
+                "Thanks for volunteering! You'll be able to sign up for specific shifts soon.",
+                "info",
+            )
             return redirect(url_for(".choose_role"))
 
     current_roles = current_volunteer.interested_roles.all()
@@ -93,9 +97,7 @@ def choose_role():
         role_ids = [r.id for r in current_roles]
         form.select_roles(role_ids)
     if uninterested_roles := [
-        se.shift.role
-        for se in current_user.shift_entries
-        if se.shift.role not in current_roles
+        se.shift.role for se in current_user.shift_entries if se.shift.role not in current_roles
     ]:
         ui_roles_str = ", ".join([uir.name for uir in uninterested_roles])
         flash(
