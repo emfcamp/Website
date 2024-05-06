@@ -1,12 +1,40 @@
 from random import sample
 
-from flask import current_app as app
+from flask import (
+    flash,
+    redirect,
+    render_template,
+    request,
+    current_app as app,
+    url_for,
+)
+from flask_mailman import EmailMessage
 
 from main import db
 from models.cfp import WorkshopProposal
+from models.site_state import SiteState
+
+from ..common.email import from_email
+
+from . import cfp_review
 
 
-def run_lottery():
+@cfp_review.route("/lottery", methods=["GET", "POST"])
+def lottery():
+    # In theory this can be extended to other types but currently only workshops & youthworkshops care
+    ticketed_proposals = WorkshopProposal.query.filter_by(requires_ticket=True).all()
+
+    if request.method == "POST":
+        winning_tickets = run_lottery(ticketed_proposals)
+        flash(f"Lottery run. {len(ticketed_proposals)} tickets won.")
+        return redirect(url_for(".lottery"))
+
+    return render_template(
+        "cfp_review/lottery.html", ticketed_proposals=ticketed_proposals
+    )
+
+
+def run_lottery(ticketed_proposals):
     """
     Here are the rules for the lottery.
     * Each user can only have one lottery ticket per workshop
@@ -14,17 +42,22 @@ def run_lottery():
     * Drawings are done by rank
     * Once a user wins a lottery their other tickets are cancelled
     """
-
-    # In theory this can be extended to other types but currently only workshops & youthworkshops care
-    ticketed_proposals = WorkshopProposal.query.filter_by(requires_ticket=True).all()
+    # Copy because we don't want to change the original
+    ticketed_proposals = ticketed_proposals.copy()
     lottery_round = 0
 
     winning_tickets = []
 
     app.logger.info(f"Found {len(ticketed_proposals)} proposals to run a lottery for")
+    # Lock the lottery
+    state = SiteState.query.get("signup_state")
+    if not state:
+        raise Exception("'signup_state' not found.")
+
+    state.state = "pending_tickets"
+    db.session.commit()
 
     while ticketed_proposals:
-        lottery_round += 1
         app.logger.info(f"Starting round {lottery_round}")
 
         for proposal in ticketed_proposals:
@@ -65,9 +98,27 @@ def run_lottery():
                 for ticket in losing_lottery_tickets:
                     ticket.lost_lottery()
                     db.session.commit()
+        lottery_round += 1
 
     app.logger.info(
         f"Issued {len(winning_tickets)} winning tickets over {lottery_round} rounds"
     )
     # Email winning tickets here
     # We should probably also check for users who didn't win anything?
+
+    app.logger.info("sending emails")
+
+    send_from = from_email("CONTENT_EMAIL")
+
+    for ticket in winning_tickets:
+        msg = EmailMessage(
+            f"You have a ticket for the workshop '{ticket.proposal.title}'",
+            from_email=send_from,
+            to=[ticket.user.email],
+        )
+
+        msg.body = render_template(
+            "emails/event_ticket_won.txt",
+            user=ticket.user,
+            proposal=ticket.proposal,
+        )

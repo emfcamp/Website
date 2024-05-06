@@ -3,7 +3,7 @@
 {# List proposals - works for the current event year only #}
 {% macro list_proposals(proposals) %}
     {% for human_type, human_type_proposals in proposals | groupby('human_type') %}
-        <h2 class="event-type">{{ human_type | title }}s</h2>
+        <h2 class="event-type" id="{{ human_type_proposals[0].type }}">{{ human_type | title }}s</h2>
         <form method="post" action="{{url_for(".add_favourite")}}">
         <input type="hidden" name="event_type" value="proposal">
         <div>
