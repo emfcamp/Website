@@ -5,6 +5,7 @@ import re
 import os.path
 from textwrap import wrap
 import pendulum
+from dataclasses import dataclass
 
 from main import db, external_url
 from flask import session, abort, current_app as app, render_template
@@ -25,10 +26,10 @@ from models import User, event_start, event_end
 from .preload import init_preload
 
 
-class Currency(object):
-    def __init__(self, code, symbol):
-        self.code = code
-        self.symbol = symbol
+@dataclass
+class Currency():
+    code: str
+    symbol: str
 
 
 CURRENCIES = [Currency("GBP", "£"), Currency("EUR", "€")]
