@@ -1,10 +1,7 @@
 name: "Talks: Camera Operator"
 description: Operate the camera during talks
-full_description_md: >-
-  Working with the vision mixer you'll operate the camera during talks, making
-  our speakers look their best.
+full_description_md: |
+  Working with the vision mixer you'll operate the camera during talks, making our speakers look their best.
 
-  **You'll need to attend one of our training sessions before your shift, these
-  will be run daily, and are a great opportunity to learn more about live event
-  production.**
+  **You'll need to attend one of our training sessions before your shift, these will be run daily, and are a great opportunity to learn more about live event production.**
 requires_training: true

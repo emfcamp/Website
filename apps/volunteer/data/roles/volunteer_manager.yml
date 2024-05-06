@@ -1,8 +1,6 @@
 name: Volunteer Manager
 description: Run the volunteer system.
-full_description_md: >-
-  Help people sign up for volunteering, make sure they know where to go, and keep
-  an eye on where people are needed.
+full_description_md: |
+  Help people sign up for volunteering, make sure they know where to go, and keep an eye on where people are needed.
   
-  You'll be shown the various system we have for managing and communicating with
-  volunteers.
+  You'll be shown the various system we have for managing and communicating with volunteers.
