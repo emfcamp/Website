@@ -133,6 +133,7 @@ ROUGH_LENGTHS = {"> 45 mins": 50, "25-45 mins": 30, "10-25 mins": 20, "< 10 mins
 
 # These are the time periods speakers can select as being available in the form
 # This needs to go very far away
+# This still needs to go very far away, it is a nightmare
 PROPOSAL_TIMESLOTS = {
     "talk": (
         "fri_10_13",
@@ -181,21 +182,33 @@ PROPOSAL_TIMESLOTS = {
     ),
 }
 
+# Causes the scheduler to prefer putting these things in these time ranges,
+# used to pack things into attendee-friendly hours even though speakers are
+# happy to give workshops at midnight. These do not need to overlap with other
+# slot definitions.
 PREFERRED_TIMESLOTS = {
     "workshop": (
-        "fri_13_16",
-        "sat_13_16",
-        "sun_13_16",
+        "fri_12_18",
+        "sat_12_18",
+        "sun_12_18",
     )
 }
 
 HARD_START_LIMIT = {"youthworkshop": (9, 30)}
 
+# Because I have excavated this from my memory: This is a horrendous quick hack
+# to allow us to override the timeslot periods that are valid for a proposal
+# type as speakers select them from the list and we don't store actual time
+# values. BUT WE SHOULD.
 REMAP_SLOT_PERIODS = {
+    "talk": {
+        "fri_10_13": ("fri", (11, 0), (13, 00)),  # Talks start at 11 on Friday
+        "sun_16_20": ("sun", (16, 0), (18, 20)),  # Talks end at 6 on Sunday
+    },
     "youthworkshop": {
         "fri_16_20": ("fri", (16, 0), (20, 20)),
         "sat_16_20": ("sat", (16, 0), (20, 20)),
-        "sun_16_20": ("sun", (16, 0), (19, 30)),
+        "sun_16_20": ("sun", (16, 0), (19, 20)),
     },
     "performance": {
         "fri_22_24": ("fri", (22, 0), (25, 30)),
@@ -208,7 +221,7 @@ REMAP_SLOT_PERIODS = {
 # type in the same venue
 EVENT_SPACING = {
     "talk": 1,
-    "workshop": 2,
+    "workshop": 3,
     "performance": 0,
     "youthworkshop": 2,
     "installation": 0,
