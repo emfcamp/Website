@@ -26,7 +26,7 @@ def load_initial_roles() -> list[dict[str, Any]]:
     return load_from_yaml("apps/volunteer/data/roles/*.yml")
 
 
-shift_list = {
+shift_list: dict[str, dict[str, dict[str, Any]]] = {
     # "Badge Helper": {
     #     "Badge Tent": [
     #         {
