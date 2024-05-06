@@ -223,6 +223,7 @@ def export(format: str):
         "tags",
         "favourite_count",
     ]
+
     # Do not call this with untrusted field values
     def get_field(proposal, field_path):
         val = proposal
@@ -479,6 +480,7 @@ def update_proposal(proposal_id):
 
     form.user_scheduled.data = prop.user_scheduled
     form.hide_from_schedule.data = prop.hide_from_schedule
+    form.manually_scheduled.data = prop.manually_scheduled
     form.allowed_venues.data = [v.id for v in prop.get_allowed_venues()]
     form.allowed_times.data = prop.get_allowed_time_periods_serialised()
     form.scheduled_time.data = prop.scheduled_time
