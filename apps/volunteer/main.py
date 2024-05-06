@@ -21,17 +21,18 @@ from .init_data import load_initial_venues, load_initial_roles, shift_list
 
 @volunteer.route("/")
 def main():
-    if current_user.is_authenticated and Volunteer.get_for_user(current_user):
-        volunteer = Volunteer.get_for_user(current_user)
-        if volunteer is None:
-            return redirect(url_for(".info"))
+    if current_user.is_anonymous:
+        return redirect(url_for(".info"))
 
-        if feature_enabled("VOLUNTEERS_SCHEDULE") and volunteer.interested_roles.count() > 0:
-            return redirect(url_for(".schedule"))
+    volunteer = Volunteer.get_for_user(current_user)
+    if volunteer is None:
+        return redirect(url_for(".info"))
 
-        return redirect(url_for(".choose_role"))
+    if feature_enabled("VOLUNTEERS_SCHEDULE") and volunteer.interested_roles.count() > 0:
+        return redirect(url_for(".schedule"))
 
-    return redirect(url_for(".info"))
+    return redirect(url_for(".choose_role"))
+
 
 
 @volunteer.route("/info/<page_name>")
