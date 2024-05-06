@@ -636,7 +636,7 @@ class Proposal(BaseModel):
         return admission_tickets > 0 or self.user.will_have_ticket
 
     def get_allowed_venues(self) -> list["Venue"]:
-        if self.user_scheduled:
+        if self.user_scheduled and self.scheduled_venue is not None:
             return [self.scheduled_venue]
         elif self.allowed_venues:
             return self.allowed_venues
