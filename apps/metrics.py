@@ -7,7 +7,7 @@ from prometheus_client import (
 )
 from prometheus_client.core import GaugeMetricFamily, Histogram, Counter
 from prometheus_client.multiprocess import MultiProcessCollector
-from sqlalchemy import cast, String, case
+from sqlalchemy import cast, String, case, func
 from datetime import datetime
 
 from models import count_groups
@@ -16,6 +16,9 @@ from models.payment import Payment
 from models.product import Product, ProductView, Voucher, VOUCHER_GRACE_PERIOD
 from models.purchase import Purchase, AdmissionTicket
 from models.cfp import Proposal
+from models.volunteer.role import Role
+from models.volunteer.shift import Shift, ShiftEntry
+from models.volunteer.volunteer import Volunteer
 
 metrics = Blueprint("metric", __name__)
 
@@ -44,6 +47,11 @@ class ExternalMetrics:
         emf_proposals = GaugeMetricFamily("emf_proposals", "CfP Submissions", labels=["type", "state"])
         emf_email_jobs = GaugeMetricFamily("emf_emails", "Email recipients", labels=["sent"])
         emf_vouchers = GaugeMetricFamily("emf_vouchers", "Vouchers", labels=["product_view", "state"])
+        emf_roles = GaugeMetricFamily("emf_roles", "Volunteer Roles", labels=["role"])
+        emf_shifts = GaugeMetricFamily("emf_shifts", "Volunteer shifts", labels=["role", "state"])
+        emf_shift_seconds = GaugeMetricFamily(
+            "emf_shift_seconds", "Volunteer shift seconds", labels=["role", "state"]
+        )
 
         gauge_groups(
             emf_purchases,
@@ -81,6 +89,44 @@ class ExternalMetrics:
             ),
         )
 
+        gauge_groups(
+            emf_roles,
+            Volunteer.query.join(Volunteer.interested_roles),
+            Role.name,
+        )
+
+        gauge_groups(
+            emf_shifts,
+            ShiftEntry.query.join(ShiftEntry.shift).join(Shift.role),
+            Role.name,
+            case(
+                (ShiftEntry.completed, "completed"),
+                (ShiftEntry.abandoned, "abandoned"),
+                (ShiftEntry.arrived, "arrived"),
+                else_="signed_up",
+            ),
+        )
+
+        shift_seconds = (
+            ShiftEntry.query.join(ShiftEntry.shift)
+            .join(Shift.role)
+            .with_entities(
+                func.sum(Shift.duration).label("minimum"),
+                Role.name,
+                case(
+                    (ShiftEntry.completed, "completed"),
+                    (ShiftEntry.abandoned, "abandoned"),
+                    (ShiftEntry.arrived, "arrived"),
+                    else_="signed_up",
+                ),
+            )
+            .group_by(Role.name, ShiftEntry.completed, ShiftEntry.abandoned, ShiftEntry.arrived)
+            .order_by(Role.name)
+        )
+
+        for duration, *key in shift_seconds:
+            emf_shift_seconds.add_metric(key, duration.total_seconds())
+
         return [
             emf_purchases,
             emf_payments,
@@ -88,6 +134,9 @@ class ExternalMetrics:
             emf_proposals,
             emf_email_jobs,
             emf_vouchers,
+            emf_roles,
+            emf_shifts,
+            emf_shift_seconds,
         ]
 
 
