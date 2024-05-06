@@ -7,4 +7,4 @@ As a thank you for volunteering, after each shift you complete you’ll be given
 
 All volunteers are also welcome to snacks and hot & cold drinks from the volunteer lounge at any time.
 
-The intended meal schedule is breakfast 08:00-10:30, lunch 12:30-15:00, dinner 18:30-21:00, but things don't always go to plan, you can ask at the volunteer desk.
+The intended meal schedule is breakfast 08:00-10:30, lunch 13:00-15:00, dinner 18:30-21:00, but things don't always go to plan, you can ask at the volunteer desk.
