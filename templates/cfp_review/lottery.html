@@ -1,0 +1,37 @@
+{% extends "cfp_review/base.html" %}
+{% block body %}
+
+<h2>Lottery info</h2>
+
+<p><strong>Current signup state:</strong> {{ SIGNUP_STATE    }}</p>
+
+<p>These workshops require tickets:</p>
+
+<form method="POST">
+    <button class="btn btn-primary">Run Lottery</button>
+</form>
+
+<table class="table table-condensed table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Total tickets</th>
+            <th>Tickets via lottery</th>
+            <th>Lottery tickets issued</th>
+            <th>Tickets issued</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for proposal in ticketed_proposals %}
+            <tr>
+                <td>{{ proposal.title }}</td>
+                <td>{{ proposal.total_tickets }}</td>
+                <td>{{ proposal.get_lottery_capacity() }}</td>
+                <td>{{ proposal.get_tickets_in_state("entered-lottery") | length }}</td>
+                <td>{{ proposal.get_tickets_in_state("ticket") | length }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

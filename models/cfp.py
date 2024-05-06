@@ -877,6 +877,9 @@ class WorkshopProposal(Proposal):
     def has_lottery_capacity(self):
         return self.get_lottery_capacity() > 0
 
+    def get_tickets_in_state(self, state: str) -> list:
+        return [t for t in self.tickets if t.state == state]
+
 
 class YouthWorkshopProposal(WorkshopProposal):
     __mapper_args__ = {"polymorphic_identity": "youthworkshop"}

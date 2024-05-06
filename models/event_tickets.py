@@ -44,7 +44,7 @@ class EventTicket(BaseModel):
         self.rank = rank
 
     def is_in_lottery_round(self, round_rank):
-        return self.state == "entered-lottery" and self.rank == round_rank
+        return self.state == "entered-lottery" and self.rank <= round_rank
 
     def change_state(self, new_state):
         if new_state == "entered-lottery" and not self.rank:

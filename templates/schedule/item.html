@@ -69,11 +69,11 @@
     &nbsp;Favourite
   </button>
 
-  {% if SIGNUP_STATE == "issue_lottery_tickets" %}
+  {% if SIGNUP_STATE == "issue_lottery_tickets" and proposal.requires_ticket %}
     {{ form.enter_lottery(class_="btn btn-primary") }}
-  {% elif SIGNUP_STATE == "issue_tickets" %}
+  {% elif SIGNUP_STATE == "issue_tickets" and proposal.requires_ticket %}
     {{ form.get_ticket(class_="btn btn-primary") }}
-  {% elif SIGNUP_STATE == "pending_tickets" %}
+  {% elif SIGNUP_STATE == "pending_tickets" and proposal.requires_ticket %}
     <p>The lottery for this {{proposal.human_type}} is currently closed. A small number of tickets will be available first come/first served on the day.</p>
   {% endif %}
 

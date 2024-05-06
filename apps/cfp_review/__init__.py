@@ -135,3 +135,4 @@ from . import base  # noqa: F401
 from . import review  # noqa: F401
 from . import anonymise  # noqa: F401
 from . import sense_check  # noqa: F401
+from . import event_tickets_lottery  # noqa: F401

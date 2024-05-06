@@ -1,0 +1,8 @@
+{% extends "emails/base.txt" %}
+{% block body %}
+Hi {{ user.name }},
+
+Good news! You've won a spot in the {{proposal.human_type}} '{{proposal.title}}'.
+
+
+{% endblock %}
