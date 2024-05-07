@@ -107,6 +107,22 @@ def choose_role():
     return render_template("volunteer/choose_role.html", form=form)
 
 
+@volunteer.route("/role_admin", methods=["GET"])
+@v_user_required
+def role_admin_index():
+    roles = []
+    if current_user.has_permission("admin") or current_user.has_permission("volunteer:manager"):
+        roles = Role.query.order_by("name").all()
+    else:
+        roles = [admin.role for admin in current_user.volunteer_admin_roles]
+
+    if len(roles) == 0:
+        flash("You're not an admin for any roles.")
+        redirect(url_for(".choose_role"))
+
+    return render_template("volunteer/role_admin_index.html", roles=roles)
+
+
 @volunteer.route("/role/<int:role_id>", methods=["GET", "POST"])
 @feature_flag("VOLUNTEERS_SIGNUP")
 @v_user_required
