@@ -1,0 +1,9 @@
+name: "Video Editor"
+description: Edit recorded talks ready for on-demand viewing
+full_description_md: |
+  You'll review, edit, subtitle and check talk recordings, helping us get video on
+  demand of talks up on the website as soon as we can.
+
+  You'll be doing this in the VOC tent where friendly neighborhood video team members
+  will be able to show you the workflow and answer any questions!
+requires_training: false
