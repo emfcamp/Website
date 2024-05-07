@@ -4,7 +4,7 @@ title: Deliveries
 
 If you want to get items delivered to the event while you're here, the Logistics team offer a *best-effort* delivery receiving service for anything coming by post or delivery service (e.g. Amazon packages).
 
-*Note: This is for personal and village deliveries only. If you need something delivered for an EMF team or if it's larger than a pallet, please contact the Logistics team for instructions*
+*Note: This is for personal and village deliveries only. If you need something delivered for an EMF team or if it's larger than a pallet, please contact the Logistics team at logistics@emfcamp.org or DECT 1030 for instructions*
 
 To make sure your item gets to you, you need to do three things:
 
@@ -37,4 +37,4 @@ Packages are held for collection at the Logistics tent; visit us just inside the
 
 It takes us a little bit to get through all of the packages when they arrive (during the main event, we often have a delivery van just full of items for us) so please give us an hour or so after you are notified of delivery to come collect it.
 
-If you don't collect them before the end of the event, or they arrive after the event is over, they will be discarded!
+Note that we will not notify you when something has arrived. If you don't collect your deliveries before the end of the event, or they arrive after the event is over, they will be discarded!
