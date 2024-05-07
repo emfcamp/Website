@@ -14,9 +14,7 @@ class ShiftEntry(BaseModel):
     __tablename__ = "volunteer_shift_entry"
     __versioned__: dict = {}
 
-    shift_id = db.Column(
-        db.Integer, db.ForeignKey("volunteer_shift.id"), primary_key=True
-    )
+    shift_id = db.Column(db.Integer, db.ForeignKey("volunteer_shift.id"), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
     checked_in = db.Column(db.Boolean, nullable=False, default=False)
     missing_others = db.Column(db.Boolean, nullable=False, default=False)
@@ -34,9 +32,7 @@ class Shift(BaseModel):
 
     id = db.Column(db.Integer, primary_key=True)
     role_id = db.Column(db.Integer, db.ForeignKey("volunteer_role.id"), nullable=False)
-    venue_id = db.Column(
-        db.Integer, db.ForeignKey("volunteer_venue.id"), nullable=False
-    )
+    venue_id = db.Column(db.Integer, db.ForeignKey("volunteer_venue.id"), nullable=False)
     proposal_id = db.Column(db.Integer, db.ForeignKey("proposal.id"), nullable=True)
     start = db.Column(db.DateTime)
     end = db.Column(db.DateTime)
@@ -48,10 +44,10 @@ class Shift(BaseModel):
     proposal = db.relationship("Proposal", backref="shift")
 
     current_count = db.column_property(
-        select([func.count(ShiftEntry.shift_id)])
-        .where(ShiftEntry.shift_id == id)
-        .scalar_subquery()  # type: ignore[attr-defined]
+        select([func.count(ShiftEntry.shift_id)]).where(ShiftEntry.shift_id == id).scalar_subquery()  # type: ignore[attr-defined]
     )
+
+    duration = db.column_property(end - start)
 
     volunteers = association_proxy("entries", "user")
 
@@ -79,10 +75,7 @@ class Shift(BaseModel):
 
         if self.venue == other.venue and self.role == other.role:
             return False
-        return (
-            other.start <= self.start <= other.end
-            or self.start <= other.start <= self.end
-        )
+        return other.start <= self.start <= other.end or self.start <= other.start <= self.end
 
     def __repr__(self):
         return "<Shift {0}/{1}@{2}>".format(self.role.name, self.venue.name, self.start)
@@ -119,17 +112,13 @@ class Shift(BaseModel):
         Return all shifts for the requested day.
         """
         return (
-            cls.query.where(
-                text("lower(to_char(start, 'Dy'))=:day").bindparams(day=day.lower())
-            )
+            cls.query.where(text("lower(to_char(start, 'Dy'))=:day").bindparams(day=day.lower()))
             .order_by(Shift.start, Shift.venue_id)
             .all()
         )
 
     @classmethod
-    def generate_for(
-        cls, role, venue, first, final, min, max, base_duration=120, changeover=15
-    ):
+    def generate_for(cls, role, venue, first, final, min, max, base_duration=120, changeover=15):
         """
         Will generate shifts between start and end times. The last shift will
         end at end.
@@ -145,9 +134,7 @@ class Shift(BaseModel):
 
         final_start = final.subtract(minutes=base_duration)
 
-        initial_start_times = list(
-            period(first.naive(), final_start.naive()).range("minutes", base_duration)
-        )
+        initial_start_times = list(period(first.naive(), final_start.naive()).range("minutes", base_duration))
 
         return [
             Shift(
