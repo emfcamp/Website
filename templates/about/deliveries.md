@@ -23,9 +23,7 @@ Eastnor Castle Deer Park
 Access from A438
 Eastnor, LEDBURY HR8 1RQ
 
-It's important you get all of this in; if the service you're using doesn't
-have that many address lines, combine some (the name/village name line and the
-Deer Park/A438 lines could be combined).
+It's important you get all of this in; if the service you're using doesn't have that many address lines, combine some (the name/village name line and the Deer Park/A438 lines could be combined).
 
 ## Let Us Know
 
