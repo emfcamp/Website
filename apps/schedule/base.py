@@ -70,6 +70,7 @@ def line_up():
         Proposal.is_accepted,
         # FIXME this should be all types. Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]),
         Proposal.type.in_(["talk", "workshop"]),
+        Proposal.user_scheduled.isnot(True),
         Proposal.hide_from_schedule.isnot(True),
     ).all()
 
