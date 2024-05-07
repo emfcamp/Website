@@ -232,24 +232,29 @@ def form(cfp_type="talk"):
         form.set_session_choices(remaining_lightning_slots)
 
     # If the user is already logged in set their name & email for the form
+    email = form.email.data
+    name = form.name.data
     if current_user.is_authenticated:
-        form.email.data = current_user.email
+        email = current_user.email
+        del form.email
+        # Override the form, unless it's an invited user
         if current_user.name != current_user.email:
-            form.name.data = current_user.name
+            name = current_user.name
+            del form.name
 
     if request.method == "POST":
         app.logger.info(
             "Checking %s proposal for %s (%s)",
             cfp_type,
-            form.name.data,
-            form.email.data,
+            name,
+            email,
         )
 
     if form.validate_on_submit():
         new_user = False
         if current_user.is_anonymous:
             try:
-                create_current_user(form.email.data, form.name.data)
+                create_current_user(email, name)
                 new_user = True
             except IntegrityError as e:
                 app.logger.warn("Adding user raised %r, possible double-click", e)
@@ -259,7 +264,8 @@ def form(cfp_type="talk"):
                 return redirect(url_for(".main"))
 
         elif current_user.name == current_user.email:
-            current_user.name = form.name.data
+            # Prefer the form if it's an invited user
+            current_user.name = name
 
         if cfp_type == "talk":
             proposal = TalkProposal()
