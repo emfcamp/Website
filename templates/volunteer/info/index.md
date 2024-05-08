@@ -13,7 +13,7 @@ You'll never be made to do something you're not comfortable with, so don't worry
 
 ## Why Volunteer?
 
-Volunteering is a great way to get to know new people, learn a new skill, and make EMF the best event possible. If that's not enough for every volunteer shift you do you'll get a token for a free meal from the volunteer kitchen, which serves three freshly cooked hot meals a day, and provides snacks and drinks between meals.
+Volunteering is a great way to get to know new people, learn a new skill, and make EMF the best event possible. If that's not enough, for every volunteer shift you do you'll get a token for a free meal from the volunteer kitchen, which serves three freshly cooked hot meals a day, and provides snacks and drinks between meals.
 
 Finally, anyone who does at least one volunteer shift will receive a voucher to purchase a guaranteed ticket for the next EMF.
 
@@ -27,7 +27,7 @@ Nobody will criticise you if you can't do something, and telling us quickly mean
 
 ## How to Volunteer
 
-Click the button below to register as a volunteer, which will allow you to choose which roles you're interested in, and then select shifts at a convineant time for you. You can also opt in to receiving a notification if we're having difficulty filling shifts for those roles, which would be greatly appreciated. There's no obligation to take those shifts.
+Click the button below to register as a volunteer, which will allow you to choose which roles you're interested in, and then select shifts at a convenient time for you. You can also opt in to receiving a notification if we're having difficulty filling shifts for those roles, which would be greatly appreciated. There's no obligation to take those shifts.
 
 <a href="/volunteer/sign-up" class="btn btn-primary btn-lg">Register to volunteer</a>
 

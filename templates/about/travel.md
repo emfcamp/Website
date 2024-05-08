@@ -13,7 +13,7 @@ The station at Ledbury has short platforms, so if you are on one of the long 9-c
 from Paddington, you will need to be in the front three coaches to get off the train.
 
 We will be providing a free shuttle bus service between Ledbury station and the EMF site.
-Timetables ane further information can be found on the [shuttle bus page](https://bus.emf.camp/about/).
+Timetables and further information can be found on the [shuttle bus page](https://bus.emf.camp/about/).
 
 **Note:** There is engineering work on the Sunday of EMF (June 2nd) which means the line between
 Ledbury and Worcester is closed, with a rail replacement bus service. We are planning to run our
