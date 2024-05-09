@@ -10,13 +10,13 @@
   {% for shift in shifts %}
     {% set s = shift.to_localtime_dict() %}
     <div class="role-admin-shift well content-well">
-      <h3>{{ shift.venue.name }} {{ s['start'] }} - {{ s['end_time'] }}</h3>
+      <h3>{{ shift.start.strftime("%a %H:%M") }} - {{ shift.end.strftime("%H:%M") }} - {{ shift.venue.name }}</h3>
       {% for se in shift.entries|sort(attribute="user_id") %}
         <p>
           <strong>{{ se.user.volunteer.nickname }}</strong>
           {% if se.user.volunteer.volunteer_phone %}({{ se.user.volunteer.volunteer_phone }}){% endif %}<br />
           {% if not se.user.volunteer.completed_shift(role) %}First shift<br />{% endif %}
-          Mark as:&nbsp;
+          {{ se.state | capitalize | replace("_", " ") }} | Mark as:&nbsp;
           {% for state in se.valid_states() %}
             <a href="/volunteer/role/{{ role.id }}/set_state/{{ se.shift_id }}/{{ se.user_id }}/{{ state }}">{{ state | capitalize | replace("_", " ") }}</a>
           {% endfor %}
