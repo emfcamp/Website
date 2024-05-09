@@ -27,7 +27,7 @@ It's important you get all of this in; if the service you're using doesn't have 
 
 If your shipping company requires a phone number, please use your own phone number (but note that you may not get reception on site unless you have WiFi calling or SIP).
 
-We will accept attendee and village deliveries from **Wednesday 29th May through to Sunday 2nd June inclusive**. Any deliveries received after this date will be discarded; if you absolutely need something delivered before, please get in touch with Logistics (`logistics@emfcamp.org`) and we'll see if we can accommodate you.
+We will accept attendee and village deliveries from **Wednesday 29th May through to Sunday 2nd June inclusive**. Any deliveries received after this date will be discarded; if you absolutely need something delivered before, please get in touch with Logistics (<logistics@emfcamp.org>) and we'll see if we can accommodate you.
 
 ## Let Us Know
 
