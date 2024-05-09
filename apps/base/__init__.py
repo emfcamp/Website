@@ -139,7 +139,7 @@ def sponsor():
 
 @base.route("/badge")
 def badge():
-    return redirect("https://wiki-archive.emfcamp.org/2012/wiki/TiLDA")
+    return redirect("https://tildagon.badge.emfcamp.org/")
 
 
 @base.route("/code-of-conduct")
