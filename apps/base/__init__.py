@@ -12,6 +12,7 @@ from flask import (
     abort,
     current_app as app,
 )
+from flask_login import current_user
 import requests
 
 from main import cache
@@ -44,6 +45,14 @@ def main():
     state = get_site_state()
     if app.config.get("DEBUG"):
         state = request.args.get("site_state", state)
+
+    # Send ticketholders to the account page.
+    if (
+        state in ("sales", "event")
+        and current_user.is_authenticated
+        and len(list(current_user.get_owned_tickets(True))) > 0
+    ):
+        return redirect(url_for("users.account"))
 
     return render_template("home/%s.html" % state, full_price=get_full_price())
 
