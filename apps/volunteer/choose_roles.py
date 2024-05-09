@@ -18,7 +18,12 @@ from datetime import datetime, timedelta
 from main import db
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer as VolunteerUser
-from models.volunteer.shift import Shift, ShiftEntry
+from models.volunteer.shift import (
+    Shift,
+    ShiftEntry,
+    ShiftEntryState,
+    ShiftEntryStateException,
+)
 
 from . import volunteer, v_user_required
 from ..common import feature_enabled, feature_flag
@@ -189,36 +194,19 @@ def role_admin(role_id):
     )
 
 
-@volunteer.route("role/<int:role_id>/toggle_arrived/<int:shift_id>/<int:user_id>")
+@volunteer.route("role/<int:role_id>/set_state/<int:shift_id>/<int:user_id>/<state>")
 @role_admin_required
-def toggle_arrived(role_id, shift_id, user_id):
-    se = ShiftEntry.query.filter(
-        ShiftEntry.shift_id == shift_id, ShiftEntry.user_id == user_id
-    ).first_or_404()
-    se.arrived = not se.arrived
-    db.session.commit()
-    return redirect(url_for(".role_admin", role_id=role_id))
+def toggle_arrived(role_id: int, shift_id: int, user_id: int, state: ShiftEntryState):
+    try:
+        se = ShiftEntry.query.filter(
+            ShiftEntry.shift_id == shift_id, ShiftEntry.user_id == user_id
+        ).first_or_404()
+        if se.state != state:
+            se.set_state(state)
+        db.session.commit()
+    except ShiftEntryStateException:
+        flash(f"{state} is not a valid state for this shift.")
 
-
-@volunteer.route("role/<int:role_id>/toggle_abandoned/<int:shift_id>/<int:user_id>")
-@role_admin_required
-def toggle_abandoned(role_id, shift_id, user_id):
-    se = ShiftEntry.query.filter(
-        ShiftEntry.shift_id == shift_id, ShiftEntry.user_id == user_id
-    ).first_or_404()
-    se.abandoned = not se.abandoned
-    db.session.commit()
-    return redirect(url_for(".role_admin", role_id=role_id))
-
-
-@volunteer.route("role/<int:role_id>/toggle_complete/<int:shift_id>/<int:user_id>")
-@role_admin_required
-def toggle_complete(role_id, shift_id, user_id):
-    se = ShiftEntry.query.filter(
-        ShiftEntry.shift_id == shift_id, ShiftEntry.user_id == user_id
-    ).first_or_404()
-    se.completed = not se.completed
-    db.session.commit()
     return redirect(url_for(".role_admin", role_id=role_id))
 
 

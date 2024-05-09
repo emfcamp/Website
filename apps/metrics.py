@@ -96,15 +96,7 @@ class ExternalMetrics:
         )
 
         gauge_groups(
-            emf_shifts,
-            ShiftEntry.query.join(ShiftEntry.shift).join(Shift.role),
-            Role.name,
-            case(
-                (ShiftEntry.completed, "completed"),
-                (ShiftEntry.abandoned, "abandoned"),
-                (ShiftEntry.arrived, "arrived"),
-                else_="signed_up",
-            ),
+            emf_shifts, ShiftEntry.query.join(ShiftEntry.shift).join(Shift.role), Role.name, ShiftEntry.state
         )
 
         shift_seconds = (
@@ -113,14 +105,9 @@ class ExternalMetrics:
             .with_entities(
                 func.sum(Shift.duration).label("minimum"),
                 Role.name,
-                case(
-                    (ShiftEntry.completed, "completed"),
-                    (ShiftEntry.abandoned, "abandoned"),
-                    (ShiftEntry.arrived, "arrived"),
-                    else_="signed_up",
-                ),
+                ShiftEntry.state,
             )
-            .group_by(Role.name, ShiftEntry.completed, ShiftEntry.abandoned, ShiftEntry.arrived)
+            .group_by(Role.name, ShiftEntry.state)
             .order_by(Role.name)
         )
 

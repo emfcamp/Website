@@ -1,3 +1,4 @@
+from typing import Literal, TypeAlias, Union
 import pytz
 
 from pendulum import period
@@ -10,20 +11,46 @@ from .. import BaseModel
 event_tz = pytz.timezone("Europe/London")
 
 
+# state: [allowed next state, ] pairs
+ShiftEntryState: TypeAlias = Union[
+    Literal["signed_up"], Literal["arrived"], Literal["abandoned"], Literal["completed"], Literal["no_show"]
+]
+
+SHIFT_ENTRY_STATES: dict[ShiftEntryState, list[ShiftEntryState]] = {
+    "signed_up": ["arrived", "abandoned", "completed", "no_show"],
+    "arrived": ["abandoned", "completed", "signed_up"],
+    "abandoned": ["arrived"],
+    "completed": ["arrived"],
+    "no_show": ["arrived"],
+}
+
+
+class ShiftEntryStateException(ValueError):
+    """Raised when a shift entry is moved to an invalid state."""
+
+
 class ShiftEntry(BaseModel):
     __tablename__ = "volunteer_shift_entry"
     __versioned__: dict = {}
 
     shift_id = db.Column(db.Integer, db.ForeignKey("volunteer_shift.id"), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
-    checked_in = db.Column(db.Boolean, nullable=False, default=False)
-    missing_others = db.Column(db.Boolean, nullable=False, default=False)
-    arrived = db.Column(db.Boolean, default=False)
-    abandoned = db.Column(db.Boolean, default=False)
-    completed = db.Column(db.Boolean, default=False)
+    state: ShiftEntryState = db.Column(db.String, default="signed_up")
 
     user = db.relationship("User", backref="shift_entries")
     shift = db.relationship("Shift", backref="entries")
+
+    def set_state(self, state: ShiftEntryState):
+        if state not in SHIFT_ENTRY_STATES:
+            raise ShiftEntryStateException('"%s" is not a valid state' % state)
+
+        if state not in SHIFT_ENTRY_STATES[self.state]:
+            raise ShiftEntryStateException('"%s->%s" is not a valid transition' % (self.state, state))
+
+        self.state = state
+
+    def valid_states(self) -> list[ShiftEntryState]:
+        return SHIFT_ENTRY_STATES[self.state]
 
 
 class Shift(BaseModel):
