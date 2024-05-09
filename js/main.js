@@ -81,9 +81,11 @@ $(function () {
   $('.debounce').on('click', EMF.debounce_submit);
 });
 
+// Used for toggling the main nav menu on mobile. I struggled to make the
+//bootstrap data-toggle work here.
 $(() => {
-  $('button[data-toggle]').on('click', (ev) => {
-    let toggle_el = ev.currentTarget.getAttribute("data-toggle");
+  $('button[data-emf-toggle]').on('click', (ev) => {
+    let toggle_el = ev.currentTarget.getAttribute("data-emf-toggle");
     $(`#${toggle_el}`).toggle();
     ev.stopPropagation();
   });
