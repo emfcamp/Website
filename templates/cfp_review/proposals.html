@@ -4,11 +4,11 @@
 <a role="button" class="btn btn-default pull-right" href="{{ url_for('.message_batch', **request.args) }}">
     Message all {{ proposals | count }} proposals
 </a>
-<div class="btn-group pull-right">
-  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="exportdropdown" aria-haspopup="true" aria-expanded="false">
+<div class="btn-group pull-right dropdown">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     Export <span class="caret"></span>
   </button>
-  <ul class="dropdown-menu" id="exportdropdown">
+  <ul class="dropdown-menu">
     <li><a href="{{ url_for('.export', format='csv', **request.args) }}">CSV</a></li>
     <li><a href="{{ url_for('.export', format='json', **request.args) }}">JSON</a></li>
   </ul>

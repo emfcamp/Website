@@ -8,7 +8,7 @@
     <a href="{{url}}">{{text}}</a>
 </li>
 {% endmacro %}
-{% if current_user.is_authenticated %}
+{% if current_user.is_authenticated and current_user.has_permission('volunteer:user') %}
     <ul class="nav nav-pills">
         {{ menuitem('Account', '.account') }}
         {{ menuitem('Roles', '.choose_role') }}

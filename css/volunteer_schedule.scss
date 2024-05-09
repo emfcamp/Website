@@ -30,7 +30,7 @@ table.shifts-table tbody td.mobile-only {
 
 // Overrides for mobile.
 @media (max-width: 768px) {
-  .nav-tabs {
+  .nav-tabs.has-nav-select {
     display: none;
   }
 
