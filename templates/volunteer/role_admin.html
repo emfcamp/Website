@@ -1,5 +1,18 @@
 {% extends 'base.html' %}
 
+{% macro state_selector(shift_entry) %}
+  <form method="post" action="/volunteer/role/{{ shift_entry.shift.role_id }}/set_state/{{ shift_entry.shift_id }}/{{ shift_entry.user_id }}" class="role-state-selector">
+    <label class="sr-only" for="state">New State</label>
+    <select name="state" class="form-control">
+      <option value="{{ shift_entry.state }}">{{ shift_entry.state | capitalize | replace("_", " ") }}</option>
+      <hr>
+      {% for state in shift_entry.valid_states() %}
+        <option value="{{ state }}">{{ state | capitalize | replace("_", " ") }}</option>
+      {% endfor %}
+    </select>
+  </form>
+{% endmacro %}
+
 {% block title %}
   EMF Volunteer Role Admin
 {% endblock %}
@@ -7,20 +20,44 @@
 {% block body %}
   {% include "volunteer/_nav.html" %}
   <h2>{{ role }} Admin</h2>
-  {% for shift in shifts %}
-    {% set s = shift.to_localtime_dict() %}
-    <div class="role-admin-shift well content-well">
-      <h3>{{ shift.start.strftime("%a %H:%M") }} - {{ shift.end.strftime("%H:%M") }} - {{ shift.venue.name }}</h3>
-      {% for se in shift.entries|sort(attribute="user_id") %}
+  <h3>Volunteers on Shift</h3>
+  <div class="role-admin-shift well content-well">
+    {% for active in active_shift_entries %}
+      <div class="volunteer">
         <p>
-          <strong>{{ se.user.volunteer.nickname }}</strong>
-          {% if se.user.volunteer.volunteer_phone %}({{ se.user.volunteer.volunteer_phone }}){% endif %}<br />
-          {% if not se.user.volunteer.completed_shift(role) %}First shift<br />{% endif %}
-          {{ se.state | capitalize | replace("_", " ") }} | Mark as:&nbsp;
-          {% for state in se.valid_states() %}
-            <a href="/volunteer/role/{{ role.id }}/set_state/{{ se.shift_id }}/{{ se.user_id }}/{{ state }}">{{ state | capitalize | replace("_", " ") }}</a>
-          {% endfor %}
+          <strong>{{ active.user.volunteer.nickname }}</strong> {{ active.shift.start.strftime("%a %H:%M") }}&ndash;{{ active.shift.end.strftime("%H:%M") }}
+          {% if now > active.shift.end %}
+              <br /><span class="overtime">{{ now - active.shift.end }} over</span>
+          {% endif %}
         </p>
+        {{ state_selector(active) }}
+      </div>
+    {% endfor %}
+  </div>
+
+  <h3>Volunteers Due</h3>
+  <div class="role-admin-shift well content-well">
+    {% for pending in pending_shift_entries %}
+      <div class="volunteer">
+        <p>{{ pending.user.volunteer.nickname }}: {{ pending.shift.start.strftime("%a %H:%M") }}&ndash;{{ pending.shift.end.strftime("%H:%M") }}</p>
+        {{ state_selector(pending) }}
+      </div>
+    {% endfor %}
+  </div>
+
+  <h3>Upcoming Shifts</h3>
+  {% for shift in shifts %}
+    <div class="role-admin-shift well content-well">
+      <h4>{{ shift.start.strftime("%a %H:%M") }} - {{ shift.end.strftime("%H:%M") }} - {{ shift.venue.name }}</h4>
+      {% for se in shift.entries|sort(attribute="user_id") %}
+        <div class="volunteer">
+          <p>
+            <strong>{{ se.user.volunteer.nickname }}</strong>
+            {% if se.user.volunteer.volunteer_phone %}({{ se.user.volunteer.volunteer_phone }}){% endif %}<br />
+            {% if not se.user.volunteer.completed_shift(role) %}First shift<br />{% endif %}
+          </p>
+          {{ state_selector(se) }}
+        </div>
       {% endfor %}
     </div>
   {% endfor %}

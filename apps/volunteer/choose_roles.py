@@ -173,10 +173,16 @@ def role_admin_required(f, *args, **kwargs):
 @volunteer.route("role/<int:role_id>/admin")
 @role_admin_required
 def role_admin(role_id):
+    # Allow mocking the time for testing.
+    if "now" in request.args:
+        now = datetime.strptime(request.args["now"], "%Y-%m-%dT%H:%M")
+    else:
+        now = datetime.now()
+
     limit = int(request.args.get("limit", "5"))
     offset = int(request.args.get("offset", "0"))
     role = Role.query.get_or_404(role_id)
-    cutoff = datetime.now() - timedelta(minutes=30)
+    cutoff = now - timedelta(minutes=30)
     shifts = (
         Shift.query.filter_by(role=role)
         .filter(Shift.end >= cutoff)
@@ -185,18 +191,38 @@ def role_admin(role_id):
         .limit(limit)
         .all()
     )
+
+    active_shift_entries = (
+        ShiftEntry.query.filter(ShiftEntry.state == "arrived")
+        .join(ShiftEntry.shift)
+        .filter(Shift.role_id == role.id)
+        .all()
+    )
+    pending_shift_entries = (
+        ShiftEntry.query.join(ShiftEntry.shift)
+        .filter(
+            Shift.start <= now - timedelta(minutes=15), Shift.role == role, ShiftEntry.state == "signed_up"
+        )
+        .all()
+    )
+
     return render_template(
         "volunteer/role_admin.html",
         role=role,
         shifts=shifts,
+        active_shift_entries=active_shift_entries,
+        pending_shift_entries=pending_shift_entries,
+        now=now,
         offset=offset,
         limit=limit,
     )
 
 
-@volunteer.route("role/<int:role_id>/set_state/<int:shift_id>/<int:user_id>/<state>")
+@volunteer.route("role/<int:role_id>/set_state/<int:shift_id>/<int:user_id>", methods=["POST"])
 @role_admin_required
-def toggle_arrived(role_id: int, shift_id: int, user_id: int, state: ShiftEntryState):
+def set_state(role_id: int, shift_id: int, user_id: int):
+    state = request.form["state"]
+
     try:
         se = ShiftEntry.query.filter(
             ShiftEntry.shift_id == shift_id, ShiftEntry.user_id == user_id

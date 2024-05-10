@@ -17,8 +17,8 @@ ShiftEntryState: TypeAlias = Union[
 ]
 
 SHIFT_ENTRY_STATES: dict[ShiftEntryState, list[ShiftEntryState]] = {
-    "signed_up": ["arrived", "abandoned", "completed", "no_show"],
-    "arrived": ["abandoned", "completed", "signed_up"],
+    "signed_up": ["arrived", "completed", "abandoned", "no_show"],
+    "arrived": ["completed", "abandoned", "signed_up"],
     "abandoned": ["arrived"],
     "completed": ["arrived"],
     "no_show": ["arrived"],
