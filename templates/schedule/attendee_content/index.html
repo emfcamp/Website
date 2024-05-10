@@ -2,8 +2,15 @@
 {% extends "base.html" %}
 {% block title %}Your Content{% endblock %}
 {% block body %}
-    <h2>Your Content</h2>
+<p>
+    You can help other people find you or your village's talks, workshops, installations, and gatherings by
+    adding them to the schedule.
+</p>
+<p>
+    <strong>You should not add content that you have submitted to the CfP here.</strong>
+</p>
     {% if content|length > 0 %}
+    <h2>Your Content</h2
     <table class="table">
         <thead>
             <tr>
@@ -40,8 +47,6 @@
             {% endfor %}
         </tbody>
     </table>
-    {% else %}
-    <p>You haven't posted any content yet.</p>
     {% endif %}
 
     <div class="panel panel-default">
