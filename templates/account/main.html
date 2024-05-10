@@ -15,16 +15,19 @@
         </div>
         <div class="panel-body">
           {% if current_user.village %}
-            You're a member of the <strong>{{current_user.village.name}}</strong> village.
+            <p>You're a member of the <strong>{{current_user.village.name}}</strong> village.</p>
             {% if current_user.village_membership.admin %}
-              <a href="{{url_for('villages.edit', year=event_year, village_id=current_user.village.id)}}">
-                Edit this village</a>.
+              <a class="btn btn-primary" href="{{url_for('villages.edit', year=event_year, village_id=current_user.village.id)}}">
+                Edit village details</a>
             {% endif %}
           {% else %}
             <p>Village registration is open! If you're planning on camping with a group of people,
-            you can let us know about it by <a href="{{ url_for("villages.register") }}">registering your village</a>.
+            you can let us know about it by registering your village</a>.
             This will help us try to make sure you have the space and facilities you need.</p>
-            <p>You can also see a <a href="{{url_for("villages.main", year=event_year)}}">list of registered villages</a>.</p>
+            <div class="btn-group">
+              <a class="btn btn-primary" href="{{ url_for("villages.register") }}">Register a village</a>
+              <a class="btn btn-default" href="{{url_for("villages.main", year=event_year)}}">View villages</a>
+            </div>
           {% endif %}
         </div>
     </div>
@@ -37,9 +40,10 @@
           <h3 class="panel-title">Call for Participation</h3>
         </div>
         <div class="panel-body">
-          Our Call for Participation is now open!<br>
-          If you want to give a talk, workshop, or performance at EMF {{event_year}},
-          you can now <a href="{{url_for('cfp.main')}}">submit your proposal</a>.
+          <p>Our Call for Participation is open!<br>
+          We're looking for talks, workshops, or performances at EMF {{event_year}}.
+          </p>
+          <a class="btn btn-primary" href="{{url_for('cfp.main')}}">Submit a proposal</a>
         </div>
       </div>
     </div>
@@ -54,11 +58,12 @@
         <div class="panel-body">
           <p>
             You can help other people find you or your village's talks, workshops, installations, and gatherings by
-            adding them to the schedule. If you're part of a village you'll be able to schedule content occurring there,
+            adding them to the schedule.</p>
+          <p>
+            If you're part of a village you'll be able to schedule content occurring there,
             and anyone can arrange gatherings in the main bar or lounge.
           </p>
-          <p><strong>You should not add content that you have submitted to the CFP here.</strong></p>
-          <p><a href="{{url_for('schedule.attendee_content')}}">Manage your content</a></p>
+          <a class="btn btn-primary" href="{{url_for('schedule.attendee_content')}}">Manage your content</a>
         </div>
       </div>
     </div>
