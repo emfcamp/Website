@@ -16,8 +16,8 @@ from models.volunteer import (
     Shift,
     ShiftEntry,
 )
-from .init_data import load_initial_venues, load_initial_roles, shift_list
-
+from .init_data import load_initial_venues, load_initial_roles
+from .shift_list import shift_list
 
 @volunteer.route("/")
 def main():
@@ -45,7 +45,6 @@ def info_page(page_name: str):
 @feature_flag("VOLUNTEERS_SIGNUP")
 def info():
     return render_markdown(f"volunteer/info/index", page_name="index")
-
 
 @volunteer.route("/init_shifts")
 @v_admin_required
