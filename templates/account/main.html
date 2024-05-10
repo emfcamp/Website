@@ -3,6 +3,7 @@
 {% block title %}My Account{% endblock %}
 {% block body %}
 {% include "account/_nav.html" %}
+{% set owned_tickets = current_user.get_owned_tickets(True)|list %}
 <p>
   You're logged in as <strong>{{current_user.name}}</strong> (<strong>{{ current_user.email }}</strong>).
     <a href="{{url_for('.details')}}">Edit your account details</a>.
@@ -22,8 +23,10 @@
             {% endif %}
           {% else %}
             <p>Village registration is open! If you're planning on camping with a group of people,
-            you can let us know about it by registering your village</a>.
-            This will help us try to make sure you have the space and facilities you need.</p>
+            you can let us know about it by registering your village.
+            This will help us try to make sure you have the space and facilities you need.
+            <a href="{{url_for('base.page', page_name='villages')}}">Learn more about villages</a>.
+            </p>
             <div class="btn-group">
               <a class="btn btn-primary" href="{{ url_for("villages.register") }}">Register a village</a>
               <a class="btn btn-default" href="{{url_for("villages.main", year=event_year)}}">View villages</a>
@@ -69,7 +72,7 @@
     </div>
   {% endif %}
 
-  {% if current_user.get_owned_tickets(True)|list|length > 1 %}
+  {% if owned_tickets|length > 1 %}
     <div class="col-md-6">
       <div class="panel panel-default">
         <div class="panel-heading">
@@ -81,6 +84,24 @@
           whoever will be using them, so they can receive updates from us and sign up for workshops.
           </p>
           <a class="btn btn-primary" href="{{url_for(".purchases")}}">Transfer tickets</a>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if SITE_STATE in ('sales', 'event') %}
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">T-shirts and badges</h3>
+        </div>
+        <div class="panel-body">
+          <p>We still have a limited number of EMF 2024 T-shirts and Tildagon electronic badges available
+          for sale &mdash; order now and collect them at the event.</p>
+          <div class="btn-group">
+            <a class="btn btn-primary" href="{{url_for("tickets.main", flow="tees")}}">Buy t-shirts</a>
+            <a class="btn btn-primary" href="{{url_for("tickets.main", flow="badge")}}">Buy badges</a>
+          </div>
         </div>
       </div>
     </div>
