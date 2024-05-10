@@ -20,26 +20,30 @@
     {% endif %}
 
     {% if feature_enabled('CFP') %}
-      {{ menuitem("Proposals", "cfp.proposals") }}
-      {{ menuitem("Messages", "cfp.all_messages", unread_count or 0) }}
+      {% if current_user.proposals.all()|length > 0 %}
+        {{ menuitem("Proposals", "cfp.proposals") }}
+        {{ menuitem("Messages", "cfp.all_messages", unread_count or 0) }}
+      {% endif %}
 
-      {% if current_user.has_permission('cfp_admin') %}
-        {{ menuitem("CfP Admin", "cfp_review.proposals") }}
+      {% if not current_user.has_permission('admin') %}
+        {% if current_user.has_permission('cfp_admin') %}
+          {{ menuitem("CfP Admin", "cfp_review.proposals") }}
 
-      {% elif current_user.has_permission('cfp_anonymiser') %}
-        {{ menuitem("Anonymise proposals", "cfp_review.anonymisation") }}
+        {% elif current_user.has_permission('cfp_anonymiser') %}
+          {{ menuitem("Anonymise proposals", "cfp_review.anonymisation") }}
 
-      {% elif current_user.has_permission('cfp_reviewer') %}
-        {{ menuitem("Review proposals", "cfp_review.review_list") }}
+        {% elif current_user.has_permission('cfp_reviewer') %}
+          {{ menuitem("Review proposals", "cfp_review.review_list") }}
 
+        {% endif %}
       {% endif %}
     {% endif %}
 
-    {% if current_user.has_permission('villages') %}
+    {% if current_user.has_permission('villages') and not current_user.has_permission('admin') %}
       {{ menuitem("Villages Admin", "villages.admin") }}
     {% endif %}
 
-    {% if current_user.has_permission('volunteer:admin') %}
+    {% if current_user.has_permission('volunteer:admin') and not current_user.has_permission('admin') %}
       {{ menuitem("Volunteer Admin", "volunteer_admin.index") }}
     {% endif %}
 
