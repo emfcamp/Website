@@ -20,6 +20,9 @@
 {% block body %}
   {% include "volunteer/_nav.html" %}
   <h2>{{ role }} Admin</h2>
+  <div>
+    <a href="{{ url_for('.role_volunteers', role_id=role.id) }}" class="btn btn-primary">All Volunteers</a> <a href="{{ url_for('.train_users', role_id=role.id) }}") }}" class="btn btn-primary">Training</a>
+  </div>
   <h3>Volunteers on Shift</h3>
   <div class="role-admin-shift well content-well">
     {% for active in active_shift_entries %}
