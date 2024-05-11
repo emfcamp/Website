@@ -239,12 +239,14 @@ def set_state(role_id: int, shift_id: int, user_id: int):
 @role_admin_required
 def role_volunteers(role_id):
     role = Role.query.get_or_404(role_id)
-    entries = ShiftEntry.query.filter(ShiftEntry.shift.has(role_id=role_id)).all()
+    interested = VolunteerUser.query.join(VolunteerUser.interested_roles).filter(Role.id == role_id).all()
+    entries = ShiftEntry.query.join(ShiftEntry.shift).filter(Shift.role_id == role_id).all()
     signed_up = list(set([se.user.volunteer for se in entries]))
-    completed = list(set([se.user.volunteer for se in entries if se.completed]))
+    completed = list(set([se.user.volunteer for se in entries if se.state == "completed"]))
     return render_template(
         "volunteer/role_volunteers.html",
         role=role,
+        interested=interested,
         signed_up=signed_up,
         completed=completed,
     )
