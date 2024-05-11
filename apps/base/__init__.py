@@ -89,9 +89,7 @@ def main_post():
             response.status_code,
             response.text,
         )
-        flash(
-            "Sorry, we were unable to subscribe you to the mailing list. Please try again later."
-        )
+        flash("Sorry, we were unable to subscribe you to the mailing list. Please try again later.")
 
     else:
         flash(
@@ -148,7 +146,7 @@ def sponsor():
 
 @base.route("/badge")
 def badge():
-    return redirect("https://wiki-archive.emfcamp.org/2012/wiki/TiLDA")
+    return redirect("https://tildagon.badge.emfcamp.org/")
 
 
 @base.route("/code-of-conduct")
