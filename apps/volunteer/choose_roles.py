@@ -21,7 +21,6 @@ from models.volunteer.volunteer import Volunteer as VolunteerUser
 from models.volunteer.shift import (
     Shift,
     ShiftEntry,
-    ShiftEntryState,
     ShiftEntryStateException,
 )
 
