@@ -1,0 +1,18 @@
+/* A grid of panels. */
+
+.panel-grid {
+  --panel-grid-min-size: 350px;
+  --panel-grid-max-size: 1fr;
+  --panel-grid-gap: 10px;
+
+  display: grid;
+  gap: var(--panel-grid-gap);
+  grid-template-columns: repeat(auto-fill, minmax(var(--panel-grid-min-size), var(--panel-grid-max-size)));
+  grid-template-rows: masonry;
+  margin-bottom: 20px;
+}
+
+.panel-grid > .panel {
+  block-size: fit-content;
+  margin-bottom: 0;
+}
