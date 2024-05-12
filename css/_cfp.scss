@@ -54,6 +54,14 @@
   color: color.mix($main-background-text, $main-background, 50%);
 }
 
+.sortable-ghost-class {
+  background-color: $brand-2024-blue
+}
+
+.draggable-panel {
+  cursor: move;
+}
+
 textarea#description {
   height: 200px;
 }

@@ -10,6 +10,7 @@ from main import db
 from models.cfp import Proposal
 from models.ical import CalendarEvent
 from models.admin_message import AdminMessage
+from models.event_tickets import EventTicket
 
 
 def _require_video_api_key(func):
@@ -134,6 +135,32 @@ class FavouriteExternal(Resource):
         return {"is_favourite": new_state}
 
 
+class UpdateLotteryPreferences(Resource):
+    def post(self):
+        if not current_user.is_authenticated:
+            abort(401)
+
+        new_order = [int(i) for i in request.get_json()]
+
+        current_tickets = {
+            t.id: t
+            for t in EventTicket.query.filter_by(
+                state="entered-lottery", user_id=current_user.id
+            ).all()
+        }
+
+        for new_rank, t_id in enumerate(new_order):
+            ticket = current_tickets[t_id]
+            ticket.rank = new_rank
+
+        db.session.commit()
+
+        res = sorted(current_tickets.values(), key=lambda t: t.rank)
+
+        # return the curret version of the preference list
+        return [t.id for t in res]
+
+
 def renderScheduleMessage(message):
     return {"id": message.id, "body": message.message}
 
@@ -150,3 +177,4 @@ api.add_resource(ProposalResource, "/proposal/<int:proposal_id>")
 api.add_resource(FavouriteProposal, "/proposal/<int:proposal_id>/favourite")
 api.add_resource(FavouriteExternal, "/external/<int:event_id>/favourite")
 api.add_resource(ScheduleMessage, "/schedule_messages")
+api.add_resource(UpdateLotteryPreferences, "/schedule/tickets/preferences")
