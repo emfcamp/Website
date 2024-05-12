@@ -114,6 +114,24 @@ class ExternalMetrics:
         for duration, *key in shift_seconds:
             emf_shift_seconds.add_metric(key, duration.total_seconds())
 
+        required_shift_seconds = (
+            Shift.query.join(Shift.role)
+            .with_entities(
+                func.sum(Shift.duration * Shift.min_needed).label("minimum_secs"),
+                func.sum(Shift.duration * Shift.max_needed).label("maximum_secs"),
+                func.sum(Shift.min_needed).label("minimum"),
+                func.sum(Shift.max_needed).label("maximum"),
+                Role.name,
+            )
+            .group_by(Role.name)
+            .order_by(Role.name)
+        )
+        for min_sec, max_sec, min, max, role in required_shift_seconds:
+            emf_shift_seconds.add_metric([role, "min_required"], min_sec.total_seconds())
+            emf_shift_seconds.add_metric([role, "max_required"], max_sec.total_seconds())
+            emf_shifts.add_metric([role, "min_required"], min)
+            emf_shifts.add_metric([role, "max_required"], max)
+
         return [
             emf_purchases,
             emf_payments,
