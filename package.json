@@ -64,6 +64,7 @@
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-nl2br": "^0.6.1",
+    "sortablejs": "^1.15.2",
     "workbox-cacheable-response": "^6.5.4",
     "workbox-expiration": "^6.6.0",
     "workbox-routing": "^6.6.0",

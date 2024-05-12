@@ -1,5 +1,7 @@
 from main import db
 from . import BaseModel
+from .user import User
+from .cfp import Proposal
 
 
 # entered-lottery -- An entry in the lottery for a ticket
@@ -32,16 +34,20 @@ class EventTicket(BaseModel):
         if state not in EVENT_TICKET_STATES:
             raise EventTicketException(f"invalid ticket state {state}")
 
-        if state == "entered-lottery" and rank:
-            raise EventTicketException("lottery tickets must have a rank")
-
-        if state == "entered-lottery" and rank and rank <= 0:
+        if state == "entered-lottery" and ((rank and rank <= 0) or not rank):
             raise EventTicketException("rank must be greater than 0")
 
         self.user_id = user_id
         self.proposal_id = proposal_id
         self.state = state
         self.rank = rank
+
+    def get_other_lottery_tickets(self):
+        return [
+            t
+            for t in self.user.event_tickets
+            if t.state == "entered-lottery" and t != self
+        ]
 
     def is_in_lottery_round(self, round_rank):
         return self.state == "entered-lottery" and self.rank <= round_rank
@@ -61,21 +67,29 @@ class EventTicket(BaseModel):
     def won_lottery_and_cancel_others(self):
         self.change_state("ticket")
         # Now cancel other tickets
-        for other_ticket in self.user.event_tickets:
-            if other_ticket.state == "entered-lottery":
-                other_ticket.change_state("cancelled")
+        for other_ticket in self.get_other_lottery_tickets():
+            other_ticket.cancel()
 
         return self
 
     def lost_lottery(self):
         return self.change_state("lost-lottery")
 
+    def cancel_and_update_ranks(self):
+        # adjust ranks for lottery tickets
+        if self.state == "entered-lottery":
+            for ticket in self.get_other_lottery_tickets():
+                if (ticket.id == self.id) or (ticket.rank < self.rank):
+                    continue
+                ticket.rank -= 1
+        return self.change_state("cancelled")
 
-def create_ticket(user, proposal):
+
+def create_ticket(user: User, proposal: Proposal) -> EventTicket:
     return EventTicket(user.id, proposal.id, state="ticket")
 
 
-def create_lottery_ticket(user, proposal, rank=None):
+def create_lottery_ticket(user: User, proposal: Proposal, rank=None) -> EventTicket:
     if not rank:
         rank = len(user.event_tickets.all())
     return EventTicket(user.id, proposal.id, state="entered-lottery", rank=rank)

@@ -8,7 +8,13 @@ from flask import render_template, redirect, url_for, flash, request, abort
 from flask_login import current_user
 from flask import current_app as app
 
-from wtforms import BooleanField, SubmitField, FormField, StringField, SelectField
+from wtforms import (
+    BooleanField,
+    FormField,
+    SelectField,
+    StringField,
+    SubmitField,
+)
 
 from main import db
 from models import event_year
@@ -17,7 +23,7 @@ from models.ical import CalendarSource, CalendarEvent
 from models.user import generate_api_token
 from models.admin_message import AdminMessage
 from models.site_state import get_signup_state
-from models.event_tickets import create_ticket, create_lottery_ticket
+from models.event_tickets import create_lottery_ticket, create_ticket
 
 from ..common import feature_flag, feature_enabled
 from ..common.forms import Form
@@ -221,6 +227,9 @@ def item_current(year, proposal_id, slug=None):
 
         elif form.enter_lottery.data and get_signup_state() == "issue_lottery_tickets":
             msg = f'Entered lottery up for "{proposal.display_title}"'
+            app.logger.info(
+                f"theoretical next rank: {len(current_user.event_tickets.all())}"
+            )
             db.session.add(create_lottery_ticket(current_user, proposal))
 
         db.session.commit()
@@ -245,6 +254,18 @@ def item_current(year, proposal_id, slug=None):
         venue_name=venue_name,
         form=form,
     )
+
+
+@schedule.route("/schedule/tickets", methods=["GET", "POST"])
+def event_tickets():
+    if current_user.is_anonymous:
+        return redirect(url_for("users.login", next=url_for("schedule.event_tickets")))
+
+    user_tickets = sorted(
+        current_user.event_tickets.all(), key=lambda t: (t.state, t.rank)
+    )
+
+    return render_template("schedule/event_tickets.html", tickets=user_tickets)
 
 
 @schedule.route("/now-and-next")

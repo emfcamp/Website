@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import render_field %}
+{% from "schedule/_faves.html" import favourite_icons %}
+{% from "schedule/_proposal_icons.html" import proposal_icons %}
+{% block title %}Workshop Tickets{% endblock %}
+{% block body %}
+
+<h2>Your current workshop tickets</h2>
+
+<noscript>
+  This page requires Javascript, sorry.
+</noscript>
+
+<p>
+  You can drag & drop your tickets in order of preference with top being your
+  highest preference and the bottom being your lowest.
+</p>
+
+<div id="event-tickets" class="list-group">
+  {% for t in tickets %}
+    <div class="list-group-item panel draggable-panel" data-id="{{ t.id }}">
+      {{t.id}} ==>  {{ t.proposal.title }}
+    </div>
+  {% endfor %}
+</div>
+
+
+{% endblock %}
+
+{% block foot %}
+  <script type="text/javascript" src="{{static_url_for('static', filename="js/event-tickets.js")}}"></script>
+{% endblock -%}

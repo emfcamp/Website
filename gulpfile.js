@@ -91,11 +91,12 @@ const main_js = (cb) => pump(jsBuild('main.js'), cb),
   line_up_js = (cb) => pump(jsBuild('line-up.js'), cb),
   schedule_js = (cb) => pump(jsBuild('schedule.js'), cb),
   volunteer_schedule_js = (cb) => pump(jsBuild('volunteer-schedule.js'), cb),
+  event_tickets_js = (cb) => pump(jsBuild('event-tickets.js'), cb),
   arrivals_js = (cb) => pump(jsBuild('arrivals.js'), cb);
 
 
 function js(cb) {
-  gulp.parallel(main_js, line_up_js, schedule_js, volunteer_schedule_js, arrivals_js)(cb);
+  gulp.parallel(main_js, line_up_js, schedule_js, volunteer_schedule_js, event_tickets_js, arrivals_js)(cb);
 }
 
 function css(cb) {
