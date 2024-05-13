@@ -1,189 +1,84 @@
 from ..event_date import edt
 
+tech_times = [
+    {
+        "first": edt("thur", "17:30:00"),
+        "final": edt("thur", "22:30:00"),
+        "min": 1,
+        "max": 1,
+        "base_duration": 300,
+        "changeover": 0
+    },
+] + [
+    {
+        "first": edt(d[0], "19:45:00"),
+        "final": edt(d[1], "02:00:00"),
+        "min": 1,
+        "max": 1,
+        "base_duration": 375,
+        "changeover": 0
+    } for d in [("fri", "sat"), ("sat", "sun"), ("sun", "mon")]
+]
+
 bands_shifts = {
     "Bands: Artist Liason": {
         "Stage B": [
              {
                 "first": edt("thur", "17:30:00"),
-                "final": edt("fri", "01:00:00"),
+                "final": edt("thur", "23:00:00"),
                 "min": 1,
                 "max": 1,
-                 "base_duration": 450,
+                "base_duration": 330,
+                "changeover": 0
             },
             {
                 "first": edt("fri", "17:30:00"),
                 "final": edt("sat", "01:00:00"),
                 "min": 1,
                 "max": 1,
-                 "base_duration": 450,
+                "base_duration": 450,
+                "changeover": 0
             },
             {
                 "first": edt("sat", "17:30:00"),
                 "final": edt("sun", "01:00:00"),
                 "min": 1,
                 "max": 1,
-                 "base_duration": 450,
+                "base_duration": 450,
+                "changeover": 0
             },
             {
                 "first": edt("sun", "17:30:00"),
                 "final": edt("mon", "01:00:00"),
                 "min": 1,
                 "max": 1,
-                 "base_duration": 450,
+                "base_duration": 450,
+                "changeover": 0
             },
         ], 
     },  
     "Bands: Venue Manager": {
-        "Stage B": [
-             {
-                "first": edt("thur", "17:30:00"),
-                "final": edt("fri", "01:00:00"),
-                "min": 1,
-                "max": 1,
-                 "base_duration": 450,
-            },
-            {
-                "first": edt("fri", "17:30:00"),
-                "final": edt("sat", "01:00:00"),
-                "min": 1,
-                "max": 1,
-                 "base_duration": 450,
-            },
-            {
-                "first": edt("sat", "17:30:00"),
-                "final": edt("sun", "01:00:00"),
-                "min": 1,
-                "max": 1,
-                 "base_duration": 450,
-            },
-            {
-                "first": edt("sun", "17:30:00"),
-                "final": edt("mon", "01:00:00"),
-                "min": 1,
-                "max": 1,
-                 "base_duration": 450,
-            },
-        ], 
+        "Stage B": tech_times, 
     },    
     "Bands: Sound Operator": {
-        "Stage B": [
-             {
-                "first": edt("thur", "18:00:00"),
-                "final": edt("fri", "01:00:00"),
-                "min": 1,
-                "max": 1,
-                 "base_duration": 420,
-            },
-            {
-                "first": edt("fri", "18:00:00"),
-                "final": edt("sat", "01:00:00"),
-                "min": 1,
-                "max": 1,
-                 "base_duration": 420,
-            },
-            {
-                "first": edt("sat", "18:00:00"),
-                "final": edt("sun", "01:00:00"),
-                "min": 1,
-                "max": 1,
-                 "base_duration": 420,
-            },
-            {
-                "first": edt("sun", "18:00:00"),
-                "final": edt("mon", "01:00:00"),
-                "min": 1,
-                "max": 1,
-                 "base_duration": 420,
-            },
-        ], 
+        "Stage B": tech_times
     },
     "Bands: Sound Technician": {
-        "Stage B": [
-             {
-                "first": edt("thur", "18:00:00"),
-                "final": edt("fri", "01:00:00"),
-                "min": 1,
-                "max": 1,
-                "base_duration": 420,
-            },
-            {
-                "first": edt("fri", "18:00:00"),
-                "final": edt("sat", "01:00:00"),
-                "min": 1,
-                "max": 1,
-                "base_duration": 420,
-            },
-            {
-                "first": edt("sat", "18:00:00"),
-                "final": edt("sun", "01:00:00"),
-                "min": 1,
-                "max": 1,
-                "base_duration": 420,
-            },
-            {
-                "first": edt("sun", "18:00:00"),
-                "final": edt("mon", "01:00:00"),
-                "min": 1,
-                "max": 1,
-                "base_duration": 420,
-            },
-        ], 
+        "Stage B": tech_times
     },
     "Bands: Lighting Operator": {
-        "Stage B": [
-             {
-                "first": edt("thur", "18:00:00"),
-                "final": edt("fri", "01:00:00"),
-                "min": 1,
-                "max": 1,
-                "base_duration": 420,
-            },
-            {
-                "first": edt("fri", "18:00:00"),
-                "final": edt("sat", "01:00:00"),
-                "min": 1,
-                "max": 1,
-                "base_duration": 420,
-            },
-            {
-                "first": edt("sat", "18:00:00"),
-                "final": edt("sun", "01:00:00"),
-                "min": 1,
-                "max": 1,
-                "base_duration": 420,
-            },
-            {
-                "first": edt("sun", "18:00:00"),
-                "final": edt("mon", "01:00:00"),
-                "min": 1,
-                "max": 1,
-                "base_duration": 420,
-            },
-        ], 
+        "Stage B": tech_times
     },
     "Bands: Stage Crew": {
         "Stage B": [
             {
-                "first": edt("fri", "18:00:00"),
-                "final": edt("fri", "21:00:00"),
+                "first": edt(d, "19:45:00"),
+                "final": edt(d, "23:00:00"),
                 "min": 1,
                 "max": 1,
-                "base_duration": 180,
-            },
-            {
-                "first": edt("sat", "18:00:00"),
-                "final": edt("sat", "21:00:00"),
-                "min": 1,
-                "max": 1,
-                "base_duration": 180,
-            },
-            {
-                "first": edt("sun", "18:00:00"),
-                "final": edt("sun", "21:00:00"),
-                "min": 1,
-                "max": 1,
-                "base_duration": 180,
-            },
+                "base_duration": 195,
+                "changeover": 0
+            } for d in ["fri", "sat", "sun"]
         ], 
     },
 
