@@ -78,6 +78,7 @@ class ProductGroupForm(Form):
     type = SelectField("Type", choices=[(t.slug, t.name) for t in PRODUCT_GROUP_TYPES])
     capacity_max = IntegerField("Maximum to sell (Optional)", [Optional()])
     expires = DateField("Expiry Date (Optional)", [Optional()])
+    attributes = JSONField("Attributes")
 
 
 class NewProductGroupForm(ProductGroupForm):
@@ -92,12 +93,14 @@ class EditProductGroupForm(ProductGroupForm):
         self.type.data = pg.type
         self.capacity_max.data = pg.capacity_max
         self.expires.data = pg.expires
+        self.attributes.data = pg.attributes
 
     def update_pg(self, pg):
         pg.name = self.name.data
         pg.type = self.type.data
         pg.capacity_max = self.capacity_max.data
         pg.expires = self.expires.data
+        pg.attributes = self.attributes.data
         return pg
 
 
