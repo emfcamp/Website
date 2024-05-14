@@ -125,7 +125,7 @@ def network():
 
 @base.route("/phones")
 def phones():
-    return redirect("https://wiki.emfcamp.org/wiki/Phones")
+    return redirect("/about/phones")
 
 
 @base.route("/feedback")
