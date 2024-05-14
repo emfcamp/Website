@@ -28,7 +28,10 @@ Click Submit and your number will be created.
 
 NOTE:
 
-If you had a Permanent Number Reserved in the Eventphone system and used this on DECT at EMF2022 then we have kept your reservation, please email [poc@emfcamp.org](mailto:poc@emfcamp.org) once you have created an account in our system for us to transfer it over to you.
+_If you had a Permanent Number Reserved in the Eventphone system and used this on DECT at EMF2022 then we have kept your reservation, please email [poc@emfcamp.org](mailto:poc@emfcamp.org) once you have created an account in our system for us to transfer it over to you._
+
+** Numbers are a finite rescource**, we have ~3000 attendees and ~7700 numbers, please do not register excessive amounts of numbers that you don't need, we may remove numbers or accounts that are felt to be abusing the system.
+If you have a use-case that needs a lot of numbers come and talk to the Phone Team.
 
 
 ### Managing your Numbers
@@ -55,7 +58,7 @@ You can bring your own DECT telephone and join the network, enabling you to call
 
 If you're buying a DECT phone and don't know what to get, buy pretty much any Gigaset DECT handset, for example:
 
-- Gigaset A170, £18 on Amazon [https://amzn.to/3yaJ5EG](https://amzn.to/3yaJ5EG)
+- Gigaset A170, £18 on Amazon [https://amzn.eu/d/5bMa7ic](https://amzn.eu/d/5bMa7ic)
 - Gigaset Life A, ~£60 on Amazon [https://amzn.eu/d/4GuVoMu](https://amzn.eu/d/4GuVoMu) (Known to be compatible with Bluetooth Hearing Aids from Phonak, Unitron and Hansaton)
 
 If you've got one already, feel free to bring it. Use Eventphones [DECT Phone Compatibility List](https://eventphone.de/doku/dect_phone_compatibility_list) to find out if your phone is likely compatible.
