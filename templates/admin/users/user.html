@@ -30,7 +30,7 @@
                     -
                 {% endif %}
             </td>
-            <td>{% if ticket.checked_in %}Yes{% else %}No{% endif %}</td>
+            <td>{% if ticket.redeemed %}Yes{% else %}No{% endif %}</td>
             <td>
               <div class="btn-group">
                 <a href="{{ url_for('.view_ticket', ticket_id=ticket.id) }}" class="btn btn-default">View</a>

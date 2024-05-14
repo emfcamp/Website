@@ -1,5 +1,6 @@
 from datetime import datetime
 from sqlalchemy.orm import column_property, validates
+from sqlalchemy_continuum.version import VersionClassBase
 from main import db
 from .user import User
 from . import BaseModel, Currency
@@ -71,6 +72,8 @@ class Purchase(BaseModel):
     is_paid_for = column_property(state.in_(bought_states))
     # Whether an e-ticket has been issued for this item
     ticket_issued = db.Column(db.Boolean, default=False, nullable=False)
+    # Whether this ticket has been checked-in/merch issued
+    redeemed = db.Column(db.Boolean, default=False)
 
     # Relationships
     owner = db.relationship(
@@ -112,13 +115,14 @@ class Purchase(BaseModel):
 
     @property
     def is_transferable(self):
-        return self.product.get_attribute("is_transferable")
+        return self.product.get_attribute("is_transferable") and not self.redeemed
 
     def is_refundable(self, ignore_event_refund_state=False) -> bool:
         return (
             (self.is_paid_for is True)
             and not self.is_transferred
             and self.payment.is_refundable(ignore_event_refund_state)
+            and not self.redeemed
         )
 
     @property
@@ -216,6 +220,35 @@ class Purchase(BaseModel):
 
         PurchaseTransfer(purchase=self, to_user=to_user, from_user=from_user)
 
+    def redeem(self):
+        if not self.product.get_attribute("is_redeemable"):
+            raise CheckinStateException("This item isn't redeemable.")
+        if self.is_paid_for is False:
+            raise CheckinStateException(
+                "Trying to redeem an item which hasn't been paid for."
+            )
+        if self.redeemed is True:
+            raise CheckinStateException("Purchase has already been redeemed.")
+        self.redeemed = True
+
+    def unredeem(self):
+        if not self.product.get_attribute("is_redeemable"):
+            raise CheckinStateException("This item isn't redeemable.")
+        if self.redeemed is False:
+            raise CheckinStateException("Purchase hasn't been redeemed.")
+        self.redeemed = False
+
+    def redemption_version(self) -> VersionClassBase | None:
+        if not self.redeemed:
+            return None
+        # This is inefficient without continuum's PropertyModTrackerPlugin
+        # However: usually the only attribute that changes is the redemption bit
+        for ver in self.versions[::-1]:
+            if 'redeemed' in ver.changeset:
+                return ver
+        return None
+
+
 
 class Ticket(Purchase):
     """A ticket, which is a specific type of purchase, but with different vocabulary.
@@ -229,45 +262,7 @@ class Ticket(Purchase):
 class AdmissionTicket(Ticket):
     """A ticket that can contribute to the licensed capacity and be issued a badge."""
 
-    checked_in = db.Column(db.Boolean, default=False)
-    badge_issued = db.Column(db.Boolean, default=False)
-
     __mapper_args__ = {"polymorphic_identity": "admission_ticket"}
-
-    @property
-    def is_transferable(self) -> bool:
-        return self.product.get_attribute("is_transferable") and not self.checked_in
-
-    def is_refundable(self, ignore_event_refund_state=False) -> bool:
-        return super().is_refundable(ignore_event_refund_state) and not self.checked_in
-
-    def check_in(self):
-        if self.is_paid_for is False:
-            raise CheckinStateException(
-                "Trying to check in a ticket which hasn't been paid for."
-            )
-        if self.checked_in is True:
-            raise CheckinStateException("Ticket is already checked in.")
-        self.checked_in = True
-
-    def undo_check_in(self):
-        if self.checked_in is False:
-            raise CheckinStateException("Ticket is not checked in.")
-        self.checked_in = False
-
-    def badge_up(self):
-        if self.is_paid_for is False:
-            raise CheckinStateException(
-                "Trying to issue a badge for a ticket which hasn't been paid for."
-            )
-        if self.badge_issued is True:
-            raise CheckinStateException("Ticket is already badged up.")
-        self.badge_issued = True
-
-    def undo_badge_up(self):
-        if self.badge_issued is False:
-            raise CheckinStateException("Ticket is not badged up.")
-        self.badge_issued = False
 
 
 class PurchaseTransfer(BaseModel):

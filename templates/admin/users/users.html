@@ -84,7 +84,7 @@
     <td>{{ u.name }}</td>
     <td><a href="{{ url_for('.user', user_id=u.id) }}">{{ u.email }}</a></td>
     <td>{% for permission in u.permissions %}{{ permission.name }}&nbsp;{% endfor %}</td>
-    <td>{{ u.owned_admission_tickets | selectattr("checked_in") | list | count or '' }}</td>
+    <td>{{ u.owned_admission_tickets | selectattr("redeemed") | list | count or '' }}</td>
 </tr>
 {% endfor %}
 </table>
