@@ -55,11 +55,10 @@ You can bring your own DECT telephone and join the network, enabling you to call
 
 If you're buying a DECT phone and don't know what to get, buy pretty much any Gigaset DECT handset, for example:
 
-	Gigaset A170, £18 on Amazon [https://amzn.to/3yaJ5EG](https://amzn.to/3yaJ5EG)
+- Gigaset A170, £18 on Amazon [https://amzn.to/3yaJ5EG](https://amzn.to/3yaJ5EG)
+- Gigaset Life A, ~£60 on Amazon [https://amzn.eu/d/4GuVoMu](https://amzn.eu/d/4GuVoMu) (Known to be compatible with Bluetooth Hearing Aids from Phonak, Unitron and Hansaton)
 
-Gigaset Life A, ~£60 on Amazon [https://amzn.eu/d/4GuVoMu](https://amzn.eu/d/4GuVoMu) (Known to be compatible with Bluetooth Hearing Aids from Phonak, Unitron and Hansaton)
-
-If you've got one already, feel free to bring it. Use the DECT Phone Compatibility List to find out if your phone is likely compatible.
+If you've got one already, feel free to bring it. Use Eventphones [DECT Phone Compatibility List](https://eventphone.de/doku/dect_phone_compatibility_list) to find out if your phone is likely compatible.
 
 
 ### POTS (Plain old telephone service)
