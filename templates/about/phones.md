@@ -41,7 +41,7 @@ Next to each number is 3 buttons.
 
 **Modify** lets you amend the Description in the phonebook, change the visibility in the phonebook and set a Fallback Number.
 
-The** Falback Number **is a number that will be called if the main number doesn’t answer the call within 30sec or is unavailable. 
+The **Fallback Number** is a number that will be called if the main number doesn’t answer the call within 30sec or is unavailable. 
 
 
 ## Types of Service
