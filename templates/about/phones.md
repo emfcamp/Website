@@ -30,7 +30,7 @@ NOTE:
 
 _If you had a Permanent Number Reserved in the Eventphone system and used this on DECT at EMF2022 then we have kept your reservation, please email [poc@emfcamp.org](mailto:poc@emfcamp.org) once you have created an account in our system for us to transfer it over to you._
 
-** Numbers are a finite rescource**, we have ~3000 attendees and ~7700 numbers, please do not register excessive amounts of numbers that you don't need, we may remove numbers or accounts that are felt to be abusing the system.
+**Numbers are a finite rescource**, we have ~3000 attendees and ~7700 numbers, please do not register excessive amounts of numbers that you don't need, we may remove numbers or accounts that are felt to be abusing the system.
 If you have a use-case that needs a lot of numbers come and talk to the Phone Team.
 
 
