@@ -57,7 +57,7 @@
     "bootstrap": "^3.4.1",
     "bootstrap-sass": "^3.4.3",
     "core-js": "^3.34.0",
-    "datatables.net": "^1.13.8",
+    "datatables.net-bs": "^2.0.7",
     "jquery": "^3.7.1",
     "jquery-highlight": "^3.5.0",
     "luxon": "^1.28.1",
