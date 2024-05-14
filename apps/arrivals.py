@@ -72,8 +72,6 @@ def begin_badge_up():
 
 
 # Entrypoint for QR code
-# TODO: remove the /checkin URL after 2022
-@arrivals.route("/checkin/qrcode/<code>")
 @arrivals.route("/arrivals/qrcode/<code>")
 @arrivals_required
 def checkin_qrcode(code):
@@ -214,9 +212,6 @@ def search(query=None):
     return data
 
 
-# TODO: remove the /checkin URL after 2022
-@arrivals.route("/checkin/<int:user_id>", methods=["GET", "POST"])
-@arrivals.route("/checkin/<int:user_id>/<source>", methods=["GET", "POST"])
 @arrivals.route("/arrivals/<int:user_id>", methods=["GET", "POST"])
 @arrivals.route("/arrivals/<int:user_id>/<source>", methods=["GET", "POST"])
 @arrivals_required
@@ -294,8 +289,7 @@ def checkin(user_id, source=None):
     )
 
 
-# TODO: remove the /checkin URL after 2022
-@arrivals.route("/checkin/ticket/<ticket_id>", methods=["POST"])
+@arrivals.route("/arrivals/ticket/<ticket_id>", methods=["POST"])
 @arrivals_required
 def ticket_checkin(ticket_id):
     ticket = Purchase.query.get_or_404(ticket_id)
@@ -315,8 +309,7 @@ def ticket_checkin(ticket_id):
     return redirect(url_for(".checkin", user_id=ticket.owner.id))
 
 
-# TODO: remove the /checkin URL after 2022
-@arrivals.route("/checkin/ticket/<ticket_id>/undo", methods=["POST"])
+@arrivals.route("/arrivals/ticket/<ticket_id>/undo", methods=["POST"])
 @arrivals_required
 def undo_ticket_checkin(ticket_id):
     ticket = Purchase.query.get_or_404(ticket_id)
