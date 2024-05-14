@@ -21,5 +21,5 @@ check-syntax:
 	mypy ./*.py ./apps ./models
 
 fix-syntax:
-	ruff --check --fix ./main.py ./apps ./models ./tests
+	ruff check --fix ./main.py ./apps ./models ./tests
 	mypy ./*.py ./apps ./models
