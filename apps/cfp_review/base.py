@@ -1344,11 +1344,16 @@ def get_diversity_counts(user_list):
 
         if user.diversity.age:
             res["age"][guess_age(user.diversity.age)] += 1
+        else:
+            res["age"][""] += 1
         if user.diversity.gender:
             res["gender"][guess_gender(user.diversity.gender)] += 1
+        else:
+            res["gender"][""] += 1
         if user.diversity.ethnicity:
             res["ethnicity"][guess_ethnicity(user.diversity.ethnicity)] += 1
-
+        else:
+            res["ethnicity"][""] += 1
         for tag in user.cfp_reviewer_tags:
             res["reviewer_tags"][tag] += 1
 
