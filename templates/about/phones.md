@@ -12,7 +12,7 @@ Firstly you will need to register an account with a username, email & password. 
 
 ### Registering a Number
 
-Once logged in cick Add a Number in the top menu bar.
+Once logged in click Add a Number in the top menu bar.
 
 This will then show you the Create Number form
 
