@@ -43,7 +43,7 @@ class ExternalMetrics:
             "emf_purchases", "Tickets purchased", labels=["product", "state", "type"]
         )
         emf_payments = GaugeMetricFamily("emf_payments", "Payments received", labels=["provider", "state"])
-        emf_attendees = GaugeMetricFamily("emf_attendees", "Attendees", labels=["checked_in", "badged_up"])
+        emf_attendees = GaugeMetricFamily("emf_attendees", "Attendees", labels=["checked_in"])
         emf_proposals = GaugeMetricFamily("emf_proposals", "CfP Submissions", labels=["type", "state"])
         emf_email_jobs = GaugeMetricFamily("emf_emails", "Email recipients", labels=["sent"])
         emf_vouchers = GaugeMetricFamily("emf_vouchers", "Vouchers", labels=["product_view", "state"])
@@ -64,8 +64,7 @@ class ExternalMetrics:
         gauge_groups(
             emf_attendees,
             AdmissionTicket.query.filter(AdmissionTicket.is_paid_for),
-            cast(AdmissionTicket.checked_in, String),
-            cast(AdmissionTicket.badge_issued, String),
+            cast(AdmissionTicket.redeemed, String),
         )
         gauge_groups(emf_proposals, Proposal.query, Proposal.type, Proposal.state)
         gauge_groups(

@@ -274,7 +274,7 @@ def test_product_group_get_counts_by_state(db, parent_group, user):
     assert parent_group.purchase_count_by_state == expected
 
 
-def test_check_in(db, parent_group, user):
+def test_redemption(db, parent_group, user):
     product = Product(name="product", capacity_max=3, parent=parent_group)
     tier = PriceTier(name="tier", parent=product)
     price = Price(price_tier=tier, currency="GBP", price_int=666)
@@ -290,15 +290,21 @@ def test_check_in(db, parent_group, user):
 
     with pytest.raises(CheckinStateException):
         # Likewise, checking in should fail.
-        purchase.check_in()
+        purchase.redeem()
 
     purchase.state = "paid"
     db.session.commit()
 
+    with pytest.raises(CheckinStateException):
+        # This product isn't redeemable yet.
+        purchase.redeem()
+
+    product.set_attribute("is_redeemable", True)
+
     purchase.ticket_issued = True
-    assert purchase.checked_in is False
-    purchase.check_in()
-    assert purchase.checked_in is True
+    assert purchase.redeemed is False
+    purchase.redeem()
+    assert purchase.redeemed is True
 
 
 @pytest.mark.skip(
@@ -319,7 +325,6 @@ def test_transfer(db, user, parent_group):
 
     item = user1.purchases[0]
 
-    item.price_tier.allow_check_in = True
     item.price_tier.is_transferable = False
 
     with pytest.raises(PurchaseTransferException) as e:

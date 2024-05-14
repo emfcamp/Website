@@ -16,7 +16,7 @@
   <dt>Sold</dt><dd>{{ product.capacity_used }}</dd>
   <dt>Maximum</dt><dd>{{ product.capacity_max }}</dd>
   <dt>Expires</dt><dd>{{ format_expiry(product) }}</dd>
-  <dt>Issue Badge</dt><dd>{{ product.get_attribute('has_badge') or False}}</dd>
+  <dt>Redeemable</dt><dd>{{ product.get_attribute('is_redeemable') or False}}</dd>
   <dt>Transferable</dt><dd>{{ product.get_attribute('is_transferable') or False}}</dd>
   <dt>Description</dt><dd>{{ product.description or '--' }}</dd>
 </dl>

@@ -61,17 +61,15 @@
   <td>
     {% if mode == "badge" %}
       {%- if ticket.badge_issued %}
-        {# FIXME this ain't necessarily so #}
-        Badge issued {{ ticket.versions[-1].transaction.issued_at.strftime('%A %H:%M') }}
-        by {{ ticket.versions[-1].transaction.user.name }}
+        Badge issued {{ ticket.redemption_version().transaction.issued_at.strftime('%A %H:%M') }}
+        by {{ ticket.redemption_transaction.user.name }}
       {% else %}
         Badge not issued
       {% endif -%}
     {% else %}
       {%- if ticket.checked_in %}
-        {# FIXME this ain't necessarily so #}
-        Checked in {{ ticket.versions[-1].transaction.issued_at.strftime('%A %H:%M') }}
-        by {{ ticket.versions[-1].transaction.user.name }}
+        Checked in {{ ticket.redemption_version().transaction.issued_at.strftime('%A %H:%M') }}
+        by {{ ticket.redemption_transaction.user.name }}
       {% else %}
         Not checked in
       {% endif -%}
