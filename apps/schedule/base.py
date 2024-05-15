@@ -23,7 +23,7 @@ from models.ical import CalendarSource, CalendarEvent
 from models.user import generate_api_token
 from models.admin_message import AdminMessage
 from models.site_state import get_signup_state
-from models.event_tickets import create_lottery_ticket, create_ticket
+from models.event_tickets import create_lottery_ticket, create_ticket, EventTicket
 
 from ..common import feature_flag, feature_enabled
 from ..common.forms import Form
@@ -185,6 +185,7 @@ class ItemForm(Form):
     # Signup/eventticket bits
     get_ticket = SubmitField("Get Ticket")
     enter_lottery = SubmitField("Enter lottery")
+    ticket_count = SelectField("How many tickets?", coerce=int)
 
 
 def item_current(year, proposal_id, slug=None):
@@ -200,8 +201,17 @@ def item_current(year, proposal_id, slug=None):
 
     form = ItemForm()
 
+    if proposal.type == "youthworkshop":
+        form.ticket_count.choices = [(i, i) for i in range(1, 5)]
+    else:
+        form.ticket_count.choices = [(1, 1)]
+
     if form.validate_on_submit() and not current_user.is_anonymous:
         msg = ""
+        ticket_count = form.ticket_count.data if proposal.type == "youthworkshop" else 1
+
+        app.logger.info(f"ticket_count = {ticket_count}")
+
         if form.toggle_favourite.data:
             if is_fave:
                 current_user.favourites.remove(proposal)
@@ -216,7 +226,9 @@ def item_current(year, proposal_id, slug=None):
             form.enter_lottery.data
             and current_user.has_lottery_ticket_for_event(proposal.id)
         ):
+            # FIXME this should cope with people changing the number of tickets in their event ticket but good gods
             msg = f"You already have a ticket for this event"
+
         elif (
             form.get_ticket.data
             and get_signup_state() == "issue_tickets"
@@ -230,13 +242,21 @@ def item_current(year, proposal_id, slug=None):
             app.logger.info(
                 f"theoretical next rank: {len(current_user.event_tickets.all())}"
             )
-            db.session.add(create_lottery_ticket(current_user, proposal))
+
+            db.session.add(create_lottery_ticket(current_user, proposal, ticket_count))
 
         db.session.commit()
         flash(msg)
         return redirect(
             url_for(".item", year=year, proposal_id=proposal.id, slug=proposal.slug)
         )
+
+    ticket = EventTicket.get_event_ticket(current_user, proposal)
+
+    if ticket:
+        form.ticket_count.data = ticket.ticket_count
+    else:
+        form.ticket_count.data = form.ticket_count.choices[0][0]
 
     if slug != proposal.slug:
         return redirect(

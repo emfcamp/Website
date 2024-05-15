@@ -29,17 +29,22 @@ class EventTicket(BaseModel):
     proposal_id = db.Column(db.Integer, db.ForeignKey("proposal.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     rank = db.Column(db.Integer, nullable=True)
+    ticket_count = db.Column(db.Integer, nullable=False, default=1)
 
-    def __init__(self, user_id, proposal_id, state, rank=None):
+    def __init__(self, user_id, proposal_id, state, ticket_count=1, rank=None):
         if state not in EVENT_TICKET_STATES:
             raise EventTicketException(f"invalid ticket state {state}")
 
-        if state == "entered-lottery" and ((rank and rank <= 0) or not rank):
-            raise EventTicketException("rank must be greater than 0")
+        if state == "entered-lottery" and ((rank and rank < 0) or rank is None):
+            raise EventTicketException("rank must be greater than or equal to 0")
+
+        if ticket_count <= 0:
+            raise EventTicketException("ticket_count must be greater than 0")
 
         self.user_id = user_id
         self.proposal_id = proposal_id
         self.state = state
+        self.ticket_count = ticket_count
         self.rank = rank
 
     def get_other_lottery_tickets(self):
@@ -84,12 +89,21 @@ class EventTicket(BaseModel):
                 ticket.rank -= 1
         return self.change_state("cancelled")
 
+    @classmethod
+    def get_event_ticket(cls, user: User, proposal: Proposal):
+        return EventTicket.query.filter_by(
+            user_id=user.id, proposal_id=proposal.id
+        ).one_or_none()
+
 
 def create_ticket(user: User, proposal: Proposal) -> EventTicket:
-    return EventTicket(user.id, proposal.id, state="ticket")
+    return EventTicket(user.id, proposal.id, "ticket")
 
 
-def create_lottery_ticket(user: User, proposal: Proposal, rank=None) -> EventTicket:
-    if not rank:
+def create_lottery_ticket(
+    user: User, proposal: Proposal, ticket_count=1, rank=None
+) -> EventTicket:
+    if rank is None:
         rank = len(user.event_tickets.all())
-    return EventTicket(user.id, proposal.id, state="entered-lottery", rank=rank)
+
+    return EventTicket(user.id, proposal.id, "entered-lottery", ticket_count, rank)
