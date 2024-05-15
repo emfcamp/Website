@@ -49,7 +49,7 @@ stage_a_pattern = [
 
 stage_bc_pattern = [
     {"first": edt("fri", "10:45:00"),
-     "final": edt("fri", "17:45:00"),
+     "final": edt("fri", "20:45:00"),
      "min": 1,
      "max": 1,
      "base_duration": 140
@@ -85,13 +85,17 @@ stage_bc_pattern = [
 ]
 
 vm_pattern = [
-    {"first": edt(d, "09:30:00"),
+    {"first": edt(d, "10:00:00"),
      "final": edt(d, "20:30:00"),
      "min": 1,
      "max": 1,
-     "base_duration": 220
+     "base_duration": 315,
+     "changeover": 30,
     } for d in ["fri", "sat", "sun"]
 ]
+
+def set_max(shifts, val=2):
+    return [s | {"max": val} for s in shifts]
 
 talks_shifts = {
     "Green Room Runner": {
@@ -120,9 +124,9 @@ talks_shifts = {
         "Stage C": herald_pattern,
     },
     "Talks: Camera Operator": {
-        "Stage A": stage_a_pattern,
-        "Stage B": stage_bc_pattern,
-        "Stage C": stage_bc_pattern,
+        "Stage A": set_max(stage_a_pattern),
+        "Stage B": set_max(stage_bc_pattern),
+        "Stage C": set_max(stage_bc_pattern),
     },
     "Talks: Vision Mixer": {
         "Stage A": stage_a_pattern,

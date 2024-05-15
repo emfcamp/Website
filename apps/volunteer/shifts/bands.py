@@ -1,6 +1,6 @@
 from ..event_date import edt
 
-tech_times = [
+vm_times = [
     {
         "first": edt("thur", "17:30:00"),
         "final": edt("thur", "22:30:00"),
@@ -17,6 +17,25 @@ tech_times = [
         "max": 1,
         "base_duration": 375,
         "changeover": 0
+    } for d in [("fri", "sat"), ("sat", "sun"), ("sun", "mon")]
+]
+tech_times = [
+    {
+        "first": edt("thur", "17:30:00"),
+        "final": edt("thur", "22:30:00"),
+        "min": 1,
+        "max": 1,
+        "base_duration": 150,
+        "changeover": 15
+    },
+] + [
+    {
+        "first": edt(d[0], "20:00:00"),
+        "final": edt(d[1], "02:00:00"),
+        "min": 1,
+        "max": 1,
+        "base_duration": 180,
+        "changeover": 15
     } for d in [("fri", "sat"), ("sat", "sun"), ("sun", "mon")]
 ]
 
@@ -58,7 +77,7 @@ bands_shifts = {
         ], 
     },  
     "Bands: Venue Manager": {
-        "Stage B": tech_times, 
+        "Stage B": vm_times, 
     },    
     "Bands: Sound Operator": {
         "Stage B": tech_times
@@ -72,12 +91,12 @@ bands_shifts = {
     "Bands: Stage Crew": {
         "Stage B": [
             {
-                "first": edt(d, "19:45:00"),
+                "first": edt(d, "20:00:00"),
                 "final": edt(d, "23:00:00"),
                 "min": 1,
                 "max": 1,
-                "base_duration": 195,
-                "changeover": 0
+                "base_duration": 90,
+                "changeover": 15
             } for d in ["fri", "sat", "sun"]
         ], 
     },
