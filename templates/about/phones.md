@@ -68,7 +68,7 @@ If you've got one already, feel free to bring it. Use Eventphones [DECT Phone Co
 
 There will be a site-wide analog POTS network allowing you to connect a traditional analog phone to a phone line, with support for modems and fax machines.
 
-For more information see [docs.cutel.net](docs.cutel.net)
+For more information see [docs.cutel.net](https://docs.cutel.net)
 
 
 ### Cellular
