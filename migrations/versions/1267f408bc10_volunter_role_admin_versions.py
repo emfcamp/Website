@@ -1,14 +1,14 @@
-"""VolunteerRoleAdminSetting
+"""empty message
 
-Revision ID: 4dcd2eba5f2c
-Revises: e9529c62ca57
-Create Date: 2024-05-14 01:00:14.114990
+Revision ID: 1267f408bc10
+Revises: b9db98f438aa
+Create Date: 2024-05-15 21:17:04.246271
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '4dcd2eba5f2c'
-down_revision = 'e9529c62ca57'
+revision = '1267f408bc10'
+down_revision = 'b9db98f438aa'
 
 from alembic import op
 import sqlalchemy as sa
