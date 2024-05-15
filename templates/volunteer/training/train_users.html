@@ -4,6 +4,7 @@
     Train users
 {% endblock %}
 {% block body %}
+    {% include "volunteer/_nav.html" %}
     <h2>Who have you trained?</h2>
     <form method="post">
         {{ form.hidden_tag() }}

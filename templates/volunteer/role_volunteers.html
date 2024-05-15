@@ -14,12 +14,15 @@
   {% include "volunteer/_nav.html" %}
   <h2>{{ role }} Volunteers</h2>
 
-  <h3>All volunteers signed up for a {{ role }} shift</h3>
+  <h3>Signed up for a shift - {{ signed_up | length }}</h3>
   {{ listvols(signed_up) }}
 
   {% if completed %}
-    <h3>Shift marked as complete</h3>
+    <h3>With one or more completed shifts - {{ completed | length }}</h3>
     {{ listvols(completed) }}
   {% endif %}
+
+  <h3>Interested Volunteers - {{ interested | length }}</h3>
+  {{ listvols(interested) }}
 
 {% endblock %}

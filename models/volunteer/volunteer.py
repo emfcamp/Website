@@ -12,12 +12,8 @@ from . import ShiftEntry
 VolunteerRoleInterest = db.Table(
     "volunteer_role_interest",
     db.Model.metadata,
-    db.Column(
-        "volunteer_id", db.Integer, db.ForeignKey("volunteer.id"), primary_key=True
-    ),
-    db.Column(
-        "role_id", db.Integer, db.ForeignKey("volunteer_role.id"), primary_key=True
-    ),
+    db.Column("volunteer_id", db.Integer, db.ForeignKey("volunteer.id"), primary_key=True),
+    db.Column("role_id", db.Integer, db.ForeignKey("volunteer_role.id"), primary_key=True),
 )
 
 
@@ -25,12 +21,8 @@ VolunteerRoleInterest = db.Table(
 VolunteerRoleTraining = db.Table(
     "volunteer_role_training",
     db.Model.metadata,
-    db.Column(
-        "volunteer_id", db.Integer, db.ForeignKey("volunteer.id"), primary_key=True
-    ),
-    db.Column(
-        "role_id", db.Integer, db.ForeignKey("volunteer_role.id"), primary_key=True
-    ),
+    db.Column("volunteer_id", db.Integer, db.ForeignKey("volunteer.id"), primary_key=True),
+    db.Column("role_id", db.Integer, db.ForeignKey("volunteer_role.id"), primary_key=True),
 )
 
 
@@ -72,7 +64,7 @@ class Volunteer(BaseModel, UserMixin):
         shifts = ShiftEntry.query.filter(
             ShiftEntry.shift.has(role=role),
             ShiftEntry.user == self.user,
-            ShiftEntry.completed,
+            ShiftEntry.state == "completed",
         ).all()
         return bool(shifts)
 

@@ -75,9 +75,7 @@ def schedule():
     venues = VolunteerVenue.get_all()
 
     untrained_roles = [
-        r
-        for r in roles
-        if r["is_interested"] and r["requires_training"] and not r["is_trained"]
+        r for r in roles if r["is_interested"] and r["requires_training"] and not r["is_trained"]
     ]
 
     return render_template(
@@ -97,9 +95,7 @@ def shift(shift_id):
     shift = Shift.query.get_or_404(shift_id)
     all_volunteers = Volunteer.query.order_by(Volunteer.nickname).all()
 
-    return render_template(
-        "volunteer/shift.html", shift=shift, all_volunteers=all_volunteers
-    )
+    return render_template("volunteer/shift.html", shift=shift, all_volunteers=all_volunteers)
 
 
 @volunteer.route("/shift/<shift_id>/sign-up", methods=["POST"])
@@ -107,7 +103,7 @@ def shift(shift_id):
 @v_user_required
 def shift_sign_up(shift_id):
     shift = Shift.query.get_or_404(shift_id)
-    if current_user.has_permission("volunteer:admin") and request.form["user_id"]:
+    if current_user.has_permission("volunteer:admin") and "user_id" in request.form:
         user = User.query.get(request.form["user_id"])
     else:
         user = current_user
@@ -119,17 +115,10 @@ def shift_sign_up(shift_id):
         return redirect_next_or_schedule(f"Signed up for {shift.role.name} shift")
 
     if shift.current_count >= shift.max_needed:
-        return redirect_next_or_schedule(
-            "This shift is already full. You have not been signed up."
-        )
+        return redirect_next_or_schedule("This shift is already full. You have not been signed up.")
 
-    if (
-        shift.role.requires_training
-        and shift.role not in Volunteer.get_for_user(current_user).trained_roles
-    ):
-        return redirect_next_or_schedule(
-            "You must complete training before you can sign up for this shift."
-        )
+    if shift.role.requires_training and shift.role not in Volunteer.get_for_user(current_user).trained_roles:
+        return redirect_next_or_schedule("You must complete training before you can sign up for this shift.")
 
     for shift_entry in user.shift_entries:
         if shift.is_clash(shift_entry.shift):
