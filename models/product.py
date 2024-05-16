@@ -318,10 +318,14 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
 
         We have to consider under-18 tickets as adult tickets because 16-18 year olds may attend
         the event without an adult.
+
+        Day tickets should be able to buy badges/merchandise.
         """
         # FIXME: Make this less awful, we need a less brittle way of detecting this
         return self.parent.type == "admissions" and (
-            self.name.startswith("full") or self.name.startswith("u18")
+            self.name.startswith("full")
+            or self.name.startswith("u18")
+            or self.name.startswith("day")
         )
 
     @property
