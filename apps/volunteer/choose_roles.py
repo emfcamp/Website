@@ -18,7 +18,11 @@ from datetime import datetime, timedelta
 from main import db
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer as VolunteerUser
-from models.volunteer.shift import Shift, ShiftEntry
+from models.volunteer.shift import (
+    Shift,
+    ShiftEntry,
+    ShiftEntryStateException,
+)
 
 from . import volunteer, v_user_required
 from ..common import feature_enabled, feature_flag
@@ -168,10 +172,16 @@ def role_admin_required(f, *args, **kwargs):
 @volunteer.route("role/<int:role_id>/admin")
 @role_admin_required
 def role_admin(role_id):
+    # Allow mocking the time for testing.
+    if "now" in request.args:
+        now = datetime.strptime(request.args["now"], "%Y-%m-%dT%H:%M")
+    else:
+        now = datetime.now()
+
     limit = int(request.args.get("limit", "5"))
     offset = int(request.args.get("offset", "0"))
     role = Role.query.get_or_404(role_id)
-    cutoff = datetime.now() - timedelta(minutes=30)
+    cutoff = now - timedelta(minutes=30)
     shifts = (
         Shift.query.filter_by(role=role)
         .filter(Shift.end >= cutoff)
@@ -180,45 +190,48 @@ def role_admin(role_id):
         .limit(limit)
         .all()
     )
+
+    active_shift_entries = (
+        ShiftEntry.query.filter(ShiftEntry.state == "arrived")
+        .join(ShiftEntry.shift)
+        .filter(Shift.role_id == role.id)
+        .all()
+    )
+    pending_shift_entries = (
+        ShiftEntry.query.join(ShiftEntry.shift)
+        .filter(
+            Shift.start <= now - timedelta(minutes=15), Shift.role == role, ShiftEntry.state == "signed_up"
+        )
+        .all()
+    )
+
     return render_template(
         "volunteer/role_admin.html",
         role=role,
         shifts=shifts,
+        active_shift_entries=active_shift_entries,
+        pending_shift_entries=pending_shift_entries,
+        now=now,
         offset=offset,
         limit=limit,
     )
 
 
-@volunteer.route("role/<int:role_id>/toggle_arrived/<int:shift_id>/<int:user_id>")
+@volunteer.route("role/<int:role_id>/set_state/<int:shift_id>/<int:user_id>", methods=["POST"])
 @role_admin_required
-def toggle_arrived(role_id, shift_id, user_id):
-    se = ShiftEntry.query.filter(
-        ShiftEntry.shift_id == shift_id, ShiftEntry.user_id == user_id
-    ).first_or_404()
-    se.arrived = not se.arrived
-    db.session.commit()
-    return redirect(url_for(".role_admin", role_id=role_id))
+def set_state(role_id: int, shift_id: int, user_id: int):
+    state = request.form["state"]
 
+    try:
+        se = ShiftEntry.query.filter(
+            ShiftEntry.shift_id == shift_id, ShiftEntry.user_id == user_id
+        ).first_or_404()
+        if se.state != state:
+            se.set_state(state)
+        db.session.commit()
+    except ShiftEntryStateException:
+        flash(f"{state} is not a valid state for this shift.")
 
-@volunteer.route("role/<int:role_id>/toggle_abandoned/<int:shift_id>/<int:user_id>")
-@role_admin_required
-def toggle_abandoned(role_id, shift_id, user_id):
-    se = ShiftEntry.query.filter(
-        ShiftEntry.shift_id == shift_id, ShiftEntry.user_id == user_id
-    ).first_or_404()
-    se.abandoned = not se.abandoned
-    db.session.commit()
-    return redirect(url_for(".role_admin", role_id=role_id))
-
-
-@volunteer.route("role/<int:role_id>/toggle_complete/<int:shift_id>/<int:user_id>")
-@role_admin_required
-def toggle_complete(role_id, shift_id, user_id):
-    se = ShiftEntry.query.filter(
-        ShiftEntry.shift_id == shift_id, ShiftEntry.user_id == user_id
-    ).first_or_404()
-    se.completed = not se.completed
-    db.session.commit()
     return redirect(url_for(".role_admin", role_id=role_id))
 
 
@@ -226,12 +239,14 @@ def toggle_complete(role_id, shift_id, user_id):
 @role_admin_required
 def role_volunteers(role_id):
     role = Role.query.get_or_404(role_id)
-    entries = ShiftEntry.query.filter(ShiftEntry.shift.has(role_id=role_id)).all()
+    interested = VolunteerUser.query.join(VolunteerUser.interested_roles).filter(Role.id == role_id).all()
+    entries = ShiftEntry.query.join(ShiftEntry.shift).filter(Shift.role_id == role_id).all()
     signed_up = list(set([se.user.volunteer for se in entries]))
-    completed = list(set([se.user.volunteer for se in entries if se.completed]))
+    completed = list(set([se.user.volunteer for se in entries if se.state == "completed"]))
     return render_template(
         "volunteer/role_volunteers.html",
         role=role,
+        interested=interested,
         signed_up=signed_up,
         completed=completed,
     )

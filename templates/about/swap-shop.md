@@ -1,7 +1,7 @@
-title: Bring & Donate
+title: Swap Shop
 ---
-# Red Cross Bring & Donate
-The Old Curie-osity Shoppe is a way for you to get rid of those parts you bought for a project that never went anywhere, get new parts for a future project that might go somewhere, and donate money to the Red Cross while you’re doing it.
+# Swap Shop
+The Swap Shop is a way for you to get rid of those parts you bought for a project that never went anywhere, get new parts for a future project that might go somewhere, and donate money to charity while you’re doing it.
 
 ## Buying
 There’ll be a selection of crates containing stuff that people have brought with them: take a look around, pick up anything that takes your fancy and leave a donation in return. Make a note of the number on any crates you took items from so we can let the person who brought them how much they’ve raised. We will be performing age verification for any items that are age-restricted, such as blades or flammables.
