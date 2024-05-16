@@ -29,6 +29,10 @@ OPT_OUT = [
     ("", "Prefer not to say"),
 ]
 
+NULL_SELECTION = [
+    ("", "(please choose)"),
+]
+
 GENDER_VALUES = ("female", "male", "non-binary", "other")
 GENDER_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in GENDER_VALUES])
 
@@ -38,6 +42,7 @@ ETHNICITY_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in ETHNICITY_VALU
 AGE_VALUES = ("0-15", "16-25", "26-35", "36-45", "46-55", "56-65", "66+")
 AGE_CHOICES = tuple(OPT_OUT + [(v, v) for v in AGE_VALUES])
 
+TOPIC_CHOICES = tuple(NULL_SELECTION + [(v, v.capitalize()) for v in DEFAULT_TAGS])
 
 # FIXME these are matchers for transition from freetext diversity form -> select boxes
 # This should be deleted for 2026
@@ -97,9 +102,9 @@ class DiversityForm(Form):
     ethnicity = SelectField("Ethnicity", default=OPT_OUT[0], choices=ETHNICITY_CHOICES)
 
     # Track CfP reviewer tags
-    cfp_tag_0 = SelectField("Topic 1", default=DEFAULT_TAGS[0], choices=DEFAULT_TAGS)
-    cfp_tag_1 = SelectField("Topic 2", default=DEFAULT_TAGS[1], choices=DEFAULT_TAGS)
-    cfp_tag_2 = SelectField("Topic 3", default=DEFAULT_TAGS[2], choices=DEFAULT_TAGS)
+    cfp_tag_0 = SelectField("Topic 1", choices=TOPIC_CHOICES)
+    cfp_tag_1 = SelectField("Topic 2", choices=TOPIC_CHOICES)
+    cfp_tag_2 = SelectField("Topic 3", choices=TOPIC_CHOICES)
 
     def update_user(self, user):
         if not user.diversity:
@@ -137,7 +142,10 @@ class DiversityForm(Form):
         result = True
         seen = set()
         for field in [self.cfp_tag_0, self.cfp_tag_1, self.cfp_tag_2]:
-            if field.data in seen:
+            if field.data == "":
+                field.errors = ["Please select a topic."]
+                result = False
+            elif field.data in seen:
                 field.errors = ["Please select three different choices."]
                 result = False
             else:
