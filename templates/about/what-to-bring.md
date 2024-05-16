@@ -8,7 +8,7 @@ title: What to Bring
 * Clean clothes
 * A towel, shower gel, shampoo, soap, toothbrush, etc. (We have showers!)
 * Torch and extra batteries. The site will be well-lit, but there will be darker bits (e.g. inside your tent)
-* Food and/or money for food. All on-site bars and vendors accept cards, but the bar also offers cashback on debit cards if needed
+* Food and/or money for food. All on-site bars and vendors accept cards.
 * Walking boots and/or wellies (the site is a field, good shoes are a must)
 * Waterproofs. This is the UK: it will probably rain
 * Warm clothing for evenings and sleeping in if it gets cold
@@ -31,6 +31,7 @@ title: What to Bring
 * Pen and paper
 * Bin bags (for rubbish and dirty clothes)
 * A few gold and silver space blankets and clothes pins to cover your tent and prevent it from turning into an oven in the morning sun
+* Cash, some workshops will have a small fee to cover materials, this will need to be paid in cash to the organiser (there are ATMs in Ledbury if you need to get cash).
 
 ## Advice for Villages/Large Groups
 * A small camping kettle may come in handy (larger kettles require care). We have food and drink vendors on site.
