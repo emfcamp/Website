@@ -128,3 +128,11 @@ $(() => {
     });
   });
 });
+
+$(() => {
+  document.querySelectorAll('.role-state-selector').forEach((el) => {
+    el.addEventListener('change', (event) => {
+      event.target.form.submit();
+    })
+  });
+});

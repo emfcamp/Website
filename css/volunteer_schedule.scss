@@ -114,3 +114,22 @@ table.shifts-table tbody td.mobile-only {
     }
   }
 }
+
+.role-admin-shift {
+  .volunteer {
+    p {
+      margin-bottom: 0;
+    }
+
+    margin-bottom: 15px;
+  }
+
+  .volunteer:last-child {
+    margin-bottom: 0;
+  }
+
+  .overtime {
+    font-weight: bold;
+    color: $brand-2024-pink;
+  }
+}

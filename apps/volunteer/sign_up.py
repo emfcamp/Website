@@ -20,6 +20,7 @@ from . import volunteer, v_user_required
 from ..common.forms import Form
 from ..common.fields import TelField
 from ..common import create_current_user, feature_flag
+from apps.users import get_next_url
 
 
 class VolunteerSignUpForm(Form):
@@ -82,7 +83,8 @@ def sign_up():
         db.session.commit()
         app.logger.info("Add volunteer: %s", new_volunteer)
         flash("Thank you for signing up!", "message")
-        return redirect(url_for(".choose_role"))
+
+        return redirect(get_next_url(default=url_for(".choose_role")))
 
     return render_template("volunteer/sign-up.html", user=current_user, form=form)
 

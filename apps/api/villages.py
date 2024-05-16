@@ -1,9 +1,10 @@
 from flask import abort, request
 from flask_login import current_user
 from flask_restful import Resource
+from models.user import User
 from models.village import Village, VillageMember
 from models.cfp import Venue
-from shapely.geometry import shape
+from shapely.geometry import Point
 from geoalchemy2.shape import to_shape, from_shape
 
 from main import db
@@ -16,9 +17,9 @@ def render_village(village: Village):
         "name": village.name,
         "url": village.url,
         "description": village.description,
-        "location": to_shape(village.location).__geo_interface__
-        if village.location
-        else None,
+        "location": (
+            to_shape(village.location).__geo_interface__ if village.location else None
+        ),
     }
 
 
@@ -26,7 +27,13 @@ class VillagesMap(Resource):
     def get(self):
         features = []
         for obj in Village.query.filter(Village.location.isnot(None)):
-            features.append(obj.__geo_interface__)
+            data = obj.__geo_interface__
+            if data["properties"].get("description") is not None:
+                desc = data["properties"]["description"]
+                data["properties"]["description"] = (
+                    (desc[:230] + "...") if len(desc) > 230 else desc
+                )
+            features.append(data)
         return {"type": "FeatureCollection", "features": features}
 
 
@@ -42,11 +49,18 @@ class MyVillages(Resource):
     def get(self):
         if not current_user.is_authenticated:
             return abort(404)
-        my_villages = (
-            Village.query.join(VillageMember)
-            .filter((VillageMember.user == current_user))
-            .all()
-        )
+
+        my_villages = Village.query.join(VillageMember)
+        if (not current_user.has_permission("villages")) or request.args.get(
+            "all"
+        ) != "true":
+            my_villages = my_villages.filter(
+                (VillageMember.user == current_user) & (VillageMember.admin.is_(True))
+            )
+
+        if request.args.get("placed") == "false":
+            my_villages = my_villages.filter(Village.location.is_(None))
+
         result = []
         for village in my_villages:
             result.append(render_village(village))
@@ -61,11 +75,21 @@ class VillageResource(Resource):
         return render_village(village)
 
     def post(self, id):
+        # Used to update village location from the map.
+        # This only updates location for the moment.
         obj = Village.query.get(id)
         if not obj:
             return abort(404)
 
-        if obj.owner != current_user and not current_user.has_permission("villages"):
+        village_admins = (
+            User.query.join(VillageMember)
+            .filter(VillageMember.village_id == obj.id, VillageMember.admin.is_(True))
+            .all()
+        )
+
+        if (current_user not in village_admins) and not current_user.has_permission(
+            "villages"
+        ):
             return abort(403)
 
         data = request.get_json()
@@ -73,8 +97,7 @@ class VillageResource(Resource):
         if "location" not in data:
             return
 
-        loc = shape(data["location"])
-        obj.location = from_shape(loc)
+        obj.location = from_shape(Point(data["location"]), srid=4326)
         db.session.commit()
 
 

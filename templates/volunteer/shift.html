@@ -28,7 +28,7 @@
             <select name="user_id">
                 {% for volunteer in all_volunteers %}
                     {% if volunteer not in shift.volunteers %}
-                        <option value="{{ volunteer.id }}">{{ volunteer.nickname }}</option>
+                        <option value="{{ volunteer.user_id }}">{{ volunteer.nickname }}</option>
                     {% endif %}
                 {% endfor %}
             </select>

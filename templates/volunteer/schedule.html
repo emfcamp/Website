@@ -73,27 +73,35 @@
                                 {% else %}
                                     <td class="start_time hidden">{{ hour }}</td>
                                 {% endif %}
-                                <td class="end_time">{{ shift.end_time if shift.end else '--' }}</td>
-                                <td class="time mobile-only">{{ hour }}{% if shift.end %} to {{ shift.end_time }}{% endif %}</td>
+                                <td class="end_time">
+                                    {% if current_user.has_permission("volunteer:admin") %}
+                                        <a href="{{ url_for('.shift', shift_id=shift.id) }}">{{ shift.end_time if shift.end else '--' }}</a>
+                                    {% else %}
+                                        {{ shift.end_time if shift.end else '--' }}
+                                    {% endif %}
+                                </td>
+                                <td class="time mobile-only">
+                                    {% if current_user.has_permission("volunteer:admin") %}
+                                        <a href="{{ url_for('.shift', shift_id=shift.id) }}">{{ hour }}{% if shift.end %} to {{ shift.end_time }}{% endif %}</a>
+                                    {% else %}
+                                        {{ hour }}{% if shift.end %} to {{ shift.end_time }}{% endif %}
+                                    {% endif %}
+                                </td>
                                 <td class="venue">{{ shift.venue.name }}</td>
                                 <td class="role">{{ shift.role.name }}</td>
                                 <td class="staffing">{{ shift.current_count }}/{{ shift.max_needed }}</td>
-                                {% if current_user.has_permission("volunteer:admin") %}
-                                    <td class="button"><a href="{{ url_for('.shift', shift_id=shift.id) }}" class="btn btn-block btn-primary">Details</a></td>
-                                {% else %}
-                                    <td class="button">
-                                            {%- if shift.is_user_shift -%}
-                                                <form method="post" action="{{ url_for('.shift_cancel', shift_id=shift.id) }}">
-                                                    <button class="btn btn-block btn-danger">Cancel</button>
-                                                </form>
-                                            {%- else -%}
-                                                <form method="post" action="{{ url_for('.shift_sign_up', shift_id=shift.id) }}">
-                                                    <button class="btn btn-block btn-success">Sign Up</button>
-                                                </form>
-                                            {%- endif -%}
-                                        </form>
-                                    </td>
-                                {% endif %}
+                                <td class="button">
+                                        {%- if shift.is_user_shift -%}
+                                            <form method="post" action="{{ url_for('.shift_cancel', shift_id=shift.id, next=url_for('.schedule', day=active_day)) }}">
+                                                <button class="btn btn-block btn-danger">Cancel</button>
+                                            </form>
+                                        {%- else -%}
+                                            <form method="post" action="{{ url_for('.shift_sign_up', shift_id=shift.id, next=url_for('.schedule', day=active_day)) }}">
+                                                <button class="btn btn-block btn-success">Sign Up</button>
+                                            </form>
+                                        {%- endif -%}
+                                    </form>
+                                </td>
                             </tr>
                         {% endfor %}
                     {% endfor %}

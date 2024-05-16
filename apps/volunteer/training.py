@@ -5,12 +5,13 @@ from flask import render_template, flash, current_app as app, redirect, url_for
 from wtforms import SubmitField, BooleanField, FormField, FieldList
 from wtforms.validators import InputRequired
 
+from apps.volunteer.choose_roles import role_admin_required
 from main import db
 
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer
 
-from . import v_admin_required, volunteer
+from . import volunteer
 from ..common.forms import Form
 from ..common.fields import HiddenIntegerField
 
@@ -39,21 +40,13 @@ class TrainingForm(Form):
             field.label = field._volunteer.nickname
 
 
-@volunteer.route("/train-users")
-@v_admin_required
-def select_training():
-    return render_template(
-        "volunteer/training/select_training.html", roles=Role.get_all()
-    )
-
-
-@volunteer.route("/train-users/<role_id>", methods=["GET", "POST"])
-@v_admin_required
+@volunteer.route("/role-admin/<role_id>/train-users", methods=["GET", "POST"])
+@role_admin_required
 def train_users(role_id):
     role = Role.get_by_id(role_id)
     form = TrainingForm()
-
-    form.add_volunteers(Volunteer.get_all())
+    volunteers = Volunteer.query.join(Volunteer.interested_roles).filter(Role.id == role_id).all()
+    form.add_volunteers(volunteers)
 
     if form.validate_on_submit():
         changes = 0
