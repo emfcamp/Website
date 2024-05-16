@@ -89,7 +89,7 @@ vm_pattern = [
      "final": edt(d, "20:30:00"),
      "min": 1,
      "max": 1,
-     "base_duration": 315,
+     "base_duration": 210,
      "changeover": 30,
     } for d in ["fri", "sat", "sun"]
 ]
@@ -124,9 +124,9 @@ talks_shifts = {
         "Stage C": herald_pattern,
     },
     "Talks: Camera Operator": {
-        "Stage A": set_max(stage_a_pattern),
-        "Stage B": set_max(stage_bc_pattern),
-        "Stage C": set_max(stage_bc_pattern),
+        "Stage A": set_max(stage_a_pattern, 2),
+        "Stage B": set_max(stage_bc_pattern, 2),
+        "Stage C": set_max(stage_bc_pattern, 2),
     },
     "Talks: Vision Mixer": {
         "Stage A": stage_a_pattern,

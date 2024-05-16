@@ -1,4 +1,4 @@
-from ..event_date improt edt
+from ..event_date import edt
 
 phone_shifts = {
     "Phone Helpdesk Assistant": {

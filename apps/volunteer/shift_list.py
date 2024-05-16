@@ -8,7 +8,7 @@ from .shifts.kitchen import kitchen_shifts
 from .shifts.logistics import logistics_shifts
 from .shifts.nullsector import nullsector_shifts
 from .shifts.parking import parking_shifts
-# from .shifts.phone import phone_shifts
+from .shifts.phone import phone_shifts
 from .shifts.shop import shop_shifts
 from .shifts.talks import talks_shifts
 
@@ -23,6 +23,6 @@ shift_list.update(kitchen_shifts)
 shift_list.update(logistics_shifts)
 shift_list.update(nullsector_shifts)
 shift_list.update(parking_shifts)
-# shift_list.update(phone_shifts)
+shift_list.update(phone_shifts)
 shift_list.update(shop_shifts)
 shift_list.update(talks_shifts)
