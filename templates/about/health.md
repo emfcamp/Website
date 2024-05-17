@@ -44,7 +44,7 @@ The risk of catching airborne diseases is likely to be higher in smaller village
 ### What to do if you're ill at EMF
 If you experience symptoms of COVID during the event, please take a rapid COVID test &mdash; if you don't have one, the First Aid tent will give you one for free.
 
-A positive rapid test means that you are very likely contagious. If you test positive for COVID or have flu-like symptoms, please wear a mask, take great care to avoid close contact with other attendees, and leave the event as soon as you are able to. Even mild COVID symptoms won't be fun if you're stuck in a tent.
+A positive rapid test means that you are very likely contagious. If you test positive for COVID or have symptoms of flu or measles, please wear a mask, take great care to avoid close contact with other attendees, and leave the event as soon as you are able to. Even mild symptoms won't be fun if you're stuck in a tent. If you need any assistance, call our medical team.
 
 If you have any respiratory symptoms but have tested negative for COVID, please keep testing every day and wear a mask while you're near other people.
 
