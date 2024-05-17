@@ -8,7 +8,7 @@ This page applies to Electromagnetic Field 2024. It may be updated before the ev
 
 While you're at EMF, our medical team will be available to assist you if you're injured or ill, or if you just need some suncream &mdash; just drop by the first aid tent.
 
-If you have an urgent medical issue, call 1099 on the phone system or ask any volunteer with a radio. Please call our medical team instead of dialling 999, as you will get a faster response from our paramedics on site.
+If you have an urgent medical issue, head to the first aid tent, call 1099 on the phone system, or ask any volunteer with a radio. Only dial 999 as a last resort &mdash; we have paramedics on site who will get to you quicker.
 
 ## Refund policy
 
@@ -48,13 +48,18 @@ A positive rapid test means that you are very likely contagious. If you test pos
 
 If you have any respiratory symptoms but have tested negative for COVID, please keep testing every day and wear a mask while you're near other people.
 
-## Food-borne illness
+## Food poisoning
 Outdoor events carry a higher risk of catching food poisoning. We'll provide plenty of places for you to wash your hands, with running water and soap &mdash; please wash your hands regularly.
 
 ## Tick bites
 EMF is held in a deer park, which increases the risk of tick bites, especially if you wander off the event site into longer grass.
 
 Tick bites can carry [Lyme disease](https://www.nhs.uk/conditions/lyme-disease/). If you are bitten by a tick, please visit the First Aid tent to have it removed, and be aware of the symptoms of Lyme disease.
+
+## Alcohol
+If you're drinking alcohol, be aware that dehydration worsens its effects and it's easier to get dehydrated when camping outdoors. Make sure you eat regularly and drink plenty of water.
+
+Never get so drunk that you cannot take care of yourself if you were to get into a difficult situation. Be aware that our [code of conduct](/code-of-conduct) applies to everyone, and intoxication is not an excuse for bad behaviour.
 
 ## Burns
 Camping gas accidents can cause serious burns. Never change gas canisters in or near a tent and make sure the canister is threaded properly before lighting.
@@ -63,8 +68,8 @@ Camping gas accidents can cause serious burns. Never change gas canisters in or 
 Exposure to loud music can cause damage to your hearing &mdash; we provide free earplugs at the Info desk and at Null Sector. Please use them if you don't have your own!
 
 ## Weather
-Please come prepared for all weather! England in early June can be hot and sunny, or cold and rainy, sometimes within hours of each other.
+Please come prepared for all weather! England in early June can be hot and sunny, or cold and rainy, often within hours of each other.
 
-Make sure you drink plenty of water &mdash; there are water points across the site and free water is provided at the bars.
+Make sure you drink plenty of water &mdash; there are water points across the site and free water is provided at the bars. Bring sunscreen, wear it, and re-apply regularly, even if it's cloudy.
 
 Bring plenty of warm clothing and layers as it can get surprisingly cold at night.
