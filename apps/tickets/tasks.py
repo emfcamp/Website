@@ -26,16 +26,16 @@ from . import tickets
 
 def create_product_groups():
     top_level_groups = [
-        # name, capacity, expires
-        ("admissions", None, 2500),
-        ("parking", None, None),
-        ("campervan", None, None),
-        ("merchandise", None, None),
+        # name, capacity, expires, redeemable
+        ("admissions", None, 2500, True),
+        ("parking", None, None, False),
+        ("campervan", None, None, False),
+        ("merchandise", None, None, True),
     ]
-    for name, expires, capacity in top_level_groups:
+    for name, expires, capacity, redeemable in top_level_groups:
         if ProductGroup.get_by_name(name):
             continue
-        pg = ProductGroup(name=name, type=name, capacity_max=capacity, expires=expires)
+        pg = ProductGroup(name=name, type=name, capacity_max=capacity, expires=expires, attributes={"is_redeemable": redeemable})
         db.session.add(pg)
 
     db.session.flush()
@@ -64,11 +64,10 @@ def create_product_groups():
     general = ProductGroup.get_by_name("general")
 
     products = [
-        # name, display name, transferable, badge, capacity, description, vat_rate, (std cap, gbp eur), (early cap, gbp, eur), (late cap, gbp, eur)
+        # name, display name, transferable, capacity, description, vat_rate, (std cap, gbp eur), (early cap, gbp, eur), (late cap, gbp, eur)
         (
             "full",
             "Full Camp Ticket",
-            True,
             True,
             None,
             "Full ticket",
@@ -79,7 +78,6 @@ def create_product_groups():
             "full-s",
             "Full Camp Ticket (Supporter)",
             True,
-            True,
             None,
             "Support this non-profit event by paying a bit more. All money will go towards making EMF more awesome.",
             0.2,
@@ -88,7 +86,6 @@ def create_product_groups():
         (
             "full-sg",
             "Full Camp Ticket (Gold Supporter)",
-            True,
             True,
             None,
             "Support this non-profit event by paying a bit more. All money will go towards making EMF more awesome.",
@@ -99,7 +96,6 @@ def create_product_groups():
             "u18",
             "Under-18",
             True,
-            False,
             150,
             "For visitors born after August 30th, 2000. All under-18s must be accompanied by an adult.",
             0.2,
@@ -109,7 +105,6 @@ def create_product_groups():
             "u12",
             "Under-12",
             True,
-            False,
             50,
             "For children born after August 30th, 2006. All children must be accompanied by an adult.",
             0.2,
@@ -123,7 +118,6 @@ def create_product_groups():
         name,
         display_name,
         has_xfer,
-        has_badge,
         capacity,
         description,
         vat_rate,
@@ -137,7 +131,7 @@ def create_product_groups():
             capacity_max=capacity,
             description=description,
             parent=general,
-            attributes={"is_transferable": has_xfer, "has_badge": has_badge},
+            attributes={"is_transferable": has_xfer},
         )
 
         for index, (price_cap, gbp, eur) in enumerate(prices):
@@ -196,6 +190,7 @@ def create_product_groups():
         ),
     ]
 
+    order = 0
     for name, display_name, cap, personal_limit, gbp, eur, description, vat_rate in misc:
         if Product.get_by_name(name, name):
             continue
@@ -221,6 +216,96 @@ def create_product_groups():
 def create():
     """Create tickets structure from hardcoded data"""
     create_product_groups()
+
+
+@tickets.cli.command("create_merch")
+def create_merch():
+    merch_group = ProductGroup.get_by_name("merchandise")
+
+    tees_group = ProductGroup.get_by_name("tees")
+    if not tees_group:
+        tees_group = ProductGroup(name="tees", parent=merch_group)
+        db.session.add(tees_group)
+    tees_view = ProductView.get_by_name("tees")
+    if not tees_view:
+        tees_view = ProductView(name="tees", type="tees")
+        db.session.add(tees_view)
+
+    badge_group = ProductGroup.get_by_name("badge")
+    if not badge_group:
+        badge_group = ProductGroup(name="badge", parent=merch_group)
+        db.session.add(badge_group)
+    badge_view = ProductView.get_by_name("badge")
+    if not badge_view:
+        badge_view = ProductView(name="badge", type="badge")
+        db.session.add(badge_view)
+
+    db.session.flush()
+
+    badge_def = [
+        # name, display_name, personal_limit, gbp, eur, description, vat_rate
+        (
+            "tildagon",
+            "Tildagon",
+            4,
+            10,
+            11.70,
+            "One badge without a battery",
+            0.2,
+        ),
+        (
+            "tildagon-battery",
+            "Tildagon battery",
+            4,
+            3,
+            3.50,
+            "If you have a TiLDA badge battery from EMF 2016 or EMF 2018 (not EMF 2022), it will work with Tildagon.",
+            0.2,
+        ),
+    ]
+
+    order = 0
+    for name, display_name, personal_limit, gbp, eur, description, vat_rate in badge_def:
+        if Product.get_by_name(badge_group.name, name):
+            continue
+
+        product = Product(
+            name=name, display_name=display_name, description=description, parent=badge_group
+        )
+        pt = PriceTier(name=name, parent=product, vat_rate=vat_rate)
+        db.session.add(pt)
+        db.session.add(Price(currency="GBP", price_int=gbp * 100, price_tier=pt))
+        db.session.add(Price(currency="EUR", price_int=eur * 100, price_tier=pt))
+
+        ProductViewProduct(badge_view, product, order)
+        order += 1
+
+    # name, display_name, GBP, EUR
+    shirt_types = [
+        (f"unisex-{size}", f"Unisex T-shirt ({size})", 12, 14) for size in ["small", "medium", "large", "XL", "2XL", "3XL", "4XL", "5XL"]
+    ] + [
+        (f"womens-{size}", f"Womens T-shirt ({size})", 12, 14) for size in ["small", "medium", "large", "XL", "2XL"]
+    ] + [
+        (f"kids-{ages}", f"Kids T-shirt (age {ages})", 6, 7) for ages in ["3-4", "5-6", "7-8", "9-11", "12-13"]
+    ]
+
+    order = 0
+    for name, display_name, gbp, eur in shirt_types:
+        if Product.get_by_name(tees_group.name, name):
+            continue
+
+        product = Product(
+            name=name, display_name=display_name, parent=tees_group
+        )
+        pt = PriceTier(name=name, parent=product, vat_rate=vat_rate)
+        db.session.add(pt)
+        db.session.add(Price(currency="GBP", price_int=gbp * 100, price_tier=pt))
+        db.session.add(Price(currency="EUR", price_int=eur * 100, price_tier=pt))
+
+        ProductViewProduct(tees_view, product, order)
+        order += 1
+
+    db.session.commit()
 
 
 @scheduled_task(minutes=30)
