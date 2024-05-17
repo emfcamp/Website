@@ -59,7 +59,7 @@ Tick bites can carry [Lyme disease](https://www.nhs.uk/conditions/lyme-disease/)
 ## Alcohol
 If you're drinking alcohol, be aware that dehydration worsens its effects and it's easier to get dehydrated when camping outdoors. Make sure you eat regularly and drink plenty of water.
 
-Never get so drunk that you cannot take care of yourself if you were to get into a difficult situation. Be aware that our [code of conduct](/code-of-conduct) applies to everyone, and intoxication is not an excuse for bad behaviour.
+Never get so drunk that you cannot take care of yourself if you were to get into a difficult situation. Our [code of conduct](/code-of-conduct) applies to everyone, and intoxication is never an excuse for bad behaviour.
 
 ## Burns
 Camping gas accidents can cause serious burns. Never change gas canisters in or near a tent and make sure the canister is threaded properly before lighting.
