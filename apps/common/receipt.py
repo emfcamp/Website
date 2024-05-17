@@ -12,7 +12,7 @@ from models.product import Product, ProductGroup, PriceTier
 from models.purchase import Purchase, PurchaseTransfer
 
 
-RECEIPT_TYPES = ["admissions", "parking", "campervan", "tees", "hire"]
+RECEIPT_TYPES = ["admissions", "parking", "campervan", "merchandise", "hire"]
 
 
 def render_receipt(user, png=False, pdf=False):
@@ -28,7 +28,7 @@ def render_receipt(user, png=False, pdf=False):
     parking_tickets = purchases.filter(ProductGroup.type == "parking").all()
     campervan_tickets = purchases.filter(ProductGroup.type == "campervan").all()
 
-    tees = purchases.filter(ProductGroup.type == "tees").all()
+    merch = purchases.filter(ProductGroup.type == "merchandise").all()
     hires = purchases.filter(ProductGroup.type == "hire").all()
 
     transferred_tickets = (
@@ -47,7 +47,7 @@ def render_receipt(user, png=False, pdf=False):
         parking_tickets=parking_tickets,
         campervan_tickets=campervan_tickets,
         transferred_tickets=transferred_tickets,
-        tees=tees,
+        merch=merch,
         hires=hires,
         pdf=pdf,
         png=png,
