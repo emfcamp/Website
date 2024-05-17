@@ -529,6 +529,7 @@ def update_proposal(proposal_id):
         form.published_cost.data = prop.published_cost
         form.published_participant_equipment.data = prop.published_participant_equipment
         form.tickets.data = prop.total_tickets
+        # FIXME set defaults better?
         form.non_lottery_tickets.data = prop.non_lottery_tickets
 
         if prop.type == "youthworkshop":

@@ -1,3 +1,6 @@
+from random import choices
+from string import ascii_lowercase
+
 from main import db
 from . import BaseModel
 from .user import User
@@ -30,6 +33,7 @@ class EventTicket(BaseModel):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     rank = db.Column(db.Integer, nullable=True)
     ticket_count = db.Column(db.Integer, nullable=False, default=1)
+    ticket_codes = db.Column(db.String, nullable=True)
 
     def __init__(self, user_id, proposal_id, state, ticket_count=1, rank=None):
         if state not in EVENT_TICKET_STATES:
@@ -75,10 +79,21 @@ class EventTicket(BaseModel):
         for other_ticket in self.get_other_lottery_tickets():
             other_ticket.cancel()
 
+        # Now generate the ticket_codes
+        # These are in no way cryptographically secure etc but 1 in 308m should
+        # be low enough odds for guessing.
+        codes = []
+        for i in range(self.ticket_count):
+            codes.append("".join(choices(ascii_lowercase, k=6)))
+        self.ticket_codes = ",".join(codes)
+
         return self
 
     def lost_lottery(self):
         return self.change_state("lost-lottery")
+
+    def cancel(self):
+        return self.change_state("cancelled")
 
     def cancel_and_update_ranks(self):
         # adjust ranks for lottery tickets
@@ -87,7 +102,7 @@ class EventTicket(BaseModel):
                 if (ticket.id == self.id) or (ticket.rank < self.rank):
                     continue
                 ticket.rank -= 1
-        return self.change_state("cancelled")
+        return self.cancel()
 
     @classmethod
     def get_event_ticket(cls, user: User, proposal: Proposal):
