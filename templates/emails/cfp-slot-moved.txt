@@ -5,5 +5,6 @@ Hi {{ proposal.user.name }},
 Unfortunately we have had to move your EMF {{ proposal.human_type }} '{{ proposal.title }}' due to the availability of other speakers. We've done our best to minimise the amount of hassle it will cause you.
 
 You now have a {{ proposal.scheduled_duration }} minute slot in {{ proposal.scheduled_venue.name }} on {{ proposal.scheduled_time.strftime('%A at %-I:%M %p') }}. If this is not suitable, please let us know as soon as possible.
+
+{% include "emails/_cfp-slot-blurb.txt" %}
 {% endblock %}
-{% include "emails/cfp-slot.txt" %}

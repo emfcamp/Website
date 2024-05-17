@@ -5,5 +5,7 @@ Hi {{ proposal.user.name }},
 Your EMF {{ proposal.human_type }} '{{ proposal.title }}' has been scheduled!
 
 You have a {{ proposal.scheduled_duration }} minute slot in {{ proposal.scheduled_venue.name }} on {{ proposal.scheduled_time.strftime('%A at %-I:%M %p') }}. If this is not suitable, please let us know as soon as possible.
+
+{% include "emails/_cfp-slot-blurb.txt" %}
+
 {% endblock %}
-{% include "emails/cfp-slot.txt" %}
