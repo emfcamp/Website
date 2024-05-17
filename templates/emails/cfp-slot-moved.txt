@@ -11,8 +11,9 @@ If you'd like to share this with people, the public link to your {{ proposal.hum
 Things to note:
 
 * If you have special requirements and have not spoken to our Green Room team about them, please let them know as soon as possible via: https://www.emfcamp.org/cfp/proposals/{{ proposal.id }}/messages
-* Any device you wish to connect to our Laser Display Board (aka “projector”) must have an HDMI female socket. If it does not, you will need to bring an adaptor that works with your device.
+* Any device you're wanting to connect to our projectors must have an HDMI female socket. If it does not, you will need to bring an adaptor that works with your device.
 {% if proposal.type == 'talk' %}
+* If you're intending to bring any equipment on stage or conduct any demonstrations during your {{ proposal.human_type }}, you must let us know in advance. 
 * Please report to the Green Room 30 minutes before your {{ proposal.human_type }} so that the team can make sure everything is ready for you, and your {{ proposal.human_type }} will go as smoothly as possible!
 {% endif %}
 {% if proposal.type == 'workshop' %}
