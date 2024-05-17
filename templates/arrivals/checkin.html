@@ -1,21 +1,15 @@
 {% extends "arrivals/base.html" %}
 {% block body %}
-{% if mode == "badge" %}
-<h2>Issue badge</h2>
+<h2>Check in purchases</h2>
 
-<p>To issue {{ tickets|count == 1 and 'this badge' or 'these badges' }}, please click below.</p>
-{% else %}
-<h2>Check in tickets</h2>
-
-<p>To check in {{ tickets|count == 1 and 'this ticket' or 'these tickets' }}, please click below.</p>
-{% endif %}
+<p>To check in {{ purchases|count == 1 and 'this purchase' or 'these purchases' }}, please click below.</p>
 
 <dl class="dl-horizontal">
 <dt>Name</dt><dd>{{ user.name }}</dd>
 <dt>Email</dt><dd>{{ user.email }}</dd>
 </dl>
 
-{% if user.checkin_note and mode == "checkin" %}
+{% if user.checkin_note %}
 <div class="alert alert-info">
   <p><strong>Important instructions for processing this attendee's arrival:</strong></p>
   <p>{{ user.checkin_note }}</p>
@@ -30,74 +24,53 @@
     </div>
     <div class="col-sm-10">
       <h4>Request ID</h4>
-      <p>Please validate the above ticketholder details with identification before {% if mode == "badge" %} issuing a badge {% else %} checking them in {%- endif %}.</p>
+      <p>Please validate the above details with identification before checking them in.</p>
     </div>
   </div>
 </div>
 {% endif %}
 
-{% if tickets|count %}
+{% if purchases|count %}
 <table class="table table-condensed table-striped">
 <thead><tr>
   <th class="hidden-xs">ID</th>
   <th>Type</th>
   <th>Transferred from</th>
   <th>Status</th>
-  {% if tickets|count > 1 or (mode == "badge" and tickets[0].badge_issued) or (mode == "checkin" and tickets[0].checked_in) %}
+  {% if purchases|count > 1 or purchases[0].redeemed %}
   <th></th>
   {% endif %}
 </tr></thead>
 <tbody>
-{% for ticket in tickets %}
+{% for purchase in purchases %}
 <tr>
-  <td class="hidden-xs">{{ ticket.id }}</td>
-  <td>{{ ticket.product.checkin_display_name }}</td>
+  <td class="hidden-xs">{{ purchase.id }}</td>
+  <td>{{ purchase.product.checkin_display_name }}</td>
   <td>
-    {% if ticket.transfers %}
-      {% set from_user = ticket.transfers[-1].from_user %}
+    {% if purchase.transfers %}
+      {% set from_user = purchase.transfers[-1].from_user %}
       <a href="{{ url_for('.checkin', user_id=from_user.id) }}">{{ from_user.name }}</a>
     {% endif %}
   </td>
   <td>
-    {% if mode == "badge" %}
-      {%- if ticket.badge_issued %}
-        Badge issued {{ ticket.redemption_version().transaction.issued_at.strftime('%A %H:%M') }}
-        by {{ ticket.redemption_transaction.user.name }}
-      {% else %}
-        Badge not issued
-      {% endif -%}
+    {%- if purchase.redeemed %}
+      Redeemed {{ purchase.redemption_version().transaction.issued_at.strftime('%A %H:%M') }}
+      by {{ purchase.redemption_version().transaction.user.name }}
     {% else %}
-      {%- if ticket.checked_in %}
-        Checked in {{ ticket.redemption_version().transaction.issued_at.strftime('%A %H:%M') }}
-        by {{ ticket.redemption_transaction.user.name }}
-      {% else %}
-        Not checked in
-      {% endif -%}
+      Not redeemed
     {% endif -%}
   </td>
-  {% if tickets|count > 1 or (mode == "badge" and tickets[0].badge_issued) or (mode == "checkin" and tickets[0].checked_in) %}
+  {% if purchases|count > 1 or purchases[0].redeemed %}
   <td>
-    {% if mode == "badge" %}
-      {%- if ticket.badge_issued %}
-        <form method="post" action="{{ url_for('arrivals.undo_ticket_checkin', ticket_id=ticket.id) }}">
-        <input type="submit" class="btn btn-danger debounce" value="Return badge"/>
-        </form>
-      {% else %}
-        <form method="post" action="{{ url_for('arrivals.ticket_checkin', ticket_id=ticket.id) }}">
-        <input type="submit" class="btn btn-success debounce" value="Issue badge"/>
-        </form>
-      {% endif -%}
+    {%- if purchase.redeemed %}
+      <form method="post" action="{{ url_for('arrivals.undo_purchase_checkin', purchase_id=purchase.id) }}">
+      <input type="submit" class="btn btn-danger debounce" value="Undo check-in"/>
+      </form>
     {% else %}
-      {%- if ticket.checked_in %}
-        <form method="post" action="{{ url_for('arrivals.undo_ticket_checkin', ticket_id=ticket.id) }}">
-        <input type="submit" class="btn btn-danger debounce" value="Undo check-in"/>
-        </form>
-      {% else %}
-        <form method="post" action="{{ url_for('arrivals.ticket_checkin', ticket_id=ticket.id) }}">
-        <input type="submit" class="btn btn-success debounce" value="Check in"/>
-        </form>
-      {% endif -%}
-    {% endif %}
+      <form method="post" action="{{ url_for('arrivals.purchase_checkin', purchase_id=purchase.id) }}">
+      <input type="submit" class="btn btn-success debounce" value="Check in"/>
+      </form>
+    {% endif -%}
   </td>
   {% endif %}
 </tr>
@@ -106,18 +79,12 @@
 </table>
 {% else %}
 <div class="alert alert-danger">
-  {% if mode == "badge" %}
-  <h4>This account has no available badges</h4>
-  <p>Please ask them to provide ID for any other names the tickets may be under.</p>
-  <p>A badge cannot be issued if the ticket has not yet been checked in.</p>
-  {% else %}
-  <h4>This account has no entrance tickets</h4>
-  <p>Please ask them to provide ID for any other names the tickets may be under.</p>
-  {% endif %}
+  <h4>This account has no purchases for check-in type {{view.name}}</h4>
+  <p>Please ask them to provide ID for any other names the purchases may be under.</p>
 </div>
 {% endif %}
 
-{% if tickets|count %}
+{% if purchases|count %}
 <form method="post" action="{{ url_for('arrivals.checkin', user_id=user.id) }}" class="shrink">
 <div class="col-sm-5 col-sm-offset-7">
   {% if mode == "badge" %}
@@ -131,69 +98,73 @@
 
 <div>&nbsp;</div>
 
-{% if transferred_tickets|count %}
-<h3>Transferred tickets</h3>
-<p>These tickets may have been sold. If in doubt, check the ID of the recipient before clicking through.</p>
+{% if transferred_purchases|count %}
+<h3>Transferred purchases</h3>
+<p>These purchases may have been sold. If in doubt, check the ID of the recipient before clicking through.</p>
 <table class="table table-condensed table-striped">
 <thead><tr>
   <th class="hidden-xs">ID</th>
   <th>Type</th>
   <th>Transferred to</th>
   <th>Status</th>
-  {% if transferred_tickets|count > 1 %}
+  {% if transferred_purchases|count > 1 %}
   <th></th>
   {% endif %}
 </tr></thead>
 <tbody>
-{% for ticket in transferred_tickets %}
+{% for purchase in transferred_purchases %}
 <tr>
-  <td class="hidden-xs">{{ ticket.id }}</td>
-  <td>{{ ticket.type.name }}</td>
-  <td><a href="{{ url_for('.checkin', user_id=ticket.owner.id) }}">{{ ticket.owner.name }}</a></td>
+  <td class="hidden-xs">{{ purchase.id }}</td>
+  <td>{{ purchase.product.display_name }}</td>
+  <td><a href="{{ url_for('.checkin', user_id=purchase.owner.id) }}">{{ purchase.owner.name }}</a></td>
   <td>
-    {% if mode == "badge" %}
-      {%- if ticket.badge_issued %}
-        {# FIXME this ain't necessarily so #}
-        Badge issued {{ ticket.versions[-1].transaction.issued_at.strftime('%A %H:%M') }}
-        by {{ ticket.versions[-1].transaction.user.name }}
-      {% else %}
-        Badge not issued
-      {% endif -%}
+    {%- if purchase.redeemed %}
+      Checked in {{ purchase.redemption_version().transaction.issued_at.strftime('%A %H:%M') }}
+      by {{ purchase.redemption_version().transaction.user.name }}
     {% else %}
-      {%- if ticket.checked_in %}
-        {# FIXME this ain't necessarily so #}
-        Checked in {{ ticket.versions[-1].transaction.issued_at.strftime('%A %H:%M') }}
-        by {{ ticket.versions[-1].transaction.user.name }}
-      {% else %}
-        Not checked in
-      {% endif -%}
+      Not checked in
     {% endif -%}
   </td>
-  {% if transferred_tickets|count > 1 %}
+  {% if transferred_purchases|count > 1 %}
   <td>
-    {% if mode == "badge" %}
-      {%- if ticket.badge_issued %}
-        <form method="post" action="{{ url_for('arrivals.undo_ticket_checkin', ticket_id=ticket.id) }}">
-        <input type="submit" class="btn btn-danger debounce" value="Return badge"/>
-        </form>
-      {% else %}
-        <form method="post" action="{{ url_for('arrivals.ticket_checkin', ticket_id=ticket.id) }}">
-        <input type="submit" class="btn btn-success debounce" value="Issue badge"/>
-        </form>
-      {% endif -%}
+    {%- if purchase.redeemed %}
+      <form method="post" action="{{ url_for('arrivals.undo_purchase_checkin', purchase_id=purchase.id) }}">
+      <input type="submit" class="btn btn-danger debounce" value="Undo check-in"/>
+      </form>
     {% else %}
-      {%- if ticket.checked_in %}
-        <form method="post" action="{{ url_for('arrivals.undo_ticket_checkin', ticket_id=ticket.id) }}">
-        <input type="submit" class="btn btn-danger debounce" value="Undo check-in"/>
-        </form>
-      {% else %}
-        <form method="post" action="{{ url_for('arrivals.ticket_checkin', ticket_id=ticket.id) }}">
-        <input type="submit" class="btn btn-success debounce" value="Check in"/>
-        </form>
-      {% endif -%}
-    {% endif %}
+      <form method="post" action="{{ url_for('arrivals.purchase_checkin', purchase_id=purchase.id) }}">
+      <input type="submit" class="btn btn-success debounce" value="Check in"/>
+      </form>
+    {% endif -%}
   </td>
   {% endif %}
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+
+{% if other_purchases|count %}
+<h3>Other purchases</h3>
+<table class="table table-condensed table-striped">
+<thead><tr>
+  <th class="hidden-xs">ID</th>
+  <th>Type</th>
+  <th>Status</th>
+</tr></thead>
+<tbody>
+{% for purchase in other_purchases %}
+<tr>
+  <td class="hidden-xs">{{ purchase.id }}</td>
+  <td>{{ purchase.product.display_name }}</td>
+  <td>
+    {%- if purchase.redeemed %}
+      Checked in {{ purchase.redemption_version().transaction.issued_at.strftime('%A %H:%M') }}
+      by {{ purchase.redemption_version().transaction.user.name }}
+    {% else %}
+      Not checked in
+    {% endif -%}
+  </td>
 </tr>
 {% endfor %}
 </tbody>

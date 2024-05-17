@@ -10,6 +10,7 @@ from flask import (
     url_for,
     session,
     current_app as app,
+    g,
     Blueprint,
     abort,
     render_template_string,
@@ -19,14 +20,13 @@ from flask_login import current_user
 from sqlalchemy import func
 
 from main import db
-from models.purchase import Purchase, AdmissionTicket, CheckinStateException
+from models.arrivals import ArrivalsView
+from models.permission import Permission
+from models.purchase import Purchase, CheckinStateException
 from models.user import User, checkin_code_re
-from .common import require_permission, json_response
+from .common import json_response
 
 arrivals = Blueprint("arrivals", __name__)
-
-checkin_required = require_permission("arrivals:checkin")
-badge_required = require_permission("arrivals:badge")
 
 
 @decorator
@@ -34,40 +34,44 @@ def arrivals_required(f, *args, **kwargs):
     if not current_user.is_authenticated:
         return app.login_manager.unauthorized()
 
-    mode = session.get("arrivals_mode")
-    if mode is None:
-        if current_user.has_permission("arrivals:checkin"):
-            mode = "checkin"
-        elif current_user.has_permission("arrivals:badge"):
-            mode = "badge"
+    # If we have an arrivals_view, ensure they're authorised for it.
+    view_name = session.get("arrivals_view")
+    view = None
+    if view_name:
+        view = ArrivalsView.get_by_name(view_name)
+        if view:
+            if not current_user.has_permission(view.required_permission.name):
+                # User has an arrivals_view, but they don't have permission.
+                abort(403)
         else:
-            abort(403)
-    if mode == "checkin" and not current_user.has_permission("arrivals:checkin"):
-        abort(404)
-    if mode == "badge" and not current_user.has_permission("arrivals:badge"):
-        abort(404)
-    session["arrivals_mode"] = mode
+            app.logger.warning('User had invalid "arrivals_view" in their session: %s', view_name)
+            del session["arrivals_view"]
+            view_name = view = None
 
+    if current_user.has_permission("admin"):
+        views = ArrivalsView.query.all()
+    else:
+        views = ArrivalsView.query.join(ArrivalsView.required_permission).join(Permission.user).where(User.id == current_user.id).all()
+    if not views:
+        abort(404)
+    g.arrivals_views = views
+    if not view:
+        view = views[0]
+    session["arrivals_view"] = view.name
+    g.arrivals_view = view
     return f(*args, **kwargs)
 
 
 @arrivals.route("/")
 @arrivals_required
 def main():
-    return render_template("arrivals/arrivals.html", mode=session["arrivals_mode"])
+    return render_template("arrivals/arrivals.html", view=g.arrivals_view, views=g.arrivals_views)
 
 
-@arrivals.route("/check-in")
-@checkin_required
-def begin_check_in():
-    session["arrivals_mode"] = "checkin"
-    return redirect(url_for(".main"))
-
-
-@arrivals.route("/badge-up")
-@badge_required
-def begin_badge_up():
-    session["arrivals_mode"] = "badge"
+@arrivals.route("/arrivals/view/<view>")
+@arrivals_required
+def change_arrivals_view(view):
+    session["arrivals_view"] = view
     return redirect(url_for(".main"))
 
 
@@ -171,26 +175,22 @@ def search(query=None):
     users_ordered = users_from_query(query)
     users = User.query.filter(User.id.in_([u.id for u in users_ordered]))
 
-    tickets = (
+    product_ids = [p.id for p in g.arrivals_view.products]
+    purchases = (
         users.join(User.owned_purchases)
         .filter_by(is_paid_for=True)
+        .filter(Purchase.product_id.in_(product_ids))
         .group_by(User.id)
         .with_entities(User.id, func.count(User.id))
     )
-    tickets = dict(tickets)
+    purchases = dict(purchases)
 
-    if session["arrivals_mode"] == "badge":
-        completes = (
-            users.join(User.owned_tickets)
-            .filter_by(is_paid_for=True)
-            .filter(AdmissionTicket.badge_issued == True)  # noqa: E712
-        )
-    else:
-        completes = (
-            users.join(User.owned_tickets)
-            .filter_by(is_paid_for=True)
-            .filter(AdmissionTicket.checked_in == True)  # noqa: E712
-        )
+    completes = (
+        users.join(User.owned_purchases)
+        .filter_by(is_paid_for=True)
+        .filter_by(redeemed=True)
+        .filter(Purchase.product_id.in_(product_ids))
+    )
 
     completes = completes.group_by(User).with_entities(User.id, func.count(User.id))
     completes = dict(completes)
@@ -201,7 +201,7 @@ def search(query=None):
             "id": u.id,
             "name": u.name,
             "email": u.email,
-            "tickets": tickets.get(u.id, 0),
+            "purchases": purchases.get(u.id, 0),
             "completes": completes.get(u.id, 0),
             "url": url_for(".checkin", user_id=u.id, source="typed"),
         }
@@ -221,109 +221,101 @@ def checkin(user_id, source=None):
     if source not in {None, "typed", "transfer", "code"}:
         abort(404)
 
-    badge = session["arrivals_mode"] == "badge"
-
-    if badge:
-        # Ticket must be checked in to receive a badge
-        tickets = [
-            t
-            for t in user.get_owned_tickets(type="admission_ticket")
-            if t.checked_in and t.product.attributes.get("has_badge")
-        ]
-    else:
-        tickets = list(user.get_owned_tickets(paid=True, type="admission_ticket"))
+    product_ids = [p.id for p in g.arrivals_view.products]
+    purchases = (
+        user.owned_purchases
+        .filter(Purchase.product_id.in_(product_ids))
+        .filter_by(is_paid_for=True)
+        .order_by(Purchase.id)
+        .all()
+    )
+    other_purchases = (
+        user.owned_purchases
+        .filter(Purchase.product_id.not_in(product_ids))
+        .filter_by(is_paid_for=True)
+        .order_by(Purchase.id)
+        .all()
+    )
 
     if request.method == "POST":
         failed = []
-        for t in tickets:
+        for p in purchases:
             # Only allow bulk completion, not undoing
             try:
-                if badge:
-                    t.badge_up()
-                else:
-                    t.check_in()
+                p.redeem()
             except CheckinStateException:
-                failed.append(t)
+                failed.append(p)
 
         db.session.commit()
 
         if failed:
-            failed_str = ", ".join(str(t.id) for t in failed)
-            success_count = len(tickets) - len(failed)
-            if badge:
-                flash(
-                    "Issued %s badges. Already issued: %s" % (success_count, failed_str)
-                )
-            else:
-                flash(
-                    "Checked in %s tickets. Already checked in: %s"
-                    % (success_count, failed_str)
-                )
+            failed_str = ", ".join(str(p.id) for p in failed)
+            success_count = len(purchases) - len(failed)
+            flash(
+                "Checked in %s purchases. Already checked in: %s"
+                % (success_count, failed_str)
+            )
 
             return redirect(url_for(".checkin", user_id=user.id))
 
         msg = Markup(
             render_template_string(
                 """
-            {{ tickets|count }} ticket {{- tickets|count != 1 and 's' or '' }} checked in.
-            <a class="alert-link" href="{{ url_for('.checkin', user_id=user.id) }}">Show tickets</a>.""",
+            {{ purchases|count }} purchase {{- purchases|count != 1 and 's' or '' }} checked in.
+            <a class="alert-link" href="{{ url_for('.checkin', user_id=user.id) }}">Show purchases</a>.""",
                 user=user,
-                tickets=tickets,
+                purchases=purchases,
             )
         )
         flash(msg)
 
         return redirect(url_for(".main"))
 
-    transferred_tickets = [
-        t.purchase for t in user.transfers_from if t.purchase.type == "admission_ticket"
+    transferred_purchases = [
+        t.purchase for t in user.transfers_from
     ]
 
     return render_template(
         "arrivals/checkin.html",
+        view=g.arrivals_view,
+        views=g.arrivals_views,
         user=user,
-        tickets=tickets,
-        transferred_tickets=transferred_tickets,
-        mode=session["arrivals_mode"],
+        purchases=purchases,
+        other_purchases=other_purchases,
+        transferred_purchases=transferred_purchases,
         source=source,
     )
 
 
-@arrivals.route("/arrivals/ticket/<ticket_id>", methods=["POST"])
+@arrivals.route("/arrivals/purchase/<purchase_id>", methods=["POST"])
 @arrivals_required
-def ticket_checkin(ticket_id):
-    ticket = Purchase.query.get_or_404(ticket_id)
-    if not ticket.is_paid_for:
+def purchase_checkin(purchase_id):
+    purchase = Purchase.query.get_or_404(purchase_id)
+    if not purchase.is_paid_for:
         abort(404)
 
     try:
-        if session["arrivals_mode"] == "badge":
-            ticket.badge_up()
-        else:
-            ticket.check_in()
+        purchase.redeem()
     except CheckinStateException as e:
         flash(str(e))
 
     db.session.commit()
 
-    return redirect(url_for(".checkin", user_id=ticket.owner.id))
+    return redirect(url_for(".checkin", user_id=purchase.owner.id))
 
 
-@arrivals.route("/arrivals/ticket/<ticket_id>/undo", methods=["POST"])
+@arrivals.route("/arrivals/purchase/<purchase_id>/undo", methods=["POST"])
 @arrivals_required
-def undo_ticket_checkin(ticket_id):
-    ticket = Purchase.query.get_or_404(ticket_id)
-    if not ticket.is_paid_for:
+def undo_purchase_checkin(purchase_id):
+    purchase = Purchase.query.get_or_404(purchase_id)
+    if not purchase.is_paid_for:
         abort(404)
 
     try:
-        if session["arrivals_mode"] == "badge":
-            ticket.undo_badge_up()
-        else:
-            ticket.undo_check_in()
+        purchase.unredeem()
     except CheckinStateException as e:
         flash(str(e))
 
     db.session.commit()
 
-    return redirect(url_for(".checkin", user_id=ticket.owner.id))
+    return redirect(url_for(".checkin", user_id=purchase.owner.id))
