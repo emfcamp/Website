@@ -407,6 +407,9 @@ def email_transfer_reminders():
 @tickets.cli.command("email_tickets")
 def email_tickets():
     """Email tickets to those who haven't received them"""
+    ctx = app.test_request_context()
+    ctx.push()
+
     users_purchase_counts = (
         Purchase.query.filter_by(is_paid_for=True, state="paid")
         .join(PriceTier, Product, ProductGroup)
