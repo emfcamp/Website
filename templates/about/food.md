@@ -12,7 +12,7 @@ We have a great range of food vendors with vegetarian, vegan, and gluten free op
 * [Colombo Street](https://www.colombostreet.co.uk/foodtruck) - Award Winning Sri Lankan street food.
 * [Goodness Gracious Healthy Foods](https://www.mobileveggiefood.co.uk/) - Fresh, healthy vegan and vegetarian food, with plenty of falafel, halloumi and hummus.
 * [Isabel’s Bakehouse](https://www.isabelsbakehouse.com/) - Sweet and savoury crêpes, and fresh baked goods.
-* [La Pizzeria](https://www.cheltenhampizzeria.com/) - Freshly made pizza and healthy toppings, available with gluten free bases.
+* [La Pizzeria](https://www.instagram.com/cheltenhampizzeria/) - Freshly made pizza and healthy toppings, available with gluten free bases.
 * [The Grazing Shed](https://www.thegrazingshed.com/) - Quality burgers and fries from this Welsh burger joint.
 * [The Coffee Vagabond](http://www.coffeevagabond.co.uk/) - Amazing coffee, courtesy of our favourite returning caffeine maestros.
 
