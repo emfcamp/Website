@@ -32,5 +32,5 @@ Things to note:
 {% endif %}
 
 Looking forward to seeing you in the field,
-The EMF Speaker Ops Team
+The EMF Green Room Team
 {% endblock %}
