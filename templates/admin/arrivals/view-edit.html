@@ -1,0 +1,47 @@
+{% extends "admin/base.html" %}
+{% from "_formhelpers.html" import render_field  %}
+{% block title %}Arrivals View "{{view.name}}"{% endblock %}
+
+{% set nav_active = 'arrivals_views' %}
+{% block body %}
+<ol class="breadcrumb">
+  <li><a href="{{url_for('.arrivals_views')}}">Arrivals Views</a></li>
+  <li class="active">Arrivals View "{{ view.name }}"</li>
+</ol>
+
+<form action="" method="post">
+{{ form.hidden_tag() }}
+
+{{ render_field(form.name, horizontal=False) }}
+{{ render_field(form.required_permission, horizontal=False) }}
+
+
+<h3>Products</h3>
+<table class="table table-condensed table-striped">
+  <tr>
+    <th>Group</th>
+    <th>Product</th>
+    <th>Display Name</th>
+    <th>Delete</th>
+  </tr>
+  {% for pvp in view.arrivals_view_products %}
+  <tr>
+    <td>{{ pvp.product.parent.name }}</td>
+    <td><a tabindex="-1" href="{{ url_for('admin.product_details', product_id=pvp.product.id) }}">{{ pvp.product.name }}</a></td>
+    <td>{{ pvp.product.display_name }}</td>
+    <td>
+      {{ pvp._field.product_id() }}
+      {{ pvp._field.delete(class_="btn btn-danger") }}
+    </td>
+  </tr>
+
+  {% endfor %}
+</table>
+<div class="btn-group">
+{{ form.update(class_="btn btn-success debounce") }}
+<a href="{{ url_for('.arrivals_view_add', view_id=view.id) }}" class="btn btn-default">Add products</a>
+{{ form.delete(class_="btn btn-danger debounce") }}
+</div>
+</form>
+
+{% endblock %}
