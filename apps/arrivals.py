@@ -289,7 +289,7 @@ def checkin(user_id, source=None):
 
 @arrivals.route("/arrivals/purchase/<purchase_id>", methods=["POST"])
 @arrivals_required
-def purchase_checkin(purchase_id):
+def redeem_purchase(purchase_id):
     purchase = Purchase.query.get_or_404(purchase_id)
     if not purchase.is_paid_for:
         abort(404)
@@ -300,13 +300,15 @@ def purchase_checkin(purchase_id):
         flash(str(e))
 
     db.session.commit()
+    flash(f"Redeemed {purchase.product.display_name} owned by {purchase.owner.name}")
 
-    return redirect(url_for(".checkin", user_id=purchase.owner.id))
+    back = int(request.args.get('back', purchase.owner.id))
+    return redirect(url_for(".checkin", user_id=back))
 
 
 @arrivals.route("/arrivals/purchase/<purchase_id>/undo", methods=["POST"])
 @arrivals_required
-def undo_purchase_checkin(purchase_id):
+def unredeem_purchase(purchase_id):
     purchase = Purchase.query.get_or_404(purchase_id)
     if not purchase.is_paid_for:
         abort(404)
@@ -317,5 +319,7 @@ def undo_purchase_checkin(purchase_id):
         flash(str(e))
 
     db.session.commit()
+    flash(f"Undid redemption of {purchase.product.display_name} owned by {purchase.owner.name}")
 
-    return redirect(url_for(".checkin", user_id=purchase.owner.id))
+    back = int(request.args.get('back', purchase.owner.id))
+    return redirect(url_for(".checkin", user_id=back))

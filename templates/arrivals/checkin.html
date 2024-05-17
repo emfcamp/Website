@@ -1,8 +1,8 @@
 {% extends "arrivals/base.html" %}
 {% block body %}
-<h2>Check in purchases</h2>
+<h2>Redeem purchases</h2>
 
-<p>To check in {{ purchases|count == 1 and 'this purchase' or 'these purchases' }}, please click below.</p>
+<p>To redeem {{ purchases|count == 1 and 'this purchase' or 'these purchases' }}, please click below.</p>
 
 <dl class="dl-horizontal">
 <dt>Name</dt><dd>{{ user.name }}</dd>
@@ -63,12 +63,12 @@
   {% if purchases|count > 1 or purchases[0].redeemed %}
   <td>
     {%- if purchase.redeemed %}
-      <form method="post" action="{{ url_for('arrivals.undo_purchase_checkin', purchase_id=purchase.id) }}">
-      <input type="submit" class="btn btn-danger debounce" value="Undo check-in"/>
+      <form method="post" action="{{ url_for('arrivals.unredeem_purchase', purchase_id=purchase.id) }}">
+      <input type="submit" class="btn btn-danger debounce" value="Undo redemption"/>
       </form>
     {% else %}
-      <form method="post" action="{{ url_for('arrivals.purchase_checkin', purchase_id=purchase.id) }}">
-      <input type="submit" class="btn btn-success debounce" value="Check in"/>
+      <form method="post" action="{{ url_for('arrivals.redeem_purchase', purchase_id=purchase.id) }}">
+      <input type="submit" class="btn btn-success debounce" value="Redeem"/>
       </form>
     {% endif -%}
   </td>
@@ -90,7 +90,7 @@
   {% if mode == "badge" %}
   <input type="submit" class="btn btn-info form-control debounce" value="Issue all badges"/>
   {% else %}
-  <input type="submit" class="btn btn-info form-control debounce" value="Check in all"/>
+  <input type="submit" class="btn btn-info form-control debounce" value="Redeem all"/>
   {% endif %}
 </div>
 </form>
@@ -119,21 +119,21 @@
   <td><a href="{{ url_for('.checkin', user_id=purchase.owner.id) }}">{{ purchase.owner.name }}</a></td>
   <td>
     {%- if purchase.redeemed %}
-      Checked in {{ purchase.redemption_version().transaction.issued_at.strftime('%A %H:%M') }}
+      Redeemed {{ purchase.redemption_version().transaction.issued_at.strftime('%A %H:%M') }}
       by {{ purchase.redemption_version().transaction.user.name }}
     {% else %}
-      Not checked in
+      Not redeemed
     {% endif -%}
   </td>
   {% if transferred_purchases|count > 1 %}
   <td>
     {%- if purchase.redeemed %}
-      <form method="post" action="{{ url_for('arrivals.undo_purchase_checkin', purchase_id=purchase.id) }}">
-      <input type="submit" class="btn btn-danger debounce" value="Undo check-in"/>
+      <form method="post" action="{{ url_for('arrivals.unredeem_purchase', purchase_id=purchase.id, back=user.id) }}">
+      <input type="submit" class="btn btn-danger debounce" value="Undo redemption"/>
       </form>
     {% else %}
-      <form method="post" action="{{ url_for('arrivals.purchase_checkin', purchase_id=purchase.id) }}">
-      <input type="submit" class="btn btn-success debounce" value="Check in"/>
+      <form method="post" action="{{ url_for('arrivals.redeem_purchase', purchase_id=purchase.id, back=user.id) }}">
+      <input type="submit" class="btn btn-success debounce" value="Redeem"/>
       </form>
     {% endif -%}
   </td>
@@ -159,10 +159,10 @@
   <td>{{ purchase.product.display_name }}</td>
   <td>
     {%- if purchase.redeemed %}
-      Checked in {{ purchase.redemption_version().transaction.issued_at.strftime('%A %H:%M') }}
+      Redeemed {{ purchase.redemption_version().transaction.issued_at.strftime('%A %H:%M') }}
       by {{ purchase.redemption_version().transaction.user.name }}
     {% else %}
-      Not checked in
+      Not redeemed
     {% endif -%}
   </td>
 </tr>
