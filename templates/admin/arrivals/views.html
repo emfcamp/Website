@@ -1,0 +1,24 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'arrivals_views' %}
+{% block body %}
+
+<h2>Arrivals Views</h2>
+<table class="table table-condensed table-striped">
+  <tr>
+    <th>Name</th>
+    <th>Required Permission</th>
+    <th>Products</th>
+  </tr>
+  {% for view, count, required_permission in view_counts %}
+  <tr>
+    <td><a href="{{ url_for('admin.arrivals_view', view_id=view.id) }}">{{ view.name }}</a></td>
+    <td>{{ required_permission }}</td>
+    <td>{{ count }}</td>
+  </tr>
+
+  {% endfor %}
+</table>
+
+<a href="{{ url_for('.arrivals_view_new') }}" class="btn btn-default">Create arrivals view</a>
+
+{% endblock %}

@@ -384,3 +384,4 @@ from . import email  # noqa: F401
 from . import hire  # noqa: F401
 from . import search  # noqa: F401
 from . import admin_message  # noqa: F401
+from . import arrivals # noqa: F401

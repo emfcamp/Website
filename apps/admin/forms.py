@@ -14,7 +14,9 @@ from wtforms import (
     TextAreaField,
 )
 from wtforms.fields.html5 import DateField
+from wtforms_sqlalchemy.fields import QuerySelectField
 
+from models.permission import Permission
 from models.product import ProductGroup, PRODUCT_GROUP_TYPES
 from models.basket import Basket
 
@@ -303,3 +305,33 @@ class TransferTicketForm(Form):
 
 class TransferTicketNewUserForm(TransferTicketForm):
     name = StringField("Name")
+
+
+def _available_permissions():
+    return Permission.query.all()
+
+
+class ArrivalsViewForm(Form):
+    name = StringField("Name")
+    required_permission = QuerySelectField("Required Permission", query_factory=_available_permissions, get_label='name')
+
+
+class NewArrivalsViewForm(ArrivalsViewForm):
+    create = SubmitField("Create", [DataRequired()])
+
+
+class ArrivalsViewProductForm(Form):
+    product_id = HiddenIntegerField("product_id", [InputRequired()])
+    delete = SubmitField("Delete")
+
+
+class EditArrivalsViewForm(ArrivalsViewForm):
+    update = SubmitField("Update")
+    delete = SubmitField("Delete")
+    avps = FieldList(FormField(ArrivalsViewProductForm))
+
+
+class AddArrivalsViewProductForm(Form):
+    add_all_products = SubmitField("Add all")
+    add_all_products_recursive = SubmitField("Add all (recursively)")
+    add_product = SubmitField("Add product")
