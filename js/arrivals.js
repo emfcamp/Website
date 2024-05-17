@@ -22,7 +22,7 @@ EMF.search_arrivals_fail = function(jqXHR) {
     $('#error-text').text(data.error);
     $('#error-description').text(data.description);
     $('#error').show();
-    $('#tickets').hide();
+    $('#purchases').hide();
 };
 
 EMF.search_arrivals_done = function(data) {
@@ -38,21 +38,21 @@ EMF.search_arrivals_done = function(data) {
         return;
     }
 
-    if (EMF.tickets_data == undefined) {
-        EMF.tickets_data = new DataTable('#tickets-data', {
+    if (EMF.purchases_data == undefined) {
+        EMF.purchases_data = new DataTable('#purchases-data', {
             columns: [
                 { data: 'name' },
                 { data: 'email' },
             ],
             createdRow: function(row, data, index) {
-                if (data.tickets == 0) {
-                    $(row).addClass('no-tickets');
-                } else if (data.completes == data.tickets) {
+                if (data.purchases == 0) {
+                    $(row).addClass('no-purchases');
+                } else if (data.completes == data.purchases) {
                     $(row).addClass('complete');
                 } else if (data.completes > 0) {
                     $(row).addClass('partial');
                 } else {
-                    $(row).addClass('has-tickets');
+                    $(row).addClass('has-purchases');
                 }
                 var link = $('<a>').attr('href', data.url);
                 $('td', row).wrapInner(link);
@@ -65,9 +65,9 @@ EMF.search_arrivals_done = function(data) {
             searchHighlight: true
         });
     }
-    EMF.tickets_data.clear();
-    EMF.tickets_data.settings()[0].oPreviousSearch.sSearch = $('#query').val();
-    EMF.tickets_data.rows.add(data.users).draw();
+    EMF.purchases_data.clear();
+    EMF.purchases_data.settings()[0].oPreviousSearch.sSearch = $('#query').val();
+    EMF.purchases_data.rows.add(data.users).draw();
 };
 
 EMF.cancel_return = function(e) {

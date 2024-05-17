@@ -1,10 +1,6 @@
 {% extends "arrivals/base.html" %}
 {% block body %}
-{% if mode == "badge" %}
-<h2>Badges</h2>
-{% else %}
-<h2>Check-in</h2>
-{% endif %}
+<h2>{{view.name}}</h2>
 
 <form class="form-horizontal">
   <div class="col-sm-9">
@@ -14,12 +10,12 @@
 
 <div class="row" style="display: none" id="error">
   <div class="col-sm-12 alert alert-danger">
-      <p>An error occurred fetching tickets: <b id="error-text"></b></p>
+      <p>An error occurred fetching purchases: <b id="error-text"></b></p>
       <p id="error-description"></p>
   </div>
 </div>
 <div class="row">
-  <table id="tickets-data" class="table display nowrap">
+  <table id="purchases-data" class="table display nowrap">
     <thead>
       <tr>
         <th>Name</th>
@@ -35,7 +31,7 @@
 {{ super() }}
 <script id="arrivals-config" type="application/json">
 {
-  "arrivalsMode": {{ mode | tojson }},
+  "arrivalsMode": {{ view.name | tojson }},
   "searchURL": {{ url_for('arrivals.search') | tojson }}
 }
 </script>

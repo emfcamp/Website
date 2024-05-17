@@ -8,11 +8,11 @@ body {
   margin-bottom: 2ex;
 }
 
-#tickets-data .highlight {
+#purchases-data .highlight {
   font-weight: bold;
 }
 
-#tickets-data td {
+#purchases-data td {
   padding: 0;
 }
 
@@ -25,7 +25,7 @@ table.dataTable.display tbody tr:hover a {
   color: #333;
 }
 
-#tickets-data td > a {
+#purchases-data td > a {
   padding: 8px 10px;
   cursor: pointer;
   display: block;
