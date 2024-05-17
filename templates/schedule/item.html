@@ -71,12 +71,8 @@
 
   {% if SIGNUP_STATE == "issue_lottery_tickets" and proposal.requires_ticket %}
     {{ form.enter_lottery(class_="btn btn-primary") }}
-    {% if proposal.type == "youthworkshop" %}
-      {# FIXME the control div produced by this needs 'display: inline-block' adding to it  #}
-      {{ render_field(form.ticket_count, horizontal=2) }}
-    {% else %}
-      <input type="hidden" id="{{ form.ticket_count.id }}" name="{{ form.ticket_count.name }}" value="{{ form.ticket_count.data }}">
-    {% endif %}
+    {# FIXME the control div produced by this needs 'display: inline-block' adding to it  #}
+    {{ render_field(form.ticket_count, horizontal=2) }}
 
   {% elif SIGNUP_STATE == "issue_tickets" and proposal.requires_ticket %}
     {{ form.get_ticket(class_="btn btn-primary") }}

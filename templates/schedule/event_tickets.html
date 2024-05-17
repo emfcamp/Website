@@ -18,6 +18,7 @@
 
 <div id="event-tickets" class="list-group">
   {% for t in tickets %}
+   {# FIXME add how many tickets are per ticket & sort by status #}
     <div class="list-group-item panel draggable-panel" data-id="{{ t.id }}">
       {{t.id}} ==>  {{ t.proposal.title }}
     </div>

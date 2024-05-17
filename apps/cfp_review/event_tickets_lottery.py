@@ -1,4 +1,4 @@
-from random import sample
+from random import shuffle
 
 from flask import (
     flash,
@@ -16,10 +16,11 @@ from models.site_state import SiteState
 
 from ..common.email import from_email
 
-from . import cfp_review
+from . import cfp_review, admin_required
 
 
 @cfp_review.route("/lottery", methods=["GET", "POST"])
+@admin_required
 def lottery():
     # In theory this can be extended to other types but currently only workshops & youthworkshops care
     ticketed_proposals = WorkshopProposal.query.filter_by(requires_ticket=True).all()
@@ -71,25 +72,20 @@ def run_lottery(ticketed_proposals):
             current_rounds_lottery_tickets = [
                 t for t in proposal.tickets if t.is_in_lottery_round(lottery_round)
             ]
+            shuffle(current_rounds_lottery_tickets)  # shuffle operates in place
 
             if len(current_rounds_lottery_tickets) == 0:
                 app.logger.info(f"{proposal} has un-used lottery ticket capacity")
                 ticketed_proposals.remove(proposal)
                 continue
 
-            # All tickets in this round get a place
-            elif len(current_rounds_lottery_tickets) < tickets_remaining:
-                for ticket in current_rounds_lottery_tickets:
-                    ticket.won_lottery_and_cancel_others()
-                    winning_tickets.append(ticket)
-                    db.session.commit()
-
-            # Not everyone at this rank will get a ticket so actually do the lottery
             else:
-                for ticket in sample(current_rounds_lottery_tickets, tickets_remaining):
-                    ticket.won_lottery_and_cancel_others()
-                    winning_tickets.append(ticket)
-                    db.session.commit()
+                for ticket in current_rounds_lottery_tickets:
+                    if ticket.ticket_count < tickets_remaining:
+                        ticket.won_lottery_and_cancel_others()
+                        winning_tickets.append(ticket)
+                        tickets_remaining -= ticket.ticket_count
+                        db.session.commit()
 
                 losing_lottery_tickets = [
                     t for t in proposal.tickets if t.state == "entered-lottery"

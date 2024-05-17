@@ -202,9 +202,9 @@ def item_current(year, proposal_id, slug=None):
     form = ItemForm()
 
     if proposal.type == "youthworkshop":
-        form.ticket_count.choices = [(i, i) for i in range(1, 5)]
+        form.ticket_count.choices = [(i, i) for i in range(1, 7)]  # max 6
     else:
-        form.ticket_count.choices = [(1, 1)]
+        form.ticket_count.choices = [(i, i) for i in range(1, 3)]  # max 2
 
     if form.validate_on_submit() and not current_user.is_anonymous:
         msg = ""
