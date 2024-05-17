@@ -275,6 +275,9 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
     product_view_products = db.relationship(
         "ProductViewProduct", backref="product", cascade="all, delete-orphan"
     )
+    arrivals_view_products = db.relationship(
+        "ArrivalsViewProduct", backref="product", cascade="all, delete-orphan"
+    )
 
     __table_args__ = (UniqueConstraint("name", "group_id"),)
     __export_data__ = False  # Exported by ProductGroup
