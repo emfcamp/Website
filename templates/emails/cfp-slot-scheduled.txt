@@ -10,10 +10,10 @@ If you'd like to share this with people, the public link to your {{ proposal.hum
 
 Things to note:
 
-* If you have special requirements and have not spoken to our speaker ops team about them, please reply to this email.
-
+* If you have special requirements and have not spoken to our Green Room team about them, please let them know as soon as possible via: https://www.emfcamp.org/cfp/proposals/{{ proposal.id }}/messages
+* Any device you wish to connect to our Laser Display Board (aka “projector”) must have an HDMI female socket. If it does not, you will need to bring an adaptor that works with your device.
 {% if proposal.type == 'talk' %}
-* Please report to the Green Room 30 minutes before your {{ proposal.human_type }} so that the speaker ops team can make sure everything is ready for you, and your {{ proposal.human_type }} will go as smoothly as possible!
+* Please report to the Green Room 30 minutes before your {{ proposal.human_type }} so that the team can make sure everything is ready for you, and your {{ proposal.human_type }} will go as smoothly as possible!
 {% endif %}
 {% if proposal.type == 'workshop' %}
 * Please head to the workshop venue 30 minutes before your session is due to start, so you can set everything up, and the team there can sort out the furniture and AV kit as needed for your workshop.
@@ -30,8 +30,6 @@ Things to note:
 
   If you'd like to continue the discussion after your talk, the Herald will invite attendees to meet you at the dedicated Q&A tent - located near the lounge - or an alternative venue such as your village or the bar.
 {% endif %}
-
-* All this information and more is available on our speakers website page: https://wiki.emfcamp.org/wiki/Speaking
 
 Looking forward to seeing you in the field,
 The EMF Speaker Ops Team
