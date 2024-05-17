@@ -272,7 +272,7 @@ def checkin(user_id, source=None):
         return redirect(url_for(".main"))
 
     transferred_purchases = [
-        t.purchase for t in user.transfers_from
+        t.purchase for t in user.transfers_from.join(Purchase).filter(Purchase.product_id.in_(product_ids))
     ]
 
     return render_template(
