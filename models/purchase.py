@@ -73,7 +73,7 @@ class Purchase(BaseModel):
     # Whether an e-ticket has been issued for this item
     ticket_issued = db.Column(db.Boolean, default=False, nullable=False)
     # Whether this ticket has been checked-in/merch issued
-    redeemed = db.Column(db.Boolean, default=False)
+    redeemed = db.Column(db.Boolean, default=False, nullable=False)
 
     # Relationships
     owner = db.relationship(
@@ -244,10 +244,9 @@ class Purchase(BaseModel):
         # This is inefficient without continuum's PropertyModTrackerPlugin
         # However: usually the only attribute that changes is the redemption bit
         for ver in self.versions[::-1]:
-            if 'redeemed' in ver.changeset:
+            if "redeemed" in ver.changeset:
                 return ver
         return None
-
 
 
 class Ticket(Purchase):
