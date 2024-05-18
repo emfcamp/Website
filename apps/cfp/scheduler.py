@@ -52,6 +52,9 @@ class Scheduler(object):
             .filter(
                 Proposal.user_scheduled.is_(False)
             )  # NOTE: This ignores all village-scheduled content
+            .filter(
+                Proposal.manually_scheduled.isnot(True)
+            )  # Used when we manually schedule things into slots and we want the scheduler to ignore them
             .order_by(Proposal.favourite_count.desc())
             .all()
         )
