@@ -22,6 +22,19 @@ from ..admin.users import NewUserForm
 from dateutil.parser import parse as parse_date
 
 
+def ValidVenue():
+    def validate_venue(self, field):
+        venue_name = field.data.strip()
+        if not venue_name:
+            return
+
+        count = Venue.query.filter_by(name=venue_name).count()
+        if count != 1:
+            raise ValidationError("Cannot identify venue")
+
+    return validate_venue
+
+
 class UpdateProposalForm(Form):
     # Admin can change anything
     state = SelectField("State", choices=[(s, s) for s in ORDERED_STATES])
@@ -76,9 +89,9 @@ class UpdateProposalForm(Form):
     allowed_times = TextAreaField("Allowed Time Periods")
     scheduled_duration = StringField("Duration")
     scheduled_time = StringField("Scheduled Time")
-    scheduled_venue = StringField("Scheduled Venue")
+    scheduled_venue = StringField("Scheduled Venue", [ValidVenue()])
     potential_time = StringField("Potential Time")
-    potential_venue = StringField("Potential Venue")
+    potential_venue = StringField("Potential Venue", [ValidVenue()])
 
     thumbnail_url = StringField("Video Thumbnail URL")
     c3voc_url = StringField("C3VOC Video URL")
