@@ -36,10 +36,11 @@ VALID_STATES = {
     "sales_state": ["sold-out", "sales-ended", "unavailable", "available"],
     "refund_state": ["on", "off", "illness", "cancellation"],
     "signup_state": [
-        "issue_lottery_tickets",
-        "pending_tickets",
-        "issue_tickets",
         "closed",
+        "issue-lottery-tickets",
+        "run-lottery",
+        "pending-tickets",
+        "issue-event-tickets",
     ],
 }
 

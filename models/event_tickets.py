@@ -3,6 +3,7 @@ from string import ascii_lowercase
 
 from main import db
 from . import BaseModel
+from .site_state import get_signup_state
 from .user import User
 from .cfp import Proposal
 
@@ -12,11 +13,26 @@ from .cfp import Proposal
 # lost-lottery -- did not convert from a lottery ticket to an actual ticket
 # cancelled -- with drawn/returned. Either as an actual ticket or a lottery ticket
 
-EVENT_TICKET_STATES = {
-    "entered-lottery": ["ticket", "lost-lottery", "cancelled"],
-    "ticket": ["cancelled"],
-    "lost-lottery": ["cancelled"],
-    "cancelled": [],
+EVENT_TICKET_STATES = {"entered-lottery", "ticket", "lost-lottery", "cancelled"}
+
+EVENT_TICKET_STATE_TRANSITIONS = {
+    "closed": {},
+    "issue-lottery-tickets": {
+        "entered-lottery": ["cancelled"],
+        "cancelled": ["entered-lottery"],
+    },
+    "run-lottery": {
+        "entered-lottery": ["cancelled", "ticket", "lost-lottery"],
+        "ticket": ["cancelled"],
+    },
+    "pending-tickets": {
+        "ticket": ["cancelled"],
+    },
+    "issue-event-tickets": {
+        "ticket": ["cancelled"],
+        "cancelled": ["ticket"],
+        "lost-lottery": ["ticket"],
+    },
 }
 
 
@@ -65,19 +81,19 @@ class EventTicket(BaseModel):
         if new_state == "entered-lottery" and not self.rank:
             raise EventTicketException("lottery tickets must have a rank")
 
-        if new_state not in EVENT_TICKET_STATES[self.state]:
+        signup_state = get_signup_state()
+        valid_transitions = EVENT_TICKET_STATE_TRANSITIONS[signup_state]
+
+        if new_state not in valid_transitions[self.state]:
             raise EventTicketException(
-                f"invalid state transition {self.state} -> {new_state}"
+                f"invalid state transition {self.state} -> {new_state} whilst in {signup_state}"
             )
 
         self.state = new_state
         return self
 
-    def won_lottery_and_cancel_others(self):
+    def issue_ticket(self):
         self.change_state("ticket")
-        # Now cancel other tickets
-        for other_ticket in self.get_other_lottery_tickets():
-            other_ticket.cancel()
 
         # Now generate the ticket_codes
         # These are in no way cryptographically secure etc but 1 in 308m should
@@ -86,6 +102,14 @@ class EventTicket(BaseModel):
         for i in range(self.ticket_count):
             codes.append("".join(choices(ascii_lowercase, k=6)))
         self.ticket_codes = ",".join(codes)
+        return self
+
+    def won_lottery_and_cancel_others(self):
+        self.issue_ticket()
+
+        # Now cancel other tickets
+        for other_ticket in self.get_other_lottery_tickets():
+            other_ticket.cancel()
 
         return self
 
