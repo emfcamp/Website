@@ -119,6 +119,7 @@
                                 {{ render_dl_field(form.hide_from_schedule) }}
                                 {{ render_dl_field(form.manually_scheduled) }}
                                 {{ render_dl_field(form.allowed_venues) }}
+                                {{ render_dl_field(form.available_times, readonly=True) }}
                                 {{ render_dl_field(form.allowed_times) }}
                                 {{ render_dl_field(form.scheduled_duration) }}
                                 {{ render_dl_field(form.scheduled_venue) }}
@@ -197,7 +198,6 @@
                                 {% endif %}
                                 {{ render_dl_field(form.arrival_period) }}
                                 {{ render_dl_field(form.departure_period) }}
-                                {{ render_dl_field(form.available_times) }}
                             </dl>
                         </div>
                     </div>
