@@ -17,9 +17,10 @@ from models.ical import CalendarSource, CalendarEvent
 from models.user import generate_api_token
 from models.admin_message import AdminMessage
 
-from ..common import feature_flag, feature_enabled
+from ..common import feature_flag, feature_enabled, archive_file
 from ..common.forms import Form
 from ..common.fields import HiddenIntegerField
+from ..common.markdown import render_markdown, markdown_content, render_markdown_content
 from ..volunteer import v_user_required
 from ..cfp_review import admin_required as cfp_admin_required
 
@@ -431,3 +432,16 @@ def greenroom():
         messages=messages,
         upcoming=upcoming,
     )
+
+
+@schedule.route("/schedule/<int:year>/<page_name>")
+def schedule_static(year, page_name):
+    page_vars = {'page_name': page_name, 'show_nav': False}
+
+    if year == event_year():
+        return render_markdown(f"schedule/content/{page_name}", **page_vars)
+
+    content = archive_file(year, "schedule_content", f"{page_name}.md")
+    with open(content, 'r') as f:
+        metadata, content = markdown_content(f.read())
+    return render_markdown_content(metadata, content, **page_vars)

@@ -5,7 +5,7 @@ from pendulum import parse
 
 from . import volunteer, v_admin_required
 from ..common import feature_enabled, feature_flag
-from ..base.about import render_markdown
+from ..common.markdown import render_markdown
 
 from main import db
 from models.volunteer import (
