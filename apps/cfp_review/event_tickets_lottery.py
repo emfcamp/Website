@@ -51,11 +51,11 @@ def run_lottery(ticketed_proposals):
 
     app.logger.info(f"Found {len(ticketed_proposals)} proposals to run a lottery for")
     # Lock the lottery
-    state = SiteState.query.get("signup_state")
-    if not state:
+    signup = SiteState.query.get("signup_state")
+    if not signup:
         raise Exception("'signup_state' not found.")
 
-    state.state = "pending-tickets"
+    signup.state = "run-lottery"
     db.session.commit()
 
     while ticketed_proposals:
@@ -105,6 +105,9 @@ def run_lottery(ticketed_proposals):
     app.logger.info("sending emails")
 
     send_from = from_email("CONTENT_EMAIL")
+
+    signup.state = "pending-tickets"
+    db.session.commit()
 
     for ticket in winning_tickets:
         msg = EmailMessage(
