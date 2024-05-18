@@ -24,7 +24,7 @@
     <th>Display Name</th>
     <th>Delete</th>
   </tr>
-  {% for pvp in view.arrivals_view_products %}
+  {% for pvp in view.arrivals_view_products | sort(attribute="product_id") %}
   <tr>
     <td>{{ pvp.product.parent.name }}</td>
     <td><a tabindex="-1" href="{{ url_for('admin.product_details', product_id=pvp.product.id) }}">{{ pvp.product.name }}</a></td>
