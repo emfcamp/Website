@@ -337,6 +337,25 @@ def convert_proposal(proposal_id):
 
     if form.validate_on_submit():
         proposal.type = form.new_type.data
+
+        # User time availability can vary based on type, if the type has
+        # changed we need to nuke whatever they selected. If we keep previous
+        # availability and filter we could end up in a case when tiny amounts
+        # overlap and we think that is a hard constraint, when it's actually
+        # just that the user was never able to select new times.
+        proposal.available_times = None
+        # The user didn't select this, but we _do_ allow admins to override
+        # things into any venue. When things are converted this is not
+        # desirable as it can mean that things that were previously scheduled
+        # into a workshop tent stay there when they are now a talk and can be
+        # in any stage.
+        proposal.allowed_venues = []
+        # We also need to put talks that were finalised back into accepted so
+        # they are re-notified to finalise, as their availability is now
+        # incorrect and there are other form fields they may need to complete.
+        if proposal.state == "finalised":
+            proposal.state = "accepted"
+
         db.session.commit()
 
         proposal = Proposal.query.get_or_404(proposal_id)

@@ -5,7 +5,19 @@
 
 <div class="col-md-12">
     <h2>{{ proposal.title }}</h2>
-    <div>This is currently of type {{ proposal.human_type }}. To convert to another type, select below.</div>
+    <div>This is currently of type "{{ proposal.human_type }}". To convert to another type, select below.</div>
+
+</div>
+
+<p>&nbsp;</p>
+
+<div class="col-md-12">
+    <h4>Please note:</h4>
+    <ul>
+        <li>Converting will reset the allowed venues and user availability to defaults for the new type.</li>
+        <li>Finalised proposals will be set to "accepted" so the user can re-finalise.</li>
+        <li>The user is NOT notified of the conversion or need to re-finalise.</li>
+    </ul>
 </div>
 
 <p>&nbsp;</p>
