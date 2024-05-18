@@ -203,7 +203,7 @@ HARD_START_LIMIT = {"youthworkshop": (9, 30)}
 REMAP_SLOT_PERIODS = {
     "talk": {
         "fri_10_13": ("fri", (11, 0), (13, 00)),  # Talks start at 11 on Friday
-        "sun_16_20": ("sun", (16, 0), (19, 20)),  # Talks end at 7 on Sunday
+        "sun_16_20": ("sun", (16, 0), (18, 20)),  # Talks end at 6 on Sunday
     },
     "youthworkshop": {
         "fri_16_20": ("fri", (16, 0), (20, 20)),
