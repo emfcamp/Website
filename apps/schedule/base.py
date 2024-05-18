@@ -22,8 +22,7 @@ from models.cfp import Proposal, Venue
 from models.ical import CalendarSource, CalendarEvent
 from models.user import generate_api_token
 from models.admin_message import AdminMessage
-from models.site_state import get_signup_state
-from models.event_tickets import create_lottery_ticket, create_ticket, EventTicket
+from models.event_tickets import EventTicket
 
 from ..common import feature_flag, feature_enabled
 from ..common.forms import Form
@@ -199,18 +198,16 @@ def item_current(year, proposal_id, slug=None):
     else:
         is_fave = False
 
+    ticket = EventTicket.get_event_ticket(current_user, proposal)
     form = ItemForm()
 
     if proposal.type == "youthworkshop":
-        form.ticket_count.choices = [(i, i) for i in range(1, 7)]  # max 6
+        form.ticket_count.choices = [(i, i) for i in range(1, 6)]  # max 5
     else:
         form.ticket_count.choices = [(i, i) for i in range(1, 3)]  # max 2
 
     if form.validate_on_submit() and not current_user.is_anonymous:
         msg = ""
-        ticket_count = form.ticket_count.data if proposal.type == "youthworkshop" else 1
-
-        app.logger.info(f"ticket_count = {ticket_count}")
 
         if form.toggle_favourite.data:
             if is_fave:
@@ -220,30 +217,34 @@ def item_current(year, proposal_id, slug=None):
                 current_user.favourites.append(proposal)
                 msg = f'Added "{proposal.display_title}" to favourites'
 
-        elif (
-            form.get_ticket.data and current_user.has_ticket_for_event(proposal.id)
-        ) or (
-            form.enter_lottery.data
-            and current_user.has_lottery_ticket_for_event(proposal.id)
-        ):
-            # FIXME this should cope with people changing the number of tickets in their event ticket but good gods
-            msg = f"You already have a ticket for this event"
+        elif ticket:
+            # Convert the existing ticket into whatever state it should be
+            if form.enter_lottery.data:
+                if ticket.state != "entered-lottery":
+                    ticket.reenter_lottery()
+                    msg = f'Re-entered lottery for "{proposal.display_title}" tickets'
+                else:
+                    msg = f"Updated ticket count"
+                ticket.ticket_count = form.ticket_count.data
 
-        elif (
-            form.get_ticket.data
-            and get_signup_state() == "issue_tickets"
-            and proposal.has_ticket_capacity
-        ):
-            msg = f'Signed up for "{proposal.display_title}"'
-            db.session.add(create_ticket(current_user, proposal))
+            elif form.get_ticket.data:
+                if ticket.state != "ticket":
+                    ticket.issue_ticket()
+                    msg = f'Issued ticket for "{proposal.display_title}"'
+                else:
+                    msg = f"Updated ticket count"
+                ticket.ticket_count = form.ticket_count.data
 
-        elif form.enter_lottery.data and get_signup_state() == "issue_lottery_tickets":
-            msg = f'Entered lottery up for "{proposal.display_title}"'
-            app.logger.info(
-                f"theoretical next rank: {len(current_user.event_tickets.all())}"
+        elif form.get_ticket.data or form.enter_lottery.data:
+            ticket = EventTicket.create_ticket(
+                current_user, proposal, form.ticket_count.data
             )
 
-            db.session.add(create_lottery_ticket(current_user, proposal, ticket_count))
+            if ticket.state == "entered-lottery":
+                msg = f'Entered lottery up for "{proposal.display_title}"'
+            else:
+                msg = f'Signed up for "{proposal.display_title}"'
+            db.session.add(ticket)
 
         db.session.commit()
         flash(msg)
@@ -251,10 +252,10 @@ def item_current(year, proposal_id, slug=None):
             url_for(".item", year=year, proposal_id=proposal.id, slug=proposal.slug)
         )
 
-    ticket = EventTicket.get_event_ticket(current_user, proposal)
-
     if ticket:
         form.ticket_count.data = ticket.ticket_count
+        form.enter_lottery.label.text = "Re-enter lottery/update"
+        form.get_ticket.label.text = "Get Ticket/update"
     else:
         form.ticket_count.data = form.ticket_count.choices[0][0]
 
