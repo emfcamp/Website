@@ -16,14 +16,22 @@
   highest preference and the bottom being your lowest.
 </p>
 
-<div id="event-tickets" class="list-group">
-  {% for t in tickets %}
-   {# FIXME add how many tickets are per ticket & sort by status #}
-    <div class="list-group-item panel draggable-panel" data-id="{{ t.id }}">
-      {{t.id}} ==>  {{ t.proposal.title }}
-    </div>
-  {% endfor %}
-</div>
+<form method="POST">
+  {{ form.hidden_tag() }}
+  <div id="event-tickets" class="list-group">
+    {% for t in form.tickets %}
+     {# FIXME add how many tickets are per ticket & sort by status #}
+      <div class="list-group-item panel draggable-panel" data-id="{{ t.id }}">
+        {{ t.ticket_id() }}
+        {{ t._ticket.proposal.title }}
+        ({{ t._ticket.ticket_count }} -- {{ t._ticket.state }})
+        {% if t._ticket.state != "cancelled" %}
+          {{ t.cancel(_class="pull-right")}}
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</form>
 
 
 {% endblock %}

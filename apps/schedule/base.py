@@ -10,6 +10,7 @@ from flask import current_app as app
 
 from wtforms import (
     BooleanField,
+    FieldList,
     FormField,
     SelectField,
     StringField,
@@ -277,16 +278,60 @@ def item_current(year, proposal_id, slug=None):
     )
 
 
+class SingleEventTicket(Form):
+    ticket_id = HiddenIntegerField("ticket_id")
+    cancel = SubmitField("Cancel")
+
+
+class EventTicketsForm(Form):
+    tickets = FieldList(FormField(SingleEventTicket))
+
+
 @schedule.route("/schedule/tickets", methods=["GET", "POST"])
 def event_tickets():
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for("schedule.event_tickets")))
 
-    user_tickets = sorted(
-        current_user.event_tickets.all(), key=lambda t: (t.state, t.rank)
+    user_tickets = current_user.event_tickets.all()
+
+    form = EventTicketsForm()
+
+    if request.method == "POST":
+        for form_ticket in form.tickets:
+            if form_ticket.cancel.data:
+                for ticket in user_tickets:
+                    if ticket.id == form_ticket.ticket_id.data:
+                        ticket.cancel()
+                        db.session.commit()
+                        return redirect(url_for(".event_tickets"))
+
+    sorted(user_tickets, key=lambda t: (t.state, t.rank))
+
+    for ticket in user_tickets:
+        form.tickets.append_entry()
+        form.tickets[-1].ticket_id.data = ticket.id
+        form.tickets[-1]._ticket = ticket
+
+    return render_template(
+        "schedule/event_tickets.html", tickets=user_tickets, form=form
     )
 
-    return render_template("schedule/event_tickets.html", tickets=user_tickets)
+
+@schedule.route("/api/schedule/tickets/<int:ticket_id>/cancel", methods=["POST"])
+def cancel_event_ticket(ticket_id):
+    if current_user.is_anonymous:
+        return redirect(url_for("users.login", next=url_for("schedule.event_tickets")))
+
+    ticket = EventTicket.query.get_or_404(ticket_id)
+
+    if ticket.user != current_user:
+        abort(401)
+
+    ticket.cancel_and_update_ranks()
+    app.logger.info(f"Cancelling event ticket {ticket_id} by user {current_user}")
+    db.session.commit()
+
+    return redirect(url_for(".event_tickets"))
 
 
 @schedule.route("/now-and-next")
