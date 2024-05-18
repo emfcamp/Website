@@ -1,0 +1,22 @@
+{% extends "cfp_review/base.html" %}
+
+{% block body %}
+<h2>Schedule Sense Check</h2>
+
+<p>Checked {{ proposals_count }} proposals, found {{ not_sensible_proposals|length }} suspect proposals.</p>
+
+{% if not_sensible_proposals|length > 0 %}
+<ul>
+{% for proposal, reasons in not_sensible_proposals %}
+  <li>
+    <h3><a href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}">{{ proposal.display_title }}</a>, {{ proposal.type }} by {{ proposal.user.name }}</h3>
+    <ul>
+      {% for reason in reasons.values() %}
+      <li>{{ reason }}</li>
+      {% endfor %}
+    </ul>
+  </li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

@@ -770,7 +770,7 @@ class Proposal(BaseModel):
 
     @property
     def potential_end_date(self) -> Optional[datetime]:
-        start = self.start_date
+        start = self.potential_start_date
         duration = self.scheduled_duration
         if start and duration:
             return start + timedelta(minutes=int(duration))
