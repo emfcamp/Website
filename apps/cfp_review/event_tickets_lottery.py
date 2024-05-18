@@ -55,7 +55,7 @@ def run_lottery(ticketed_proposals):
     if not state:
         raise Exception("'signup_state' not found.")
 
-    state.state = "pending_tickets"
+    state.state = "pending-tickets"
     db.session.commit()
 
     while ticketed_proposals:
