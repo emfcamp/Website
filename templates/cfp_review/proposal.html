@@ -64,23 +64,6 @@
                 </div>
             </div>
             <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="tagsPanelHeading">
-                    <h4 class="panel-title">
-                        <a role="button" data-toggle="collapse" href="#tagsPanel" aria-expanded="false" aria-controls="tagsPanel">
-                            Tags ({{ proposal.tags | join(", ", attribute="tag") }})
-                        </a>
-                    </h4>
-                </div>
-                <div id="tagsPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="tagsPanelHeading">
-                    <div class="panel-body">
-                        <dl class="dl-horizontal">
-                            {{ render_field(form.tags, size=(form.tags.choices| count)) }}
-                        </dl>
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="requirementsPanelHeading">
                     <h4 class="panel-title">
                         <a role="button" data-toggle="collapse" href="#requirementsPanel" aria-expanded="false" aria-controls="requirementsPanel">
@@ -125,7 +108,7 @@
                         </a>
                     </h4>
                 </div>
-                <div id="schedulingPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="schedulingPanelHeading">
+                <div id="schedulingPanel" class="panel-collapse" role="tabpanel" aria-labelledby="schedulingPanelHeading">
                     <div class="panel-body">
                         <dl class="dl-horizontal">
                             {% if proposal.type == "lightning" %}
@@ -143,6 +126,22 @@
                                 {{ render_dl_field(form.potential_venue) }}
                                 {{ render_dl_field(form.potential_time) }}
                             {% endif %}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="tagsPanelHeading">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" href="#tagsPanel" aria-expanded="false" aria-controls="tagsPanel">
+                            Tags ({{ proposal.tags | join(", ", attribute="tag") }})
+                        </a>
+                    </h4>
+                </div>
+                <div id="tagsPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="tagsPanelHeading">
+                    <div class="panel-body">
+                        <dl class="dl-horizontal">
+                            {{ render_field(form.tags, size=(form.tags.choices| count)) }}
                         </dl>
                     </div>
                 </div>
