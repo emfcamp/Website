@@ -78,7 +78,10 @@ class EventTicket(BaseModel):
         return self.state == "entered-lottery" and self.rank <= round_rank
 
     def change_state(self, new_state):
-        if new_state == "entered-lottery" and not self.rank:
+        if new_state == self.state:
+            return self
+
+        if new_state == "entered-lottery" and (self.rank is None or self.rank < 0):
             raise EventTicketException("lottery tickets must have a rank")
 
         signup_state = get_signup_state()
@@ -119,6 +122,9 @@ class EventTicket(BaseModel):
     def cancel(self):
         return self.change_state("cancelled")
 
+    def reenter_lottery(self):
+        return self.change_state("entered-lottery")
+
     def cancel_and_update_ranks(self):
         # adjust ranks for lottery tickets
         if self.state == "entered-lottery":
@@ -134,15 +140,23 @@ class EventTicket(BaseModel):
             user_id=user.id, proposal_id=proposal.id
         ).one_or_none()
 
+    @classmethod
+    def create_ticket(self, user, proposal, ticket_count=1):
+        signup_state = get_signup_state()
 
-def create_ticket(user: User, proposal: Proposal) -> EventTicket:
-    return EventTicket(user.id, proposal.id, "ticket")
+        if signup_state == "issue-lottery-tickets":
+            rank = len(user.event_tickets.all())
+            return EventTicket(
+                user.id, proposal.id, "entered-lottery", ticket_count, rank
+            )
+        elif signup_state == "issue-event-tickets" and proposal.has_ticket_capacity():
+            return EventTicket(user.id, proposal.id, "ticket")
 
+        elif (
+            signup_state == "issue-event-tickets" and not proposal.has_ticket_capacity()
+        ):
+            raise EventTicketException(
+                f"This f{proposal.human_type} is currently full."
+            )
 
-def create_lottery_ticket(
-    user: User, proposal: Proposal, ticket_count=1, rank=None
-) -> EventTicket:
-    if rank is None:
-        rank = len(user.event_tickets.all())
-
-    return EventTicket(user.id, proposal.id, "entered-lottery", ticket_count, rank)
+        raise EventTicketException("Tickets are not currently being issued")
