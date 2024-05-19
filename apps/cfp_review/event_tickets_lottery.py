@@ -99,15 +99,15 @@ def run_lottery(ticketed_proposals):
     app.logger.info(
         f"Issued {len(winning_tickets)} winning tickets over {lottery_round} rounds"
     )
+
+    signup.state = "pending-tickets"
+    db.session.commit()
+
     # Email winning tickets here
     # We should probably also check for users who didn't win anything?
 
     app.logger.info("sending emails")
-
     send_from = from_email("CONTENT_EMAIL")
-
-    signup.state = "pending-tickets"
-    db.session.commit()
 
     for ticket in winning_tickets:
         msg = EmailMessage(
@@ -121,3 +121,5 @@ def run_lottery(ticketed_proposals):
             user=ticket.user,
             proposal=ticket.proposal,
         )
+
+    return winning_tickets
