@@ -7,15 +7,15 @@ function saveFilters() {
 function loadFilters() {
     let savedFilters = localStorage.getItem("volunteer-filters:v2");
     if (savedFilters === null) {
-        interestedRoles = document.querySelectorAll('input[data-role-id]').forEach((checkbox) => checkbox.checked = checkbox.getAttribute('data-interested') == 'True');
-        savedFilters = {
+        let interestedRoles = Array.from(document.querySelectorAll('input[data-role-id]')).filter(box => box.getAttribute('data-interested') == "True").map(box => box.getAttribute('data-role-id'));
+        savedFilters = JSON.stringify({
             "role_ids": interestedRoles,
             "show_finished_shifts": false,
             "signed_up": false,
             "hide_full": false,
             "hide_staffed": false,
             "colourful_mode": false,
-        }
+        })
     }
 
     let filters = JSON.parse(savedFilters)
