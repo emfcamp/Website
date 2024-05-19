@@ -646,10 +646,10 @@ class Proposal(BaseModel):
         return admission_tickets > 0 or self.user.will_have_ticket
 
     def get_allowed_venues(self) -> list["Venue"]:
-        if self.user_scheduled:
-            return Venue.query.filter(~Venue.scheduled_content_only).all()
-        elif self.allowed_venues:
+        if self.allowed_venues:
             return self.allowed_venues
+        elif self.user_scheduled:
+            return Venue.query.filter(~Venue.scheduled_content_only).all()
         else:
             return Venue.query.filter(Venue.default_for_types.any(self.type)).all()
 
