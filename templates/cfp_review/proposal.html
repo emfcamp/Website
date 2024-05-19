@@ -1,6 +1,6 @@
 {% from "_formhelpers.html" import render_field, render_dl_field, render_radio_field %}
 {% extends "cfp_review/base.html" %}
-{% block title %}{{proposal.title}}{% endblock %}
+{% block title %}{{proposal.published_title or proposal.title}}{% endblock %}
 {% block body %}
 
 {% set active='details' %}
