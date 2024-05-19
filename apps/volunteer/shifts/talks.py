@@ -1,13 +1,25 @@
 from ..event_date import edt
 
 herald_pattern = [
-            {
-                "first": edt("fri", "09:00:00"),
-                "final": edt("fri", "21:00:00"),
-                "min": 1,
-                "max": 1,
-            } for d in ["fri", "sat", "sun"]
-        ]
+    {
+        "first": edt("fri", "11:00:00"),
+        "final": edt("fri", "20:00:00"),
+        "min": 1,
+        "max": 1,
+    },
+    {
+        "first": edt("sat", "10:00:00"),
+        "final": edt("sat", "20:00:00"),
+        "min": 1,
+        "max": 1,
+    },
+    {
+        "first": edt("sun", "09:00:00"),
+        "final": edt("sun", "19:00:00"),
+        "min": 1,
+        "max": 1,
+    }
+]
 
 stage_a_pattern = [
     {"first": edt(d, "09:45:00"),
@@ -101,8 +113,8 @@ talks_shifts = {
     "Green Room Runner": {
         "Green Room": [
             {
-                "first": edt(d, "09:00:00"),
-                "final": edt(d, "21:00:00"),
+                "first": edt(d, "09:30:00"),
+                "final": edt(d, "20:00:00"),
                 "min": 1,
                 "max": 2,
             } for d in ["fri", "sat", "sun"]
@@ -111,8 +123,8 @@ talks_shifts = {
     "Content Team": {
       "Green Room": [
             {
-                "first": edt(d, "09:00:00"),
-                "final": edt(d, "21:00:00"),
+                "first": edt(d, "09:30:00"),
+                "final": edt(d, "20:00:00"),
                 "min": 1,
                 "max": 1,
             } for d in ["fri", "sat", "sun"]
