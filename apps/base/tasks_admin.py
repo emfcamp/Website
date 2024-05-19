@@ -5,6 +5,8 @@ from apps.base import base as app
 from models.user import User
 from models.permission import Permission
 from models.scheduled_task import execute_scheduled_tasks
+from models.feature_flag import FeatureFlag, refresh_flags, DB_FEATURE_FLAGS
+from models.site_state import SiteState, refresh_states, VALID_STATES
 
 
 @app.cli.command("periodic")
@@ -69,3 +71,44 @@ def create_perms():
             db.session.add(Permission(permission))
 
     db.session.commit()
+
+
+@app.cli.command("set_flag")
+@click.argument("flag_names", nargs=-1)
+@click.option("--enable/--disable", default=True)
+def set_flag(flag_names, enable):
+    for flag in flag_names:
+        current = FeatureFlag.query.filter_by(feature=flag).one_or_none()
+        if current:
+            current.enabled = enable
+        else:
+            db.session.add(FeatureFlag(feature=flag, enabled=enable))
+
+        if enable:
+            print(f"enabling flag: '{flag}'")
+        else:
+            print(f"disabling flag: '{flag}'")
+
+        if flag not in DB_FEATURE_FLAGS:
+            print(f"[WARN] flag ({flag}) not in DB_FEATURE_FLAGS")
+    db.session.commit()
+    refresh_flags()
+
+
+@app.cli.command("set_site_state")
+@click.argument("state_name", nargs=1)
+@click.argument("state", nargs=1)
+def set_site_state(state_name, state):
+    if state_name not in VALID_STATES:
+        print(f"[WARN] state name ({state_name}) not in VALID_STATES")
+    elif state not in VALID_STATES[state_name]:
+        print(f"[WARN] state ({state}) not found in valid states for {state_name}")
+
+    current = SiteState.query.filter_by(name=state_name).one_or_none()
+    if not current:
+        db.session.add(SiteState(name=state_name, state=state))
+    else:
+        current.state = state
+    print(f"set '{state_name}' to state '{state}'")
+    db.session.commit()
+    refresh_states()
