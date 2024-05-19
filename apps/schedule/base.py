@@ -305,12 +305,13 @@ def event_tickets():
                         db.session.commit()
                         return redirect(url_for(".event_tickets"))
 
-    tickets_dict = defaultdict(list)
+    tickets_dict = defaultdict(lambda: defaultdict(list))
+
     for ticket in user_tickets:
         form.tickets.append_entry()
         form.tickets[-1].ticket_id.data = ticket.id
         ticket._form = form.tickets[-1]
-        tickets_dict[ticket.state].append(ticket)
+        tickets_dict[ticket.state][ticket.proposal.type].append(ticket)
 
     return render_template(
         "schedule/event_tickets.html", tickets=tickets_dict, form=form
