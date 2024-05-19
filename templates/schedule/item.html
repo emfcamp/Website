@@ -68,6 +68,7 @@
     {{ favourite_icons() }}
     &nbsp;Favourite
   </button>
+  {# FIXME explain how ticket count works WRT children etc. #}
 
   {% if SIGNUP_STATE == "issue-lottery-tickets" and proposal.requires_ticket %}
     {{ form.enter_lottery(class_="btn btn-primary") }}
