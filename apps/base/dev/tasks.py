@@ -12,6 +12,8 @@ from models.volunteer.role import Role
 
 from apps.cfp.tasks import create_tags
 from models.payment import BankAccount
+from models.site_state import SiteState, refresh_states
+from models.feature_flag import FeatureFlag, refresh_flags
 
 from . import dev_cli
 from .fake import FakeDataGenerator
@@ -21,6 +23,7 @@ from .fake import FakeDataGenerator
 @click.pass_context
 def dev_data(ctx):
     """Make all categories of fake data for dev"""
+    ctx.invoke(enable_cfp)
     ctx.invoke(fake_data)
     ctx.invoke(volunteer_data)
     ctx.invoke(volunteer_shifts)
@@ -33,6 +36,25 @@ def fake_data():
     """Make fake users, proposals, locations, etc"""
     fdg = FakeDataGenerator()
     fdg.run()
+
+
+@dev_cli.command("enable_cfp")
+def enable_cfp():
+    for flag in ["LINE_UP", "CFP"]:
+        if not FeatureFlag.query.get(flag):
+            db.session.add(FeatureFlag(feature=flag, enabled=True))
+
+    signup_state = SiteState.query.filter_by(name="signup_state").one_or_none()
+    if not signup_state:
+        db.session.add(SiteState("signup_state", "issue-lottery-tickets"))
+    else:
+        signup_state.state = "issue-lottery-tickets"
+
+    db.session.commit()
+    db.session.flush()
+    refresh_flags()
+    refresh_states()
+
 
 
 @dev_cli.command("volunteer_data")
