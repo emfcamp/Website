@@ -1,4 +1,5 @@
 from random import shuffle
+from sqlalchemy import func
 
 from flask import (
     flash,
@@ -12,7 +13,8 @@ from flask_mailman import EmailMessage
 
 from main import db
 from models.cfp import WorkshopProposal, Proposal
-from models.site_state import SiteState, get_signup_state, refresh_states
+from models.event_tickets import EventTicket
+from models.site_state import SiteState, refresh_states
 
 from ..common.email import from_email
 
@@ -35,10 +37,10 @@ def lottery():
         )
         flash(f"Lottery run for workshops. {len(winning_tickets)} tickets won.")
 
-        # winning_tickets = run_lottery(
-        #     [t for t in ticketed_proposals if t.type == "youthworkshop"]
-        # )
-        # flash(f"Lottery run for youthworkshops. {len(winning_tickets)} tickets won.")
+        winning_tickets = run_lottery(
+            [t for t in ticketed_proposals if t.type == "youthworkshop"]
+        )
+        flash(f"Lottery run for youthworkshops. {len(winning_tickets)} tickets won.")
         return redirect(url_for(".lottery"))
 
     return render_template(
@@ -72,58 +74,36 @@ def run_lottery(ticketed_proposals):
     db.session.flush()
     refresh_states()
 
-    app.logger.info(f"state is now {get_signup_state()}")
 
-    while ticketed_proposals:
-        app.logger.info(f"Starting round {lottery_round}")
+    max_rank = db.session.query(func.max(EventTicket.rank)).scalar() + 1
+    # Cache this locally so we're not hitting the db and not having to flush() etc.
+    proposal_capacities = {p.id: p.get_lottery_capacity() for p in ticketed_proposals}
+    winning_tickets = []
 
+    for lottery_round in range(max_rank):
         for proposal in ticketed_proposals:
-            app.logger.info(f"run lottery for {proposal}")
-            tickets_remaining = proposal.get_lottery_capacity()
+            tickets_remaining = proposal_capacities[proposal.id]
+
+            tickets_for_round = [t for t in proposal.tickets if t.is_in_lottery_round(lottery_round)]
+            shuffle(tickets_for_round)
 
             if tickets_remaining <= 0:
-                app.logger.info(f"{proposal} is at capacity")
-                # If we're at capacity ALL remaining lottery tickets have lost
-                for ticket in proposal.tickets:
-                    if ticket.state == "entered-lottery":
-                        ticket.lost_lottery()
-                ticketed_proposals.remove(proposal)
-                continue
-
-            current_rounds_lottery_tickets = [
-                t for t in proposal.tickets if t.is_in_lottery_round(lottery_round)
-            ]
-
-            shuffle(current_rounds_lottery_tickets)  # shuffle operates in place
-
-            # FIXME I think the stopping function isn't quite right here. I think
-            # we only stop if all proposals' capacity is reached OR
-            # all event tickets have moved to lost/won
-            if len(current_rounds_lottery_tickets) == 0:
-                app.logger.info(f"{proposal} has un-used lottery ticket capacity")
-                ticketed_proposals.remove(proposal)
-                # Still set this because there may be tickets with counts > than remaining capacity
-                for ticket in proposal.tickets:
-                    if ticket.state == "entered-lottery":
-                        ticket.lost_lottery()
-                continue
-
-            else:
-                for ticket in current_rounds_lottery_tickets:
-                    if ticket.ticket_count < tickets_remaining:
-                        ticket.won_lottery_and_cancel_others()
-                        winning_tickets.append(ticket)
-                        tickets_remaining -= ticket.ticket_count
-                        db.session.commit()
-
-                losing_lottery_tickets = [
-                    t for t in proposal.tickets if t.state == "entered-lottery"
-                ]
-
-                for ticket in losing_lottery_tickets:
+                for ticket in tickets_for_round:
                     ticket.lost_lottery()
                     db.session.commit()
-        lottery_round += 1
+
+                continue
+
+            for ticket in tickets_for_round:
+                if ticket.ticket_count < tickets_remaining:
+                    ticket.won_lottery_and_cancel_others()
+                    winning_tickets.append(ticket)
+                    tickets_remaining -= ticket.ticket_count
+                else:
+                    ticket.lost_lottery()
+                db.session.commit()
+
+            proposal_capacities[proposal.id] = tickets_remaining
 
     db.session.flush()
     app.logger.info(

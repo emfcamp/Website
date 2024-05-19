@@ -83,7 +83,12 @@ class EventTicket(BaseModel):
     def is_in_lottery_round(self, round_rank):
         return self.state == "entered-lottery" and self.rank <= round_rank
 
-    def change_state(self, new_state):
+    def change_state(self, new_state, force=False):
+        # The force option only exists for ease of resetting this in dev
+        if force:
+            self.state = new_state
+            return
+
         if new_state == self.state:
             return self
 
@@ -141,9 +146,10 @@ class EventTicket(BaseModel):
                 ticket.rank -= 1
         return self.change_state("cancelled")
 
-    def reenter_lottery(self):
+    def reenter_lottery(self, force=False):
+        # The force option only exists for ease of resetting this in dev
         self.rank = get_max_rank_for_user(self.user, self.proposal.type)
-        return self.change_state("entered-lottery")
+        return self.change_state("entered-lottery", force)
 
     @classmethod
     def get_event_ticket(cls, user: User, proposal: Proposal):
