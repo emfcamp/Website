@@ -89,7 +89,12 @@ def add_event(room, event):
 
     _add_sub_with_text(event_node, "room", room.attrib["name"])
     _add_sub_with_text(event_node, "title", event["title"])
-    _add_sub_with_text(event_node, "type", event.get("type", "talk"))
+
+    event_type = event.get("type", "talk")
+    _add_sub_with_text(event_node, "type", event_type)
+    # infobeamer frab scheduler can color by "track"
+    _add_sub_with_text(event_node, "track", event_type)
+
     _add_sub_with_text(event_node, "date", event["start_date"].isoformat())
     _add_sub_with_text(event_node, "url", url)
 
@@ -109,7 +114,6 @@ def add_event(room, event):
     )
 
     _add_sub_with_text(event_node, "subtitle", "")
-    _add_sub_with_text(event_node, "track", "")
 
     add_persons(event_node, event)
     add_recording(event_node, event)
