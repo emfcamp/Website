@@ -222,6 +222,16 @@ def export(format: str):
         "notice_required",
         "tags",
         "favourite_count",
+
+        "published_names",
+        "published_pronouns",
+        "published_title",
+        "published_description",
+
+        "arrival_period",
+        "departure_period",
+        "telephone_number",
+        "eventphone_number",
     ]
 
     # Do not call this with untrusted field values
