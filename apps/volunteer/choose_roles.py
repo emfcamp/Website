@@ -235,6 +235,19 @@ def set_state(role_id: int, shift_id: int, user_id: int):
     return redirect(url_for(".role_admin", role_id=role_id))
 
 
+@volunteer.route("role/<int:role_id>/<int:shift_id>", methods=["POST"])
+@role_admin_required
+def update_shift(role_id: int, shift_id: int):
+    shift = Shift.query.get_or_404(shift_id)
+    shift.min_needed = int(request.form["min_needed"])
+    shift.max_needed = int(request.form["max_needed"])
+    db.session.add(shift)
+    db.session.commit()
+
+    flash("Shift requirements updated.")
+    return redirect(url_for(".role_admin", role_id=role_id, _anchor=f"shift-{shift.id}"))
+
+
 @volunteer.route("role/<int:role_id>/volunteers")
 @role_admin_required
 def role_volunteers(role_id):

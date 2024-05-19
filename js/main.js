@@ -135,4 +135,32 @@ $(() => {
       event.target.form.submit();
     })
   });
+
+  document.querySelectorAll('.shift-status').forEach((el) => {
+    el.classList.remove("hidden");
+  });
+
+  document.querySelectorAll('.shift-editor').forEach((el) => {
+    el.classList.add("hidden");
+  });
+
+  document.querySelectorAll('.shift-status-edit').forEach((el) => {
+    el.addEventListener('click', (event) => {
+      event.preventDefault();
+
+      let id = event.target.getAttribute('data-shift-id');
+      document.getElementById(`shift-editor-${id}`).classList.remove('hidden');
+      document.getElementById(`shift-status-${id}`).classList.add('hidden');
+    });
+  });
+
+  document.querySelectorAll('.shift-editor-cancel').forEach((el) => {
+    el.addEventListener('click', (event) => {
+      event.preventDefault();
+
+      let id = event.target.getAttribute('data-shift-id');
+      document.getElementById(`shift-editor-${id}`).classList.add('hidden');
+      document.getElementById(`shift-status-${id}`).classList.remove('hidden');
+    });
+  });
 });

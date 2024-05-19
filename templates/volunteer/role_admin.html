@@ -51,7 +51,28 @@
   <h3>Upcoming Shifts</h3>
   {% for shift in shifts %}
     <div class="role-admin-shift well content-well">
-      <h4>{{ shift.start.strftime("%a %H:%M") }} - {{ shift.end.strftime("%H:%M") }} - {{ shift.venue.name }}</h4>
+      <h4 id="shift-{{ shift.id }}">{{ shift.start.strftime("%a %H:%M") }} - {{ shift.end.strftime("%H:%M") }} - {{ shift.venue.name }}</h4>
+      <form method="post" class="shift-editor" id="shift-editor-{{ shift.id }}" action="/volunteer/role/{{ shift.role_id }}/{{ shift.id }}">
+        <div class="form-group">
+          <label class="control-label" for="min_needed">Minimum Volunteers</label>
+          <input name="min_needed" type="number" class="form-control" value="{{ shift.min_needed }}">
+        </div>
+        <div class="form-group">
+          <label class="control-label" for="max_needed">Maximum Volunteers</label>
+          <input name="max_needed" type="number" class="form-control" value="{{ shift.max_needed }}">
+        </div>
+        <div class="form-group">
+          <button type="button" class="btn btn-danger shift-editor-cancel" data-shift-id="{{ shift.id }}">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+      </form>
+      <div class="clearfix"></div>
+      <ul class="shift-status" id="shift-status-{{ shift.id }}">
+        <li><strong>Minimum:</strong> {{ shift.min_needed }}</li>
+        <li><strong>Maximum:</strong> {{ shift.max_needed }}</li>
+        <li><strong>Current:</strong> {{ shift.entries | count }}</li>
+        <li><a href="#shift-status-{{ shift.id }}" class="shift-status-edit" data-shift-id="{{ shift.id }}">Edit</a></li>
+      </ul>
       {% for se in shift.entries|sort(attribute="user_id") %}
         <div class="volunteer">
           <p>
