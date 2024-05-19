@@ -67,11 +67,17 @@ class EventTicket(BaseModel):
         self.ticket_count = ticket_count
         self.rank = rank
 
-    def get_other_lottery_tickets(self):
+    # add a way to indicate a code has been used?
+    def use_code(self, code):
+        pass
+
+    def get_users_other_lottery_tickets_for_type(self):
         return [
             t
             for t in self.user.event_tickets
-            if t.state == "entered-lottery" and t != self
+            if t.state == "entered-lottery"
+            and t != self
+            and t.proposal.type == self.proposal.type
         ]
 
     def is_in_lottery_round(self, round_rank):
@@ -90,9 +96,14 @@ class EventTicket(BaseModel):
         signup_state = get_signup_state()
         valid_transitions = EVENT_TICKET_STATE_TRANSITIONS[signup_state]
 
-        if new_state not in valid_transitions[self.state]:
+        try:
+            if new_state not in valid_transitions[self.state]:
+                raise EventTicketException(
+                    f"invalid state transition {self.state} -> {new_state} whilst in {signup_state}"
+                )
+        except KeyError:
             raise EventTicketException(
-                f"invalid state transition {self.state} -> {new_state} whilst in {signup_state}"
+                f"State, {self.state} not found in in {signup_state}, new state {new_state}"
             )
 
         self.state = new_state
@@ -114,7 +125,7 @@ class EventTicket(BaseModel):
         self.issue_ticket()
 
         # Now cancel other tickets
-        for other_ticket in self.get_other_lottery_tickets():
+        for other_ticket in self.get_users_other_lottery_tickets_for_type():
             other_ticket.cancel()
 
         return self
@@ -124,14 +135,14 @@ class EventTicket(BaseModel):
 
     def cancel(self):
         if self.state == "entered-lottery":
-            for ticket in self.get_other_lottery_tickets():
+            for ticket in self.get_users_other_lottery_tickets_for_type():
                 if (ticket.id == self.id) or (ticket.rank < self.rank):
                     continue
                 ticket.rank -= 1
         return self.change_state("cancelled")
 
     def reenter_lottery(self):
-        self.rank = get_max_rank_for_user(self.user)
+        self.rank = get_max_rank_for_user(self.user, self.proposal.type)
         return self.change_state("entered-lottery")
 
     @classmethod
@@ -145,7 +156,7 @@ class EventTicket(BaseModel):
         signup_state = get_signup_state()
 
         if signup_state == "issue-lottery-tickets":
-            rank = get_max_rank_for_user(user)
+            rank = get_max_rank_for_user(user, proposal.type)
             return EventTicket(
                 user.id, proposal.id, "entered-lottery", ticket_count, rank
             )
@@ -162,5 +173,11 @@ class EventTicket(BaseModel):
         raise EventTicketException("Tickets are not currently being issued")
 
 
-def get_max_rank_for_user(user):
-    return len([t for t in user.event_tickets.all() if t.state == "entered-lottery"])
+def get_max_rank_for_user(user, proposal_type):
+    return len(
+        [
+            t
+            for t in user.event_tickets.all()
+            if t.state == "entered-lottery" and t.proposal.type == proposal_type
+        ]
+    )
