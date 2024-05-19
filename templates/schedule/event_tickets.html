@@ -2,6 +2,18 @@
 {% from "_formhelpers.html" import render_field %}
 {% from "schedule/_faves.html" import favourite_icons %}
 {% from "schedule/_proposal_icons.html" import proposal_icons %}
+
+{% macro display_ticket(ticket, is_draggable=False) %}
+<div class=" panel {% if is_draggable %}list-group-item draggable-panel{% endif %}" data-id="{{ ticket.id }}">
+  {{ ticket._form.ticket_id() }}
+  <a href="{{ url_for('.item', proposal_id=ticket.proposal.id, year=2024 ) }}">{{ ticket.proposal.title }}</a>
+  ({{ ticket.ticket_count }})
+  {% if ticket.state != "cancelled" %}
+    {{ ticket._form.cancel(class_="btn btn-primary pull-right")}}
+  {% endif %}
+</div>
+{% endmacro %}
+
 {% block title %}Workshop Tickets{% endblock %}
 {% block body %}
 
@@ -11,26 +23,44 @@
   This page requires Javascript, sorry.
 </noscript>
 
-<p>
-  You can drag & drop your tickets in order of preference with top being your
-  highest preference and the bottom being your lowest.
-</p>
-
 <form method="POST">
   {{ form.hidden_tag() }}
-  <div id="event-tickets" class="list-group">
-    {% for t in form.tickets %}
-     {# FIXME add how many tickets are per ticket & sort by status #}
-      <div class="list-group-item panel draggable-panel" data-id="{{ t.id }}">
-        {{ t.ticket_id() }}
-        {{ t._ticket.proposal.title }}
-        ({{ t._ticket.ticket_count }} -- {{ t._ticket.state }})
-        {% if t._ticket.state != "cancelled" %}
-          {{ t.cancel(_class="pull-right")}}
-        {% endif %}
-      </div>
+
+  {% if SIGNUP_STATE == "issue-lottery-tickets" %}
+    <h2>Lottery entries</h2>
+
+    <p>
+      You can drag & drop your tickets in order of preference with top being your
+      highest preference and the bottom being your lowest.
+    </p>
+
+    {# Lottery tickets get treated specially b/c they need to be ranked #}
+    <div id="event-tickets" class="list-group">
+      {% for t in tickets["entered-lottery"] %}
+        {{ display_ticket(t, is_draggable=True) }}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% for state in ["ticket", "cancelled", "lost-lottery"] %}
+    {% if state == "lost-lottery" %}
+      <h2>Lost lottery</h2>
+      <p>These are tickets for lotteries you did not win a ticket to.</p>
+    {% elif state == "cancelled" %}
+      <h2>Cancelled tickets</h2>
+      <p>Tickets you have cancelled.</p>
+    {% elif state == "ticket" %}
+      <h2>Tickets</h2>
+      <p>Tickets you have to workshops (or you have for youth workshops)</p>
+    {% endif %}
+
+    {% for t in tickets[state] %}
+      {{ display_ticket(t) }}
     {% endfor %}
-  </div>
+
+  {% endfor %}
+
+
 </form>
 
 
