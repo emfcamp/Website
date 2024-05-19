@@ -148,7 +148,7 @@ def shift_cancel(shift_id):
         db.session.delete(shift_entry)
         db.session.commit()
 
-    redirect_next_or_schedule(f"{shift.role.name} shift cancelled")
+    return redirect_next_or_schedule(f"{shift.role.name} shift cancelled")
 
 
 @volunteer.route("/shift/<shift_id>/contact", methods=["GET"])
