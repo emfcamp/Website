@@ -84,6 +84,9 @@ class EventTicket(BaseModel):
         if new_state == "entered-lottery" and (self.rank is None or self.rank < 0):
             raise EventTicketException("lottery tickets must have a rank")
 
+        if new_state != "entered-lottery":
+            self.rank = None
+
         signup_state = get_signup_state()
         valid_transitions = EVENT_TICKET_STATE_TRANSITIONS[signup_state]
 
@@ -120,19 +123,16 @@ class EventTicket(BaseModel):
         return self.change_state("lost-lottery")
 
     def cancel(self):
-        return self.change_state("cancelled")
-
-    def reenter_lottery(self):
-        return self.change_state("entered-lottery")
-
-    def cancel_and_update_ranks(self):
-        # adjust ranks for lottery tickets
         if self.state == "entered-lottery":
             for ticket in self.get_other_lottery_tickets():
                 if (ticket.id == self.id) or (ticket.rank < self.rank):
                     continue
                 ticket.rank -= 1
-        return self.cancel()
+        return self.change_state("cancelled")
+
+    def reenter_lottery(self):
+        self.rank = get_max_rank_for_user(self.user)
+        return self.change_state("entered-lottery")
 
     @classmethod
     def get_event_ticket(cls, user: User, proposal: Proposal):
@@ -145,7 +145,7 @@ class EventTicket(BaseModel):
         signup_state = get_signup_state()
 
         if signup_state == "issue-lottery-tickets":
-            rank = len(user.event_tickets.all())
+            rank = get_max_rank_for_user(user)
             return EventTicket(
                 user.id, proposal.id, "entered-lottery", ticket_count, rank
             )
@@ -160,3 +160,7 @@ class EventTicket(BaseModel):
             )
 
         raise EventTicketException("Tickets are not currently being issued")
+
+
+def get_max_rank_for_user(user):
+    return len([t for t in user.event_tickets.all() if t.state == "entered-lottery"])
