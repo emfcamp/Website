@@ -5,16 +5,18 @@ from apps.cfp.scheduler import Scheduler
 from main import db
 from models.user import User
 from models.basket import Basket
+from models.event_tickets import EventTicket
 from models.product import PriceTier
 from models.payment import StripePayment, BankPayment
 from models.cfp import (
-    TalkProposal,
+    CFPVote,
+    InstallationProposal,
+    LENGTH_OPTIONS,
+    LightningTalkProposal,
     PerformanceProposal,
+    TalkProposal,
     WorkshopProposal,
     YouthWorkshopProposal,
-    InstallationProposal,
-    CFPVote,
-    LENGTH_OPTIONS,
 )
 from models.village import Village, VillageMember, VillageRequirements
 
@@ -66,7 +68,7 @@ def fake_proposal(fake, reviewers):
     cfp.needs_money = random.random() < 0.2
     cfp.one_day = random.random() < 0.2
 
-    if type(cfp) in (TalkProposal, WorkshopProposal):
+    if type(cfp) not in (LightningTalkProposal, InstallationProposal):
         cfp.length = random.choice(LENGTH_OPTIONS)[0]
 
     states = {
@@ -105,6 +107,10 @@ def fake_proposal(fake, reviewers):
 
     if type(cfp) in (WorkshopProposal, YouthWorkshopProposal):
         cfp.attendees = int(round(random.uniform(5, 50)))
+
+        if cfp.state in ("accepted", "finalised") and randombool(0.7):
+            cfp.requires_ticket = True
+            cfp.total_tickets = cfp.attendees - 5
     return cfp
 
 
@@ -152,6 +158,17 @@ class FakeDataGenerator(object):
             for i in range(0, int(round(random.uniform(0, 2)))):
                 cfp = fake_proposal(self.fake, reviewers)
                 cfp.user = user
+                db.session.add(cfp)
+                print(f"created fake proposal -- {cfp.type}")
+
+                if (
+                    cfp.type in ["youthworkshop", "workshop"]
+                    and cfp.state in ["finalised", "accepted"]
+                    and cfp.requires_ticket
+                ):
+                    print(f"going to create_fake_lottery_tickets")
+                    # User reviewers as a handy list of users
+                    self.create_fake_lottery_tickets(reviewers, cfp)
 
             if randombool(0.2):
                 self.create_volunteer_data(user)
@@ -196,7 +213,7 @@ class FakeDataGenerator(object):
         vol.volunteer_email = user.email
         vol.nickname = user.name
 
-        user.grant_permission('volunteer:user')
+        user.grant_permission("volunteer:user")
         db.session.add(vol)
 
     def create_fake_tickets(self, user):
@@ -241,3 +258,14 @@ class FakeDataGenerator(object):
             if random.random() < 0.2:
                 payment.manual_refund()
                 db.session.commit()
+
+    def create_fake_lottery_tickets(self, users_list: list[User], proposal):
+        n_lottery_tickets = random.randint(0, len(users_list))
+        max_ticket_count = 2 if proposal is WorkshopProposal else 5
+
+        for user in random.sample(users_list, k=n_lottery_tickets):
+            db.session.add(
+                EventTicket.create_ticket(
+                    user, proposal, random.randint(1, max_ticket_count)
+                )
+            )
