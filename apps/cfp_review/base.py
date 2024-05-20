@@ -38,6 +38,7 @@ from models.cfp import (
     ORDERED_STATES,
     Proposal,
     Venue,
+    WorkshopProposal,
 )
 from models.cfp_tag import Tag
 from models.user import User
@@ -1458,6 +1459,16 @@ def cfp_user(user_id):
         "cfp_review/cfp_user.html",
         user=user,
     )
+
+@cfp_review.route("/lottery")
+@admin_required
+def lottery():
+    ticketed_proposals = (
+        WorkshopProposal.query.filter_by(requires_ticket=True)
+        .filter(Proposal.state.in_(["accepted", "finalised"]))
+        .all()
+    )
+    return render_template("cfp_review/lottery.html", ticketed_proposals=ticketed_proposals)
 
 
 from . import venues  # noqa

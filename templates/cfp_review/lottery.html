@@ -5,12 +5,12 @@
 
 <p><strong>Current signup state:</strong> {{ SIGNUP_STATE }}</p>
 
+<div>To run the lottery shell into the server and run <pre>./flask cfp lottery</pre></div>
+
 <p>These workshops require tickets:</p>
 
-<form method="POST">
-    <button class="btn btn-primary" {% if SIGNUP_STATE != "issue-lottery-tickets" %}disabled{% endif %}>Run Lottery</button>
-</form>
-
+{% for type, all_proposals in ticketed_proposals | groupby('type') %}
+<h3>{{ type | capitalize }}</h3>
 <table class="table table-condensed table-striped">
     <thead>
         <tr>
@@ -24,7 +24,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for proposal in ticketed_proposals  %}
+        {% for proposal in all_proposals %}
             <tr>
                 <td><a href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}">{{ proposal.title }}</a></td>
                 <td>{{ proposal.total_tickets }}</td>
@@ -37,5 +37,6 @@
         {% endfor %}
     </tbody>
 </table>
+{% endfor %}
 
 {% endblock %}
