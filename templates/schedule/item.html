@@ -68,20 +68,27 @@
     {{ favourite_icons() }}
     &nbsp;Favourite
   </button>
-  {# FIXME explain how ticket count works WRT children etc. #}
+  <div class="pull-right">
+    {% if SIGNUP_STATE == "issue-lottery-tickets" and proposal.requires_ticket %}
+      {{ form.ticket_count.label() }}
+      {{ form.ticket_count(class_="form-control") }}
+      {{ form.enter_lottery(class_="btn btn-primary") }}
 
-  {% if SIGNUP_STATE == "issue-lottery-tickets" and proposal.requires_ticket %}
-    {{ form.enter_lottery(class_="btn btn-primary") }}
-    {# FIXME the control div produced by this needs 'display: inline-block' adding to it  #}
-    {{ render_field(form.ticket_count, horizontal=2) }}
+    {% elif SIGNUP_STATE == "issue-event-tickets" and proposal.requires_ticket %}
+      {{ form.get_ticket(class_="btn btn-primary") }}
 
-  {% elif SIGNUP_STATE == "issue-event-tickets" and proposal.requires_ticket %}
-    {{ form.get_ticket(class_="btn btn-primary") }}
-
-  {% elif SIGNUP_STATE == "pending-tickets" and proposal.requires_ticket %}
-    {# FIXME add info about held tickets here #}
-    <p>The lottery for this {{proposal.human_type}} is currently closed. A small number of tickets will be available first come/first served on the day.</p>
-  {% endif %}
+    {% elif SIGNUP_STATE == "pending-tickets" and proposal.requires_ticket %}
+      {# FIXME add info about held tickets here #}
+      <p>The lottery for this {{proposal.human_type}} is currently closed. A small number of tickets will be available first come/first served on the day.</p>
+    {% endif %}
+  </div>
+  <div class="pull-right">
+    <small>
+      You can see your other workshop tickets
+      {% if SIGNUP_STATE=="issue-lottery-tickets" %}(and rank your preferences){% endif %}
+      by going to your <a href="{{ url_for('.event_tickets') }}">account's workshop-tickets page</a>
+    </small>
+  </div>
 
   </form>
 {% else %}

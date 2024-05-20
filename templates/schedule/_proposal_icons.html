@@ -8,7 +8,11 @@
     <span style="padding-left: 10px;" title="There is a content note on this talk">⚠️</span>
     {% endif %}
     {% if prop.family_friendly %}
-    <span style="padding-left: 10px;" title="This talk is family friendly">{{ ["👪", "👩‍👧", "👩‍👦", "👨‍👧", "👨‍👦", "👩‍👩‍👦", "👨‍👨‍👧", "👨‍👨‍👦", "👨‍👩‍👧", "👩‍👩‍👧", "👨‍👦‍👦", "👨‍👧‍👦", "👨‍👧‍👧", "👩‍👧‍👧", "👩‍👦‍👦", "👩‍👧‍👦", "👨‍👩‍👦", "👨‍👨‍👧‍👦", "👨‍👩‍👧‍👧", "👩‍👩‍👧‍👧" ] | random }}</span>
+    <span style="padding-left: 10px;" title="This talk is family friendly">{{ [ "👪","👩‍👧","👩‍👩‍👧","👨‍👦‍👦","👩‍👩‍👧‍👧"] | random }}</span>
+    {% endif %}
+  {% elif prop.type == "workshop" or prop.type == "youthworkshop" %}
+    {% if prop.requires_ticket %}
+      <span style="padding-left: 10px;" title="This workshop requires you sign up for a ticket">🎟</span>
     {% endif %}
   {% endif %}
 {% endmacro %}

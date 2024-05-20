@@ -275,6 +275,7 @@ def item_current(year, proposal_id, slug=None):
         is_fave=is_fave,
         venue_name=venue_name,
         form=form,
+        ticket=ticket,
     )
 
 
