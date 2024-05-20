@@ -78,6 +78,14 @@ def not_sensible_reasons(proposal: Proposal) -> dict[str, str]:
         if t.hour >= 2 and t.hour < 9:
             reasons[f'{reason_key}_quiet'] = f'{note} is scheduled between 2am and 9am ({t.strftime(human_format)})'
 
+        permitted_time = False
+        for n, period in enumerate(proposal.get_allowed_time_periods()):
+            if t >= period.start and t <= period.end:
+                permitted_time = True
+
+        if not permitted_time:
+            reasons[f'{reason_key}_outside_allowed_times'] = f'{note} is outside allowed proposal time periods'
+
     _check_timing(proposal.potential_time, 'Proposed start', 'proposed_start')
     _check_timing(proposal.scheduled_time, 'Scheduled start', 'scheduled_start')
     _check_timing(proposal.potential_end_date, 'Proposed end', 'proposed_end')
@@ -92,6 +100,7 @@ def sense_check():
     accepted_proposals = (
         Proposal.query_accepted(include_user_scheduled=False)
         .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]))
+        .order_by(Proposal.type)
         .all()
     )
 
