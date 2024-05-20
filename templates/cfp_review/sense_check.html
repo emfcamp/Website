@@ -3,6 +3,15 @@
 {% block body %}
 <h2>Schedule Sense Check</h2>
 
+<p>
+  Show:
+  <a href="{{ url_for('cfp_review.sense_check') }}">All</a> /
+  <a href="{{ url_for('cfp_review.sense_check', type='talk') }}">Talk</a> /
+  <a href="{{ url_for('cfp_review.sense_check', type='workshop') }}">Workshop</a> /
+  <a href="{{ url_for('cfp_review.sense_check', type='youthworkshop') }}">Youth Workshop</a> /
+  <a href="{{ url_for('cfp_review.sense_check', type='performance') }}">Performance</a>
+</p>
+
 <p>Checked {{ proposals_count }} proposals, found {{ not_sensible_proposals|length }} suspect proposals.</p>
 
 {% if not_sensible_proposals|length > 0 %}

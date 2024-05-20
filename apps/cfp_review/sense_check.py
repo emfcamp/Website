@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from flask import render_template
+from flask import render_template, request
 
 from models import event_start, event_end
 from models.cfp import Proposal
@@ -97,9 +97,13 @@ def not_sensible_reasons(proposal: Proposal) -> dict[str, str]:
 @cfp_review.route("/sense_check")
 @review_required
 def sense_check():
+    types_to_show = request.args.getlist("type")
+    if not types_to_show:
+        types_to_show = ["talk", "workshop", "youthworkshop", "performance"]
+
     accepted_proposals = (
         Proposal.query_accepted(include_user_scheduled=False)
-        .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]))
+        .filter(Proposal.type.in_(types_to_show))
         .order_by(Proposal.type)
         .all()
     )
