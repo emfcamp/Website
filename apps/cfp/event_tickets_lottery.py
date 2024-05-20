@@ -1,14 +1,7 @@
 from random import shuffle
 from sqlalchemy import func
 
-from flask import (
-    flash,
-    redirect,
-    render_template,
-    request,
-    current_app as app,
-    url_for,
-)
+from flask import render_template, current_app as app
 from flask_mailman import EmailMessage
 
 from main import db
@@ -18,34 +11,30 @@ from models.site_state import SiteState, refresh_states
 
 from ..common.email import from_email
 
-from . import cfp_review, admin_required
+from . import cfp
 
 
-@cfp_review.route("/lottery", methods=["GET", "POST"])
-@admin_required
+@cfp.cli.command("lottery")
 def lottery():
     # In theory this can be extended to other types but currently only workshops & youthworkshops care
-    ticketed_proposals = (
-        WorkshopProposal.query.filter_by(requires_ticket=True)
+    workshops = (
+        WorkshopProposal.query.filter_by(requires_ticket=True, type="workshop")
         .filter(Proposal.state.in_(["accepted", "finalised"]))
         .all()
     )
 
-    if request.method == "POST":
-        winning_tickets = run_lottery(
-            [t for t in ticketed_proposals if t.type == "workshop"]
-        )
-        flash(f"Lottery run for workshops. {len(winning_tickets)} tickets won.")
+    app.logger.info(f"Running lottery for {len(workshops)} workshops")
+    winning_tickets = run_lottery(workshops)
+    app.logger.info(f"{len(winning_tickets)} won")
 
-        winning_tickets = run_lottery(
-            [t for t in ticketed_proposals if t.type == "youthworkshop"]
-        )
-        flash(f"Lottery run for youthworkshops. {len(winning_tickets)} tickets won.")
-        return redirect(url_for(".lottery"))
-
-    return render_template(
-        "cfp_review/lottery.html", ticketed_proposals=ticketed_proposals
+    youthworkshops = (
+        WorkshopProposal.query.filter_by(requires_ticket=True, type="youthworkshop")
+        .filter(Proposal.state.in_(["accepted", "finalised"]))
+        .all()
     )
+    app.logger.info(f"Running lottery for {len(youthworkshops)} youthworkshops")
+    winning_tickets = run_lottery(youthworkshops)
+    app.logger.info(f"{len(winning_tickets)} won")
 
 
 def run_lottery(ticketed_proposals):
