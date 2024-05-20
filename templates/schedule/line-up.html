@@ -13,7 +13,10 @@
     <p>You can favourite talks which sound interesting, which will let you keep track of them, and help
         our scheduling algorithm place them in the best slot.
     </p>
-    <p><strong><a class="btn btn-lg btn-primary" href="{{ url_for('.favourites') }}">View your favourites</a></strong></p>
+    <p>
+      <strong><a class="btn btn-lg btn-primary" href="{{ url_for('.favourites') }}">View your favourites</a></strong>
+      <strong><a class="btn btn-lg btn-primary" href="{{ url_for('.event_tickets') }}">View your workshop tickets</a></strong>
+    </p>
     {% if feature_enabled('SCHEDULE') %}
     <p>You can also get this list as an <a href="{{ url_for('.schedule_ical', year=event_year) }}">iCal feed</a>
        for your calendar, and a <a href="{{ url_for('.schedule_json', year=event_year) }}">json feed</a> for your giant robot.

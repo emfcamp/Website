@@ -58,9 +58,22 @@
   background-color: $brand-2024-blue
 }
 
+.event-tickets {
+  .panel {
+    padding: 10px;
+  }
+}
+
 .draggable-panel {
   cursor: move;
+  line-height: 1.9; /* hack to get stuff aligned nicely */
+
+  .octicon {
+    padding-right: 7px;
+    margin-top: -1px;
+  }
 }
+
 
 textarea#description {
   height: 200px;
