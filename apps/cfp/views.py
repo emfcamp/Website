@@ -695,7 +695,21 @@ def finalise_proposal(proposal_id):
             proposal.published_cost = form.cost.data
             proposal.published_participant_equipment = form.participant_equipment.data
 
-        proposal.available_times = form.get_availability_json()
+        # Proposers can change their availability after finalisation and are
+        # notified of this in the scheduling emails. We need to know this in order to re-run scheduling.
+        new_availability = form.get_availability_json()
+        if (
+            proposal.state == "finalised"
+            and proposal.available_times != new_availability
+        ):
+            if channel := app.config.get("CONTENT_IRC_CHANNEL"):
+                # WARNING: don't send personal information via this (the channel is public)
+                irc_send(
+                    channel,
+                    f"🗓️🚨 Speaker availability changed for {proposal.human_type}: {external_url('cfp_review.message_proposer', proposal_id=proposal_id)}",
+                )
+
+        proposal.available_times = new_availability
         proposal.set_state("finalised")
 
         db.session.commit()
