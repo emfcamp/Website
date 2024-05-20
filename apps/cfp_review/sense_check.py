@@ -1,4 +1,5 @@
-from datetime import timedelta
+from collections import defaultdict
+from datetime import datetime, timedelta
 
 from flask import render_template, request
 
@@ -8,7 +9,7 @@ from models.cfp import Proposal
 from . import cfp_review, review_required
 
 
-def not_sensible_reasons(proposal: Proposal) -> dict[str, str]:
+def not_sensible_reasons(proposal: Proposal, proposals_by_speaker: dict[int, set[Proposal]]) -> dict[str, str]:
     reasons = {}
 
     # -- Proposal (is accepted/finalised and) does not have a proposed or scheduled time.
@@ -78,6 +79,7 @@ def not_sensible_reasons(proposal: Proposal) -> dict[str, str]:
         if t.hour >= 2 and t.hour < 9:
             reasons[f'{reason_key}_quiet'] = f'{note} is scheduled between 2am and 9am ({t.strftime(human_format)})'
 
+        # -- Proposal lies outside the allowed time periods.
         permitted_time = False
         for n, period in enumerate(proposal.get_allowed_time_periods()):
             if t >= period.start and t <= period.end:
@@ -90,6 +92,25 @@ def not_sensible_reasons(proposal: Proposal) -> dict[str, str]:
     _check_timing(proposal.scheduled_time, 'Scheduled start', 'scheduled_start')
     _check_timing(proposal.potential_end_date, 'Proposed end', 'proposed_end')
     _check_timing(proposal.end_date, 'Scheduled end', 'scheduled_end')
+
+    # -- Proposal overlaps another one by the same user.
+    def _talk_ranges(p: Proposal) -> dict[str, tuple[datetime, datetime]]:
+        ranges = {}
+        if p.potential_time and p.potential_end_date:
+            ranges['proposed'] = (p.potential_time, p.potential_end_date)
+        if p.scheduled_time and p.end_date:
+            ranges['scheduled'] = (p.scheduled_time, p.end_date)
+        return ranges
+    talk_ranges = _talk_ranges(proposal)
+    for other_proposal in proposals_by_speaker[proposal.user_id]:
+        if other_proposal == proposal:
+            continue
+        other_ranges = _talk_ranges(other_proposal)
+        for this_type, (this_start, this_end) in talk_ranges.items():
+            for other_type, (other_start, other_end) in other_ranges.items():
+                if max(this_start, other_start) < min(this_end, other_end):
+                    # Overlap.
+                    reasons[f'{this_type}_overlap_{other_proposal.id}_{other_type}'] = f"The {this_type} time ({this_start} > {this_end}) overlaps with a {other_proposal.type} by same user: {other_proposal.display_title}'s {other_type} time ({other_start} > {other_end})"
 
     return reasons
 
@@ -108,9 +129,18 @@ def sense_check():
         .all()
     )
 
+    proposals_for_overlap = (
+        Proposal.query_accepted(include_user_scheduled=False)
+        .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]))
+        .all()
+    )
+    proposals_by_speaker = defaultdict(set)
+    for proposal in proposals_for_overlap:
+        proposals_by_speaker[proposal.user_id].add(proposal)
+
     not_sensible_proposals = []
     for accepted_proposal in accepted_proposals:
-        if reasons := not_sensible_reasons(accepted_proposal):
+        if reasons := not_sensible_reasons(accepted_proposal, proposals_by_speaker):
             not_sensible_proposals.append((accepted_proposal, reasons))
 
     return render_template(
