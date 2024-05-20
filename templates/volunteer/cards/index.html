@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% from "_formhelpers.html" import render_field %}
+
+{% macro search_form() %}
+  <form method="post" action="{{ url_for('.cards') }}">
+    <div class="form-group">
+      <label for="email" class="control-label">Email</label>
+      <input name="email" type="email" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary btn-lg">Search</button>
+  </form>
+{% endmacro %}
+
+{% block title %}
+    Volunteer Cards
+{% endblock %}
+{% block body %}
+{% include "volunteer/_nav.html" %}
+<h1>Card Issuing</h1>
+{% if user %}
+  <form method="post" action="{{ url_for('.issue_card') }}">
+    {{ form.hidden_tag() }}
+    {% if current_user.has_permission("admin") %} 
+      {{ render_field(form.type) }}
+      {{ render_field(form.printer) }}
+    {% endif %}
+    {{ render_field(form.name) }}
+    {{ render_field(form.alias) }}
+    {{ render_field(form.pronouns) }}
+    {% if current_user.has_permission("admin") %}
+      <p>The following fields are only used on role cards.</p>
+      {{ render_field(form.line_one) }}
+      {{ render_field(form.line_two) }}
+    {% endif %}
+    <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+  </form>
+  <h2>Search Again</h2>
+  {{ search_form() }}
+{% else %}
+  <p>To issue a volunteer card enter the email address of the person you're
+  printing for.</p>
+  {{ search_form() }}
+{% endif %}
+{% endblock %}
+
