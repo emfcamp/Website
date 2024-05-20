@@ -142,7 +142,7 @@ def favourites_ical():
         if not event["is_fave"]:
             continue
         cal_event = Event()
-        cal_event.add("uid", "%s-%s" % (year, event["id"]))
+        cal_event.add("uid", "%s-%s" % (event_year(), event["id"]))
         cal_event.add("summary", event["title"])
         cal_event.add("description", _format_event_description(event))
         cal_event.add("location", event["venue"])
