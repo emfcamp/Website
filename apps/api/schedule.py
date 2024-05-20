@@ -136,7 +136,10 @@ class FavouriteExternal(Resource):
 
 
 class UpdateLotteryPreferences(Resource):
-    def post(self):
+    def post(self, proposal_type):
+        if proposal_type not in ["workshop", "youthworkshop"]:
+            abort(400)
+
         if not current_user.is_authenticated:
             abort(401)
 
@@ -147,6 +150,7 @@ class UpdateLotteryPreferences(Resource):
             for t in EventTicket.query.filter_by(
                 state="entered-lottery", user_id=current_user.id
             ).all()
+            if t.proposal.type == proposal_type
         }
 
         for new_rank, t_id in enumerate(new_order):
@@ -177,4 +181,4 @@ api.add_resource(ProposalResource, "/proposal/<int:proposal_id>")
 api.add_resource(FavouriteProposal, "/proposal/<int:proposal_id>/favourite")
 api.add_resource(FavouriteExternal, "/external/<int:event_id>/favourite")
 api.add_resource(ScheduleMessage, "/schedule_messages")
-api.add_resource(UpdateLotteryPreferences, "/schedule/tickets/preferences")
+api.add_resource(UpdateLotteryPreferences, "/schedule/tickets/<proposal_type>/preferences")
