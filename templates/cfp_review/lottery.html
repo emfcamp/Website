@@ -20,7 +20,6 @@
             <th>Lottery tickets issued</th>
             <th>Tickets issued</th>
             <th>Cancelled issued</th>
-            <th>Lost issued</th>
         </tr>
     </thead>
     <tbody>
@@ -32,7 +31,6 @@
                 <td>{{ proposal.sum_tickets_in_state("entered-lottery") }}</td>
                 <td>{{ proposal.sum_tickets_in_state("ticket") }}</td>
                 <td>{{ proposal.sum_tickets_in_state("cancelled") }}</td>
-                <td>{{ proposal.sum_tickets_in_state("lost-lottery") }}</td>
             </tr>
         {% endfor %}
     </tbody>
