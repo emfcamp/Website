@@ -24,6 +24,7 @@ from models.ical import CalendarSource, CalendarEvent
 from models.user import generate_api_token
 from models.admin_message import AdminMessage
 from models.event_tickets import EventTicket
+from models.site_state import get_signup_state
 
 from ..common import feature_flag, feature_enabled
 from ..common.forms import Form
@@ -204,9 +205,14 @@ def item_current(year, proposal_id, slug=None):
 
     if proposal.type == "youthworkshop":
         form.ticket_count.label.text = "How many U18 tickets?"
-        form.ticket_count.choices = [(i, i) for i in range(1, 6)]  # max 5
-    else:
-        form.ticket_count.choices = [(i, i) for i in range(1, 3)]  # max 2
+
+
+    max_tickets = 5 if proposal.type == "youthworkshop" else 2
+
+    if get_signup_state() != "issue-lottery-tickets":
+        max_tickets = min([max_tickets, proposal.get_total_capacity()])
+
+    form.ticket_count.choices = [(i, i) for i in range(1, max_tickets + 1)]
 
     if form.validate_on_submit() and not current_user.is_anonymous:
         msg = ""
@@ -260,7 +266,7 @@ def item_current(year, proposal_id, slug=None):
         form.ticket_count.data = ticket.ticket_count
         form.enter_lottery.label.text = "Re-enter lottery/update"
         form.get_ticket.label.text = "Get Ticket/update"
-    else:
+    elif max_tickets > 0:
         form.ticket_count.data = form.ticket_count.choices[0][0]
 
     if slug != proposal.slug:
@@ -278,7 +284,7 @@ def item_current(year, proposal_id, slug=None):
         is_fave=is_fave,
         venue_name=venue_name,
         form=form,
-        ticket=ticket,
+        event_ticket=ticket,
     )
 
 
