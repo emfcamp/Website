@@ -81,8 +81,6 @@ def run_lottery(ticketed_proposals):
             if tickets_remaining <= 0:
                 for ticket in tickets_for_round:
                     ticket.lost_lottery()
-                    db.session.commit()
-
                 continue
 
             for ticket in tickets_for_round:
@@ -92,7 +90,6 @@ def run_lottery(ticketed_proposals):
                     tickets_remaining -= ticket.ticket_count
                 else:
                     ticket.lost_lottery()
-                db.session.commit()
 
             proposal_capacities[proposal.id] = tickets_remaining
 
