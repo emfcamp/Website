@@ -14,7 +14,7 @@
   {% if ticket.state == "ticket" %}
     <em>Codes for this workshop: {{ticket.ticket_codes |replace(',', ', ') | upper}}</em>
   {% endif %}
-  {% if ticket.state not in ["cancelled", "lost-lottery"] %}
+  {% if ticket.state != "cancelled" %}
     {{ ticket._form.cancel(class_="btn btn-primary pull-right")}}
     <div class="clearfix"></div>
   {% endif %}
@@ -54,18 +54,29 @@
           highest preference and the bottom being your lowest.
         </p>
 
+        <p>
+          You can only get tickets for a single workshop via the lottery but any remaining
+          tickets will be made available once the event starts on a first-come, first served
+          basis.
+        </p>
+
+        <p>
+          {# FIXME hard coded date alert event_start should find this but I CBA with date calculations rn #}
+          The lottery will be run on Wednesday 29th June 2024
+        </p>
+
+        <hr>
         {{ draggable_tickets_block("Workshops", tickets["entered-lottery"]["workshop"], "event-tickets-workshops") }}
 
         {{ draggable_tickets_block("Youth Workshops", tickets["entered-lottery"]["youthworkshop"], "event-tickets-youthworkshops") }}
       {% endif %}
 
-      {% for state in ["ticket", "cancelled", "lost-lottery"] if (tickets[state]["workshop"] or tickets[state]["youthworkshop"])%}
-        {% if state == "lost-lottery" %}
-          <h2>Lost lottery</h2>
-          <p>These are tickets for lotteries you did not win a ticket to.</p>
-        {% elif state == "cancelled" %}
+      {% for state in ["ticket", "cancelled"] if (tickets[state]["workshop"] or tickets[state]["youthworkshop"])%}
+        {% if state == "cancelled" %}
           <h2>Cancelled tickets</h2>
-          <p>Tickets you have cancelled or were cancelled because you won a lottery. If there are still spaces you can apply for a ticket once they slots re-open.</p>
+          <p>Tickets you have cancelled, were cancelled because you won a different
+            lottery (you can only win once) or were cancelled because you lost this
+            lottery. If there are still tickets you can apply for them once they re-open.</p>
         {% elif state == "ticket" %}
           <h2>Tickets</h2>
           <p>Tickets you have to workshops (or you have for youth workshops).</p>

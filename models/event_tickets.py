@@ -10,10 +10,9 @@ from .cfp import Proposal
 
 # entered-lottery -- An entry in the lottery for a ticket
 # ticket -- either a converted lottery ticket or a simply issued ticket
-# lost-lottery -- did not convert from a lottery ticket to an actual ticket
 # cancelled -- with drawn/returned. Either as an actual ticket or a lottery ticket
 
-EVENT_TICKET_STATES = {"entered-lottery", "ticket", "lost-lottery", "cancelled"}
+EVENT_TICKET_STATES = {"entered-lottery", "ticket", "cancelled"}
 
 EVENT_TICKET_STATE_TRANSITIONS = {
     "closed": {},
@@ -22,7 +21,7 @@ EVENT_TICKET_STATE_TRANSITIONS = {
         "cancelled": ["entered-lottery"],
     },
     "run-lottery": {
-        "entered-lottery": ["cancelled", "ticket", "lost-lottery"],
+        "entered-lottery": ["cancelled", "ticket"],
         "ticket": ["cancelled"],
     },
     "pending-tickets": {
@@ -31,7 +30,6 @@ EVENT_TICKET_STATE_TRANSITIONS = {
     "issue-event-tickets": {
         "ticket": ["cancelled"],
         "cancelled": ["ticket"],
-        "lost-lottery": ["ticket"],
     },
 }
 
@@ -139,7 +137,7 @@ class EventTicket(BaseModel):
         return self
 
     def lost_lottery(self):
-        return self.change_state("lost-lottery")
+        return self.change_state("cancelled")
 
     def cancel(self):
         if self.state == "entered-lottery":

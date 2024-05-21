@@ -204,8 +204,7 @@ def item_current(year, proposal_id, slug=None):
     form = ItemForm()
 
     if proposal.type == "youthworkshop":
-        form.ticket_count.label.text = "How many U18 tickets?"
-
+        form.ticket_count.label.text = "How many U12 tickets?"
 
     max_tickets = 5 if proposal.type == "youthworkshop" else 2
 
