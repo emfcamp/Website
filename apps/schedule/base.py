@@ -337,7 +337,7 @@ def cancel_event_ticket(ticket_id):
     if ticket.user != current_user:
         abort(401)
 
-    ticket.cancel_and_update_ranks()
+    ticket.cancel()
     app.logger.info(f"Cancelling event ticket {ticket_id} by user {current_user}")
     db.session.commit()
 
