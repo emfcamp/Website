@@ -245,6 +245,7 @@ class UpdateLightningTalkForm(UpdateProposalForm):
 
 class UpdateWorkshopForm(UpdateProposalForm):
     attendees = StringField("Attendees", [DataRequired()])
+    requires_ticket = BooleanField("Requires ticket")
     tickets = IntegerField("Total tickets")
     non_lottery_tickets = IntegerField("Non lottery tickets")
     cost = StringField("Cost per attendee")
@@ -257,7 +258,7 @@ class UpdateWorkshopForm(UpdateProposalForm):
     def update_proposal(self, proposal):
         if self.attendees.raw_data:
             proposal.attendees = self.attendees.data
-        if self.tickets.data:
+        if self.requires_ticket.data:
             proposal.total_tickets = self.tickets.data
             proposal.non_lottery_tickets = self.non_lottery_tickets.data
             proposal.requires_ticket = True
@@ -284,6 +285,7 @@ class UpdateWorkshopForm(UpdateProposalForm):
 
 class UpdateYouthWorkshopForm(UpdateProposalForm):
     attendees = StringField("Attendees", [DataRequired()])
+    requires_ticket = BooleanField("Requires ticket")
     tickets = IntegerField("Total tickets")
     non_lottery_tickets = IntegerField("Non lottery tickets")
     cost = StringField("Cost per attendee")
@@ -297,7 +299,7 @@ class UpdateYouthWorkshopForm(UpdateProposalForm):
     def update_proposal(self, proposal):
         if self.attendees.raw_data:
             proposal.attendees = self.attendees.data
-        if self.tickets.data:
+        if self.requires_ticket.data:
             proposal.total_tickets = self.tickets.data
             proposal.non_lottery_tickets = self.non_lottery_tickets.data
             proposal.requires_ticket = True
