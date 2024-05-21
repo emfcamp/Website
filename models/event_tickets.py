@@ -1,5 +1,4 @@
 from random import choices
-from string import ascii_lowercase
 
 from main import db
 from . import BaseModel
@@ -32,6 +31,8 @@ EVENT_TICKET_STATE_TRANSITIONS = {
         "cancelled": ["ticket"],
     },
 }
+
+SAFECHARS = "2346789BCDFGHJKMPQRTVWXY"
 
 
 class EventTicketException(Exception):
@@ -118,7 +119,7 @@ class EventTicket(BaseModel):
         # be low enough odds for guessing.
         codes = []
         for i in range(self.ticket_count):
-            codes.append("".join(choices(ascii_lowercase, k=6)))
+            codes.append("".join(choices(SAFECHARS, k=6)))
         self.ticket_codes = ",".join(codes)
         return self
 
