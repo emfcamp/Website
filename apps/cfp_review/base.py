@@ -222,12 +222,10 @@ def export(format: str):
         "notice_required",
         "tags",
         "favourite_count",
-
         "published_names",
         "published_pronouns",
         "published_title",
         "published_description",
-
         "arrival_period",
         "departure_period",
         "telephone_number",
@@ -1249,15 +1247,16 @@ def clashfinder():
         offset += 1
         prop1 = Proposal.query.get(id1)
         prop2 = Proposal.query.get(id2)
-        if prop1.overlaps_with(prop2):
-            clashes.append(
-                {
-                    "proposal_1": prop1,
-                    "proposal_2": prop2,
-                    "favourites": count,
-                    "number": offset,
-                }
-            )
+        if prop1.is_accepted and prop2.is_accepted:
+            if prop1.overlaps_with(prop2):
+                clashes.append(
+                    {
+                        "proposal_1": prop1,
+                        "proposal_2": prop2,
+                        "favourites": count,
+                        "number": offset,
+                    }
+                )
 
     return render_template("cfp_review/clashfinder.html", clashes=clashes)
 
