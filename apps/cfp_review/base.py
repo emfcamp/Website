@@ -1239,7 +1239,7 @@ def clashfinder():
         user_counts[user].append(proposal)
 
     for proposals in user_counts.values():
-        popularity.update(combinations(proposals, 2))
+        popularity.update(combinations(sorted(proposals), 2))
 
     clashes = []
     offset = 0
