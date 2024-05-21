@@ -119,6 +119,7 @@
                                 {{ render_dl_field(form.hide_from_schedule) }}
                                 {{ render_dl_field(form.manually_scheduled) }}
                                 {% if proposal.type in ["workshop", "youthworkshop"] %}
+                                    {{ render_dl_field(form.requires_ticket) }}
                                     {{ render_dl_field(form.tickets) }}
                                     {{ render_dl_field(form.non_lottery_tickets) }}
                                 {% endif %}
