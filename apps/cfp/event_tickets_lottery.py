@@ -98,6 +98,7 @@ def run_lottery(ticketed_proposals):
     )
 
     signup.state = "pending-tickets"
+    db.session.commit()
     db.session.flush()
     refresh_states()
 
