@@ -83,7 +83,7 @@ class EventTicket(BaseModel):
     def is_in_lottery_round(self, round_rank):
         return self.state == "entered-lottery" and self.rank <= round_rank
 
-    def change_state(self, new_state, force=False):
+    def change_state(self, new_state, *, force=False):
         # The force option only exists for ease of resetting this in dev
         if force:
             self.state = new_state
@@ -114,9 +114,7 @@ class EventTicket(BaseModel):
         self.state = new_state
         return self
 
-    def issue_ticket(self):
-        self.change_state("ticket")
-
+    def issue_codes(self):
         # Now generate the ticket_codes
         # These are in no way cryptographically secure etc but 1 in 308m should
         # be low enough odds for guessing.
@@ -124,6 +122,11 @@ class EventTicket(BaseModel):
         for i in range(self.ticket_count):
             codes.append("".join(choices(ascii_lowercase, k=6)))
         self.ticket_codes = ",".join(codes)
+        return self
+
+    def issue_ticket(self):
+        self.change_state("ticket")
+        self.issue_codes()
         return self
 
     def won_lottery_and_cancel_others(self):
@@ -146,10 +149,10 @@ class EventTicket(BaseModel):
                 ticket.rank -= 1
         return self.change_state("cancelled")
 
-    def reenter_lottery(self, force=False):
+    def reenter_lottery(self, *, force=False):
         # The force option only exists for ease of resetting this in dev
         self.rank = get_max_rank_for_user(self.user, self.proposal.type)
-        return self.change_state("entered-lottery", force)
+        return self.change_state("entered-lottery", force=force)
 
     @classmethod
     def get_event_ticket(cls, user: User, proposal: Proposal):
@@ -166,11 +169,11 @@ class EventTicket(BaseModel):
             return EventTicket(
                 user.id, proposal.id, "entered-lottery", ticket_count, rank
             )
-        elif signup_state == "issue-event-tickets" and proposal.has_ticket_capacity():
-            return EventTicket(user.id, proposal.id, "ticket")
+        elif signup_state == "issue-event-tickets" and (ticket_count <= proposal.get_total_capacity()):
+            return EventTicket(user.id, proposal.id, "ticket", ticket_count).issue_codes()
 
         elif (
-            signup_state == "issue-event-tickets" and not proposal.has_ticket_capacity()
+            signup_state == "issue-event-tickets" and not (ticket_count < proposal.get_total_capacity())
         ):
             raise EventTicketException(
                 f"This f{proposal.human_type} is currently full."
