@@ -864,6 +864,7 @@ class WorkshopProposal(Proposal):
     requires_ticket = db.Column(db.Boolean, default=False, nullable=True)
     total_tickets = db.Column(db.Integer, nullable=True)
     non_lottery_tickets = db.Column(db.Integer, default=5, nullable=True)
+    max_tickets_per_person = 2
 
     def get_total_capacity(self):
         return self.total_tickets - self.sum_tickets_in_state("ticket")
@@ -885,6 +886,7 @@ class YouthWorkshopProposal(WorkshopProposal):
     __mapper_args__ = {"polymorphic_identity": "youthworkshop"}
     human_type = HUMAN_CFP_TYPES["youthworkshop"]
     valid_dbs = db.Column(db.Boolean, nullable=False, default=False)
+    max_tickets_per_person = 2
 
 
 class InstallationProposal(Proposal):

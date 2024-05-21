@@ -61,6 +61,17 @@
 {% endif %}
 </div>
 {% if current_user.is_authenticated %}
+  {% if SIGNUP_STATE in ["pending-tickets", "issue-event-tickets"] and event_ticket %}
+    <div class="well">
+      You currently have {{event_ticket.ticket_count}} codes for this {{proposal.human_type}}.
+      When you attend you can either give your name or a code to get in. Your codes are:
+      <ul>
+        {% for code in event_ticket.ticket_codes.split(",") %}
+          <li>{{code | upper}}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
   <form method="post" class="form-inline">
   {{ form.hidden_tag() }}
 
@@ -78,10 +89,13 @@
         <p>This {{ proposal.human_type }} does not have any tickets available via lottery.</p>
       {% endif %}
 
-    {% elif SIGNUP_STATE == "issue-event-tickets" and proposal.requires_ticket %}
+    {% elif SIGNUP_STATE == "issue-event-tickets" and proposal.requires_ticket and proposal.has_ticket_capacity() %}
       {{ form.ticket_count.label() }}
       {{ form.ticket_count(class_="form-control") }}
       {{ form.get_ticket(class_="btn btn-primary") }}
+
+    {% elif SIGNUP_STATE == "issue-event-tickets" and proposal.requires_ticket and not proposal.has_ticket_capacity() %}
+      <p>This ticket is now full, if any slots become available they will be visible here.</p>
 
     {% elif SIGNUP_STATE == "pending-tickets" and proposal.requires_ticket %}
       {# FIXME add info about held tickets here #}
