@@ -4,5 +4,13 @@ Hi {{ user.name }},
 
 Good news! You've won a spot in the {{proposal.human_type}} '{{proposal.title}}'.
 
+Your codes for this {{proposal.human_type}} are:
+{% for code in ticket.ticket_codes.split(",") %}
+  * {{ code | upper }}
+{%- endfor %}
+
+Love
+
+The EMF team
 
 {% endblock %}

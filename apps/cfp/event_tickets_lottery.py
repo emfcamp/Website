@@ -121,6 +121,8 @@ def run_lottery(ticketed_proposals):
             "emails/event_ticket_won.txt",
             user=ticket.user,
             proposal=ticket.proposal,
+            ticket=ticket,
         )
+        msg.send()
 
     return winning_tickets
