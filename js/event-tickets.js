@@ -5,7 +5,7 @@ var workshops = Sortable.create(
   {
     ghostClass: "sortable-ghost-class",
     onEnd:  async (event) => {
-      const response = await fetch(`/api/schedule/tickets/preferences`, {
+      const response = await fetch(`/api/schedule/tickets/workshop/preferences`, {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -24,7 +24,7 @@ var youthworkshops = Sortable.create(
   {
     ghostClass: "sortable-ghost-class",
     onEnd:  async (event) => {
-      const response = await fetch(`/api/schedule/tickets/preferences`, {
+      const response = await fetch(`/api/schedule/tickets/youthworkshop/preferences`, {
           method: 'POST',
           credentials: 'include',
           headers: {

@@ -203,6 +203,7 @@ def item_current(year, proposal_id, slug=None):
     form = ItemForm()
 
     if proposal.type == "youthworkshop":
+        form.ticket_count.label.text = "How many U18 tickets?"
         form.ticket_count.choices = [(i, i) for i in range(1, 6)]  # max 5
     else:
         form.ticket_count.choices = [(i, i) for i in range(1, 3)]  # max 2
@@ -229,12 +230,14 @@ def item_current(year, proposal_id, slug=None):
                 ticket.ticket_count = form.ticket_count.data
 
             elif form.get_ticket.data:
+                ticket.ticket_count = form.ticket_count.data
                 if ticket.state != "ticket":
                     ticket.issue_ticket()
                     msg = f'Issued ticket for "{proposal.display_title}"'
                 else:
+                    # it's already in 'ticket' state so just re-issue codes
+                    ticket.issue_codes()
                     msg = f"Updated ticket count"
-                ticket.ticket_count = form.ticket_count.data
 
         elif form.get_ticket.data or form.enter_lottery.data:
             ticket = EventTicket.create_ticket(
@@ -242,7 +245,7 @@ def item_current(year, proposal_id, slug=None):
             )
 
             if ticket.state == "entered-lottery":
-                msg = f'Entered lottery up for "{proposal.display_title}"'
+                msg = f'Entered lottery for "{proposal.display_title}"'
             else:
                 msg = f'Signed up for "{proposal.display_title}"'
             db.session.add(ticket)
@@ -293,7 +296,7 @@ def event_tickets():
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for("schedule.event_tickets")))
 
-    user_tickets = current_user.event_tickets.all()
+    user_tickets = sorted(current_user.event_tickets.all(), key=lambda t: t.rank or 0)
 
     form = EventTicketsForm()
 

@@ -70,11 +70,17 @@
   </button>
   <div class="pull-right">
     {% if SIGNUP_STATE == "issue-lottery-tickets" and proposal.requires_ticket %}
-      {{ form.ticket_count.label() }}
-      {{ form.ticket_count(class_="form-control") }}
-      {{ form.enter_lottery(class_="btn btn-primary") }}
+      {% if proposal.has_lottery_capacity() %}
+        {{ form.ticket_count.label() }}
+        {{ form.ticket_count(class_="form-control") }}
+        {{ form.enter_lottery(class_="btn btn-primary") }}
+      {% else %}
+        <p>This {{ proposal.human_type }} does not have any tickets available via lottery.</p>
+      {% endif %}
 
     {% elif SIGNUP_STATE == "issue-event-tickets" and proposal.requires_ticket %}
+      {{ form.ticket_count.label() }}
+      {{ form.ticket_count(class_="form-control") }}
       {{ form.get_ticket(class_="btn btn-primary") }}
 
     {% elif SIGNUP_STATE == "pending-tickets" and proposal.requires_ticket %}

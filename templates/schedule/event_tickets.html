@@ -6,7 +6,9 @@
 {% macro display_ticket(ticket, is_draggable=False) %}
 <div class=" panel {% if is_draggable %}list-group-item draggable-panel{% endif %}" data-id="{{ ticket.id }}">
   {{ ticket._form.ticket_id() }}
-  {% if is_draggable %}{{ octicon("grabber-24") }} {% endif %}
+  {% if is_draggable %}
+    {{ octicon("grabber-24") }}<span class="event-ticket-rank">{{ ticket.rank + 1 }}&nbsp;</span>
+  {% endif %}
   <a href="{{ url_for('.item', proposal_id=ticket.proposal.id, year=2024 ) }}">{{ ticket.proposal.title }}</a>
   ({{ ticket.ticket_count }} tickets)
   {% if ticket.state == "ticket" %}
