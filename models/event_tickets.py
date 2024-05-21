@@ -174,7 +174,7 @@ class EventTicket(BaseModel):
             signup_state == "issue-event-tickets" and not (ticket_count < proposal.get_total_capacity())
         ):
             raise EventTicketException(
-                f"This f{proposal.human_type} is currently full."
+                f"This {proposal.human_type} is currently full."
             )
 
         raise EventTicketException("Tickets are not currently being issued")

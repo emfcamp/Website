@@ -153,6 +153,10 @@ class UpdateLotteryPreferences(Resource):
             if t.proposal.type == proposal_type
         }
 
+        if len(current_tickets) != len(new_order):
+            # the ticket lists don't match
+            abort(400)
+
         for new_rank, t_id in enumerate(new_order):
             ticket = current_tickets[t_id]
             ticket.rank = new_rank

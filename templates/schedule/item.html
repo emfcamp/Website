@@ -95,7 +95,7 @@
       {{ form.get_ticket(class_="btn btn-primary") }}
 
     {% elif SIGNUP_STATE == "issue-event-tickets" and proposal.requires_ticket and not proposal.has_ticket_capacity() %}
-      <p>This ticket is now full, if any slots become available they will be visible here.</p>
+      <p>This {{proposal.human_type}} is now full, if any slots become available they will be visible here.</p>
 
     {% elif SIGNUP_STATE == "pending-tickets" and proposal.requires_ticket %}
       {# FIXME add info about held tickets here #}
