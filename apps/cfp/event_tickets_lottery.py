@@ -7,7 +7,7 @@ from flask_mailman import EmailMessage
 from main import db
 from models.cfp import WorkshopProposal, Proposal
 from models.event_tickets import EventTicket
-from models.site_state import SiteState, refresh_states
+from models.site_state import SiteState, refresh_states, get_signup_state
 
 from ..common.email import from_email
 
@@ -17,6 +17,10 @@ from . import cfp
 @cfp.cli.command("lottery")
 def lottery():
     # In theory this can be extended to other types but currently only workshops & youthworkshops care
+
+    if get_signup_state() != "issue-lottery-tickets":
+        raise Exception(f"Expected signup state to be 'issue-lottery-tickets'.")
+
     workshops = (
         WorkshopProposal.query.filter_by(requires_ticket=True, type="workshop")
         .filter(Proposal.state.in_(["accepted", "finalised"]))
@@ -59,13 +63,11 @@ def run_lottery(ticketed_proposals):
 
     # This is the only state for running the lottery
     signup.state = "run-lottery"
-    db.session.commit()
     db.session.flush()
     refresh_states()
 
 
     max_rank = db.session.query(func.max(EventTicket.rank)).scalar() + 1
-    # Cache this locally so we're not hitting the db and not having to flush() etc.
     proposal_capacities = {p.id: p.get_lottery_capacity() for p in ticketed_proposals}
     winning_tickets = []
 
@@ -94,13 +96,11 @@ def run_lottery(ticketed_proposals):
 
             proposal_capacities[proposal.id] = tickets_remaining
 
-    db.session.flush()
     app.logger.info(
         f"Issued {len(winning_tickets)} winning tickets over {lottery_round} rounds"
     )
 
     signup.state = "pending-tickets"
-    db.session.commit()
     db.session.flush()
     refresh_states()
 
