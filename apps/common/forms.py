@@ -173,8 +173,11 @@ def update_refund_purchase_form_details(f, purchase, ignore_event_refund_state=F
     else:
         f._disabled = True
 
-        if type(purchase) is AdmissionTicket and purchase.checked_in:
-            f.refund.label.text += " (checked in)"
+        if purchase.redeemed:
+            if type(purchase) is AdmissionTicket:
+                f.refund.label.text += " (checked in)"
+            else:
+                f.refund.label.text += " (redeemed)"
 
         elif purchase.state == "refunded":
             f.refund.label.text += " (refunded)"
