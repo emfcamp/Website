@@ -107,9 +107,7 @@
   <th>Type</th>
   <th>Transferred to</th>
   <th>Status</th>
-  {% if transferred_purchases|count > 1 %}
   <th></th>
-  {% endif %}
 </tr></thead>
 <tbody>
 {% for purchase in transferred_purchases %}
@@ -125,7 +123,6 @@
       Not redeemed
     {% endif -%}
   </td>
-  {% if transferred_purchases|count > 1 %}
   <td>
     {%- if purchase.redeemed %}
       <form method="post" action="{{ url_for('arrivals.unredeem_purchase', purchase_id=purchase.id, back=user.id) }}">
@@ -137,7 +134,6 @@
       </form>
     {% endif -%}
   </td>
-  {% endif %}
 </tr>
 {% endfor %}
 </tbody>
