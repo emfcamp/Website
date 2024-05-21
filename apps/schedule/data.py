@@ -45,6 +45,7 @@ def _get_proposal_dict(proposal: Proposal, favourites_ids):
         res["equipment"] = proposal.display_participant_equipment
         res["age_range"] = proposal.display_age_range
         res["attendees"] = proposal.attendees
+        res["requires_ticket"] = proposal.requires_ticket
     video_res = {}
     if proposal.c3voc_url:
         video_res["ccc"] = proposal.c3voc_url

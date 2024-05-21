@@ -36,13 +36,20 @@ function ContentWarningIcon({ hasContentWarning }) {
   return <Icon name="alert-fill" className="content-warning" size="32" label="Content Warning" />;
 }
 
-function EventIcons({ noRecording, isFavourite, isFamilyFriendly, hasContentWarning }) {
+function RequiresTicketIcon({ requiresTicket }) {
+  if (!requiresTicket) { return null; }
+
+  return (<span title="This workshop requires you sign up for a ticket">🎟</span>);
+}
+
+function EventIcons({ noRecording, isFavourite, isFamilyFriendly, hasContentWarning, requiresTicket }) {
   return (
     <div className="event-icons">
       <NoRecordingIcon key='no-recording' noRecording={ noRecording } />
       <FavouriteIcon key='favourite' isFavourite={ isFavourite } />
       <FamilyFriendlyIcon key='family-friendly' isFamilyFriendly={ isFamilyFriendly } />
       <ContentWarningIcon key='content-warning' hasContentWarning={ hasContentWarning } />
+      <RequiresTicketIcon key='requires-ticket' requiresTicket={ requiresTicket } />
     </div>
   );
 }
@@ -110,7 +117,7 @@ function Event({ event, toggleFavourite, authenticated }) {
           <h3 title={ event.title }>{ event.title }</h3>
           <p>{ metadata } | <span className="speaker">{ event.speaker }</span></p>
         </div>
-        <EventIcons noRecording={ event.noRecording } isFavourite={ event.is_fave } isFamilyFriendly={ event.is_family_friendly } hasContentWarning={ event.content_note && event.content_note != ''} />
+        <EventIcons noRecording={ event.noRecording } isFavourite={ event.is_fave } isFamilyFriendly={ event.is_family_friendly } hasContentWarning={ event.content_note && event.content_note != ''} requiresTicket={ event.requires_ticket } />
       </div>
       { eventDetails() }
     </div>
