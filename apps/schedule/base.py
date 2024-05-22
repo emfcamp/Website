@@ -611,3 +611,23 @@ def greenroom():
         upcoming=upcoming,
     )
 
+@schedule.route("/schedule/workshop-steward/<int:proposal_id>")
+@v_user_required
+def workshop_steward(proposal_id):
+    proposal = Proposal.query.get_or_404(proposal_id)
+    # user_role_strs = [r.name for current_user.volunteer.interested_roles.all()]
+
+    # if proposal.type == "youthworkshop" and "Youth Workshop Helper" not in user_role_strs:
+    #     abort(401)
+
+    # if proposal.type == "workshop" and "Workshop Steward" not in user_role_strs:
+    #     abort(401)
+
+    # if (
+    #     datetime.now() < (proposal.scheduled_time - timedelta(minutes=60)) or
+    #     datetime.now() > (proposal.scheduled_time + timedelta(minutes=(proposal.scheduled_duration+60)))
+    # ):
+    #     # please come back later
+    #     pass
+
+    return render_template("schedule/workshop-steward.html", proposal=proposal)

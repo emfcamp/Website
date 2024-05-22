@@ -1,0 +1,14 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block title %}Workshop Steward{% endblock %}
+{% block body %}
+
+<h1>Workshop Steward -- {{ proposal.title }}</h1>
+
+<ul>
+  {% for ticket in proposal.tickets if ticket.state == "ticket" %}
+    <li>{{ ticket.user.name }} -- {{ ticket.ticket_codes }} </li>
+  {% endfor %}
+</ul>
+
+{% endblock %}

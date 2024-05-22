@@ -61,7 +61,7 @@
 {% endif %}
 </div>
 {% if current_user.is_authenticated %}
-  {% if SIGNUP_STATE in ["pending-tickets", "issue-event-tickets"] and event_ticket %}
+  {% if SIGNUP_STATE in ["pending-tickets", "issue-event-tickets"] and event_ticket and event_ticket.ticket_codes %}
     <div class="well">
       You currently have {{event_ticket.ticket_count}} codes for this {{proposal.human_type}}.
       When you attend you can either give your name or a code to get in. Your codes are:
