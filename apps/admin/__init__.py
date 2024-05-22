@@ -14,23 +14,20 @@ from flask import (
 
 from flask_login import current_user
 
-from wtforms.validators import Optional, DataRequired, URL
+from wtforms.validators import Optional, DataRequired
 from wtforms import (
     SubmitField,
     BooleanField,
     HiddenField,
-    StringField,
     FieldList,
     FormField,
     SelectField,
-    IntegerField,
 )
 import logging_tree
 
 from main import db
 from models.payment import Payment, BankAccount, BankPayment, BankTransaction
 from models.purchase import Purchase
-from models.ical import CalendarSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
 from models.site_state import SiteState, VALID_STATES, refresh_states, get_states
 from models.scheduled_task import tasks, ScheduledTaskResult
@@ -276,86 +273,6 @@ def payment_config_verify():
             BankTransaction.id.desc()
         ).first(),
     )
-
-
-@admin.route("/schedule-feeds")
-def schedule_feeds():
-    feeds = CalendarSource.query.all()
-    return render_template("admin/schedule-feeds.html", feeds=feeds)
-
-
-class ScheduleForm(Form):
-    feed_name = StringField("Feed Name", [DataRequired()])
-    url = StringField("URL", [DataRequired(), URL()])
-    enabled = BooleanField("Feed Enabled")
-    location = SelectField("Location")
-    published = BooleanField("Publish events from this feed")
-    priority = IntegerField("Priority", [Optional()])
-    preview = SubmitField("Preview")
-    submit = SubmitField("Save")
-    delete = SubmitField("Delete")
-
-    def update_feed(self, feed):
-        feed.name = self.feed_name.data
-        feed.url = self.url.data
-        feed.enabled = self.enabled.data
-        feed.published = self.published.data
-        feed.priority = self.priority.data
-
-    def init_from_feed(self, feed):
-        self.feed_name.data = feed.name
-        self.url.data = feed.url
-        self.enabled.data = feed.enabled
-        self.published.data = feed.published
-        self.priority.data = feed.priority
-
-        if feed.mapobj:
-            self.location.data = str(feed.mapobj.id)
-        else:
-            self.location.data = ""
-
-
-@admin.route("/schedule-feeds/<int:feed_id>", methods=["GET", "POST"])
-def schedule_feed(feed_id):
-    feed = CalendarSource.query.get_or_404(feed_id)
-    form = ScheduleForm()
-
-    form.location.choices = []
-
-    if form.validate_on_submit():
-        if form.delete.data:
-            for event in feed.events:
-                db.session.delete(event)
-            db.session.delete(feed)
-            db.session.commit()
-            flash("Feed deleted")
-            return redirect(url_for(".schedule_feeds", feed_id=feed_id))
-
-        form.update_feed(feed)
-        db.session.commit()
-        msg = "Updated feed %s" % feed.name
-        flash(msg)
-        app.logger.info(msg)
-        return redirect(url_for(".schedule_feed", feed_id=feed_id))
-
-    form.init_from_feed(feed)
-    return render_template("admin/edit-feed.html", feed=feed, form=form)
-
-
-@admin.route("/schedule-feeds/new", methods=["GET", "POST"])
-def new_feed():
-    form = ScheduleForm()
-
-    if form.validate_on_submit():
-        feed = CalendarSource("")
-        form.update_feed(feed)
-        db.session.add(feed)
-        db.session.commit()
-        msg = "Created feed %s" % feed.name
-        flash(msg)
-        app.logger.info(msg)
-        return redirect(url_for(".schedule_feed", feed_id=feed.id))
-    return render_template("admin/edit-feed.html", form=form)
 
 
 @admin.route("/scheduled-tasks")

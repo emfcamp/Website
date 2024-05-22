@@ -188,7 +188,7 @@ CFPReviewerTags: Table = db.Table(
 
 class User(BaseModel, UserMixin):
     __tablename__ = "user"
-    __versioned__ = {"exclude": ["favourites", "calendar_favourites"]}
+    __versioned__ = {"exclude": ["favourites"]}
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, unique=True, index=True)

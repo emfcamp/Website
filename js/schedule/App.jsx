@@ -76,8 +76,7 @@ function App() {
   });
 
   function toggleFavourite(event) {
-    let endpoint = event.source === 'database' ? `/api/proposal/${event.id}/favourite` : `/api/external/${Math.abs(event.id)}/favourite`;
-    fetch(endpoint, { headers: { 'Authorization': apiToken, 'Content-Type': 'application/json' }, method: 'put', body: '{}' })
+    fetch(`/api/proposal/${event.id}/favourite`, { headers: { 'Authorization': apiToken, 'Content-Type': 'application/json' }, method: 'put', body: '{}' })
       .then((response) => response.json())
       .then((data) => {
         let schedule = JSON.parse(JSON.stringify(rawSchedule))

@@ -187,7 +187,6 @@ from .payment import *  # noqa: F401,F403
 from .cfp import *  # noqa: F401,F403
 from .permission import *  # noqa: F401,F403
 from .email import *  # noqa: F401,F403
-from .ical import *  # noqa: F401,F403
 from .product import *  # noqa: F401,F403
 from .purchase import *  # noqa: F401,F403
 from .basket import *  # noqa: F401,F403
