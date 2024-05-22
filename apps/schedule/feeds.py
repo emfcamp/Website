@@ -8,7 +8,7 @@ from models import event_year
 from models.user import User
 from models.cfp import Proposal
 
-from ..common import feature_flag, json_response
+from ..common import feature_flag, feature_enabled, json_response
 from .schedule_xml import export_frab
 from .historic import feed_historic
 from .data import (
@@ -37,6 +37,9 @@ def schedule_json(year):
     if year != event_year():
         return feed_historic(year, "json")
 
+    if not feature_enabled('SCHEDULE'):
+        abort(404)
+
     schedule = [_convert_time_to_str(p) for p in _get_scheduled_proposals(request.args)]
 
     # NB this is JSON in a top-level array (security issue for low-end browsers)
@@ -47,6 +50,9 @@ def schedule_json(year):
 def schedule_frab(year):
     if year != event_year():
         return feed_historic(year, "frab")
+
+    if not feature_enabled('SCHEDULE'):
+        abort(404)
 
     schedule = (
         Proposal.query.filter(
@@ -71,6 +77,9 @@ def schedule_frab(year):
 def schedule_ical(year):
     if year != event_year():
         return feed_historic(year, "ics")
+
+    if not feature_enabled('SCHEDULE'):
+        abort(404)
 
     schedule = _get_scheduled_proposals(request.args)
     title = "EMF {}".format(event_year())
