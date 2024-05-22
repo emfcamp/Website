@@ -202,8 +202,10 @@ def item_current(year, proposal_id, slug=None):
 
     form = ItemForm()
 
+    ticket = None
     if proposal.type in ["workshop", "youthworkshop"]:
-        ticket = EventTicket.get_event_ticket(current_user, proposal)
+        if not current_user.is_anonymous:
+            ticket = EventTicket.get_event_ticket(current_user, proposal)
 
         if proposal.type == "youthworkshop":
             form.ticket_count.label.text = "How many U12 tickets?"
@@ -214,8 +216,6 @@ def item_current(year, proposal_id, slug=None):
             max_tickets = min([max_tickets, proposal.get_total_capacity()])
 
         form.ticket_count.choices = [(i, i) for i in range(1, max_tickets + 1)]
-    else:
-        ticket = None
 
     if form.validate_on_submit() and not current_user.is_anonymous:
         msg = ""
