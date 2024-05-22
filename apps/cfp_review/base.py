@@ -40,7 +40,7 @@ from models.cfp import (
     Venue,
     WorkshopProposal,
 )
-from models.cfp_tag import Tag
+from models.cfp_tag import Tag, ProposalTag
 from models.user import User
 from models.purchase import Ticket
 from .forms import (
@@ -188,7 +188,16 @@ def proposals():
     if "reverse" in non_sort_query_string:
         del non_sort_query_string["reverse"]
 
-    tag_counts = {t.tag: [0, len(t.proposals)] for t in Tag.query.all()}
+    tag_counts = dict(
+        db.session
+        .query(Tag.tag, db.func.count(ProposalTag.c.proposal_id))
+        .select_from(Tag)
+        .outerjoin(ProposalTag)
+        .group_by(Tag.tag)
+        .order_by(Tag.tag)
+        .all()
+    )
+    tag_counts = {tag: [0, prop_count] for tag, prop_count in tag_counts.items()}
     for prop in proposals:
         for t in prop.tags:
             tag_counts[t.tag][0] = tag_counts[t.tag][0] + 1
