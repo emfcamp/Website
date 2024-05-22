@@ -200,18 +200,22 @@ def item_current(year, proposal_id, slug=None):
     else:
         is_fave = False
 
-    ticket = EventTicket.get_event_ticket(current_user, proposal)
     form = ItemForm()
 
-    if proposal.type == "youthworkshop":
-        form.ticket_count.label.text = "How many U12 tickets?"
+    if proposal.type in ["workshop", "youthworkshop"]:
+        ticket = EventTicket.get_event_ticket(current_user, proposal)
 
-    max_tickets = 5 if proposal.type == "youthworkshop" else 2
+        if proposal.type == "youthworkshop":
+            form.ticket_count.label.text = "How many U12 tickets?"
 
-    if get_signup_state() != "issue-lottery-tickets":
-        max_tickets = min([max_tickets, proposal.get_total_capacity()])
+        max_tickets = 5 if proposal.type == "youthworkshop" else 2
 
-    form.ticket_count.choices = [(i, i) for i in range(1, max_tickets + 1)]
+        if get_signup_state() != "issue-lottery-tickets":
+            max_tickets = min([max_tickets, proposal.get_total_capacity()])
+
+        form.ticket_count.choices = [(i, i) for i in range(1, max_tickets + 1)]
+    else:
+        ticket = None
 
     if form.validate_on_submit() and not current_user.is_anonymous:
         msg = ""
@@ -261,12 +265,14 @@ def item_current(year, proposal_id, slug=None):
             url_for(".item", year=year, proposal_id=proposal.id, slug=proposal.slug)
         )
 
-    if ticket:
-        form.ticket_count.data = ticket.ticket_count
-        form.enter_lottery.label.text = "Re-enter lottery/update"
-        form.get_ticket.label.text = "Get Ticket/update"
-    elif max_tickets > 0:
-        form.ticket_count.data = form.ticket_count.choices[0][0]
+
+    if proposal.type in ["workshop", "youthworkshop"]:
+        if ticket:
+            form.ticket_count.data = ticket.ticket_count
+            form.enter_lottery.label.text = "Re-enter lottery/update"
+            form.get_ticket.label.text = "Get Ticket/update"
+        elif max_tickets > 0:
+            form.ticket_count.data = form.ticket_count.choices[0][0]
 
     if slug != proposal.slug:
         return redirect(

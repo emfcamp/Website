@@ -867,6 +867,8 @@ class WorkshopProposal(Proposal):
     max_tickets_per_person = 2
 
     def get_total_capacity(self):
+        if not self.requires_ticket:
+            return 0
         return self.total_tickets - self.sum_tickets_in_state("ticket")
 
     def has_ticket_capacity(self):
@@ -879,6 +881,8 @@ class WorkshopProposal(Proposal):
         return self.get_lottery_capacity() > 0
 
     def sum_tickets_in_state(self, state: str) -> int:
+        if not self.requires_ticket:
+            return 0
         return sum([t.ticket_count for t in self.tickets if t.state == state])
 
 
