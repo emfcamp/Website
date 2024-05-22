@@ -1,5 +1,4 @@
 {% from "schedule/_proposal_lister.html" import list_proposals with context %}
-{% from "schedule/_external_lister.html" import list_externals with context %}
 {% extends "base.html" %}
 {% block title %}Favourites{% endblock %}
 {% block body %}
@@ -16,12 +15,8 @@
 <div class="line-up">
 {{ list_proposals(proposals) }}
 </div>
-<div class="line-up">
-<h2 class="event-type">Other Events</h2>
-{{ list_externals(externals) }}
-</div>
 
-{% if proposals | count == 0 and externals | count == 0 %}
+{% if proposals | count == 0 %}
     <p>
         You currently don't have any favourites, add some by going to our
         <a href="{{ url_for('schedule.main_year', year=event_year) }}">line-up</a>, clicking anything

@@ -9,7 +9,6 @@ from . import api
 from main import db
 from models import event_year
 from models.cfp import Proposal
-from models.ical import CalendarEvent
 from models.admin_message import AdminMessage
 from models.event_tickets import EventTicket
 
@@ -99,40 +98,6 @@ class FavouriteProposal(Resource):
             current_user.favourites.append(proposal)
         elif current_state and not new_state:
             current_user.favourites.remove(proposal)
-
-        db.session.commit()
-
-        return {"is_favourite": new_state}
-
-
-class FavouriteExternal(Resource):
-    def get(self, event_id):
-        if not current_user.is_authenticated:
-            abort(401)
-
-        event = CalendarEvent.query.get_or_404(event_id)
-        current_state = event in current_user.calendar_favourites
-
-        return {"is_favourite": current_state}
-
-    def put(self, event_id):
-        """Put with no data to toggle"""
-        if not current_user.is_authenticated:
-            abort(401)
-
-        event = CalendarEvent.query.get_or_404(event_id)
-        current_state = event in current_user.calendar_favourites
-
-        data = request.get_json()
-        if data.get("state") is not None:
-            new_state = bool(data["state"])
-        else:
-            new_state = not current_state
-
-        if new_state and not current_state:
-            current_user.calendar_favourites.append(event)
-        elif current_state and not new_state:
-            current_user.calendar_favourites.remove(event)
 
         db.session.commit()
 
@@ -283,7 +248,6 @@ class ScheduleMessage(Resource):
 
 api.add_resource(ProposalResource, "/proposal/<int:proposal_id>")
 api.add_resource(FavouriteProposal, "/proposal/<int:proposal_id>/favourite")
-api.add_resource(FavouriteExternal, "/external/<int:event_id>/favourite")
 api.add_resource(ScheduleMessage, "/schedule_messages")
 api.add_resource(UpdateLotteryPreferences, "/schedule/tickets/<proposal_type>/preferences")
 api.add_resource(ProposalC3VOCPublishingWebhook, "/proposal/c3voc-publishing-webhook")
