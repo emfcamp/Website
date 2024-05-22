@@ -68,6 +68,5 @@ def feed_redirect(fmt):
 
 from . import base  # noqa
 from . import feeds  # noqa
-from . import external  # noqa
 from . import attendee_content  # noqa
-from . import tasks  # noqa
+
