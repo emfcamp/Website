@@ -276,9 +276,7 @@ def item_current(year, proposal_id, slug=None):
 
         db.session.commit()
         flash(msg)
-        return redirect(
-            url_for(".item", year=year, proposal_id=proposal.id, slug=proposal.slug)
-        )
+        return redirect(url_for(".event_tickets"))
 
 
     if proposal.type in ["workshop", "youthworkshop"]:
