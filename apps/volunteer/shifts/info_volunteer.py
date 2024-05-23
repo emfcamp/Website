@@ -16,14 +16,6 @@ info_vol_shifts = {
                 "min": 1,
                 "max": 3,
             },
-        ],
-        "Entrance Tent": [
-            {
-                "first": edt(d, "10:00:00"),
-                "final": edt(d, "18:00:00"),
-                "min": 1,
-                "max": 1,
-            } for d in ["thurs", "fri"]
         ]
     },
     "Volunteer Manager": {
