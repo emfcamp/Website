@@ -19,7 +19,7 @@ from wtforms import (
 
 from main import db
 from models import event_year
-from models.cfp import Proposal, Venue
+from models.cfp import Proposal, Venue, HUMAN_CFP_TYPES
 from models.ical import CalendarSource, CalendarEvent
 from models.user import generate_api_token
 from models.admin_message import AdminMessage
@@ -35,6 +35,11 @@ from ..cfp_review import admin_required as cfp_admin_required
 from . import schedule, event_tz
 from .historic import talks_historic, item_historic, historic_talk_data
 from .data import _get_upcoming
+
+
+# This controls both which types show on lineup and favourites, and in which order they are presented.
+LINEUP_TYPE_ORDER = ["talk", "workshop", "youthworkshop", "performance"]
+LINEUP_ORDER_HUMAN = [HUMAN_CFP_TYPES[t] for t in LINEUP_TYPE_ORDER]
 
 
 @schedule.route("/schedule/")
@@ -73,13 +78,18 @@ def schedule_current():
     )
 
 
+def _group_proposals_by_human_type(proposals: list[Proposal]) -> dict[str, list[Proposal]]:
+    grouped = defaultdict(list)
+    for proposal in proposals:
+        grouped[proposal.human_type].append(proposal)
+    return grouped
+
+
 def line_up():
-    # The order of these types also defines the order on the lineup page
-    types = ["talk", "workshop", "youthworkshop", "performance"]
     proposals = Proposal.query.filter(
         Proposal.scheduled_duration.isnot(None),
         Proposal.is_accepted,
-        Proposal.type.in_(types),
+        Proposal.type.in_(LINEUP_TYPE_ORDER),
         Proposal.user_scheduled.isnot(True),
         Proposal.hide_from_schedule.isnot(True),
     ).all()
@@ -88,14 +98,13 @@ def line_up():
     # (Because we don't want a bias in starring)
     random.Random(current_user.get_id()).shuffle(proposals)
 
-    grouped = defaultdict(list)
-    for proposal in proposals:
-        grouped[proposal.human_type].append(proposal)
-
     externals = CalendarSource.get_enabled_events()
 
     return render_template(
-        "schedule/line-up.html", proposals=grouped, externals=externals, types=types
+        "schedule/line-up.html",
+        proposals=_group_proposals_by_human_type(proposals),
+        externals=externals,
+        human_types=LINEUP_ORDER_HUMAN,
     )
 
 
@@ -168,9 +177,10 @@ def favourites():
 
     return render_template(
         "schedule/favourites.html",
-        proposals=proposals,
+        proposals=_group_proposals_by_human_type(proposals),
         externals=externals,
         token=token,
+        human_types=LINEUP_ORDER_HUMAN
     )
 
 
