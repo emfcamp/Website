@@ -3,35 +3,37 @@
 {# List proposals - works for the current event year only #}
 {% macro list_proposals(proposals) %}
     {% include "schedule/_icon_key.html" %}
-    {% for human_type, human_type_proposals in proposals | groupby('human_type') %}
-        <h2 class="event-type" id="{{ human_type_proposals[0].type }}">{{ human_type | title }}s</h2>
-        <form method="post" action="{{url_for(".add_favourite")}}">
-        <input type="hidden" name="event_type" value="proposal">
-        <div>
-            {% for prop in human_type_proposals %}
-            <a href="{{ url_for('.item', year=event_year, proposal_id=prop.id, slug=prop.slug) }}" class="event proposal" id="proposal-{{ prop.id }}">
-            <div class="row">
-                <div class="col-xs-10">
-                    <div>
-                        <b>{{ prop.published_names or prop.user.name }}</b>
-                        {{ proposal_icons(prop) }}
+    {% for human_type in types %}
+        {% if proposals[human_type] %}
+            <h2 class="event-type" id="{{ proposals[human_type][0].type }}">{{ human_type | title }}s</h2>
+            <form method="post" action="{{url_for(".add_favourite")}}">
+            <input type="hidden" name="event_type" value="proposal">
+            <div>
+                {% for prop in proposals[human_type] %}
+                <a href="{{ url_for('.item', year=event_year, proposal_id=prop.id, slug=prop.slug) }}" class="event proposal" id="proposal-{{ prop.id }}">
+                <div class="row">
+                    <div class="col-xs-10">
+                        <div>
+                            <b>{{ prop.published_names or prop.user.name }}</b>
+                            {{ proposal_icons(prop) }}
+                        </div>
+                        <div>
+                            {{ prop.display_title }}
+                        </div>
                     </div>
-                    <div>
-                        {{ prop.display_title }}
+                    {% if current_user.is_authenticated %}
+                    <div class="col-xs-2">
+                        <button name="fave" value="{{ prop.id }}" type="submit" class="btn btn-primary btn-transparent btn-hoverlabel favourite-button favourite-button-{{ 'faved' if prop in current_user.favourites else 'unfaved' }}">
+                            {{ favourite_icons() }}
+                            <span class="hoverlabel">Favourite</span>
+                        </button>
                     </div>
+                    {% endif %}
                 </div>
-                {% if current_user.is_authenticated %}
-                <div class="col-xs-2">
-                    <button name="fave" value="{{ prop.id }}" type="submit" class="btn btn-primary btn-transparent btn-hoverlabel favourite-button favourite-button-{{ 'faved' if prop in current_user.favourites else 'unfaved' }}">
-                        {{ favourite_icons() }}
-                        <span class="hoverlabel">Favourite</span>
-                    </button>
-                </div>
-                {% endif %}
+                </a>
+                {% endfor %}
             </div>
-            </a>
-            {% endfor %}
-        </div>
-        </form>
+            </form>
+        {% endif %}
     {% endfor %}
 {% endmacro %}

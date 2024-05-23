@@ -74,10 +74,12 @@ def schedule_current():
 
 
 def line_up():
+    # The order of these types also defines the order on the lineup page
+    types = ["talk", "workshop", "youthworkshop", "performance"]
     proposals = Proposal.query.filter(
         Proposal.scheduled_duration.isnot(None),
         Proposal.is_accepted,
-        Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]),
+        Proposal.type.in_(types),
         Proposal.user_scheduled.isnot(True),
         Proposal.hide_from_schedule.isnot(True),
     ).all()
@@ -86,10 +88,14 @@ def line_up():
     # (Because we don't want a bias in starring)
     random.Random(current_user.get_id()).shuffle(proposals)
 
+    grouped = defaultdict(list)
+    for proposal in proposals:
+        grouped[proposal.human_type].append(proposal)
+
     externals = CalendarSource.get_enabled_events()
 
     return render_template(
-        "schedule/line-up.html", proposals=proposals, externals=externals
+        "schedule/line-up.html", proposals=grouped, externals=externals, types=types
     )
 
 
