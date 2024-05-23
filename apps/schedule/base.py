@@ -306,6 +306,11 @@ def item_current(year, proposal_id, slug=None):
     )
 
 
+@schedule.route("/schedule/tickets/about")
+def about_event_tickets():
+    return render_template("schedule/event_tickets_about.html")
+
+
 class SingleEventTicket(Form):
     ticket_id = HiddenIntegerField("ticket_id")
     cancel = SubmitField("Cancel")
