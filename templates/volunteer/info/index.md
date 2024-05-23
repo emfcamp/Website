@@ -33,12 +33,12 @@ Click the button below to register as a volunteer, which will allow you to choos
 
 ## Queries
 
-If you have any queries about volunteering (or issues during a shift) you can get in touch with the volunteer desk by emailing [volunteer@emfcamp.org](mailto:volunteer@emfcamp.org), calling 1038 on the internal EMF phone system, or stopping by the desk in the [Info tent](https://map.emfcamp.org/#21.46/52.0416706/-2.3770618).
+If you have any queries about volunteering (or issues during a shift) you can get in touch with the volunteer desk by emailing [volunteer@emfcamp.org](mailto:volunteer@emfcamp.org), calling 1009 on the internal EMF phone system, or stopping by the desk in the [Info tent](https://map.emfcamp.org/#21.46/52.0416706/-2.3770618).
 
 <!-- TODO: Move these somewhere else -->
 # Important numbers
 
-From external phones:  
+From external phones (tbc):  
 
 <dl class="dl-horizontal">
   <dt>EMERGENCY <br />First Aid</dt><dd>01908 870909</dd>
@@ -51,14 +51,14 @@ Internal to EMF phone system:
 
 <dl class="dl-horizontal">
   <dt>Infodesk <br />(switchboard)</dt><dd>1001</dd>
-  <dt>Logistics</dt><dd>1002</dd>
+  <dt>Logistics</dt><dd>1030</dd>
   <dt>Site Manager</dt><dd>1004</dd>
-  <dt>Creche</dt><dd>1005</dd>
-  <dt>First Aid Tent</dt><dd>1008</dd>
-  <dt>EMERGENCY <br />First Aid</dt><dd>1009</dd>
+  <dt>Creche</dt><dd>1040</dd>
+  <dt>First Aid Tent</dt><dd>1090</dd>
+  <dt>EMERGENCY <br />First Aid</dt><dd>1099</dd>
   <dt>HQ</dt><dd>1011</dd>
-  <dt>Conduct</dt><dd>1012</dd>
-  <dt>Volunteer desk</dt><dd>1038</dd>
+  <dt>Conduct</dt><dd>1234</dd>
+  <dt>Volunteer desk</dt><dd>1009</dd>
 </dl>
 
 <a href="{{ url_for('base.page', page_name='volunteering') }}">About volunteering (orga-side)</a>
