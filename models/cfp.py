@@ -737,15 +737,18 @@ class Proposal(BaseModel):
             return self.end_date > other.start_date and other.end_date > self.start_date
 
     def get_conflicting_content(self) -> list["Proposal"]:
-        # I gave up trying to do this as SQL via SQLAlchemy's filter expressions.
+        # This is for attendee content, so will only conflict with other attendee
+        # content or workshops. Workshops may not have a scheduled time/duration.
         return [
             p
             for p in Proposal.query.filter(
                 Proposal.id != self.id,
                 Proposal.scheduled_venue_id == self.scheduled_venue_id,
                 Proposal.scheduled_time >= self.start_date,
+                Proposal.scheduled_duration.is_not(None),
             ).all()
-            if p.overlaps_with(self)
+            if self.scheduled_time + timedelta(minutes=self.scheduled_duration) > p.scheduled_time and
+            p.scheduled_time + timedelta(minutes=p.scheduled_duration) > self.scheduled_time
         ]
 
     @property
