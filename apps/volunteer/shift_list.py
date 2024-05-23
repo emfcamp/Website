@@ -11,7 +11,7 @@ from .shifts.parking import parking_shifts
 from .shifts.phone import phone_shifts
 from .shifts.shop import shop_shifts
 from .shifts.talks import talks_shifts
-
+from .shifts.youth_workshops import youth_workshop_shifts
 
 shift_list = arcade_shifts
 shift_list.update(badge_shifts)
@@ -26,3 +26,4 @@ shift_list.update(parking_shifts)
 shift_list.update(phone_shifts)
 shift_list.update(shop_shifts)
 shift_list.update(talks_shifts)
+shift_list.update(youth_workshop_shifts)
