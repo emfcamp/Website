@@ -77,8 +77,7 @@ def line_up():
     proposals = Proposal.query.filter(
         Proposal.scheduled_duration.isnot(None),
         Proposal.is_accepted,
-        # FIXME this should be all types. Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]),
-        Proposal.type.in_(["talk", "workshop", "youthworkshop"]),
+        Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]),
         Proposal.user_scheduled.isnot(True),
         Proposal.hide_from_schedule.isnot(True),
     ).all()
