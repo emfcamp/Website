@@ -744,7 +744,7 @@ class Proposal(BaseModel):
             for p in Proposal.query.filter(
                 Proposal.id != self.id,
                 Proposal.scheduled_venue_id == self.scheduled_venue_id,
-                Proposal.scheduled_time >= self.start_date,
+                Proposal.scheduled_time.is_not(None),
                 Proposal.scheduled_duration.is_not(None),
             ).all()
             if self.scheduled_time + timedelta(minutes=self.scheduled_duration) > p.scheduled_time and
