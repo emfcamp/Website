@@ -418,9 +418,9 @@ class Proposal(BaseModel):
     )
     allowed_times = db.Column(db.String, nullable=True)
     scheduled_duration = db.Column(db.Integer, nullable=True)
-    scheduled_time: datetime = db.Column(db.DateTime, nullable=True)
+    scheduled_time = db.Column(db.DateTime, nullable=True)
     scheduled_venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"))
-    potential_time: datetime = db.Column(db.DateTime, nullable=True)
+    potential_time = db.Column(db.DateTime, nullable=True)
     potential_venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"))
 
     scheduled_venue = db.relationship(
