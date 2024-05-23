@@ -1,5 +1,4 @@
 {% from "schedule/_proposal_lister.html" import list_proposals with context %}
-{% from "schedule/_external_lister.html" import list_externals with context %}
 
 {% extends "base.html" %}
 {% block title %}Line-up{% endblock %}
@@ -33,13 +32,6 @@
 <div class="line-up">
 {{ list_proposals(proposals) }}
 </div>
-
-{% if externals|length > 0 %}
-<div class="line-up">
-<h2 class="event-type">Other Events</h2>
-{{ list_externals(externals) }}
-</div>
-{% endif %}
 
 {% endblock %}
 

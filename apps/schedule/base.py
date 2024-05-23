@@ -20,7 +20,6 @@ from wtforms import (
 from main import db
 from models import event_year
 from models.cfp import Proposal, Venue
-from models.ical import CalendarSource, CalendarEvent
 from models.user import generate_api_token
 from models.admin_message import AdminMessage
 from models.event_tickets import EventTicket
@@ -87,10 +86,8 @@ def line_up():
     # (Because we don't want a bias in starring)
     random.Random(current_user.get_id()).shuffle(proposals)
 
-    externals = CalendarSource.get_enabled_events()
-
     return render_template(
-        "schedule/line-up.html", proposals=proposals, externals=externals
+        "schedule/line-up.html", proposals=proposals,
     )
 
 
@@ -101,30 +98,20 @@ def add_favourite():
 
     event_id = int(request.form["fave"])
     event_type = request.form["event_type"]
-    if event_type == "proposal":
-        proposal = Proposal.query.get_or_404(event_id)
-        if proposal in current_user.favourites:
-            current_user.favourites.remove(proposal)
-        else:
-            current_user.favourites.append(proposal)
+    if event_type != "proposal":
+        abort(400)
 
-        db.session.commit()
-        return redirect(
-            url_for(".main_year", year=event_year())
-            + "#proposal-{}".format(proposal.id)
-        )
-
+    proposal = Proposal.query.get_or_404(event_id)
+    if proposal in current_user.favourites:
+        current_user.favourites.remove(proposal)
     else:
-        event = CalendarEvent.query.get_or_404(event_id)
-        if event in current_user.calendar_favourites:
-            current_user.calendar_favourites.remove(event)
-        else:
-            current_user.calendar_favourites.append(event)
+        current_user.favourites.append(proposal)
 
-        db.session.commit()
-        return redirect(
-            url_for(".main_year", year=event_year()) + "#event-{}".format(event.id)
-        )
+    db.session.commit()
+    return redirect(
+        url_for(".main_year", year=event_year())
+        + "#proposal-{}".format(proposal.id)
+    )
 
 
 @schedule.route("/favourites", methods=["GET", "POST"])
@@ -133,38 +120,28 @@ def favourites():
     if (request.method == "POST") and current_user.is_authenticated:
         event_id = int(request.form["fave"])
         event_type = request.form["event_type"]
-        if event_type == "proposal":
-            proposal = Proposal.query.get_or_404(event_id)
-            if proposal in current_user.favourites:
-                current_user.favourites.remove(proposal)
-            else:
-                current_user.favourites.append(proposal)
+        if event_type != "proposal":
+            abort(400)
 
-            db.session.commit()
-            return redirect(url_for(".favourites") + "#proposal-{}".format(proposal.id))
-
+        proposal = Proposal.query.get_or_404(event_id)
+        if proposal in current_user.favourites:
+            current_user.favourites.remove(proposal)
         else:
-            event = CalendarEvent.query.get_or_404(event_id)
-            if event in current_user.calendar_favourites:
-                current_user.calendar_favourites.remove(event)
-            else:
-                current_user.calendar_favourites.append(event)
+            current_user.favourites.append(proposal)
 
-            db.session.commit()
-            return redirect(url_for(".favourites") + "#event-{}".format(event.id))
+        db.session.commit()
+        return redirect(url_for(".favourites") + "#proposal-{}".format(proposal.id))
 
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for(".favourites")))
 
     proposals = [p for p in current_user.favourites if not p.hide_from_schedule]
-    externals = current_user.calendar_favourites
 
     token = generate_api_token(app.config["SECRET_KEY"], current_user.id)
 
     return render_template(
         "schedule/favourites.html",
         proposals=proposals,
-        externals=externals,
         token=token,
     )
 

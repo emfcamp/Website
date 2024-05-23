@@ -6,7 +6,6 @@ from slugify import slugify_unicode as slugify
 
 from models import event_year
 from models.cfp import Proposal, Venue
-from models.ical import CalendarSource
 
 from main import external_url
 from . import event_tz
@@ -59,33 +58,6 @@ def _get_proposal_dict(proposal: Proposal, favourites_ids):
     return res
 
 
-def _get_ical_dict(event, favourites_ids):
-    res = {
-        "id": -event.id,
-        "start_date": event_tz.localize(event.start_dt),
-        "end_date": event_tz.localize(event.end_dt),
-        "venue": event.location or "(Unknown)",
-        "latlon": event.latlon,
-        "map_link": event.map_link,
-        "title": event.summary,
-        "speaker": "",
-        "user_id": None,
-        "description": event.description,
-        "type": "talk",
-        "may_record": False,
-        "is_fave": event.id in favourites_ids,
-        "source": "external",
-        "link": external_url(
-            ".item_external", year=event_year(), slug=event.slug, event_id=event.id
-        ),
-    }
-    if event.type in ["workshop", "youthworkshop"]:
-        res["cost"] = event.display_cost
-        res["equipment"] = event.display_participant_equipment
-        res["age_range"] = event.display_age_range
-    return res
-
-
 def _filter_obj_to_dict(filter_obj):
     """Request.args uses a MulitDict this lets us pass filter_obj as plain dicts
     and have everything work as expected.
@@ -103,10 +75,9 @@ def _get_scheduled_proposals(filter_obj={}, override_user=None):
         user = current_user
 
     if user.is_anonymous:
-        proposal_favourites = external_favourites = []
+        proposal_favourites = []
     else:
         proposal_favourites = [f.id for f in user.favourites]
-        external_favourites = [f.id for f in user.calendar_favourites]
 
     schedule = Proposal.query.filter(
         Proposal.is_accepted,
@@ -117,14 +88,6 @@ def _get_scheduled_proposals(filter_obj={}, override_user=None):
     ).all()
 
     schedule = [_get_proposal_dict(p, proposal_favourites) for p in schedule]
-
-    ical_sources = CalendarSource.query.filter_by(enabled=True, published=True)
-
-    for source in ical_sources:
-        for e in source.events:
-            d = _get_ical_dict(e, external_favourites)
-            d["venue"] = source.mapobj.name
-            schedule.append(d)
 
     if "is_favourite" in filter_obj and filter_obj["is_favourite"]:
         schedule = [s for s in schedule if s.get("is_fave", False)]
@@ -171,16 +134,9 @@ def _get_priority_sorted_venues(venues_to_allow):
     main_venues = Venue.query.filter().all()
     main_venue_names = [(v.name, "main", v.priority) for v in main_venues]
 
-    ical_sources = CalendarSource.query.filter_by(enabled=True, published=True)
-    ical_source_names = [
-        (v.mapobj.name, "ical", v.priority)
-        for v in ical_sources
-        if v.mapobj and v.events
-    ]
-
     res = []
     seen_names = []
-    for venue in main_venue_names + ical_source_names:
+    for venue in main_venue_names:
         name = venue[0]
         if name not in seen_names and name in venues_to_allow:
             seen_names.append(name)
@@ -193,5 +149,5 @@ def _get_priority_sorted_venues(venues_to_allow):
                 }
             )
 
-    res = sorted(res, key=lambda v: (v["source"] != "ical", v["order"]), reverse=True)
+    res = sorted(res, key=lambda v: v["order"], reverse=True)
     return res
