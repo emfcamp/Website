@@ -17,6 +17,6 @@ If you encounter a fire (and it's not meant to be there), follow the steps below
 
 In most cases people who need first aid should make their own way to the first aid tent, which can be found near the bar.
 
-If someone is unable to safely get to the first aid tent, request the first aid team either via radio, or by calling First Aid: 1008 / First Aid Emergency 1009. Unless you are qualified to do so, or the person is in imminent danger, you should not attempt to perform first aid yourself.
+If someone is unable to safely get to the first aid tent, request the first aid team either via radio, or by calling First Aid: 1090 / First Aid Emergency 1099. Unless you are qualified to do so, or the person is in imminent danger, you should not attempt to perform first aid yourself.
 
 Do not call 999, we have an ambulance on site and people will get help quicker by calling first aid.
