@@ -438,6 +438,7 @@ class Proposal(BaseModel):
     thumbnail_url = db.Column(db.String)
     video_recording_lost = db.Column(db.Boolean, default=False)
 
+    type_might_require_ticket = False
     tickets = db.relationship("EventTicket", backref="proposal")
 
     __mapper_args__ = {"polymorphic_on": type}
@@ -870,6 +871,7 @@ class WorkshopProposal(Proposal):
     total_tickets = db.Column(db.Integer, nullable=True)
     non_lottery_tickets = db.Column(db.Integer, default=5, nullable=True)
     max_tickets_per_person = 2
+    type_might_require_ticket = True
 
     def get_total_capacity(self):
         if not self.requires_ticket:

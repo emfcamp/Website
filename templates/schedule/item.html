@@ -82,36 +82,40 @@
   {% if feature_enabled('SCHEDULE') and proposal.map_link %}
   <a href="{{ proposal.map_link }}" target="_blank" class="btn btn-primary favourite-button">📍&nbsp;Map</a>
   {% endif %}
-  <div class="pull-right">
-    {% if SIGNUP_STATE == "issue-lottery-tickets" and proposal.requires_ticket %}
-      {% if proposal.has_lottery_capacity() %}
+  {% if proposal.type_might_require_ticket %}
+    <div class="pull-right">
+      {% if not proposal.requires_ticket %}
+        <p>This {{ proposal.human_type }} does not require a lottery ticket.</p>
+      {% elif SIGNUP_STATE == "issue-lottery-tickets" %}
+        {% if proposal.has_lottery_capacity() %}
+          {{ form.ticket_count.label() }}
+          {{ form.ticket_count(class_="form-control") }}
+          {{ form.enter_lottery(class_="btn btn-primary") }}
+        {% else %}
+          <p>This {{ proposal.human_type }} does not have any tickets available via lottery.</p>
+        {% endif %}
+
+      {% elif SIGNUP_STATE == "issue-event-tickets" and proposal.has_ticket_capacity() %}
         {{ form.ticket_count.label() }}
         {{ form.ticket_count(class_="form-control") }}
-        {{ form.enter_lottery(class_="btn btn-primary") }}
-      {% else %}
-        <p>This {{ proposal.human_type }} does not have any tickets available via lottery.</p>
+        {{ form.get_ticket(class_="btn btn-primary") }}
+
+      {% elif SIGNUP_STATE == "issue-event-tickets" and not proposal.has_ticket_capacity() %}
+        <p>This {{proposal.human_type}} is now full, if any slots become available they will be visible here.</p>
+
+      {% elif SIGNUP_STATE == "pending-tickets" %}
+        {# FIXME add info about held tickets here #}
+        <p>The lottery for this {{proposal.human_type}} is currently closed. A small number of tickets will be available first come/first served on the day.</p>
       {% endif %}
-
-    {% elif SIGNUP_STATE == "issue-event-tickets" and proposal.requires_ticket and proposal.has_ticket_capacity() %}
-      {{ form.ticket_count.label() }}
-      {{ form.ticket_count(class_="form-control") }}
-      {{ form.get_ticket(class_="btn btn-primary") }}
-
-    {% elif SIGNUP_STATE == "issue-event-tickets" and proposal.requires_ticket and not proposal.has_ticket_capacity() %}
-      <p>This {{proposal.human_type}} is now full, if any slots become available they will be visible here.</p>
-
-    {% elif SIGNUP_STATE == "pending-tickets" and proposal.requires_ticket %}
-      {# FIXME add info about held tickets here #}
-      <p>The lottery for this {{proposal.human_type}} is currently closed. A small number of tickets will be available first come/first served on the day.</p>
-    {% endif %}
-  </div>
-  <div class="pull-right">
-    <small>
-      You can see your other workshop tickets
-      {% if SIGNUP_STATE=="issue-lottery-tickets" %}(and rank your preferences){% endif %}
-      by going to your <a href="{{ url_for('.event_tickets') }}">account's workshop-tickets page</a>
-    </small>
-  </div>
+    </div>
+    <div class="pull-right">
+      <small>
+        You can see your other workshop tickets
+        {% if SIGNUP_STATE=="issue-lottery-tickets" %}(and rank your preferences){% endif %}
+        by going to your <a href="{{ url_for('.event_tickets') }}">account's workshop-tickets page</a>
+      </small>
+    </div>
+  {% endif %}
 
   </form>
 {% else %}
