@@ -728,13 +728,15 @@ class Proposal(BaseModel):
         return make_periods_contiguous(preferred_time_periods)
 
     def overlaps_with(self, other) -> bool:
-        if self.potential_start_date:
-            return (
-                self.potential_end_date > other.potential_start_date
-                and other.potential_end_date > self.potential_start_date
-            )
+        this_start = self.potential_start_date or self.start_date
+        this_end = self.potential_end_date or self.end_date
+        other_start = other.potential_start_date or other.start_date
+        other_end = other.potential_end_date or other.end_date
+
+        if this_start and this_end and other_start and other_end:
+            return this_end > other_start and other_end > this_start
         else:
-            return self.end_date > other.start_date and other.end_date > self.start_date
+            return False
 
     def get_conflicting_content(self) -> list["Proposal"]:
         # This is for attendee content, so will only conflict with other attendee
