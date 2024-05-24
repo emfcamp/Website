@@ -40,7 +40,7 @@ def schedule_json(year):
     if year != event_year():
         return feed_historic(year, "json")
 
-    if not feature_enabled('SCHEDULE'):
+    if not feature_enabled("SCHEDULE"):
         abort(404)
 
     schedule = [_convert_time_to_str(p) for p in _get_scheduled_proposals(request.args)]
@@ -49,21 +49,21 @@ def schedule_json(year):
     return Response(json.dumps(schedule), mimetype="application/json")
 
 
-@schedule.route("/schedule/schedule-<int:year>.json") # TODO validate url with upstream
+@schedule.route("/schedule/schedule-<int:year>.json")  # TODO validate url with upstream
 @cross_origin(methods=["GET"])
 def schedule_json_schema(year):
     if year != event_year():
         return feed_historic(year, "json")
 
-    if not feature_enabled('SCHEDULE'):
+    if not feature_enabled("SCHEDULE"):
         abort(404)
 
     def duration_hhmm(duration_minutes):
         if not duration_minutes or duration_minutes < 1:
             return "00:00"
         return "{}:{}".format(
-            int(duration_minutes/60),
-            str(duration_minutes%60).zfill(2),
+            int(duration_minutes / 60),
+            str(duration_minutes % 60).zfill(2),
         )
 
     schedule = (
@@ -77,12 +77,9 @@ def schedule_json_schema(year):
         .all()
     )
 
-    duration_days = ceil((event_end() - event_end()).total_seconds / 86400),
+    duration_days = (ceil((event_end() - event_end()).total_seconds / 86400),)
 
-    rooms = [
-        proposal.scheduled_venue.name
-        for proposal in schedule
-    ]
+    rooms = [proposal.scheduled_venue.name for proposal in schedule]
 
     schedule_json = {
         "version": "1.0-public",
@@ -128,55 +125,62 @@ def schedule_json_schema(year):
                 }
                 links.discard(None)
                 links.discard("")
-                day_schedule["rooms"][room].append({
-                    "abstract": None, # The proposal model does not implement abstracts
-                    "attachments": [],
-                    "date": event_tz.localize(proposal.start_date).isoformat(),
-                    "description": proposal.description,
-                    "do_not_record": False if proposal.may_record else True,
-                    "duration": duration_hhmm(proposal.duration_minutes),
-                    "guid": None,
-                    "id": proposal.id,
-                    # This assumes there will never be a non-english talk,
-                    # which is probably fine for a conference in the UK.
-                    "language": "en",
-                    "links": sorted(links),
-                    "persons": [
-                        {
-                            "name": name.strip(),
-                            "public_name": name.strip(),
-                        }
-                        for name in (proposal.published_names or proposal.user.name).split(",")
-                    ],
-                    "recording_license": "CC BY-SA 3.0",
-                    "room": room,
-                    "slug": "emf{}-{}-{}".format(
-                        event_year(),
-                        proposal.id,
-                        proposal.slug,
-                    ),
-                    "start": event_tz.localize(proposal.start_date).strftime("%H:%M"),
-                    "subtitle": None,
-                    "title": proposal.display_title,
-                    "track": None, # TODO does emf have tracks?
-                    "type": proposal.type,
-                    "url": external_url(
-                        ".item",
-                        year=event_year(),
-                        proposal_id=proposal.id,
-                        slug=proposal.slug,
-                    ),
-                })
+                day_schedule["rooms"][room].append(
+                    {
+                        "abstract": None,  # The proposal model does not implement abstracts
+                        "attachments": [],
+                        "date": event_tz.localize(proposal.start_date).isoformat(),
+                        "description": proposal.description,
+                        "do_not_record": False if proposal.may_record else True,
+                        "duration": duration_hhmm(proposal.duration_minutes),
+                        "guid": None,
+                        "id": proposal.id,
+                        # This assumes there will never be a non-english talk,
+                        # which is probably fine for a conference in the UK.
+                        "language": "en",
+                        "links": sorted(links),
+                        "persons": [
+                            {
+                                "name": name.strip(),
+                                "public_name": name.strip(),
+                            }
+                            for name in (proposal.published_names or proposal.user.name).split(",")
+                        ],
+                        "recording_license": "CC BY-SA 3.0",
+                        "room": room,
+                        "slug": "emf{}-{}-{}".format(
+                            event_year(),
+                            proposal.id,
+                            proposal.slug,
+                        ),
+                        "start": event_tz.localize(proposal.start_date).strftime("%H:%M"),
+                        "subtitle": None,
+                        "title": proposal.display_title,
+                        "track": None,  # TODO does emf have tracks?
+                        "type": proposal.type,
+                        "url": external_url(
+                            ".item",
+                            year=event_year(),
+                            proposal_id=proposal.id,
+                            slug=proposal.slug,
+                        ),
+                    }
+                )
         schedule_json["conference"]["days"].append(day_schedule)
 
-    return Response(json.dumps({
-        "schedule": schedule_json,
-        "$schema": "https://c3voc.de/schedule/schema.json",
-        "generator": {
-            "name": "emfcamp-website",
-            "url": "https://github.com/emfcamp/Website",
-        },
-    }), mimetype="application/json")
+    return Response(
+        json.dumps(
+            {
+                "schedule": schedule_json,
+                "$schema": "https://c3voc.de/schedule/schema.json",
+                "generator": {
+                    "name": "emfcamp-website",
+                    "url": "https://github.com/emfcamp/Website",
+                },
+            }
+        ),
+        mimetype="application/json",
+    )
 
 
 @schedule.route("/schedule/<int:year>.frab")
@@ -184,7 +188,7 @@ def schedule_frab(year):
     if year != event_year():
         return feed_historic(year, "frab")
 
-    if not feature_enabled('SCHEDULE'):
+    if not feature_enabled("SCHEDULE"):
         abort(404)
 
     schedule = (
@@ -211,7 +215,7 @@ def schedule_ical(year):
     if year != event_year():
         return feed_historic(year, "ics")
 
-    if not feature_enabled('SCHEDULE'):
+    if not feature_enabled("SCHEDULE"):
         abort(404)
 
     schedule = _get_scheduled_proposals(request.args)
@@ -298,9 +302,7 @@ def favourites_ical():
 @schedule.route("/now-and-next.json")
 @schedule.route("/upcoming.json")
 def upcoming():
-    return Response(
-        json.dumps(_get_upcoming(request.args)), mimetype="application/json"
-    )
+    return Response(json.dumps(_get_upcoming(request.args)), mimetype="application/json")
 
 
 @schedule.route("/schedule/<int:year>/<int:proposal_id>.json")
