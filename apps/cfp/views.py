@@ -197,6 +197,9 @@ def form(cfp_type="talk"):
         current_user.is_authenticated and current_user.is_invited_speaker
     )
 
+    if feature_enabled("LIGHTNING_TALKS") and cfp_type == "lightning":
+        ignore_closed = True
+
     if feature_enabled("CFP_CLOSED") and not ignore_closed:
         return render_template("cfp/closed.html", cfp_type=cfp_type)
 
