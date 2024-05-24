@@ -4,6 +4,10 @@
     <link rel="stylesheet" type="text/css" href="{{ static_url_for('static', filename='css/schedule.css') }}">
 {% endblock %}
 {% block body %}
+  <p>
+    <strong><a class="btn btn-lg btn-primary" href="{{ url_for('.favourites') }}">View your favourites</a></strong>
+    <strong><a class="btn btn-lg btn-primary" href="{{ url_for('.event_tickets') }}">View your workshop tickets</a></strong>
+  </p>
   <div id="schedule-app" data-api-token="{{ token }}" data-debug="{{ debug }}"></div>
   <p>
     <strong>Schedule feeds:</strong>
