@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import octicons from '@primer/octicons';
 import nl2br from 'react-nl2br';
+import Linkify from "linkify-react";
 
 function Icon({ name, className, size, label }) {
   let svg = octicons[name].toSVG({ 'aria-label': label, width: size, height: size });
@@ -106,7 +107,7 @@ function Event({ event, toggleFavourite, authenticated }) {
         <AdditionalInformation label="Cost" value={ event.cost } />
         <AdditionalInformation label="Required equipment" value={ event.equipment } />
 
-        <p>{ nl2br(event.description) }</p>
+        <p><Linkify options={{target:'blank'}}>{ nl2br(event.description) }</Linkify></p>
         <p>
           <a href={ event.link } target="_blank" class="btn btn-default"><Icon name="link" size="16" /> Details</a>&nbsp;
           <FavouriteButton event={ event } toggleFavourite={ toggleFavourite } authenticated={ authenticated } />&nbsp;
