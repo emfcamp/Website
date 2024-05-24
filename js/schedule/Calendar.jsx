@@ -66,6 +66,14 @@ function FavouriteButton({ event, toggleFavourite, authenticated }) {
   );
 }
 
+function TicketButton({ event, authenticated }) {
+  if (!authenticated || !event.requires_ticket) { return null; }
+
+  return (
+    <a href={event.link} className="btn btn-primary">Request Tickets</a>
+  )
+}
+
 function AdditionalInformation({ label, value }) {
   if (value === null || value === undefined || value == "Unspecified" || value == "") { return null; }
 
@@ -100,6 +108,7 @@ function Event({ event, toggleFavourite, authenticated }) {
 
         <p>{ nl2br(event.description) }</p><p><a href={ event.link } target="_blank"><Icon name="link" size="16" label="Link to this content" />Details</a></p>
         <FavouriteButton event={ event } toggleFavourite={ toggleFavourite } authenticated={ authenticated } />
+        <TicketButton event={event} authenticated={authenticated} />
       </div>
     );
   }
