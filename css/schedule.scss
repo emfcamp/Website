@@ -1,7 +1,7 @@
 @use "./_variables.scss" as *;
 
 .filters {
-  background-color: #90CCD6;
+  background-color: $brand-2024-pale-green;
   margin-top: 1em;
 
   h3 {
@@ -13,12 +13,12 @@
   .panel-title {
     display: flex;
     justify-content: space-between;
-    background-color: #90CCD6;
+    background-color: $brand-2024-pale-green;
     border: none;
   }
 
   .panel-heading {
-    background-color: #90CCD6;
+    background-color: $brand-2024-pale-green;
     border: none;
   }
 }
@@ -74,7 +74,7 @@
   margin-bottom: 1em;
 
   &.cfp {
-    border: 2px solid #E4147E;
+    border: 2px solid $brand-2024-pale-green;
   }
 
   .event-synopsis {
@@ -112,7 +112,7 @@
     }
 
     .speaker {
-      color: #E4147E;
+      color: $brand-2024-yellow;
       font-weight: bold;
     }
   }
@@ -131,14 +131,14 @@
   }
 
   .btn-warning {
-    background-color: #F2DE1B;
+    background-color: $brand-2024-yellow;
     color: #151735;
     font-weight: bold;
     border: none;
   }
 
   .btn-warning:active {
-    background-color: #F2DE1B;
+    background-color: $brand-2024-yellow;
     color: #151735;
     font-weight: bold;
     border: none;
