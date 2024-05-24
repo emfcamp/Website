@@ -54,9 +54,21 @@ class ScheduleData {
       this.scheduleByHour[isoHour].push(e);
     });
 
+    this.venuePriority = (venue) => {
+      if (venue.name.startsWith("Stage")) { return 999 }
+      if (venue.name.startsWith("Workshop")) { return 900 }
+      return 1;
+    };
+
     this.venues = this.venues.sort((a,b) => {
       if (a.official && !b.official) { return -1; }
       if (!a.official && b.official) { return 1; }
+
+      // Horrible code, used for prioritising stages and workshops.
+      let priority_a = this.venuePriority(a);
+      let priority_b = this.venuePriority(b);
+      if (priority_a > priority_b) { return -1; }
+      if (priority_b > priority_a) { return 1; }
 
       return a.name.localeCompare(b.name);
     });
@@ -89,7 +101,13 @@ class ScheduleData {
   }
 
   addVenue(name, official) {
-    if (this.venuesSeen.has(name)) { return null; }
+    if (this.venuesSeen.has(name)) {
+      // More nasty hacks to handle venues with mixed content not being marked
+      // as one of our's if the first event in that venue is attendee content.
+      if (official) {
+        this.venues.find(v => v["name"] == name)["official"] = official;
+      }
+    }
 
     this.venuesSeen.add(name);
     this.venues.push({ name: name, official: official });
