@@ -11,6 +11,7 @@ from flask import current_app as app
 from wtforms import (
     FieldList,
     FormField,
+    HiddenField,
     SelectField,
     StringField,
     SubmitField,
@@ -611,23 +612,83 @@ def greenroom():
         upcoming=upcoming,
     )
 
-@schedule.route("/schedule/workshop-steward/<int:proposal_id>")
+
+class CheckInEventTicketCodeForm(Form):
+    code = HiddenField("code") # Will be hidden
+    use_code = SubmitField("Check-in Code")
+
+
+class CheckInEventTicketForm(Form):
+    event_ticket_id = HiddenIntegerField("ticket_id")
+    codes = FieldList(FormField(CheckInEventTicketCodeForm))
+    use_all_codes = SubmitField("Check in all")
+
+
+class WorkshopCheckingForm(Form):
+    event_tickets = FieldList(FormField(CheckInEventTicketForm))
+
+
+@schedule.route("/schedule/workshop-steward/<int:proposal_id>", methods=["GET", "POST"])
 @v_user_required
 def workshop_steward(proposal_id):
     proposal = Proposal.query.get_or_404(proposal_id)
-    # user_role_strs = [r.name for current_user.volunteer.interested_roles.all()]
+    user_role_strs = [r.name for r in current_user.volunteer.interested_roles.all()]
 
-    # if proposal.type == "youthworkshop" and "Youth Workshop Helper" not in user_role_strs:
-    #     abort(401)
+    # Require that the user has the appropriate role & only show the attendee list the hour before
+    if proposal.type == "youthworkshop" and "Youth Workshop Helper" not in user_role_strs:
+        abort(401)
 
-    # if proposal.type == "workshop" and "Workshop Steward" not in user_role_strs:
-    #     abort(401)
+    if proposal.type == "workshop" and "Workshop Steward" not in user_role_strs:
+        abort(401)
 
-    # if (
-    #     datetime.now() < (proposal.scheduled_time - timedelta(minutes=60)) or
-    #     datetime.now() > (proposal.scheduled_time + timedelta(minutes=(proposal.scheduled_duration+60)))
-    # ):
-    #     # please come back later
-    #     pass
+    show_list_after = proposal.scheduled_time - timedelta(minutes=60)
+    if app.config.get("DEBUG") and request.args.get("time_locked", False):
+        time_locked = False
+    elif (
+        datetime.now() < show_list_after or
+        (datetime.now() > (proposal.scheduled_time + timedelta(minutes=(proposal.scheduled_duration+60))))
+    ):
+        app.logger.info("Time locked view")
+        flash(f"The attendee list will be visible after { show_list_after }")
+        time_locked = True
+    else:
+        time_locked = False
 
-    return render_template("schedule/workshop-steward.html", proposal=proposal)
+    # Now actually do the form
+    form = WorkshopCheckingForm()
+
+    if form.validate_on_submit():
+        for ticket_form in form.event_tickets:
+            ticket = EventTicket.query.get(ticket_form.event_ticket_id.data)
+            if ticket_form.use_all_codes.data:
+                ticket.use_all_codes()
+                db.session.commit()
+                flash(f"Checked in {ticket.user.name}")
+                return redirect(url_for(".workshop_steward", proposal_id=proposal_id))
+
+            for code_form in ticket_form.codes:
+                if code_form.use_code.data:
+                    ticket.use_code(code_form.code.data)
+                    db.session.commit()
+                    flash(f"Used {ticket.user.name}'s code '{code_form.code.data}'")
+                    return redirect(url_for(".workshop_steward", proposal_id=proposal_id))
+
+    for event_ticket in proposal.tickets:
+        form.event_tickets.append_entry()
+        form.event_tickets[-1]._ticket = event_ticket
+        form.event_tickets[-1].event_ticket_id.data = event_ticket.id
+
+        if not event_ticket.ticket_codes:
+            continue
+
+        for code in event_ticket.ticket_codes.split(","):
+            form.event_tickets[-1].codes.append_entry()
+            form.event_tickets[-1].codes[-1].code.data = code
+
+    return render_template(
+        "schedule/workshop-steward.html",
+        form=form,
+        time_locked=time_locked,
+        proposal=proposal,
+        show_list_after=show_list_after,
+    )

@@ -68,7 +68,19 @@ class EventTicket(BaseModel):
 
     # add a way to indicate a code has been used?
     def use_code(self, code):
-        pass
+        all_codes = self.ticket_codes.split(",")
+        if code not in all_codes:
+            raise EventTicketException(f"Code '{code}' not found")
+
+        all_codes.remove(code)
+        self.ticket_codes = ",".join(all_codes)
+        return self
+
+    def use_all_codes(self):
+        if not self.ticket_codes:
+            raise EventTicketException("No codes found")
+        self.ticket_codes = ""
+        return self
 
     def get_users_other_lottery_tickets_for_type(self):
         return [
