@@ -80,7 +80,7 @@
     &nbsp;Favourite
   </button>
   {% if feature_enabled('SCHEDULE') and proposal.map_link %}
-  <a href="{{ proposal.map_link }}" target="_blank" class="btn btn-primary favourite-button">📍&nbsp;Map</a>
+  <a href="{{ proposal.map_link }}" target="_blank" class="btn btn-primary">📍&nbsp;Map</a>
   {% endif %}
   {% if proposal.type_might_require_ticket %}
     <div class="pull-right">
