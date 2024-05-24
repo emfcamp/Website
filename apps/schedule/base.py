@@ -85,6 +85,8 @@ def _group_proposals_by_human_type(proposals: list[Proposal]) -> dict[str, list[
     return grouped
 
 
+# FIXME this should probably work for other years
+@schedule.route("/schedule/line-up/2024")
 def line_up():
     proposals = Proposal.query.filter(
         Proposal.scheduled_duration.isnot(None),

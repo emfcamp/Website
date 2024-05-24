@@ -79,6 +79,9 @@
     {{ favourite_icons() }}
     &nbsp;Favourite
   </button>
+  {% if feature_enabled('SCHEDULE') and proposal.map_link %}
+  <a href="{{ proposal.map_link }}" target="_blank" class="btn btn-primary favourite-button">📍&nbsp;Map</a>
+  {% endif %}
   <div class="pull-right">
     {% if SIGNUP_STATE == "issue-lottery-tickets" and proposal.requires_ticket %}
       {% if proposal.has_lottery_capacity() %}
