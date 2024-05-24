@@ -5,7 +5,7 @@ from apps.cfp.scheduler import Scheduler
 from main import db
 from models.user import User
 from models.basket import Basket
-from models.event_tickets import EventTicket
+from models.event_tickets import EventTicket, get_max_rank_for_user
 from models.product import PriceTier
 from models.payment import StripePayment, BankPayment
 from models.cfp import (
@@ -264,8 +264,8 @@ class FakeDataGenerator(object):
         max_ticket_count = 2 if proposal is WorkshopProposal else 5
 
         for user in random.sample(users_list, k=n_lottery_tickets):
-            db.session.add(
-                EventTicket.create_ticket(
-                    user, proposal, random.randint(1, max_ticket_count)
-                )
-            )
+            rank = get_max_rank_for_user(user, proposal.type)
+            db.session.add(EventTicket(
+                user.id, proposal.id, "entered-lottery", random.randint(1, max_ticket_count), rank
+            ))
+
