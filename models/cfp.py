@@ -799,7 +799,7 @@ class Proposal(BaseModel):
     def map_link(self) -> Optional[str]:
         latlon = self.latlon
         if latlon:
-            return "https://map.emfcamp.org/#18.5/%s/%s" % (latlon[0], latlon[1])
+            return "https://map.emfcamp.org/#18.5/%s/%s/m=%s,%s" % (latlon[0], latlon[1], latlon[0], latlon[1])
         return None
 
     @property
