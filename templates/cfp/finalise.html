@@ -106,7 +106,7 @@
 
     <fieldset>
         <legend>Final Requirements</legend>
-        {% if proposal.type == 'talk' %}
+        {% if proposal.type in ['talk', 'performance'] %}
         {{ render_field(form.may_record, 7) }}
         {{ render_field(form.needs_laptop, 7) }}
         {% endif %}
