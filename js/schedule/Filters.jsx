@@ -60,12 +60,13 @@ function Filters({ schedule, onlyFavourites, setOnlyFavourites, onlyFamilyFriend
           labels={ schedule.eventTypes.map(t => t.name) }
           onChange={ setSelectedEventTypes } />
 
-        <h3>Age Ranges</h3>
+        { /* Hidden because they're a mess. */}
+        {/* <h3>Age Ranges</h3>
         <CheckboxGroup
           options={ schedule.ageRanges }
           selectedOptions={ selectedAgeRanges }
           labels={ schedule.ageRanges }
-          onChange={ setSelectedAgeRanges } />
+          onChange={ setSelectedAgeRanges } /> */}
 
         <DebugOptions debug={ debug } currentTime={ currentTime } setCurrentTime={ setCurrentTime } />
       </div>
