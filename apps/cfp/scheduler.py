@@ -140,56 +140,49 @@ class Scheduler(object):
 
         return proposal_data
 
-    def handle_schedule_change(self, proposal, venue, time):
-        # Keep history of the venue while updating
-        current_scheduled_venue = None
-        previous_potential_venue = None
-        if proposal.scheduled_venue:
-            current_scheduled_venue = proposal.scheduled_venue
-        if proposal.potential_venue:
-            previous_potential_venue = proposal.potential_venue
-
-        proposal.potential_venue = venue
-        if str(proposal.potential_venue) == str(current_scheduled_venue):
+    def handle_schedule_change(self, proposal, venue, time, ignore_potential=False):
+        # If the existing proposal is identical to the scheduled, clear proposed
+        if (
+            str(proposal.scheduled_venue) == str(proposal.potential_venue)
+            and proposal.scheduled_time == proposal.potential_time
+        ):
             proposal.potential_venue = None
-
-        # Same for time
-        previous_potential_time = proposal.potential_time
-        proposal.potential_time = parser.parse(time)
-        if proposal.potential_time == proposal.scheduled_time:
             proposal.potential_time = None
 
-        if (
-            str(proposal.potential_venue) == str(previous_potential_venue)
-            and proposal.potential_time == previous_potential_time
-        ):
-            # Nothing changed
+        if not ignore_potential:
+            previous_venue = proposal.potential_venue or proposal.scheduled_venue
+            previous_time = proposal.potential_time or proposal.scheduled_time
+        else:
+            previous_venue = proposal.scheduled_venue
+            previous_time = proposal.scheduled_time
+
+        previous_venue_name = None
+        if previous_venue:
+            previous_venue_name = previous_venue.name
+
+        parsed_time = parser.parse(time)
+
+        # Nothing changed
+        if str(venue) == str(previous_venue) and parsed_time == previous_time:
             return False
 
-        previous_venue_name = new_venue_name = None
-        if previous_potential_venue:
-            previous_venue_name = previous_potential_venue.name
-        if proposal.potential_venue:
-            new_venue_name = proposal.potential_venue.name
+        proposal.potential_venue = venue
+        proposal.potential_time = parsed_time
 
-        # And we want to try and make sure both are populated
-        if proposal.potential_venue and not proposal.potential_time:
-            proposal.potential_time = proposal.scheduled_time
-        if proposal.potential_time and not proposal.potential_venue:
-            proposal.potential_venue = proposal.scheduled_venue
         app.logger.info(
             'Moved "%s": "%s" at "%s" -> "%s" at "%s"'
             % (
                 proposal.title,
                 previous_venue_name,
-                previous_potential_time,
-                new_venue_name,
+                previous_time,
+                proposal.potential_venue.name,
                 proposal.potential_time,
             )
         )
+
         return True
 
-    def apply_changes(self, schedule):
+    def apply_changes(self, schedule, ignore_potential=False):
         changes = False
         for event in schedule:
             if "time" not in event or not event["time"]:
@@ -199,7 +192,9 @@ class Scheduler(object):
 
             proposal = Proposal.query.filter_by(id=event["id"]).one()
             venue = Venue.query.get(event["venue"])
-            changes |= self.handle_schedule_change(proposal, venue, event["time"])
+            changes |= self.handle_schedule_change(
+                proposal, venue, event["time"], ignore_potential
+            )
 
         if not changes:
             app.logger.info("No schedule changes generated")
@@ -214,7 +209,7 @@ class Scheduler(object):
             return
 
         new_schedule = sm.schedule(data)
-        self.apply_changes(new_schedule)
+        self.apply_changes(new_schedule, ignore_potential)
 
         if persist:
             db.session.commit()
