@@ -107,6 +107,7 @@ class ScheduleData {
       if (official) {
         this.venues.find(v => v["name"] == name)["official"] = official;
       }
+      return null;
     }
 
     this.venuesSeen.add(name);
