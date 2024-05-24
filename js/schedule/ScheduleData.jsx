@@ -120,7 +120,7 @@ class ScheduleData {
 
     e.startTime = DateTime.fromSQL(e.start_date, { locale: 'en-GB' });
     e.endTime = DateTime.fromSQL(e.end_date, { locale: 'en-GB' });
-    e.officialEvent = e.source === 'database';
+    e.officialEvent = e.is_from_cfp;
 
     e.noRecording = !e.may_record && e.officialEvent && e.type === 'talk';
 
