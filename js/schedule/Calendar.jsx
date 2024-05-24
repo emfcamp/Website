@@ -106,9 +106,12 @@ function Event({ event, toggleFavourite, authenticated }) {
         <AdditionalInformation label="Cost" value={ event.cost } />
         <AdditionalInformation label="Required equipment" value={ event.equipment } />
 
-        <p>{ nl2br(event.description) }</p><p><a href={ event.link } target="_blank"><Icon name="link" size="16" label="Link to this content" />Details</a></p>
-        <FavouriteButton event={ event } toggleFavourite={ toggleFavourite } authenticated={ authenticated } />
-        <TicketButton event={event} authenticated={authenticated} />
+        <p>{ nl2br(event.description) }</p>
+        <p>
+          <a href={ event.link } target="_blank" class="btn btn-default"><Icon name="link" size="16" /> Details</a>&nbsp;
+          <FavouriteButton event={ event } toggleFavourite={ toggleFavourite } authenticated={ authenticated } />&nbsp;
+          <TicketButton event={event} authenticated={authenticated} />
+        </p>
       </div>
     );
   }
