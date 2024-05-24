@@ -106,6 +106,16 @@ class DiversityForm(Form):
     cfp_tag_1 = SelectField("Topic 2", choices=TOPIC_CHOICES)
     cfp_tag_2 = SelectField("Topic 3", choices=TOPIC_CHOICES)
 
+    cfp_tags_required: bool
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.cfp_tags_required = user.has_permission("cfp_reviewer")
+        if not self.cfp_tags_required:
+            del self.cfp_tag_0
+            del self.cfp_tag_1
+            del self.cfp_tag_2
+
     def update_user(self, user):
         if not user.diversity:
             user.diversity = UserDiversity()
@@ -114,7 +124,7 @@ class DiversityForm(Form):
         user.diversity.gender = self.gender.data
         user.diversity.ethnicity = self.ethnicity.data
 
-        if user.has_permission("cfp_reviewer"):
+        if self.cfp_tags_required:
             user.cfp_reviewer_tags = [
                 Tag.get_by_value(self.cfp_tag_0.data),
                 Tag.get_by_value(self.cfp_tag_1.data),
@@ -129,7 +139,7 @@ class DiversityForm(Form):
             self.gender.data = guess_gender(user.diversity.gender)
             self.ethnicity.data = guess_ethnicity(user.diversity.ethnicity)
 
-        if user.cfp_reviewer_tags:
+        if self.cfp_tags_required and user.cfp_reviewer_tags:
             self.cfp_tag_0.data = user.cfp_reviewer_tags[0].tag
             self.cfp_tag_1.data = user.cfp_reviewer_tags[1].tag
             self.cfp_tag_2.data = user.cfp_reviewer_tags[2].tag
@@ -140,16 +150,17 @@ class DiversityForm(Form):
         if not super().validate(extra_validators):
             return False
         result = True
-        seen = set()
-        for field in [self.cfp_tag_0, self.cfp_tag_1, self.cfp_tag_2]:
-            if field.data == "":
-                field.errors = ["Please select a topic."]
-                result = False
-            elif field.data in seen:
-                field.errors = ["Please select three different choices."]
-                result = False
-            else:
-                seen.add(field.data)
+        if self.cfp_tags_required:
+            seen = set()
+            for field in [self.cfp_tag_0, self.cfp_tag_1, self.cfp_tag_2]:
+                if field.data == "":
+                    field.errors = ["Please select a topic."]
+                    result = False
+                elif field.data in seen:
+                    field.errors = ["Please select three different choices."]
+                    result = False
+                else:
+                    seen.add(field.data)
         return result
 
 

@@ -372,7 +372,7 @@ def complete():
     if current_user.is_anonymous:
         return redirect(url_for(".main"))
 
-    form = DiversityForm()
+    form = DiversityForm(user=current_user)
     if form.validate_on_submit():
         form.update_user(current_user)
         db.session.commit()
