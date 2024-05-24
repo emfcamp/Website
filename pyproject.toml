@@ -5,7 +5,7 @@ line-length = 110
 # TODO: see if we can sensibly lose any of these ignores. We should probably add the
 # "UP", "SIM", and "B" selectors but that will need some work.
 select = ["E", "F"]
-ignore = ["E402", "F541", "F841", "E721", "E722", "E501"]
+ignore = ["E402", "F541", "F841", "E721", "E722", "E501", "E712"]
 
 [tool.poetry]
 name = "website"
