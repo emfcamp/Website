@@ -108,6 +108,9 @@
         <legend>Final Requirements</legend>
         {% if proposal.type in ['talk', 'performance'] %}
         {{ render_field(form.may_record, 7) }}
+        {% endif %}
+        
+        {% if proposal.type == 'talk' %}
         {{ render_field(form.needs_laptop, 7) }}
         {% endif %}
 
