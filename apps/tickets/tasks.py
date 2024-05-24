@@ -414,6 +414,7 @@ def email_tickets():
         Purchase.query.filter_by(is_paid_for=True, state="paid")
         .join(PriceTier, Product, ProductGroup)
         .filter(ProductGroup.type.in_(RECEIPT_TYPES))
+        .filter(Purchase.ticket_issued == False)
         .join(Purchase.owner)
         .with_entities(User, func.count(Purchase.id))
         .group_by(User)
