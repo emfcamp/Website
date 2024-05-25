@@ -763,6 +763,9 @@ def finalise_proposal(proposal_id):
         form.title.data = proposal.title
         form.description.data = proposal.description
 
+        form.equipment_required.data = proposal.equipment_required
+        form.additional_info.data = proposal.additional_info
+
         if proposal.type == "workshop" or proposal.type == "youthworkshop":
             form.age_range.data = proposal.age_range
             form.cost.data = proposal.cost
