@@ -15,11 +15,7 @@ from Paddington, you will need to be in the front three coaches to get off the t
 We will be providing a free shuttle bus service between Ledbury station and the EMF site.
 Timetables and further information can be found on the [shuttle bus page](https://bus.emf.camp/about/).
 
-**Note:** There is engineering work on the Sunday of EMF (June 2nd) which means the line between
-Ledbury and Worcester is closed until 18:00, with a rail replacement bus service. We are planning to run our
-shuttle bus service to **Worcestershire Parkway** station during the day. Our buses will run to Ledbury
-after 18:00 to meet the trains there, but if you're travelling by train, we recommend you stay until
-Monday if possible.
+**Note:** There is engineering work on the Sunday of EMF (June 2nd) which means the line between Ledbury and Worcester is closed until 18:00, with a rail replacement bus service. We are planning to run our shuttle bus service to **Worcestershire Parkway** station during the day. Our buses will run to Ledbury after 18:00 to meet the trains there, but if you're travelling by train, we recommend you stay until Monday if possible.
 
 ## By Car
 If you plan to drive, you will need to [buy a parking ticket or live-in vehicle ticket](/tickets/other). Motorcycles do not require a parking ticket. 
