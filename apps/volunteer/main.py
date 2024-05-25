@@ -1,7 +1,11 @@
 # encoding=utf-8
+from datetime import timedelta
 from flask import redirect, url_for, current_app as app, abort
 from flask_login import current_user
+from geoalchemy2.shape import to_shape
 from pendulum import parse
+
+from models.cfp import WorkshopProposal
 
 from . import volunteer, v_admin_required
 from ..common import feature_enabled, feature_flag
@@ -99,6 +103,44 @@ def init_shifts():
 
     db.session.commit()
     return redirect(url_for(".main"))
+
+
+@volunteer.route("/init_workshop_shifts")
+@v_admin_required
+def init_workshop_shifts():
+    time_before_start = timedelta(minutes=30)
+    time_after_start = timedelta(minutes=15)
+
+    proposals = WorkshopProposal.query.filter_by(
+        state="finalised", requires_ticket=True, user_scheduled=False, type="workshop"
+    ).all()
+
+    # Yes, I know. We shouldn't be tieing things to human readable role names. It's too
+    # late to do anything about that right now.
+    role = Role.query.filter_by(name="Workshop Steward").first()
+
+    with db.session.no_autoflush:
+        for proposal in proposals:
+            shift = Shift.query.filter_by(proposal=proposal, role=role).first()
+            if shift is None:
+                shift = Shift(proposal=proposal, role=role)
+
+            # Because VolunteerVenues are complete distinct from Venues, despite being the same physical location.
+            venue = VolunteerVenue.query.filter_by(name=proposal.scheduled_venue.name).first()
+            if venue is None:
+                location = to_shape(proposal.scheduled_venue.location)
+                mapref = f"https://map.emfcamp.org/#20.82/{location.y}/{location.x}"
+                venue = VolunteerVenue(name=proposal.scheduled_venue.name, mapref=mapref)
+
+            shift.start = proposal.scheduled_time - time_before_start
+            shift.end = proposal.scheduled_time + time_after_start
+            shift.venue = venue
+            shift.min_needed = 1
+            shift.max_needed = 1
+            db.session.add(shift)
+
+    db.session.commit()
+    return redirect(url_for(".schedule"))
 
 
 @volunteer.route("/clear_data")
