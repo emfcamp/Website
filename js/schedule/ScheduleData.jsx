@@ -38,6 +38,7 @@ class ScheduleData {
       if (options.selectedAgeRanges && options.selectedAgeRanges.indexOf(e.age_range) === -1) { return null; }
       if (options.onlyFavourites && !e.is_fave) { return null; }
       if (options.onlyFamilyFriendly && !e.is_family_friendly) { return null; }
+      if (options.onlyTicketed && !e.requires_ticket) { return null; }
 
       let startHour = e.startTime.startOf('hour');
       if (e.startTime <= options.currentTime && !options.includeFinished) {
