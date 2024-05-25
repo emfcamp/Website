@@ -106,7 +106,7 @@ def bool_qs(val):
 
 
 def filter_proposal_request() -> tuple[list[Proposal], bool]:
-    bool_names = ["one_day", "needs_help", "needs_money"]
+    bool_names = ["one_day", "needs_help", "needs_money", "hide_from_schedule"]
     bool_vals = [request.args.get(n, type=bool_qs) for n in bool_names]
     bool_dict = {n: v for n, v in zip(bool_names, bool_vals) if v is not None}
 
