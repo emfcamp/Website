@@ -13,10 +13,6 @@
     <p>You can favourite talks which sound interesting, which will let you keep track of them, and help
         our scheduling algorithm place them in the best slot.
     </p>
-    <p>
-      <strong><a class="btn btn-lg btn-primary" href="{{ url_for('.favourites') }}">View your favourites</a></strong>
-      <strong><a class="btn btn-lg btn-primary" href="{{ url_for('.event_tickets') }}">View your workshop tickets</a></strong>
-    </p>
     {% if feature_enabled('SCHEDULE') %}
     <p>You can also get this list as an <a href="{{ url_for('.schedule_ical', year=event_year) }}">iCal feed</a>
        for your calendar, and a <a href="{{ url_for('.schedule_json', year=event_year) }}">json feed</a> for your giant robot.
@@ -27,6 +23,18 @@
     Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('.main')) }}" target="_new">log in</a> to let us know your favourite talks or workshops.
     You'll be able to download a calendar of these for the event.
   </div>
+  {% endif %}
+
+  <p>
+    Workshops that require you to sign up for a ticket will be allocated via
+    <a href="{{ url_for('.about_event_tickets') }}" title="About the workshop ticket lottery">a lottery</a>.
+  </p>
+
+  {% if current_user.is_authenticated %}
+    <p>
+      <strong><a class="btn btn-lg btn-primary" href="{{ url_for('.favourites') }}">View your favourites</a></strong>
+      <strong><a class="btn btn-lg btn-primary" href="{{ url_for('.event_tickets') }}">View your workshop tickets</a></strong>
+    </p>
   {% endif %}
 </div>
 
