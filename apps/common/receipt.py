@@ -6,6 +6,7 @@ from markupsafe import Markup
 from playwright.async_api import async_playwright
 import segno
 
+from apps.common import feature_enabled
 from main import external_url
 from models import event_year
 from models.product import Product, ProductGroup, PriceTier
@@ -125,6 +126,9 @@ def attach_tickets(msg, user):
 
 
 def set_tickets_emailed(user):
+    if not feature_enabled("ISSUE_TICKETS"):
+        return False
+
     purchases = (
         user.owned_purchases.filter_by(is_paid_for=True)
         .filter(Purchase.state.in_(["paid"]))
