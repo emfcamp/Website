@@ -11,7 +11,7 @@ fixme: EVENT_START, EVENT_END, if you're updating them you need to set times her
 ## More detailed times
 
 **Thursday 30 May 10am** -- Gates open. You can be on site from now; it's intended for folks to have a chance to set up their tents, find one another and get comfortable.
-**Friday 31 May 12pm (midday)** -- Talks start on our stages.
+**Friday 31 May 11am** -- Talks start on our stages.
 **Monday 3 June 12pm (midday)** -- Site closes to the public.
 
 ## Set up & tear down

@@ -410,10 +410,15 @@ def email_tickets():
     ctx = app.test_request_context()
     ctx.push()
 
+    if not feature_enabled('ISSUE_TICKETS'):
+        app.logger.warn("Not emailing tickets as ISSUE_TICKETS is disabled")
+        return
+
     users_purchase_counts = (
         Purchase.query.filter_by(is_paid_for=True, state="paid")
         .join(PriceTier, Product, ProductGroup)
         .filter(ProductGroup.type.in_(RECEIPT_TYPES))
+        .filter(Purchase.ticket_issued == False)
         .join(Purchase.owner)
         .with_entities(User, func.count(Purchase.id))
         .group_by(User)

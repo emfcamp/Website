@@ -17,6 +17,7 @@ function App() {
   const [selectedAgeRanges, setSelectedAgeRanges] = useState([]);
   const [onlyFavourites, setOnlyFavourites] = useState(false);
   const [onlyFamilyFriendly, setOnlyFamilyFriendly] = useState(false);
+  const [onlyTicketed, setOnlyTicketed] = useState(false);
   const [includeFinished, setIncludeFinished] = useState(false);
   const [debug, setDebug] = useState(false);
 
@@ -59,9 +60,9 @@ function App() {
   useEffect(() => {
     if (rawSchedule == null) { return };
 
-    let newSchedule = new ScheduleData(rawSchedule, { currentTime, onlyFavourites, onlyFamilyFriendly, includeFinished, selectedVenues, selectedEventTypes, selectedAgeRanges });
+    let newSchedule = new ScheduleData(rawSchedule, { currentTime, onlyFavourites, onlyFamilyFriendly, onlyTicketed, includeFinished, selectedVenues, selectedEventTypes, selectedAgeRanges });
     setSchedule(newSchedule);
-  }, [currentTime, onlyFavourites, onlyFamilyFriendly, includeFinished, selectedVenues, selectedEventTypes, selectedAgeRanges, rawSchedule]);
+  }, [currentTime, onlyFavourites, onlyFamilyFriendly, onlyTicketed, includeFinished, selectedVenues, selectedEventTypes, selectedAgeRanges, rawSchedule]);
 
   // Update time once a minute
   useEffect(() => {
@@ -97,7 +98,7 @@ function App() {
   }
 
   let filterProps = {
-    schedule, onlyFavourites, setOnlyFavourites, onlyFamilyFriendly, setOnlyFamilyFriendly, includeFinished, setIncludeFinished, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, selectedAgeRanges, setSelectedAgeRanges, debug, currentTime, setCurrentTime
+    schedule, onlyFavourites, setOnlyFavourites, onlyFamilyFriendly, setOnlyFamilyFriendly, onlyTicketed, setOnlyTicketed, includeFinished, setIncludeFinished, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, selectedAgeRanges, setSelectedAgeRanges, debug, currentTime, setCurrentTime
   }
 
   return (

@@ -23,6 +23,7 @@ title: What to Bring
 * Pint or half-pint cups to use at the bar for a small discount (This must be [UKCA, CE or Crown marking](https://www.gov.uk/guidance/applying-a-crown-symbol-to-pint-glasses))
 * A long (as long as the power lead) ethernet cable to connect your tent
 * A computer
+* A USB C-C cable (useful for the badge)
 * A DECT phone to make and receive phone calls via the local DECT network
 * Europe to UK plug adaptors (if you have non-UK equipment)
 * Making gear (for any/all of your hobbies)
