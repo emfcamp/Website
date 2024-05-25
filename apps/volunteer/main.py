@@ -119,25 +119,44 @@ def init_workshop_shifts():
     # late to do anything about that right now.
     role = Role.query.filter_by(name="Workshop Steward").first()
 
+    venues = {}
     with db.session.no_autoflush:
         for proposal in proposals:
+            # This is terrible, and should be rewritten. If you're reading this it presumably hasn't been, and you
+            # need to create some workshop shifts anyway, so here's what's happening.
+            #
+            # For each finalised workshop which requires tickets we want to create a volunteer shift for a workshop
+            # steward. To go with those shifts we need a VolunteerVenue, which is a separate entity representing the
+            # same physical location as the Venue associated with the proposal.
+            #
+            # Because multiple workshops may appear in the same venue we keep a dict of venue_name -> VolunteerVenue
+            # instances to make sure we don't queue multiple instances of the same venue for insertion, which results
+            # in a constraint violation, and makes the whole process throw a 500.
+            #
+            # If, as suspected, you're reading this in the future a week away from opening, I'm sorry, and share your
+            # pain.
+            if proposal.scheduled_venue.name in venues:
+                venue = venues[proposal.scheduled_venue.name]
+            else:
+                venue = VolunteerVenue.query.filter_by(name=proposal.scheduled_venue.name).first()
+                if venue is None:
+                    location = to_shape(proposal.scheduled_venue.location)
+                    mapref = f"https://map.emfcamp.org/#20.82/{location.y}/{location.x}"
+                    venue = VolunteerVenue(name=proposal.scheduled_venue.name, mapref=mapref)
+                    db.session.add(venue)
+                venues[proposal.scheduled_venue.name] = venue
+
             shift = Shift.query.filter_by(proposal=proposal, role=role).first()
             if shift is None:
-                shift = Shift(proposal=proposal, role=role)
-
-            # Because VolunteerVenues are complete distinct from Venues, despite being the same physical location.
-            venue = VolunteerVenue.query.filter_by(name=proposal.scheduled_venue.name).first()
-            if venue is None:
-                location = to_shape(proposal.scheduled_venue.location)
-                mapref = f"https://map.emfcamp.org/#20.82/{location.y}/{location.x}"
-                venue = VolunteerVenue(name=proposal.scheduled_venue.name, mapref=mapref)
+                shift = Shift(proposal=proposal, role=role, venue=venue)
 
             shift.start = proposal.scheduled_time - time_before_start
             shift.end = proposal.scheduled_time + time_after_start
-            shift.venue = venue
             shift.min_needed = 1
             shift.max_needed = 1
             db.session.add(shift)
+
+            db.session.commit()
 
     db.session.commit()
     return redirect(url_for(".schedule"))
