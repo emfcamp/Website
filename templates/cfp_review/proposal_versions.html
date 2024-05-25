@@ -18,8 +18,8 @@
           {{ version.title }}
         </a>
       </td>
-      <td>{{ version.modified.strftime("%Y-%m-%d %H:%M") }}</td>
-      <td>{{ version.user.name }} ({{ version.user.email }}</td>
+      <td>{{ version.transaction.issued_at.strftime("%Y-%m-%d %H:%M") }}</td>
+      <td>{{ version.transaction.user.name }} ({{ version.transaction.user.email }})</td>
     </tr>
   {% endfor %}
 </table>
