@@ -87,7 +87,7 @@
                                         {{ hour }}{% if shift.end %} to {{ shift.end_time }}{% endif %}
                                     {% endif %}
                                 </td>
-                                <td class="venue">{{ shift.venue.name }}</td>
+                                <td class="venue"><a href="{{ shift.venue.mapref }}">{{ shift.venue.name }}</a></td>
                                 <td class="role">{{ shift.role.name }}</td>
                                 <td class="staffing">{{ shift.current_count }}/{{ shift.max_needed }}</td>
                                 <td class="button">
