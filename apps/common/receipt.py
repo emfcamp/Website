@@ -131,7 +131,6 @@ def set_tickets_emailed(user):
 
     purchases = (
         user.owned_purchases.filter_by(is_paid_for=True)
-        .filter(Purchase.state.in_(["paid"]))
         .join(PriceTier, Product, ProductGroup)
         .filter(ProductGroup.type.in_(RECEIPT_TYPES))
         .with_entities(Purchase)
