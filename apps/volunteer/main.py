@@ -9,7 +9,7 @@ from models.cfp import WorkshopProposal
 
 from . import volunteer, v_admin_required
 from ..common import feature_enabled, feature_flag
-from ..base.about import render_markdown
+from apps.common import render_markdown
 
 from main import db
 from models.volunteer import (
