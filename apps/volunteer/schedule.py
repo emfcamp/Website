@@ -6,7 +6,7 @@ from flask import render_template, request, redirect, url_for, flash, abort, ses
 from flask import current_app as app
 from collections import defaultdict
 from flask_login import current_user
-from sqlalchemy.orm import joinedload, defer
+from sqlalchemy.orm import joinedload
 
 from main import db
 from models import event_year
@@ -121,7 +121,6 @@ def schedule_ical():
             .select_from(ShiftEntry)
             .join(Shift.entries.and_(ShiftEntry.user == user))
             .options(
-                defer(Shift.current_count),  # the subquery for that column breaks this query
                 joinedload(Shift.venue),
                 joinedload(Shift.role)
             )).all()

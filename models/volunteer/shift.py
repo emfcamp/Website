@@ -71,7 +71,7 @@ class Shift(BaseModel):
     proposal = db.relationship("Proposal", backref="shift")
 
     current_count = db.column_property(
-        select([func.count(ShiftEntry.shift_id)]).where(ShiftEntry.shift_id == id).scalar_subquery()  # type: ignore[attr-defined]
+        select([func.count(ShiftEntry.shift_id)]).where(ShiftEntry.shift_id == id).correlate_except(ShiftEntry).scalar_subquery()  # type: ignore[attr-defined]
     )
 
     duration = db.column_property(end - start)
