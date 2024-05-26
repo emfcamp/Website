@@ -15,7 +15,7 @@ As usual, the EMF Network Operations Centre will be aiming to provide fast wired
   </tbody>
 </table>
 
-We recommend you connect to the `emf2024` network for the highest security - this uses WPA Enterprise encryption which will ask for a username and password - you can the below username and passwords (in the table) only to connect to this network.
+We recommend you connect to the `emf2024` network for the highest security - this uses WPA Enterprise encryption which will ask for a username and password - you can use the below usernames and passwords (in the table) only to connect to this network.
 
 The `emf2024-open` network supports [Opportunistic Wireless Encryption](https://en.wikipedia.org/wiki/Opportunistic_Wireless_Encryption) (OWE) which will automatically provide security comparable to a normal WiFi network with a shared password, *if your device supports OWE*. Otherwise, it will be completely unencrypted.
 
