@@ -15,7 +15,7 @@ As usual, the EMF Network Operations Centre will be aiming to provide fast wired
   </tbody>
 </table>
 
-We recommend you connect to the `emf2024` network for the highest security - this uses WPA Enterprise encryption which will ask for a username and password - you can use **any random username and password** because we only use this for encryption.
+We recommend you connect to the `emf2024` network for the highest security - this uses WPA Enterprise encryption which will ask for a username and password - you can use the below usernames and passwords (in the table) only to connect to this network.
 
 The `emf2024-open` network supports [Opportunistic Wireless Encryption](https://en.wikipedia.org/wiki/Opportunistic_Wireless_Encryption) (OWE) which will automatically provide security comparable to a normal WiFi network with a shared password, *if your device supports OWE*. Otherwise, it will be completely unencrypted.
 
@@ -32,7 +32,7 @@ There are some special usernames and passwords which can modify the firewall beh
   </thead>
   <tbody>
     <tr>
-      <td><code>emf</code></td><td><code>emf</code></td><td>(Or any random username/password.) Filtered connection with public IP address. Inbound connections from the rest of the event are possible, but connections from the Internet are blocked.</td>
+      <td><code>emf</code></td><td><code>emf</code></td><td>Filtered connection with public IP address. Inbound connections from the rest of the event are possible, but connections from the Internet are blocked.</td>
     </tr>
     <tr>
       <td><code>outboundonly</code></td><td><code>outboundonly</code></td><td>Filtered connection with public IP address. Inbound connections from the Internet or event are not possible.</td>
