@@ -3,7 +3,7 @@ title: Johan Peitz' Gamestation
 # Johan Peitz' PICO-8 Arcade Game Bonanza
 ## Johan Peitz
 
-**URL**: https://apskeppet.se/
+**URL**: <https://apskeppet.se/>
 
 An arcade machine packed with small and easy to play arcade games.
 
