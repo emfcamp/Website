@@ -1,13 +1,13 @@
-"""create_id_cards
+"""create_volunteer_cards
 
-Revision ID: 1f24c2fa3a24
+Revision ID: 35066af0d451
 Revises: fa176a23edd6
-Create Date: 2024-05-26 20:05:27.725179
+Create Date: 2024-05-26 21:06:16.328165
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '1f24c2fa3a24'
+revision = '35066af0d451'
 down_revision = 'fa176a23edd6'
 
 from alembic import op
