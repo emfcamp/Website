@@ -6,16 +6,20 @@
 <h2>Check in a speaker</h2>
 
 <form method="post">
-  {{ form.hidden_tag() }}
+  {{ arrived_form.hidden_tag() }}
 
-  {{ render_field(form.speakers, horizontal=8) }}
-  {{ form.arrived(class="btn btn-success pull-right") }}
+  {{ render_field(arrived_form.speakers, horizontal=8) }}
+  {{ arrived_form.arrived(class="btn btn-success pull-right") }}
+</form>
 
 <p>&nbsp;</p>
 <h2>Send a message to heralds</h2>
 
-  {{ render_field(form.message, horizontal=8) }}
-  {{ form.send_message(class="btn btn-success pull-right") }}
+<form method="post">
+  {{ message_form.hidden_tag() }}
+
+  {{ render_field(message_form.message, horizontal=8) }}
+  {{ message_form.send_message(class="btn btn-success pull-right") }}
 
 </form>
 
@@ -71,3 +75,4 @@
 {% endif %}
 
 {% endblock %}
+

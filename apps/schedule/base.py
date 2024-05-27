@@ -543,10 +543,11 @@ def herald_venue(venue_name):
     )
 
 
-class GreenroomForm(Form):
+class GreenroomArrivedForm(Form):
     speakers = SelectField("Speaker name")
     arrived = SubmitField("Arrived")
 
+class GreenroomMessageForm(Form):
     message = StringField("Message")
     send_message = SubmitField("Send message")
 
@@ -562,7 +563,8 @@ def greenroom():
         )
 
     show = request.args.get("show", default=10, type=int)
-    form = GreenroomForm()
+    arrived_form = GreenroomArrivedForm()
+    message_form = GreenroomMessageForm()
 
     upcoming = (
         Proposal.query.filter(
@@ -576,28 +578,36 @@ def greenroom():
         .limit(show)
         .all()
     )
-    form.speakers.choices = [
+    arrived_form.speakers.choices = [
         (prop.published_names or prop.user.name) for prop in upcoming
     ]
 
-    if form.validate_on_submit():
-        app.logger.info(f"{form.speakers.data} arrived.")
-        if form.arrived.data:
-            msg = greenroom_message(f"{form.speakers.data} arrived.")
+    if arrived_form.arrived.data:
+        if arrived_form.validate_on_submit():
+            app.logger.info(f"{arrived_form.speakers.data} arrived.")
+            msg = greenroom_message(f"{arrived_form.speakers.data} arrived.")
+            db.session.add(msg)
+            db.session.commit()
 
-        elif form.send_message.data:
-            msg = greenroom_message(form.message.data)
+            flash(f"Marked {arrived_form.speakers.data} as arrived")
+            return redirect(url_for(".greenroom"))
 
-        db.session.add(msg)
-        db.session.commit()
+    elif message_form.send_message.data:
+        if message_form.validate_on_submit():
+            msg = greenroom_message(message_form.message.data)
+            db.session.add(msg)
+            db.session.commit()
 
-        return redirect(url_for(".greenroom"))
+            flash(f"Message sent")
+            return redirect(url_for(".greenroom"))
 
     messages = AdminMessage.get_all_for_topic("heralds")
 
     return render_template(
         "schedule/herald/greenroom.html",
-        form=form,
+        arrived_form=arrived_form,
+        message_form=message_form,
         messages=messages,
         upcoming=upcoming,
     )
+
