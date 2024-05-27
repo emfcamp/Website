@@ -9,7 +9,6 @@ from flask_login import current_user
 from flask import current_app as app
 
 from wtforms import (
-    BooleanField,
     FieldList,
     FormField,
     SelectField,
@@ -443,7 +442,14 @@ def herald_main():
 
 class HeraldCommsForm(Form):
     talk_id = HiddenIntegerField()
-    may_record = BooleanField("Can this be recorded?")
+    video_privacy = SelectField(
+      "Recording",
+      choices=[
+        ("public", "Stream and record"),
+        ("review", "Do not stream, and do not publish until reviewed"),
+        ("none", "Do not stream or record"),
+      ],
+    )
     update = SubmitField("Update info")
 
     speaker_here = SubmitField("'Now' Speaker here")
@@ -493,17 +499,16 @@ def herald_venue(venue_name):
                 flash("'now' changed, please refresh")
                 return redirect(url_for(".herald_venue", venue_name=venue_name))
 
-            change = "may" if form.now.may_record else "may not"
-            msg = herald_message(f"Change: {change} record '{now.title}'", now)
-            now.may_record = form.now.may_record.data
+            msg = herald_message(f"Change: video privacy '{now.video_privacy}' for '{now.title}'", now)
+            now.video_privacy = form.now.video_privacy.data
 
         elif form.next.update.data:
             if next is None or form.next.talk_id.data != next.id:
                 flash("'next' changed, please refresh")
                 return redirect(url_for(".herald_venue", venue_name=venue_name))
-            change = "may" if form.next.may_record else "may not"
-            msg = herald_message(f"Change: {change} record '{next.title}'", next)
-            next.may_record = form.next.may_record.data
+
+            msg = herald_message(f"Change: video privacy '{now.video_privacy}' for '{next.title}'", next)
+            next.video_privacy = form.next.video_privacy.data
 
         elif form.now.speaker_here.data:
             msg = herald_message(f"{now.user.name}, arrived.", now)
@@ -522,11 +527,11 @@ def herald_venue(venue_name):
 
     if now:
         form.now.talk_id.data = now.id
-        form.now.may_record.data = now.may_record
+        form.now.video_privacy.data = now.video_privacy
 
     if next:
         form.next.talk_id.data = next.id
-        form.next.may_record.data = next.may_record
+        form.next.video_privacy.data = next.video_privacy
 
     return render_template(
         "schedule/herald/venue.html",

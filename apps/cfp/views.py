@@ -566,7 +566,15 @@ class FinaliseForm(Form):
     telephone_number = TelField("Telephone")
     eventphone_number = TelField("On-site extension", min_length=3, max_length=5)
 
-    may_record = BooleanField("I am happy for this to be recorded", default=True)
+    video_privacy = SelectField(
+      "Recording",
+      default="public",
+      choices=[
+        ("public", "I am happy for this to be streamed and recorded"),
+        ("review", "Do not stream, and do not publish until reviewed"),
+        ("none", "Do not stream or record"),
+      ],
+    )
     needs_laptop = BooleanField("I will need to borrow a laptop for slides")
     equipment_required = TextAreaField("Equipment Required")
     additional_info = TextAreaField("Additional Information")
@@ -684,7 +692,12 @@ def finalise_proposal(proposal_id):
         proposal.telephone_number = form.telephone_number.data
         proposal.eventphone_number = form.eventphone_number.data
 
-        proposal.may_record = form.may_record.data
+        if form.video_privacy.data == "review" and proposal.video_privacy != "review":
+            # FIXME move this and the one above to validators
+            flash("Recording privacy can only be changed to 'review' by an administrator")
+            return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
+        else:
+            proposal.video_privacy = form.video_privacy.data
         proposal.needs_laptop = form.needs_laptop.data
         proposal.equipment_required = form.equipment_required.data
         proposal.additional_info = form.additional_info.data
@@ -740,7 +753,11 @@ def finalise_proposal(proposal_id):
         form.content_note.data = proposal.content_note
         form.family_friendly.data = proposal.family_friendly
 
-        form.may_record.data = proposal.may_record
+        form.video_privacy.data = proposal.video_privacy
+        if proposal.video_privacy != "review":
+            # Don't allow users to choose review themselves
+            form.video_privacy.choices = [(c, _) for c, _ in form.video_privacy.choices if c != "review"]
+
         form.needs_laptop.data = proposal.needs_laptop
         form.equipment_required.data = proposal.equipment_required
         form.additional_info.data = proposal.additional_info
