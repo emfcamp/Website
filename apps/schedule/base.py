@@ -452,7 +452,7 @@ class HeraldCommsForm(Form):
     )
     update = SubmitField("Update info")
 
-    speaker_here = SubmitField("'Now' Speaker here")
+    speaker_here = SubmitField("Speaker has arrived")
 
 
 class HeraldStageForm(Form):
