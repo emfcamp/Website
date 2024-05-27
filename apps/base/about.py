@@ -24,6 +24,10 @@ def branding():
 def page(page_name: str):
     return render_markdown(f"about/{page_name}", page_name=page_name)
 
+@base.route("/about/diversity/<int:year>")
+def yearly_diversity_stats(year: int):
+    return render_markdown(f"about/diversity/{year}")
+
 
 # About and Contact have actual logic in them, so remain as HTML rather than
 # markdown
