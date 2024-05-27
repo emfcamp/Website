@@ -198,6 +198,7 @@ def orga_links():
 
 from . import redirects  # noqa
 from . import about  # noqa
+from . import arcade  # noqa: F401
 from . import organisation  # noqa
 from . import scheduled_tasks  # noqa
 from . import tasks_admin  # noqa

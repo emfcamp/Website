@@ -1,7 +1,13 @@
 @use "./_variables.scss" as *;
 
+.schedule {
+  #emf-container {
+    /* To make sticky work */
+    overflow: initial !important;
+  }
+}
 .filters {
-  background-color: #90CCD6;
+  background-color: $brand-2024-pale-green;
   margin-top: 1em;
 
   h3 {
@@ -13,12 +19,12 @@
   .panel-title {
     display: flex;
     justify-content: space-between;
-    background-color: #90CCD6;
+    background-color: $brand-2024-pale-green;
     border: none;
   }
 
   .panel-heading {
-    background-color: #90CCD6;
+    background-color: $brand-2024-pale-green;
     border: none;
   }
 }
@@ -26,6 +32,20 @@
 .schedule-day h2 {
   border-bottom: 2px solid #fff;
   padding-bottom: 2px;
+  position: sticky;
+  background: $brand-2024-dark-green;
+  top: 0;
+}
+
+.schedule-hour {
+  padding-left: 1px;
+  padding-right: 1px;
+}
+
+@media(max-width: 550px) {
+  .schedule-day h2 {
+    top: 54px;
+  }
 }
 
 .no-recording {
@@ -66,7 +86,7 @@
 }
 
 .schedule-event {
-  background-color: $schedule-block;
+  background-color: darken($schedule-block, 10%);
   color: $schedule-text;
   padding: 0.5em;
   border-radius: 5px;
@@ -74,7 +94,7 @@
   margin-bottom: 1em;
 
   &.cfp {
-    border: 2px solid #E4147E;
+    border: 2px solid $brand-2024-pale-green;
   }
 
   .event-synopsis {
@@ -112,7 +132,7 @@
     }
 
     .speaker {
-      color: #E4147E;
+      color: $brand-2024-yellow;
       font-weight: bold;
     }
   }
@@ -131,14 +151,14 @@
   }
 
   .btn-warning {
-    background-color: #F2DE1B;
+    background-color: $brand-2024-yellow;
     color: #151735;
     font-weight: bold;
     border: none;
   }
 
   .btn-warning:active {
-    background-color: #F2DE1B;
+    background-color: $brand-2024-yellow;
     color: #151735;
     font-weight: bold;
     border: none;

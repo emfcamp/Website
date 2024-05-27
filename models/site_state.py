@@ -13,6 +13,7 @@ log = logging.getLogger(__name__)
 class SiteState(BaseModel):
     __tablename__ = "site_state"
     __export_data__ = False
+    __versioned__: dict = {}
     name = db.Column(db.String, primary_key=True)
     state = db.Column(db.String)
 

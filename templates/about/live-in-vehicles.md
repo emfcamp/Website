@@ -10,6 +10,12 @@ The maximum size of a live-in vehicle pitch is 8m × 6m. You can bring an awning
 
 If you are bringing a caravan or a trailer tent, the towing vehicle must be parked in the main car park, but it does not require a separate parking ticket.
 
+## Facilities
+
+The site at Eastnor is quite hilly and we can't guarantee a level pitch - please bring levelling ramps. We will provide power as a 16A ceeform connector (see [our power page](/about/power)). Water will be available from taps around the site but you will have to carry it.
+
+There are two toilet waste disposal points, near the [north toilets](https://map.emfcamp.org/#17/52.0424574/-2.3770253/m=52.0425712,-2.3769645) and the [south toilets](https://map.emfcamp.org/#17/52.040493/-2.377293/m=52.0408227,-2.3787174).
+
 ## Arrival and departure
 
 You should aim to arrive between **08:00 and 16:00 on Thursday** or between **08:00 and 12:00 on Friday**, and depart on **Monday between 12:00 and 16:00**. Arrivals and departures outside these hours may be possible, but they will be slower due to the need to escort vehicles to keep attendees safe.

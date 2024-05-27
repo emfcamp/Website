@@ -89,6 +89,15 @@
                 </label>
             </div>
         </div>
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input name="hide_from_schedule" id="hide_from_schedule" type="checkbox" value="True"
+                           {%- if request.args.get('hide_from_schedule', False) %}checked{% endif %}>
+		    Hidden from Schedule
+                </label>
+            </div>
+        </div>
     </fieldset>
     <fieldset class="form-horizontal col-md-6">
         <div class="form-group">

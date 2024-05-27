@@ -21,6 +21,8 @@
     <h2>Pick your shifts</h2>
     <p>Select a day to sign up for shifts. To change which roles you're interested in, <a href="{{ url_for('.choose_role') }}">click here</a>.</p>
 
+    <p>You can get a list of all your shifts as an <a href="{{ url_for('.schedule_ical', token=token) }}">iCal feed</a>.</p>
+
     {% if untrained_roles %}
         <div class="alert alert-info">
             You still need training before starting a shift for the following roles:
@@ -87,7 +89,7 @@
                                         {{ hour }}{% if shift.end %} to {{ shift.end_time }}{% endif %}
                                     {% endif %}
                                 </td>
-                                <td class="venue">{{ shift.venue.name }}</td>
+                                <td class="venue"><a href="{{ shift.venue.mapref }}">{{ shift.venue.name }}</a></td>
                                 <td class="role">{{ shift.role.name }}</td>
                                 <td class="staffing">{{ shift.current_count }}/{{ shift.max_needed }}</td>
                                 <td class="button">

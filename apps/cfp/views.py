@@ -197,6 +197,9 @@ def form(cfp_type="talk"):
         current_user.is_authenticated and current_user.is_invited_speaker
     )
 
+    if feature_enabled("LIGHTNING_TALKS") and cfp_type == "lightning":
+        ignore_closed = True
+
     if feature_enabled("CFP_CLOSED") and not ignore_closed:
         return render_template("cfp/closed.html", cfp_type=cfp_type)
 
@@ -369,7 +372,7 @@ def complete():
     if current_user.is_anonymous:
         return redirect(url_for(".main"))
 
-    form = DiversityForm()
+    form = DiversityForm(user=current_user)
     if form.validate_on_submit():
         form.update_user(current_user)
         db.session.commit()
@@ -759,6 +762,9 @@ def finalise_proposal(proposal_id):
         form.name.data = current_user.name
         form.title.data = proposal.title
         form.description.data = proposal.description
+
+        form.equipment_required.data = proposal.equipment_required
+        form.additional_info.data = proposal.additional_info
 
         if proposal.type == "workshop" or proposal.type == "youthworkshop":
             form.age_range.data = proposal.age_range

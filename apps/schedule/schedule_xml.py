@@ -133,7 +133,7 @@ def add_recording(event_node, event):
 
     recording_node = etree.SubElement(event_node, "recording")
 
-    _add_sub_with_text(recording_node, "license", "CC BY-SA 3.0")
+    _add_sub_with_text(recording_node, "license", "CC BY-SA 4.0")
     _add_sub_with_text(
         recording_node, "optout", "false" if event.get("may_record") else "true"
     )

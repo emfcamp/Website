@@ -18,8 +18,8 @@ Please address the item in this format:
 
 **Your Name Here**
 **Your Village Name Here (if applicable)**
-Electromagnetic Field 2024
-Eastnor Castle Deer Park
+EMF Electromagnetic Field 2024
+Eastnor Deer Park
 Access from A438
 Eastnor, LEDBURY HR8 1RQ
 Phone: 07441 101723

@@ -1,3 +1,5 @@
+import "core-js/stable/object/group-by";
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 

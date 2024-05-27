@@ -1,12 +1,16 @@
 # coding=utf-8
 import pendulum
+from icalendar import Calendar, Event
 from datetime import datetime
-from flask import render_template, request, redirect, url_for, flash, session
+from flask import render_template, request, redirect, url_for, flash, abort, session, Response
+from flask import current_app as app
 from collections import defaultdict
 from flask_login import current_user
+from sqlalchemy.orm import joinedload
 
 from main import db
-from models.user import User
+from models import event_year
+from models.user import User, generate_api_token
 
 from models.volunteer.role import Role
 from models.volunteer.venue import VolunteerVenue
@@ -14,6 +18,7 @@ from models.volunteer.shift import Shift, ShiftEntry
 from models.volunteer.volunteer import Volunteer
 from models import config_date
 
+from ..schedule import event_tz
 from ..users import get_next_url
 from ..common import feature_flag
 from . import volunteer, v_user_required, v_admin_required
@@ -78,6 +83,8 @@ def schedule():
         r for r in roles if r["is_interested"] and r["requires_training"] and not r["is_trained"]
     ]
 
+    token = generate_api_token(app.config["SECRET_KEY"], current_user.id)
+
     return render_template(
         "volunteer/schedule.html",
         roles=roles,
@@ -85,7 +92,49 @@ def schedule():
         all_shifts=by_time,
         active_day=active_day,
         untrained_roles=untrained_roles,
+        token=token,
     )
+
+
+@volunteer.route("/schedule.ical")
+@volunteer.route("/schedule.ics")
+@feature_flag("VOLUNTEERS_SCHEDULE")
+def schedule_ical():
+    code = request.args.get("token", None)
+    user = None
+    if code:
+        user = User.get_by_api_token(app.config.get("SECRET_KEY"), str(code))
+    if not current_user.is_anonymous:
+        user = current_user
+    if not user:
+        abort(404)
+
+    title = "EMF {} Volunteer Shifts for {}".format(event_year(), user.name)
+
+    cal = Calendar()
+    cal.add("summary", title)
+    cal.add("X-WR-CALNAME", title)
+    cal.add("X-WR-CALDESC", title)
+    cal.add("version", "2.0")
+
+    shifts = (Shift.query
+            .select_from(ShiftEntry)
+            .join(Shift.entries.and_(ShiftEntry.user == user))
+            .options(
+                joinedload(Shift.venue),
+                joinedload(Shift.role)
+            )).all()
+
+    for shift in shifts:
+        cal_event = Event()
+        cal_event.add("uid", "%s-%s" % (event_year(), shift.id))
+        cal_event.add("summary", "%s at %s" % (shift.role.name, shift.venue.name))
+        cal_event.add("location", shift.venue.name)
+        cal_event.add("dtstart", event_tz.localize(shift.start))
+        cal_event.add("dtend", event_tz.localize(shift.end))
+        cal.add_component(cal_event)
+
+    return Response(cal.to_ical(), mimetype="text/calendar")
 
 
 @volunteer.route("/shift/<shift_id>", methods=["GET"])

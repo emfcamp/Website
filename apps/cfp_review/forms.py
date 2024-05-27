@@ -246,8 +246,8 @@ class UpdateLightningTalkForm(UpdateProposalForm):
 class UpdateWorkshopForm(UpdateProposalForm):
     attendees = StringField("Attendees", [DataRequired()])
     requires_ticket = BooleanField("Requires ticket")
-    tickets = IntegerField("Total tickets")
-    non_lottery_tickets = IntegerField("Non lottery tickets")
+    tickets = IntegerField("Total tickets", [Optional()])
+    non_lottery_tickets = IntegerField("Non lottery tickets", [Optional()])
     cost = StringField("Cost per attendee")
     participant_equipment = StringField("Attendee equipment")
     age_range = StringField("Age range")
