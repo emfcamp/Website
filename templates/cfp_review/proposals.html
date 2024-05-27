@@ -9,8 +9,8 @@
     Export <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-    <li><a href="{{ url_for('.export', format='csv', **request.args) }}">CSV</a></li>
-    <li><a href="{{ url_for('.export', format='json', **request.args) }}">JSON</a></li>
+    <li><a href="{{ url_for('.export', format='csv', **new_qs) }}">CSV</a></li>
+    <li><a href="{{ url_for('.export', format='json', **new_qs) }}">JSON</a></li>
   </ul>
 </div>
 <h2>Proposals</h2>
