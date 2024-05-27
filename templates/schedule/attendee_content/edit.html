@@ -3,5 +3,12 @@
 {% block title %}Your Content{% endblock %}
 {% block body %}
     <h2>Editing {{ proposal.title }}</h2>
-    {% include "schedule/attendee_content/_form.html" %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Edit Content</h3>
+        </div>
+        <div class="panel-body">
+            {% include "schedule/attendee_content/_form.html" %}
+        </div>
+    </div>
 {% endblock %}

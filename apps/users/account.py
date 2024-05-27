@@ -52,7 +52,7 @@ def account():
 @users.route("/account/details", methods=["GET", "POST"])
 @login_required
 def details():
-    form = AccountForm()
+    form = AccountForm(user=current_user)
 
     if form.validate_on_submit():
         form.update_user(current_user)

@@ -197,8 +197,10 @@
                             <dl class="dl-horizontal">
                                 {{ render_dl_field(form.telephone_number) }}
                                 {{ render_dl_field(form.eventphone_number) }}
-                                {% if proposal.type == 'talk' %}
+                                {% if proposal.type in ['talk', 'performance'] %}
                                     {{ render_dl_field(form.may_record) }}
+                                {% endif %}
+                                {% if proposal.type == 'talk' %}
                                     {{ render_radio_field(form.needs_laptop) }}
                                 {% endif %}
                                 {{ render_dl_field(form.arrival_period) }}

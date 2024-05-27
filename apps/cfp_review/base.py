@@ -24,6 +24,7 @@ from flask_mailman import EmailMessage
 from models.permission import Permission
 from sqlalchemy import func, exists, select
 from sqlalchemy.orm import joinedload, undefer
+from sqlalchemy_continuum.utils import version_class
 
 from main import db, external_url
 from .estimation import get_cfp_estimate
@@ -106,7 +107,7 @@ def bool_qs(val):
 
 
 def filter_proposal_request() -> tuple[list[Proposal], bool]:
-    bool_names = ["one_day", "needs_help", "needs_money"]
+    bool_names = ["one_day", "needs_help", "needs_money", "hide_from_schedule"]
     bool_vals = [request.args.get(n, type=bool_qs) for n in bool_names]
     bool_dict = {n: v for n, v in zip(bool_names, bool_vals) if v is not None}
 
@@ -666,6 +667,17 @@ def message_proposer(proposal_id):
         messages=messages,
         proposal=proposal,
     )
+
+
+@cfp_review.route("/proposals/versions")
+@admin_required
+def proposal_versions():
+    size = int(request.args.get("size", "100"))
+    version_cls = version_class(Proposal)
+    versions = version_cls.query.order_by(version_cls.modified.desc())
+    paged_versions = db.paginate(versions, per_page=size, error_out=False)
+
+    return render_template("cfp_review/proposal_versions.html", versions=paged_versions)
 
 
 @cfp_review.route("/proposals/<int:proposal_id>/versions")

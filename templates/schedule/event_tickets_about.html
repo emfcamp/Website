@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}About the workshop signup{% endblock %}
+{% block body %}
+
+<h2>Workshop sign-up</h2>
+
+<p>Workshops at EMF are always extremely oversubscribed. To make (youth)workshops
+  more equitable as well as preventing long queues, we're introducing an online
+  sign up system for most workshops.</p>
+
+<p>The majority of workshop places will be allocated via a lottery, which you can
+  enter and win tickets for one workshop in advance. For most workshops, any
+  remaining or returned tickets will be made available online on a first-come,
+  first-served basis before the workshop is due to take place. Remaining places
+  for youth workshops will be allocated at the Youth Workshop tent on a first-come,
+  first-served basis 15 minutes before the workshop start time.</p>
+
+<p>To enter the workshop lottery:</p>
+<ol>
+  <li>Go to the <a href="{{ url_for('.main') }}">schedule</a> and choose the
+    workshops you'd most like to attend. Any that are part of the lottery are
+    marked with 🎟</li>
+  <li>Click on each workshop title and select how many tickets you would like.
+    You can choose a maximum of 2 places for workshops, or a maximum of 5
+    children's places for youth workshops; you don't need to include accompanying
+    adults in this number.</li>
+  <li>After you've selected all the workshops you would like to enter the lottery
+    for, go to <a href="{{ url_for('.event_tickets') }}">the workshop tickets page</a>
+    and arrange them in your order of preference.</li>
+</ol>
+
+<p>On Wednesday 29th May lottery places will be allocated. The lottery will be
+  closed from this point onwards.</p>
+
+<p>You can only win places for one workshop. You will get sent a code for this,
+  which you will be asked for by the workshop stewards to gain entrance to your
+  allocated workshop, or you can provide your name. You can share your code(s)
+  with others, but only one person will be admitted per code.</p>
+
+<p>Any other workshop lotteries you entered will appear as 'cancelled' on the
+  workshop tickets page.</p>
+
+<p>You can still sign up for tickets for other workshops. These tickets will be
+  available once the event starts on a first-come first-served basis but there
+  won't be as many.</p>
+
+<p>Workshops provided by Villages will not be using this system, and how you can
+  attend these workshops will be decided by each individual village. The best
+  idea is to visit the village early and ask them.</p>
+
+
+{% endblock %}

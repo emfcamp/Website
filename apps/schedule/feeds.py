@@ -26,8 +26,18 @@ def _format_event_description(event):
         description += "\n\nAttending this workshop will cost: " + event["cost"]
         description += "\nSuitable age range: " + event["age_range"]
         description += "\nAttendees should bring: " + event["equipment"]
+
+    footer_block = []
     if event["link"]:
-        description += "\n\nLink: " + event["link"]
+        footer_block.append(f'Link: {event["link"]}')
+    if event["venue"]:
+        venue_str = event["venue"]
+        if event["map_link"]:
+            venue_str = f'{venue_str} ({event["map_link"]})'
+        footer_block.append(f'Venue: {venue_str}')
+    if footer_block:
+        description += '\n\n' + '\n'.join(footer_block)
+
     return description
 
 

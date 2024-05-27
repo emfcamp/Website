@@ -122,8 +122,8 @@ _EMF_VENUES = [
         priority=92,
         latlon=(52.04117, -2.37771),
         scheduled_content_only=True,
-        allowed_types=["workshop"],
-        default_for_types=["workshop"],
+        allowed_types=["youthworkshop"],
+        default_for_types=["youthworkshop"],
         capacity=30,
     ),
     VenueDefinition(

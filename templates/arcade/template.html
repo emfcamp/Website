@@ -1,0 +1,57 @@
+{% macro view(title, view_name) -%}
+  <li class="{{ 'active' if request.endpoint == view_name }}">
+    <a href="{{url_for(view_name)}}">{{title}}</a>
+  </li>
+{%- endmacro %}
+{% macro page(title, target_page) -%}
+  <li class="{{ 'active' if request.endpoint == 'base.arcade_page' and page_name==target_page }}">
+    <a href="{{url_for('base.arcade_page', page_name=target_page)}}">{{title}}</a>
+  </li>
+{%- endmacro %}
+{% extends "base.html" %}
+{% set main_class = "arcade" %}
+{% block title %}{{title}}{% endblock %}
+{% block secondary_nav %}
+  <ul role="navigation list" aria-label="Arcade">
+    {{view("EMF Arcade", "base.arcade")}}
+    {{page("Demo Schedule", "demo")}}
+    {{page("Game Jam", "game-jam")}}
+    {{page("Games in Other Places", "other-games")}}
+    <summary>Games</summary>
+    {{page("Last Call BBS", "last-call-bbs")}}
+    {{page("Pip Pepper: Park Planner", "pip-pepper")}}
+    {{page("Weasel Words", "weasel-words")}}
+    {{page("Dikdik", "dikdik")}}
+    {{page("Tune it up!", "tune-it-up")}}
+    {{page("Monument Valley 2", "monument-valley-2")}}
+    {{page("Alba: A Wildlife Adventure", "alba")}}
+    {{page("Assemble With Care", "assemble-with-care")}}
+    {{page("HyperRogue", "hyperrogue")}}
+    {{page("Roundguard", "roundguard")}}
+    {{page("Out and About", "out-and-about")}}
+    {{page("Climate Survivors", "climate-survivors")}}
+    {{page("HEAT.wav", "heatwav")}}
+    {{page("Pupperazzi", "pupperazzi")}}
+    {{page("The Shrouded Isle", "shrouded-isle")}}
+    {{page("Mutazione", "mutazione")}}
+    {{page("Saltsea Chronicles", "saltsea-chronicles")}}
+    {{page("Animal Well", "animal-well")}}
+    {{page("Moon Hunters", "moon-hunters")}}
+    {{page("Hades II", "hades-ii")}}
+    {{page("TowerFall", "towerfall")}}
+    {{page("The Book Ritual", "the-book-ritual")}}
+    {{page("Johan Peitz' Gamestation", "gamestation")}}
+    {{page("Janey Thomson's Marathon", "marathon")}}
+    {{page("Mathsteroids", "mathsteroids")}}
+    {{page("Downpour", "downpour")}}
+    {{page("Was it always like this dad?", "was-it")}}
+    {{page("Lunar Lander", "lunar-lander")}}
+    {{page("Revolution", "revolution")}}
+    {{page("Teletype", "teletype")}}
+    {{page("MattG's Gameboy Space", "gameboys")}}
+    {{page("Polybius", "polybius")}}
+  </ul>
+{% endblock %}
+{% block body %}
+  {{content}}
+{% endblock %}

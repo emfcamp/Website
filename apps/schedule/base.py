@@ -85,6 +85,8 @@ def _group_proposals_by_human_type(proposals: list[Proposal]) -> dict[str, list[
     return grouped
 
 
+# FIXME this should probably work for other years
+@schedule.route("/schedule/line-up/2024")
 def line_up():
     proposals = Proposal.query.filter(
         Proposal.scheduled_duration.isnot(None),
@@ -276,9 +278,7 @@ def item_current(year, proposal_id, slug=None):
 
         db.session.commit()
         flash(msg)
-        return redirect(
-            url_for(".item", year=year, proposal_id=proposal.id, slug=proposal.slug)
-        )
+        return redirect(url_for(".event_tickets"))
 
 
     if proposal.type in ["workshop", "youthworkshop"]:
@@ -306,6 +306,11 @@ def item_current(year, proposal_id, slug=None):
         form=form,
         event_ticket=ticket,
     )
+
+
+@schedule.route("/schedule/tickets/about")
+def about_event_tickets():
+    return render_template("schedule/event_tickets_about.html")
 
 
 class SingleEventTicket(Form):

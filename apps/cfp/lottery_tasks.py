@@ -49,8 +49,6 @@ def run_lottery(ticketed_proposals):
     * Drawings are done by rank
     * Once a user wins a lottery their other tickets are cancelled
     """
-    # Copy because we don't want to change the original
-    ticketed_proposals = ticketed_proposals.copy()
     lottery_round = 0
 
     winning_tickets = []
@@ -110,7 +108,7 @@ def run_lottery(ticketed_proposals):
 
     for ticket in winning_tickets:
         msg = EmailMessage(
-            f"You have a ticket for the workshop '{ticket.proposal.title}'",
+            f"You have a ticket for the {ticket.proposal.human_type} '{ticket.proposal.title}'",
             from_email=send_from,
             to=[ticket.user.email],
         )

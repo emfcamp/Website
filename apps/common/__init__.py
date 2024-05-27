@@ -7,15 +7,25 @@ from textwrap import wrap
 import pendulum
 from dataclasses import dataclass
 
-from main import db, external_url
-from flask import session, abort, current_app as app, render_template
-from markupsafe import Markup
+from flask import (
+    session,
+    abort,
+    current_app as app,
+    render_template,
+    render_template_string,
+)
 from flask.json import jsonify
 from flask_login import login_user, current_user
+from jinja2.utils import urlize
+from markdown import markdown
+from markupsafe import Markup
+from os import path
+from pathlib import Path
 from werkzeug.wrappers import Response
 from werkzeug.exceptions import HTTPException
-from jinja2.utils import urlize
+from yaml import safe_load as parse_yaml
 
+from main import db, external_url
 from models.basket import Basket
 from models.product import Price
 from models.purchase import Ticket
@@ -327,3 +337,36 @@ def load_archive_file(year: int, *path, raise_404=True):
     if json_path is None:
         return None
     return json.load(open(json_path, "r"))
+
+
+def page_template(metadata, template):
+    if "page_template" in metadata:
+        return metadata["page_template"]
+
+    if "show_nav" not in metadata or metadata["show_nav"] is True:
+        return template
+    else:
+        return "static_page.html"
+
+
+def render_markdown(source, template="about/template.html", **view_variables):
+    template_root = Path(path.join(app.root_path, app.template_folder)).resolve()
+    source_file = template_root.joinpath(f"{source}.md").resolve()
+
+    if not source_file.is_relative_to(template_root) or not source_file.exists():
+        return abort(404)
+
+    with open(source_file, "r") as f:
+        source = f.read()
+        (metadata, content) = source.split("---", 2)
+        metadata = parse_yaml(metadata)
+        content = Markup(
+            markdown(
+                render_template_string(content),
+                extensions=["markdown.extensions.nl2br"],
+            )
+        )
+
+    view_variables.update(content=content, title=metadata["title"])
+    return render_template(page_template(metadata, template), **view_variables)
+

@@ -418,9 +418,9 @@ class Proposal(BaseModel):
     )
     allowed_times = db.Column(db.String, nullable=True)
     scheduled_duration = db.Column(db.Integer, nullable=True)
-    scheduled_time: datetime = db.Column(db.DateTime, nullable=True)
+    scheduled_time = db.Column(db.DateTime, nullable=True)
     scheduled_venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"))
-    potential_time: datetime = db.Column(db.DateTime, nullable=True)
+    potential_time = db.Column(db.DateTime, nullable=True)
     potential_venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"))
 
     scheduled_venue = db.relationship(
@@ -438,6 +438,7 @@ class Proposal(BaseModel):
     thumbnail_url = db.Column(db.String)
     video_recording_lost = db.Column(db.Boolean, default=False)
 
+    type_might_require_ticket = False
     tickets = db.relationship("EventTicket", backref="proposal")
 
     __mapper_args__ = {"polymorphic_on": type}
@@ -728,24 +729,29 @@ class Proposal(BaseModel):
         return make_periods_contiguous(preferred_time_periods)
 
     def overlaps_with(self, other) -> bool:
-        if self.potential_start_date:
-            return (
-                self.potential_end_date > other.potential_start_date
-                and other.potential_end_date > self.potential_start_date
-            )
+        this_start = self.potential_start_date or self.start_date
+        this_end = self.potential_end_date or self.end_date
+        other_start = other.potential_start_date or other.start_date
+        other_end = other.potential_end_date or other.end_date
+
+        if this_start and this_end and other_start and other_end:
+            return this_end > other_start and other_end > this_start
         else:
-            return self.end_date > other.start_date and other.end_date > self.start_date
+            return False
 
     def get_conflicting_content(self) -> list["Proposal"]:
-        # I gave up trying to do this as SQL via SQLAlchemy's filter expressions.
+        # This is for attendee content, so will only conflict with other attendee
+        # content or workshops. Workshops may not have a scheduled time/duration.
         return [
             p
             for p in Proposal.query.filter(
                 Proposal.id != self.id,
                 Proposal.scheduled_venue_id == self.scheduled_venue_id,
-                Proposal.scheduled_time >= self.start_date,
+                Proposal.scheduled_time.is_not(None),
+                Proposal.scheduled_duration.is_not(None),
             ).all()
-            if p.overlaps_with(self)
+            if self.scheduled_time + timedelta(minutes=self.scheduled_duration) > p.scheduled_time and
+            p.scheduled_time + timedelta(minutes=p.scheduled_duration) > self.scheduled_time
         ]
 
     @property
@@ -793,7 +799,7 @@ class Proposal(BaseModel):
     def map_link(self) -> Optional[str]:
         latlon = self.latlon
         if latlon:
-            return "https://map.emfcamp.org/#18.5/%s/%s" % (latlon[0], latlon[1])
+            return "https://map.emfcamp.org/#18.5/%s/%s/m=%s,%s" % (latlon[0], latlon[1], latlon[0], latlon[1])
         return None
 
     @property
@@ -865,6 +871,7 @@ class WorkshopProposal(Proposal):
     total_tickets = db.Column(db.Integer, nullable=True)
     non_lottery_tickets = db.Column(db.Integer, default=5, nullable=True)
     max_tickets_per_person = 2
+    type_might_require_ticket = True
 
     def get_total_capacity(self):
         if not self.requires_ticket:
