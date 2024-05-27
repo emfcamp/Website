@@ -137,36 +137,36 @@ function Event({ event, toggleFavourite, authenticated }) {
   );
 }
 
-function Hour({ hour, content, newDay, toggleFavourite, authenticated }) {
+function Hour({ hour, content, toggleFavourite, authenticated }) {
   if (content.length === 0) { return null; }
 
   return (
-    <div className="schedule-day">
-      { newDay && <h2>{ hour.weekdayLong }</h2> }
-      <div className="schedule-hour">
-        <h3 id={hour.toISO()}>{hour.toFormat('HH:mm')}</h3>
-        <div className="schedule-events-container">
-          { content.map(event => <Event key={event.id} event={event} toggleFavourite={ toggleFavourite } authenticated={ authenticated } />) }
-        </div>
+    <div className="schedule-hour">
+      <h3 id={hour.toISO()}>{hour.toFormat('HH:mm')}</h3>
+      <div className="schedule-events-container">
+        { content.map(event => <Event key={event.id} event={event} toggleFavourite={ toggleFavourite } authenticated={ authenticated } />) }
       </div>
     </div>
   );
 }
 
 function Calendar({ schedule, toggleFavourite, authenticated }) {
-  let currentDay = null;
-  let previousDay = null;
-  let newDay = false;
+  const daysHours = Object.groupBy(schedule.hoursWithContent, h => h.toFormat('DD'));
 
-  return schedule.hoursWithContent.map(hour => {
-    currentDay = hour.toFormat('DD');
-    newDay = currentDay != previousDay;
-    previousDay = currentDay;
+  return Object.entries(daysHours).map(([day, hours]) => (
+    <div key={day} className="schedule-day">
+      <h2>{ hours[0].weekdayLong }</h2>
 
-    return (
-      <Hour key={hour.toISO()} hour={hour} newDay={ newDay } content={schedule.contentForHour(hour)} toggleFavourite={ toggleFavourite } authenticated={ authenticated } />
-    );
-  });
+    {
+      hours.map(hour => {
+        return (
+          <Hour key={hour.toISO()} hour={hour} content={schedule.contentForHour(hour)} toggleFavourite={ toggleFavourite } authenticated={ authenticated } />
+        );
+      })
+    }
+
+    </div>
+  ));
 }
 
 export default Calendar;

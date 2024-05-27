@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block body_class %}class="schedule"{% endblock %}
 {% block title %}Schedule{% endblock %}
 {% block head %}
     <link rel="stylesheet" type="text/css" href="{{ static_url_for('static', filename='css/schedule.css') }}">
