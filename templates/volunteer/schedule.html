@@ -23,6 +23,14 @@
 
     <p>You can get a list of all your shifts as an <a href="{{ url_for('.schedule_ical', token=token) }}">iCal feed</a>.</p>
 
+    {% if active_day == "wed" %}
+        <div class="alert alert-warning">
+            <p><strong>The EMF site is not open for all ticketholders on Wednesday!</strong></p>
+            <p>Please do not sign up for Wednesday shifts unless you have already agreed to be on site, either to help with build up, or as part of a village.</p>
+            <p>If you are willing to volunteer <strong>all day</strong> please contact <a href="mailto:volunteer@emfcamp.org">volunteer@emfcamp.org</a> to confirm this before taking shifts.</p>
+        </div>
+    {% endif %}
+
     {% if untrained_roles %}
         <div class="alert alert-info">
             You still need training before starting a shift for the following roles:
