@@ -142,7 +142,7 @@ class ScheduleData {
     e.endTime = DateTime.fromSQL(e.end_date, { locale: 'en-GB' });
     e.officialEvent = e.is_from_cfp;
 
-    e.noRecording = !e.may_record && e.officialEvent && e.type === 'talk';
+    e.noRecording = !e.may_record && e.officialEvent && (e.type === 'talk' || e.type === 'performance');
 
     if (e.type === 'youthworkshop') {
       e.humanReadableType = 'Youth Workshop'
