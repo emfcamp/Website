@@ -22,6 +22,7 @@ from loggingmanager import create_logging_manager, set_user_id
 from werkzeug.exceptions import HTTPException
 import stripe
 import pywisetransfer
+import email_validator
 
 
 # If we have logging handlers set up here, don't touch them.
@@ -294,6 +295,11 @@ def create_app(dev_server=False, config_override=None):
         ctx["db"] = db
 
         return ctx
+
+    if (app.config['DEBUG'] or app.testing):
+        if not email_validator.TEST_ENVIRONMENT:
+            email_validator.TEST_ENVIRONMENT = True
+            email_validator.SPECIAL_USE_DOMAIN_NAMES.remove("invalid")
 
     from apps.common import load_utility_functions
 
