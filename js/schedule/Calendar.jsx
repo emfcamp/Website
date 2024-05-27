@@ -3,6 +3,19 @@ import octicons from '@primer/octicons';
 import nl2br from 'react-nl2br';
 import Linkify from "linkify-react";
 
+// Polyfill to make schedule viewable on old browsers without Object.groupBy
+// See https://mastodon.radio/@m0rpk/112513036951002978 for bug report
+if(typeof Object.groupBy === typeof undefined) {
+  Object.groupBy = (arr, callback) => {
+    return arr.reduce((acc = {}, ...args) => {
+      const key = callback(...args);
+      acc[key] ??= []
+      acc[key].push(args[0]);
+      return acc;
+    }, {})
+  }
+}
+
 function Icon({ name, className, size, label }) {
   let svg = octicons[name].toSVG({ 'aria-label': label, width: size, height: size });
   return <span className={ className } dangerouslySetInnerHTML={ { __html: svg } } title={ label } />;
