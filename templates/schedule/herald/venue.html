@@ -7,6 +7,7 @@
 
   <form method="post">
     {{ form.hidden_tag() }}
+    {% if now %}
     <h2>Now</h2>
     <dl class="dl-horizontal">
       <dt>Title</dt>
@@ -26,7 +27,9 @@
     <p>&nbsp;</p>
     {{ render_field(form.now.speaker_here, horizontal=8) }}
     <p>&nbsp;</p>
+    {% endif %}
 
+    {% if next %}
     <h2>Next</h2>
     <dl class="dl-horizontal">
       <dt>Title</dt>
@@ -46,6 +49,7 @@
     <p>&nbsp;</p>
     {{ render_field(form.next.speaker_here, horizontal=8) }}
     <p>&nbsp;</p>
+    {% endif %}
 
     <h2>Send message to the Greenroom</h2>
 
