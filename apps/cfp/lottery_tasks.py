@@ -82,7 +82,7 @@ def run_lottery(ticketed_proposals):
                 continue
 
             for ticket in tickets_for_round:
-                if ticket.ticket_count < tickets_remaining:
+                if ticket.ticket_count <= tickets_remaining:
                     ticket.won_lottery_and_cancel_others()
                     winning_tickets.append(ticket)
                     tickets_remaining -= ticket.ticket_count
