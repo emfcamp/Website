@@ -3,17 +3,17 @@
 {% block title %}Workshop Steward{% endblock %}
 {% block body %}
 
-<h1>Workshop Steward -- {{ proposal.published_title }}</h1>
+<h1>Workshop Steward -- {{ proposal.published_title or proposal.title }}</h1>
 
-<p>{{ proposal.published_description }}</p>
+<p>{{ proposal.published_description or proposal.description }}</p>
 
 <p>&nbsp;</p>
 
-<ul>
-  {% if time_locked %}
-    The full list of attendees will be available after {{ show_list_after }}
-    and for the duration of the {{ proposal.huamn_type }}
-  {% else %}
+{% if time_locked %}
+  <p>The full list of attendees will be available after {{ show_list_after }}
+     and for the duration of the {{ proposal.type }}.</p>
+{% else %}
+  <ul>
     <form method="POST">
       {{ form.hidden_tag() }}
       <ul>
@@ -37,7 +37,7 @@
       {% endfor %}
       </ul>
     </form>
-  {% endif %}
-</ul>
+  </ul>
+{% endif %}
 
 {% endblock %}
