@@ -460,14 +460,17 @@ class HeraldStageForm(Form):
 @schedule.route("/herald/<string:venue_name>", methods=["GET", "POST"])
 @v_user_required
 def herald_venue(venue_name):
-    def herald_message(message, proposal):
+    def herald_message(message, proposal=None):
         app.logger.info(f"Creating new message {message}")
-        end = proposal.scheduled_time + timedelta(minutes=proposal.scheduled_duration)
+        if proposal is None:
+            end = datetime.now() + timedelta(days=1)
+        else:
+            end = proposal.scheduled_time + timedelta(minutes=proposal.scheduled_duration)
         return AdminMessage(
             f"[{venue_name}] -- {message}", current_user, end=end, topic="heralds"
         )
 
-    now, next = (
+    proposals = (
         Proposal.query.join(Venue, Venue.id == Proposal.scheduled_venue_id)
         .filter(
             Venue.name == venue_name,
@@ -480,12 +483,13 @@ def herald_venue(venue_name):
         .limit(2)
         .all()
     )
+    now, next = (proposals + [None, None])[:2]
 
     form = HeraldStageForm()
 
     if form.validate_on_submit():
         if form.now.update.data:
-            if form.now.talk_id.data != now.id:
+            if now is None or form.now.talk_id.data != now.id:
                 flash("'now' changed, please refresh")
                 return redirect(url_for(".herald_venue", venue_name=venue_name))
 
@@ -494,7 +498,7 @@ def herald_venue(venue_name):
             now.may_record = form.now.may_record.data
 
         elif form.next.update.data:
-            if form.next.talk_id.data != next.id:
+            if next is None or form.next.talk_id.data != next.id:
                 flash("'next' changed, please refresh")
                 return redirect(url_for(".herald_venue", venue_name=venue_name))
             change = "may" if form.next.may_record else "may not"
@@ -508,8 +512,7 @@ def herald_venue(venue_name):
             msg = herald_message(f"{next.user.name}, arrived.", next)
 
         elif form.send_message.data:
-            # in lieu of a better time set TTL to end of next talk
-            msg = herald_message(form.message.data, next)
+            msg = herald_message(form.message.data)
 
         db.session.add(msg)
         db.session.commit()
@@ -517,11 +520,13 @@ def herald_venue(venue_name):
 
     messages = AdminMessage.get_all_for_topic("heralds")
 
-    form.now.talk_id.data = now.id
-    form.now.may_record.data = now.may_record
+    if now:
+        form.now.talk_id.data = now.id
+        form.now.may_record.data = now.may_record
 
-    form.next.talk_id.data = next.id
-    form.next.may_record.data = next.may_record
+    if next:
+        form.next.talk_id.data = next.id
+        form.next.may_record.data = next.may_record
 
     return render_template(
         "schedule/herald/venue.html",
