@@ -401,6 +401,7 @@ class Proposal(BaseModel):
     telephone_number = db.Column(db.String)
     eventphone_number = db.Column(db.String)
     may_record = db.Column(db.Boolean)
+    video_privacy = db.Column(db.String)
     needs_laptop = db.Column(db.Boolean)
     available_times = db.Column(db.String)
     family_friendly = db.Column(db.Boolean, default=False)
@@ -463,6 +464,7 @@ class Proposal(BaseModel):
             "one_day",
             "notice_required",
             "may_record",
+            "video_privacy",
             "state",
         ]
 
@@ -485,6 +487,7 @@ class Proposal(BaseModel):
             "eventphone_number",
             "telephone_number",
             "may_record",
+            "video_privacy",
             "needs_laptop",
             "available_times",
             "attendees",
@@ -510,6 +513,7 @@ class Proposal(BaseModel):
             cls.departure_period,
             cls.needs_laptop,
             cls.may_record,
+            cls.video_privacy,
         ).order_by(cls.id)
 
         if cls.__name__ == "WorkshopProposal":
@@ -558,6 +562,7 @@ class Proposal(BaseModel):
             cls.published_names.label("names"),
             cls.published_pronouns.label("pronouns"),
             cls.may_record,
+            cls.video_privacy,
             cls.scheduled_time,
             cls.scheduled_duration,
             Venue.name.label("venue"),

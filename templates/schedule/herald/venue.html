@@ -22,7 +22,7 @@
       <dt>Duration</dt><dd>{{ now.scheduled_duration }} minutes</dd>
     </dl>
     {{ form.now.talk_id() }}
-    {{ render_field(form.now.may_record, horizontal=8) }}
+    {{ render_field(form.now.video_privacy, horizontal=8) }}
     {{ render_field(form.now.update, horizontal=8) }}
     <p>&nbsp;</p>
     {{ render_field(form.now.speaker_here, horizontal=8) }}
@@ -44,7 +44,7 @@
       <dt>Duration</dt><dd>{{ next.scheduled_duration }} minutes</dd>
     </dl>
     {{ form.next.talk_id() }}
-    {{ render_field(form.next.may_record, horizontal=8) }}
+    {{ render_field(form.next.video_privacy, horizontal=8) }}
     {{ render_field(form.next.update, horizontal=8) }}
     <p>&nbsp;</p>
     {{ render_field(form.next.speaker_here, horizontal=8) }}

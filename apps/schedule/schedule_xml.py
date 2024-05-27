@@ -135,7 +135,7 @@ def add_recording(event_node, event):
 
     _add_sub_with_text(recording_node, "license", "CC BY-SA 4.0")
     _add_sub_with_text(
-        recording_node, "optout", "false" if event.get("may_record") else "true"
+        recording_node, "optout", "false" if event.get("video_privacy") == "public" else "true"
     )
     if "ccc" in video:
         _add_sub_with_text(recording_node, "url", video["ccc"])

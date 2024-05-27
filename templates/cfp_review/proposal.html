@@ -198,7 +198,7 @@
                                 {{ render_dl_field(form.telephone_number) }}
                                 {{ render_dl_field(form.eventphone_number) }}
                                 {% if proposal.type in ['talk', 'performance'] %}
-                                    {{ render_dl_field(form.may_record) }}
+                                    {{ render_dl_field(form.video_privacy) }}
                                 {% endif %}
                                 {% if proposal.type == 'talk' %}
                                     {{ render_radio_field(form.needs_laptop) }}

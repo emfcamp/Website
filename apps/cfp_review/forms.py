@@ -68,7 +68,14 @@ class UpdateProposalForm(Form):
     departure_period = StringField("Departure time")
     telephone_number = StringField("Telephone")
     eventphone_number = StringField("On-site extension")
-    may_record = BooleanField("May record")
+    video_privacy = SelectField(
+      "Recording",
+      choices=[
+        ("public", "Stream and record"),
+        ("review", "Do not stream, and do not publish until reviewed"),
+        ("none", "Do not stream or record"),
+      ],
+    )
     needs_laptop = SelectField(
         "Needs laptop",
         choices=[
@@ -141,7 +148,7 @@ class UpdateProposalForm(Form):
 
         if self.needs_laptop.raw_data:
             proposal.needs_laptop = self.needs_laptop.data
-        proposal.may_record = self.may_record.data
+        proposal.video_privacy = self.video_privacy.data
 
         # All these if statements are because this will nuke the data if you
         # change the state when the fields are currently hidden, so changing

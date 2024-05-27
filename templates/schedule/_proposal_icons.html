@@ -1,7 +1,7 @@
 {# reusable icons #}
 {% macro proposal_icons(prop) %}
   {% if prop.type == 'talk' and prop.state == 'finalised' %}
-    {% if not prop.may_record %}
+    {% if prop.video_privacy == 'none' %}
     <span style="padding-left: 10px;" title="This talk will not be recorded"><img src="{{ static_url_for('static', filename='images/icons/not-recorded.svg') }}" width="24" height="24"></span>
     {% endif %}
     {% if prop.content_note %}
