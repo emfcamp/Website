@@ -19,19 +19,21 @@
       <td class="table-actions">
         <div class="btn-group" role="group">
           {%- if p.state == "inprogress" and p.provider == "banktransfer" %}
-          <a href="{{ url_for('payments.transfer_waiting', payment_id=p.id) }}" class="btn btn-success">Pay</a>
+            <a href="{{ url_for('payments.transfer_waiting', payment_id=p.id) }}" class="btn btn-success">Pay</a>
           {%- elif p.state in ["new", "failed"] and p.provider == "stripe" %}
-          <a href="{{ url_for('payments.stripe_capture', payment_id=p.id) }}" class="btn btn-success">Pay</a>
+            <a href="{{ url_for('payments.stripe_capture', payment_id=p.id) }}" class="btn btn-success">Pay</a>
           {% endif -%}
 
           {%- if p.state in ["new", "inprogress"] and p.provider == "banktransfer" %}
-          <a href="{{ url_for('payments.transfer_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
+            <a href="{{ url_for('payments.transfer_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
           {%- elif p.state in ["new", "captured", "failed"] and p.provider == "stripe" %}
-          <a href="{{ url_for('payments.stripe_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
+            <a href="{{ url_for('payments.stripe_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
           {% endif -%}
 
           {% if REFUND_STATE != "off" and p.state in ["paid", "partrefunded"] %}
-          <a href="{{ url_for('payments.payment_refund_request', payment_id=p.id) }}" class="btn btn-default">Request refund</a>
+            <a href="{{ url_for('payments.payment_refund_request', payment_id=p.id) }}" class="btn btn-default">Request refund {% if REFUND_STATE == "illness" %}
+              due to illness
+            {% endif %}</a>
           {% endif %}
 
           <a href="{{ url_for('payments.invoice', payment_id=p.id) }}" class="btn btn-default">View Receipt</a>
