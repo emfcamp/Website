@@ -952,6 +952,9 @@ class LightningTalkProposal(Proposal):
             .filter(cls.state != "withdrawn")
             .group_by(cls.session)
             .all()
+            # This is a horrible hack but we need to limit the LT slots for now
+            # and they have been preseeded as 12 in the DB (which is more than we can fit)
+            .limit(6)
         }
         return {day: (count - day_counts.get(day, 0)) for (day, count) in slots.items()}
 
