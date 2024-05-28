@@ -27,10 +27,6 @@
       <input type="submit" name="{{form.now.update.name}}" value="{{form.now.update.label.text}}" class="btn btn-success debounce pull-right"/>
     </div>
     <p>&nbsp;</p>
-    <div class="col-sm-8 col-sm-offset-4">
-      <input type="submit" name="{{form.now.speaker_here.name}}" value="{{form.now.speaker_here.label.text}}" class="form-control btn btn-primary debounce"/>
-    </div>
-    <p>&nbsp;</p>
     {% endif %}
 
     {% if next %}
@@ -51,10 +47,6 @@
     {{ render_field(form.next.video_privacy, horizontal=8) }}
     <div class="col-sm-12">
       <input type="submit" name="{{form.next.update.name}}" value="{{form.next.update.label.text}}" class="btn btn-success debounce pull-right"/>
-    </div>
-    <p>&nbsp;</p>
-    <div class="col-sm-8 col-sm-offset-4">
-      <input type="submit" name="{{form.next.speaker_here.name}}" value="{{form.next.speaker_here.label.text}}" class="form-control btn btn-primary debounce"/>
     </div>
     <p>&nbsp;</p>
     {% endif %}
