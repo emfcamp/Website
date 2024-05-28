@@ -49,20 +49,18 @@
 }
 
 .no-recording {
-  position: relative;
-  width: 32px;
-  height: 32px;
+  display: grid;
+  grid-template-columns: [overlay] 32px;
+  grid-template-rows: [overlay] 32px;
 
   .camera {
-    position: absolute;
-    top: 8px;
-    left: 6px;
+    grid-area: overlay;
+    margin-top: auto;
+    text-align: center;
   }
 
   .slash {
-    position: absolute;
-    top: 0;
-    left: 0;
+    grid-area: overlay;
     color: #e62b27;
   }
 }
