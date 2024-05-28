@@ -947,13 +947,12 @@ class LightningTalkProposal(Proposal):
             day: count
             for (day, count) in cls.query.with_entities(
                 cls.session,
-                func.count(cls.id),
+                # This is a horrible hack but we need to limit the LT slots for now
+                # and they have been preseeded as 12 in the DB (which is more than we can fit)
+                func.least(func.count(cls.id), 6)
             )
             .filter(cls.state != "withdrawn")
             .group_by(cls.session)
-            # This is a horrible hack but we need to limit the LT slots for now
-            # and they have been preseeded as 12 in the DB (which is more than we can fit)
-            .limit(6)
             .all()
         }
         return {day: (count - day_counts.get(day, 0)) for (day, count) in slots.items()}
