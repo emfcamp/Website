@@ -1,62 +1,51 @@
 {% from "_formhelpers.html" import render_field %}
+{% macro render_proposal(title, form, proposal) %}
+  <h2>{{ title }}: <a href="{{ url_for('schedule.item', year=year, proposal_id=proposal.id) }}">{{ proposal.published_title or proposal.title }}</a></h2>
+  <div>
+    {% if proposal.user_scheduled %}
+      An attendee {{proposal.human_type}} by
+    {% else %}
+      A {{proposal.human_type}} by
+    {% endif %}
+    {{ proposal.published_names or proposal.user.name }}{% if proposal.published_pronouns %} ({{proposal.published_pronouns}}){% endif %}
+  </div>
+
+  <p></p>
+  <div class="col-sm-12">{{ proposal.published_description or proposal.description }}</div>
+
+  <div>&nbsp;</div>
+  <div>{{ proposal.scheduled_time.strftime("%A %H:%M") }} for {{ proposal.scheduled_duration }} minutes</div>
+
+  <div>&nbsp;</div>
+  <div class="col-sm-6 col-sm-offset-6">
+    {{ form.talk_id() }}
+    {{ render_field(form.video_privacy) }}
+    <input type="submit" name="{{form.update.name}}" value="{{form.update.label.text}}" class="btn btn-success debounce pull-right"/>
+  </div>
+  <div style="clear: both"></div>
+{% endmacro %}
 {% extends "base.html" %}
 {% block title %}Herald for {{ venue_name }}{% endblock %}
 {% block body %}
 
-  <h1>Now &amp; next on: {{ venue_name }}</h1>
-
   <form method="post">
     {{ form.hidden_tag() }}
     {% if now %}
-    <h2>Now</h2>
-    <dl class="dl-horizontal">
-      <dt>Title</dt>
-      <dd><a href="{{ url_for('schedule.item', year=year, proposal_id=now.id) }}">{{ now.published_title or now.title }}</a></dd>
-      <dt>Description</dt>
-      <dd>{{ now.published_description or now.description }}</dd>
-      <dt>Speaker</dt>
-      <dd>
-        {{ now.published_names or now.user.name }}{% if now.published_pronouns %} ({{now.published_pronouns}}){% endif %}
-      </dd>
-      <dt>Start</dt><dd>{{ now.scheduled_time.strftime("%A %H:%M") }}</dd>
-      <dt>Duration</dt><dd>{{ now.scheduled_duration }} minutes</dd>
-    </dl>
-    {{ form.now.talk_id() }}
-    {{ render_field(form.now.video_privacy, horizontal=8) }}
-    <div class="col-sm-12">
-      <input type="submit" name="{{form.now.update.name}}" value="{{form.now.update.label.text}}" class="btn btn-success debounce pull-right"/>
-    </div>
+    {{ render_proposal("Now", form.now, now) }}
     <p>&nbsp;</p>
     {% endif %}
 
     {% if next %}
-    <h2>Next</h2>
-    <dl class="dl-horizontal">
-      <dt>Title</dt>
-      <dd><a href="{{ url_for('schedule.item', year=year, proposal_id=now.id) }}">{{ next.published_title or next.title }}</a></dd>
-      <dt>Description</dt>
-      <dd>{{ next.published_description or next.description }}</dd>
-      <dt>Speaker</dt>
-      <dd>
-        {{ next.published_names or next.user.name }}{% if next.published_pronouns %} ({{next.published_pronouns}}){% endif %}
-      </dd>
-      <dt>Start</dt><dd>{{ next.scheduled_time.strftime("%A %H:%M") }}</dd>
-      <dt>Duration</dt><dd>{{ next.scheduled_duration }} minutes</dd>
-    </dl>
-    {{ form.next.talk_id() }}
-    {{ render_field(form.next.video_privacy, horizontal=8) }}
-    <div class="col-sm-12">
-      <input type="submit" name="{{form.next.update.name}}" value="{{form.next.update.label.text}}" class="btn btn-success debounce pull-right"/>
-    </div>
+    {{ render_proposal("Next", form.next, next) }}
     <p>&nbsp;</p>
     {% endif %}
 
     <h2>Send message to the Greenroom</h2>
 
-    {{ render_field(form.message, horizontal=8) }}
-    <div class="col-sm-8 col-sm-offset-4">
-      <input type="submit" name="{{form.send_message.name}}" value="{{form.send_message.label.text}}" class="btn btn-success debounce pull-right"/>
-    </div>
+  <div class="col-sm-12">
+    {{ render_field(form.message) }}
+    <input type="submit" name="{{form.send_message.name}}" value="{{form.send_message.label.text}}" class="btn btn-success debounce pull-right"/>
+  </div>
   </form>
 <p>&nbsp;</p>
 
