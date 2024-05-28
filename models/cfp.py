@@ -94,9 +94,7 @@ LENGTH_OPTIONS = [
     ("> 45 mins", "Longer than 45 minutes"),
 ]
 
-LIGHTNING_TALK_LENGTH = 5
-INITIAL_LIGHTNING_TALK_SLOTS = 60 / LIGHTNING_TALK_LENGTH
-# Try to encourage filling the Friday slot first by initially having fewer slots on Saturday & Sunday
+INITIAL_LIGHTNING_TALK_SLOTS = 6
 LIGHTNING_TALK_SESSIONS = {
     "fri": {"human": "Friday", "slots": INITIAL_LIGHTNING_TALK_SLOTS},
     "sat": {"human": "Saturday", "slots": INITIAL_LIGHTNING_TALK_SLOTS},
@@ -947,9 +945,7 @@ class LightningTalkProposal(Proposal):
             day: count
             for (day, count) in cls.query.with_entities(
                 cls.session,
-                # This is a horrible hack but we need to limit the LT slots for now
-                # and they have been preseeded as 12 in the DB (which is more than we can fit)
-                func.least(func.count(cls.id), 6)
+                func.count(cls.id),
             )
             .filter(cls.state != "withdrawn")
             .group_by(cls.session)
