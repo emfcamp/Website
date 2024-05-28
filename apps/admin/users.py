@@ -3,8 +3,8 @@ import time
 from flask import render_template, redirect, flash, url_for, current_app as app, request
 from flask_login import current_user
 from flask_mailman import EmailMessage
-from wtforms import SubmitField, BooleanField, StringField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms import SubmitField, BooleanField, StringField, SelectField
+from wtforms.validators import DataRequired, ValidationError, Optional
 
 from . import admin
 from main import db
@@ -13,6 +13,7 @@ from sqlalchemy_continuum.utils import version_class
 
 from models.user import User, generate_signup_code
 from models.permission import Permission
+from models.village import Village, VillageMember
 from ..common.email import from_email
 from ..common.forms import Form
 from ..common.fields import EmailField
@@ -105,6 +106,9 @@ def user(user_id):
         new_email = StringField("New email (will notify old and new emails if changed)")
         update_details = SubmitField("Update")
 
+        village_admin = SelectField("Village Administered", [Optional()], coerce=int)
+        change_village = SubmitField("Change")
+
     for permission in permissions:
         setattr(
             UserForm,
@@ -115,6 +119,18 @@ def user(user_id):
         )
 
     form = UserForm()
+
+    villages = Village.query.all()
+
+    village_memberships = VillageMember.query.filter(VillageMember.user == user, VillageMember.admin == True).all()
+    if len(village_memberships) != 1:
+        village_membership = None
+    else:
+        village_membership = village_memberships[0]
+
+    none_option = "(Remove)" if village_membership else "(None)"
+
+    form.village_admin.choices = [(-1, none_option)] + [(v.id, v.name) for v in villages]
 
     if form.validate_on_submit():
         if form.change_permissions.data:
@@ -176,12 +192,27 @@ def user(user_id):
             flash("Updated user's cfp invite reason")
             user.cfp_invite_reason = form.cfp_invite_reason.data
 
+        elif form.change_village.data:
+            flash("Updated village administered")
+
+            old_village_id = village_membership.village_id if village_membership else -1
+
+            if old_village_id != form.village_admin.data:
+                if old_village_id != -1:
+                    db.session.delete(village_membership)
+                    db.session.flush()
+                if form.village_admin.data != -1:
+                    db.session.add(VillageMember(village_id=form.village_admin.data, user=user, admin=True))
+
         db.session.commit()
         return redirect(url_for(".user", user_id=user.id))
 
     form.note.data = user.checkin_note
     form.new_name.data = user.name
     form.new_email.data = user.email
+
+    if village_membership is not None:
+        form.village_admin.data = village_membership.village_id
 
     versions = user.versions.order_by(None).order_by(
         version_class(User).transaction_id.desc()
