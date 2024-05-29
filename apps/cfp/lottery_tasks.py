@@ -79,6 +79,8 @@ def run_lottery(ticketed_proposals, dry_run=False):
     proposal_capacities = {p.id: p.get_lottery_capacity() for p in ticketed_proposals}
     winning_tickets = []
 
+    all_lottery_ticket_holders = {t.user for t in EventTicket.query.filter_by(state="enter-lottery").all()}
+
     for lottery_round in range(max_rank):
         for proposal in ticketed_proposals:
             tickets_remaining = proposal_capacities[proposal.id]
@@ -132,9 +134,11 @@ def run_lottery(ticketed_proposals, dry_run=False):
     db.session.flush()
     refresh_states()
 
+    losing_ticket_holders = all_lottery_ticket_holders = {t.user for t in winning_tickets}
+    app.logger.info(f"people who didn't win a ticket are: {losing_ticket_holders}")
+
     # Email winning tickets here
     # We should probably also check for users who didn't win anything?
-
     app.logger.info("sending emails")
     send_from = from_email("CONTENT_EMAIL")
 
@@ -156,6 +160,7 @@ def run_lottery(ticketed_proposals, dry_run=False):
         if dry_run:
             continue
         msg.send()
+
 
     if dry_run:
         app.logger.info(f"Would have sent {sent_emails} emails for {len(winning_tickets)} winners")
