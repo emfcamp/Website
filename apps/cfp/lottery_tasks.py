@@ -134,7 +134,7 @@ def run_lottery(ticketed_proposals, dry_run=False):
     db.session.flush()
     refresh_states()
 
-    losing_ticket_holders = all_lottery_ticket_holders = {t.user for t in winning_tickets}
+    losing_ticket_holders = all_lottery_ticket_holders - {t.user for t in winning_tickets}
     app.logger.info(f"people who didn't win a ticket are: {losing_ticket_holders}")
 
     # Email winning tickets here
