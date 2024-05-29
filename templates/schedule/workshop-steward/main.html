@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Workshop Steward{% endblock %}
+{% block body %}
+
+<h1>Workshop Steward</h1>
+
+<h2>Workshops</h2>
+
+<ul>
+  {% for venue in workshop_venues %}
+    <li><a href="{{ url_for('.workshop_steward_venue', venue_id=venue.id) }}">{{ venue.name }}</a></li>
+  {% endfor %}
+</ul>
+
+<h2>Youth Workshops</h2>
+
+<ul>
+  {% for venue in youthworkshop_venues %}
+    <li><a href="{{ url_for('.workshop_steward_venue', venue_id=venue.id) }}">{{ venue.name }}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -3,15 +3,15 @@
 {% block title %}Workshop Steward{% endblock %}
 {% block body %}
 
-<h1>Workshop Steward -- {{ proposal.published_title or proposal.title }}</h1>
+<h1>Workshop Steward -- {{ workshop.published_title or workshop.title }}</h1>
 
-<p>{{ proposal.published_description or proposal.description }}</p>
+<p>{{ workshop.published_description or workshop.description }}</p>
 
 <p>&nbsp;</p>
 
 {% if time_locked %}
   <p>The full list of attendees will be available after {{ show_list_after }}
-     and for the duration of the {{ proposal.type }}.</p>
+     and for the duration of the {{ workshop.type }}.</p>
 {% else %}
   <ul>
     <form method="POST">
