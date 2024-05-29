@@ -675,18 +675,18 @@ def workshop_steward(workshop_id):
     if workshop.type == "workshop" and "Workshop Steward" not in user_role_strs:
         abort(401)
 
-    show_list_after = workshop.scheduled_time - timedelta(minutes=60)
+    show_list_after = event_tz.localize(workshop.scheduled_time - pendulum.duration(minutes=60))
+    show_list_before = event_tz.localize(workshop.scheduled_time + pendulum.duration(minutes=(workshop.scheduled_duration+60)))
+
     if app.config.get("DEBUG") and request.args.get("time_locked", False):
         time_locked = False
-    elif (
-        datetime.now() < show_list_after or
-        (datetime.now() > (workshop.scheduled_time + timedelta(minutes=(workshop.scheduled_duration+60))))
-    ):
-        app.logger.info("Time locked view")
+
+    elif show_list_after < pendulum.now(event_tz) < show_list_before:
+        time_locked = False
+
+    else:
         flash(f"The attendee list will be visible after { show_list_after }")
         time_locked = True
-    else:
-        time_locked = False
 
     # Now actually do the form
     form = WorkshopCheckingForm()
