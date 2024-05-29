@@ -26,8 +26,7 @@ def lottery(dry_run):
     else:
         app.logger.info(f"'no-dry-run' is set, running lottery")
 
-
-    if get_signup_state() != "issue-lottery-tickets":
+    if get_signup_state() not in ["issue-lottery-tickets", "run-lottery"]:
         raise Exception(f"Expected signup state to be 'issue-lottery-tickets'.")
 
     workshops = (
