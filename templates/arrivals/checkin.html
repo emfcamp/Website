@@ -114,7 +114,7 @@
 {% for purchase in transferred_purchases %}
 <tr>
   <td class="hidden-xs">{{ purchase.id }}</td>
-  <td>{{ purchase.product.display_name }}</td>
+  <td>{{ purchase.product.checkin_display_name }}</td>
   <td><a href="{{ url_for('.checkin', user_id=purchase.owner.id) }}">{{ purchase.owner.name }}</a></td>
   <td>
     {%- if purchase.redeemed %}
@@ -153,7 +153,7 @@
 {% for purchase in other_purchases %}
 <tr>
   <td class="hidden-xs">{{ purchase.id }}</td>
-  <td>{{ purchase.product.display_name }}</td>
+  <td>{{ purchase.product.checkin_display_name }}</td>
   <td>
     {%- if purchase.redeemed %}
       Redeemed {{ purchase.redemption_version().transaction.issued_at.strftime('%A %H:%M') }}
