@@ -115,7 +115,9 @@ def choose_role():
 @v_user_required
 def role_admin_index():
     roles = []
-    if current_user.has_permission("admin") or current_user.has_permission("volunteer:manager"):
+    if (current_user.has_permission("admin") or
+        current_user.has_permission("volunteer:manager") or
+        current_user.has_permission("volunteer:admin")):
         roles = Role.query.order_by("name").all()
     else:
         roles = [admin.role for admin in current_user.volunteer_admin_roles]
@@ -163,7 +165,8 @@ def role_admin_required(f, *args, **kwargs):
     if current_user.is_authenticated:
         if int(args[0]) in [
             ra.role_id for ra in current_user.volunteer_admin_roles
-        ] or current_user.has_permission("volunteer:admin"):
+        ] or (current_user.has_permission("volunteer:admin") or
+              current_user.has_permission("volunteer:manager")):
             return f(*args, **kwargs)
         abort(404)
     return app.login_manager.unauthorized()
