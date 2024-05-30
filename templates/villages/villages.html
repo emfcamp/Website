@@ -17,6 +17,7 @@ If you have a ticket, you can <a href="{{url_for('users.login', next=url_for('.r
     <tr>
       <th>Name</th>
       <th>Description</th>
+      {% if any_village_located %}<th></th>{% endif %}
     </tr>
   </thead>
   <tbody>
@@ -28,6 +29,14 @@ If you have a ticket, you can <a href="{{url_for('users.login', next=url_for('.r
         <td>{{village.name}}</td>
       {% endif %}
       <td style="overflow-wrap: anywhere">{{village.description}}</td>
+      {% if any_village_located %}
+      <td style="width: 1px; white-space: nowrap;">
+        {% if village.map_link %}
+          <a href="{{ village.map_link }}">📍&nbsp;Map</a>
+        {% endif %}
+      </td>
+      {% endif %}
+      
     </tr>
   {% endfor %}
   </tbody>
