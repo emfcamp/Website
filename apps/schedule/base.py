@@ -650,7 +650,8 @@ def workshop_steward_venue(venue_id: int):
         .filter(
             WorkshopProposal.type.in_(venue.allowed_types),
             WorkshopProposal.is_accepted,
-            WorkshopProposal.scheduled_time > pendulum.now(event_tz.zone).naive(),
+            WorkshopProposal.scheduled_time > (
+                pendulum.now(event_tz.zone).naive() - timedelta(hours=1)),
             WorkshopProposal.scheduled_duration.isnot(None),
             WorkshopProposal.hide_from_schedule.isnot(True),
             WorkshopProposal.user_scheduled.isnot(True),
