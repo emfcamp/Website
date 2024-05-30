@@ -63,8 +63,13 @@ def main(year):
     if year != event_year():
         abort(404)
 
-    villages = Village.query.all()
-    return render_template("villages/villages.html", villages=villages)
+    villages = list(Village.query.all())
+    any_village_located = any(v.location is not None for v in villages)
+    return render_template(
+        "villages/villages.html",
+        villages=villages,
+        any_village_located=any_village_located,
+    )
 
 
 @villages.route("/<int:year>/<int:village_id>/edit", methods=["GET", "POST"])

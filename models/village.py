@@ -57,6 +57,20 @@ class Village(BaseModel):
             "geometry": location.__geo_interface__,
         }
 
+    @property
+    def latlon(self):
+        if self.location:
+            loc = to_shape(self.location)
+            return (loc.y, loc.x)
+        return None
+
+    @property
+    def map_link(self) -> Optional[str]:
+        latlon = self.latlon
+        if latlon:
+            return "https://map.emfcamp.org/#18.5/%s/%s/m=%s,%s" % (latlon[0], latlon[1], latlon[0], latlon[1])
+        return None
+
 
 # I'm not entirely sure why we create this index separately but this is how
 # it was done with the old MapObject stuff.
