@@ -318,7 +318,11 @@ FavouriteProposal = db.Table(
     BaseModel.metadata,
     db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
     db.Column(
-        "proposal_id", db.Integer, db.ForeignKey("proposal.id"), primary_key=True
+        "proposal_id",
+        db.Integer,
+        db.ForeignKey("proposal.id"),
+        primary_key=True,
+        index=True,
     ),
 )
 
@@ -753,8 +757,10 @@ class Proposal(BaseModel):
                 Proposal.scheduled_time.is_not(None),
                 Proposal.scheduled_duration.is_not(None),
             ).all()
-            if self.scheduled_time + timedelta(minutes=self.scheduled_duration) > p.scheduled_time and
-            p.scheduled_time + timedelta(minutes=p.scheduled_duration) > self.scheduled_time
+            if self.scheduled_time + timedelta(minutes=self.scheduled_duration)
+            > p.scheduled_time
+            and p.scheduled_time + timedelta(minutes=p.scheduled_duration)
+            > self.scheduled_time
         ]
 
     @property
@@ -802,7 +808,12 @@ class Proposal(BaseModel):
     def map_link(self) -> Optional[str]:
         latlon = self.latlon
         if latlon:
-            return "https://map.emfcamp.org/#18.5/%s/%s/m=%s,%s" % (latlon[0], latlon[1], latlon[0], latlon[1])
+            return "https://map.emfcamp.org/#18.5/%s/%s/m=%s,%s" % (
+                latlon[0],
+                latlon[1],
+                latlon[0],
+                latlon[1],
+            )
         return None
 
     @property
