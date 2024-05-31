@@ -1,0 +1,26 @@
+{% macro view(title, view_name) -%}
+  <li class="{{ 'active' if request.endpoint == view_name }}">
+    <a href="{{url_for(view_name)}}">{{title}}</a>
+  </li>
+{%- endmacro %}
+{% macro page(title, target_page) -%}
+  <li class="{{ 'active' if request.endpoint == 'base.installations_page' and page_name==target_page }}">
+    <a href="{{url_for('base.installations_page', page_name=target_page)}}">{{title}}</a>
+  </li>
+{%- endmacro %}
+{% extends "base.html" %}
+{% set main_class = "installations" %}
+{% block title %}{{title}}{% endblock %}
+{% block secondary_nav %}
+  <ul role="navigation list" aria-label="Installations">
+    {{view("Installations", "base.installations")}}
+    {{page("The Lounges", "lounges")}}
+    {{page("Arcade & Bar", "arcadebar")}}
+    {{page("Null Sector", "nullsec")}}
+    {{page("<Installation>", "installation")}}
+    {{page("Out & About", "outandabout")}}
+  </ul>
+{% endblock %}
+{% block body %}
+  {{content}}
+{% endblock %}
