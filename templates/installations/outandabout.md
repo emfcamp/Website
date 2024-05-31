@@ -7,6 +7,7 @@ title: Out & About Installations
 - [Great Camp Hexpansion Quest - (GCHQ.NET)](/schedule/2024/365)
 - [The Button](/schedule/2024/600)
 - [EMF Camp Scavenger Hunt](/schedule/2024/440)
+- [EMF Puzzlehunt 2024: The Wizard of OS](/schedule/2024/51)
 - [Lasers, lots of lasers](/schedule/2024/484)
 - [World'O'Techno](/schedule/2024/587)
 
