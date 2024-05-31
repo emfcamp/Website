@@ -27,7 +27,7 @@ def _get_proposal_dict(proposal: Proposal, favourites_ids):
         "user_id": proposal.user.id,
         "description": proposal.published_description or proposal.description,
         "type": proposal.type,
-        "may_record": proposal.may_record,
+        "video_privacy": proposal.video_privacy,
         "is_fave": proposal.id in favourites_ids,
         "is_family_friendly": proposal.family_friendly,
         "is_from_cfp": not proposal.user_scheduled,

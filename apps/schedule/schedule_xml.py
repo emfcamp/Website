@@ -17,7 +17,11 @@ def get_duration(start_time, end_time):
     duration = (end_time - start_time).total_seconds() / 60
     hours = int(duration // 60)
     minutes = int(duration % 60)
-    return "{0:01d}:{1:02d}".format(hours, minutes)
+    if hours < 24:
+        return f"{hours:d}:{minutes:02d}"
+    days = int(hours // 24)
+    hours = int(hours % 24)
+    return f"{days:d}:{hours:02d}:{minutes:02d}"
 
 
 def get_day_start_end(dt, start_time=time(4, 0)):
@@ -135,7 +139,7 @@ def add_recording(event_node, event):
 
     _add_sub_with_text(recording_node, "license", "CC BY-SA 4.0")
     _add_sub_with_text(
-        recording_node, "optout", "false" if event.get("may_record") else "true"
+        recording_node, "optout", "false" if event.get("video_privacy") == "public" else "true"
     )
     if "ccc" in video:
         _add_sub_with_text(recording_node, "url", video["ccc"])

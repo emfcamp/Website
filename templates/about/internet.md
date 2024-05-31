@@ -21,6 +21,17 @@ The `emf2024-open` network supports [Opportunistic Wireless Encryption](https://
 
 By default, wireless devices are firewalled from the Internet, but inbound connections from other users on the event network are still allowed.
 
+In case you need additional information for that connection:
+
+* Certificate: ‘Use system certificates’ or explicitly select (after installation) [ISRG Root X1](https://letsencrypt.org/certs/isrgrootx1.pem) certificate.
+* Domain: radius.emf.camp
+
+It's fine to select ‘Do not validate’ for the **Online Certificate status** and leave the **Anonymous identity** blank.
+
+* EAP-TTLS: Phase 1: EAP-TTLS, Phase 2: PAP
+* PEAP: Phase 1: PEAP, Phase 2: MSCHAPv2 or EAP-MSCHAPv2 or PAP
+
+
 ### Special credentials
 
 There are some special usernames and passwords which can modify the firewall behaviour of the `emf2024` network:

@@ -333,6 +333,8 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
 
     @property
     def checkin_display_name(self):
+        if self.parent.type != "admissions":
+            return self.display_name
         return re.sub(r" \(.*\)", "", self.display_name)
 
     def get_price_tier(self, name):

@@ -1,0 +1,45 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block title %}Workshop Steward{% endblock %}
+{% block body %}
+
+<h1>Workshop Steward -- {{ workshop.published_title or workshop.title }}</h1>
+
+<em>Starts at: {{ workshop.scheduled_time }}</em>
+
+<p>{{ workshop.published_description or workshop.description }}</p>
+
+<p>&nbsp;</p>
+
+{% if time_locked %}
+  <p>The full list of attendees will be available after {{ show_list_after }}
+     and for the duration of the {{ workshop.type }}.</p>
+{% else %}
+  <ul>
+    <form method="POST">
+      {{ form.hidden_tag() }}
+      <ul>
+      {% for ticket_form in form.event_tickets %}
+        <li>
+          {{ ticket_form._ticket.user.name }}
+          {{ ticket_form.event_ticket_id() }}
+          {{ ticket_form.use_all_codes(class_="btn btn-primary") }}
+          <ul>
+            {% if ticket_form.codes %}
+              {% for code_form in ticket_form.codes %}
+                <li>
+                  {{code_form.code()}}
+                  {{code_form.code.data}}
+                  {{code_form.use_code(class_="btn btn-warning")}}
+                </li>
+              {% endfor %}
+            {% endif %}
+          </ul>
+        </li>
+      {% endfor %}
+      </ul>
+    </form>
+  </ul>
+{% endif %}
+
+{% endblock %}
