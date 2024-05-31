@@ -1,11 +1,11 @@
 {% macro view(title, view_name) -%}
   <li class="{{ 'active' if request.endpoint == view_name }}">
-    <a href="{{url_for(view_name)}}">{{title}}</a>
+    <a href="{{url_for(view_name, year=2024)}}">{{title}}</a>
   </li>
 {%- endmacro %}
 {% macro page(title, target_page) -%}
   <li class="{{ 'active' if request.endpoint == 'base.installations_page' and page_name==target_page }}">
-    <a href="{{url_for('base.installations_page', page_name=target_page)}}">{{title}}</a>
+    <a href="{{url_for('base.installations_page', page_name=target_page, year=2024)}}">{{title}}</a>
   </li>
 {%- endmacro %}
 {% extends "base.html" %}
