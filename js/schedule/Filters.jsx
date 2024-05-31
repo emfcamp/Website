@@ -16,7 +16,7 @@ function DebugOptions({ debug, currentTime, setCurrentTime }) {
   );
 }
 
-function Filters({ schedule, onlyFavourites, setOnlyFavourites, onlyFamilyFriendly, setOnlyFamilyFriendly, onlyTicketed, setOnlyTicketed, includeFinished, setIncludeFinished, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, selectedAgeRanges, setSelectedAgeRanges, debug, currentTime, setCurrentTime }) {
+function Filters({ schedule, onlyFavourites, setOnlyFavourites, onlyFamilyFriendly, setOnlyFamilyFriendly, onlyNoRecording, setOnlyNoRecording, onlyTicketed, setOnlyTicketed, includeFinished, setIncludeFinished, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, selectedAgeRanges, setSelectedAgeRanges, debug, currentTime, setCurrentTime }) {
   const [visible, setVisible] = useState(false);
 
   function selectOfficialVenues(ev) {
@@ -43,6 +43,9 @@ function Filters({ schedule, onlyFavourites, setOnlyFavourites, onlyFamilyFriend
           </Checkbox>
           <Checkbox checked={onlyFamilyFriendly} onChange={setOnlyFamilyFriendly}>
             Family friendly only
+          </Checkbox>
+          <Checkbox checked={onlyNoRecording} onChange={setOnlyNoRecording}>
+            No Recording only
           </Checkbox>
           <Checkbox checked={ includeFinished } onChange={ setIncludeFinished }>
             Include finished events
