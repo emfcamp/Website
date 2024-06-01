@@ -799,22 +799,11 @@ class Proposal(BaseModel):
 
     @property
     def latlon(self):
-        if self.scheduled_venue and self.scheduled_venue.location:
-            loc = to_shape(self.scheduled_venue.location)
-            return (loc.y, loc.x)
-        return None
+        return self.scheduled_venue.latlon if self.scheduled_venue else None
 
     @property
     def map_link(self) -> Optional[str]:
-        latlon = self.latlon
-        if latlon:
-            return "https://map.emfcamp.org/#18.5/%s/%s/m=%s,%s" % (
-                latlon[0],
-                latlon[1],
-                latlon[0],
-                latlon[1],
-            )
-        return None
+        return self.scheduled_venue.map_link if self.scheduled_venue else None
 
     @property
     def display_title(self) -> str:
@@ -1182,6 +1171,27 @@ class Venue(BaseModel):
     @classmethod
     def get_by_name(cls, name):
         return cls.query.filter_by(name=name).one()
+
+    @property
+    def latlon(self):
+        if self.location:
+            loc = to_shape(self.location)
+            return (loc.y, loc.x)
+        if self.village and self.village.latlon:
+            return self.village.latlon
+        return None
+
+    @property
+    def map_link(self) -> Optional[str]:
+        latlon = self.latlon
+        if latlon:
+            return "https://map.emfcamp.org/#18.5/%s/%s/m=%s,%s" % (
+                latlon[0],
+                latlon[1],
+                latlon[0],
+                latlon[1],
+            )
+        return None
 
 
 # TODO: change the relationships on User and Proposal to 1-to-1
