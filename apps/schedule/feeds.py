@@ -21,7 +21,14 @@ from . import schedule
 
 
 def _format_event_description(event):
-    description = event["description"] if event["description"] else ""
+    description = ""
+
+    if event["content_note"]:
+        description += "\nCONTENT NOTE: %s" % event["content_note"]
+
+    if event["description"]:
+        description += "\n\n" + event["description"]
+
     if event["type"] in ["workshop", "youthworkshop"]:
         description += "\n\nAttending this workshop will cost: " + event["cost"]
         description += "\nSuitable age range: " + event["age_range"]
@@ -35,10 +42,12 @@ def _format_event_description(event):
         if event["map_link"]:
             venue_str = f'{venue_str} ({event["map_link"]})'
         footer_block.append(f'Venue: {venue_str}')
+    if event["type"] in ("talk", "lightning talk", "performance") and event["video_privacy"] != "public":
+        footer_block.append(f'This {event["type"]} will not be recorded.')
     if footer_block:
         description += '\n\n' + '\n'.join(footer_block)
 
-    return description
+    return description.lstrip('\n')
 
 
 @schedule.route("/schedule/<int:year>.json")
