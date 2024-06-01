@@ -16,7 +16,7 @@ from main import db
 from models.exc import CapacityException
 from models.product import PriceTier, ProductView, ProductViewProduct, Product, Voucher
 from models.basket import Basket
-from models.site_state import get_sales_state
+from models.site_state import get_site_state, get_sales_state
 from typing import Optional
 
 from ..common import get_user_currency, set_user_currency, feature_enabled
@@ -60,6 +60,10 @@ def main(flow="main"):
         # from vouchers until the final cutoff (sales-ended).
         if flow != "main":
             sales_state = "available"
+
+    # Allow badges and batteries to be sold during the event
+    if get_site_state() == "event" and flow == "badge":
+        sales_state = "available"
 
     if app.config.get("DEBUG"):
         sales_state = request.args.get("sales_state", sales_state)
