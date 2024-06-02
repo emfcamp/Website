@@ -6,7 +6,7 @@ from flask_login import current_user
 
 from models import event_year
 from models.user import User
-from models.cfp import Proposal
+from models.cfp import Proposal, HUMAN_CFP_TYPES
 
 from ..common import feature_flag, feature_enabled, json_response
 from .schedule_xml import export_frab
@@ -42,8 +42,8 @@ def _format_event_description(event):
         if event["map_link"]:
             venue_str = f'{venue_str} ({event["map_link"]})'
         footer_block.append(f'Venue: {venue_str}')
-    if event["type"] in ("talk", "lightning talk", "performance") and event["video_privacy"] != "public":
-        footer_block.append(f'This {event["type"]} will not be recorded.')
+    if event["type"] in ("talk", "lightningtalk", "performance") and event["video_privacy"] != "public":
+        footer_block.append(f'This {HUMAN_CFP_TYPES[event["type"]]} will not be recorded.')
     if footer_block:
         description += '\n\n' + '\n'.join(footer_block)
 
