@@ -1,8 +1,14 @@
 import json
 
 from markupsafe import Markup
-from wtforms import IntegerField, SelectField, StringField, ValidationError
-from wtforms.widgets import Input, HiddenInput
+from wtforms import (
+    IntegerField,
+    SelectField,
+    SelectMultipleField,
+    StringField,
+    ValidationError,
+)
+from wtforms.widgets import Input, HiddenInput, CheckboxInput, ListWidget
 from wtforms.widgets.html5 import EmailInput
 from wtforms.widgets.core import html_params
 from email_validator import validate_email, EmailNotValidError
@@ -117,3 +123,8 @@ class StaticWidget(object):
 
 class StaticField(StringField):
     widget = StaticWidget()
+
+
+class MultiCheckboxField(SelectMultipleField):
+    widget = ListWidget(prefix_label=False)
+    option_widget = CheckboxInput()

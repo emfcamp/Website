@@ -1,4 +1,4 @@
-{% from "_formhelpers.html" import render_field %}
+{% from "_formhelpers.html" import render_field, render_multi_checkbox %}
 
 {% macro render_diversity_fields(form, current_user) %}
 {# Should only be rendered inside a .panel #}
@@ -13,6 +13,7 @@
     {{ render_field(form.age, True) }}
     {{ render_field(form.gender, True) }}
     {{ render_field(form.ethnicity, True) }}
+    {{ render_multi_checkbox(form.disability) }}
     {% if current_user.has_permission("cfp_reviewer") %}
       <p>
         Just so we know that we're reflecting our attendees' interests reasonably well:
