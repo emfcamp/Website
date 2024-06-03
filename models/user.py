@@ -470,6 +470,8 @@ class UserDiversity(BaseModel):
     age = db.Column(db.String)
     gender = db.Column(db.String)
     ethnicity = db.Column(db.String)
+    disability = db.Column(db.String)
+    sexuality = db.Column(db.String)
 
     @classmethod
     def get_export_data(cls):
@@ -477,6 +479,8 @@ class UserDiversity(BaseModel):
         ages = defaultdict(int)
         sexes = defaultdict(int)
         ethnicities = defaultdict(int)
+        disability = defaultdict(int)
+        sexuality = defaultdict(int)
 
         for row in cls.query:
             matches = re.findall(r"\b[0-9]{1,3}\b", row.age)
@@ -523,11 +527,21 @@ class UserDiversity(BaseModel):
             else:
                 ethnicities["other"] += 1
 
+            # This doesn't need a matcher because it's already encoded
+            disability[row.disability] += 1
+            sexuality[row.sexuality] += 1
+
         ages.update(bucketise(valid_ages, [0, 15, 25, 35, 45, 55, 65]))
 
         data = {
             "private": {
-                "diversity": {"age": ages, "sex": sexes, "ethnicity": ethnicities}
+                "diversity": {
+                    "age": ages,
+                    "sex": sexes,
+                    "ethnicity": ethnicities,
+                    "disability": disability,
+                    "sexuality": sexuality,
+                }
             },
             "tables": ["diversity"],
         }
