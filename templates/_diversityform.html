@@ -13,6 +13,7 @@
     {{ render_field(form.age, True) }}
     {{ render_field(form.gender, True) }}
     {{ render_field(form.ethnicity, True) }}
+    {{ render_field(form.sexuality, True) }}
     {{ render_multi_checkbox(form.disability) }}
     {% if current_user.has_permission("cfp_reviewer") %}
       <p>
