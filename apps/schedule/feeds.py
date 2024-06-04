@@ -42,7 +42,7 @@ def _format_event_description(event):
         if event["map_link"]:
             venue_str = f'{venue_str} ({event["map_link"]})'
         footer_block.append(f'Venue: {venue_str}')
-    if event["type"] in ("talk", "lightningtalk", "performance") and event["video_privacy"] != "public":
+    if event["type"] in ("talk", "lightningtalk", "performance") and event["video_privacy"] == "none":
         footer_block.append(f'This {HUMAN_CFP_TYPES[event["type"]]} will not be recorded.')
     if footer_block:
         description += '\n\n' + '\n'.join(footer_block)
