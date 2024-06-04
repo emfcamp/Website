@@ -42,8 +42,8 @@ ETHNICITY_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in ETHNICITY_VALU
 AGE_VALUES = ("0-15", "16-25", "26-35", "36-45", "46-55", "56-65", "66+")
 AGE_CHOICES = tuple(OPT_OUT + [(v, v) for v in AGE_VALUES])
 
-SEXUALITY_CHOICES = ("0-15", "16-25", "26-35", "36-45", "46-55", "56-65", "66+")
-SEXUALITY_CHOICES = tuple(OPT_OUT + [(v, v) for v in AGE_VALUES])
+SEXUALITY_VALUES = ("straight-or-heterosexual","gay-or-lesbian","bisexual","other")
+SEXUALITY_CHOICES = tuple(OPT_OUT + [(v, v.capitalize().replace("-", " ")) for v in SEXUALITY_VALUES])
 
 
 DISABILITY_CHOICES = tuple(
@@ -56,7 +56,7 @@ DISABILITY_CHOICES = tuple(
         ("dyslexic", "Dyslexia, dyspraxia or attention deficit hyperactivity disorder (ADHD) or another learning disability"),
         ("long-term-illness", "Long-term illness (for example cancer, HIV, diabetes, chronic heart disease or epilepsy)"),
         ("mental-health-illness", "Mental health condition (for example depression, schizophrenia or anxiety disorder)"),
-        ("physical-disabled", "Physical disability or mobility issue (for example impaired use of arms or legs, use of a wheelchair or cruches)"),
+        ("physical-disabled", "Physical disability or mobility issue (for example impaired use of arms or legs, use of a wheelchair or crutches)"),
         ("other", "Another disability, health condition or impairment affecting daily life"),
     ]
 )
@@ -120,6 +120,7 @@ class DiversityForm(Form):
     age = SelectField("Age", default=OPT_OUT[0], choices=AGE_CHOICES)
     gender = SelectField("Gender", default=OPT_OUT[0], choices=GENDER_CHOICES)
     ethnicity = SelectField("Ethnicity", default=OPT_OUT[0], choices=ETHNICITY_CHOICES)
+    sexuality = SelectField("Sexuality", default=OPT_OUT[0], choices=SEXUALITY_CHOICES)
     disability = MultiCheckboxField("Disability", choices=DISABILITY_CHOICES)
 
     # Track CfP reviewer tags
@@ -144,6 +145,7 @@ class DiversityForm(Form):
         user.diversity.age = self.age.data
         user.diversity.gender = self.gender.data
         user.diversity.ethnicity = self.ethnicity.data
+        user.diversity.sexuality = self.sexuality.data
         user.diversity.disability = self.disability.data
 
         if self.cfp_tags_required:
@@ -160,6 +162,7 @@ class DiversityForm(Form):
             self.age.data = guess_age(user.diversity.age)
             self.gender.data = guess_gender(user.diversity.gender)
             self.ethnicity.data = guess_ethnicity(user.diversity.ethnicity)
+            self.sexuality.data = user.diversity.sexuality
             self.disability.data = user.diversity.disability
 
         if self.cfp_tags_required and user.cfp_reviewer_tags:
