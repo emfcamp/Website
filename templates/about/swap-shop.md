@@ -24,5 +24,5 @@ Items don't necessarily have to be working, but should pass the test of "it's re
 
 * Items that are illegal in the UK
 * Weapons
-* Anything with non-obvious hazards (for example asbestos, chemical, or explosive hazards, Ionisation Chambers, radioactives (no more orphan source events please)
+* Anything with non-obvious hazards (for example asbestos, chemical, or explosive hazards, Ionisation Chambers, Radioactives (no more orphan source events please)
 * Anything that would be in breach of the [EMF code of conduct](/code-of-conduct)
