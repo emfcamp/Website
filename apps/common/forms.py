@@ -42,22 +42,27 @@ ETHNICITY_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in ETHNICITY_VALU
 AGE_VALUES = ("0-15", "16-25", "26-35", "36-45", "46-55", "56-65", "66+")
 AGE_CHOICES = tuple(OPT_OUT + [(v, v) for v in AGE_VALUES])
 
-SEXUALITY_VALUES = ("straight-or-heterosexual","gay-or-lesbian","bisexual","other")
-SEXUALITY_CHOICES = tuple(OPT_OUT + [(v, v.capitalize().replace("-", " ")) for v in SEXUALITY_VALUES])
+SEXUALITY_VALUES = (
+    "straight-or-heterosexual",
+    "gay-or-lesbian",
+    "bisexual-or-pansexual",
+    "other",
+)
+SEXUALITY_CHOICES = tuple(
+    OPT_OUT + [(v, v.capitalize().replace("-", " ")) for v in SEXUALITY_VALUES]
+)
 
 
 DISABILITY_CHOICES = tuple(
     [
-        ("none", "I do not have any of these disabilities or health conditions"),
-        ("autistic", "Autistic spectrum condition or another condition affecting speech, language, communication or social skills"),
-        ("blind", "Blindness or a visual impairment not corrected by glasses"),
-        ("developmental", "Condition affecting motor, cognitive, social and emotional skills, speech or language since childhood"),
-        ("deaf", "Deafness or a serious hearing impairment"),
-        ("dyslexic", "Dyslexia, dyspraxia or attention deficit hyperactivity disorder (ADHD) or another learning disability"),
-        ("long-term-illness", "Long-term illness (for example cancer, HIV, diabetes, chronic heart disease or epilepsy)"),
-        ("mental-health-illness", "Mental health condition (for example depression, schizophrenia or anxiety disorder)"),
-        ("physical-disabled", "Physical disability or mobility issue (for example impaired use of arms or legs, use of a wheelchair or crutches)"),
-        ("other", "Another disability, health condition or impairment affecting daily life"),
+        ("physical", "Physical disability or mobility issue"),
+        ("vision", "Blindness or a visual impairment not corrected by glasses"),
+        ("hearing", "Deafness or a serious hearing impairment"),
+        ("autism-adhd", "Autistic spectrum condition, Asperger's, or ADHD"),
+        ("long-term", "Long-term illness"),
+        ("mental-health", "Mental health condition"),
+        ("other", "Another condition not mentioned here"),
+        ("none", "None of the above"),
     ]
 )
 
@@ -177,7 +182,6 @@ class DiversityForm(Form):
             raise ValidationError("Cannot select 'no disability' and a disability")
         elif len(field.data) > 1 and "" in field.data:
             raise ValidationError("Cannot select 'prefer not to say' and a disability")
-
 
     def validate(self, extra_validators=None):
         if not super().validate(extra_validators):
