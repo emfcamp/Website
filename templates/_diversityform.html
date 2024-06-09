@@ -2,30 +2,30 @@
 
 {% macro render_diversity_fields(form, current_user) %}
 {# Should only be rendered inside a .panel #}
-
-<fieldset>
-  <div class="panel-heading">
-    If you're comfortable telling us a little bit about yourself, we'd appreciate it.
-    This information will only be summarised and compared with previous years, to find out how well we're doing with outreach.
-  </div>
-  <div class="panel-heading">
-    <p></p>
-    {{ render_field(form.age, True) }}
-    {{ render_field(form.gender, True) }}
-    {{ render_field(form.ethnicity, True) }}
-    {{ render_field(form.sexuality, True) }}
-    {{ render_multi_checkbox(form.disability) }}
-    {% if current_user.has_permission("cfp_reviewer") %}
-      <p>
-        Just so we know that we're reflecting our attendees' interests reasonably well:
-        please select the three topics that <em>most</em> interest you. Please review
-        everything you feel able to, this is purely so we can track if there are areas
-        we need to recruit more reviewers.
-      </p>
-      {{ render_field(form.cfp_tag_0, True) }}
-      {{ render_field(form.cfp_tag_1, True) }}
-      {{ render_field(form.cfp_tag_2, True) }}
-    {% endif %}
-  </div>
-</fieldset>
+  {% if current_user.has_permission("cfp_reviewer") %}
+  <fieldset>
+    <h4>CfP reviewer survey</h4>
+    <p>As you're a reviewer for our Call for Participation, please select the three topics that
+      <em>most</em> interest you, to help us track the interests of our review panel. Please still
+    review everything you feel able to.</p>
+    {{ render_field(form.cfp_tag_0, True) }}
+    {{ render_field(form.cfp_tag_1, True) }}
+    {{ render_field(form.cfp_tag_2, True) }}
+  </fieldset>
+  {% endif %}
+  <fieldset>
+    <h4>Diversity survey</h4>
+    <p>
+      If you're comfortable telling us a little bit about yourself, we'd appreciate it if you
+      filled in our diversity survey. This information will be summarised and used to track how we
+      can improve the diversity of the community and the accessibility of EMF.
+    </p>
+      {{ render_field(form.age, True) }}
+      {{ render_field(form.gender, True) }}
+      {{ render_field(form.ethnicity, True) }}
+      {{ render_field(form.sexuality, True) }}
+      {% call render_multi_checkbox(form.disability) %}
+        Please select any of the following that apply to you, or "None of the above":
+      {% endcall %}
+  </fieldset>
 {% endmacro %}
