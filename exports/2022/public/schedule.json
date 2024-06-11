@@ -3472,7 +3472,10 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/214-computational-alchemy",
     "start_time": "14:30",
-    "end_time": "15:00"
+    "end_time": "15:00",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=LODereXf9Zc"
+    }
   },
   {
     "id": 216,
