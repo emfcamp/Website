@@ -4,14 +4,14 @@ from typing import Pattern
 from flask import current_app as app
 from flask_wtf import FlaskForm
 
-from wtforms import SelectField, BooleanField
+from wtforms import SelectField, BooleanField, ValidationError
 from wtforms.validators import InputRequired
 
 from models.user import UserDiversity
 from models.cfp_tag import DEFAULT_TAGS, Tag
 from models.purchase import AdmissionTicket
 
-from .fields import HiddenIntegerField
+from .fields import HiddenIntegerField, MultiCheckboxField
 
 
 class Form(FlaskForm):
@@ -41,6 +41,31 @@ ETHNICITY_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in ETHNICITY_VALU
 
 AGE_VALUES = ("0-15", "16-25", "26-35", "36-45", "46-55", "56-65", "66+")
 AGE_CHOICES = tuple(OPT_OUT + [(v, v) for v in AGE_VALUES])
+
+SEXUALITY_VALUES = (
+    "straight-or-heterosexual",
+    "gay-or-lesbian",
+    "bisexual-or-pansexual",
+    "other",
+)
+SEXUALITY_CHOICES = tuple(
+    OPT_OUT + [(v, v.capitalize().replace("-", " ")) for v in SEXUALITY_VALUES]
+)
+
+
+DISABILITY_CHOICES = tuple(
+    [
+        ("physical", "Physical disability or mobility issue"),
+        ("vision", "Blindness or a visual impairment not corrected by glasses"),
+        ("hearing", "Deafness or a serious hearing impairment"),
+        ("autism-adhd", "Autistic spectrum condition, Asperger's, or ADHD"),
+        ("long-term", "Long-term illness"),
+        ("mental-health", "Mental health condition"),
+        ("other", "Another condition not mentioned here"),
+        ("none", "None of the above"),
+    ]
+)
+
 
 TOPIC_CHOICES = tuple(NULL_SELECTION + [(v, v.capitalize()) for v in DEFAULT_TAGS])
 
@@ -100,6 +125,8 @@ class DiversityForm(Form):
     age = SelectField("Age", default=OPT_OUT[0], choices=AGE_CHOICES)
     gender = SelectField("Gender", default=OPT_OUT[0], choices=GENDER_CHOICES)
     ethnicity = SelectField("Ethnicity", default=OPT_OUT[0], choices=ETHNICITY_CHOICES)
+    sexuality = SelectField("Sexuality", default=OPT_OUT[0], choices=SEXUALITY_CHOICES)
+    disability = MultiCheckboxField("Disability", choices=DISABILITY_CHOICES)
 
     # Track CfP reviewer tags
     cfp_tag_0 = SelectField("Topic 1", choices=TOPIC_CHOICES)
@@ -123,6 +150,8 @@ class DiversityForm(Form):
         user.diversity.age = self.age.data
         user.diversity.gender = self.gender.data
         user.diversity.ethnicity = self.ethnicity.data
+        user.diversity.sexuality = self.sexuality.data
+        user.diversity.disability = self.disability.data
 
         if self.cfp_tags_required:
             user.cfp_reviewer_tags = [
@@ -138,6 +167,8 @@ class DiversityForm(Form):
             self.age.data = guess_age(user.diversity.age)
             self.gender.data = guess_gender(user.diversity.gender)
             self.ethnicity.data = guess_ethnicity(user.diversity.ethnicity)
+            self.sexuality.data = user.diversity.sexuality
+            self.disability.data = user.diversity.disability
 
         if self.cfp_tags_required and user.cfp_reviewer_tags:
             self.cfp_tag_0.data = user.cfp_reviewer_tags[0].tag
@@ -145,6 +176,12 @@ class DiversityForm(Form):
             self.cfp_tag_2.data = user.cfp_reviewer_tags[2].tag
 
         return self
+
+    def validate_disability(form, field):
+        if len(field.data) > 1 and "none" in field.data:
+            raise ValidationError("Cannot select 'no disability' and a disability")
+        elif len(field.data) > 1 and "" in field.data:
+            raise ValidationError("Cannot select 'prefer not to say' and a disability")
 
     def validate(self, extra_validators=None):
         if not super().validate(extra_validators):
