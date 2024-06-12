@@ -77,7 +77,7 @@ def schedule_json(year):
         .all()
     )
 
-    duration_days = (ceil((event_end() - event_end()).total_seconds / 86400),)
+    duration_days = ceil((event_end() - event_end()).total_seconds / 86400)
 
     rooms = [proposal.scheduled_venue.name for proposal in schedule]
 
