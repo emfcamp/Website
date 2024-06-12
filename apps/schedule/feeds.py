@@ -45,7 +45,6 @@ def _format_event_description(event):
 
 
 @schedule.route("/schedule/<int:year>.json")
-@cross_origin(methods=["GET"])
 def schedule_json(year):
     if year != event_year():
         return feed_historic(year, "json")
@@ -53,20 +52,11 @@ def schedule_json(year):
     if not feature_enabled("SCHEDULE"):
         abort(404)
 
-    schedule = [_convert_time_to_str(p) for p in _get_scheduled_proposals(request.args)]
+    if request.args.get('format') == 'array':
+        schedule = [_convert_time_to_str(p) for p in _get_scheduled_proposals(request.args)]
 
-    # NB this is JSON in a top-level array (security issue for low-end browsers)
-    return Response(json.dumps(schedule), mimetype="application/json")
-
-
-@schedule.route("/schedule/schedule-<int:year>.json")  # TODO validate url with upstream
-@cross_origin(methods=["GET"])
-def schedule_json_schema(year):
-    if year != event_year():
-        return feed_historic(year, "json")
-
-    if not feature_enabled("SCHEDULE"):
-        abort(404)
+        # NB this is JSON in a top-level array (security issue for low-end browsers)
+        return Response(json.dumps(schedule), mimetype="application/json")
 
     def duration_hhmm(duration_minutes):
         if not duration_minutes or duration_minutes < 1:
