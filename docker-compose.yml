@@ -38,6 +38,7 @@ services:
     build:
       context: "./docker/netcat"
     command: -k -l -p 12345
+    init: true
     networks:
       - emfweb
 
