@@ -172,9 +172,8 @@ def favourites_ical():
     return Response(cal.to_ical(), mimetype="text/calendar")
 
 
-@schedule.route("/now-and-next.json")
-@schedule.route("/upcoming.json")
-def upcoming():
+@schedule.route("/schedule/now-and-next.json")
+def now_and_next_json():
     return Response(
         json.dumps(_get_upcoming(request.args)), mimetype="application/json"
     )
