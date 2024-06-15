@@ -325,6 +325,13 @@ def send_email_for_proposal(proposal, reason="still-considered", from_address=No
         )
         template = "emails/cfp-slot-moved.txt"
 
+    elif reason == "video-recording-published":
+        subject = "Your EMF %s video recording has been published ('%s')" % (
+            proposal.human_type,
+            proposal.title,
+        )
+        template = "emails/video-recording-published.txt"
+
     else:
         raise Exception("Unknown cfp proposal email type %s" % reason)
 
