@@ -6,6 +6,8 @@ from flask_login import current_user
 from flask_restful import Resource, abort
 
 from . import api
+from apps.cfp_review.base import send_email_for_proposal
+from apps.common.email import from_email
 from main import db
 from models.cfp import Proposal
 from models.ical import CalendarEvent
@@ -41,6 +43,10 @@ class ProposalResource(Resource):
         if not payload:
             abort(400)
 
+        if proposal.video_recording_lost:
+            # Prevent updates to video recordings already flagged as lost
+            abort(400)
+
         ALLOWED_ATTRIBUTES = {
             "youtube_url",
             "thumbnail_url",
@@ -50,12 +56,25 @@ class ProposalResource(Resource):
         if set(payload.keys()) - ALLOWED_ATTRIBUTES:
             abort(400)
 
+        if "video_recording_lost" in payload and len(payload) > 1:
+            # Flagging a recording lost is mutually exclusive with other edits
+            abort(400)
+
+        was_published = proposal.is_video_published
         for attribute in ALLOWED_ATTRIBUTES:
             if attribute in payload:
                 setattr(proposal, attribute, payload[attribute] or "")
+        is_published = proposal.is_video_published
 
         db.session.add(proposal)
         db.session.commit()
+
+        if was_published is False and is_published is True:
+            send_email_for_proposal(
+                proposal,
+                reason="video-recording-published",
+                from_address=from_email("SPEAKERS_EMAIL"),
+            )
 
         return {
             "id": proposal.id,

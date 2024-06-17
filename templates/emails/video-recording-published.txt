@@ -1,0 +1,10 @@
+{% extends "emails/base.txt" %}
+{% block body %}
+Hi {{ proposal.user.name }},
+
+The video recording for your EMF {{ proposal.human_type }} '{{ proposal.title }}' has been edited and published.
+
+The video and direct links to it can be found at: https://www.emfcamp.org/schedule/{{ event_year }}/{{ proposal.id }}
+
+Thank you again for participating in EMF {{ event_year }}!
+{% endblock %}
