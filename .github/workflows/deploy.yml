@@ -39,9 +39,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build app image
         run: docker build -t ghcr.io/emfcamp/website:latest -f ./Dockerfile.prod .
-      - name: Publish app image
-        run: docker push ghcr.io/emfcamp/website:latest
       - name: Build static image
+        # This builds from ghcr.io/emfcamp/website:latest, which we haven't pushed yet but should be correct locally
         run: docker build -t ghcr.io/emfcamp/website-static:latest -f ./docker/static/Dockerfile ./docker/static/
       - name: Publish static image
+        # Push static first so it hopefully gets pulled first
         run: docker push ghcr.io/emfcamp/website-static:latest
+      - name: Publish app image
+        run: docker push ghcr.io/emfcamp/website:latest
