@@ -441,6 +441,10 @@ class Proposal(BaseModel):
     thumbnail_url = db.Column(db.String)
     video_recording_lost = db.Column(db.Boolean, default=False)
 
+    @property
+    def is_video_published(self) -> bool:
+        return any([self.c3voc_url, self.youtube_url])
+
     type_might_require_ticket = False
     tickets = db.relationship("EventTicket", backref="proposal")
 
