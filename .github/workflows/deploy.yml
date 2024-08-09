@@ -19,8 +19,6 @@ jobs:
       COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       COVERALLS_GIT_BRANCH: ${{ github.ref }}
     steps:
-      - run: sudo apt update
-      - run: sudo apt install -y docker-compose-plugin
       - uses: actions/checkout@v4
       - name: Build containers
         run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml build --parallel
