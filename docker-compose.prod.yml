@@ -19,7 +19,6 @@ services:
     environment:
       SETTINGS_FILE: ./config/production.cfg
       IRCCAT: irccat.orga.emfcamp.org:12345
-      FLASK_ENV: production
     logging:
       driver: journald
 
