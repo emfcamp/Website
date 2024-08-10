@@ -27,7 +27,7 @@ services:
     networks:
       - emfweb
 
-  postgres_exporter:
+  postgres-exporter:
     restart: unless-stopped
     image: 'wrouesnel/postgres_exporter:v0.8.0'
     environment:
