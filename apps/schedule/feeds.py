@@ -12,7 +12,7 @@ from models.user import User
 from models.cfp import Proposal
 
 from ..common import feature_flag, feature_enabled, json_response
-from .schedule_xml import export_frab
+from .schedule_xml import export_frab, get_day_start_end, get_duration
 from .historic import feed_historic
 from .data import (
     _get_scheduled_proposals,
@@ -67,14 +67,6 @@ def schedule_frab_json(year):
     if not feature_enabled("SCHEDULE"):
         abort(404)
 
-    def duration_hhmm(duration_minutes):
-        if not duration_minutes or duration_minutes < 1:
-            return "00:00"
-        return "{}:{}".format(
-            int(duration_minutes / 60),
-            str(duration_minutes % 60).zfill(2),
-        )
-
     schedule = (
         Proposal.query.filter(
             Proposal.is_accepted,
@@ -113,10 +105,11 @@ def schedule_frab_json(year):
 
     for day in range(0, duration_days):
         day_dt = event_start() + timedelta(days=day)
+        day_start, day_end = get_day_start_end(day_dt)
         day_schedule = {
             "date": day_dt.strftime("%Y-%m-%d"),
-            "day_end": (day_dt.replace(hour=3, minute=59, second=59) + timedelta(days=1)).isoformat(),
-            "day_start": day_dt.replace(hour=4, minute=0, second=0).isoformat(),
+            "day_end": day_start.isoformat(),
+            "day_start": day_end.isoformat(),
             "index": day,
             "rooms": {},
         }
@@ -141,7 +134,7 @@ def schedule_frab_json(year):
                         "date": event_tz.localize(proposal.start_date).isoformat(),
                         "description": proposal.description,
                         "do_not_record": proposal.video_privacy != "public",
-                        "duration": duration_hhmm(proposal.duration_minutes),
+                        "duration": get_duration(proposal.start_date, proposal.end_date),
                         "guid": None,
                         "id": proposal.id,
                         # This assumes there will never be a non-english talk,
