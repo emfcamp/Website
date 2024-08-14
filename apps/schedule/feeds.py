@@ -52,11 +52,19 @@ def schedule_json(year):
     if not feature_enabled("SCHEDULE"):
         abort(404)
 
-    if request.args.get('format') == 'array':
-        schedule = [_convert_time_to_str(p) for p in _get_scheduled_proposals(request.args)]
+    schedule = [_convert_time_to_str(p) for p in _get_scheduled_proposals(request.args)]
 
-        # NB this is JSON in a top-level array (security issue for low-end browsers)
-        return Response(json.dumps(schedule), mimetype="application/json")
+    # NB this is JSON in a top-level array (security issue for low-end browsers)
+    return Response(json.dumps(schedule), mimetype="application/json")
+
+
+@schedule.route("/schedule/frab-<int:year>.json")
+def schedule_frab_json(year):
+    if year != event_year():
+        return feed_historic(year, "frab_json")
+
+    if not feature_enabled("SCHEDULE"):
+        abort(404)
 
     def duration_hhmm(duration_minutes):
         if not duration_minutes or duration_minutes < 1:
