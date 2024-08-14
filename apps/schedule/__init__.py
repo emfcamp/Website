@@ -57,7 +57,7 @@ def lineup_talk_redirect(year, proposal_id, slug=None):
 def feed_redirect(fmt):
     routes = {
         "json": "schedule.schedule_json",
-        "frab": "schedule.schedule_frab",
+        "frab": "schedule.schedule_frab_xml",
         "ical": "schedule.schedule_ical",
         "ics": "schedule.schedule_ical",
     }
