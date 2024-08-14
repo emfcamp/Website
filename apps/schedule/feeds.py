@@ -45,6 +45,7 @@ def _format_event_description(event):
 
 
 @schedule.route("/schedule/<int:year>.json")
+@cross_origin(methods=["GET"])
 def schedule_json(year):
     if year != event_year():
         return feed_historic(year, "json")
