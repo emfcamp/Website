@@ -1,7 +1,7 @@
 import json
 from datetime import timedelta
 from icalendar import Calendar, Event
-from flask import request, abort, current_app as app, Response
+from flask import request, abort, current_app as app, redirect, url_for, Response
 from flask_cors import cross_origin
 from flask_login import current_user
 from math import ceil
@@ -193,6 +193,10 @@ def schedule_frab_json(year):
 
 @schedule.route("/schedule/<int:year>.frab")
 def schedule_frab(year):
+    return redirect(url_for('schedule_frab_xml', year=year), code=301)
+
+@schedule.route("/schedule/frab-<int:year>.xml")
+def schedule_frab_xml(year):
     if year != event_year():
         return feed_historic(year, "frab")
 
