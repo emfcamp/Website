@@ -131,8 +131,13 @@ def export_db(table):
         return
 
     with app.test_client() as client:
-        for file_type in ["frab", "json", "ics"]:
-            url = f"/schedule/{year}.{file_type}"
+        for file_type, file_url in (
+            ("frab", f"frab-{year}.xml"),
+            ("frab_json", f"frab-{year}.json"),
+            ("json", f"{year}.json"),
+            ("ics", f"{year}.ics"),
+        ):
+            url = f"/schedule/{file_url}"
             dest_path = os.path.join(path, "public", f"schedule.{file_type}")
             response = client.get(url)
             if response.status_code != 200:
