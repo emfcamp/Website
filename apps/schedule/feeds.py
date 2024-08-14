@@ -139,7 +139,7 @@ def schedule_frab_json(year):
                         "attachments": [],
                         "date": event_tz.localize(proposal.start_date).isoformat(),
                         "description": proposal.description,
-                        "do_not_record": False if proposal.may_record else True,
+                        "do_not_record": proposal.video_privacy != "public",
                         "duration": duration_hhmm(proposal.duration_minutes),
                         "guid": None,
                         "id": proposal.id,
