@@ -165,7 +165,7 @@ def schedule_frab_json(year):
                         "start": event_tz.localize(proposal.start_date).strftime("%H:%M"),
                         "subtitle": None,
                         "title": proposal.display_title,
-                        "track": None,  # TODO does emf have tracks?
+                        "track": None,
                         "type": proposal.type,
                         "url": external_url(
                             ".item",
