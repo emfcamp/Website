@@ -14,7 +14,8 @@
     <strong>Schedule feeds:</strong>
     <a href="{{ url_for('.schedule_json', year=year) }}">JSON</a> |
     <a href="{{ url_for('.schedule_ical', year=year) }}">iCal</a> |
-    <a href="{{ url_for('.schedule_frab', year=year) }}">Frab</a>
+    <a href="{{ url_for('.schedule_frab_json', year=year) }}">Frab JSON</a> |
+    <a href="{{ url_for('.schedule_frab_xml', year=year) }}">Frab XML</a>
   </p>
 {% endblock %}
 {% block foot %}
