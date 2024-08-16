@@ -60,8 +60,16 @@
           <button class="youtube-wait-for-click-button">Continue</button>
         </div>
       </div>
-      <p>View this video <a href="{{ event.video.youtube }}">on YouTube</a>.</p>
     {% endif %}
+    <strong>Video Hosts:</strong>
+    <ul>
+    {% if event.video.ccc %}
+      <li>View this video <a href="{{ event.video.ccc }}">on the Chaos Computer Club's website</a>.</li>
+    {% endif %}
+    {% if event.video.youtube %}
+      <li>View this video <a href="{{ event.video.youtube }}">on YouTube</a>.</li>
+    {% endif %}
+    </ul>
   </div>
 {% endif %}
 {% endblock %}
