@@ -11,6 +11,7 @@ from main import db
 from models.payment import BankPayment, BankTransaction
 from ..common import get_user_currency, feature_enabled
 from ..common.email import from_email
+from ..common.epc import format_inline_epc_qr
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
 from . import get_user_payment_or_abort, lock_user_payment_or_abort
@@ -86,6 +87,7 @@ def transfer_waiting(payment_id):
         account=payment.recommended_destination,
         form=form,
         days=app.config["EXPIRY_DAYS_TRANSFER"],
+        format_inline_epc_qr=format_inline_epc_qr,
     )
 
 

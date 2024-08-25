@@ -57,3 +57,7 @@
   color: color.scale($highlight-background-text, $alpha: -60%);
 }
 
+.epc-qr-code svg {
+  width: 123px;
+  height: 123px;
+}

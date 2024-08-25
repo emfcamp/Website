@@ -1,0 +1,13 @@
+/* Based on: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/Tooltip_Role */
+[role="tooltip"] {
+  visibility: hidden;
+  position: absolute;
+}
+[role="tooltip"]:hover,
+[role="tooltip"]:focus {
+  visibility: visible;
+}
+[aria-describedby]:hover + [role="tooltip"],
+[aria-describedby]:focus + [role="tooltip"] {
+  visibility: visible;
+}
