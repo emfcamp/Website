@@ -53,6 +53,8 @@ def _get_proposal_dict(proposal: Proposal, favourites_ids):
         video_res["youtube"] = proposal.youtube_url
     if proposal.thumbnail_url:
         video_res["preview_image"] = proposal.thumbnail_url
+    if proposal.video_download_url:
+        video_res["video_download_url"] = proposal.video_download_url
     video_res["recording_lost"] = proposal.video_recording_lost
     if video_res:
         res["video"] = video_res

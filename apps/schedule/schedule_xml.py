@@ -119,6 +119,9 @@ def add_event(room, event):
 
     _add_sub_with_text(event_node, "subtitle", "")
 
+    if vdu := event.get("video", {}).get("video_download_url"):
+        _add_sub_with_text(event_node, "video_download_url", vdu)
+
     add_persons(event_node, event)
     add_recording(event_node, event)
 

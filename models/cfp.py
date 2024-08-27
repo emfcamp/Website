@@ -440,6 +440,13 @@ class Proposal(BaseModel):
     youtube_url = db.Column(db.String)
     thumbnail_url = db.Column(db.String)
     video_recording_lost = db.Column(db.Boolean, default=False)
+    video_download_url = db.Column(
+        db.String,
+        doc="""
+        Canonical, potentially ephemeral source for the video recording.
+        Used to automate release of videos to other platforms, in particular media.ccc.de.
+        """,
+    )
 
     type_might_require_ticket = False
     tickets = db.relationship("EventTicket", backref="proposal")

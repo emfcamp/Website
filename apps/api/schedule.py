@@ -52,6 +52,7 @@ class ProposalResource(Resource):
             "thumbnail_url",
             "c3voc_url",
             "video_recording_lost",
+            "video_download_url",
         }
         if set(payload.keys()) - ALLOWED_ATTRIBUTES:
             abort(400)
@@ -66,10 +67,7 @@ class ProposalResource(Resource):
         return {
             "id": proposal.id,
             "slug": proposal.slug,
-            "youtube_url": proposal.youtube_url,
-            "thumbnail_url": proposal.thumbnail_url,
-            "c3voc_url": proposal.c3voc_url,
-            "video_recording_lost": proposal.video_recording_lost,
+            **{a: getattr(proposal, a) for a in ALLOWED_ATTRIBUTES}
         }
 
 
