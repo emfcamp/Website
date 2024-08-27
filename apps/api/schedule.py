@@ -17,10 +17,16 @@ def _require_video_api_key(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         auth_header = request.headers.get("authorization", None)
-        if not auth_header or not auth_header.startswith("Bearer "):
+        if not auth_header:
             abort(401)
 
-        bearer_token = auth_header.removeprefix("Bearer ")
+        if auth_header.startswith("bearer "):
+            bearer_token = auth_header.removeprefix("bearer ")
+        elif auth_header.startswith("Bearer "):
+            bearer_token = auth_header.removeprefix("Bearer ")
+        else:
+            abort(401)
+
         if not compare_digest(bearer_token, app.config["VIDEO_API_KEY"]):
             abort(401)
 
