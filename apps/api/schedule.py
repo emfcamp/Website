@@ -148,9 +148,7 @@ class UpdateLotteryPreferences(Resource):
 
         current_tickets = {
             t.id: t
-            for t in EventTicket.query.filter_by(
-                state="entered-lottery", user_id=current_user.id
-            ).all()
+            for t in EventTicket.query.filter_by(state="entered-lottery", user_id=current_user.id).all()
             if t.proposal.type == proposal_type
         }
 
@@ -190,14 +188,17 @@ class ProposalC3VOCPublishingWebhook(Resource):
                 abort(403, message="The request referenced a non-master video edit, and has been denied.")
 
             if conference != f"emf{event_year()}":
-                abort(422, message="The request did not reference the current event year, and has not been processed.")
+                abort(
+                    422,
+                    message="The request did not reference the current event year, and has not been processed.",
+                )
 
             proposal = Proposal.query.get_or_404(proposal_id)
 
             if payload["voctoweb"]["enabled"]:
                 if payload["voctoweb"]["frontend_url"]:
                     c3voc_url = payload["voctoweb"]["frontend_url"]
-                    if not c3voc_url.startswith('https://media.ccc.de/'):
+                    if not c3voc_url.startswith("https://media.ccc.de/"):
                         abort(406, message="voctoweb frontend_url must start with https://media.ccc.de/")
                     app.logger.info(f"C3VOC webhook set c3voc_url for {proposal.id=} to {c3voc_url}")
                     proposal.c3voc_url = c3voc_url
@@ -207,7 +208,9 @@ class ProposalC3VOCPublishingWebhook(Resource):
                     # as well. We do not explicitely set 'video_recording_lost'
                     # here because the video might only need fixing audio or
                     # such.
-                    app.logger.warning(f"C3VOC webhook cleared c3voc_url for {proposal.id=}, was {proposal.c3voc_url}")
+                    app.logger.warning(
+                        f"C3VOC webhook cleared c3voc_url for {proposal.id=}, was {proposal.c3voc_url}"
+                    )
                     proposal.c3voc_url = ""
 
             if payload["youtube"]["enabled"]:
@@ -215,7 +218,7 @@ class ProposalC3VOCPublishingWebhook(Resource):
                     # Please do not overwrite existing youtube urls
                     if not proposal.youtube_url:
                         youtube_url = payload["youtube"]["urls"][0]
-                        if  not youtube_url.startswith('https://www.youtube.com/watch'):
+                        if not youtube_url.startswith("https://www.youtube.com/watch"):
                             abort(406, message="youtube url must start with https://www.youtube.com/watch")
                         # c3voc will send us a list, even though we only have one
                         # video.
@@ -228,10 +231,14 @@ class ProposalC3VOCPublishingWebhook(Resource):
                         app.logger.warning(
                             "C3VOC webhook sent youtube urls update without referencing the previously stored value. Ignoring."
                         )
-                        app.logger.debug(f"{proposal.id=} {payload['youtube']['urls']=} {proposal.youtube_url=}")
+                        app.logger.debug(
+                            f"{proposal.id=} {payload['youtube']['urls']=} {proposal.youtube_url=}"
+                        )
                 else:
                     # see comment at c3voc_url above
-                    app.logger.warning(f"C3VOC webhook cleared youtube_url for {proposal.id=}, was {proposal.youtube_url}")
+                    app.logger.warning(
+                        f"C3VOC webhook cleared youtube_url for {proposal.id=}, was {proposal.youtube_url}"
+                    )
                     proposal.youtube_url = ""
 
             db.session.add(proposal)
