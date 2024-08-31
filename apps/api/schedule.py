@@ -7,6 +7,7 @@ from flask_restful import Resource, abort
 
 from . import api
 from main import db
+from models import event_year
 from models.cfp import Proposal
 from models.ical import CalendarEvent
 from models.admin_message import AdminMessage
@@ -169,6 +170,56 @@ class UpdateLotteryPreferences(Resource):
         return [t.id for t in res]
 
 
+class C3VOCPublishingWebhook(Resource):
+    method_decorators = {"post": [_require_video_api_key]}
+
+    def post(self):
+        if not request.is_json:
+            abort(415)
+
+        payload = request.get_json()
+
+        try:
+            conference = payload["fahrplan"]["conference"]
+            proposal_id = payload["fahrplan"]["id"]
+        except KeyError:
+            abort(422)
+
+        if not payload["is_master"]:
+            # c3voc *should* only send us information about the master
+            # encoding getting published. Aborting early ensures we don't
+            # accidentially delete video information from the database.
+            abort(406)
+
+        if conference != f"emf{event_year()}":
+            abort(422)
+
+        proposal = Proposal.query.get_or_404(proposal_id)
+
+        if payload["voctoweb"]["enabled"]:
+            proposal.c3voc_url = payload["voctoweb"]["frontend_url"]
+            proposal.video_recording_lost = False
+        else:
+            # This allows c3voc to notify us if videos got depublished
+            # as well. We do not explicitely set 'video_recording_lost'
+            # here because the video might only need fixing audio or
+            # such.
+            proposal.c3voc_url = ""
+
+        if payload["youtube"]["enabled"]:
+            # c3voc will send us a list, even though we only have one
+            # video.
+            proposal.youtube_url = payload["youtube"]["urls"][0]
+            proposal.video_recording_lost = False
+        else:
+            proposal.youtube_url = ""
+
+        db.session.add(proposal)
+        db.session.commit()
+
+        return "OK", 204
+
+
 def renderScheduleMessage(message):
     return {"id": message.id, "body": message.message}
 
@@ -186,3 +237,4 @@ api.add_resource(FavouriteProposal, "/proposal/<int:proposal_id>/favourite")
 api.add_resource(FavouriteExternal, "/external/<int:event_id>/favourite")
 api.add_resource(ScheduleMessage, "/schedule_messages")
 api.add_resource(UpdateLotteryPreferences, "/schedule/tickets/<proposal_type>/preferences")
+api.add_resource(C3VOCPublishingWebhook, "/c3voc/publishing-webhook")
