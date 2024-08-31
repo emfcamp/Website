@@ -198,6 +198,8 @@ class ProposalC3VOCPublishingWebhook(Resource):
 
         if payload["voctoweb"]["enabled"]:
             if payload["voctoweb"]["frontend_url"]:
+                if not payload["voctoweb"]["frontend_url"].startswith('https://media.ccc.de/'):
+                    abort(406, message="voctoweb frontend_url must start with https://media.ccc.de/")
                 proposal.c3voc_url = payload["voctoweb"]["frontend_url"]
                 proposal.video_recording_lost = False
             else:
@@ -211,6 +213,9 @@ class ProposalC3VOCPublishingWebhook(Resource):
             if payload["youtube"]["urls"]:
                 # Please do not overwrite existing youtube urls
                 if not proposal.youtube_url:
+                    youtube_url = payload["youtube"]["urls"][0]
+                    if  not youtube_url.startswith('https://www.youtube.com/watch'):
+                        abort(406, message="youtube url must start with https://www.youtube.com/watch")
                     # c3voc will send us a list, even though we only have one
                     # video.
                     proposal.youtube_url = payload["youtube"]["urls"][0]
