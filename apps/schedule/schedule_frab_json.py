@@ -102,7 +102,7 @@ def export_frab_json(schedule):
                             }
                             for name in (proposal.published_names or proposal.user.name).split(",")
                         ],
-                        "recording_license": "CC BY-SA 3.0",
+                        "recording_license": "CC BY-SA 4.0",
                         "room": room,
                         "slug": "emf{}-{}-{}".format(
                             event_year(),
