@@ -196,23 +196,36 @@ class ProposalC3VOCPublishingWebhook(Resource):
 
         proposal = Proposal.query.get_or_404(proposal_id)
 
-        if payload["voctoweb"]["enabled"] and payload["voctoweb"]["frontend_url"]:
-            proposal.c3voc_url = payload["voctoweb"]["frontend_url"]
-            proposal.video_recording_lost = False
-        else:
-            # This allows c3voc to notify us if videos got depublished
-            # as well. We do not explicitely set 'video_recording_lost'
-            # here because the video might only need fixing audio or
-            # such.
-            proposal.c3voc_url = ""
+        if payload["voctoweb"]["enabled"]:
+            if payload["voctoweb"]["frontend_url"]:
+                proposal.c3voc_url = payload["voctoweb"]["frontend_url"]
+                proposal.video_recording_lost = False
+            else:
+                # This allows c3voc to notify us if videos got depublished
+                # as well. We do not explicitely set 'video_recording_lost'
+                # here because the video might only need fixing audio or
+                # such.
+                proposal.c3voc_url = ""
 
-        if payload["youtube"]["enabled"] and payload["youtube"]["urls"]:
-            # c3voc will send us a list, even though we only have one
-            # video.
-            proposal.youtube_url = payload["youtube"]["urls"][0]
-            proposal.video_recording_lost = False
-        else:
-            proposal.youtube_url = ""
+        if payload["youtube"]["enabled"]:
+            if payload["youtube"]["urls"]:
+                # Please do not overwrite existing youtube urls
+                if not proposal.youtube_url:
+                    # c3voc will send us a list, even though we only have one
+                    # video.
+                    proposal.youtube_url = payload["youtube"]["urls"][0]
+                    proposal.video_recording_lost = False
+                elif proposal.youtube_url not in payload["youtube"]["urls"]:
+                    # c3voc sent us some urls, but none of them are matching
+                    # the url we have in our database.
+                    app.logger.warning(
+                        f"C3VOC webhook sent youtube urls {payload['youtube']['urls']!r}, "
+                        f"but we already have {proposal.youtube_url}. NOT "
+                        "overwriting!"
+                    )
+            else:
+                # see comment at c3voc_url above
+                proposal.youtube_url = ""
 
         db.session.add(proposal)
         db.session.commit()
