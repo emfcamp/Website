@@ -57,7 +57,7 @@ def schedule_json(year):
     return Response(json.dumps(schedule), mimetype="application/json")
 
 
-@schedule.route("/schedule/frab-<int:year>.json")
+@schedule.route("/schedule/<int:year>.frab.json")
 def schedule_frab_json(year):
     if year != event_year():
         return feed_historic(year, "frab_json")
@@ -96,7 +96,7 @@ def schedule_frab(year):
     return redirect(url_for("schedule_frab_xml", year=year), code=301)
 
 
-@schedule.route("/schedule/frab-<int:year>.xml")
+@schedule.route("/schedule/<int:year>.frab.xml")
 def schedule_frab_xml(year):
     if year != event_year():
         return feed_historic(year, "frab")
