@@ -3,7 +3,7 @@ from datetime import datetime
 from lxml import etree
 
 from apps.schedule import event_tz
-from apps.schedule.schedule_xml import (
+from apps.schedule.schedule_frab_xml import (
     make_root,
     add_day,
     add_room,
