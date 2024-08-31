@@ -29,15 +29,15 @@ def events_per_day_and_room(schedule):
             # Event is outside the scheduled event duration.
             continue
         if proposal.scheduled_venue.name not in days[talk_date]:
-            days[talk_date][proposal.scheduled_venue.name] = [proposal]
+            days[talk_date]["rooms"][proposal.scheduled_venue.name] = [proposal]
         else:
-            days[talk_date][proposal.scheduled_venue.name].append(proposal)
+            days[talk_date]["rooms"][proposal.scheduled_venue.name].append(proposal)
 
     return days.values()
 
 
 def export_frab_json(schedule):
-    duration_days = ceil((event_end() - event_end()).total_seconds / 86400)
+    duration_days = ceil((event_end() - event_start()).total_seconds() / 86400)
 
     rooms = set([proposal.scheduled_venue.name for proposal in schedule])
 
@@ -55,14 +55,14 @@ def export_frab_json(schedule):
                 for room in sorted(rooms)
             ],
             "start": event_start().strftime("%Y-%m-%d"),
-            "time_zone_name": event_tz,
+            "time_zone_name": str(event_tz),
             "timeslot_duration": "00:10",
             "title": "Electromagnetic Field {}".format(event_year()),
-            "url": external_url("main"),
+            "url": external_url(".main"),
         },
     }
 
-    for day in events_per_day_and_room:
+    for day in events_per_day_and_room(schedule):
         day_schedule = {
             "date": day["start"].strftime("%Y-%m-%d"),
             "day_end": day["start"].isoformat(),
