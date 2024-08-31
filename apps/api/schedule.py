@@ -189,7 +189,7 @@ class ProposalC3VOCPublishingWebhook(Resource):
             # c3voc *should* only send us information about the master
             # encoding getting published. Aborting early ensures we don't
             # accidentially delete video information from the database.
-            abort(406)
+            abort(403)
 
         if conference != f"emf{event_year()}":
             abort(422)
