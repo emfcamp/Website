@@ -182,62 +182,62 @@ class ProposalC3VOCPublishingWebhook(Resource):
         try:
             conference = payload["fahrplan"]["conference"]
             proposal_id = payload["fahrplan"]["id"]
-        except KeyError:
-            abort(422)
 
-        if not payload["is_master"]:
-            # c3voc *should* only send us information about the master
-            # encoding getting published. Aborting early ensures we don't
-            # accidentially delete video information from the database.
-            abort(403)
+            if not payload["is_master"]:
+                # c3voc *should* only send us information about the master
+                # encoding getting published. Aborting early ensures we don't
+                # accidentially delete video information from the database.
+                abort(403, message="The request referenced a non-master video edit, and has been denied.")
 
-        if conference != f"emf{event_year()}":
-            abort(422)
+            if conference != f"emf{event_year()}":
+                abort(422, message="The request did not reference the current event year, and has not been processed.")
 
-        proposal = Proposal.query.get_or_404(proposal_id)
+            proposal = Proposal.query.get_or_404(proposal_id)
 
-        if payload["voctoweb"]["enabled"]:
-            if payload["voctoweb"]["frontend_url"]:
-                c3voc_url = payload["voctoweb"]["frontend_url"]
-                if not c3voc_url.startswith('https://media.ccc.de/'):
-                    abort(406, message="voctoweb frontend_url must start with https://media.ccc.de/")
-                app.logger.info(f"C3VOC webhook set c3voc_url for {proposal.id=} to {c3voc_url}")
-                proposal.c3voc_url = c3voc_url
-                proposal.video_recording_lost = False
-            else:
-                # This allows c3voc to notify us if videos got depublished
-                # as well. We do not explicitely set 'video_recording_lost'
-                # here because the video might only need fixing audio or
-                # such.
-                app.logger.warning(f"C3VOC webhook cleared c3voc_url for {proposal.id=}, was {proposal.c3voc_url}")
-                proposal.c3voc_url = ""
-
-        if payload["youtube"]["enabled"]:
-            if payload["youtube"]["urls"]:
-                # Please do not overwrite existing youtube urls
-                if not proposal.youtube_url:
-                    youtube_url = payload["youtube"]["urls"][0]
-                    if  not youtube_url.startswith('https://www.youtube.com/watch'):
-                        abort(406, message="youtube url must start with https://www.youtube.com/watch")
-                    # c3voc will send us a list, even though we only have one
-                    # video.
-                    app.logger.info(f"C3VOC webhook set youtube_url for {proposal.id=} to {youtube_url}")
-                    proposal.youtube_url = youtube_url
+            if payload["voctoweb"]["enabled"]:
+                if payload["voctoweb"]["frontend_url"]:
+                    c3voc_url = payload["voctoweb"]["frontend_url"]
+                    if not c3voc_url.startswith('https://media.ccc.de/'):
+                        abort(406, message="voctoweb frontend_url must start with https://media.ccc.de/")
+                    app.logger.info(f"C3VOC webhook set c3voc_url for {proposal.id=} to {c3voc_url}")
+                    proposal.c3voc_url = c3voc_url
                     proposal.video_recording_lost = False
-                elif proposal.youtube_url not in payload["youtube"]["urls"]:
-                    # c3voc sent us some urls, but none of them are matching
-                    # the url we have in our database.
-                    app.logger.warning(
-                        "C3VOC webhook sent youtube urls update without referencing the previously stored value. Ignoring."
-                    )
-                    app.logger.debug(f"{proposal.id=} {payload['youtube']['urls']=} {proposal.youtube_url=}")
-            else:
-                # see comment at c3voc_url above
-                app.logger.warning(f"C3VOC webhook cleared youtube_url for {proposal.id=}, was {proposal.youtube_url}")
-                proposal.youtube_url = ""
+                else:
+                    # This allows c3voc to notify us if videos got depublished
+                    # as well. We do not explicitely set 'video_recording_lost'
+                    # here because the video might only need fixing audio or
+                    # such.
+                    app.logger.warning(f"C3VOC webhook cleared c3voc_url for {proposal.id=}, was {proposal.c3voc_url}")
+                    proposal.c3voc_url = ""
 
-        db.session.add(proposal)
-        db.session.commit()
+            if payload["youtube"]["enabled"]:
+                if payload["youtube"]["urls"]:
+                    # Please do not overwrite existing youtube urls
+                    if not proposal.youtube_url:
+                        youtube_url = payload["youtube"]["urls"][0]
+                        if  not youtube_url.startswith('https://www.youtube.com/watch'):
+                            abort(406, message="youtube url must start with https://www.youtube.com/watch")
+                        # c3voc will send us a list, even though we only have one
+                        # video.
+                        app.logger.info(f"C3VOC webhook set youtube_url for {proposal.id=} to {youtube_url}")
+                        proposal.youtube_url = youtube_url
+                        proposal.video_recording_lost = False
+                    elif proposal.youtube_url not in payload["youtube"]["urls"]:
+                        # c3voc sent us some urls, but none of them are matching
+                        # the url we have in our database.
+                        app.logger.warning(
+                            "C3VOC webhook sent youtube urls update without referencing the previously stored value. Ignoring."
+                        )
+                        app.logger.debug(f"{proposal.id=} {payload['youtube']['urls']=} {proposal.youtube_url=}")
+                else:
+                    # see comment at c3voc_url above
+                    app.logger.warning(f"C3VOC webhook cleared youtube_url for {proposal.id=}, was {proposal.youtube_url}")
+                    proposal.youtube_url = ""
+
+            db.session.add(proposal)
+            db.session.commit()
+        except KeyError as e:
+            abort(400, message=f"Missing required field: {e}")
 
         return "OK", 204
 
