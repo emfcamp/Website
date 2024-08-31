@@ -5,7 +5,7 @@ from main import external_url
 from models import event_end, event_start, event_year
 
 from . import event_tz
-from .schedule_xml import get_day_start_end, get_duration
+from .schedule_frab_xml import get_day_start_end, get_duration
 
 
 def events_per_day_and_room(schedule):

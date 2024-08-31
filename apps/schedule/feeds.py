@@ -9,8 +9,8 @@ from models.user import User
 from models.cfp import Proposal
 
 from ..common import feature_flag, feature_enabled, json_response
-from .schedule_json import export_frab_json
-from .schedule_xml import export_frab
+from .schedule_frab_json import export_frab_json
+from .schedule_frab_xml import export_frab
 from .historic import feed_historic
 from .data import (
     _get_scheduled_proposals,
