@@ -196,7 +196,7 @@ class C3VOCPublishingWebhook(Resource):
 
         proposal = Proposal.query.get_or_404(proposal_id)
 
-        if payload["voctoweb"]["enabled"]:
+        if payload["voctoweb"]["enabled"] and payload["voctoweb"]["frontend_url"]:
             proposal.c3voc_url = payload["voctoweb"]["frontend_url"]
             proposal.video_recording_lost = False
         else:
@@ -206,7 +206,7 @@ class C3VOCPublishingWebhook(Resource):
             # such.
             proposal.c3voc_url = ""
 
-        if payload["youtube"]["enabled"]:
+        if payload["youtube"]["enabled"] and payload["youtube"]["urls"]:
             # c3voc will send us a list, even though we only have one
             # video.
             proposal.youtube_url = payload["youtube"]["urls"][0]
