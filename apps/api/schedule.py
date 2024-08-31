@@ -170,7 +170,7 @@ class UpdateLotteryPreferences(Resource):
         return [t.id for t in res]
 
 
-class C3VOCPublishingWebhook(Resource):
+class ProposalC3VOCPublishingWebhook(Resource):
     method_decorators = {"post": [_require_video_api_key]}
 
     def post(self):
@@ -237,4 +237,4 @@ api.add_resource(FavouriteProposal, "/proposal/<int:proposal_id>/favourite")
 api.add_resource(FavouriteExternal, "/external/<int:event_id>/favourite")
 api.add_resource(ScheduleMessage, "/schedule_messages")
 api.add_resource(UpdateLotteryPreferences, "/schedule/tickets/<proposal_type>/preferences")
-api.add_resource(C3VOCPublishingWebhook, "/c3voc/publishing-webhook")
+api.add_resource(ProposalC3VOCPublishingWebhook, "/proposal/c3voc-publishing-webhook")
