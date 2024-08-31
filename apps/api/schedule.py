@@ -211,7 +211,7 @@ class ProposalC3VOCPublishingWebhook(Resource):
                     app.logger.warning(
                         f"C3VOC webhook cleared c3voc_url for {proposal.id=}, was {proposal.c3voc_url}"
                     )
-                    proposal.c3voc_url = ""
+                    proposal.c3voc_url = None
 
             if payload["youtube"]["enabled"]:
                 if payload["youtube"]["urls"]:
@@ -239,7 +239,7 @@ class ProposalC3VOCPublishingWebhook(Resource):
                     app.logger.warning(
                         f"C3VOC webhook cleared youtube_url for {proposal.id=}, was {proposal.youtube_url}"
                     )
-                    proposal.youtube_url = ""
+                    proposal.youtube_url = None
 
             db.session.add(proposal)
             db.session.commit()
