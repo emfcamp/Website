@@ -216,10 +216,10 @@ class ProposalC3VOCPublishingWebhook(Resource):
             if payload["youtube"]["enabled"]:
                 if payload["youtube"]["urls"]:
                     # Please do not overwrite existing youtube urls
+                    youtube_url = payload["youtube"]["urls"][0]
+                    if not youtube_url.startswith("https://www.youtube.com/watch"):
+                        abort(406, message="youtube url must start with https://www.youtube.com/watch")
                     if not proposal.youtube_url:
-                        youtube_url = payload["youtube"]["urls"][0]
-                        if not youtube_url.startswith("https://www.youtube.com/watch"):
-                            abort(406, message="youtube url must start with https://www.youtube.com/watch")
                         # c3voc will send us a list, even though we only have one
                         # video.
                         app.logger.info(f"C3VOC webhook set youtube_url for {proposal.id=} to {youtube_url}")
