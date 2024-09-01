@@ -17,10 +17,11 @@ def proposal(db, user):
     return proposal
 
 
-def clean_proposal(db, proposal, c3voc_url=None, youtube_url=None, video_recording_lost=True):
+def clean_proposal(db, proposal, c3voc_url=None, youtube_url=None, thumbnail_url=None, video_recording_lost=True):
     proposal.c3voc_url = c3voc_url
-    proposal.youtube_url = youtube_url
+    proposal.thumbnail_url = thumbnail_url
     proposal.video_recording_lost = video_recording_lost
+    proposal.youtube_url = youtube_url
     db.session.add(proposal)
     db.session.commit()
 
@@ -167,6 +168,7 @@ def test_request_voctoweb_update_voctoweb_correct_url(client, app, db, proposal)
             "voctoweb": {
                 "enabled": True,
                 "frontend_url": "https://media.ccc.de/",
+                "thumb_path": "",
             },
             "youtube": {
                 "enabled": False,
@@ -204,6 +206,7 @@ def test_request_voctoweb_update_voctoweb_wrong_url(client, app, db, proposal):
             "voctoweb": {
                 "enabled": True,
                 "frontend_url": "https://example.org",
+                "thumb_path": "",
             },
             "youtube": {
                 "enabled": False,
@@ -241,6 +244,7 @@ def test_request_voctoweb_clears_voctoweb(client, app, db, proposal):
             "voctoweb": {
                 "enabled": True,
                 "frontend_url": "",
+                "thumb_path": "",
             },
             "youtube": {
                 "enabled": False,
@@ -251,6 +255,154 @@ def test_request_voctoweb_clears_voctoweb(client, app, db, proposal):
 
     proposal = Proposal.query.get(proposal.id)
     assert proposal.c3voc_url is None
+
+
+def test_request_thumbnail_update_thumbnail_correct_path(client, app, db, proposal):
+    app.config.update(
+        {
+            "VIDEO_API_KEY": "api-key",
+        }
+    )
+
+    clean_proposal(db, proposal)
+
+    rv = client.post(
+        f"/api/proposal/c3voc-publishing-webhook",
+        headers={
+            "Authorization": "Bearer api-key",
+        },
+        json={
+            "is_master": True,
+            "fahrplan": {
+                "conference": f"emf{event_year()}",
+                "id": proposal.id,
+            },
+            "voctoweb": {
+                "enabled": True,
+                "frontend_url": "",
+                "thumb_path": "/static.media.ccc.de/thumb.jpg",
+            },
+            "youtube": {
+                "enabled": False,
+            },
+        },
+    )
+    assert rv.status_code == 204
+
+    proposal = Proposal.query.get(proposal.id)
+    assert proposal.thumbnail_url  == "https://static.media.ccc.de/media/thumb.jpg"
+    assert proposal.c3voc_url is None
+    assert proposal.youtube_url is None
+
+
+def test_request_thumbnail_update_thumbnail_correct_url(client, app, db, proposal):
+    app.config.update(
+        {
+            "VIDEO_API_KEY": "api-key",
+        }
+    )
+
+    clean_proposal(db, proposal)
+
+    rv = client.post(
+        f"/api/proposal/c3voc-publishing-webhook",
+        headers={
+            "Authorization": "Bearer api-key",
+        },
+        json={
+            "is_master": True,
+            "fahrplan": {
+                "conference": f"emf{event_year()}",
+                "id": proposal.id,
+            },
+            "voctoweb": {
+                "enabled": True,
+                "frontend_url": "",
+                "thumb_path": "https://example.com/thumb.jpg",
+            },
+            "youtube": {
+                "enabled": False,
+            },
+        },
+    )
+    assert rv.status_code == 204
+
+    proposal = Proposal.query.get(proposal.id)
+    assert proposal.thumbnail_url  == "https://example.com/thumb.jpg"
+    assert proposal.c3voc_url is None
+    assert proposal.youtube_url is None
+
+
+def test_request_thumbnail_update_thumbnail_not_url(client, app, db, proposal):
+    app.config.update(
+        {
+            "VIDEO_API_KEY": "api-key",
+        }
+    )
+
+    clean_proposal(db, proposal, thumbnail_url="https://example.com/thumb.jpg")
+
+    rv = client.post(
+        f"/api/proposal/c3voc-publishing-webhook",
+        headers={
+            "Authorization": "Bearer api-key",
+        },
+        json={
+            "is_master": True,
+            "fahrplan": {
+                "conference": f"emf{event_year()}",
+                "id": proposal.id,
+            },
+            "voctoweb": {
+                "enabled": True,
+                "frontend_url": "",
+                "thumb_path": "gopher://example.com/thumb.jpg",
+            },
+            "youtube": {
+                "enabled": False,
+            },
+        },
+    )
+    assert rv.status_code == 406
+
+    proposal = Proposal.query.get(proposal.id)
+    assert proposal.thumbnail_url == "https://example.com/thumb.jpg"
+
+
+def test_request_thumbnail_clears_thumbnail(client, app, db, proposal):
+    app.config.update(
+        {
+            "VIDEO_API_KEY": "api-key",
+        }
+    )
+
+    clean_proposal(db, proposal, thumbnail_url="https://example.com/thumb.jpg")
+
+    rv = client.post(
+        f"/api/proposal/c3voc-publishing-webhook",
+        headers={
+            "Authorization": "Bearer api-key",
+        },
+        json={
+            "is_master": True,
+            "fahrplan": {
+                "conference": f"emf{event_year()}",
+                "id": proposal.id,
+            },
+            "voctoweb": {
+                "enabled": True,
+                "frontend_url": "",
+                "thumb_path": "",
+            },
+            "youtube": {
+                "enabled": False,
+            },
+        },
+    )
+    assert rv.status_code == 204
+
+    proposal = Proposal.query.get(proposal.id)
+    assert proposal.thumbnail_url is None
 
 
 def test_request_youtube_update_youtube_correct_url(client, app, db, proposal):

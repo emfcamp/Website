@@ -216,6 +216,20 @@ class ProposalC3VOCPublishingWebhook(Resource):
                     )
                     proposal.c3voc_url = None
 
+                if payload["voctoweb"]["thumb_path"]:
+                    path = payload["voctoweb"]["thumb_path"]
+                    if path.startswith("/static.media.ccc.de"):
+                        path = "https://static.media.ccc.de/media" + path[len("/static.media.ccc.de"):]
+                    if not path.startswith("https://"):
+                        abort(406, message="voctoweb thumb_path must start with https:// or /static.media.ccc.de")
+                    app.logger.info(f"C3VOC webhook set thumbnail_url for {proposal.id=} to {path}")
+                    proposal.thumbnail_url = path
+                else:
+                    app.logger.warning(
+                        f"C3VOC webhook cleared thumbnail_url for {proposal.id=}, was {proposal.thumbnail_url}"
+                    )
+                    proposal.thumbnail_url = None
+
             if payload["youtube"]["enabled"]:
                 if payload["youtube"]["urls"]:
                     # Please do not overwrite existing youtube urls
