@@ -4,7 +4,7 @@ from models import event_year
 from models.cfp import Proposal, TalkProposal
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def proposal(db, user):
     # Setup
     proposal = TalkProposal()
