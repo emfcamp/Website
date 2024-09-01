@@ -334,7 +334,7 @@ def test_denies_thumbnail_not_url(client, app, db, proposal):
         }
     )
 
-    proposal.thumb_path = "https://example.com/thumb.jpg"
+    proposal.thumbnail_url = "https://example.com/thumb.jpg"
     db.session.add(proposal)
     db.session.flush()
 
@@ -372,7 +372,7 @@ def test_clears_thumbnail(client, app, db, proposal):
         }
     )
 
-    proposal.thumb_path = "https://example.com/thumb.jpg"
+    proposal.thumbnail_url = "https://example.com/thumb.jpg"
     db.session.add(proposal)
     db.session.flush()
 
