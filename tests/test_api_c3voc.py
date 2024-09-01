@@ -24,12 +24,6 @@ def proposal(db, user):
 
 
 def test_denies_request_without_api_key(client, app, proposal):
-    app.config.update(
-        {
-            "VIDEO_API_KEY": "api-key",
-        }
-    )
-
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
         json={
@@ -50,16 +44,10 @@ def test_denies_request_without_api_key(client, app, proposal):
 
 
 def test_denies_request_no_master(client, app, proposal):
-    app.config.update(
-        {
-            "VIDEO_API_KEY": "api-key",
-        }
-    )
-
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
         headers={
-            "Authorization": "Bearer api-key",
+            "Authorization": "Bearer video-api-test-token",
         },
         json={
             "is_master": False,
@@ -79,16 +67,10 @@ def test_denies_request_no_master(client, app, proposal):
 
 
 def test_denies_request_wrong_year(client, app, proposal):
-    app.config.update(
-        {
-            "VIDEO_API_KEY": "api-key",
-        }
-    )
-
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
         headers={
-            "Authorization": "Bearer api-key",
+            "Authorization": "Bearer video-api-test-token",
         },
         json={
             "is_master": True,
@@ -108,16 +90,10 @@ def test_denies_request_wrong_year(client, app, proposal):
 
 
 def test_request_none_unchanged(client, app, db, proposal):
-    app.config.update(
-        {
-            "VIDEO_API_KEY": "api-key",
-        }
-    )
-
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
         headers={
-            "Authorization": "Bearer api-key",
+            "Authorization": "Bearer video-api-test-token",
         },
         json={
             "is_master": True,
@@ -141,16 +117,10 @@ def test_request_none_unchanged(client, app, db, proposal):
 
 
 def test_update_voctoweb_with_correct_url(client, app, db, proposal):
-    app.config.update(
-        {
-            "VIDEO_API_KEY": "api-key",
-        }
-    )
-
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
         headers={
-            "Authorization": "Bearer api-key",
+            "Authorization": "Bearer video-api-test-token",
         },
         json={
             "is_master": True,
@@ -177,12 +147,6 @@ def test_update_voctoweb_with_correct_url(client, app, db, proposal):
 
 
 def test_denies_voctoweb_with_wrong_url(client, app, db, proposal):
-    app.config.update(
-        {
-            "VIDEO_API_KEY": "api-key",
-        }
-    )
-
     proposal.c3voc_url = "https://example.com"
     proposal.video_recording_lost = True
     db.session.add(proposal)
@@ -191,7 +155,7 @@ def test_denies_voctoweb_with_wrong_url(client, app, db, proposal):
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
         headers={
-            "Authorization": "Bearer api-key",
+            "Authorization": "Bearer video-api-test-token",
         },
         json={
             "is_master": True,
@@ -218,12 +182,6 @@ def test_denies_voctoweb_with_wrong_url(client, app, db, proposal):
 
 
 def test_clears_voctoweb(client, app, db, proposal):
-    app.config.update(
-        {
-            "VIDEO_API_KEY": "api-key",
-        }
-    )
-
     proposal.c3voc_url = "https://example.com"
     db.session.add(proposal)
     db.session.flush()
@@ -231,7 +189,7 @@ def test_clears_voctoweb(client, app, db, proposal):
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
         headers={
-            "Authorization": "Bearer api-key",
+            "Authorization": "Bearer video-api-test-token",
         },
         json={
             "is_master": True,
@@ -256,16 +214,10 @@ def test_clears_voctoweb(client, app, db, proposal):
 
 
 def test_update_thumbnail_with_path(client, app, db, proposal):
-    app.config.update(
-        {
-            "VIDEO_API_KEY": "api-key",
-        }
-    )
-
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
         headers={
-            "Authorization": "Bearer api-key",
+            "Authorization": "Bearer video-api-test-token",
         },
         json={
             "is_master": True,
@@ -292,16 +244,10 @@ def test_update_thumbnail_with_path(client, app, db, proposal):
 
 
 def test_update_thumbnail_with_url(client, app, db, proposal):
-    app.config.update(
-        {
-            "VIDEO_API_KEY": "api-key",
-        }
-    )
-
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
         headers={
-            "Authorization": "Bearer api-key",
+            "Authorization": "Bearer video-api-test-token",
         },
         json={
             "is_master": True,
@@ -328,12 +274,6 @@ def test_update_thumbnail_with_url(client, app, db, proposal):
 
 
 def test_denies_thumbnail_not_url(client, app, db, proposal):
-    app.config.update(
-        {
-            "VIDEO_API_KEY": "api-key",
-        }
-    )
-
     proposal.thumbnail_url = "https://example.com/thumb.jpg"
     db.session.add(proposal)
     db.session.flush()
@@ -341,7 +281,7 @@ def test_denies_thumbnail_not_url(client, app, db, proposal):
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
         headers={
-            "Authorization": "Bearer api-key",
+            "Authorization": "Bearer video-api-test-token",
         },
         json={
             "is_master": True,
@@ -366,12 +306,6 @@ def test_denies_thumbnail_not_url(client, app, db, proposal):
 
 
 def test_clears_thumbnail(client, app, db, proposal):
-    app.config.update(
-        {
-            "VIDEO_API_KEY": "api-key",
-        }
-    )
-
     proposal.thumbnail_url = "https://example.com/thumb.jpg"
     db.session.add(proposal)
     db.session.flush()
@@ -379,7 +313,7 @@ def test_clears_thumbnail(client, app, db, proposal):
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
         headers={
-            "Authorization": "Bearer api-key",
+            "Authorization": "Bearer video-api-test-token",
         },
         json={
             "is_master": True,
@@ -404,16 +338,10 @@ def test_clears_thumbnail(client, app, db, proposal):
 
 
 def test_update_youtube_with_correct_url(client, app, db, proposal):
-    app.config.update(
-        {
-            "VIDEO_API_KEY": "api-key",
-        }
-    )
-
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
         headers={
-            "Authorization": "Bearer api-key",
+            "Authorization": "Bearer video-api-test-token",
         },
         json={
             "is_master": True,
@@ -441,12 +369,6 @@ def test_update_youtube_with_correct_url(client, app, db, proposal):
 
 
 def test_denies_youtube_update_with_exisiting_url(client, app, db, proposal):
-    app.config.update(
-        {
-            "VIDEO_API_KEY": "api-key",
-        }
-    )
-
     proposal.youtube_url = "https://example.com"
     proposal.video_recording_lost = True
     db.session.add(proposal)
@@ -455,7 +377,7 @@ def test_denies_youtube_update_with_exisiting_url(client, app, db, proposal):
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
         headers={
-            "Authorization": "Bearer api-key",
+            "Authorization": "Bearer video-api-test-token",
         },
         json={
             "is_master": True,
@@ -483,12 +405,6 @@ def test_denies_youtube_update_with_exisiting_url(client, app, db, proposal):
 
 
 def test_denies_youtube_update_with_wrong_url(client, app, db, proposal):
-    app.config.update(
-        {
-            "VIDEO_API_KEY": "api-key",
-        }
-    )
-
     proposal.youtube_url = "https://example.com"
     proposal.video_recording_lost = True
     db.session.add(proposal)
@@ -497,7 +413,7 @@ def test_denies_youtube_update_with_wrong_url(client, app, db, proposal):
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
         headers={
-            "Authorization": "Bearer api-key",
+            "Authorization": "Bearer video-api-test-token",
         },
         json={
             "is_master": True,
@@ -525,12 +441,6 @@ def test_denies_youtube_update_with_wrong_url(client, app, db, proposal):
 
 
 def test_clears_youtube(client, app, db, proposal):
-    app.config.update(
-        {
-            "VIDEO_API_KEY": "api-key",
-        }
-    )
-
     proposal.youtube_url = "https://example.com"
     db.session.add(proposal)
     db.session.flush()
@@ -538,7 +448,7 @@ def test_clears_youtube(client, app, db, proposal):
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
         headers={
-            "Authorization": "Bearer api-key",
+            "Authorization": "Bearer video-api-test-token",
         },
         json={
             "is_master": True,
