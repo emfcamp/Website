@@ -31,7 +31,7 @@ def test_denies_request_without_api_key(client, app, proposal):
             "is_master": True,
             "fahrplan": {
                 "conference": "emf1970",
-                "id": 0,
+                "id": proposal.id,
             },
             "voctoweb": {
                 "enabled": False,
@@ -54,7 +54,7 @@ def test_denies_request_no_master(client, app, proposal):
             "is_master": False,
             "fahrplan": {
                 "conference": "emf1970",
-                "id": 0,
+                "id": proposal.id,
             },
             "voctoweb": {
                 "enabled": False,
@@ -77,7 +77,7 @@ def test_denies_request_wrong_year(client, app, proposal):
             "is_master": True,
             "fahrplan": {
                 "conference": "emf1970",
-                "id": 0,
+                "id": proposal.id,
             },
             "voctoweb": {
                 "enabled": False,
