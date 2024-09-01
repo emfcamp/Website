@@ -56,7 +56,7 @@ class ProposalResource(Resource):
 
         for attribute in ALLOWED_ATTRIBUTES:
             if attribute in payload:
-                setattr(proposal, attribute, payload[attribute] or "")
+                setattr(proposal, attribute, payload[attribute])
 
         db.session.add(proposal)
         db.session.commit()

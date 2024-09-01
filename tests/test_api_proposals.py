@@ -83,7 +83,7 @@ def test_clearing_video_url(client, app, db, proposal):
     assert rv.status_code == 200
 
     proposal = Proposal.query.get(proposal.id)
-    assert proposal.youtube_url == ""
+    assert proposal.youtube_url is None
 
 
 def test_rejects_disallowed_attributes(client, app, proposal):
