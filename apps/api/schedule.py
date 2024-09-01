@@ -17,6 +17,9 @@ from models.event_tickets import EventTicket
 def _require_video_api_key(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
+        if not app.config.get("VIDEO_API_KEY"):
+            abort(401)
+
         auth_header = request.headers.get("authorization", None)
         if not auth_header or not auth_header.startswith("Bearer "):
             abort(401)
