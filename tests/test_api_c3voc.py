@@ -143,7 +143,7 @@ def test_update_voctoweb_with_correct_url(client, app, db, proposal):
 
     proposal = Proposal.query.get(proposal.id)
     assert proposal.c3voc_url == "https://media.ccc.de/"
-    assert proposal.video_recording_lost == False
+    assert proposal.video_recording_lost is False
     assert proposal.youtube_url is None
 
 
@@ -178,7 +178,7 @@ def test_denies_voctoweb_with_wrong_url(client, app, db, proposal):
 
     proposal = Proposal.query.get(proposal.id)
     # setup sets this to true, the api should not change that
-    assert proposal.video_recording_lost == True
+    assert proposal.video_recording_lost is True
     assert proposal.c3voc_url == "https://example.com"
 
 
@@ -365,7 +365,7 @@ def test_update_youtube_with_correct_url(client, app, db, proposal):
 
     proposal = Proposal.query.get(proposal.id)
     assert proposal.c3voc_url is None
-    assert proposal.video_recording_lost == False
+    assert proposal.video_recording_lost is False
     assert proposal.youtube_url == "https://www.youtube.com/watch"
 
 
@@ -401,7 +401,7 @@ def test_denies_youtube_update_with_exisiting_url(client, app, db, proposal):
 
     proposal = Proposal.query.get(proposal.id)
     # setup sets this to true, the api should not change that
-    assert proposal.video_recording_lost == True
+    assert proposal.video_recording_lost is True
     assert proposal.youtube_url == "https://example.com"
 
 
@@ -437,7 +437,7 @@ def test_denies_youtube_update_with_wrong_url(client, app, db, proposal):
 
     proposal = Proposal.query.get(proposal.id)
     # setup sets this to true, the api should not change that
-    assert proposal.video_recording_lost == True
+    assert proposal.video_recording_lost is True
     assert proposal.youtube_url == "https://example.com"
 
 
