@@ -20,7 +20,7 @@ def proposal(db, user):
 
     # Teardown
     db.session.delete(proposal)
-    db.session.flush()
+    db.session.commit()
 
 
 def test_denies_request_without_api_key(client, app, proposal):
@@ -150,7 +150,7 @@ def test_denies_voctoweb_with_wrong_url(client, app, db, proposal):
     proposal.c3voc_url = "https://example.com"
     proposal.video_recording_lost = True
     db.session.add(proposal)
-    db.session.flush()
+    db.session.commit()
 
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
@@ -184,7 +184,7 @@ def test_denies_voctoweb_with_wrong_url(client, app, db, proposal):
 def test_clears_voctoweb(client, app, db, proposal):
     proposal.c3voc_url = "https://example.com"
     db.session.add(proposal)
-    db.session.flush()
+    db.session.commit()
 
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
@@ -276,7 +276,7 @@ def test_update_thumbnail_with_url(client, app, db, proposal):
 def test_denies_thumbnail_not_url(client, app, db, proposal):
     proposal.thumbnail_url = "https://example.com/thumb.jpg"
     db.session.add(proposal)
-    db.session.flush()
+    db.session.commit()
 
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
@@ -308,7 +308,7 @@ def test_denies_thumbnail_not_url(client, app, db, proposal):
 def test_clears_thumbnail(client, app, db, proposal):
     proposal.thumbnail_url = "https://example.com/thumb.jpg"
     db.session.add(proposal)
-    db.session.flush()
+    db.session.commit()
 
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
@@ -372,7 +372,7 @@ def test_denies_youtube_update_with_exisiting_url(client, app, db, proposal):
     proposal.youtube_url = "https://example.com"
     proposal.video_recording_lost = True
     db.session.add(proposal)
-    db.session.flush()
+    db.session.commit()
 
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
@@ -408,7 +408,7 @@ def test_denies_youtube_update_with_wrong_url(client, app, db, proposal):
     proposal.youtube_url = "https://example.com"
     proposal.video_recording_lost = True
     db.session.add(proposal)
-    db.session.flush()
+    db.session.commit()
 
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
@@ -443,7 +443,7 @@ def test_denies_youtube_update_with_wrong_url(client, app, db, proposal):
 def test_clears_youtube(client, app, db, proposal):
     proposal.youtube_url = "https://example.com"
     db.session.add(proposal)
-    db.session.flush()
+    db.session.commit()
 
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
