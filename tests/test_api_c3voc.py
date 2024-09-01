@@ -110,7 +110,7 @@ def test_denies_request_wrong_year(client, app, proposal):
     assert rv.status_code == 422
 
 
-def test_request_none_update_none(client, app, db, proposal):
+def test_request_none_unchanged(client, app, db, proposal):
     app.config.update(
         {
             "VIDEO_API_KEY": "api-key",
@@ -145,7 +145,7 @@ def test_request_none_update_none(client, app, db, proposal):
     assert proposal.c3voc_url is None
 
 
-def test_request_voctoweb_update_voctoweb_correct_url(client, app, db, proposal):
+def test_update_voctoweb_with_correct_url(client, app, db, proposal):
     app.config.update(
         {
             "VIDEO_API_KEY": "api-key",
@@ -183,7 +183,7 @@ def test_request_voctoweb_update_voctoweb_correct_url(client, app, db, proposal)
     assert proposal.youtube_url is None
 
 
-def test_request_voctoweb_update_voctoweb_wrong_url(client, app, db, proposal):
+def test_denies_voctoweb_with_wrong_url(client, app, db, proposal):
     app.config.update(
         {
             "VIDEO_API_KEY": "api-key",
@@ -221,7 +221,7 @@ def test_request_voctoweb_update_voctoweb_wrong_url(client, app, db, proposal):
     assert proposal.c3voc_url == "https://example.com"
 
 
-def test_request_voctoweb_clears_voctoweb(client, app, db, proposal):
+def test_clears_voctoweb(client, app, db, proposal):
     app.config.update(
         {
             "VIDEO_API_KEY": "api-key",
@@ -257,7 +257,7 @@ def test_request_voctoweb_clears_voctoweb(client, app, db, proposal):
     assert proposal.c3voc_url is None
 
 
-def test_request_thumbnail_update_thumbnail_correct_path(client, app, db, proposal):
+def test_update_thumbnail_with_path(client, app, db, proposal):
     app.config.update(
         {
             "VIDEO_API_KEY": "api-key",
@@ -295,7 +295,7 @@ def test_request_thumbnail_update_thumbnail_correct_path(client, app, db, propos
     assert proposal.youtube_url is None
 
 
-def test_request_thumbnail_update_thumbnail_correct_url(client, app, db, proposal):
+def test_update_thumbnail_with_url(client, app, db, proposal):
     app.config.update(
         {
             "VIDEO_API_KEY": "api-key",
@@ -333,7 +333,7 @@ def test_request_thumbnail_update_thumbnail_correct_url(client, app, db, proposa
     assert proposal.youtube_url is None
 
 
-def test_request_thumbnail_update_thumbnail_not_url(client, app, db, proposal):
+def test_denies_thumbnail_not_url(client, app, db, proposal):
     app.config.update(
         {
             "VIDEO_API_KEY": "api-key",
@@ -356,7 +356,7 @@ def test_request_thumbnail_update_thumbnail_not_url(client, app, db, proposal):
             "voctoweb": {
                 "enabled": True,
                 "frontend_url": "",
-                "thumb_path": "gopher://example.com/thumb.jpg",
+                "thumb_path": "/example.com/thumb.jpg",
             },
             "youtube": {
                 "enabled": False,
@@ -369,7 +369,7 @@ def test_request_thumbnail_update_thumbnail_not_url(client, app, db, proposal):
     assert proposal.thumbnail_url == "https://example.com/thumb.jpg"
 
 
-def test_request_thumbnail_clears_thumbnail(client, app, db, proposal):
+def test_clears_thumbnail(client, app, db, proposal):
     app.config.update(
         {
             "VIDEO_API_KEY": "api-key",
@@ -405,7 +405,7 @@ def test_request_thumbnail_clears_thumbnail(client, app, db, proposal):
     assert proposal.thumbnail_url is None
 
 
-def test_request_youtube_update_youtube_correct_url(client, app, db, proposal):
+def test_update_youtube_with_correct_url(client, app, db, proposal):
     app.config.update(
         {
             "VIDEO_API_KEY": "api-key",
@@ -444,7 +444,7 @@ def test_request_youtube_update_youtube_correct_url(client, app, db, proposal):
     assert proposal.youtube_url == "https://www.youtube.com/watch"
 
 
-def test_request_youtube_update_youtube_correct_url_but_existing_url(client, app, db, proposal):
+def test_denies_youtube_update_with_exisiting_url(client, app, db, proposal):
     app.config.update(
         {
             "VIDEO_API_KEY": "api-key",
@@ -483,7 +483,7 @@ def test_request_youtube_update_youtube_correct_url_but_existing_url(client, app
     assert proposal.youtube_url == "https://example.com"
 
 
-def test_request_youtube_update_youtube_wrong_url(client, app, db, proposal):
+def test_denies_youtube_update_with_wrong_url(client, app, db, proposal):
     app.config.update(
         {
             "VIDEO_API_KEY": "api-key",
@@ -522,7 +522,7 @@ def test_request_youtube_update_youtube_wrong_url(client, app, db, proposal):
     assert proposal.youtube_url == "https://example.com"
 
 
-def test_request_youtube_clears_youtube(client, app, db, proposal):
+def test_clears_youtube(client, app, db, proposal):
     app.config.update(
         {
             "VIDEO_API_KEY": "api-key",
