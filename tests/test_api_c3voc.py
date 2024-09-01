@@ -7,10 +7,11 @@ from models.cfp import Proposal, TalkProposal
 @pytest.fixture
 def proposal(db, user):
     # Setup
-    proposal = TalkProposal()
-    proposal.title = "Title"
-    proposal.description = "Description"
-    proposal.user = user
+    proposal = TalkProposal(
+        title="Title",
+        description="Description",
+        user=user,
+    )
 
     db.session.add(proposal)
     db.session.commit()
