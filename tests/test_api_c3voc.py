@@ -360,7 +360,7 @@ def test_update_from_youtube_with_correct_url(client, app, db, proposal, valid_a
     assert proposal.youtube_url == "https://www.youtube.com/watch"
 
 
-def test_denies_youtube_update_with_exisiting_url(client, app, db, proposal, valid_auth_headers):
+def test_denies_youtube_update_with_existing_url(client, app, db, proposal, valid_auth_headers):
     proposal.youtube_url = "https://example.com"
     proposal.video_recording_lost = True
     db.session.add(proposal)
