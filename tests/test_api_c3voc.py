@@ -117,6 +117,10 @@ def test_request_none_unchanged(client, app, db, proposal, valid_auth_headers):
 
 
 def test_update_voctoweb_with_correct_url(client, app, db, proposal, valid_auth_headers):
+    proposal.video_recording_lost = True
+    db.session.add(proposal)
+    db.session.commit()
+
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
         headers=valid_auth_headers,
@@ -323,7 +327,11 @@ def test_clears_thumbnail(client, app, db, proposal, valid_auth_headers):
     assert proposal.thumbnail_url is None
 
 
-def test_update_youtube_with_correct_url(client, app, db, proposal, valid_auth_headers):
+def test_update_from_youtube_with_correct_url(client, app, db, proposal, valid_auth_headers):
+    proposal.video_recording_lost = True
+    db.session.add(proposal)
+    db.session.commit()
+
     rv = client.post(
         f"/api/proposal/c3voc-publishing-webhook",
         headers=valid_auth_headers,
