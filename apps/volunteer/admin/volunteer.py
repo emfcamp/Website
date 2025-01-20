@@ -39,6 +39,7 @@ class VolunteerUserModelView(VolunteerModelView):
         "volunteer_phone",
         "interested_roles",
         "trained_roles",
+        "admined_roles",
         "over_18",
         "allow_comms_during_event",
         "banned",
