@@ -337,6 +337,96 @@ ProposalAllowedVenues = db.Table(
 )
 
 
+class ScheduleItemType(StrEnum):
+    talk = 'talk'
+    workshop = 'workshop'
+    youthworkshop = 'youthworkshop'
+    # NB this should be easy to extend
+
+    def human_type(self):
+        ...
+
+class ScheduleItem(BaseModel):
+    id?
+    itemtype: ScheduleItemType
+    occurrences: List[Occurrence]
+    auto_schedule: Boolean
+    has_lottery: Boolean
+    # List of EventDay and AM/PM/Evening (but list example times)
+    # only shown if auto_schedule is set
+    constraint_periods = db.JSON(db.String)
+
+    published_names = db.Column(db.String)
+    published_pronouns = db.Column(db.String)
+    published_title = db.Column(db.String)
+    published_description = db.Column(db.String)
+
+    may_record = db.Column(db.Boolean)
+    video_privacy = db.Column(db.String)
+    needs_laptop = db.Column(db.Boolean)
+    # on User, but ask them to fill this in - telephone_number = db.Column(db.String)
+    # on User, but ask them to fill this in - eventphone_number = db.Column(db.String)
+
+    family_friendly = db.Column(db.Boolean, default=False)
+    content_note = db.Column(db.String, nullable=True)
+
+    favourites = db.relationship(
+        User, secondary=Favourite, backref=db.backref("favourites")
+    )
+
+    # Convenience for individual objects. Use an outerjoin and groupby for more than a few records
+    favourite_count = column_property(
+        select([func.count(Favourite.c.proposal_id)])
+        .where(Favourite.c.proposal_id == id)
+        .scalar_subquery(),  # type: ignore[attr-defined]
+        deferred=True,
+    )
+
+
+class TimeBlock(BaseModel):
+    venue: Venue
+    allowed_types: List[ScheduleItemType]
+    preferred_types: List[ScheduleItemType]
+    auto_schedule: Boolean
+
+
+class Occurrence(BaseModel):
+    id?
+    uuid: UUID
+    schedule_item: ScheduleItem
+    is_official: Boolean
+
+    scheduled_duration = db.Column(db.Integer, nullable=True)
+    scheduled_time = db.Column(db.DateTime, nullable=True)
+    scheduled_venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"))
+    scheduled_venue = db.relationship(
+        "Venue",
+        backref="proposals",
+        primaryjoin="Venue.id == Proposal.scheduled_venue_id",
+    )
+
+    # Video stuff
+    c3voc_url = db.Column(db.String)
+    youtube_url = db.Column(db.String)
+    thumbnail_url = db.Column(db.String)
+    video_recording_lost = db.Column(db.Boolean, default=False)
+    lottery: Lottery
+
+class Lottery(BaseModel):
+    lottery_entries = db.relationship("LotteryEntry", backref="proposal")
+
+
+
+@dataclass
+class ScheduleAttribute:
+    equipment_required: str
+    funding_required: str
+    additional_info: str
+    length: str  # only used for talks and workshops
+
+
+
+
 class Proposal(BaseModel):
     __versioned__ = {"exclude": ["favourites", "favourite_count"]}
     __tablename__ = "proposal"
@@ -357,11 +447,6 @@ class Proposal(BaseModel):
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
 
-    equipment_required = db.Column(db.String)
-    funding_required = db.Column(db.String)
-    additional_info = db.Column(db.String)
-    length = db.Column(db.String)  # only used for talks and workshops
-    notice_required = db.Column(db.String)
     private_notes = db.Column(db.String)
 
     tags = db.relationship(
@@ -371,80 +456,14 @@ class Proposal(BaseModel):
         secondary=ProposalTag,
     )
 
-    # Flags
     needs_help = db.Column(db.Boolean, nullable=False, default=False)
     needs_money = db.Column(db.Boolean, nullable=False, default=False)
     one_day = db.Column(db.Boolean, nullable=False, default=False)
-    has_rejected_email = db.Column(db.Boolean, nullable=False, default=False)
-    user_scheduled = db.Column(db.Boolean, nullable=False, default=False)
+    rejection_email_sent = db.Column(db.Boolean, nullable=False, default=False)
 
     # References to this table
     messages = db.relationship("CFPMessage", backref="proposal")
     votes = db.relationship("CFPVote", backref="proposal")
-    favourites = db.relationship(
-        User, secondary=FavouriteProposal, backref=db.backref("favourites")
-    )
-
-    # Convenience for individual objects. Use an outerjoin and groupby for more than a few records
-    favourite_count = column_property(
-        select([func.count(FavouriteProposal.c.proposal_id)])
-        .where(FavouriteProposal.c.proposal_id == id)
-        .scalar_subquery(),  # type: ignore[attr-defined]
-        deferred=True,
-    )
-
-    # Fields for finalised info
-    published_names = db.Column(db.String)
-    published_pronouns = db.Column(db.String)
-    published_title = db.Column(db.String)
-    published_description = db.Column(db.String)
-    arrival_period = db.Column(db.String)
-    departure_period = db.Column(db.String)
-    telephone_number = db.Column(db.String)
-    eventphone_number = db.Column(db.String)
-    may_record = db.Column(db.Boolean)
-    video_privacy = db.Column(db.String)
-    needs_laptop = db.Column(db.Boolean)
-    available_times = db.Column(db.String)
-    family_friendly = db.Column(db.Boolean, default=False)
-    content_note = db.Column(db.String, nullable=True)
-
-    # Fields for scheduling
-    # hide_from_schedule -- do not display this item
-    hide_from_schedule = db.Column(db.Boolean, default=False, nullable=False)
-    # manually_scheduled -- make the scheduler ignore this
-    manually_scheduled = db.Column(db.Boolean, default=False, nullable=False)
-    allowed_venues = db.relationship(
-        "Venue",
-        secondary=ProposalAllowedVenues,
-        backref="allowed_proposals",
-    )
-    allowed_times = db.Column(db.String, nullable=True)
-    scheduled_duration = db.Column(db.Integer, nullable=True)
-    scheduled_time = db.Column(db.DateTime, nullable=True)
-    scheduled_venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"))
-    potential_time = db.Column(db.DateTime, nullable=True)
-    potential_venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"))
-
-    scheduled_venue = db.relationship(
-        "Venue",
-        backref="proposals",
-        primaryjoin="Venue.id == Proposal.scheduled_venue_id",
-    )
-    potential_venue = db.relationship(
-        "Venue", primaryjoin="Venue.id == Proposal.potential_venue_id"
-    )
-
-    # Video stuff
-    c3voc_url = db.Column(db.String)
-    youtube_url = db.Column(db.String)
-    thumbnail_url = db.Column(db.String)
-    video_recording_lost = db.Column(db.Boolean, default=False)
-
-    type_might_require_ticket = False
-    tickets = db.relationship("EventTicket", backref="proposal")
-
-    __mapper_args__ = {"polymorphic_on": type}
 
     @classmethod
     def query_accepted(cls, include_user_scheduled=False):
@@ -849,18 +868,9 @@ class Proposal(BaseModel):
         return ""
 
 
-class PerformanceProposal(Proposal):
-    __mapper_args__ = {"polymorphic_identity": "performance"}
-    human_type = HUMAN_CFP_TYPES["performance"]
 
+class WorkshopAttrs:
 
-class TalkProposal(Proposal):
-    __mapper_args__ = {"polymorphic_identity": "talk"}
-    human_type = HUMAN_CFP_TYPES["talk"]
-
-
-class WorkshopProposal(Proposal):
-    __mapper_args__ = {"polymorphic_identity": "workshop"}
     human_type = HUMAN_CFP_TYPES["workshop"]
     attendees = db.Column(db.String)
     cost = db.Column(db.String)
@@ -896,23 +906,17 @@ class WorkshopProposal(Proposal):
         return sum([t.ticket_count for t in self.tickets if t.state == state])
 
 
-class YouthWorkshopProposal(WorkshopProposal):
-    __mapper_args__ = {"polymorphic_identity": "youthworkshop"}
-    human_type = HUMAN_CFP_TYPES["youthworkshop"]
+class YouthWorkshopAttrs:
     valid_dbs = db.Column(db.Boolean, nullable=False, default=False)
     max_tickets_per_person = 2
 
 
-class InstallationProposal(Proposal):
-    __mapper_args__ = {"polymorphic_identity": "installation"}
-    human_type = HUMAN_CFP_TYPES["installation"]
+class InstallationAttrs:
     size = db.Column(db.String)
     installation_funding = db.Column(db.String, nullable=True)
 
 
-class LightningTalkProposal(Proposal):
-    __mapper_args__ = {"polymorphic_identity": "lightning"}
-    human_type = HUMAN_CFP_TYPES["lightning"]
+class LightningTalkAttrs:
     slide_link = db.Column(db.String, nullable=True)
     session = db.Column(db.String, default="fri")
 
@@ -958,12 +962,10 @@ class LightningTalkProposal(Proposal):
         return {k: v["slots"] for (k, v) in LIGHTNING_TALK_SESSIONS.items()}
 
 
-PYTHON_CFP_TYPES = {
-    "performance": PerformanceProposal,
-    "talk": TalkProposal,
-    "workshop": WorkshopProposal,
-    "youthworkshop": YouthWorkshopProposal,
-    "installation": InstallationProposal,
+AttrSchemas = {
+    "workshop": WorkshopAttrs,
+    "youthworkshop": YouthWorkshopAttrs,
+    "installation": InstallationAttrs,
 }
 
 
