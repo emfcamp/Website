@@ -10,7 +10,8 @@ from apps.common.forms import (
 )
 from apps.cfp.scheduler import Scheduler
 from main import db
-from models.user import User, UserDiversity
+from models.user import User
+from models.diversity import UserDiversity
 from models.basket import Basket
 from models.event_tickets import EventTicket, get_max_rank_for_user
 from models.product import PriceTier
