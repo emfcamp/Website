@@ -83,8 +83,11 @@ def get_export_data(table_filter: Optional[str] = None):
 
 
 @base.cli.command("export")
+@click.option(
+    "--stdout", is_flag=True, help="Print to stdout rather than write to disk"
+)
 @click.argument("table", required=False)
-def export_db(table):
+def export_db(stdout, table):
     """Export data from the DB to disk.
 
     This command is run as a last step before wiping the DB after an event, to export
@@ -92,8 +95,11 @@ def export_db(table):
     exports directory.
 
     Model classes should implement get_export_data, which returns a dict with keys:
+
         public   Public data to save in git
+
         private  Private data that should be stored for a limited amount of time
+
         tables   Tables this method exported, used to sanity check the export process
 
     Alternatively, add __export_data__ = False to a class to state that get_export_data
@@ -110,12 +116,15 @@ def export_db(table):
             if dirname in export:
                 filename = os.path.join(path, dirname, "{}.json".format(model))
                 try:
-                    json.dump(
-                        export[dirname],
-                        open(filename, "w"),
-                        indent=4,
-                        cls=ExportEncoder,
-                    )
+                    if stdout:
+                        app.logger.info(json.dumps(export[dirname]))
+                    else:
+                        json.dump(
+                            export[dirname],
+                            open(filename, "w"),
+                            indent=4,
+                            cls=ExportEncoder,
+                        )
                 except:
                     app.logger.exception("Error encoding export for %s", model)
                     raise click.Abort()
@@ -125,7 +134,11 @@ def export_db(table):
         "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
     }
     filename = os.path.join(path, "export.json")
-    json.dump(data, open(filename, "w"), indent=4, cls=ExportEncoder)
+
+    if stdout:
+        app.logger.info(json.dumps(data))
+    else:
+        json.dump(data, open(filename, "w"), indent=4, cls=ExportEncoder)
 
     if table:
         return
