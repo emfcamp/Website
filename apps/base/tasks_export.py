@@ -133,7 +133,7 @@ def export_db(table):
     with app.test_client() as client:
         for file_type, file_url in (
             ("frab", f"{year}.frab.xml"),
-            ("frab_json", f"{year}.frab.json"),
+            ("frab.json", f"{year}.frab.json"),
             ("json", f"{year}.json"),
             ("ics", f"{year}.ics"),
         ):

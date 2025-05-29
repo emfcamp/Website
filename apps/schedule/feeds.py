@@ -60,7 +60,7 @@ def schedule_json(year):
 @schedule.route("/schedule/<int:year>.frab.json")
 def schedule_frab_json(year):
     if year != event_year():
-        return feed_historic(year, "frab_json")
+        return feed_historic(year, "frab.json")
 
     if not feature_enabled("SCHEDULE"):
         abort(404)
