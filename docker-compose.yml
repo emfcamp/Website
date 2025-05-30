@@ -2,6 +2,7 @@ services:
   app:
     build:
       context: "./"
+    init: true
     networks:
       - emfweb
     depends_on:
