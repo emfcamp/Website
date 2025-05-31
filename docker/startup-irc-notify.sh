@@ -11,8 +11,8 @@ send() {
   echo "#emfcamp-web $1" | curl -s -m5 telnet://$IRCCAT ||:
 }
 
-db_head=$(poetry run flask db current)
-heads=$(poetry run flask db heads)
+db_head=$(uv run flask db current)
+heads=$(uv run flask db heads)
 git_head=$(git rev-parse HEAD|cut -c -8)
 
 msg="%BOLDWebsite%NORMAL starting (%DGREEN${git_head}%NORMAL),"
@@ -24,8 +24,8 @@ send "$msg DB migration required"
 
 sleep $MIGRATION_GRACE_SECS
 
-db_head=$(poetry run flask db current)
-heads=$(poetry run flask db heads)
+db_head=$(uv run flask db current)
+heads=$(uv run flask db heads)
 
 if [[ "$db_head" != "$heads" ]]; then
   send "%BOLDWebsite%NORMAL DB migration %BOLDnot complete%NORMAL after $MIGRATION_GRACE_SECS seconds"

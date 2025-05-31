@@ -26,17 +26,17 @@ then
 fi;
 
 echo "Initialising database..."
-poetry run flask db upgrade
+uv run flask db upgrade
 
 if [ $# -gt 0 ]; then
   exec "$@"
 fi
 
 echo "Creating base data..."
-poetry run flask create_perms
-poetry run flask dev createbankaccounts
-poetry run flask cfp create_venues
-poetry run flask cfp create_tags
-poetry run flask tickets create
+uv run flask create_perms
+uv run flask dev createbankaccounts
+uv run flask cfp create_venues
+uv run flask cfp create_tags
+uv run flask tickets create
 echo "Starting dev server..."
-exec poetry run flask run --extra-files ./config/development.cfg:./logging.yaml:./logging.override.yaml -h 0.0.0.0 -p 2342 --debug
+exec uv run flask run --extra-files ./config/development.cfg:./logging.yaml:./logging.override.yaml -h 0.0.0.0 -p 2342 --debug

@@ -8,16 +8,16 @@ FROM ghcr.io/emfcamp/website-base:latest
 COPY . /app/
 WORKDIR /app
 
-RUN poetry install --no-dev \
-	&& poetry run playwright install-deps \
-	&& poetry run playwright install chromium \
+RUN uv sync --no-dev \
+	&& uv run playwright install-deps \
+	&& uv run playwright install chromium \
 	&& rm -Rf ./static
 
 COPY --from=static /app/static /app/static
 
 # The settings file doesn't matter for the purposes of the below command,
 # but it's needed for it to run.
-RUN SETTINGS_FILE=/app/config/test.cfg poetry run flask digest compile
+RUN SETTINGS_FILE=/app/config/test.cfg uv run flask digest compile
 ENV PROMETHEUS_MULTIPROC_DIR=/var/prometheus
 ENV SHELL=/bin/bash
 ENTRYPOINT ["./docker/prod_entrypoint.sh"]
