@@ -75,7 +75,8 @@ def edit(year, village_id):
 
     form = VillageForm()
     if form.validate_on_submit():
-        if Village.get_by_name(form.name.data):
+        other_village = Village.get_by_name(form.name.data)
+        if other_village and other_village != village:
             # FIXME: this should be a WTForms validation
             flash("A village already exists with that name, please choose another")
             return redirect(url_for(".register"))
