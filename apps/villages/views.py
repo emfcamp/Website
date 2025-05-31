@@ -24,20 +24,16 @@ def register():
             flash("A village already exists with that name, please choose another")
             return redirect(url_for(".register"))
 
-        village = Village(name=form.name.data, description=form.description.data)
+        village = Village()
+        form.populate_obj(village)
 
         membership = VillageMember(village=village, user=current_user, admin=True)
 
         venue = Venue(village=village, name=village.name)
 
-        requirements = VillageRequirements(
-            village=village,
-            num_attendees=form.num_attendees.data,
-            size_sqm=form.size_sqm.data,
-            power_requirements=form.power_requirements.data,
-            noise=form.noise.data,
-            structures=form.structures.data,
-        )
+        requirements = VillageRequirements(village=village)
+        form.populate_obj(requirements)
+
         db.session.add(village)
         db.session.add(membership)
         db.session.add(requirements)
