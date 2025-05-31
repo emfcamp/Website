@@ -71,6 +71,35 @@ class Village(BaseModel):
             return "https://map.emfcamp.org/#18.5/%s/%s/m=%s,%s" % (latlon[0], latlon[1], latlon[0], latlon[1])
         return None
 
+    @classmethod
+    def get_export_data(cls):
+        data = {
+            "public": {
+                "villages": {
+                    v.id: {
+                        "name": v.name,
+                        "description": v.description,
+                        "url": v.url,
+                        "location": v.latlon,
+                    }
+                    for v in Village.query.all()
+                }
+            },
+            "tables": ["village", "village_member", "village_requirements"],
+            "private": {
+                # Village contact/attendee counts are exported here to issue vouchers for the next event
+                "village_info": {
+                    v.id: {
+                        "admin_emails": [u.email for u in v.admins()],
+                        "predicted_attendees": v.requirements.num_attendees,
+                    }
+                    for v in Village.query.all()
+                },
+            },
+        }
+
+        return data
+
 
 # I'm not entirely sure why we create this index separately but this is how
 # it was done with the old MapObject stuff.
