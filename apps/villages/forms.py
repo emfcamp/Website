@@ -44,15 +44,25 @@ class VillageForm(Form):
         self.url.data = village.url
 
         requirements = village.requirements
-
         self.num_attendees.data = requirements.num_attendees
         self.size_sqm.data = requirements.size_sqm
         self.power_requirements.data = requirements.power_requirements
         self.noise.data = requirements.noise
         self.structures.data = requirements.structures
 
-    def validate_name(form, field):
-        field.data = field.data.strip()
+    def populate_obj(self, village):
+        village.name = self.name.data
+        village.description = self.description.data
+        village.url = self.url.data
+
+        village.requirements.num_attendees = self.num_attendees.data
+        village.requirements.size_sqm = self.size_sqm.data
+        village.requirements.power_requirements = self.power_requirements.data
+        village.requirements.noise = self.noise.data
+        village.requirements.structures = self.structures.data
+
+    def validate_name(self, field):
+        field.data = (field.data or '').strip()
 
 class AdminVillageForm(VillageForm):
     latlon = StringField("Location", [Optional()])
