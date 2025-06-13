@@ -90,6 +90,16 @@ class Shift(BaseModel):
                     "min_needed": s.min_needed,
                     "max_needed": s.max_needed,
                     "signed_up": s.current_count,
+                    "entry_states": db.session.execute(
+                        select(
+                            [
+                                ShiftEntry.state,
+                                func.count(ShiftEntry.user_id),
+                            ]
+                        )
+                        .group_by(ShiftEntry.state)
+                        .where(ShiftEntry.shift_id == s.id)
+                    ).all(),
                 }
                 for s in cls.get_all()
             ]
