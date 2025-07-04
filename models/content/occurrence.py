@@ -19,6 +19,10 @@ class Occurrence(BaseModel):
         db.Integer, db.ForeignKey("schedule_item.id", nullable=False)
     )
 
+    time_block_id = db.Column(
+        db.Integer, db.ForeignKey("time_block.id"), nullable=False
+    )
+
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     modified = db.Column(
         db.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow
