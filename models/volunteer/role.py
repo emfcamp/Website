@@ -50,6 +50,36 @@ class Role(BaseModel):
     def get_all(cls):
         return cls.query.order_by(Role.name).all()
 
+    @classmethod
+    def get_export_data(cls):
+        from . import Shift, ShiftEntry
+
+        roles = {}
+        for role in cls.get_all():
+            shift_counts_q = (
+                db.select(db.func.count(ShiftEntry.shift_id).label("shift_count"))
+                .join(Shift, (Shift.id == ShiftEntry.shift_id))
+                .where(Shift.role_id == role.id)
+                .cte("shift_counts")
+            )
+            shift_histogram_q = (
+                db.select(shift_counts_q.c.shift_count, db.func.count(db.distinct(ShiftEntry.user_id)))
+                .join(ShiftEntry, db.true)
+                .join(Shift, (Shift.id == ShiftEntry.shift_id))
+                .where(Shift.role_id == role.id)
+                .group_by(shift_counts_q.c.shift_count)
+            )
+            shift_histogram = dict(db.session.execute(shift_histogram_q).all())
+            roles[role.name] = {
+                "shift_histogram": shift_histogram,
+                "total_volunteers": sum(shift_histogram.values()),
+            }
+        return {
+            "public": {
+                "roles": roles,
+            },
+        }
+
 
 class RolePermission(BaseModel):
     __versioned__: dict = {}
