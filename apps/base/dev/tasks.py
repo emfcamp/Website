@@ -1,5 +1,8 @@
-""" Development CLI tasks """
+"""Development CLI tasks"""
+
+import json
 import click
+
 from pendulum import Duration as Offset, parse
 from flask import current_app as app
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -14,9 +17,15 @@ from apps.cfp.tasks import create_tags
 from models.payment import BankAccount
 from models.site_state import SiteState, refresh_states
 from models.feature_flag import FeatureFlag, refresh_flags
+from models.content.content_type_definition import (
+    ContentTypeDefinition,
+    ContentTypeFieldDefinition,
+)
 
 from . import dev_cli
 from .fake import FakeDataGenerator
+
+CONTENT_TYPE_DEFINITIONS_FILE = "apps/base/dev/content_types.json"
 
 
 @dev_cli.command("data")
@@ -54,7 +63,6 @@ def enable_cfp():
     db.session.flush()
     refresh_flags()
     refresh_states()
-
 
 
 @dev_cli.command("volunteer_data")
@@ -632,3 +640,30 @@ def create_bank_accounts():
             pass
 
     db.session.commit()
+
+
+@dev_cli.command("create_content_types")
+def create_content_types():
+    app.logger.info(f"Adding content type definitions")
+    with open(CONTENT_TYPE_DEFINITIONS_FILE, "r") as file:
+        data = json.load(file)
+
+    # FIXME make this update correctly
+    for content_type_name, type_field_defs in data.items():
+        app.logger.info(f"Adding {content_type_name} definition")
+        content_type = ContentTypeDefinition(content_type_name)
+        db.session.add(content_type)
+        db.session.commit()
+
+        for field_name, field_def in type_field_defs.items():
+            db.session.add(
+                ContentTypeFieldDefinition(
+                    content_type,
+                    field_name,
+                    field_def.get("display_name", None),
+                    field_def.get("default", None),
+                )
+            )
+    db.session.commit()
+    db.session.flush()
+    app.logger.info("Done")
