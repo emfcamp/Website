@@ -1,8 +1,8 @@
-version: "3.7"
 services:
   app:
     build:
       context: "./"
+    init: true
     networks:
       - emfweb
     depends_on:
@@ -14,8 +14,7 @@ services:
       - "2342:2342"
     environment:
       SETTINGS_FILE: ./config/development.cfg
-      FLASK_APP: dev_server.py
-      FLASK_ENV: development
+      FLASK_APP: dev_server.py  # Required for flask-admin 1.6.1 to work (see #1769)
       COLORIZE_LOGS: always
       PYTHONUNBUFFERED: 1
       IRCCAT: fakeirccat:12345
@@ -38,6 +37,7 @@ services:
     build:
       context: "./docker/netcat"
     command: -k -l -p 12345
+    init: true
     networks:
       - emfweb
 

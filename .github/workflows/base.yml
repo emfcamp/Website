@@ -12,6 +12,8 @@ on:
       - 'docker/Dockerfile.base-dev.dockerignore'
       - 'pyproject.toml'
       - 'poetry.lock'
+      - 'package.json'
+      - 'package-lock.json'
   schedule:
     - cron:  '30 5 */14 * *'
 

@@ -5,6 +5,8 @@
     although some legacy content remains here.
 """
 
+import json
+
 from flask import (
     redirect,
     render_template,
@@ -24,8 +26,18 @@ def branding():
 def page(page_name: str):
     return render_markdown(f"about/{page_name}", page_name=page_name)
 
+
 @base.route("/about/diversity/<int:year>")
 def yearly_diversity_stats(year: int):
+    if year in (2018, 2022):
+        with open(f"exports/{year}/public/UserDiversity.json", "r") as raw_data:
+            data = json.load(raw_data)
+
+        return render_template(
+            f"about/diversity/pre-2024-stats.html",
+            year=year,
+            data=data["diversity"],
+        )
     return render_markdown(f"about/diversity/{year}")
 
 

@@ -52,6 +52,11 @@ def admin_village(village_id):
     form = AdminVillageForm()
 
     if form.validate_on_submit():
+        for venue in village.venues:
+            if venue.name == village.name:
+                # Rename a village venue if it exists and has the old name.
+                venue.name = form.name.data
+
         form.populate_obj(village)
         db.session.add(village)
         db.session.commit()

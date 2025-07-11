@@ -136,14 +136,14 @@ function css(cb) {
 
 function icons(cb) {
   pump([
-    gulp.src('./images/**/*'),
+    gulp.src('./images/**/*', { encoding: false }),
     gulp.dest('static/images'),
   ], cb);
 }
 
 function images(cb) {
   pump([
-    gulp.src('./node_modules/@primer/octicons/build/svg/**/*.svg'),
+    gulp.src('./node_modules/@primer/octicons/build/svg/**/*.svg', { encoding: false }),
     gulp.dest('static/icons'),
   ], cb);
 }

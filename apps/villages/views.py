@@ -79,8 +79,17 @@ def edit(year, village_id):
 
     form = VillageForm()
     if form.validate_on_submit():
+        if Village.get_by_name(form.name.data):
+            # FIXME: this should be a WTForms validation
+            flash("A village already exists with that name, please choose another")
+            return redirect(url_for(".register"))
+
+        for venue in village.venues:
+            if venue.name == village.name:
+                # Rename a village venue if it exists and has the old name.
+                venue.name = form.name.data
+
         form.populate_obj(village)
-        form.populate_obj(village.requirements)
         db.session.commit()
         flash("Your village registration has been updated.")
         return redirect(url_for(".edit", year=year, village_id=village_id))

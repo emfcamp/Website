@@ -60,8 +60,19 @@
           <button class="youtube-wait-for-click-button">Continue</button>
         </div>
       </div>
-      <p>View this video <a href="{{ event.video.youtube }}">on YouTube</a>.</p>
     {% endif %}
+    <strong>Video Hosts:</strong>
+    <ul>
+    {% if event.video.ccc %}
+      <li>View this video <a href="{{ event.video.ccc }}">on media.ccc.de</a>.</li>
+    {% endif %}
+    {% if event.video.archiveorg %}
+      <li>View this video <a href="{{ event.video.archiveorg }}">on the Internet Archive</a>.</li>
+    {% endif %}
+    {% if event.video.youtube %}
+      <li>View this video <a href="{{ event.video.youtube }}">on YouTube</a>.</li>
+    {% endif %}
+    </ul>
   </div>
 {% endif %}
 {% endblock %}

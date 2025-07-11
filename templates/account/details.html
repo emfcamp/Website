@@ -14,10 +14,11 @@
            in the schedule.</div>
     {% endif %}
   </div>
+  <div class="panel-body">
   <form method="post" class="form-horizontal">
     {{ form.hidden_tag() }}
     <fieldset>
-      <p></p>
+      <h4>Account details</h4>
       <div class="col-sm-12">
         <div class="form-group">
           <label class="col-sm-2 control-label">Email</label>
@@ -38,7 +39,8 @@
     </fieldset>
     {{ render_diversity_fields(form, current_user) }}
 
-    {{ form.forward(class_="btn btn-default pull-right", style="margin-bottom: 15px;") }}
+    {{ form.forward(class_="btn btn-primary pull-right") }}
   </form>
+  </div>
 </div>
 {% endblock %}

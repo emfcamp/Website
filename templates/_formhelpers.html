@@ -136,5 +136,33 @@
         {% endfor %}
     {% endif %}
 </dd>
-
 {% endmacro %}
+
+{% macro render_multi_checkbox(field) %}
+    {% if caller %}
+        {% set help_text = caller() %}
+    {% endif %}
+
+    {% if field.errors %}
+        {# If we have help text, add an aria-describedby attribute to the field. #}
+        {% do kwargs.update({'aria-describedby': "help-block-" + field.name}) %}
+    {% endif %}
+
+    <dt><label for="{{ field.name }}" class="control-label">
+        {{ field.label.text }}
+    </label></dt>
+    <dd {%- if field.errors %} class="has-error" {%- endif %}>
+        {% if help_text %}
+            <p>{{help_text}}</p>
+        {% endif %}
+        <div class="form-check">
+            {{ field(class_="form-check-input") }}
+        </div>
+        {% if field.errors %}
+            {% for error in field.errors %}
+                <p class="help-block" id="help-block-{{ field.name }}">{{ error }}</p>
+            {% endfor %}
+        {% endif -%}
+    </dd>
+{% endmacro %}
+
