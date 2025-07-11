@@ -17,26 +17,7 @@ in making things.{% endblock %} {% block body %} {% include
         <a href="https://social.emfcamp.org/@emf">the Fediverse</a> or join our
         mailing list:
       </p>
-      <form method="post" class="form-inline" role="form">
-        <div class="input-group">
-          <input
-            id="email-field"
-            type="text"
-            class="form-control"
-            placeholder="Enter email address"
-            name="email"
-          />
-          <span class="input-group-btn">
-            <button type="submit" class="btn btn-default debounce">Join</button>
-          </span>
-        </div>
-      </form>
-      <p>
-        <small
-          >(We'll only use your details to contact you about future
-          events)</small
-        >
-      </p>
+      {{contact_form("main")}}
     </div>
   </div>
 </div>

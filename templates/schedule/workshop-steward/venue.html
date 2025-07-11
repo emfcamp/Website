@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Workshop Steward -- {{ venue.name }}{% endblock %}
+{% block body %}
+
+<h1>Workshop Steward for {{ venue.name }}</h1>
+
+<ul>
+  {% for workshop in all_workshops %}
+    <li><a href="{{ url_for('.workshop_steward', workshop_id=workshop.id) }}">{{ workshop.scheduled_time }} -- {{ workshop.title }}</a></li>
+  {% endfor %}
+</ul>
+
+{% endblock %}

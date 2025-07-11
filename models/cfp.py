@@ -24,6 +24,7 @@ from models import (
 from main import db
 from .user import User
 from .cfp_tag import ProposalTag
+from .village import Village
 from . import BaseModel
 
 
@@ -94,9 +95,7 @@ LENGTH_OPTIONS = [
     ("> 45 mins", "Longer than 45 minutes"),
 ]
 
-LIGHTNING_TALK_LENGTH = 5
-INITIAL_LIGHTNING_TALK_SLOTS = 60 / LIGHTNING_TALK_LENGTH
-# Try to encourage filling the Friday slot first by initially having fewer slots on Saturday & Sunday
+INITIAL_LIGHTNING_TALK_SLOTS = 6
 LIGHTNING_TALK_SESSIONS = {
     "fri": {"human": "Friday", "slots": INITIAL_LIGHTNING_TALK_SLOTS},
     "sat": {"human": "Saturday", "slots": INITIAL_LIGHTNING_TALK_SLOTS},
@@ -320,7 +319,11 @@ FavouriteProposal = db.Table(
     BaseModel.metadata,
     db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
     db.Column(
-        "proposal_id", db.Integer, db.ForeignKey("proposal.id"), primary_key=True
+        "proposal_id",
+        db.Integer,
+        db.ForeignKey("proposal.id"),
+        primary_key=True,
+        index=True,
     ),
 )
 
@@ -566,10 +569,12 @@ class Proposal(BaseModel):
             cls.scheduled_time,
             cls.scheduled_duration,
             Venue.name.label("venue"),
+            Village.id.label("venue_village_id"),
         )
         accepted_public = (
             cls.query.filter(cls.is_accepted)
             .outerjoin(cls.scheduled_venue)
+            .outerjoin(Venue.village)
             .with_entities(*public_columns)
         )
 
@@ -755,8 +760,10 @@ class Proposal(BaseModel):
                 Proposal.scheduled_time.is_not(None),
                 Proposal.scheduled_duration.is_not(None),
             ).all()
-            if self.scheduled_time + timedelta(minutes=self.scheduled_duration) > p.scheduled_time and
-            p.scheduled_time + timedelta(minutes=p.scheduled_duration) > self.scheduled_time
+            if self.scheduled_time + timedelta(minutes=self.scheduled_duration)
+            > p.scheduled_time
+            and p.scheduled_time + timedelta(minutes=p.scheduled_duration)
+            > self.scheduled_time
         ]
 
     @property
@@ -795,17 +802,11 @@ class Proposal(BaseModel):
 
     @property
     def latlon(self):
-        if self.scheduled_venue and self.scheduled_venue.location:
-            loc = to_shape(self.scheduled_venue.location)
-            return (loc.y, loc.x)
-        return None
+        return self.scheduled_venue.latlon if self.scheduled_venue else None
 
     @property
     def map_link(self) -> Optional[str]:
-        latlon = self.latlon
-        if latlon:
-            return "https://map.emfcamp.org/#18.5/%s/%s/m=%s,%s" % (latlon[0], latlon[1], latlon[0], latlon[1])
-        return None
+        return self.scheduled_venue.map_link if self.scheduled_venue else None
 
     @property
     def display_title(self) -> str:
@@ -1173,6 +1174,27 @@ class Venue(BaseModel):
     @classmethod
     def get_by_name(cls, name):
         return cls.query.filter_by(name=name).one()
+
+    @property
+    def latlon(self):
+        if self.location:
+            loc = to_shape(self.location)
+            return (loc.y, loc.x)
+        if self.village and self.village.latlon:
+            return self.village.latlon
+        return None
+
+    @property
+    def map_link(self) -> Optional[str]:
+        latlon = self.latlon
+        if latlon:
+            return "https://map.emfcamp.org/#18.5/%s/%s/m=%s,%s" % (
+                latlon[0],
+                latlon[1],
+                latlon[0],
+                latlon[1],
+            )
+        return None
 
 
 # TODO: change the relationships on User and Proposal to 1-to-1

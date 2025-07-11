@@ -75,6 +75,7 @@ class UpdateProposalForm(Form):
         ("review", "Do not stream, and do not publish until reviewed"),
         ("none", "Do not stream or record"),
       ],
+      validators=[Optional()],
     )
     needs_laptop = SelectField(
         "Needs laptop",

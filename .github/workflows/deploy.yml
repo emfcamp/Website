@@ -20,12 +20,10 @@ jobs:
       COVERALLS_GIT_BRANCH: ${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
-      - name: Fetch latest docker-compose
-        run: sudo curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
       - name: Build containers
-        run: docker-compose -f ./docker-compose.yml -f ./docker-compose.ci.yml build --parallel
+        run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml build --parallel
       - name: Test
-        run: docker-compose -f ./docker-compose.yml -f ./docker-compose.ci.yml run -T app poetry run make test
+        run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml run -T app poetry run make test
   build:
     runs-on: ubuntu-latest
     needs: test
@@ -39,9 +37,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build app image
         run: docker build -t ghcr.io/emfcamp/website:latest -f ./Dockerfile.prod .
-      - name: Publish app image
-        run: docker push ghcr.io/emfcamp/website:latest
       - name: Build static image
+        # This builds from ghcr.io/emfcamp/website:latest, which we haven't pushed yet but should be correct locally
         run: docker build -t ghcr.io/emfcamp/website-static:latest -f ./docker/static/Dockerfile ./docker/static/
       - name: Publish static image
+        # Push static first so it hopefully gets pulled first
         run: docker push ghcr.io/emfcamp/website-static:latest
+      - name: Publish app image
+        run: docker push ghcr.io/emfcamp/website:latest

@@ -36,3 +36,9 @@ def wave_talks():
 @base.route("/wave/SiNE")
 def sine():
     return redirect("https://wiki-archive.emfcamp.org/2014/wiki/SiNE")
+
+
+@base.route("/now-and-next.json")
+@base.route("/upcoming.json")
+def old_now_next_feed():
+    return redirect(url_for("schedule.now_and_next_json"), code=301)

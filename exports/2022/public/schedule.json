@@ -3472,7 +3472,10 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/214-computational-alchemy",
     "start_time": "14:30",
-    "end_time": "15:00"
+    "end_time": "15:00",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=LODereXf9Zc"
+    }
   },
   {
     "id": 216,
@@ -5540,7 +5543,10 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/353-the-atomic-gardener",
     "start_time": "15:00",
-    "end_time": "15:30"
+    "end_time": "15:30",
+    "video": {
+        "youtube": "https://www.youtube.com/watch?v=-ouMGoQ4HYU"
+    }
   },
   {
     "id": 354,

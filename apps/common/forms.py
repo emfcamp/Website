@@ -1,17 +1,25 @@
-import re
-from typing import Pattern
-
-from flask import current_app as app
 from flask_wtf import FlaskForm
 
-from wtforms import SelectField, BooleanField
+from wtforms import SelectField, BooleanField, ValidationError
 from wtforms.validators import InputRequired
 
-from models.user import UserDiversity
-from models.cfp_tag import DEFAULT_TAGS, Tag
+from models.diversity import UserDiversity
+from models.cfp_tag import Tag
 from models.purchase import AdmissionTicket
 
-from .fields import HiddenIntegerField
+from .fields import HiddenIntegerField, MultiCheckboxField
+from models.diversity import (
+    guess_age,
+    guess_ethnicity,
+    guess_gender,
+    AGE_CHOICES,
+    DISABILITY_CHOICES,
+    ETHNICITY_CHOICES,
+    GENDER_CHOICES,
+    OPT_OUT,
+    SEXUALITY_CHOICES,
+)
+from models.cfp_tag import DEFAULT_TAGS
 
 
 class Form(FlaskForm):
@@ -25,81 +33,18 @@ class Form(FlaskForm):
         csrf_context = None
 
 
-OPT_OUT = [
-    ("", "Prefer not to say"),
-]
-
 NULL_SELECTION = [
     ("", "(please choose)"),
 ]
-
-GENDER_VALUES = ("female", "male", "non-binary", "other")
-GENDER_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in GENDER_VALUES])
-
-ETHNICITY_VALUES = ("asian", "black", "mixed", "white", "other")
-ETHNICITY_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in ETHNICITY_VALUES])
-
-AGE_VALUES = ("0-15", "16-25", "26-35", "36-45", "46-55", "56-65", "66+")
-AGE_CHOICES = tuple(OPT_OUT + [(v, v) for v in AGE_VALUES])
-
 TOPIC_CHOICES = tuple(NULL_SELECTION + [(v, v.capitalize()) for v in DEFAULT_TAGS])
-
-# FIXME these are matchers for transition from freetext diversity form -> select boxes
-# This should be deleted for 2026
-
-
-def guess_age(age_str: str) -> str:
-    if age_str in AGE_VALUES:
-        return age_str
-    try:
-        age = int(age_str)
-    except ValueError:  # Can't parse as an int so reset
-        return ""
-
-    if age > 66:
-        return "66+"
-
-    for age_range in AGE_VALUES:
-        if age_range == "66+":
-            continue
-        low_val, high_val = age_range.split("-")
-
-        if int(low_val) <= age <= int(high_val):
-            return age_range
-
-    return ""
-
-
-def __guess_value(match_str: str, matchers_dict: dict[str, Pattern]) -> str:
-    match_str = match_str.lower().strip()
-    for key, matcher in matchers_dict.items():
-        if matcher.fullmatch(match_str):
-            return key
-
-    return ""
-
-
-def guess_gender(gender_str: str) -> str:
-    gender_matchers = app.config.get("GENDER_MATCHERS", {})
-    gender_re_matchers = {k: re.compile(v, re.I) for k, v in gender_matchers.items()}
-    return __guess_value(gender_str, gender_re_matchers)
-
-
-def guess_ethnicity(ethnicity_str: str) -> str:
-    ethnicity_matchers = app.config.get("ETHNICITY_MATCHERS", {})
-    ethnicity_re_matchers = {
-        k: re.compile(v, re.I) for k, v in ethnicity_matchers.items()
-    }
-    return __guess_value(ethnicity_str, ethnicity_re_matchers)
-
-
-# End of stuff to delete for 2026
 
 
 class DiversityForm(Form):
     age = SelectField("Age", default=OPT_OUT[0], choices=AGE_CHOICES)
     gender = SelectField("Gender", default=OPT_OUT[0], choices=GENDER_CHOICES)
     ethnicity = SelectField("Ethnicity", default=OPT_OUT[0], choices=ETHNICITY_CHOICES)
+    sexuality = SelectField("Sexuality", default=OPT_OUT[0], choices=SEXUALITY_CHOICES)
+    disability = MultiCheckboxField("Disability", choices=DISABILITY_CHOICES)
 
     # Track CfP reviewer tags
     cfp_tag_0 = SelectField("Topic 1", choices=TOPIC_CHOICES)
@@ -123,6 +68,8 @@ class DiversityForm(Form):
         user.diversity.age = self.age.data
         user.diversity.gender = self.gender.data
         user.diversity.ethnicity = self.ethnicity.data
+        user.diversity.sexuality = self.sexuality.data
+        user.diversity.disability = self.disability.data
 
         if self.cfp_tags_required:
             user.cfp_reviewer_tags = [
@@ -138,6 +85,8 @@ class DiversityForm(Form):
             self.age.data = guess_age(user.diversity.age)
             self.gender.data = guess_gender(user.diversity.gender)
             self.ethnicity.data = guess_ethnicity(user.diversity.ethnicity)
+            self.sexuality.data = user.diversity.sexuality
+            self.disability.data = user.diversity.disability
 
         if self.cfp_tags_required and user.cfp_reviewer_tags:
             self.cfp_tag_0.data = user.cfp_reviewer_tags[0].tag
@@ -145,6 +94,12 @@ class DiversityForm(Form):
             self.cfp_tag_2.data = user.cfp_reviewer_tags[2].tag
 
         return self
+
+    def validate_disability(form, field):
+        if len(field.data) > 1 and "none" in field.data:
+            raise ValidationError("Cannot select 'no disability' and a disability")
+        elif len(field.data) > 1 and "" in field.data:
+            raise ValidationError("Cannot select 'prefer not to say' and a disability")
 
     def validate(self, extra_validators=None):
         if not super().validate(extra_validators):

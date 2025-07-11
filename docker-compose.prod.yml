@@ -1,4 +1,3 @@
-version: "3.7"
 services:
   app:
     restart: unless-stopped
@@ -32,7 +31,7 @@ services:
     networks:
       - emfweb
 
-  postgres_exporter:
+  postgres-exporter:
     restart: unless-stopped
     image: 'wrouesnel/postgres_exporter:v0.8.0'
     environment:
@@ -49,7 +48,7 @@ services:
       - emfweb
     command: memcached -m 64
 
-  memcached_exporter:
+  memcached-exporter:
     restart: unless-stopped
     image: 'prom/memcached-exporter:v0.9.0'
     depends_on:

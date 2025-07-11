@@ -9,10 +9,10 @@
   {% if is_draggable %}
     {{ octicon("grabber-24") }}<span class="event-ticket-rank">{{ ticket.rank + 1 }}&nbsp;</span>
   {% endif %}
-  <a href="{{ url_for('.item', proposal_id=ticket.proposal.id, year=event_year ) }}">{{ ticket.proposal.title }}</a>
-  ({{ ticket.ticket_count }} tickets)
+  <a href="{{ url_for('.item', proposal_id=ticket.proposal.id, year=event_year ) }}">{{ ticket.proposal.title }}</a> on <time datetime="{{ ticket.proposal.start_date.strftime('%Y-%m-%dT%H:%M:%S') }}">{{ ticket.proposal.start_date.strftime('%A at %H:%M') }}</time> in <a href="{{ ticket.proposal.map_link }}">{{ ticket.proposal.scheduled_venue.name }}</a>
+  {% if ticket.state != "cancelled" %}({{ ticket.ticket_count }} tickets){% endif %}
   {% if ticket.state == "ticket" %}
-    <em>Codes for this workshop: {{ticket.ticket_codes |replace(',', ', ') | upper}}</em>
+    <br><em>Codes for this workshop: {{ticket.ticket_codes |replace(',', ', ') | upper}}</em>
   {% endif %}
   {% if ticket.state != "cancelled" %}
     {{ ticket._form.cancel(class_="btn btn-primary pull-right")}}

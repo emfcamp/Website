@@ -418,6 +418,14 @@ def edit_proposal(proposal_id):
     del form.name
     del form.email
 
+    if proposal.type == 'lightning':
+      # Make sure that their previously selected session is a choice
+      remaining_lightning_slots = LightningTalkProposal.get_days_with_slots()
+      # Make sure that their previously selected session is a choice
+      if remaining_lightning_slots[proposal.session] <= 0:
+          remaining_lightning_slots[proposal.session] = 1
+      form.set_session_choices(remaining_lightning_slots)
+
     if form.validate_on_submit():
         if not proposal.is_editable:
             flash("This submission can no longer be edited.")
@@ -449,7 +457,7 @@ def edit_proposal(proposal_id):
 
         elif proposal.type == "lightning":
             proposal.slide_link = form.slide_link.data
-            proposal.allowed_times = form.session.data
+            proposal.session = form.session.data
 
         proposal.title = form.title.data
         proposal.description = form.description.data
@@ -489,12 +497,6 @@ def edit_proposal(proposal_id):
 
         elif proposal.type == "lightning":
             form.slide_link.data = proposal.slide_link
-
-            remaining_lightning_slots = LightningTalkProposal.get_days_with_slots()
-            # Make sure that their previously selected session is a choice
-            if remaining_lightning_slots[proposal.session] <= 0:
-                remaining_lightning_slots[proposal.session] = 1
-            form.set_session_choices(remaining_lightning_slots)
             form.session.data = proposal.session
 
         form.title.data = proposal.title
@@ -852,6 +854,13 @@ def proposal_messages(proposal_id):
     form = MessagesForm()
 
     if form.validate_on_submit():
+        # The user is replying, mark any outstanding messages as read
+        count = proposal.mark_messages_read(current_user)
+        db.session.commit()
+        app.logger.info(
+            f"Marked {count} messages from admin on proposal {proposal.id} as read"
+        )
+
         if form.send.data:
             msg = CFPMessage()
             msg.is_to_admin = True
@@ -867,12 +876,6 @@ def proposal_messages(proposal_id):
                     channel,
                     f"✉️ New CfP message for {proposal.human_type}: {external_url('cfp_review.message_proposer', proposal_id=proposal_id)} ✉️",
                 )
-
-        count = proposal.mark_messages_read(current_user)
-        db.session.commit()
-        app.logger.info(
-            "Marked %s messages to admin on proposal %s as read" % (count, proposal.id)
-        )
 
         return redirect(url_for(".proposal_messages", proposal_id=proposal_id))
 

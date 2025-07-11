@@ -199,6 +199,7 @@ from .feature_flag import *  # noqa: F401,F403
 from .site_state import *  # noqa: F401,F403
 from .arrivals import *  # noqa: F401,F403
 from .event_tickets import *  # noqa: F401,F403
+from .diversity import *  # noqa: F401,F403
 
 
 db.configure_mappers()

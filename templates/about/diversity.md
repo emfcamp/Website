@@ -24,4 +24,6 @@ catalyst for a big change.
 
 ## The stats
 
+* [2018](diversity/2018)
+* [2022](diversity/2022)
 * [2024](diversity/2024)

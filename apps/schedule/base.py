@@ -11,6 +11,7 @@ from flask import current_app as app
 from wtforms import (
     FieldList,
     FormField,
+    HiddenField,
     SelectField,
     StringField,
     SubmitField,
@@ -18,7 +19,7 @@ from wtforms import (
 
 from main import db
 from models import event_year
-from models.cfp import Proposal, Venue, HUMAN_CFP_TYPES
+from models.cfp import Proposal, Venue, HUMAN_CFP_TYPES, WorkshopProposal
 from models.ical import CalendarSource, CalendarEvent
 from models.user import generate_api_token
 from models.admin_message import AdminMessage
@@ -611,3 +612,119 @@ def greenroom():
         upcoming=upcoming,
     )
 
+
+class CheckInEventTicketCodeForm(Form):
+    code = HiddenField("code") # Will be hidden
+    use_code = SubmitField("Check-in Code")
+
+
+class CheckInEventTicketForm(Form):
+    event_ticket_id = HiddenIntegerField("ticket_id")
+    codes = FieldList(FormField(CheckInEventTicketCodeForm))
+    use_all_codes = SubmitField("Check in all")
+
+
+class WorkshopCheckingForm(Form):
+    event_tickets = FieldList(FormField(CheckInEventTicketForm))
+
+
+@schedule.route("/schedule/workshop-steward")
+def workshop_steward_main():
+    workshop_venues = Venue.query.filter(
+            Venue.allowed_types.any('workshop')
+        ).all()
+
+    youthworkshop_venues = Venue.query.filter(
+            Venue.allowed_types.any('youthworkshop')
+        ).all()
+    return render_template("schedule/workshop-steward/main.html", workshop_venues=workshop_venues, youthworkshop_venues=youthworkshop_venues)
+
+
+@schedule.route("/schedule/workshop-steward/<int:venue_id>")
+@v_user_required
+def workshop_steward_venue(venue_id: int):
+    venue = Venue.query.get_or_404(venue_id)
+    workshops = (
+        WorkshopProposal.query
+        .filter_by(scheduled_venue_id=venue_id)
+        .filter(
+            WorkshopProposal.type.in_(venue.allowed_types),
+            WorkshopProposal.is_accepted,
+            WorkshopProposal.scheduled_time > (
+                pendulum.now(event_tz.zone).naive() - timedelta(hours=1)),
+            WorkshopProposal.scheduled_duration.isnot(None),
+            WorkshopProposal.hide_from_schedule.isnot(True),
+            WorkshopProposal.user_scheduled.isnot(True),
+            WorkshopProposal.requires_ticket.is_(True),
+        )
+        .order_by(WorkshopProposal.scheduled_time)
+        .all()
+    )
+    return render_template("schedule/workshop-steward/venue.html", venue=venue, all_workshops=workshops)
+
+
+@schedule.route("/schedule/workshop-steward/workshop/<int:workshop_id>", methods=["GET", "POST"])
+@v_user_required
+def workshop_steward(workshop_id):
+    workshop = WorkshopProposal.query.get_or_404(workshop_id)
+    user_role_strs = [r.name for r in current_user.volunteer.interested_roles.all()]
+
+    # Require that the user has the appropriate role & only show the attendee list the hour before
+    if workshop.type == "youthworkshop" and "Youth Workshop Helper" not in user_role_strs:
+        abort(401)
+
+    if workshop.type == "workshop" and "Workshop Steward" not in user_role_strs:
+        abort(401)
+
+    show_list_after = event_tz.localize(workshop.scheduled_time - pendulum.duration(minutes=60))
+    show_list_before = event_tz.localize(workshop.scheduled_time + pendulum.duration(minutes=(workshop.scheduled_duration+60)))
+
+    if app.config.get("DEBUG") and request.args.get("time_locked", False):
+        time_locked = False
+
+    elif show_list_after < pendulum.now(event_tz) < show_list_before:
+        time_locked = False
+
+    else:
+        flash(f"The attendee list will be visible after { show_list_after }")
+        time_locked = True
+
+    # Now actually do the form
+    form = WorkshopCheckingForm()
+
+    if form.validate_on_submit():
+        for ticket_form in form.event_tickets:
+            ticket = EventTicket.query.get(ticket_form.event_ticket_id.data)
+            if ticket_form.use_all_codes.data:
+                ticket.use_all_codes()
+                db.session.commit()
+                flash(f"Checked in {ticket.user.name}")
+                return redirect(url_for(".workshop_steward", workshop_id=workshop_id))
+
+            for code_form in ticket_form.codes:
+                if code_form.use_code.data:
+                    ticket.use_code(code_form.code.data)
+                    db.session.commit()
+                    flash(f"Used {ticket.user.name}'s code '{code_form.code.data}'")
+                    return redirect(url_for(".workshop_steward", workshop_id=workshop_id))
+
+    for event_ticket in workshop.tickets:
+        if not event_ticket.ticket_codes:
+            continue
+
+        form.event_tickets.append_entry()
+        form.event_tickets[-1]._ticket = event_ticket
+        form.event_tickets[-1].event_ticket_id.data = event_ticket.id
+
+
+        for code in event_ticket.ticket_codes.split(","):
+            form.event_tickets[-1].codes.append_entry()
+            form.event_tickets[-1].codes[-1].code.data = code
+
+    return render_template(
+        "schedule/workshop-steward/workshop.html",
+        form=form,
+        time_locked=time_locked,
+        workshop=workshop,
+        show_list_after=show_list_after,
+    )

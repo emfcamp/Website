@@ -1,9 +1,17 @@
 import random
 from faker import Faker
 
+from apps.common.forms import (
+    AGE_CHOICES,
+    DISABILITY_CHOICES,
+    ETHNICITY_CHOICES,
+    GENDER_CHOICES,
+    SEXUALITY_CHOICES,
+)
 from apps.cfp.scheduler import Scheduler
 from main import db
 from models.user import User
+from models.diversity import UserDiversity
 from models.basket import Basket
 from models.event_tickets import EventTicket, get_max_rank_for_user
 from models.product import PriceTier
@@ -171,6 +179,9 @@ class FakeDataGenerator(object):
                     self.create_fake_lottery_tickets(reviewers, cfp)
 
             if randombool(0.2):
+                self.create_fake_diversity_data(user)
+
+            if randombool(0.2):
                 self.create_volunteer_data(user)
 
             if randombool(0.2):
@@ -265,7 +276,24 @@ class FakeDataGenerator(object):
 
         for user in random.sample(users_list, k=n_lottery_tickets):
             rank = get_max_rank_for_user(user, proposal.type)
-            db.session.add(EventTicket(
-                user.id, proposal.id, "entered-lottery", random.randint(1, max_ticket_count), rank
-            ))
+            db.session.add(
+                EventTicket(
+                    user.id,
+                    proposal.id,
+                    "entered-lottery",
+                    random.randint(1, max_ticket_count),
+                    rank,
+                )
+            )
 
+    def create_fake_diversity_data(self, user):
+        diversity = UserDiversity()
+
+        diversity.user = user
+
+        diversity.age = random.choice(AGE_CHOICES)[0]
+        diversity.gender = random.choice(GENDER_CHOICES)[0]
+        diversity.ethnicity = random.choice(ETHNICITY_CHOICES)[0]
+        diversity.disability = random.choice(DISABILITY_CHOICES)[0]
+        diversity.sexuality = random.choice(SEXUALITY_CHOICES)[0]
+        db.session.add(diversity)
