@@ -1,6 +1,6 @@
 """
-ScheduleAttribute – key/value store of additional information associated with
-a ScheduleItem (e.g. workshop capacity, equipment required)
+ProposalAttribute – key/value store of additional information associated with
+a Proposal (e.g. workshop capacity, equipment required)
 """
 
 from datetime import datetime
@@ -9,13 +9,13 @@ from main import db
 from .. import BaseModel
 
 
-class ScheduleAttribute(BaseModel):
+class ProposalAttribute(BaseModel):
     __versioned__ = {}
-    __tablename__ = "schedule_attribute"
+    __tablename__ = "proposal_attribute"
 
     id = db.Column(db.Integer, primary_key=True)
-    schedule_item_id = db.Column(
-        db.Integer, db.ForeignKey("schedule_item.id", nullable=False)
+    proposal_item_id = db.Column(
+        db.Integer, db.ForeignKey("proposal.id", nullable=False)
     )
 
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)

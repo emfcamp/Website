@@ -43,7 +43,6 @@ class Proposal(BaseModel):
     title = db.Column(db.string, nullable=False)
     description = db.Column(db.string, nullable=False)
 
-    length = db.Column(db.string)
     needs_money = db.Column(db.Boolean, nullable=False, default=False)
     needs_help = db.Column(db.Boolean, nullable=False, default=False)
     private_notes = db.Column(db.string)
@@ -60,7 +59,6 @@ class Proposal(BaseModel):
         db.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow
     )
 
-    anonymiser_id = db.Column(db.Integer, db.ForeignKey("user.id"), default=None)
     has_rejected_email = db.Column(db.Boolean, nullable=False, default=False)
 
     schedule_item = db.relationship("ScheduleItem", backref="proposal")
