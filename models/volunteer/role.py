@@ -61,6 +61,7 @@ class RolePermission(BaseModel):
 
 class RoleAdmin(BaseModel):
     __tablename__ = "volunteer_role_admin"
+    __versioned__: dict = {}
     user_id = db.Column(
         db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True
     )
