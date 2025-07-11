@@ -1,17 +1,25 @@
-import re
-from typing import Pattern
-
-from flask import current_app as app
 from flask_wtf import FlaskForm
 
 from wtforms import SelectField, BooleanField, ValidationError
 from wtforms.validators import InputRequired
 
-from models.user import UserDiversity
-from models.cfp_tag import DEFAULT_TAGS, Tag
+from models.diversity import UserDiversity
+from models.cfp_tag import Tag
 from models.purchase import AdmissionTicket
 
 from .fields import HiddenIntegerField, MultiCheckboxField
+from models.diversity import (
+    guess_age,
+    guess_ethnicity,
+    guess_gender,
+    AGE_CHOICES,
+    DISABILITY_CHOICES,
+    ETHNICITY_CHOICES,
+    GENDER_CHOICES,
+    OPT_OUT,
+    SEXUALITY_CHOICES,
+)
+from models.cfp_tag import DEFAULT_TAGS
 
 
 class Form(FlaskForm):
@@ -25,100 +33,10 @@ class Form(FlaskForm):
         csrf_context = None
 
 
-OPT_OUT = [
-    ("", "Prefer not to say"),
-]
-
 NULL_SELECTION = [
     ("", "(please choose)"),
 ]
-
-GENDER_VALUES = ("female", "male", "non-binary", "other")
-GENDER_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in GENDER_VALUES])
-
-ETHNICITY_VALUES = ("asian", "black", "mixed", "white", "other")
-ETHNICITY_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in ETHNICITY_VALUES])
-
-AGE_VALUES = ("0-15", "16-25", "26-35", "36-45", "46-55", "56-65", "66+")
-AGE_CHOICES = tuple(OPT_OUT + [(v, v) for v in AGE_VALUES])
-
-SEXUALITY_VALUES = (
-    "straight-or-heterosexual",
-    "gay-or-lesbian",
-    "bisexual-or-pansexual",
-    "other",
-)
-SEXUALITY_CHOICES = tuple(
-    OPT_OUT + [(v, v.capitalize().replace("-", " ")) for v in SEXUALITY_VALUES]
-)
-
-
-DISABILITY_CHOICES = tuple(
-    [
-        ("physical", "Physical disability or mobility issue"),
-        ("vision", "Blindness or a visual impairment not corrected by glasses"),
-        ("hearing", "Deafness or a serious hearing impairment"),
-        ("autism-adhd", "Autistic spectrum condition, Asperger's, or ADHD"),
-        ("long-term", "Long-term illness"),
-        ("mental-health", "Mental health condition"),
-        ("other", "Another condition not mentioned here"),
-        ("none", "None of the above"),
-    ]
-)
-
-
 TOPIC_CHOICES = tuple(NULL_SELECTION + [(v, v.capitalize()) for v in DEFAULT_TAGS])
-
-# FIXME these are matchers for transition from freetext diversity form -> select boxes
-# This should be deleted for 2026
-
-
-def guess_age(age_str: str) -> str:
-    if age_str in AGE_VALUES:
-        return age_str
-    try:
-        age = int(age_str)
-    except ValueError:  # Can't parse as an int so reset
-        return ""
-
-    if age > 66:
-        return "66+"
-
-    for age_range in AGE_VALUES:
-        if age_range == "66+":
-            continue
-        low_val, high_val = age_range.split("-")
-
-        if int(low_val) <= age <= int(high_val):
-            return age_range
-
-    return ""
-
-
-def __guess_value(match_str: str, matchers_dict: dict[str, Pattern]) -> str:
-    match_str = match_str.lower().strip()
-    for key, matcher in matchers_dict.items():
-        if matcher.fullmatch(match_str):
-            return key
-
-    return ""
-
-
-def guess_gender(gender_str: str) -> str:
-    gender_matchers = app.config.get("GENDER_MATCHERS", {})
-    gender_re_matchers = {k: re.compile(v, re.I) for k, v in gender_matchers.items()}
-    return __guess_value(gender_str, gender_re_matchers)
-
-
-def guess_ethnicity(ethnicity_str: str) -> str:
-    ethnicity_matchers = app.config.get("ETHNICITY_MATCHERS", {})
-    ethnicity_re_matchers = {
-        k: re.compile(v, re.I) for k, v in ethnicity_matchers.items()
-    }
-    return __guess_value(ethnicity_str, ethnicity_re_matchers)
-
-
-# End of stuff to delete for 2026
 
 
 class DiversityForm(Form):

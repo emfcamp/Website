@@ -56,8 +56,11 @@ class VenueForm(Form):
             latlon = to_shape(venue.location)
             self.latlon.data = "{}, {}".format(latlon.x, latlon.y)
 
-    def populate_obj(self, venue):
-        super().populate_obj(venue)
+    def populate_obj(self, venue: Venue):
+        venue.scheduled_content_only = self.scheduled_content_only.data
+        venue.allowed_types = self.allowed_types.data
+        venue.default_for_types = self.default_for_types.data
+        venue.capacity = self.capacity.data
 
         if self.latlon.data:
             latlon = self.latlon.data.split(",")

@@ -90,7 +90,6 @@ def edit(year, village_id):
                 venue.name = form.name.data
 
         form.populate_obj(village)
-        form.populate_obj(village.requirements)
         db.session.commit()
         flash("Your village registration has been updated.")
         return redirect(url_for(".edit", year=year, village_id=village_id))

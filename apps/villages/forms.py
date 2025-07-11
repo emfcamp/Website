@@ -9,6 +9,7 @@ from wtforms.validators import Optional, Length, URL
 from geoalchemy2.shape import to_shape
 
 from ..common.forms import Form
+from models import Village
 
 
 class VillageForm(Form):
@@ -38,26 +39,36 @@ class VillageForm(Form):
 
     submit = SubmitField("Submit")
 
-    def populate(self, village):
+    def populate(self, village: Village) -> None:
         self.name.data = village.name
         self.description.data = village.description
         self.url.data = village.url
 
         requirements = village.requirements
-
         self.num_attendees.data = requirements.num_attendees
         self.size_sqm.data = requirements.size_sqm
         self.power_requirements.data = requirements.power_requirements
         self.noise.data = requirements.noise
         self.structures.data = requirements.structures
 
-    def validate_name(form, field):
-        field.data = field.data.strip()
+    def populate_obj(self, village: Village) -> None:
+        village.name = self.name.data
+        village.description = self.description.data
+        village.url = self.url.data
+
+        village.requirements.num_attendees = self.num_attendees.data
+        village.requirements.size_sqm = self.size_sqm.data
+        village.requirements.power_requirements = self.power_requirements.data
+        village.requirements.noise = self.noise.data
+        village.requirements.structures = self.structures.data
+
+    def validate_name(self, field: StringField) -> None:
+        field.data = (field.data or '').strip()
 
 class AdminVillageForm(VillageForm):
     latlon = StringField("Location", [Optional()])
 
-    def populate(self, village):
+    def populate(self, village: Village) -> None:
         super().populate(village)
 
         if village.location is None:
@@ -66,7 +77,7 @@ class AdminVillageForm(VillageForm):
             latlon = to_shape(village.location)
             self.latlon.data = "{}, {}".format(latlon.x, latlon.y)
 
-    def populate_obj(self, village):
+    def populate_obj(self, village: Village) -> None:
         village.name = self.name.data
         village.description = self.description.data
         village.url = self.url.data

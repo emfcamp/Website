@@ -24,6 +24,7 @@ from models import (
 from main import db
 from .user import User
 from .cfp_tag import ProposalTag
+from .village import Village
 from . import BaseModel
 
 
@@ -568,10 +569,12 @@ class Proposal(BaseModel):
             cls.scheduled_time,
             cls.scheduled_duration,
             Venue.name.label("venue"),
+            Village.id.label("venue_village_id"),
         )
         accepted_public = (
             cls.query.filter(cls.is_accepted)
             .outerjoin(cls.scheduled_venue)
+            .outerjoin(Venue.village)
             .with_entities(*public_columns)
         )
 
