@@ -1,6 +1,6 @@
 import json
 from icalendar import Calendar, Event
-from flask import request, abort, current_app as app, Response
+from flask import request, abort, current_app as app, redirect, url_for, Response
 from flask_cors import cross_origin
 from flask_login import current_user
 
@@ -9,7 +9,8 @@ from models.user import User
 from models.cfp import Proposal
 
 from ..common import feature_flag, feature_enabled, json_response
-from .schedule_xml import export_frab
+from .schedule_frab_json import export_frab_json
+from .schedule_frab_xml import export_frab
 from .historic import feed_historic
 from .data import (
     _get_scheduled_proposals,
@@ -34,9 +35,9 @@ def _format_event_description(event):
         venue_str = event["venue"]
         if event["map_link"]:
             venue_str = f'{venue_str} ({event["map_link"]})'
-        footer_block.append(f'Venue: {venue_str}')
+        footer_block.append(f"Venue: {venue_str}")
     if footer_block:
-        description += '\n\n' + '\n'.join(footer_block)
+        description += "\n\n" + "\n".join(footer_block)
 
     return description
 
@@ -47,7 +48,7 @@ def schedule_json(year):
     if year != event_year():
         return feed_historic(year, "json")
 
-    if not feature_enabled('SCHEDULE'):
+    if not feature_enabled("SCHEDULE"):
         abort(404)
 
     schedule = [_convert_time_to_str(p) for p in _get_scheduled_proposals(request.args)]
@@ -56,12 +57,51 @@ def schedule_json(year):
     return Response(json.dumps(schedule), mimetype="application/json")
 
 
+@schedule.route("/schedule/<int:year>.frab.json")
+def schedule_frab_json(year):
+    if year != event_year():
+        return feed_historic(year, "frab.json")
+
+    if not feature_enabled("SCHEDULE"):
+        abort(404)
+
+    schedule = (
+        Proposal.query.filter(
+            Proposal.is_accepted,
+            Proposal.scheduled_time.isnot(None),
+            Proposal.scheduled_venue_id.isnot(None),
+            Proposal.scheduled_duration.isnot(None),
+        )
+        .order_by(Proposal.scheduled_time)
+        .all()
+    )
+
+    return Response(
+        json.dumps(
+            {
+                "schedule": export_frab_json(schedule),
+                "$schema": "https://c3voc.de/schedule/schema.json",
+                "generator": {
+                    "name": "emfcamp-website",
+                    "url": "https://github.com/emfcamp/Website",
+                },
+            }
+        ),
+        mimetype="application/json",
+    )
+
+
 @schedule.route("/schedule/<int:year>.frab")
 def schedule_frab(year):
+    return redirect(url_for("schedule_frab_xml", year=year), code=301)
+
+
+@schedule.route("/schedule/<int:year>.frab.xml")
+def schedule_frab_xml(year):
     if year != event_year():
         return feed_historic(year, "frab")
 
-    if not feature_enabled('SCHEDULE'):
+    if not feature_enabled("SCHEDULE"):
         abort(404)
 
     schedule = (
@@ -88,7 +128,7 @@ def schedule_ical(year):
     if year != event_year():
         return feed_historic(year, "ics")
 
-    if not feature_enabled('SCHEDULE'):
+    if not feature_enabled("SCHEDULE"):
         abort(404)
 
     schedule = _get_scheduled_proposals(request.args)
@@ -174,9 +214,7 @@ def favourites_ical():
 
 @schedule.route("/schedule/now-and-next.json")
 def now_and_next_json():
-    return Response(
-        json.dumps(_get_upcoming(request.args)), mimetype="application/json"
-    )
+    return Response(json.dumps(_get_upcoming(request.args)), mimetype="application/json")
 
 
 @schedule.route("/schedule/<int:year>/<int:proposal_id>.json")
