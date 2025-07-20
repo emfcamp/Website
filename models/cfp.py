@@ -9,7 +9,7 @@ from geoalchemy2.shape import to_shape
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.mutable import MutableList
 
-from sqlalchemy import UniqueConstraint, func, select, text
+from sqlalchemy import UniqueConstraint, func, select, text, or_
 from sqlalchemy.orm import column_property
 from slugify import slugify_unicode
 from models import (
@@ -353,6 +353,7 @@ class Proposal(BaseModel):
     type = db.Column(db.String, nullable=False)  # talk, workshop or installation
 
     is_accepted = column_property(state.in_(["accepted", "finalised"]))
+    should_be_exported = column_property(is_accepted.expression)
 
     # Core information
     title = db.Column(db.String, nullable=False)
@@ -453,6 +454,21 @@ class Proposal(BaseModel):
         if not include_user_scheduled:
             query = query.filter(cls.user_scheduled.is_(False))
         return query
+
+    @classmethod
+    def public_export_columns(cls):
+        return [
+            cls.published_title,
+            cls.published_description,
+            cls.published_names.label("names"),
+            cls.published_pronouns.label("pronouns"),
+            cls.may_record,
+            cls.video_privacy,
+            cls.scheduled_time,
+            cls.scheduled_duration,
+            Venue.name.label("venue"),
+            Village.id.label("venue_village_id"),
+        ]
 
     @classmethod
     def get_export_data(cls):
@@ -559,23 +575,11 @@ class Proposal(BaseModel):
             anon_favourites.append([p.id for p in proposals])
         anon_favourites.sort()
 
-        public_columns = (
-            cls.published_title,
-            cls.published_description,
-            cls.published_names.label("names"),
-            cls.published_pronouns.label("pronouns"),
-            cls.may_record,
-            cls.video_privacy,
-            cls.scheduled_time,
-            cls.scheduled_duration,
-            Venue.name.label("venue"),
-            Village.id.label("venue_village_id"),
-        )
-        accepted_public = (
-            cls.query.filter(cls.is_accepted)
+        exported_public = (
+            cls.query.filter(cls.should_be_exported)
             .outerjoin(cls.scheduled_venue)
             .outerjoin(Venue.village)
-            .with_entities(*public_columns)
+            .with_entities(*cls.public_export_columns())
         )
 
         favourite_counts = [p.favourite_count for p in proposals]
@@ -592,7 +596,8 @@ class Proposal(BaseModel):
                 "proposals": {
                     "counts": export_attr_counts(cls, count_attrs),
                     "edits": export_attr_edits(cls, edits_attrs),
-                    "accepted": accepted_public,
+                    # This is still called accepted, but might not 'just' be accepted (e.g. Lightning Talks)
+                    "accepted": exported_public,
                 },
                 "favourites": {
                     "counts": bucketise(
@@ -918,6 +923,33 @@ class LightningTalkProposal(Proposal):
     human_type = HUMAN_CFP_TYPES["lightning"]
     slide_link = db.Column(db.String, nullable=True)
     session = db.Column(db.String, default="fri")
+
+    should_be_exported = column_property(or_(
+        Proposal.is_accepted.expression,
+        Proposal.state == "new",
+    ))
+
+    @classmethod
+    def public_export_columns(cls):
+        return [
+            # Use the submitted fields directly
+            cls.title.label("published_title"),
+            cls.description.label("published_description"),
+            User.name.label("names"),
+
+            # We omit fields that we don't have since they didn't go through CfP:
+            # pronouns
+            # may_record
+            # video_privacy
+            # scheduled_time
+            # scheduled_duration
+            # venue
+            # venue_village_id
+
+            # Lightning Talk specific fields:
+            cls.session,
+            cls.slide_link,
+        ]
 
     def pretty_session(self):
         return LIGHTNING_TALK_SESSIONS[self.session]["human"]
