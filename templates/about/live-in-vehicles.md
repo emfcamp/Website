@@ -18,6 +18,9 @@ There are two toilet waste disposal points, near the [north toilets](https://map
 
 ## Arrival and departure
 
+More details will be announced closer to the event.
+
+{#
 You should aim to arrive between **08:00 and 16:00 on Thursday** or between **08:00 and 12:00 on Friday**, and depart on **Monday between 12:00 and 16:00**. Arrivals and departures outside these hours may be possible, but they will be slower due to the need to escort vehicles to keep attendees safe.
 
 No live-in vehicle movements are allowed after dark. If you arrive after sunset, you can stay in the car park until morning.
@@ -27,3 +30,5 @@ No live-in vehicle movements are allowed after dark. If you arrive after sunset,
 If you are getting a live-in vehicle delivered or collected by a third party who does not have a ticket to EMF, it must be delivered on **Wednesday between 11:00 and 18:00** and collected between **Monday 12:00 and Tuesday 12:00**.
 
 Please email us at [tickets@emfcamp.org](mailto:tickets@emfcamp.org) beforehand to let us know the details of the vehicle (including registration number if known) and who will be delivering and collecting it.
+
+#}

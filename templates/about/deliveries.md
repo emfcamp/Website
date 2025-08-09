@@ -12,6 +12,9 @@ To make sure your item gets to you, you need to do three things:
 * **Let us know** it's coming
 * **Pick it up** when it has arrived
 
+This page will be updated with details of how to do this nearer to the event.
+
+{# 2024
 ## Addressing
 
 Please address the item in this format:
@@ -59,3 +62,4 @@ Packages are held for collection at the Logistics tent; visit us just inside the
 It takes us a little bit to get through all of the packages when they arrive (during the main event, we often have a delivery van just full of items for us) so please give us an hour or so after you are notified of delivery to come collect it.
 
 Note that we will not notify you when something has arrived. If you don't collect your deliveries before the end of the event, or they arrive after the event is over, they will be discarded!
+#}
