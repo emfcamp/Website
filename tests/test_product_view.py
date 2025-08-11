@@ -40,6 +40,8 @@ def test_product_view_accessible(db, user, monkeypatch):
     db.session.add(proposal)
     db.session.commit()
     proposal.set_state("accepted")
+    db.session.add(proposal)
+    db.session.commit()
 
     assert product_view.is_accessible(
         user
