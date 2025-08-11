@@ -1,4 +1,4 @@
 *
 !pyproject.toml
-!poetry.lock
+!uv.lock
 !Makefile
