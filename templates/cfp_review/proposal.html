@@ -84,7 +84,6 @@
                             {{ render_dl_field(form.needs_laptop) }}
                             {{ render_dl_field(form.one_day) }}
                             {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
-                                {{ render_dl_field(form.attendees) }}
                                 {{ render_dl_field(form.cost) }}
                                 {{ render_dl_field(form.participant_equipment) }}
                                 {{ render_dl_field(form.age_range) }}
@@ -171,6 +170,7 @@
                                 {{ render_dl_field(form.content_note) }}
                                 {{ render_dl_field(form.family_friendly, rows=4) }}
                                 {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
+                                    {{ render_dl_field(form.attendees) }}
                                     {{ render_dl_field(form.published_age_range) }}
                                     {{ render_dl_field(form.published_cost) }}
                                     {{ render_dl_field(form.published_participant_equipment) }}
