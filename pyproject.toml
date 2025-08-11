@@ -1,5 +1,90 @@
+[project]
+name = "website"
+version = "0.1"
+description = "The Electromagnetic Field web site"
+authors = []
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "decorator",
+    "iso8601",
+    "python-levenshtein~=0.12",
+    "simplejson",
+    "requests~=2.29",
+    "markdown~=3.1",
+    "flask~=2.3",
+    "flask-caching~=2.0",
+    "python-memcached==1.59",
+    "flask-sqlalchemy~=3.0",
+    "SQLAlchemy<2.0",
+    "psycopg2~=2.8",
+    "sqlalchemy-utils~=0.34",
+    "sqlalchemy-continuum~=1.3",
+    "Flask-Migrate>=3.1,<3.2",
+    "alembic~=1.1",
+    "flask-wtf~=1.0",
+    "wtforms~=2.3",
+    "flask-login~=0.6",
+    "flask-debugtoolbar",
+    "gunicorn~=22.0",
+    "pillow~=10.3",
+    "icalendar==3.11.7",
+    "pytz",
+    "stripe~=8.0.0",
+    "ofxparse==0.16",
+    "python-dateutil",
+    "slotmachine",
+    "awesome-slugify",
+    "faker",
+    "pyyaml",
+    "prometheus-client",
+    "flask-admin",
+    "pendulum>=2.0,<3.0",
+    "geoalchemy2~=0.13",
+    "flask-restful~=0.3",
+    "shapely~=2.0",
+    "flask-cors~=5.0",
+    "flask-shell-ipython",
+    "Flask-Static-Digest~=0.3",
+    "email_validator~=1.0",
+    "segno>=1.0.0,<2",
+    "pywisetransfer>=0.3.1,<0.4",
+    "freezegun>=1.1.0,<2",
+    "logging_tree~=1.9",
+    "flask-mailman>=0.3.0,<0.4",
+    "python-stdnum~=1.19",
+    "playwright>=1.43.0,<2",
+    "css-inline>=0.14.0,<0.15",
+    "wtforms-sqlalchemy~=0.3.0",
+]
+
 [tool.ruff]
 line-length = 110
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "mock",
+    "locust",
+    "ipdb",
+    "hypothesis",
+    "pytest-random-order",
+    "pytest-cov",
+    "pytest-vcr>=1.0.2,<2",
+    "coveralls",
+    "pyzbar>=0.1.8,<0.2",
+    "cairosvg>=2.4.2,<3",
+    "mypy>=1.2.0,<2",
+    "types-requests>=2.27.8,<3",
+    "types-simplejson>=3.17.3,<4",
+    "types-decorator>=5.1.4,<6",
+    "types-python-dateutil>=2.8.9,<3",
+    "types-PyYAML>=6.0.4,<7",
+    "types-Markdown>=3.3.12,<4",
+    "types-pytz",
+    "lxml-stubs>=0.3.1,<0.4",
+    "sqlalchemy-stubs>=0.4,<0.5",
+    "ruff>=0.9.5,<0.10",
+]
 
 [tool.ruff.lint]
 # TODO: see if we can sensibly lose any of these ignores. We should probably add the
@@ -7,86 +92,7 @@ line-length = 110
 select = ["E", "F"]
 ignore = ["E402", "F541", "F841", "E721", "E722", "E501", "E712"]
 
-[tool.poetry]
-name = "website"
-description = "The Electromagnetic Field web site"
-version = "0.1"
-authors = []
+[tool.uv]
 
-[tool.poetry.dependencies]
-python = "~3.11"
-decorator = "*"
-"iso8601" = "*"
-python-levenshtein = "~=0.12"
-simplejson = "*"
-requests = "~=2.29"
-markdown = "~=3.1"
-flask = "~=2.3"
-flask-caching = "~=2.0"
-python-memcached = "==1.59"
-flask-sqlalchemy = "~=3.0"
-SQLAlchemy = "<2.0"
-"psycopg2" = "~=2.8"
-sqlalchemy-utils = "~=0.34"
-sqlalchemy-continuum = "~=1.3"
-Flask-Migrate = "~3.1"
-alembic = "~=1.1"
-flask-wtf = "~=1.0"
-wtforms = "~=2.3"
-flask-login = "~=0.6"
-flask-debugtoolbar = "*"
-gunicorn = "~=22.0"
-pillow = "~=10.3"
-icalendar = "==3.11.7"
-pytz = "*"
-stripe = "~=8.0.0"
-ofxparse = "==0.16"
-python-dateutil = "*"
+[tool.uv.sources]
 slotmachine = { git = "https://github.com/emfcamp/slotmachine.git" }
-awesome-slugify = "*"
-faker = "*"
-pyyaml = "*"
-prometheus-client = "*"
-flask-admin = "*"
-pendulum = ">=2.0,<3.0"
-"geoalchemy2" = "~=0.13"
-flask-restful = "~=0.3"
-shapely = "~=2.0"
-flask-cors = "~=5.0"
-flask-shell-ipython = "*"
-Flask-Static-Digest = "~=0.3"
-email_validator = "^1.0"
-segno = "^1.0.0"
-pytest-vcr = "^1.0.2"
-pywisetransfer = "^0.3.1"
-freezegun = "^1.1.0"
-logging_tree = "^1.9"
-flask-mailman = "^0.3.0"
-python-stdnum = "^1.19"
-playwright = "^1.43.0"
-css-inline = "^0.14.0"
-wtforms-sqlalchemy = "~0.3.0"
-
-
-[tool.poetry.group.dev.dependencies]
-pytest = "*"
-mock = "*"
-locust = "*"
-ipdb = "*"
-hypothesis = "*"
-pytest-random-order = "*"
-pytest-cov = "*"
-coveralls = "*"
-pyzbar = "^0.1.8"
-cairosvg = "^2.4.2"
-mypy = "^1.2.0"
-types-requests = "^2.27.8"
-types-simplejson = "^3.17.3"
-types-decorator = "^5.1.4"
-types-python-dateutil = "^2.8.9"
-types-PyYAML = "^6.0.4"
-types-Markdown = "^3.3.12"
-types-pytz = "*"
-lxml-stubs = "^0.3.1"
-sqlalchemy-stubs = "^0.4"
-ruff = "^0.9.5"
