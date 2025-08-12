@@ -10,6 +10,7 @@ from models.cfp import (
     CFP_STATES,
     ORDERED_STATES,
     HUMAN_CFP_TYPES,
+    HUMAN_VIDEO_PRIVACIES,
 )
 from ..common import require_permission
 
@@ -118,11 +119,11 @@ def cfp_review_variables():
         )
         .count()
     )
-
     return {
         "full_qs": copy_request_args(request.args),
         "ordered_states": ORDERED_STATES,
         "cfp_types": HUMAN_CFP_TYPES,
+        "video_privacies": HUMAN_VIDEO_PRIVACIES | {"unset": "Unset"},
         "unread_count": unread_count,
         "proposal_counts": proposal_counts,
         "unread_reviewer_notes": unread_reviewer_notes,

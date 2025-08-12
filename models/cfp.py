@@ -37,6 +37,12 @@ HUMAN_CFP_TYPES = {
     "lightning": "lightning talk",
 }
 
+HUMAN_VIDEO_PRIVACIES = {
+    "public": "Stream and record",
+    "review": "Do not stream, and do not publish until reviewed",
+    "none": "Do not stream or record",
+}
+
 # state: [allowed next state, ] pairs
 CFP_STATES = {
     "edit": ["accepted", "rejected", "withdrawn", "new"],

@@ -22,7 +22,7 @@ from flask import (
 from flask_login import current_user
 from flask_mailman import EmailMessage
 from models.permission import Permission
-from sqlalchemy import func, exists, select
+from sqlalchemy import func, exists, select, or_
 from sqlalchemy.orm import joinedload, undefer
 from sqlalchemy_continuum.utils import version_class
 
@@ -132,6 +132,19 @@ def filter_proposal_request() -> tuple[list[Proposal], bool]:
     else:
         filtered = True
         proposal_query = proposal_query.filter_by(user_scheduled=True)
+
+    needs_laptop = request.args.get("needs_laptop", type=bool_qs)
+    if needs_laptop:
+        filtered = True
+        proposal_query = proposal_query.filter_by(needs_laptop=True)
+
+    video_privacy = request.args.get("video_privacy")
+    if video_privacy:
+        filtered = True
+        if video_privacy == "unset":
+            proposal_query = proposal_query.filter(or_(Proposal.video_privacy == None, Proposal.video_privacy == ""))  # noqa: E711
+        else:
+            proposal_query = proposal_query.filter_by(video_privacy=video_privacy)
 
     # This block has to be last because it will join to the user table
     needs_ticket = request.args.get("needs_ticket", type=bool_qs)
