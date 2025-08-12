@@ -13,7 +13,7 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, Optional, NumberRange, ValidationError
 
-from models.cfp import HUMAN_CFP_TYPES, Venue, ORDERED_STATES
+from models.cfp import HUMAN_CFP_TYPES, HUMAN_VIDEO_PRIVACIES, Venue, ORDERED_STATES
 from models.cfp_tag import Tag
 from ..common.forms import Form
 from ..common.fields import HiddenIntegerField, EmailField
@@ -70,11 +70,7 @@ class UpdateProposalForm(Form):
     eventphone_number = StringField("On-site extension")
     video_privacy = SelectField(
       "Recording",
-      choices=[
-        ("public", "Stream and record"),
-        ("review", "Do not stream, and do not publish until reviewed"),
-        ("none", "Do not stream or record"),
-      ],
+      choices=HUMAN_VIDEO_PRIVACIES.items(),
       validators=[Optional()],
     )
     needs_laptop = SelectField(

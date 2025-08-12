@@ -25,6 +25,7 @@ from models.user import generate_api_token
 from models.admin_message import AdminMessage
 from models.event_tickets import EventTicket
 from models.site_state import get_signup_state
+from models.cfp import HUMAN_VIDEO_PRIVACIES
 
 from ..common import feature_flag, feature_enabled
 from ..common.forms import Form
@@ -445,11 +446,7 @@ class HeraldCommsForm(Form):
     talk_id = HiddenIntegerField()
     video_privacy = SelectField(
       "Recording",
-      choices=[
-        ("public", "Stream and record"),
-        ("review", "Do not stream, and do not publish until reviewed"),
-        ("none", "Do not stream or record"),
-      ],
+      choices=HUMAN_VIDEO_PRIVACIES.items(),
     )
     update = SubmitField("Update info")
 
