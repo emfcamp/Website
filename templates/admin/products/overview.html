@@ -17,7 +17,7 @@
 {% macro render_group(group, depth=0) -%}
 <tr class="{% if group.has_expired() %}expired{% endif %}">
     <th>{% for i in range(0, depth) %}→{% endfor -%}
-        {% if depth %}&nbsp;{% endif %}<a href="{{url_for('admin.product_group_details', group_id=group.id)}}">{{group|title}}</a>
+        {% if depth %}&nbsp;{% endif %}<a href="{{url_for('admin.products.product_group_details', group_id=group.id)}}">{{group|title}}</a>
     </th>
     <td></td>
     <td></td>
@@ -31,7 +31,7 @@
     {% for product in group.products %}
         <tr class="{% if product.has_expired() %}expired{% endif %}">
             <td></td>
-            <td><a href="{{url_for('admin.product_details', product_id=product.id)}}">
+            <td><a href="{{url_for('admin.products.product_details', product_id=product.id)}}">
                     {{product.name}}
             </a></td>
             <td>{{product.display_name}}</td>
@@ -48,7 +48,7 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td><a href="{{url_for('admin.price_tier_details', tier_id=price_tier.id)}}">
+                <td><a href="{{url_for('admin.products.price_tier_details', tier_id=price_tier.id)}}">
                         {{price_tier.get_price('GBP')|price}}&nbsp;|&nbsp;{{price_tier.get_price('EUR')|price}}
                     </a></td>
                 <td>{{coalesce(price_tier.capacity_used, '0')}}</td>
@@ -85,6 +85,6 @@
         </tbody>
     </table>
 
-    <a class="btn btn-primary" href="{{url_for('.product_group_new')}}">New root product group</a>
+    <a class="btn btn-primary" href="{{url_for('admin.products.product_group_new')}}">New root product group</a>
 
 {% endblock %}
