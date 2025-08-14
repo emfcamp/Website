@@ -249,6 +249,6 @@ class ScheduleMessage(Resource):
 
 api.add_resource(ProposalResource, "/proposal/<int:proposal_id>")
 api.add_resource(FavouriteProposal, "/proposal/<int:proposal_id>/favourite")
-api.add_resource(ScheduleMessage, "/schedule_messages")
+api.add_resource(ScheduleMessage, "/schedule-messages")
 api.add_resource(UpdateLotteryPreferences, "/schedule/tickets/<proposal_type>/preferences")
 api.add_resource(ProposalC3VOCPublishingWebhook, "/proposal/c3voc-publishing-webhook")
