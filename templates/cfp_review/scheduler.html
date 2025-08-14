@@ -20,7 +20,7 @@
 {% block body %}
 
 <p>
-  Show Venues: 
+  Show Venues:
   <a href="{{ url_for('cfp_review.scheduler') }}">All</a> /
   <a href="{{ url_for('cfp_review.scheduler', venue=emf_venues) }}">EMF Venues</a> /
   {% for type, stages in default_venues.items() %}
@@ -168,7 +168,7 @@ var emf_scheduler = {};
   }
 
   scheduler.attachEvent("onDblClick",function (id){
-    window.open('/cfp-review/proposals/' + id);
+    window.open('{{ url_for("cfp_review.proposals") }}/' + id);
     return false;// block further actions
   });
 
@@ -206,7 +206,7 @@ var emf_scheduler = {};
     if (range_valid == true) {
       var isoDate = new Date(ev.start_date.getTime() - (ev.start_date.getTimezoneOffset() * 60000)).toISOString();
       jQuery.ajax({
-        url: "/cfp-review/scheduler_update",
+        url: "{{ url_for("cfp_review.scheduler_update") }}",
         type: "POST",
         data: {
           id: ev.id,
