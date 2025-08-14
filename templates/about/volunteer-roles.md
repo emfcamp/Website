@@ -34,6 +34,6 @@ Occasionally we'd like to put out a call for help with specific roles. While we'
 
 <div class="well">
   <p>You can sign up to be notified here:</p>
-  {{ contact_form("volunteer") }}
+  {{ mailing_list("volunteer") }}
 </div>
 
