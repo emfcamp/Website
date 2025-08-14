@@ -365,7 +365,7 @@ def create_app(dev_server=False, config_override=None):
     app.register_blueprint(tickets)
     app.register_blueprint(payments)
     app.register_blueprint(cfp)
-    app.register_blueprint(cfp_review, url_prefix="/cfp-review")
+    app.register_blueprint(cfp_review, url_prefix="/admin/cfp-review")
     app.register_blueprint(schedule)
     app.register_blueprint(arrivals, url_prefix="/arrivals")
     app.register_blueprint(api_bp, url_prefix="/api")
