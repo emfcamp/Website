@@ -614,7 +614,7 @@ def product_view_edit_voucher(view_id, voucher_code):
     )
 
 
-@product_views.route("/<int:view_id>/voucher/bulk_add", methods=["GET", "POST"])
+@product_views.route("/<int:view_id>/voucher/bulk-add", methods=["GET", "POST"])
 def product_view_bulk_add_vouchers_by_email(view_id):
     view = ProductView.query.get_or_404(view_id)
     form = BulkVoucherEmailForm()

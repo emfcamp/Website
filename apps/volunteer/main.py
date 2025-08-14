@@ -50,7 +50,7 @@ def info_page(page_name: str):
 def info():
     return render_markdown(f"volunteer/info/index", page_name="index")
 
-@volunteer.route("/init_shifts")
+@volunteer.route("/init-shifts")
 @v_admin_required
 def init_shifts():
     for v in load_initial_venues():
@@ -105,7 +105,7 @@ def init_shifts():
     return redirect(url_for(".main"))
 
 
-@volunteer.route("/init_workshop_shifts")
+@volunteer.route("/init-workshop-shifts")
 @v_admin_required
 def init_workshop_shifts():
     time_before_start = timedelta(minutes=30)
@@ -162,7 +162,7 @@ def init_workshop_shifts():
     return redirect(url_for(".schedule"))
 
 
-@volunteer.route("/clear_data")
+@volunteer.route("/clear-data")
 @v_admin_required
 def clear_data():
     if not app.config.get("DEBUG"):
