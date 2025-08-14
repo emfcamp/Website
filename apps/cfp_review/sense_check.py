@@ -146,7 +146,7 @@ def not_sensible_reasons(
     return reasons
 
 
-@cfp_review.route("/sense_check")
+@cfp_review.route("/sense-check")
 @review_required
 def sense_check():
     types_to_show = request.args.getlist("type")
