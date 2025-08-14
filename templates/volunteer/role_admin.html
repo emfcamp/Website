@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% macro state_selector(shift_entry) %}
-  <form method="post" action="/volunteer/role/{{ shift_entry.shift.role_id }}/set_state/{{ shift_entry.shift_id }}/{{ shift_entry.user_id }}" class="role-state-selector">
+  <form method="post" action="{{ url_for("volunteer.set_state", role_id=shift_entry.shift.role_id, shift_id=shift_entry.shift_id, user_id=shift_entry.user_id)}}" class="role-state-selector">
     <label class="sr-only" for="state">New State</label>
     <select name="state" class="form-control">
       <option value="{{ shift_entry.state }}">{{ shift_entry.state | capitalize | replace("_", " ") }}</option>

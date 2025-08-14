@@ -113,7 +113,7 @@ def choose_role():
     return render_template("volunteer/choose_role.html", form=form)
 
 
-@volunteer.route("/role_admin", methods=["GET"])
+@volunteer.route("/role-admin", methods=["GET"])
 @v_user_required
 def role_admin_index():
     roles = []
@@ -225,7 +225,7 @@ def role_admin(role_id):
     )
 
 
-@volunteer.route("role/<int:role_id>/set_state/<int:shift_id>/<int:user_id>", methods=["POST"])
+@volunteer.route("role/<int:role_id>/set-state/<int:shift_id>/<int:user_id>", methods=["POST"])
 @role_admin_required
 def set_state(role_id: int, shift_id: int, user_id: int):
     state = request.form["state"]

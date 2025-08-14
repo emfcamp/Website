@@ -696,7 +696,7 @@ def proposal_version(proposal_id, txn_id):
     )
 
 
-@cfp_review.route("/message_batch", methods=["GET", "POST"])
+@cfp_review.route("/message-batch", methods=["GET", "POST"])
 @admin_required
 def message_batch():
     proposals, filtered = filter_proposal_request()
@@ -904,7 +904,7 @@ def proposal_notes(proposal_id):
     )
 
 
-@cfp_review.route("/proposals/<int:proposal_id>/change_owner", methods=["GET", "POST"])
+@cfp_review.route("/proposals/<int:proposal_id>/change-owner", methods=["GET", "POST"])
 @admin_required
 def proposal_change_owner(proposal_id):
     form = ChangeProposalOwner()
@@ -1082,7 +1082,7 @@ def rank():
     )
 
 
-@cfp_review.route("/potential_schedule_changes", methods=["GET", "POST"])
+@cfp_review.route("/potential-schedule-changes", methods=["GET", "POST"])
 @schedule_required
 def potential_schedule_changes():
     proposals = (
@@ -1178,7 +1178,7 @@ def scheduler():
     )
 
 
-@cfp_review.route("/scheduler_update", methods=["GET", "POST"])
+@cfp_review.route("/scheduler-update", methods=["GET", "POST"])
 @admin_required
 def scheduler_update():
     proposal = Proposal.query.filter_by(id=request.form["id"]).one()

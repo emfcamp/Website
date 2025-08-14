@@ -94,7 +94,7 @@ def line_up():
     )
 
 
-@schedule.route("/schedule/add_favourite", methods=["POST"])
+@schedule.route("/schedule/add-favourite", methods=["POST"])
 def add_favourite():
     if not current_user.is_authenticated:
         abort(401)
