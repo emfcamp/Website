@@ -5,7 +5,7 @@
 {% set nav_active = 'arrivals_views' %}
 {% block body %}
 <ol class="breadcrumb">
-  <li><a href="{{url_for('.arrivals_views')}}">Arrivals Views</a></li>
+  <li><a href="{{url_for('admin.arrivals_views')}}">Arrivals Views</a></li>
   <li class="active">Arrivals View "{{ view.name }}"</li>
 </ol>
 
@@ -27,7 +27,7 @@
   {% for pvp in view.arrivals_view_products | sort(attribute="product_id") %}
   <tr>
     <td>{{ pvp.product.parent.name }}</td>
-    <td><a tabindex="-1" href="{{ url_for('admin.product_details', product_id=pvp.product.id) }}">{{ pvp.product.name }}</a></td>
+    <td><a tabindex="-1" href="{{ url_for('admin.products.product_details', product_id=pvp.product.id) }}">{{ pvp.product.name }}</a></td>
     <td>{{ pvp.product.display_name }}</td>
     <td>
       {{ pvp._field.product_id() }}

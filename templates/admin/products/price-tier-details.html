@@ -8,7 +8,7 @@
 
 <dl class="dl-horizontal">
   <dt>Product</dt><dd>
-      <a href="{{ url_for('admin.product_details', product_id=tier.parent.id) }}">{{ tier.parent }}</a>
+      <a href="{{ url_for('admin.products.product_details', product_id=tier.parent.id) }}">{{ tier.parent }}</a>
   </dd>
   <dt>Active</dt><dd>{{ tier.active }}</dd>
   <dt>Sold</dt><dd>{{ tier.capacity_used }}</dd>
@@ -31,7 +31,7 @@
 {% endif %}
 
 <form method="post" class="btn-group">
-<a href="{{ url_for('.price_tier_edit', tier_id=tier.id) }}" class="btn btn-default">Edit</a>
+<a href="{{ url_for('admin.products.price_tier_edit', tier_id=tier.id) }}" class="btn btn-default">Edit</a>
 {{ form.hidden_tag() }}
 {% if tier.unused %}
     <button name="delete" value="1" class="btn btn-danger">Delete</button>

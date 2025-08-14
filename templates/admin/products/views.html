@@ -13,7 +13,7 @@
   </tr>
   {% for view, count in view_counts %}
   <tr>
-    <td><a href="{{ url_for('admin.product_view', view_id=view.id) }}">{{ view.name }}</a></td>
+    <td><a href="{{ url_for('admin.product_views.product_view', view_id=view.id) }}">{{ view.name }}</a></td>
     <td>{{ view.type }}</td>
     <td>{{ count }}</td>
     <td>{% if view.cfp_accepted_only %}✔️{%endif%}</td>
