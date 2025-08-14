@@ -6,7 +6,7 @@ from main import db
 from .. import BaseModel
 
 from . import ShiftEntry
-
+from . import RoleAdmin
 
 # This effectively records the roles that a volunteer is interested in
 VolunteerRoleInterest = db.Table(
@@ -24,7 +24,6 @@ VolunteerRoleTraining = db.Table(
     db.Column("volunteer_id", db.Integer, db.ForeignKey("volunteer.id"), primary_key=True),
     db.Column("role_id", db.Integer, db.ForeignKey("volunteer_role.id"), primary_key=True),
 )
-
 
 class Volunteer(BaseModel, UserMixin):
     __table_name__ = "volunteer"
@@ -53,7 +52,15 @@ class Volunteer(BaseModel, UserMixin):
         secondary=VolunteerRoleTraining,
         lazy="dynamic",
     )
-
+    admined_roles = db.relationship(
+        "Role",
+        backref="role_admins",
+        secondary=RoleAdmin.__table__,
+        primaryjoin="RoleAdmin.user_id==Volunteer.user_id",
+        secondaryjoin="RoleAdmin.role_id==Role.id",
+        lazy="dynamic"
+    )
+    
     def __repr__(self):
         return f"<Volunteer {self.__str__()}>"
 
