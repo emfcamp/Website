@@ -173,16 +173,16 @@ def load_utility_functions(app_obj):
         return Markup(text)
 
     @app_obj.context_processor
-    def contact_form_processor():
-        def contact_form(list):
-            """Renders a contact form for the requested list."""
+    def mailing_list_processor():
+        def mailing_list(list):
+            """Renders a signup form for the requested list."""
             if list not in app_obj.config["LISTMONK_LISTS"]:
                 msg = f"The list '{list}' is not configured. Add it to your config file under LISTMONK_LISTS."
                 raise ValueError(msg)
 
             return Markup(render_template("home/_mailing_list_form.html", list=list))
 
-        return {"contact_form": contact_form}
+        return {"mailing_list": mailing_list}
 
     @app_obj.template_filter("ticket_state_label")
     def ticket_state_label(ticket: Ticket):
