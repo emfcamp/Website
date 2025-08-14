@@ -23,7 +23,7 @@
   {% for pvp in view.product_view_products %}
   <tr>
     <td>{{ pvp.product.parent.name }}</td>
-    <td><a tabindex="-1" href="{{ url_for('admin.product_details', product_id=pvp.product.id) }}">{{ pvp.product.name }}</a></td>
+    <td><a tabindex="-1" href="{{ url_for('admin.products.product_details', product_id=pvp.product.id) }}">{{ pvp.product.name }}</a></td>
     <td>{{ pvp.product.display_name }}</td>
     <td>{{ pvp.order }}</td>
   </tr>
@@ -33,7 +33,7 @@
 
 {% macro render_group_li(group, depth=0) -%}
 <li>
-  <a style="padding-left: {{ depth * 20 + 20 }}px" href="{{ url_for('.product_view_add', view_id=view.id, group_id=group.id) }}">
+  <a style="padding-left: {{ depth * 20 + 20 }}px" href="{{ url_for('admin.product_views.product_view_add', view_id=view.id, group_id=group.id) }}">
     {{ group | title }}
     {% if group == add_group %}
     {{ form.add_all_products(class_="btn btn-success debounce pull-right") }}
@@ -43,7 +43,7 @@
   {% if group == add_group %}
     {% for product in group.products %}
     <li>
-      <a style="padding-left: {{ depth * 20 + 40 }}px" href="{{ url_for('.product_view_add', view_id=view.id, group_id=group.id, product_id=product.id) }}">
+      <a style="padding-left: {{ depth * 20 + 40 }}px" href="{{ url_for('admin.product_views.product_view_add', view_id=view.id, group_id=group.id, product_id=product.id) }}">
       {{ product }}
       {% if product == add_product %}
       {{ form.add_product(class_="btn btn-success debounce pull-right") }}
