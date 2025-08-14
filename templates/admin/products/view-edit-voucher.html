@@ -5,9 +5,9 @@
 {% set nav_active = 'product_views' %}
 {% block body %}
 <ol class="breadcrumb">
-  <li><a href="{{url_for('.product_views')}}">Product Views</a></li>
-  <li><a href="{{url_for('.product_view', view_id=view.id)}}">Product View "{{ view.name }}"</a></li>
-  <li><a href="{{url_for('.product_view_voucher_list', view_id=view.id)}}">Vouchers</a></li>
+  <li><a href="{{url_for('admin.product_views.product_views_main')}}">Product Views</a></li>
+  <li><a href="{{url_for('admin.product_views.product_view', view_id=view.id)}}">Product View "{{ view.name }}"</a></li>
+  <li><a href="{{url_for('admin.product_views.product_view_voucher_list', view_id=view.id)}}">Vouchers</a></li>
   <li class="active">Voucher "{{voucher.code}}"</li>
 </ol>
 

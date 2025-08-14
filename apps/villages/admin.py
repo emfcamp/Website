@@ -69,7 +69,7 @@ def admin_village(village_id):
     return render_template("villages/admin/info.html", village=village, form=form)
 
 
-@villages.route("/admin/email_owners", methods=["GET", "POST"])
+@villages.route("/admin/email-owners", methods=["GET", "POST"])
 @village_admin_required
 def admin_email_owners():
     form = EmailComposeForm()

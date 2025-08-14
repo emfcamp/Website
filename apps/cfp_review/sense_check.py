@@ -115,7 +115,7 @@ def not_sensible_reasons(proposal: Proposal, proposals_by_speaker: dict[int, set
     return reasons
 
 
-@cfp_review.route("/sense_check")
+@cfp_review.route("/sense-check")
 @review_required
 def sense_check():
     types_to_show = request.args.getlist("type")

@@ -34,10 +34,10 @@
 
 {% macro render_item(item, link=True) -%}
 {% if item.__class__.__name__ == 'ProductGroup' %}
-    {% if link %}<a href="{{url_for('.product_group_details', group_id=item.id) }}">{% endif %}Product Group: {{item.name}}{% if link %}</a>{% endif %}
+    {% if link %}<a href="{{url_for('admin.products.product_group_details', group_id=item.id) }}">{% endif %}Product Group: {{item.name}}{% if link %}</a>{% endif %}
 {% elif item.__class__.__name__ == 'Product' %}
-    {% if link %}<a href="{{url_for('.product_details', product_id=item.id) }}">{% endif %}Product: {{item.display_name}}{% if link %}</a>{% endif %}
+    {% if link %}<a href="{{url_for('admin.products.product_details', product_id=item.id) }}">{% endif %}Product: {{item.display_name}}{% if link %}</a>{% endif %}
 {% elif item.__class__.__name__ == 'PriceTier' %}
-    {% if link %}<a href="{{url_for('.price_tier_details', tier_id=item.id) }}">{% endif %}Price Tier: {{item.name}}{% if link %}</a>{% endif %}
+    {% if link %}<a href="{{url_for('admin.products.price_tier_details', tier_id=item.id) }}">{% endif %}Price Tier: {{item.name}}{% if link %}</a>{% endif %}
 {% endif %}
 {%- endmacro %}
