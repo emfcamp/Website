@@ -1,4 +1,5 @@
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import selectinload
 
 from main import db
 from . import BaseModel
@@ -28,6 +29,21 @@ class ArrivalsView(BaseModel):
     @classmethod
     def get_by_name(cls, name):
         return cls.query.filter_by(name=name).one_or_none()
+
+    @classmethod
+    def get_export_data(cls):
+        data = {}
+        query = (
+            db.select(ArrivalsView)
+            .options(selectinload(ArrivalsView.required_permission))
+        )
+        for view in db.session.execute(db.select(ArrivalsView)).scalars():
+            data[view.name] = {
+                "name": view.name,
+                "permission": view.required_permission.name,
+                "products": [product.name for product in view.arrivals_view_products],
+            }
+        return {"private": data}
 
 
 class ArrivalsViewProduct(BaseModel):

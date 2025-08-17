@@ -5,6 +5,7 @@ from markdown import markdown
 from markupsafe import Markup
 
 from .. import BaseModel
+from .volunteer import VolunteerRoleInterest, VolunteerRoleTraining
 
 
 class Role(BaseModel):
@@ -65,17 +66,37 @@ class Role(BaseModel):
         )
         shift_histogram_q = (
             db.select(Role, shift_counts_q.c.shift_count, db.func.count(shift_counts_q.c.user_id))
-            .join(Role)
+            .select_from(Role)
+            .outerjoin(shift_counts_q)
             .group_by(Role, shift_counts_q.c.shift_count)
             .order_by(Role.id)
         )
+
+        interested_volunteers_q = (
+            db.select(VolunteerRoleInterest.c.role_id, db.func.count())
+            .select_from(VolunteerRoleInterest)
+            .group_by(VolunteerRoleInterest.c.role_id)
+        )
+        interested_volunteers = {role_id: count for role_id, count in db.session.execute(interested_volunteers_q)}
+
+        trained_volunteers_q = (
+            db.select(VolunteerRoleTraining.c.role_id, db.func.count())
+            .select_from(VolunteerRoleTraining)
+            .group_by(VolunteerRoleTraining.c.role_id)
+        )
+        trained_volunteers = {role_id: count for role_id, count in db.session.execute(trained_volunteers_q)}
+
         roles = {}
         for role, stats in groupby(db.session.execute(shift_histogram_q), itemgetter(0)):
-            shift_histogram = {shifts: users for _, shifts, users in stats}
+            shift_histogram = {shifts: volunteers for _, shifts, volunteers in stats}
             roles[role.name] = {
                 "shift_histogram": shift_histogram,
                 "total_volunteers": sum(shift_histogram.values()),
+                "interested_volunteers": interested_volunteers.get(role.id),
             }
+            if role.requires_training:
+                roles[role.name]["trained_volunteers"] = trained_volunteers.get(role.id)
+
         return {
             "public": {
                 "roles": roles,

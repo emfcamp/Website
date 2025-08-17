@@ -5,7 +5,7 @@ from flask_login import UserMixin
 from main import db
 from .. import BaseModel
 
-from . import ShiftEntry
+from .shift import ShiftEntry
 
 
 # This effectively records the roles that a volunteer is interested in
