@@ -80,6 +80,28 @@ class Tag(BaseModel):
         return cls.query.filter_by(tag=value).one_or_none()
 
 
+    @classmethod
+    def get_export_data(cls):
+        tag_proposals_q = (
+          db.select(Tag, db.func.count(Tag.id))
+          .join(Tag.proposals)
+          .group_by(Tag)
+        )
+        tag_reviewers_q = (
+          db.select(Tag, db.func.count(Tag.id))
+          .join(Tag.reviewers)
+          .group_by(Tag)
+        )
+        tags = {
+            "proposals": {tag.tag: c for tag, c in db.session.execute(tag_proposals_q)},
+            "reviewers": {tag.tag: c for tag, c in db.session.execute(tag_reviewers_q)},
+        }
+        return {
+            "public": {"tags": tags},
+            "tables": ["tag", "proposal_tag", "cfp_reviewer_tags"],
+        }
+
+
 ProposalTag: sqlalchemy.Table = db.Table(
     "proposal_tag",
     BaseModel.metadata,

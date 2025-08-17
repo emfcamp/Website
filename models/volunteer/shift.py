@@ -102,7 +102,8 @@ class Shift(BaseModel):
                     ).all(),
                 }
                 for s in cls.get_all()
-            ]
+            ],
+            "tables": ["volunteer_shift", "volunteer_shift_entry"]
         }
 
     def is_clash(self, other):

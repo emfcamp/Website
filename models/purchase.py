@@ -1,9 +1,10 @@
-from datetime import datetime
-from sqlalchemy.orm import column_property, validates
+from datetime import datetime, timedelta
+from sqlalchemy.orm import column_property, validates, aliased
 from sqlalchemy_continuum.version import VersionClassBase
+from sqlalchemy_continuum.utils import version_class, transaction_class
 from main import db
 from .user import User
-from . import BaseModel, Currency
+from . import BaseModel, Currency, bucketise, export_intervals, export_attr_counts
 
 
 # The type of a product determines how we handle it after purchase.
@@ -249,6 +250,65 @@ class Purchase(BaseModel):
         return None
 
 
+    @classmethod
+    def get_export_data(cls):
+        transfer_counts = (
+            db.select(db.func.count(PurchaseTransfer.id))
+            .select_from(cls)
+            .outerjoin(cls.transfers)
+            .group_by(cls.id)
+        )
+
+        cls_version = version_class(cls)
+        cls_transaction = transaction_class(cls)
+        changes = db.select(cls).join(cls.versions).group_by(cls.id)
+        change_counts = changes.with_only_columns(db.func.count(cls_version.id))
+
+        cls_ver_redeemed = aliased(cls_version)
+        cls_txn_redeemed = aliased(cls_transaction)
+        unredeemed_time = db.func.max(cls_txn_redeemed.issued_at) - cls.created
+        unredeemed_times = (
+            db.select(unredeemed_time.label("unredeemed_time"))
+            .select_from(cls)
+            .join(cls_ver_redeemed, cls_ver_redeemed.id == cls.id)
+            .join(cls_txn_redeemed, cls_txn_redeemed.id == cls_ver_redeemed.transaction_id)
+            .filter(cls_ver_redeemed.redeemed == True)
+            .group_by(cls.id)
+        )
+
+        time_buckets = [timedelta(0), timedelta(minutes=1), timedelta(hours=1)] + [
+            timedelta(d)
+            for d in [1, 2, 3, 4, 5, 6, 7, 14, 1*28, 2*28, 3*28, 4*28, 5*28]
+        ]
+
+        data = {
+            "public": {
+                "purchases": {
+                    "counts": {
+                        "changes": bucketise(db.session.execute(change_counts), list(range(10)) + [10, 20]),
+                        "created_week": export_intervals(
+                            db.select(cls), cls.created, "week", "YYYY-MM-DD"
+                        ),
+                        "transfers": bucketise(
+                            db.session.execute(transfer_counts), list(range(5)) + [5]
+                        ),
+                        "unredeemed_time": bucketise(
+                            [r.unredeemed_time for r in db.session.execute(unredeemed_times)], time_buckets
+                        ),
+                    }
+                }
+            },
+            "tables": ["purchase", "purchase_version"],
+        }
+
+        count_attrs = ["state", "redeemed"]
+        data["public"]["purchases"]["counts"].update(
+            export_attr_counts(cls, count_attrs)
+        )
+
+        return data
+
+
 class Ticket(Purchase):
     """A ticket, which is a specific type of purchase, but with different vocabulary.
 
@@ -290,6 +350,22 @@ class PurchaseTransfer(BaseModel):
             self.to_user_id,
             self.timestamp,
         )
+
+    def get_export_data(cls):
+        data = {
+            "public": {
+                "transfers": {
+                    "counts": {
+                        "timestamp_week": export_intervals(
+                            db.select(cls), cls.timestamp, "week", "YYYY-MM-DD"
+                        ),
+                    }
+                }
+            },
+            "tables": ["purchase_transfer"],
+        }
+
+        return data
 
 
 class PurchaseStateException(Exception):

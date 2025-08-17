@@ -8,6 +8,7 @@ from flask import current_app as app
 
 from main import db
 from sqlalchemy import true, inspect
+from sqlalchemy.orm import Query
 from sqlalchemy.orm.base import NO_VALUE
 from sqlalchemy.sql.functions import func
 from sqlalchemy.engine.row import Row
@@ -56,12 +57,19 @@ def to_dict(obj):
     )
 
 
-def count_groups(query, *entities):
-    return (
-        query.with_entities(func.count().label("count"), *entities)
-        .group_by(*entities)
-        .order_by(*entities)
-    )
+def count_groups(selectable, *entities):
+    if isinstance(selectable, Query):
+        return (
+            selectable.with_entities(func.count().label("count"), *entities)
+            .group_by(*entities)
+            .order_by(*entities)
+        )
+    else:
+        return db.session.execute(
+            selectable.with_only_columns(func.count().label("count"), *entities)
+            .group_by(*entities)
+            .order_by(*entities)
+        )
 
 
 def nest_count_keys(rows):
@@ -100,16 +108,16 @@ def bucketise(vals, boundaries) -> OrderedDict[str, int]:
     return counts
 
 
-def export_intervals(query, date_entity, interval, fmt):
+def export_intervals(selectable, date_entity, interval, fmt):
     return nest_count_keys(
-        count_groups(query, func.to_char(func.date_trunc(interval, date_entity), fmt))
+        count_groups(selectable, func.to_char(func.date_trunc(interval, date_entity), fmt))
     )
 
 
-def export_counts(query, cols):
+def export_counts(selectable, cols):
     counts = OrderedDict()
     for col in cols:
-        counts[col.name] = nest_count_keys(count_groups(query, col))
+        counts[col.name] = nest_count_keys(count_groups(selectable, col))
 
     return counts
 
