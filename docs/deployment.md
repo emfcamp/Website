@@ -9,10 +9,10 @@ Staging (https://www.emfcamp-test.org) is on kelvin.emfcamp.org.
 This is done after each event, following a clear of the database:
 
     docker compose -f ./docker-compose.environment.yml up -d
-    docker compose -f ./docker-compose.environment.yml exec app poetry run flask db upgrade
-    docker compose -f ./docker-compose.environment.yml exec app poetry run flask create_perms
-    docker compose -f ./docker-compose.environment.yml exec app poetry run flask cfp create_venues
-    docker compose -f ./docker-compose.environment.yml exec app poetry run flask tickets create
+    docker compose -f ./docker-compose.environment.yml exec app uv run flask db upgrade
+    docker compose -f ./docker-compose.environment.yml exec app uv run flask create_perms
+    docker compose -f ./docker-compose.environment.yml exec app uv run flask cfp create_venues
+    docker compose -f ./docker-compose.environment.yml exec app uv run flask tickets create
 
 
 # Deployments
@@ -22,14 +22,14 @@ and pushed to Github Container Registry. This is done using [Watchtower](https:/
 
 If there are any DB migrations which need to be applied, you still need to manually run:
 
-    docker compose -f /root/Website/docker-compose.prod.yml exec app poetry run flask db upgrade
+    docker compose -f /root/Website/docker-compose.prod.yml exec app uv run flask db upgrade
 
 or, if the app won't start:
 
-    docker compose -f /root/Website/docker-compose.prod.yml run --rm --entrypoint=poetry app run flask db upgrade
+    docker compose -f /root/Website/docker-compose.prod.yml run --rm --entrypoint=uv app run flask db upgrade
 
 # Admin Commands
 
 Admin commands can be listed with:
 
-    docker-compose -f /root/Website/docker-compose.prod.yml exec app poetry run flask
+    docker-compose -f /root/Website/docker-compose.prod.yml exec app uv run flask

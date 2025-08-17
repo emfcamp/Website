@@ -49,10 +49,10 @@ your VSCode instance to the application container, install relevant extensions,
 and ensure everything is configured to fit with our standards.
 
 The first time you start the dev container you will need to tell VSCode where to
-find the Poetry virtual environment. You can do this by open the command palette
+find the `uv` virtual environment. You can do this by open the command palette
 (Cmd-P on macOS devices) and searching for "Python: Select interpreter", the list
 presented should include `website-${randomHash}-py3.11`, which will be annotated
-as "Poetry". Select that, and then any Python tooling and shells will run within
+as "uv". Select that, and then any Python tooling and shells will run within
 the appropriate virtualenv.
 
 ### Errors starting the dev server
