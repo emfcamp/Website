@@ -22,7 +22,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install uv && \
-    uv sync
+    uv sync --no-dev
 
 RUN uv run playwright install-deps && \
     rm -rf /var/lib/apt/lists/*
