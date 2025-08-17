@@ -37,11 +37,11 @@ class ArrivalsView(BaseModel):
             db.select(ArrivalsView)
             .options(selectinload(ArrivalsView.required_permission))
         )
-        for view in db.session.execute(db.select(ArrivalsView)).scalars():
+        for view in db.session.scalars(query):
             data[view.name] = {
                 "name": view.name,
                 "permission": view.required_permission.name,
-                "products": [product.name for product in view.arrivals_view_products],
+                "products": [p.name for p in view.products],
             }
         return {"private": data}
 
