@@ -351,6 +351,7 @@ class PurchaseTransfer(BaseModel):
             self.timestamp,
         )
 
+    @classmethod
     def get_export_data(cls):
         data = {
             "public": {
