@@ -3,7 +3,7 @@
 # This image is used as a base image for both production and development builds.
 # It's built separately to speed up build times.
 
-FROM python:3.11-slim-bullseye
+FROM python:3.13-slim-bookworm
 
 WORKDIR /app
 COPY pyproject.toml uv.lock /app/
@@ -16,9 +16,9 @@ ENV UV_PROJECT_ENVIRONMENT=/venv
 # packages, however this complicates upgrading packages which require compilation.
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      libxml2-dev libxslt1-dev libffi-dev git glpk-utils \
-      postgresql-client make build-essential libpq-dev \
-      libzbar0 coinor-cbc curl && \
+    libxml2-dev libxslt1-dev libffi-dev git glpk-utils \
+    postgresql-client make build-essential libpq-dev \
+    libzbar0 coinor-cbc curl && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install uv && \
