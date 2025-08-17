@@ -11,7 +11,7 @@ on:
       - 'docker/Dockerfile.base-dev'
       - 'docker/Dockerfile.base-dev.dockerignore'
       - 'pyproject.toml'
-      - 'poetry.lock'
+      - 'uv.lock'
       - 'package.json'
       - 'package-lock.json'
   schedule:
