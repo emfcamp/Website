@@ -1,7 +1,7 @@
 from random import choices
 
 from main import db
-from . import BaseModel
+from . import BaseModel, export_attr_counts, bucketise
 from .site_state import get_signup_state
 from .user import User
 from .cfp import Proposal
@@ -191,6 +191,33 @@ class EventTicket(BaseModel):
             )
 
         raise EventTicketException("Tickets are not currently being issued")
+
+
+    @classmethod
+    def get_export_data(cls):
+        user_count_subq = db.select(cls.user_id, db.func.count().label("user_count")).group_by(cls.user_id).subquery()
+        user_count_q = db.select(user_count_subq.c.user_count, db.func.count()).group_by(user_count_subq.c.user_count)
+
+        proposal_count_subq = db.select(cls.proposal_id, db.func.count().label("proposal_count")).group_by(cls.proposal_id).subquery()
+        proposal_count_q = db.select(proposal_count_subq.c.proposal_count, db.func.count()).group_by(proposal_count_subq.c.proposal_count)
+
+
+        data = {
+            "public": {
+                "counts": {
+                    "users": bucketise(
+                        db.session.execute(user_count_q),
+                        [0, 10, 20, 30, 40, 50],
+                    ),
+                    "proposal_counts": bucketise(
+                        db.session.execute(proposal_count_q),
+                        [0, 10, 20, 30, 40, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500],
+                    ),
+                }
+            }
+        }
+        data["public"]["counts"].update(export_attr_counts(cls, ['state', 'rank', 'ticket_count']))
+        return data
 
 
 def get_max_rank_for_user(user, proposal_type):

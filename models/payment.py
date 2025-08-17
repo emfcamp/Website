@@ -650,3 +650,11 @@ class PaymentSequence(BaseModel):
 
     name = db.Column(db.String, primary_key=True)
     value = db.Column(db.Integer, nullable=False)
+
+    @classmethod
+    def get_export_data(cls):
+        rows = db.session.scalars(db.select(cls))
+        return {
+            "public": {r.name: r.value for r in rows}
+        }
+

@@ -1,0 +1,1210 @@
+{
+    "favourites": {
+        "counts": {
+            "0": 0,
+            "1-9": 0,
+            "10-19": 0,
+            "20-29": 0,
+            "30-39": 0,
+            "40-49": 0,
+            "50-99": 0,
+            "100-199": 0,
+            "200+": 0
+        }
+    },
+    "proposals": {
+        "accepted": [
+            {
+                "published_title": "PolyGen - Show and Tell (at Null Sector)",
+                "published_description": "A two way session to explain how PolyGen works, why it changed from PolyCoin, how the underlying game works, and to ask any questions you have about the game.\r\n\r\nNote this will take place at Null Sector on the dance floor.  \r\n",
+                "names": "Michael Turner",
+                "pronouns": "",
+                "may_record": null,
+                "video_privacy": "public",
+                "scheduled_time": "2024-06-02 14:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Morning Demoscene Watchalong",
+                "published_description": "Join us for a chilled out morning with tea and coffee, watching the some of the best the Demoscene has to offer.",
+                "names": "Enfys Castle-Roper (they/them)",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-31 10:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 4 (FieldFX)",
+                "venue_village_id": 10
+            },
+            {
+                "published_title": "Waterflower",
+                "published_description": "Waterflower (Sabine Moore), a Latvian eco-futurist artist, creates raw, grungy electronic pop music using plants and mushrooms as instruments, reflecting on the urgency of our planet's crisis.  Working on themes of ecology, extinction and psychology, Waterflower\u2019s shows are immersive, audiovisual experiences, merging noise, ambient music, electronic pop and digital hardcore. \r\n\r\nhttps://www.youtube.com/playlist?list=PLKHUeI7QICGHGfnPb4R6Rfb2H5W93uszP\r\nhttps://open.spotify.com/artist/3hC37A4FC6LS41h5E7VUk7",
+                "names": "Sabine Moore",
+                "pronouns": "She / They",
+                "may_record": false,
+                "video_privacy": "public",
+                "scheduled_time": "2024-06-02 22:25:00",
+                "scheduled_duration": 55,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Meowing Session",
+                "published_description": "We meet up and meow \r\nbring sharks!!!",
+                "names": "alyx :3",
+                "pronouns": "she/her",
+                "may_record": null,
+                "video_privacy": "public",
+                "scheduled_time": "2024-06-02 21:00:00",
+                "scheduled_duration": 30,
+                "venue": "Lounge",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Whiskyleaks",
+                "published_description": "Many bottles enter, no bottles leave.\r\n\r\nCome by with a bottle, drink whisky or something else and meet new people! \r\n\r\nThis event is free for all attendees and doesn't need sign up, but we'd appreciate donations or if you bought one of our challenge coins.\r\n\r\nThe restaurant at the end of the universe awaits. ",
+                "names": "Hibby",
+                "pronouns": "",
+                "may_record": null,
+                "video_privacy": "public",
+                "scheduled_time": "2024-06-01 20:30:00",
+                "scheduled_duration": 240,
+                "venue": "Workshop 2 (Milliways)",
+                "venue_village_id": 43
+            },
+            {
+                "published_title": "Deep Fried Buckfast",
+                "published_description": "Nae just a pair of drinks, an affa fine an funcy scran too.\r\n\r\nInvented many years ago by Scotland's own epicurious Friar Buck, this pioneering culinary innovation has delighted many Scots over the years. It has been shared as a cultural export with attendees at many events around the world, and its consumption has been placed on Trip Advisor's Top 10 Scotland Themed activities for 4 years running now.\r\n\r\nThe Scottish Consulate have formally licensed the recipe, and it can be found on the consular website.",
+                "names": "Friar Buck",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-01 14:00:00",
+                "scheduled_duration": 120,
+                "venue": "Scottish Consulate",
+                "venue_village_id": 28
+            },
+            {
+                "published_title": "Deep fried buckfast: bottom of the barrel",
+                "published_description": "The end is here. Help us finish the wine!",
+                "names": "Friar Buck",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-30 16:30:00",
+                "scheduled_duration": 30,
+                "venue": "Scottish Consulate",
+                "venue_village_id": 28
+            },
+            {
+                "published_title": "Electronic Music Open Mic (EMOM)",
+                "published_description": "On Saturday afternoon Null Sector hosts an Electronic Music Open Mic - https://electronicmusicopenmic.com\r\n\r\nEveryone is welcome to bring along their synths, sequencers, stylophones, spectrums, and signal generators of any kind to play a ten minute live gig on the Null Sector sound system to an audience of curious people.\r\n\r\nEMOM operates on a first-come-first-served basis, with a sign-up sheet opening 30 minutes before the first performance and sign-ups remaining open until we have no more time left! Remember to write your name on the sheet.\r\n\r\nWe will call people to play their 10 minute slots in order, with the next person setting up while someone plays. If you are not there to play when called we will skip to the next performer.\r\n\r\nWe can provide a single DI input for your equipment and a microphone. Please make sure you bring everything you need to connect to the sound setup. If you are not sure you can do this, please email music@emfcamp.org\r\n\r\nhttps://www.emfcamp.org/schedule/2024/661-electronic-music-open-mic-emom\r\n\r\nhttps://electronicmusicopenmic.com",
+                "names": "EMF Music",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 15:00:00",
+                "scheduled_duration": 180,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Psychiceyeclix ",
+                "published_description": "Psychiceyeclix performs wearing a robot synth helmet using unique instruments & circuit bent devices, using hacked games consoles/toys & diy electronics to create anything from drone, glitch, noise to drum & bass.\r\n\r\nhttps://youtu.be/Kga5pK69WqI?si=3JIkPd736R3bdEvf\r\nhttps://www.youtube.com/watch?v=oPihm-xOsNY",
+                "names": "EMF Live Music",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 01:05:00",
+                "scheduled_duration": 25,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "see the Bambu printer in action and talk about 3D printing",
+                "published_description": "Demo of the Bambu 3D printer, find out what all the fuss is about, chat about 3D printing plus see other Makespace members projects.",
+                "names": "Rob",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-02 09:45:00",
+                "scheduled_duration": 105,
+                "venue": "Cambridge Makespace ",
+                "venue_village_id": 51
+            },
+            {
+                "published_title": "Come chill at the Making Happiness Village!",
+                "published_description": "Come listen to the sounds of our Bob Ross sampling experience, there is face paint with gems & glitters, an Hour of Power speech by Dos Metros, Spoken Word (in Dutch) and lots of sun and very cute happy stickers!! \r\nBring your own cold drinks and a blanket to chill on. See you soon!",
+                "names": "Happy Villagers",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-02 16:00:00",
+                "scheduled_duration": 120,
+                "venue": "Making Happiness",
+                "venue_village_id": 50
+            },
+            {
+                "published_title": "Last minute DJ set and visuals",
+                "published_description": "Includes trippy shadertoy visuals",
+                "names": "Nspace",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-02 22:30:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 4 (FieldFX)",
+                "venue_village_id": 10
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 23:30:00",
+                "scheduled_duration": 55,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "edronik",
+                "published_description": "Multi genre DJ specialising in Electro Swing 4x4 and DnB with unexpected mashups mixed in.",
+                "names": "Ed Marsh",
+                "pronouns": "he/she/them",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 16:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "edronik",
+                "published_description": "",
+                "names": "edronik",
+                "pronouns": "he/she/them",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-05-31 22:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Obscenity State",
+                "published_description": "Obscenity State is an audiovisual artist/electronic music producer and musician that has been performing her shows across London and Europe at venues such as Corsica Studios, Fire and Iklectik.\r\n\r\nThe driving rhythms and expansive sound design of her music captures the euphoria of club culture whilst drawing from the musical depth of her background in classical music, with moments of tension and release, layering melodic counterpoints and dissonant shifting pitches.\r\n\r\nFollowing on from her EP in 2023, she will be releasing her debut album with the electronic label VLSI in late Spring/early Summer 2024.\r\n\r\nhttps://youtu.be/KbVy5q2wMSg?si=6sA-N8qiYumAon2E\r\nhttps://www.obscenitystate.com/\r\nhttps://www.instagram.com/obscenity_state/",
+                "names": "EMF Live Music - Performance",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-05-31 23:00:00",
+                "scheduled_duration": 55,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Funki Porcini - Vinyl DJ set",
+                "published_description": "Funki Porcini is composer and film maker James Braddell (a.k.a Giacomo Braddellini). His swirling mixtures of downtempo breaks, smooth ambiance, and disjointed drum'n'bass helped put the London-based Ninja Tune label on the map.\r\n\r\nMake sure you check out his \"Laserium\" performance in the FieldFX Workshop on Saturday night. https://www.emfcamp.org/schedule/2024/370-the-laserium\r\n\r\nhttps://www.youtube.com/user/FrankPorcini\r\nhttps://funkiporcini.bandcamp.com\r\nhttps://funkiporcini.net/things/",
+                "names": "EMF Live Music",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 20:30:00",
+                "scheduled_duration": 55,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Funki Porcini - The Laserium",
+                "published_description": "Over the last three years I have been making an instrument to convert sound to light using reflected and refracted lasers. The idea was to create a synesthesia between light and sound.\r\n\r\nNow with over 700 lasers it is arranged as three self contained units that project onto a white surface 5 to 10 meters away. It requires as much darkness as possible and takes 2/3 hours to set up. The lasers and the motors that turn them (or the object in front of them) are all controlled via midi making it a sort of light organ that creates something nobody has seen before.\r\n\r\nhttps://funkiporcini.net/things/news/the-laserium/",
+                "names": "EMF Live Music",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 23:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 4 (FieldFX)",
+                "venue_village_id": 10
+            },
+            {
+                "published_title": "Vital Organs",
+                "published_description": "Theremin, robotic carillon, sub-bass DIY bagpipes and more in this one-of-a-kind performance from humans Sarah Angliss and Karina Townsend and their extraordinary DIY machines. Hear them conjure birdsong, otherworldly voices and more as their instruments rattle your ribcage or spin into a delicate hyper-virtuosic metallic haze. Sarah Angliss is an Ivor Novello Award winning composer and instrument maker who tonight will be sharing a few of her experimental sonic excursions. Karina Townsend is a playful instrument maker and all-round creative technologist  - she's also a member of groovy beat combo Mike Flowers Pops. \r\n",
+                "names": "EMF Live Music",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 21:30:00",
+                "scheduled_duration": 40,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Graham Dunning - Mechanical Techno",
+                "published_description": "Graham Dunning's work explores sound as texture, timbre and something tactile, drawing on bedroom production, tinkering and recycling found objects.\r\n\r\nMechanical Techno uses a standard DJ turntable as a sequencer, sound source and ramshackle engine, building a spinning contraption in real-time to make wonky and weird dance music.\r\n\r\nhttps://www.youtube.com/watch?v=_p0CGOoN7J0\r\nhttps://www.grahamdunning.com",
+                "names": "EMF Live Music",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 21:30:00",
+                "scheduled_duration": 55,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 21:30:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Hoffman DJ Set",
+                "published_description": "While his roots are cemented in breakbeat music, Hoffman has a tendency to wander off the broken path, looking for gems hidden within the corners of other genres. Pouring it all into a melting pot of bass heavy tunes mixed with energetic stage presence, the result is dance floor destruction.",
+                "names": "Hoffman",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-05-31 20:00:00",
+                "scheduled_duration": 120,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "MrJoshua",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 17:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "br_nden - DJ Set:  House, Tech House, Deep House and Techno (face melting optional)",
+                "published_description": "An hour long journey through danceable groove, pulsating tech vibes, and infectious festival beats. Get ready to move to the familiar rhythms of Tech House,  the intensity of  face-melting Techno, and mix it up with  the eclectic flavours of Berlin's underground scene. Leave behind the intensity of the day's incredible talks and lose yourself in the simplicity of dark and winding beats. ",
+                "names": "Branden Faulls",
+                "pronouns": "He/Him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 18:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Brighton Consulate Cultural Exchange: Tuaca Tasting",
+                "published_description": "Take a quick detour into sunny Brighton and sample the city\u2019s best-kept secret!*\r\n\r\nTuaca, the Italian spiced brandy-vanilla liqueur, first reached British shores in the 1960s. Everyone in Brighton will tell you a different story about how it got here, and why you\u2019ll only ever find it on the south coast. Was it really first produced for Lorenzo the Magnificent? Did the salesman who brought it to the UK really just enjoy Brighton so much that he stayed? Is Brighton really responsible for 90% of all Tuaca sales?\r\n\r\nThe answers to all these questions and more lie at the bottom of a sticky, cinnamon-sweet shot glass. Come and enjoy a taste of Brighton culture!**\r\n\r\n*Warning: May contain seagulls.\r\n\r\n**Brighton Consulate cannot take any responsibility for any emotional changes or unusual events you may experience pertaining to seagulls as a result of this tasting.",
+                "names": "Jo",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-01 18:00:00",
+                "scheduled_duration": 60,
+                "venue": "Brighton Consulate",
+                "venue_village_id": 90
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-31 11:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-01 13:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-02 13:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-31 12:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-02 12:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-02 14:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-02 16:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-31 14:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-31 15:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-31 16:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-01 11:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-01 12:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-01 16:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-01 17:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-02 11:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-02 15:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Hoffman - Amiga Set",
+                "published_description": "Hoffman has been making music and DJing for over 30 years. Cutting his teeth with ProTracker as a teenager and fed on a diet of rave music, it was only a matter of time before his love of coding would result in the creation of PT-1210, a piece of software which turns any Amiga into a fully fledged DJ system. Armed with two 600\u2019s fully loaded with a raft of bangers, he leaves dance floors annihilated every time.\r\n",
+                "names": "Hoffman",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 00:00:00",
+                "scheduled_duration": 55,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-31 17:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "(NOT) Racing! ",
+                "published_description": "Cancelled as we need more time to recharge batteries and ourselves!\r\n\r\nCome join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-01 14:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Racing!",
+                "published_description": "Come join us at the Hacky Racers track, behind The Robot Arms, to watch our particular brand of motorsports!",
+                "names": "Racing!",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-01 15:00:00",
+                "scheduled_duration": 15,
+                "venue": "Hacky Racers (Track)",
+                "venue_village_id": 91
+            },
+            {
+                "published_title": "Friday Nite Rites - The Bottle Opens",
+                "published_description": "The Most Sacred Friday Nite Rites shall be undertaken. As told by the prophet DJ Bad Boy, we drink a bottle of Bucky and get out wur chicken.\r\n\r\nThis blessed wine, produced by Benedictine Monks in Devon, bloody England, is carefully, lovingly barrel aged to a smooth, steady 15% alcohol and is imbued in a holy ceremony with a blessed 280mg of caffeine. Safe passage across the Border has been assured by the Buckfast Accord of 1669 for even the bloody English appreciate that to starve Scotland of its key religious artifact will result in an invasive war and oppressive occupation. This is the source of the common phrase \"Buckfast gets you fucked fast\" - the leading word \"Nae\" was dropped due to a misunderstanding of intent during the Victorian era, and now the phrase is a common celebration and acknowledgement of the intensity of the Rites.\r\n\r\nWhen consumed in the appropriate manner (directly from the bottle, completed in roughly 1 hour) it will aid you in seeing through time and being particularly of the moment. Often, first time participants of the Drinkers Rites will find upon completion of their experience that they have voluntarily shed themselves of all material possessions. This is to be expected - when you are accelerated to the Blessed Plane of Existence, the whisperings of ancient gods and creatures that exist between dimensions will often assist the realisation that material possessions are temporary, but Tonic Experiences are for life.\r\n\r\nA note of caution to all prospective disciples, however - the intensity of your experience may transfer all the joy contained in your soul to be used tomorrow and expend it during the ritual. This transfer often leads to a despondent day, where one reflects only upon the negative aspects of life. Do not fret, to experience the highest of highs we must understand that with which it contrasts. The despair of the day after, coupled with the infamous Jakey Shakes and occasional rejections of all food and liquid are only temporary.\r\n\r\nThis is part of the journey as set out by The Wine, produced by the most blessed monks of Devonshire. It teaches us that while all shall return to equilibrium, to break from normality for just a moment of time may bring incredible joy.\r\n\r\nWhy don't you join Scots of all shapes and sizes at the nearest consular outpost on Friday to experience the Friday Nite Rites. It must be noted, the numbers stamped on the base of the bottle are a measure of ritual experience, and acolytes may start you on a high number (indicating low intensity), restricting the blessed Number 1 bottle for only the most revered members of the encampment.\r\n",
+                "names": "Hibby",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-31 19:00:00",
+                "scheduled_duration": 60,
+                "venue": "Scottish Consulate",
+                "venue_village_id": 28
+            },
+            {
+                "published_title": "The Rubber-Keyed Wonder",
+                "published_description": "An exclusive for EMF! The Rubber Keyed Wonder is brand-new documentary that  tells the story of the Sinclair ZX Spectrum. This film goes into all the finer details of how and why the ZX Spectrum was created, what impact the computer had as well as the various versions that followed right the way through to the latest iteration of the system with the ZX Spectrum Next. Complete with interviews from industry legends.\r\n\r\nA chance to see this brand new documentary from Anthony & Nicola Caulfield (Bedrooms To Billions) before it reaches cinemas later this year. ",
+                "names": "EMF Film",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 20:00:00",
+                "scheduled_duration": 140,
+                "venue": "Stage C",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Time Travellers\u2019 Party",
+                "published_description": "Balloons, champagne, and nibbles will be provided. ",
+                "names": "Dave A",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-30 15:00:00",
+                "scheduled_duration": 120,
+                "venue": "Main Bar",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "",
+                "published_description": "https://2xaa.net/",
+                "names": "2XAA",
+                "pronouns": "He/him/they",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 21:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Musical Tesla coil demo",
+                "published_description": "As night falls the sparks will be unleashed. Tonight's musical content is live improvisation on modular synth and theremin, and cheery chiptunes from Derek's mini coils.",
+                "names": "Steve Conner, Derek Woodroffe",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-31 21:30:00",
+                "scheduled_duration": 75,
+                "venue": "Odin's Tesla Fest",
+                "venue_village_id": 73
+            },
+            {
+                "published_title": "Musical Tesla coil demo",
+                "published_description": "As night falls the Tesla coils fire up, with DJ Odin, Extreme Electronics, and guest musicians TBD (any electronic musicians interested in playing please come to the village and talk to us!)",
+                "names": "Derek Woodroffe, Steve Conner",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-01 21:30:00",
+                "scheduled_duration": 75,
+                "venue": "Odin's Tesla Fest",
+                "venue_village_id": 73
+            },
+            {
+                "published_title": "Drum AND bass? In this economy?",
+                "published_description": "High energy drum and bass tunes!",
+                "names": "Polynomial",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 22:30:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Musical Tesla coil demo",
+                "published_description": "Ableton set from DJ Odin, chiptunes from Derek, guests TBD- contact the village if you're interested in playing!",
+                "names": "Steve Conner, Derek Woodroffe",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-02 21:30:00",
+                "scheduled_duration": 75,
+                "venue": "Odin's Tesla Fest",
+                "venue_village_id": 73
+            },
+            {
+                "published_title": "Synthercise - the dance fitness experience",
+                "published_description": "Get ready to enjoy Synthercise, a dance fitness experience like no other - think \"Zumba, but with chiptunes\". 8-bit sounds, 90s oriented tunes.  \r\n\r\nCome dressed in comfortable clothes, and shoes suitable for dancing and working out in - ready to shake your booty to energetic bleeps in synchrony with one another, encouraged by your fabulous ex-hacker instructor. Emerge with a dance template you can take anywhere!\r\n\r\nNo previous dance experience or fitness practise needed, options for all energy levels provided <3",
+                "names": "zooleika (aka Jo Walsh)",
+                "pronouns": "they/she",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 09:00:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "Tina Stormcaller",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 13:00:00",
+                "scheduled_duration": 120,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "2xAA",
+                "published_description": "A Game Boy Advance fuelled chiptune dance/techno set with custom audio reactive visuals.\r\n\r\nhttps://www.youtube.com/watch?v=EuwgP0WIfLo\r\nhttps://2xaa.net",
+                "names": "EMF Live Music",
+                "pronouns": "He/him/they",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 23:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Queer cosmic dance party",
+                "published_description": "DJ Superstar DJ Lai Power hails from the motor city of Birmingham, UK. Uploading echoes of interstellar dancefloors into your cyberbrain. Future sounds from the ninth dimension to deep soulful dance music from the misty past.\r\n\r\nRecently Lai has been playing loads of incredibly deep cosmic disco music (a la David Mancuso, Larry Levan). The sort of stuff that you find in a record shop bargain bin for one quid but absolutely blows your socks off.\r\n\r\nLai is known for a party in Birmingham called Energy Flow and is also part of the Selextorhood and Saffron  collectives and has previously performed and EMF camp twice and also the last Chaos Communications Camp. Guaranteed to make you dance.",
+                "names": "Lai Power",
+                "pronouns": "She/Her or They/Them",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 18:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Sugar Darling",
+                "published_description": "Sugar Darling are four wacky lads making a racket and rocking your socks off!! Often described as: \"literally the greatest band of ALL TIME\", they are sure to get your bowels moving and your toes a-tapping.\r\n\r\nGet ready for monkey business such as their hit song BABOON! \r\n\r\nhttps://youtu.be/BhFpZkeu5ok?si=sLsvpKlROdHaQTdw\r\n\r\nAre you a BABOON TOO??!!",
+                "names": "EMF Live Music",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-05-31 21:00:00",
+                "scheduled_duration": 45,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "3licks",
+                "published_description": "East London -> Eastnor -> EMF\r\n\r\nExpect donk, hyper, dnb, fast techno, hardstyle, hardcore and general silliness. ",
+                "names": "Felix Johnson",
+                "pronouns": "he/they",
+                "may_record": true,
+                "video_privacy": "public",
+                "scheduled_time": "2024-06-02 00:45:00",
+                "scheduled_duration": 45,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "EMF goes deep into the Jungle",
+                "published_description": "An hour of cantankerous bass lines and chopped up amens from the mid-90s.\r\n\r\nLet\u2019s have a little dance, shall we?",
+                "names": "MrJoshua",
+                "pronouns": "He/Him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 00:00:00",
+                "scheduled_duration": 45,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Stevie Loud - Back to the Jungle",
+                "published_description": "Showcasing a DJ set of my own Drum & Bass / Jungle productions. You will hear a blend of soulful liquid D&B progressively ramping up to amen breaks, big beats and rumbling bass lines. A kick start to your evening in the Null sector!",
+                "names": "Stevie Loud",
+                "pronouns": "",
+                "may_record": true,
+                "video_privacy": "public",
+                "scheduled_time": "2024-06-01 19:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Shirobon",
+                "published_description": "I'm Shirobon, I make music using video game consoles and stuff!\r\n\r\nhttps://www.youtube.com/@ShirobonTV/featured\r\nhttps://shirobon.bandcamp.com\r\nhttps://linktr.ee/shirobon",
+                "names": "EMF Live Music",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 23:30:00",
+                "scheduled_duration": 45,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Dune (1984)",
+                "published_description": "A rare change to see the far superior adaptation of Frank Herbert's classic novel by professional  oddball David Lynch. From Kyle MacLachlan's scenery-tearing performance, the 'huh?' apperance of Patrick Stewart to the sheer madness of Sting's fight scene (and outfit): \"I WILL KILL HIM!\", there's something for everyone*. If you loved the recent take on this sci-fi fable, prepare to have it ruined by the amazing experience that is Dune (1984).\r\n\r\n* Your mileage may *really* vary",
+                "names": "EMF Film",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-05-30 20:00:00",
+                "scheduled_duration": 140,
+                "venue": "Stage C",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Juli Jane Techno DJ Set",
+                "published_description": "A nice DJ Set playing underground Techno. Like Berlin, but at EMF Camp.\r\n\r\nJuli has played at several Hackerevents before, last at CCC Camp 2023. She knows the magic to make hackers dance! Check her out at soundcloud.com/juli_jane and don't miss her set.\r\n",
+                "names": "Juli Jane",
+                "pronouns": "she/her",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 20:00:00",
+                "scheduled_duration": 90,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Colossus: The Forbin Project",
+                "published_description": "Join us for a brilliant late-night movie, a seventies classic and eerily prescient given the current rise of AI. Thinking this will prevent war, the US government gives an impenetrable supercomputer total control over launching nuclear missiles. But what the computer does with the power is unimaginable to its creators.",
+                "names": "EMF Film",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 23:45:00",
+                "scheduled_duration": 115,
+                "venue": "Stage C",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Souled Out Drum & Bass (DJ Set)",
+                "published_description": "A selection of soulful D&B, mainly from the \"Middle-skool\" golden era of '99-'09 :-]",
+                "names": "Backyard Shaman ",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 23:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "DJ Terah",
+                "published_description": "I've been DJing since the early 2000s with a residency at Chains On Velvet in Norwich for about a decade or so; have been a guest at other clubs such as Judder in Cheltenham, ran a night called Terminal in Norwich for a bit and also played at several Mostly Harmless nights (an irregular club night held at various venues in Norwich). I also played Infest Festival in the late 00s (which feels like five minutes ago and I'm not even going to think about how long ago that actually was...)\r\n\r\nThe core of my music is old school EBM (Electro Body Musik) and Industrial Noize, with some Dubstep / Breakcore / anything that goes Oontz or Wub thrown in for funsies. Essentially it will always be four to the floor and appropriate to bring your glowsticks XD",
+                "names": "Terah Karma",
+                "pronouns": "They / Them",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 00:30:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Synthercise - the dance fitness experience",
+                "published_description": "Get ready to enjoy Synthercise, a dance fitness experience like no other - think \"Zumba, but with chiptunes\". 8-bit sounds, 90s oriented tunes.  \r\n\r\nCome dressed in comfortable clothes, and shoes suitable for dancing and working out in - ready to shake your booty to energetic bleeps in synchrony with one another, encouraged by your fabulous ex-hacker instructor. Emerge with a dance template you can take anywhere!\r\n\r\nNo previous dance experience or fitness practise needed, options for all energy levels provided <3\r\n\r\n\r\n\r\n\r\n\r\n",
+                "names": "zooleika (aka Jo Walsh)",
+                "pronouns": "they/she",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 09:00:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Tech Trivia Table (T)Quiz",
+                "published_description": "Gather your fellow adventurers, rally your digital prowess, and embark on the Tech Trivia Table (T)Quiz. Over two hours battle against other teams in this fun and whimsical tech quiz at EMFcamp.\r\n\r\nPrepare to navigate through a labyrinth of tech-themed rounds that will challenge your knowledge, sharpen your wit, and put your teamwork to the test. From mind-bending brainteasers to fascinating trivia about the evolution of computing, every question promises to ignite your passion for technology.\r\n\r\nThere's no charge to participate, but teams are limited to four people. If possible pre-organise teams, but if you're arriving solo, you won't be the only one, just prepare to make some new friends! Please arrive no earlier than 19:45 (as we'll still be setting up).",
+                "names": "Cheryl Harding",
+                "pronouns": "they/she",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 20:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 5 (Maths)",
+                "venue_village_id": 1
+            },
+            {
+                "published_title": "Geek Clubnights Nerd Rave",
+                "published_description": "Join @GeekClubnights's Geek Rave DJ Set!\r\n\r\nGet those glowsticks ready for our Nerdy DnB, Rave, and EDM Remix party.\r\n\r\nReturning for the 3rd year with new filthy tracks!",
+                "names": "DJ LastKnight",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-05-31 23:00:00",
+                "scheduled_duration": 90,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Friday Nite Rites - The Music Takes Over",
+                "published_description": "Once the bottle has been opened and we have achieved the Nirvana of being out wur chicken, we descend into a world of Techno brought by Allie and friends.",
+                "names": "Allie",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-31 20:00:00",
+                "scheduled_duration": 300,
+                "venue": "Scottish Consulate",
+                "venue_village_id": 28
+            },
+            {
+                "published_title": "Yaxu - Live coding / auto-live coding",
+                "published_description": "An algorave-style live coding performance from the movement's aging co-founder Yaxu (aka Alex McLean), using the new, accessible and free/open source Strudel live-coding environment (https://strudel.cc). This improvised from-scratch performance will include an attempt at the developing practice of \"auto-live coding\" - 'auto' in the sense of self-acting (the opposite of automatic), where I try to run myself algorithms verbally, inspired by South Indian artform of Konnakol. Come and enjoy the <strike>future</strike> past of electronic music.\r\n\r\nhttps://www.youtube.com/watch?v=fIuqDKzYBzc&t=315s\r\nhttps://yaxu.org\r\nhttps://algorave.com/yaxu/",
+                "names": "EMF Live Music",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 00:20:00",
+                "scheduled_duration": 40,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Hackers - Special Event",
+                "published_description": "On Friday we welcome Hackers director Iain Softley and vfx artist Paul Franklin to Stage C for a special 29th Anniversary (yes, off-by-one error) showing of this legendary movie. Iain will introduce the film and following will be a Q&A with Iain and Paul hosted by author and Empire Magazine editor-at-large Helen O'Hara. You'll have the chance to submit your questions in advance right up until the showing. PLUS throw on your red eyeliner and join the cosplay competition, to be judged by Iain Softley. HACK THE PLANET!",
+                "names": "EMF Film",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-05-31 20:50:00",
+                "scheduled_duration": 105,
+                "venue": "Stage C",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "The EMF Ceilidh with the Bunny Eye Ceilidh Band",
+                "published_description": "Get ready to kick up your heels and dance the night away at our lively ceilidh! Our friendly caller will guide you through the steps, whether you\u2019re a seasoned dancer or a first-timer. Expect jigs, reels, and maybe even a waltz or two!\r\nWhat it's all about: https://www.facebook.com/share/fRoor9fe4z7Cqt4s/",
+                "names": "EMF Music",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-05-30 19:30:00",
+                "scheduled_duration": 120,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Micro Men",
+                "published_description": "A rare change to see this classic comedy-drama. In the early 1980s, Clve Sinclair, an eccentric inventor, aims to dominate the nascent home computer market with his low-priced ZX range. Frustrated by Clive's temper and stubboness, employee Chris Curry decides to form a new company, Acorn Computers. When the BBC ask them both to tender for a computer that will find its way into every school in the country, a friendship turns into a fierce rivalry. An hilarious true story of ego, vendetta and weaponised newspapers.",
+                "names": "EMF Film",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-05-31 23:30:00",
+                "scheduled_duration": 95,
+                "venue": "Stage C",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "QbagYbbxHc with Benn Wiebe",
+                "published_description": "Come see a mystery film! We are not allowed to publicise this but we can say it's a fantasic, funny satire on mainstream media and politics. Benn Wiebe, who was an associate producer and climate consultant on \"Don't Look Up\" will deliver an introductory talk on the role of media in impact campaigns.\r\n\r\nBenn is a SXSW Grand Jury Prize & UNICEF Prize winning, Oscar Shortlisted, Webby nominated producer. He has been a social impact advisor and producer working across film, games and events, with a mission to bridge gaps between story and policy, and ultimately champion vast perspectives to aid social movement. He is the Head of Partnerships for Neon Picturehouse, and Executive Producer & Vice-Chairman of HF Productions. He serves as an Advisor of Think Film, Global Environment Media, Screen South, SIE Society, and Treun House Atelier. Benn also consults on projects from producing Netflix impact campaigns (\u201cDon't Look Up\u201d, \u201cBreaking Boundaries\u2026), Sony's Picture This, and SDGs in Action with UN DESA as part of the High Level Political Forum. ",
+                "names": "EMF Film",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 21:10:00",
+                "scheduled_duration": 145,
+                "venue": "Stage C",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Silent Running",
+                "published_description": "The ultimate solarpunk film? In a future Earth barren of all flora and fauna, the planet's ecosystems exist only in large pods attached to spacecraft. When word comes in that the pods are to be jettisoned into space and destroyed, most of the crew of the Valley Forge rejoice at the prospect of going home. Not so for botanist Freeman Lowell, who loves the forest and its creatures. He takes extreme measures to project what's left of Earth's ecosystem.\r\n\r\nDouglas Trumbull' s debut movie is a bonafide classic. Warming and heartbreaking in equal measures, you'll see ideas and effects that went on to inform many classic sci-fi features that followed in it's wake.",
+                "names": "EMF Film",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 22:30:00",
+                "scheduled_duration": 90,
+                "venue": "Stage C",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Electronic Music Open Mic (EMOM) Showcase",
+                "published_description": "",
+                "names": "EMF Live Music",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 20:30:00",
+                "scheduled_duration": 55,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Dave Cranmer - Very good acid house played via a musical pig",
+                "published_description": "Dave spends most of his time in his workshop making things, which offers a perfect opportunity to spend days and nights exploring new music.\r\n\r\nA particular interest in building synthesisers has developed alongside a passion for electronic sounds, and this DJ set will combine the two: an electronic pig that will play a selection of tracks from the workshop playlist.\r\n\r\nFor EMF this year the pig will concentrate on that most noble of genres: acid house.\r\n\r\nExamples of Dave's electronic, musical and engineering projects can be seen at www.nervoussquirrel.com",
+                "names": "EMF Live Music",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 01:00:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Mother Vulture",
+                "published_description": "High energy turbo-rock with an infamously chaotic live show.\r\n\r\nFuriously hard working and proudly DIY, South-West noisemakers Mother Vulture continue to push the boundaries of what is possible as an unsigned and independent band having sold out headline shows across the UK, including the 400 capacity Thekla in Bristol in October 2023. \r\n\r\nMother Vulture are loud as hell with soaring vocals, riffs for days and a reputation as one of the greatest live bands in the UK.\r\n\r\nhttps://linktr.ee/MotherVulture",
+                "names": "EMF Live Music",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-05-31 22:00:00",
+                "scheduled_duration": 50,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "chipko",
+                "published_description": "Join chipko for some geek inspired breaks and deep techy minimal vibes with some AI generated tracks thrown in for good measure! \r\nGet onboard for an adventure in sound at the awesome Null Sector!",
+                "names": "chipko",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 20:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Bytejam and demoscene chill",
+                "published_description": "Bytejam and demoscene chill\r\n\r\nA collaborative livecoding graphics jam with anyone who wants to join using TIC-80, to a live DJ set by (TBC). It's a friendly vibe, a chance to have a cup of tea, make festival friends, and start the weekend with a buzz in Workshop 4.\r\n\r\nSpectators and chatters are welcome. If you would like to participate in the coding but haven't played in a jam before then please get in touch with Field-FX, at Workshop 4 or on social media, before the event!\r\n\r\nMay contain flashing lights.",
+                "names": "Field-FX Organisers",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-31 18:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 4 (FieldFX)",
+                "venue_village_id": 10
+            },
+            {
+                "published_title": "Field-FX Demoparty",
+                "published_description": "A digital arts subculture with four decades of legacy, intangible cultural heritage, creativity, and spinning cubes. There will be competitions! There will be music, and art, and animation, and most of all there will be demos! Come and watch, come and cheer, come and shout AMIGA! at random intervals. It's a tradition. You will enjoy it.\r\n\r\nIf you'd like to submit something, check out https://field-fx.party, or come and talk to the sceners in Workshop 4. Deadline for entries is midday on Saturday.\r\n\r\nMay contain flashing lights.",
+                "names": "Field-FX Organisers",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-01 17:00:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 4 (FieldFX)",
+                "venue_village_id": 10
+            },
+            {
+                "published_title": "Feral Five and Jonathan Hogg present Truth Is The New Gold ",
+                "published_description": "Dazzling electronic duo Feral Five and artist/technologist Jonathan Hogg present a glittering interactive audiovisual performance of Truth Is The New Gold, unique to EMF.\r\n\r\nUse #emftruth on Mastodon to share your thoughts on truth for the show.\r\n\r\nIt\u2019s a musical journey through the Ferals\u2019 Truth Is The New Gold album, featuring big dance beats, sparkling synths, mighty guitars, and samples from AI Kat Five. Jonathan creates live algorithmic visuals with his custom Open Source engine Flitter.\r\n\r\nThe band\u2019s album was one of Louder Than War\u2019s picks of 2023, played on BBC 6 Music and Radio X, and featured by Roland, Vice, and globally on BBC News. \r\n\r\nThe Ferals have performed at Music Tech Fest with a 3D printer, and the National Portrait Gallery for electronic legend Martyn Ware (Heaven 17 / Human League) who remixed their album title track.",
+                "names": "EMF Live Music",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "public",
+                "scheduled_time": "2024-06-01 22:40:00",
+                "scheduled_duration": 40,
+                "venue": "Stage B",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "MARA // freeside dj set",
+                "published_description": "After last EMF's performance was a definite success, we cooked up some new plans for a banging dj set consisting of fast, hard music. remixes, bootlegs, mashups, bangers. \r\n\r\nhttps://mara.dj/",
+                "names": "coderobe",
+                "pronouns": "she/her",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 22:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector",
+                "venue_village_id": null
+            }
+        ],
+        "counts": {
+            "needs_help": {
+                "false": 106,
+                "true": 5
+            },
+            "needs_money": {
+                "false": 111
+            },
+            "needs_laptop": {
+                "false": 72,
+                "null": 39
+            },
+            "one_day": {
+                "false": 111
+            },
+            "notice_required": {
+                "1 month": 66,
+                "1 week": 2,
+                "> 1 month": 6,
+                "> 3 months": 2,
+                "null": 35
+            },
+            "may_record": {
+                "false": 62,
+                "true": 2,
+                "null": 47
+            },
+            "video_privacy": {
+                "none": 60,
+                "public": 7,
+                "null": 44
+            },
+            "state": {
+                "accepted": 7,
+                "finalised": 78,
+                "manual-review": 15,
+                "new": 5,
+                "rejected": 3,
+                "withdrawn": 3
+            },
+            "created_week": {
+                "2024-01-29": 4,
+                "2024-02-05": 6,
+                "2024-02-12": 3,
+                "2024-02-19": 4,
+                "2024-02-26": 3,
+                "2024-03-04": 2,
+                "2024-03-11": 1,
+                "2024-03-18": 1,
+                "2024-03-25": 5,
+                "2024-04-01": 3,
+                "2024-04-08": 4,
+                "2024-04-15": 3,
+                "2024-04-22": 3,
+                "2024-04-29": 4,
+                "2024-05-06": 1,
+                "2024-05-13": 4,
+                "2024-05-20": 25,
+                "2024-05-27": 35
+            }
+        },
+        "edits": {
+            "published_title": {
+                "avg": "1.88",
+                "max": 6
+            },
+            "published_description": {
+                "avg": "1.99",
+                "max": 7
+            },
+            "length": {
+                "avg": "1.06",
+                "max": 2
+            },
+            "equipment_required": {
+                "avg": "1.28",
+                "max": 3
+            },
+            "funding_required": {
+                "avg": "1.16",
+                "max": 2
+            },
+            "additional_info": {
+                "avg": "1.25",
+                "max": 3
+            },
+            "notice_required": {
+                "avg": "1.02",
+                "max": 2
+            },
+            "needs_help": {
+                "avg": "1.01",
+                "max": 2
+            },
+            "needs_money": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "one_day": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "has_rejected_email": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "published_names": {
+                "avg": "2.10",
+                "max": 7
+            },
+            "published_pronouns": {
+                "avg": "1.59",
+                "max": 3
+            },
+            "arrival_period": {
+                "avg": "1.66",
+                "max": 3
+            },
+            "departure_period": {
+                "avg": "1.67",
+                "max": 4
+            },
+            "eventphone_number": {
+                "avg": "1.50",
+                "max": 3
+            },
+            "telephone_number": {
+                "avg": "1.65",
+                "max": 3
+            },
+            "may_record": {
+                "avg": "1.57",
+                "max": 4
+            },
+            "video_privacy": {
+                "avg": "1.24",
+                "max": 3
+            },
+            "needs_laptop": {
+                "avg": "1.59",
+                "max": 2
+            },
+            "available_times": {
+                "avg": "1.71",
+                "max": 4
+            },
+            "attendees": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "cost": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "size": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "installation_funding": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "age_range": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "participant_equipment": {
+                "avg": "1.00",
+                "max": 1
+            }
+        }
+    }
+}

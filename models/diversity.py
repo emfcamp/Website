@@ -162,8 +162,8 @@ class UserDiversity(BaseModel):
                 "ages": guess_age(row.age),
                 "genders": guess_gender(row.gender),
                 "ethnicities": guess_ethnicity(row.ethnicity),
-                "sexualities": row.sexuality,
-                "disabilities": row.disability,
+                "sexualities": row.sexuality or "",
+                "disabilities": row.disability or "",
             }
 
             update_diversity_dict(data["totals"], parsed_values)
@@ -192,4 +192,6 @@ class UserDiversity(BaseModel):
 
 def update_diversity_dict(to_update, vals):
     for k, v in vals.items():
+        if k is None:
+            k = ""
         to_update[k][v] += 1

@@ -536,7 +536,7 @@ class Proposal(BaseModel):
         ).order_by(cls.id)
 
         if cls.__name__ == "WorkshopProposal":
-            proposals = proposals.add_columns(cls.attendees, cls.cost)
+            proposals = proposals.add_columns(cls.attendees, cls.cost, cls.age_range)
         elif cls.__name__ == "InstallationProposal":
             proposals = proposals.add_columns(cls.size, cls.installation_funding)
         elif cls.__name__ == "YouthWorkshopProposal":
