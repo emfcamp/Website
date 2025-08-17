@@ -1,0 +1,22 @@
+{
+    "sources": [
+        {
+            "id": 1,
+            "name": null,
+            "type": "Village",
+            "enabled": false,
+            "url": "https://hackbbs.org/myevents.ics",
+            "main_venue": null,
+            "priority": 0
+        },
+        {
+            "id": 2,
+            "name": null,
+            "type": "Village",
+            "enabled": false,
+            "url": "https://calendar.google.com/calendar/ical/3227f8d248a32ccd4c198aacd168ee87023a442c3dd9b71463657bac7050a679%40group.calendar.google.com/public/basic.ics",
+            "main_venue": null,
+            "priority": 0
+        }
+    ]
+}
