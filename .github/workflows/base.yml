@@ -21,25 +21,39 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  DOCKER_BUILDKIT: 1
-
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build base image
-        run: docker build -t ghcr.io/emfcamp/website-base:latest -f ./docker/Dockerfile.base .
-      - name: Publish base image
-        run: docker push ghcr.io/emfcamp/website-base:latest
-      - name: Build base-dev image
-        run: docker build -t ghcr.io/emfcamp/website-base-dev:latest -f ./docker/Dockerfile.base-dev .
-      - name: Publish base-dev image
-        run: docker push ghcr.io/emfcamp/website-base-dev:latest
+    
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push base image
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: ghcr.io/emfcamp/website-base:latest
+          file: ./docker/Dockerfile.base
+          platforms: linux/amd64,linux/arm64
+
+      - name: Build and push base-dev image
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: ghcr.io/emfcamp/website-base-dev:latest
+          file: ./docker/Dockerfile.base-dev
+          platforms: linux/amd64,linux/arm64
