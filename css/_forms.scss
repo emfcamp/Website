@@ -1,4 +1,6 @@
+@use "sass:color";
 @use "./_variables.scss" as *;
+
 
 .form-control {
     background-color: $form-element;
@@ -36,12 +38,12 @@ input[type=range]::range-track {
 }
 
 input[type=range]:focus::range-track {
-    background: lighten($main-link-hover, 5%);
+    background: color.adjust($main-link-hover, $lightness: 5%);
 }
 
 input[type=range]::range-thumb {
     appearance: none;
-    box-shadow: 1px 1px 1px lighten($main-background, 50%);
+    box-shadow: 1px 1px 1px color.adjust($main-background, $lightness: 50%);
     border: 1px solid $main-background;
     height: 30px;
     width: 16px;
