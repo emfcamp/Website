@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "./_variables.scss" as *;
 
 .schedule {
@@ -84,7 +85,7 @@
 }
 
 .schedule-event {
-  background-color: darken($schedule-block, 10%);
+  background-color: color.adjust($schedule-block, $lightness: -10%);
   color: $schedule-text;
   padding: 0.5em;
   border-radius: 5px;
