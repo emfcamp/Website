@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% set main_class = 'volunteer-signup' %}
 
-{% from "_formhelpers.html" import render_field %}
+{% from "volunteer/_details_form.html" import volunteer_details_form %}
 
 {% block title %}
     EMF Volunteer Sign-Up
@@ -43,18 +43,7 @@
 
         <div class="col-sm-12">
         {{ form.hidden_tag() }}
-        {{ render_field(form.nickname, horizontal=10) }}
-        {{ render_field(form.volunteer_email, horizontal=10) }}
-        <div class="form-group">
-          <div class="col-sm-10 col-sm-offset-2">
-            {{ form.over_18(class_='big-checkbox') }}
-            <label class="control-label big-checkbox" for="over_18">
-                I'm at least 18 years old
-            </label>
-          </div>
-        </div>
-        {{ render_field(form.volunteer_phone, horizontal=10) }}
-        {{ form.sign_up(class_="btn btn-primary debounce pull-right") }}
+        {{ volunteer_details_form(form, True) }}
         </div>
         </fieldset>
         <p></p>{# FIXME #}
