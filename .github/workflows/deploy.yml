@@ -23,7 +23,7 @@ jobs:
       - name: Build containers
         run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml build --parallel
       - name: Test
-        run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml run -T app uv run make test
+        run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml run --quiet-pull -T app uv run make test
   build:
     runs-on: ubuntu-latest
     needs: test
