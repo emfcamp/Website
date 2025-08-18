@@ -55,6 +55,7 @@ dependencies = [
     "playwright>=1.43.0,<2",
     "css-inline>=0.14.0,<0.15",
     "wtforms-sqlalchemy~=0.3.0",
+    "lxml>=6.0.0",
 ]
 
 [tool.ruff]
