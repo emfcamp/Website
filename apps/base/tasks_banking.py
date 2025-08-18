@@ -1,5 +1,4 @@
 import click
-import ofxparse
 from datetime import datetime, timedelta
 
 from flask import current_app as app
@@ -13,100 +12,6 @@ from apps.payments.wise import (
     sync_wise_statement,
 )
 from models.payment import BankAccount, BankTransaction
-
-
-@base.cli.command("loadofx")
-@click.argument("ofx_file", type=click.File("r"))
-def load_ofx(ofx_file):
-    """Import an OFX bank statement file"""
-    ofx = ofxparse.OfxParser.parse(ofx_file)
-
-    acct_id = ofx.account.account_id
-    sort_code = ofx.account.routing_number
-    account = BankAccount.get(sort_code, acct_id)
-    if ofx.account.statement.currency.lower() != account.currency.lower():
-        app.logger.error(
-            "Currency %s doesn't match account currency %s",
-            ofx.account.statement.currency,
-            account.currency,
-        )
-        return
-
-    added = 0
-    duplicate = 0
-    dubious = 0
-
-    for txn in ofx.account.statement.transactions:
-        if 0 < int(txn.id) < 200101010000000:
-            app.logger.debug("Ignoring uncleared transaction %s", txn.id)
-            continue
-        # date is actually dtposted and is a datetime
-        if txn.date < datetime(2015, 1, 1):
-            app.logger.debug("Ignoring historic transaction from %s", txn.date)
-            continue
-        if txn.amount <= 0:
-            app.logger.info("Ignoring non-credit transaction for %s", txn.amount)
-            continue
-
-        dbtxn = BankTransaction(
-            account_id=account.id,
-            posted=txn.date,
-            type=txn.type,
-            amount=txn.amount,
-            payee=txn.payee,
-            fit_id=txn.id,
-        )
-
-        # Check for matching/duplicate transactions.
-        # Insert if possible - conflicts can be sorted out within the app.
-        matches = dbtxn.get_matching()
-
-        # Euro payments have a blank fit_id
-        if dbtxn.fit_id == "00000000":
-            # There seems to be a serial in the payee field. Assume that's enough for uniqueness.
-            if matches.count():
-                app.logger.debug("Ignoring duplicate transaction from %s", dbtxn.payee)
-                duplicate += 1
-
-            else:
-                db.session.add(dbtxn)
-                added += 1
-
-        else:
-            different_fit_ids = matches.filter(BankTransaction.fit_id != dbtxn.fit_id)
-            same_fit_ids = matches.filter(BankTransaction.fit_id == dbtxn.fit_id)
-
-            if same_fit_ids.count():
-                app.logger.debug("Ignoring duplicate transaction %s", dbtxn.fit_id)
-                duplicate += 1
-
-            elif BankTransaction.query.filter(
-                BankTransaction.fit_id == dbtxn.fit_id
-            ).count():
-                app.logger.error(
-                    "Non-matching transactions with same fit_id %s", dbtxn.fit_id
-                )
-                dubious += 1
-
-            elif different_fit_ids.count():
-                app.logger.warn(
-                    "%s matching transactions with different fit_ids for %s",
-                    different_fit_ids.count(),
-                    dbtxn.fit_id,
-                )
-                # fit_id may have been changed, so add it anyway
-                db.session.add(dbtxn)
-                added += 1
-                dubious += 1
-
-            else:
-                db.session.add(dbtxn)
-                added += 1
-
-    db.session.commit()
-    app.logger.info(
-        "Import complete: %s new, %s duplicate, %s dubious", added, duplicate, dubious
-    )
 
 
 @base.cli.command("sync_wisetransfer")

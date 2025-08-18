@@ -30,7 +30,6 @@ dependencies = [
     "icalendar==3.11.7",
     "pytz",
     "stripe~=8.0.0",
-    "ofxparse==0.16",
     "python-dateutil",
     "slotmachine",
     "awesome-slugify",
