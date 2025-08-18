@@ -19,7 +19,7 @@ from wtforms import (
 
 from main import db
 from models import event_year
-from models.cfp import Proposal, Venue
+from models.cfp import Proposal, Venue, HUMAN_CFP_TYPES, WorkshopProposal
 from models.user import generate_api_token
 from models.admin_message import AdminMessage
 from models.event_tickets import EventTicket
