@@ -19,9 +19,9 @@ services:
       PYTHONUNBUFFERED: 1
       IRCCAT: fakeirccat:12345
 
-  gulp:
+  rsbuild:
     build:
-      context: "./docker/gulp"
+      context: "./docker/rsbuild"
     init: true
     volumes:
       - .:/app
