@@ -1,7 +1,7 @@
 Deploying outside a development environment
 ===========================================
 
-Production is on maxwell.emfcamp.org.
+Production is on heaviside.emfcamp.org.
 Staging (https://www.emfcamp-test.org) is on kelvin.emfcamp.org.
 
 # First install
