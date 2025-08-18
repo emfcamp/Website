@@ -13,8 +13,8 @@ def override_event_time(app):
     """Override the EVENT_START and EVENT_END properties to 2024."""
 
     old_start, old_end = app.config["EVENT_START"], app.config["EVENT_END"]
-    app.config["EVENT_START"] = "2024-05-30 11:00:00 BST"  # Wednesday, May 30
-    app.config["EVENT_END"] = "2024-06-02 19:00:00 BST"  # Sunday, June 2
+    app.config["EVENT_START"] = "2024-05-30 11:00:00"  # Wednesday, May 30
+    app.config["EVENT_END"] = "2024-06-02 19:00:00"  # Sunday, June 2
     yield
     app.config["EVENT_START"], app.config["EVENT_END"] = old_start, old_end
 
@@ -30,7 +30,7 @@ def _dedent_periods(periods: str) -> str:
 
 def _talk_with_time_period(periods) -> TalkProposal:
     return TalkProposal(
-        scheduled_time=parse("2024-05-30 12:00:00 BST"),
+        scheduled_time=parse("2024-05-30 12:00:00"),
         scheduled_venue=VENUE_TALK,
         scheduled_duration=25,
         allowed_times=_dedent_periods(periods),
@@ -43,7 +43,7 @@ def _talk_with_time_period(periods) -> TalkProposal:
         # Correctly scheduled
         pytest.param(
             TalkProposal(
-                scheduled_time=parse("2024-05-30 12:00:00 BST"),
+                scheduled_time=parse("2024-05-30 12:00:00"),
                 scheduled_venue=VENUE_TALK,
                 scheduled_duration=25,
                 allowed_times=_dedent_periods("""
@@ -59,7 +59,7 @@ def _talk_with_time_period(periods) -> TalkProposal:
         # No venue, but has scheduled time
         pytest.param(
             TalkProposal(
-                scheduled_time=parse("2024-05-30 12:00:00 BST"),
+                scheduled_time=parse("2024-05-30 12:00:00"),
                 scheduled_duration=25,
                 allowed_times=_dedent_periods("""
             2024-05-30 12:00:00 > 2024-05-30 12:25:00
@@ -72,7 +72,7 @@ def _talk_with_time_period(periods) -> TalkProposal:
         # No proposed venue, but has proposed time
         pytest.param(
             TalkProposal(
-                potential_time=parse("2024-05-30 12:00:00 BST"),
+                potential_time=parse("2024-05-30 12:00:00"),
                 scheduled_duration=25,
                 allowed_times=_dedent_periods("""
             2024-05-30 12:00:00 > 2024-05-30 12:25:00
@@ -85,9 +85,9 @@ def _talk_with_time_period(periods) -> TalkProposal:
         # Before event
         pytest.param(
             TalkProposal(
-                potential_time=parse("2024-05-30 11:00:00 BST"),  # 1 hour before 12 noon
+                potential_time=parse("2024-05-30 11:00:00"),  # 1 hour before 12 noon
                 potential_venue=VENUE_TALK,
-                scheduled_time=parse("2024-05-30 10:00:00 BST"),  # 2 hours before 12 noon
+                scheduled_time=parse("2024-05-30 10:00:00"),  # 2 hours before 12 noon
                 scheduled_venue=VENUE_TALK,
                 scheduled_duration=180,
                 allowed_times=_dedent_periods("""
@@ -102,10 +102,10 @@ def _talk_with_time_period(periods) -> TalkProposal:
         pytest.param(
             TalkProposal(
                 potential_time=parse(
-                    "2024-06-03 01:00:00 BST"
+                    "2024-06-03 01:00:00"
                 ),  # 1 hour before 2am (i.e. in bounds, but end is not)
                 potential_venue=VENUE_TALK,
-                scheduled_time=parse("2024-06-03 04:00:00 BST"),  # 2 hours after 2am
+                scheduled_time=parse("2024-06-03 04:00:00"),  # 2 hours after 2am
                 scheduled_venue=VENUE_TALK,
                 scheduled_duration=180,
                 allowed_times=_dedent_periods("""
@@ -127,9 +127,9 @@ def _talk_with_time_period(periods) -> TalkProposal:
         # During event, but between 2am and 9am
         pytest.param(
             TalkProposal(
-                potential_time=parse("2024-06-01 03:00:00 BST"),  # 1 hour after 2am
+                potential_time=parse("2024-06-01 03:00:00"),  # 1 hour after 2am
                 potential_venue=VENUE_TALK,
-                scheduled_time=parse("2024-06-01 04:00:00 BST"),  # 2 hours after 2am
+                scheduled_time=parse("2024-06-01 04:00:00"),  # 2 hours after 2am
                 scheduled_venue=VENUE_TALK,
                 scheduled_duration=25,
                 allowed_times=_dedent_periods("""
@@ -149,9 +149,9 @@ def _talk_with_time_period(periods) -> TalkProposal:
         # Scheduled in wrong type of venue
         pytest.param(
             TalkProposal(
-                potential_time=parse("2024-05-30 12:00:00 BST"),
+                potential_time=parse("2024-05-30 12:00:00"),
                 potential_venue=VENUE_WORKSHOP,
-                scheduled_time=parse("2024-05-30 12:00:00 BST"),
+                scheduled_time=parse("2024-05-30 12:00:00"),
                 scheduled_venue=VENUE_WORKSHOP,
                 scheduled_duration=25,
                 allowed_times=_dedent_periods("""
@@ -223,9 +223,9 @@ def _talk_with_time_period(periods) -> TalkProposal:
         # Overlaps with another proposal by same user
         pytest.param(
             TalkProposal(
-                potential_time=parse("2024-05-30 13:00:00 BST"),
+                potential_time=parse("2024-05-30 13:00:00"),
                 potential_venue=VENUE_TALK,
-                scheduled_time=parse("2024-05-30 12:00:00 BST"),
+                scheduled_time=parse("2024-05-30 12:00:00"),
                 scheduled_venue=VENUE_TALK,
                 scheduled_duration=25,
                 allowed_times=_dedent_periods("""
@@ -236,7 +236,7 @@ def _talk_with_time_period(periods) -> TalkProposal:
                 TalkProposal(
                     id=100,
                     title="Conflicted (potential x potential)",
-                    potential_time=parse("2024-05-30 13:00:00 BST"),
+                    potential_time=parse("2024-05-30 13:00:00"),
                     potential_venue=VENUE_TALK,
                     scheduled_duration=25,
                     allowed_times=_dedent_periods("""
@@ -246,7 +246,7 @@ def _talk_with_time_period(periods) -> TalkProposal:
                 TalkProposal(
                     id=101,
                     title="Conflicted (potential x scheduled)",
-                    scheduled_time=parse("2024-05-30 13:00:00 BST"),
+                    scheduled_time=parse("2024-05-30 13:00:00"),
                     scheduled_venue=VENUE_TALK,
                     scheduled_duration=25,
                     allowed_times=_dedent_periods("""
@@ -256,7 +256,7 @@ def _talk_with_time_period(periods) -> TalkProposal:
                 TalkProposal(
                     id=102,
                     title="Conflicted (scheduled x potential)",
-                    potential_time=parse("2024-05-30 12:00:00 BST"),
+                    potential_time=parse("2024-05-30 12:00:00"),
                     potential_venue=VENUE_TALK,
                     scheduled_duration=25,
                     allowed_times=_dedent_periods("""
@@ -266,7 +266,7 @@ def _talk_with_time_period(periods) -> TalkProposal:
                 TalkProposal(
                     id=103,
                     title="Conflicted (scheduled x scheduled)",
-                    scheduled_time=parse("2024-05-30 12:00:00 BST"),
+                    scheduled_time=parse("2024-05-30 12:00:00"),
                     scheduled_venue=VENUE_TALK,
                     scheduled_duration=25,
                     allowed_times=_dedent_periods("""
