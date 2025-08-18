@@ -1,0 +1,20 @@
+{% from "_formhelpers.html" import render_field %}
+
+{% macro volunteer_details_form(form, show_save_button) %}
+    {{ render_field(form.nickname, horizontal=9) }}
+    {{ render_field(form.volunteer_email, horizontal=9) }}
+    <div class="form-group">
+        <div class="col-sm-9 col-sm-offset-3">
+        <label class="control-label big-checkbox">
+            {{ form.over_18(class_='big-checkbox') }}
+            I'm at least 18 years old
+        </label>
+        </div>
+    </div>
+    {{ render_field(form.volunteer_phone, horizontal=9) }}
+    {% call render_field(form.allergies, horizontal=9) %}{% endcall %}
+    {% call render_field(form.dietary_restrictions, horizontal=9) %}{% endcall %}
+    {% if show_save_button %}
+    {{ form.save(class_="btn btn-primary debounce pull-right") }}
+    {% endif %}
+{% endmacro %}
