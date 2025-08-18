@@ -143,9 +143,7 @@ class LightningTalkProposalForm(ProposalForm):
         for day_id, day_count in remaining_lightning_slots.items():
             if day_count <= 0:
                 continue
-            self.session.choices.append(
-                (day_id, LIGHTNING_TALK_SESSIONS[day_id]["human"])
-            )
+            self.session.choices.append((day_id, LIGHTNING_TALK_SESSIONS[day_id]["human"]))
 
 
 def get_cfp_type_form(cfp_type):
@@ -175,9 +173,7 @@ def main():
     if feature_enabled("CFP_CLOSED") and not ignore_closed:
         return render_template("cfp/closed.html")
 
-    lightning_talks_closed = all(
-        [i <= 0 for i in LightningTalkProposal.get_days_with_slots().values()]
-    )
+    lightning_talks_closed = all([i <= 0 for i in LightningTalkProposal.get_days_with_slots().values()])
 
     return render_template(
         "cfp/main.html",
@@ -225,9 +221,7 @@ def form(cfp_type="talk"):
     remaining_lightning_slots = LightningTalkProposal.get_days_with_slots()
     # Require logged in users as you have to have a ticket to lightning talk
     if cfp_type == "lightning" and current_user.is_anonymous:
-        return redirect(
-            url_for("users.login", next=url_for(".form", cfp_type="lightning"))
-        )
+        return redirect(url_for("users.login", next=url_for(".form", cfp_type="lightning")))
     elif cfp_type == "lightning":
         if all([i <= 0 for i in remaining_lightning_slots.values()]):
             flash("All lightning talk sessions are now full, sorry")
@@ -256,9 +250,7 @@ def form(cfp_type="talk"):
                 new_user = True
             except IntegrityError as e:
                 app.logger.warn("Adding user raised %r, possible double-click", e)
-                flash(
-                    "An error occurred while creating an account for you. Please try again."
-                )
+                flash("An error occurred while creating an account for you. Please try again.")
                 return redirect(url_for(".main"))
 
         elif current_user.name == current_user.email:
@@ -298,9 +290,7 @@ def form(cfp_type="talk"):
             if remaining_lightning_slots[form.session.data] <= 0:
                 # Manually set this because otherwise we need to pass the
                 # remaining_lightning_slots object to validate
-                form.errors[
-                    "sessions"
-                ] = "That session is now full, sorry. Please select a different day"
+                form.errors["sessions"] = "That session is now full, sorry. Please select a different day"
                 return render_template(
                     "cfp/new.html",
                     cfp_type=cfp_type,
@@ -337,9 +327,7 @@ def form(cfp_type="talk"):
             to=[current_user.email],
         )
 
-        msg.body = render_template(
-            "emails/cfp-submission.txt", proposal=proposal, new_user=new_user
-        )
+        msg.body = render_template("emails/cfp-submission.txt", proposal=proposal, new_user=new_user)
         msg.send()
 
         if channel := app.config.get("CONTENT_IRC_CHANNEL"):
@@ -404,11 +392,7 @@ def proposals():
 @feature_flag("CFP")
 def edit_proposal(proposal_id):
     if current_user.is_anonymous:
-        return redirect(
-            url_for(
-                "users.login", next=url_for(".edit_proposal", proposal_id=proposal_id)
-            )
-        )
+        return redirect(url_for("users.login", next=url_for(".edit_proposal", proposal_id=proposal_id)))
 
     proposal = Proposal.query.get_or_404(proposal_id)
     if proposal.user != current_user:
@@ -418,13 +402,13 @@ def edit_proposal(proposal_id):
     del form.name
     del form.email
 
-    if proposal.type == 'lightning':
-      # Make sure that their previously selected session is a choice
-      remaining_lightning_slots = LightningTalkProposal.get_days_with_slots()
-      # Make sure that their previously selected session is a choice
-      if remaining_lightning_slots[proposal.session] <= 0:
-          remaining_lightning_slots[proposal.session] = 1
-      form.set_session_choices(remaining_lightning_slots)
+    if proposal.type == "lightning":
+        # Make sure that their previously selected session is a choice
+        remaining_lightning_slots = LightningTalkProposal.get_days_with_slots()
+        # Make sure that their previously selected session is a choice
+        if remaining_lightning_slots[proposal.session] <= 0:
+            remaining_lightning_slots[proposal.session] = 1
+        form.set_session_choices(remaining_lightning_slots)
 
     if form.validate_on_submit():
         if not proposal.is_editable:
@@ -514,9 +498,7 @@ def edit_proposal(proposal_id):
 
 
 class WithdrawalForm(Form):
-    message = TextAreaField(
-        "If you're comfortable, please tell us why you're withdrawing"
-    )
+    message = TextAreaField("If you're comfortable, please tell us why you're withdrawing")
     confirm_withdrawal = SubmitField("Confirm proposal withdrawal")
 
 
@@ -524,11 +506,7 @@ class WithdrawalForm(Form):
 @feature_flag("CFP")
 def withdraw_proposal(proposal_id):
     if current_user.is_anonymous:
-        return redirect(
-            url_for(
-                "users.login", next=url_for(".edit_proposal", proposal_id=proposal_id)
-            )
-        )
+        return redirect(url_for("users.login", next=url_for(".edit_proposal", proposal_id=proposal_id)))
 
     proposal = Proposal.query.get_or_404(proposal_id)
     if proposal.user != current_user:
@@ -569,13 +547,13 @@ class FinaliseForm(Form):
     eventphone_number = TelField("On-site extension", min_length=3, max_length=5)
 
     video_privacy = SelectField(
-      "Recording",
-      default="public",
-      choices=[
-        ("public", "I am happy for this to be streamed and recorded"),
-        ("review", "Do not stream, and do not publish until reviewed"),
-        ("none", "Do not stream or record"),
-      ],
+        "Recording",
+        default="public",
+        choices=[
+            ("public", "I am happy for this to be streamed and recorded"),
+            ("review", "Do not stream, and do not publish until reviewed"),
+            ("none", "Do not stream or record"),
+        ],
     )
     needs_laptop = BooleanField("I will need to borrow a laptop for slides")
     equipment_required = TextAreaField("Equipment Required")
@@ -716,10 +694,7 @@ def finalise_proposal(proposal_id):
         # Proposers can change their availability after finalisation and are
         # notified of this in the scheduling emails. We need to know this in order to re-run scheduling.
         new_availability = form.get_availability_json()
-        if (
-            proposal.state == "finalised"
-            and proposal.available_times != new_availability
-        ):
+        if proposal.state == "finalised" and proposal.available_times != new_availability:
             if channel := app.config.get("CONTENT_IRC_CHANNEL"):
                 # WARNING: don't send personal information via this (the channel is public)
                 irc_send(
@@ -857,9 +832,7 @@ def proposal_messages(proposal_id):
         # The user is replying, mark any outstanding messages as read
         count = proposal.mark_messages_read(current_user)
         db.session.commit()
-        app.logger.info(
-            f"Marked {count} messages from admin on proposal {proposal.id} as read"
-        )
+        app.logger.info(f"Marked {count} messages from admin on proposal {proposal.id} as read")
 
         if form.send.data:
             msg = CFPMessage()
@@ -879,13 +852,9 @@ def proposal_messages(proposal_id):
 
         return redirect(url_for(".proposal_messages", proposal_id=proposal_id))
 
-    messages = (
-        CFPMessage.query.filter_by(proposal_id=proposal_id).order_by("created").all()
-    )
+    messages = CFPMessage.query.filter_by(proposal_id=proposal_id).order_by("created").all()
 
-    return render_template(
-        "cfp/messages.html", proposal=proposal, messages=messages, form=form
-    )
+    return render_template("cfp/messages.html", proposal=proposal, messages=messages, form=form)
 
 
 @cfp.route("/cfp/messages")
@@ -896,20 +865,14 @@ def all_messages():
 
     proposal_with_message = (
         Proposal.query.join(CFPMessage)
-        .filter(
-            Proposal.id == CFPMessage.proposal_id, Proposal.user_id == current_user.id
-        )
+        .filter(Proposal.id == CFPMessage.proposal_id, Proposal.user_id == current_user.id)
         .order_by(CFPMessage.has_been_read, CFPMessage.created.desc())
         .all()
     )
 
-    proposal_with_message.sort(
-        key=lambda x: (x.get_unread_count(current_user) > 0, x.created), reverse=True
-    )
+    proposal_with_message.sort(key=lambda x: (x.get_unread_count(current_user) > 0, x.created), reverse=True)
 
-    return render_template(
-        "cfp/all_messages.html", proposal_with_message=proposal_with_message
-    )
+    return render_template("cfp/all_messages.html", proposal_with_message=proposal_with_message)
 
 
 @cfp.route("/cfp/guidance")

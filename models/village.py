@@ -68,7 +68,12 @@ class Village(BaseModel):
     def map_link(self) -> Optional[str]:
         latlon = self.latlon
         if latlon:
-            return "https://map.emfcamp.org/#18.5/%s/%s/m=%s,%s" % (latlon[0], latlon[1], latlon[0], latlon[1])
+            return "https://map.emfcamp.org/#18.5/%s/%s/m=%s,%s" % (
+                latlon[0],
+                latlon[1],
+                latlon[0],
+                latlon[1],
+            )
         return None
 
     @classmethod
@@ -111,15 +116,11 @@ class VillageMember(BaseModel):
 
     id = db.Column(db.Integer, primary_key=True)
     # We only allow one village per user. TODO: make this the primary key
-    user_id = db.Column(
-        db.Integer, db.ForeignKey("user.id"), unique=True, nullable=False
-    )
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), unique=True, nullable=False)
     village_id = db.Column(db.Integer, db.ForeignKey("village.id"), nullable=False)
     admin = db.Column(db.Boolean, default=False)
 
-    village = db.relationship(
-        "Village", back_populates="village_memberships", uselist=False
-    )
+    village = db.relationship("Village", back_populates="village_memberships", uselist=False)
     user = db.relationship("User", back_populates="village_membership", uselist=False)
 
     def __repr__(self):
@@ -130,9 +131,7 @@ class VillageRequirements(BaseModel):
     __tablename__ = "village_requirements"
 
     village_id = db.Column(db.Integer, db.ForeignKey("village.id"), primary_key=True)
-    village = db.relationship(
-        "Village", backref=db.backref("requirements", uselist=False)
-    )
+    village = db.relationship("Village", backref=db.backref("requirements", uselist=False))
 
     num_attendees = db.Column(db.Integer)
     size_sqm = db.Column(db.Integer)

@@ -1,8 +1,9 @@
 """
-    Villages App
+Villages App
 
-    Village registration and management
+Village registration and management
 """
+
 from flask import Blueprint, abort
 from flask_login import current_user
 from models import event_year
@@ -20,9 +21,7 @@ def load_village(year, village_id, require_admin=False):
     if not village:
         abort(404)
 
-    if require_admin and not (
-        current_user.village == village and current_user.village_membership.admin
-    ):
+    if require_admin and not (current_user.village == village and current_user.village_membership.admin):
         abort(404)
     return village
 

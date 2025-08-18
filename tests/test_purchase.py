@@ -88,15 +88,13 @@ def test_create_stripe_purchase(user, app, monkeypatch):
         # A charge.succeeded webhook is also sent but we ignore it.
 
     assert payment.state == "paid"
-    assert all(
-        purchase.state == "paid" for purchase in payment.purchases
-    ), "Purchases should be marked as paid after payment"
+    assert all(purchase.state == "paid" for purchase in payment.purchases), (
+        "Purchases should be marked as paid after payment"
+    )
 
     # Payment is all paid. Now we test refunding it.
     # Create a refund request for the entire payment, with £20 donation.
-    refund_request = RefundRequest(
-        payment=payment, donation=20, currency=payment.currency
-    )
+    refund_request = RefundRequest(payment=payment, donation=20, currency=payment.currency)
     payment.state = "refund-requested"
     db.session.add(refund_request)
     db.session.commit()
@@ -105,12 +103,10 @@ def test_create_stripe_purchase(user, app, monkeypatch):
 
     with app.test_request_context("/stripe-webhook"):
         # charge.refunded webhook. We do process this but currently we don't use it for anything.
-        stripe_charge_refunded(
-            "charge.refunded", load_webhook_fixture("charge.refunded")
-        )
+        stripe_charge_refunded("charge.refunded", load_webhook_fixture("charge.refunded"))
 
     # Payment should be marked as fully refunded.
     assert payment.state == "refunded"
-    assert all(
-        purchase.state == "refunded" for purchase in payment.purchases
-    ), "Purchases should be marked as refunded after refund"
+    assert all(purchase.state == "refunded" for purchase in payment.purchases), (
+        "Purchases should be marked as refunded after refund"
+    )

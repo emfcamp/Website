@@ -42,7 +42,7 @@ from .preload import init_preload
 
 
 @dataclass
-class Currency():
+class Currency:
     code: str
     symbol: str
 
@@ -123,15 +123,13 @@ def load_utility_functions(app_obj):
     @app_obj.context_processor
     def event_date_processor():
         def suffix(d):
-            return (
-                "th" if 11 <= d <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(d % 10, "th")
-            )
+            return "th" if 11 <= d <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(d % 10, "th")
 
         s = event_start()
         e = event_end()
         assert s.year == e.year
         if s.month == e.month:
-            fancy_dates = f"""{s.strftime('%B')}<span style="white-space: nowrap">
+            fancy_dates = f"""{s.strftime("%B")}<span style="white-space: nowrap">
                 {s.day}<sup>{suffix(s.day)}</sup>&ndash;{e.day}<sup>{suffix(e.day)}</sup>
                 {s.year}
                 </span>"""
@@ -143,9 +141,7 @@ def load_utility_functions(app_obj):
                 {s.day}<sup>{suffix(s.day)}</sup>&ndash;{e.strftime("%B")}
                 {e.day}<sup>{suffix(e.day)}</sup>"""
 
-            simple_dates = (
-                f"""{s.day} {s.strftime("%B")}&ndash;{e.day} {e.strftime("%B")}"""
-            )
+            simple_dates = f"""{s.day} {s.strftime("%B")}&ndash;{e.day} {e.strftime("%B")}"""
 
         return {
             "fancy_dates": Markup(fancy_dates),
@@ -164,9 +160,7 @@ def load_utility_functions(app_obj):
             classes = " ".join(cls_list)
 
             alt = kwargs.get("alt", name)
-            return Markup(
-                f'<img src="/static/icons/{name}.svg" class="octicon {classes}" alt="{alt}">'
-            )
+            return Markup(f'<img src="/static/icons/{name}.svg" class="octicon {classes}" alt="{alt}">')
 
         return {"octicon": octicon}
 
@@ -316,9 +310,7 @@ def archive_file(year, *path, raise_404=True):
     """Return the path to a given file within the archive.
     Optionally raise 404 if it doesn't exist.
     """
-    file_path = os.path.abspath(
-        os.path.join(__file__, "..", "..", "..", "exports", str(year), *path)
-    )
+    file_path = os.path.abspath(os.path.join(__file__, "..", "..", "..", "exports", str(year), *path))
 
     if not os.path.exists(file_path):
         if raise_404:
@@ -369,4 +361,3 @@ def render_markdown(source, template="about/template.html", **view_variables):
 
     view_variables.update(content=content, title=metadata["title"])
     return render_template(page_template(metadata, template), **view_variables)
-

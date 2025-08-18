@@ -1,9 +1,9 @@
 """
-    Tickets App
+Tickets App
 
-    This handles users selecting tickets, entering their details, and choosing a payment method.
-    Users are then passed onto the appropriate view in the payment app to enter their payment
-    details.
+This handles users selecting tickets, entering their details, and choosing a payment method.
+Users are then passed onto the appropriate view in the payment app to enter their payment
+details.
 """
 
 import re
@@ -50,18 +50,14 @@ from .forms import TicketTransferForm
 tickets = Blueprint("tickets", __name__)
 
 invalid_vouchers = Counter("emf_invalid_vouchers_total", "Invalid ticket vouchers")
-no_capacity = Counter(
-    "emf_basket_no_capacity_total", "Attempted purchases that failed due to capacity"
-)
+no_capacity = Counter("emf_basket_no_capacity_total", "Attempted purchases that failed due to capacity")
 
 price_changed = Counter(
     "emf_basket_price_changed_total",
     "Attempted purchases that failed due to changed prices",
 )
 
-empty_baskets = Counter(
-    "emf_basket_empty_total", "Attempted purchases of empty baskets"
-)
+empty_baskets = Counter("emf_basket_empty_total", "Attempted purchases of empty baskets")
 
 
 @tickets.route("/tickets/reserved")
@@ -70,9 +66,7 @@ empty_baskets = Counter(
 @tickets.route("/tickets/<flow>/reserved/<currency>")
 def tickets_reserved(flow=None, currency=None):
     if current_user.is_anonymous:
-        return redirect(
-            url_for("users.login", next=url_for(".tickets_reserved", flow=flow))
-        )
+        return redirect(url_for("users.login", next=url_for(".tickets_reserved", flow=flow)))
 
     basket = Basket(current_user, get_user_currency())
     basket.load_purchases_from_db()
@@ -123,9 +117,7 @@ def transfer(ticket_id):
         purchase.transfer(from_user=current_user, to_user=to_user)
         db.session.commit()
 
-        app.logger.info(
-            "Purchase %s transferred from %s to %s", purchase, current_user, to_user
-        )
+        app.logger.info("Purchase %s transferred from %s to %s", purchase, current_user, to_user)
 
         is_ticket = isinstance(purchase, Ticket)
 
@@ -195,7 +187,7 @@ def receipt(user_id=None, format=None):
 
     png = bool(request.args.get("png"))
     pdf = False
-    if format == 'pdf':
+    if format == "pdf":
         pdf = True
 
     page = render_receipt(user, png, pdf)

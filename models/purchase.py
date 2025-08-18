@@ -52,9 +52,7 @@ class Purchase(BaseModel):
     # price_tier and product_id are denormalised for convenience.
     # We don't expect them to change, even if price_id does (by switching currency)
     price_id = db.Column(db.Integer, db.ForeignKey("price.id"), nullable=False)
-    price_tier_id = db.Column(
-        db.Integer, db.ForeignKey("price_tier.id"), nullable=False
-    )
+    price_tier_id = db.Column(db.Integer, db.ForeignKey("price_tier.id"), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey("product.id"), nullable=False)
 
     # Financial FKs
@@ -64,9 +62,7 @@ class Purchase(BaseModel):
 
     # History
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    modified = db.Column(
-        db.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow
-    )
+    modified = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow)
 
     # State tracking info
     state = db.Column(db.String, default="reserved", nullable=False)
@@ -95,9 +91,7 @@ class Purchase(BaseModel):
 
     def __init__(self, price, user=None, state=None, **kwargs):
         if user is None and state is not None and state not in anon_states:
-            raise PurchaseStateException(
-                "%s is not a valid state for unclaimed purchases" % state
-            )
+            raise PurchaseStateException("%s is not a valid state for unclaimed purchases" % state)
 
         super().__init__(
             price=price,
@@ -106,7 +100,7 @@ class Purchase(BaseModel):
             purchaser=user,
             owner=user,
             state=state,
-            **kwargs
+            **kwargs,
         )
 
     def __repr__(self):
@@ -133,20 +127,12 @@ class Purchase(BaseModel):
     @validates("ticket_issued")
     def validate_ticket_issued(self, _key, issued):
         if not self.is_paid_for:
-            raise PurchaseStateException(
-                "Ticket cannot be issued for a purchase which hasn't been paid for"
-            )
+            raise PurchaseStateException("Ticket cannot be issued for a purchase which hasn't been paid for")
         return issued
 
     def set_user(self, user: User):
-        if (
-            self.state != "reserved"
-            or self.owner_id is not None
-            or self.purchaser_id is not None
-        ):
-            raise PurchaseStateException(
-                "Can only set state on purchases that are unclaimed & reserved."
-            )
+        if self.state != "reserved" or self.owner_id is not None or self.purchaser_id is not None:
+            raise PurchaseStateException("Can only set state on purchases that are unclaimed & reserved.")
 
         if user is None:
             raise PurchaseStateException("Cannot unclaim a purchase.")
@@ -162,15 +148,11 @@ class Purchase(BaseModel):
             raise PurchaseStateException('"%s" is not a valid state.' % new_state)
 
         if new_state not in PURCHASE_STATES[self.state]:
-            raise PurchaseStateException(
-                '"%s->%s" is not a valid transition' % (self.state, new_state)
-            )
+            raise PurchaseStateException('"%s->%s" is not a valid transition' % (self.state, new_state))
 
         if self.owner_id is None or self.purchaser_id is None:
             if new_state not in anon_states:
-                raise PurchaseStateException(
-                    "%s is not a valid state for unclaimed purchases" % new_state
-                )
+                raise PurchaseStateException("%s is not a valid state for unclaimed purchases" % new_state)
 
         self.state = new_state
 
@@ -225,9 +207,7 @@ class Purchase(BaseModel):
         if not self.product.get_attribute("is_redeemable"):
             raise CheckinStateException("This item isn't redeemable.")
         if self.is_paid_for is False:
-            raise CheckinStateException(
-                "Trying to redeem an item which hasn't been paid for."
-            )
+            raise CheckinStateException("Trying to redeem an item which hasn't been paid for.")
         if self.redeemed is True:
             raise CheckinStateException("Purchase has already been redeemed.")
         self.redeemed = True
@@ -248,7 +228,6 @@ class Purchase(BaseModel):
             if "redeemed" in ver.changeset:
                 return ver
         return None
-
 
     @classmethod
     def get_export_data(cls):
@@ -277,8 +256,7 @@ class Purchase(BaseModel):
         )
 
         time_buckets = [timedelta(0), timedelta(minutes=1), timedelta(hours=1)] + [
-            timedelta(d)
-            for d in [1, 2, 3, 4, 5, 6, 7, 14, 1*28, 2*28, 3*28, 4*28, 5*28]
+            timedelta(d) for d in [1, 2, 3, 4, 5, 6, 7, 14, 1 * 28, 2 * 28, 3 * 28, 4 * 28, 5 * 28]
         ]
 
         data = {
@@ -286,12 +264,8 @@ class Purchase(BaseModel):
                 "purchases": {
                     "counts": {
                         "changes": bucketise(db.session.execute(change_counts), list(range(10)) + [10, 20]),
-                        "created_week": export_intervals(
-                            db.select(cls), cls.created, "week", "YYYY-MM-DD"
-                        ),
-                        "transfers": bucketise(
-                            db.session.execute(transfer_counts), list(range(5)) + [5]
-                        ),
+                        "created_week": export_intervals(db.select(cls), cls.created, "week", "YYYY-MM-DD"),
+                        "transfers": bucketise(db.session.execute(transfer_counts), list(range(5)) + [5]),
                         "unredeemed_time": bucketise(
                             [r.unredeemed_time for r in db.session.execute(unredeemed_times)], time_buckets
                         ),
@@ -302,9 +276,7 @@ class Purchase(BaseModel):
         }
 
         count_attrs = ["state", "redeemed"]
-        data["public"]["purchases"]["counts"].update(
-            export_attr_counts(cls, count_attrs)
-        )
+        data["public"]["purchases"]["counts"].update(export_attr_counts(cls, count_attrs))
 
         return data
 
@@ -339,9 +311,7 @@ class PurchaseTransfer(BaseModel):
     def __init__(self, purchase, to_user, from_user):
         if to_user.id == from_user.id:
             raise PurchaseTransferException('"From" and "To" users must be different.')
-        super().__init__(
-            purchase=purchase, to_user_id=to_user.id, from_user_id=from_user.id
-        )
+        super().__init__(purchase=purchase, to_user_id=to_user.id, from_user_id=from_user.id)
 
     def __repr__(self):
         return "<Purchase Transfer: %s from %s to %s on %s>" % (

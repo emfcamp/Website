@@ -117,13 +117,11 @@ def schedule_ical():
     cal.add("X-WR-CALDESC", title)
     cal.add("version", "2.0")
 
-    shifts = (Shift.query
-            .select_from(ShiftEntry)
-            .join(Shift.entries.and_(ShiftEntry.user == user))
-            .options(
-                joinedload(Shift.venue),
-                joinedload(Shift.role)
-            )).all()
+    shifts = (
+        Shift.query.select_from(ShiftEntry)
+        .join(Shift.entries.and_(ShiftEntry.user == user))
+        .options(joinedload(Shift.venue), joinedload(Shift.role))
+    ).all()
 
     for shift in shifts:
         cal_event = Event()

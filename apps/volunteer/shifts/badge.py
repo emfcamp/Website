@@ -8,6 +8,8 @@ badge_shifts = {
                 "final": edt(d, "18:00:00"),
                 "min": 2,
                 "max": 4,
-            } for d in ["fri", "sat", "sun"]]
+            }
+            for d in ["fri", "sat", "sun"]
+        ]
     },
 }

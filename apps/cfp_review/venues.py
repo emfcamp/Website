@@ -35,9 +35,7 @@ class VenueForm(Form):
     scheduled_content_only = BooleanField("Scheduled Content Only")
     latlon = StringField("Location")
     allowed_types = SelectMultipleField("Allowed for", choices=VENUE_TYPE_CHOICES)
-    default_for_types = SelectMultipleField(
-        "Default Venue for", choices=VENUE_TYPE_CHOICES
-    )
+    default_for_types = SelectMultipleField("Default Venue for", choices=VENUE_TYPE_CHOICES)
     capacity = IntegerField("Capacity", validators=[Optional()])
     submit = SubmitField("Save")
     delete = SubmitField("Delete")

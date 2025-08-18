@@ -15,9 +15,7 @@ from .forms import VillageForm
 @login_required
 def register():
     if current_user.village and current_user.village_membership.admin:
-        return redirect(
-            url_for(".edit", year=event_year(), village_id=current_user.village.id)
-        )
+        return redirect(url_for(".edit", year=event_year(), village_id=current_user.village.id))
 
     form = VillageForm()
     if form.validate_on_submit():
@@ -45,9 +43,7 @@ def register():
         db.session.add(venue)
         db.session.commit()
 
-        flash(
-            "Your village registration has been received, thanks! You can edit it below."
-        )
+        flash("Your village registration has been received, thanks! You can edit it below.")
         return redirect(url_for(".edit", year=event_year(), village_id=village.id))
 
     return render_template("villages/register.html", form=form)

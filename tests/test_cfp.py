@@ -9,9 +9,7 @@ def test_cfp(db, app, user, outbox):
     # Run hypothesis over an inner function to avoid warnings about re-use of
     # `outbox` (which we are manually clearing in this test)
     @given(title=text(), description=text(), requirements=text())
-    @settings(
-        deadline=None
-    )  # Variable execution time errors observed in Travis and locally for russ
+    @settings(deadline=None)  # Variable execution time errors observed in Travis and locally for russ
     def test_cfp_inner(title, description, requirements):
         for c in ["\0", "\r", "\n"]:
             assume(c not in title)

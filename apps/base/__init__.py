@@ -188,13 +188,18 @@ def subscribe():
 def emp():
     return render_template("emp.html")
 
+
 @base.route("/deliveries")
 def deliveries():
     return redirect("/static/deliveries.pdf")
 
+
 @base.route("/orga-links")
 def orga_links():
-    return redirect("https://docs.google.com/document/d/1AAkzW2J1keCYZj1vDaEWcmVNLIbUTHoqh1zCaZUgNHk/edit?usp=sharing")
+    return redirect(
+        "https://docs.google.com/document/d/1AAkzW2J1keCYZj1vDaEWcmVNLIbUTHoqh1zCaZUgNHk/edit?usp=sharing"
+    )
+
 
 from . import redirects  # noqa
 from . import about  # noqa

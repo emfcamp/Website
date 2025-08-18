@@ -58,7 +58,9 @@ class Role(BaseModel):
         from . import Shift, ShiftEntry
 
         shift_counts_q = (
-            db.select(Shift.role_id, ShiftEntry.user_id, db.func.count(ShiftEntry.shift_id).label("shift_count"))
+            db.select(
+                Shift.role_id, ShiftEntry.user_id, db.func.count(ShiftEntry.shift_id).label("shift_count")
+            )
             .select_from(ShiftEntry)
             .join(Shift)
             .group_by(Shift.role_id, ShiftEntry.user_id)
@@ -77,7 +79,9 @@ class Role(BaseModel):
             .select_from(VolunteerRoleInterest)
             .group_by(VolunteerRoleInterest.c.role_id)
         )
-        interested_volunteers = {role_id: count for role_id, count in db.session.execute(interested_volunteers_q)}
+        interested_volunteers = {
+            role_id: count for role_id, count in db.session.execute(interested_volunteers_q)
+        }
 
         trained_volunteers_q = (
             db.select(VolunteerRoleTraining.c.role_id, db.func.count())
@@ -114,13 +118,9 @@ class RolePermission(BaseModel):
 
 class RoleAdmin(BaseModel):
     __tablename__ = "volunteer_role_admin"
-    user_id = db.Column(
-        db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True
-    )
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True)
     user = db.relationship("User", backref="volunteer_admin_roles")
-    role_id = db.Column(
-        db.Integer, db.ForeignKey("volunteer_role.id"), nullable=False, primary_key=True
-    )
+    role_id = db.Column(db.Integer, db.ForeignKey("volunteer_role.id"), nullable=False, primary_key=True)
     role = db.relationship("Role", backref="admins")
 
 

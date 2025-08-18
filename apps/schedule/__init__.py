@@ -1,26 +1,27 @@
 """
-    Schedule App
+Schedule App
 
-    This app displays what talks are happening from the CfP system. A deceptively complex task.
-    The schedule for an event can be in one of four modes:
+This app displays what talks are happening from the CfP system. A deceptively complex task.
+The schedule for an event can be in one of four modes:
 
-        * There's no schedule yet, why not look at previous years'?
-        * There are talks accepted, but they aren't scheduled yet - show them in a list
-          and maybe let the user favourite them to assist our scheduling algorithm.
-        * There's actually a schedule and you should probably work out which talks you're going to.
-        * The event has finished, and we're displaying an archived schedule.
+    * There's no schedule yet, why not look at previous years'?
+    * There are talks accepted, but they aren't scheduled yet - show them in a list
+      and maybe let the user favourite them to assist our scheduling algorithm.
+    * There's actually a schedule and you should probably work out which talks you're going to.
+    * The event has finished, and we're displaying an archived schedule.
 
-    ## Configuration Flags
+## Configuration Flags
 
-    The schedule app uses two configuration flags to determine how to render the schedule
-    for the current event (these don't affect historic events).
+The schedule app uses two configuration flags to determine how to render the schedule
+for the current event (these don't affect historic events).
 
-        * `LINE_UP = True` indicates that the approved talks should be displayed as a list
-        * `SCHEDULE = True` indicates that the full schedule browser should be displayed
+    * `LINE_UP = True` indicates that the approved talks should be displayed as a list
+    * `SCHEDULE = True` indicates that the full schedule browser should be displayed
 
-    If neither of these flags are enabled, links will be displayed to schedules for previous
-    events.
+If neither of these flags are enabled, links will be displayed to schedules for previous
+events.
 """
+
 import pytz
 from flask import Blueprint, redirect, url_for, abort
 
@@ -48,9 +49,7 @@ def line_up_year_redirect(year):
 @schedule.route("/line-up/<int:year>/<int:proposal_id>")
 @schedule.route("/line-up/<int:year>/<int:proposal_id>-<string:slug>")
 def lineup_talk_redirect(year, proposal_id, slug=None):
-    return redirect(
-        url_for(".item", year=year, proposal_id=proposal_id, slug=slug), 301
-    )
+    return redirect(url_for(".item", year=year, proposal_id=proposal_id, slug=slug), 301)
 
 
 @schedule.route("/schedule.<string:fmt>")

@@ -28,9 +28,7 @@ SEXUALITY_VALUES = (
     "bisexual-or-pansexual",
     "other",
 )
-SEXUALITY_CHOICES = tuple(
-    OPT_OUT + [(v, v.capitalize().replace("-", " ")) for v in SEXUALITY_VALUES]
-)
+SEXUALITY_CHOICES = tuple(OPT_OUT + [(v, v.capitalize().replace("-", " ")) for v in SEXUALITY_VALUES])
 
 
 DISABILITY_CHOICES = tuple(
@@ -90,9 +88,7 @@ def guess_gender(gender_str: str) -> str:
 
 def guess_ethnicity(ethnicity_str: str) -> str:
     ethnicity_matchers = app.config.get("ETHNICITY_MATCHERS", {})
-    ethnicity_re_matchers = {
-        k: re.compile(v, re.I) for k, v in ethnicity_matchers.items()
-    }
+    ethnicity_re_matchers = {k: re.compile(v, re.I) for k, v in ethnicity_matchers.items()}
     return __guess_value(ethnicity_str, ethnicity_re_matchers)
 
 
@@ -101,9 +97,7 @@ def guess_ethnicity(ethnicity_str: str) -> str:
 
 class UserDiversity(BaseModel):
     __tablename__ = "diversity"
-    user_id = db.Column(
-        db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True
-    )
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True)
     age = db.Column(db.String)
     gender = db.Column(db.String)
     ethnicity = db.Column(db.String)

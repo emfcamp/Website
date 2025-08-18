@@ -3,6 +3,7 @@ from flask_login import current_user
 from flask_admin import BaseView, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 
+
 # Flask-Admin requires these methods to be overridden, but doesn't let you set a base meta
 # This is annoying as there's no safe way to stop someone accidentally using a base class
 class FlaskVolunteerAdminAppMixin:

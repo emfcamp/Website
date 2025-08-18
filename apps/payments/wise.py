@@ -217,9 +217,7 @@ def _collect_bank_accounts(borderless_account):
         address = ", ".join(
             [
                 account.bankDetails.bankAddress.addressFirstLine,
-                account.bankDetails.bankAddress.city
-                + " "
-                + (account.bankDetails.bankAddress.postCode or ""),
+                account.bankDetails.bankAddress.city + " " + (account.bankDetails.bankAddress.postCode or ""),
                 account.bankDetails.bankAddress.country,
             ]
         )

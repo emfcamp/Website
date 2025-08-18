@@ -43,7 +43,8 @@ class ExternalMetrics:
             "emf_purchases", "Tickets purchased", labels=["product", "state", "type"]
         )
         emf_checked_in_purchases = GaugeMetricFamily(
-            "emf_checked_in_purchases", "Purchases by checkin state", labels=["product", "type", "checked_in"])
+            "emf_checked_in_purchases", "Purchases by checkin state", labels=["product", "type", "checked_in"]
+        )
         emf_payments = GaugeMetricFamily("emf_payments", "Payments received", labels=["provider", "state"])
         emf_attendees = GaugeMetricFamily("emf_attendees", "Attendees", labels=["checked_in"])
         emf_proposals = GaugeMetricFamily("emf_proposals", "CfP Submissions", labels=["type", "state"])

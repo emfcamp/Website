@@ -63,7 +63,8 @@ class VillageForm(Form):
         village.requirements.structures = self.structures.data
 
     def validate_name(self, field: StringField) -> None:
-        field.data = (field.data or '').strip()
+        field.data = (field.data or "").strip()
+
 
 class AdminVillageForm(VillageForm):
     latlon = StringField("Location", [Optional()])

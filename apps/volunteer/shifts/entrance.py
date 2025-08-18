@@ -27,21 +27,24 @@ entrance_shifts = {
                 "min": 2,
                 "max": 4,
             },
-        ] +
-        [
+        ]
+        + [
             {
                 "first": edt(d, "19:00:00"),
                 "final": edt(d, "23:00:00"),
                 "min": 1,
                 "max": 2,
-            } for d in ["thur", "fri"]
-        ] + [
+            }
+            for d in ["thur", "fri"]
+        ]
+        + [
             {
                 "first": edt(d, "09:00:00"),
                 "final": edt(d, "21:00:00"),
                 "min": 1,
                 "max": 2,
-            } for d in ["sat", "sun"]
-        ] 
+            }
+            for d in ["sat", "sun"]
+        ]
     },
 }

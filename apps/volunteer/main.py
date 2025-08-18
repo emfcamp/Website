@@ -23,6 +23,7 @@ from models.volunteer import (
 from .init_data import load_initial_venues, load_initial_roles
 from .shift_list import shift_list
 
+
 @volunteer.route("/")
 def main():
     if current_user.is_anonymous:
@@ -38,7 +39,6 @@ def main():
     return redirect(url_for(".choose_role"))
 
 
-
 @volunteer.route("/info/<page_name>")
 @feature_flag("VOLUNTEERS_SIGNUP")
 def info_page(page_name: str):
@@ -49,6 +49,7 @@ def info_page(page_name: str):
 @feature_flag("VOLUNTEERS_SIGNUP")
 def info():
     return render_markdown(f"volunteer/info/index", page_name="index")
+
 
 @volunteer.route("/init_shifts")
 @v_admin_required

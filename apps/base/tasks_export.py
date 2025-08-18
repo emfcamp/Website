@@ -28,9 +28,7 @@ def get_export_data(table_filter: Optional[str] = None):
         if isinstance(cls, type) and issubclass(cls, db.Model)
     }
 
-    all_version_classes = {
-        version_class(c) for c in all_model_classes if is_versioned(c)
-    }
+    all_version_classes = {version_class(c) for c in all_model_classes if is_versioned(c)}
 
     seen_model_classes = set()
     remaining_tables = set(db.metadata.tables)
@@ -83,9 +81,7 @@ def get_export_data(table_filter: Optional[str] = None):
 
 
 @base.cli.command("export")
-@click.option(
-    "--stdout", is_flag=True, help="Print to stdout rather than write to disk"
-)
+@click.option("--stdout", is_flag=True, help="Print to stdout rather than write to disk")
 @click.argument("table", required=False)
 def export_db(stdout, table):
     """Export data from the DB to disk.
@@ -149,9 +145,7 @@ def export_db(stdout, table):
             dest_path = os.path.join(path, "public", f"schedule.{file_type}")
             response = client.get(url)
             if response.status_code != 200:
-                app.logger.error(
-                    "Error fetching schedule from %s: %s", url, response.status
-                )
+                app.logger.error("Error fetching schedule from %s: %s", url, response.status)
                 raise click.Abort()
             with open(dest_path, "wb") as f:
                 f.write(response.data)

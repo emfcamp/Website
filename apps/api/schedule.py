@@ -219,9 +219,12 @@ class ProposalC3VOCPublishingWebhook(Resource):
                 if payload["voctoweb"]["thumb_path"]:
                     path = payload["voctoweb"]["thumb_path"]
                     if path.startswith("/static.media.ccc.de"):
-                        path = "https://static.media.ccc.de/media" + path[len("/static.media.ccc.de"):]
+                        path = "https://static.media.ccc.de/media" + path[len("/static.media.ccc.de") :]
                     if not path.startswith("https://"):
-                        abort(406, message="voctoweb thumb_path must start with https:// or /static.media.ccc.de")
+                        abort(
+                            406,
+                            message="voctoweb thumb_path must start with https:// or /static.media.ccc.de",
+                        )
                     app.logger.info(f"C3VOC webhook set thumbnail_url for {proposal.id=} to {path}")
                     proposal.thumbnail_url = path
                 else:

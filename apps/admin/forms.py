@@ -171,9 +171,7 @@ class VoucherForm(Form):
 
 
 class NewVoucherForm(VoucherForm):
-    voucher = StringField(
-        "Voucher code (Optional)", [Optional()]
-    )  # Maybe auto-generated
+    voucher = StringField("Voucher code (Optional)", [Optional()])  # Maybe auto-generated
     create = SubmitField("Create")
 
 
@@ -192,9 +190,7 @@ class EditVoucherForm(VoucherForm):
 
 
 class BulkVoucherEmailForm(Form):
-    subject = StringField(
-        "Subject", [DataRequired()], default="Your Electromagnetic Field Voucher"
-    )
+    subject = StringField("Subject", [DataRequired()], default="Your Electromagnetic Field Voucher")
     text = StringField(
         "Message",
         [DataRequired()],
@@ -230,6 +226,7 @@ Everyone at Electromagnetic Field
 
 class IssueTicketsInitialForm(Form):
     "Initial form to ask for email"
+
     email = EmailField("Email address")
     issue_free = SubmitField("Issue Free Ticket")
     reserve = SubmitField("Reserve Ticket for Payment")
@@ -237,6 +234,7 @@ class IssueTicketsInitialForm(Form):
 
 class TicketAmountForm(Form):
     "Sub-form for selecting the number for a specific ticket"
+
     amount = IntegerSelectField("Number of tickets", [Optional()])
     tier_id = HiddenIntegerField("Price tier", [DataRequired()])
 
@@ -273,9 +271,7 @@ class IssueTicketsForm(Form):
 
 
 class ReserveTicketsForm(IssueTicketsForm):
-    currency = SelectField(
-        "Currency", choices=[(None, "")] + list(CURRENCY_SYMBOLS.items()), default="GBP"
-    )
+    currency = SelectField("Currency", choices=[(None, "")] + list(CURRENCY_SYMBOLS.items()), default="GBP")
 
 
 class ReserveTicketsNewUserForm(ReserveTicketsForm):
@@ -313,7 +309,9 @@ def _available_permissions():
 
 class ArrivalsViewForm(Form):
     name = StringField("Name")
-    required_permission = QuerySelectField("Required Permission", query_factory=_available_permissions, get_label='name')
+    required_permission = QuerySelectField(
+        "Required Permission", query_factory=_available_permissions, get_label="name"
+    )
 
 
 class NewArrivalsViewForm(ArrivalsViewForm):

@@ -7,7 +7,7 @@ vm_times = [
         "min": 1,
         "max": 1,
         "base_duration": 300,
-        "changeover": 0
+        "changeover": 0,
     },
 ] + [
     {
@@ -16,8 +16,9 @@ vm_times = [
         "min": 1,
         "max": 1,
         "base_duration": 375,
-        "changeover": 0
-    } for d in [("fri", "sat"), ("sat", "sun"), ("sun", "mon")]
+        "changeover": 0,
+    }
+    for d in [("fri", "sat"), ("sat", "sun"), ("sun", "mon")]
 ]
 tech_times = [
     {
@@ -26,7 +27,7 @@ tech_times = [
         "min": 1,
         "max": 1,
         "base_duration": 150,
-        "changeover": 15
+        "changeover": 15,
     },
 ] + [
     {
@@ -35,20 +36,21 @@ tech_times = [
         "min": 1,
         "max": 1,
         "base_duration": 180,
-        "changeover": 15
-    } for d in [("fri", "sat"), ("sat", "sun"), ("sun", "mon")]
+        "changeover": 15,
+    }
+    for d in [("fri", "sat"), ("sat", "sun"), ("sun", "mon")]
 ]
 
 bands_shifts = {
     "Bands: Artist Liason": {
         "Stage B": [
-             {
+            {
                 "first": edt("thur", "17:30:00"),
                 "final": edt("thur", "23:00:00"),
                 "min": 1,
                 "max": 1,
                 "base_duration": 330,
-                "changeover": 0
+                "changeover": 0,
             },
             {
                 "first": edt("fri", "17:30:00"),
@@ -56,7 +58,7 @@ bands_shifts = {
                 "min": 1,
                 "max": 1,
                 "base_duration": 450,
-                "changeover": 0
+                "changeover": 0,
             },
             {
                 "first": edt("sat", "17:30:00"),
@@ -64,7 +66,7 @@ bands_shifts = {
                 "min": 1,
                 "max": 1,
                 "base_duration": 450,
-                "changeover": 0
+                "changeover": 0,
             },
             {
                 "first": edt("sun", "17:30:00"),
@@ -72,22 +74,16 @@ bands_shifts = {
                 "min": 1,
                 "max": 1,
                 "base_duration": 450,
-                "changeover": 0
+                "changeover": 0,
             },
-        ], 
-    },  
+        ],
+    },
     "Bands: Venue Manager": {
-        "Stage B": vm_times, 
-    },    
-    "Bands: Sound Operator": {
-        "Stage B": tech_times
+        "Stage B": vm_times,
     },
-    "Bands: Sound Technician": {
-        "Stage B": tech_times
-    },
-    "Bands: Lighting Operator": {
-        "Stage B": tech_times
-    },
+    "Bands: Sound Operator": {"Stage B": tech_times},
+    "Bands: Sound Technician": {"Stage B": tech_times},
+    "Bands: Lighting Operator": {"Stage B": tech_times},
     "Bands: Stage Crew": {
         "Stage B": [
             {
@@ -96,10 +92,9 @@ bands_shifts = {
                 "min": 1,
                 "max": 1,
                 "base_duration": 90,
-                "changeover": 15
-            } for d in ["fri", "sat", "sun"]
-        ], 
+                "changeover": 15,
+            }
+            for d in ["fri", "sat", "sun"]
+        ],
     },
-
-    
 }

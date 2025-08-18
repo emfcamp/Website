@@ -25,9 +25,7 @@ class VolunteerNotifyRecipient(BaseModel):
     __tablename__ = "volunteer_notify_recipient"
     id = db.Column(db.Integer, primary_key=True)
     volunteer_id = db.Column(db.Integer, db.ForeignKey("volunteer.id"), nullable=False)
-    job_id = db.Column(
-        db.Integer, db.ForeignKey("volunteer_notify_job.id"), nullable=False
-    )
+    job_id = db.Column(db.Integer, db.ForeignKey("volunteer_notify_job.id"), nullable=False)
     sent = db.Column(db.Boolean, default=False)
 
     volunteer = db.relationship("Volunteer")

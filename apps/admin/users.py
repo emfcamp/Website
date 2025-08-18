@@ -53,9 +53,7 @@ def users():
             from_email=from_email("CONTACT_EMAIL"),
             to=[email],
         )
-        msg.body = render_template(
-            "emails/manually-added-user.txt", user=user, code=code
-        )
+        msg.body = render_template("emails/manually-added-user.txt", user=user, code=code)
         msg.send()
 
         flash("Created account for: %s" % name)
@@ -113,16 +111,16 @@ def user(user_id):
         setattr(
             UserForm,
             "permission_" + permission.name,
-            BooleanField(
-                permission.name, default=user.has_permission(permission.name, False)
-            ),
+            BooleanField(permission.name, default=user.has_permission(permission.name, False)),
         )
 
     form = UserForm()
 
     villages = Village.query.all()
 
-    village_memberships = VillageMember.query.filter(VillageMember.user == user, VillageMember.admin == True).all()
+    village_memberships = VillageMember.query.filter(
+        VillageMember.user == user, VillageMember.admin == True
+    ).all()
     if len(village_memberships) != 1:
         village_membership = None
     else:
@@ -186,7 +184,7 @@ def user(user_id):
                 made_changes.append("email")
 
             if made_changes:
-                flash(f'Updated user {" & ".join(made_changes)}')
+                flash(f"Updated user {' & '.join(made_changes)}")
 
         elif form.save_cfp_invite_reason.data:
             flash("Updated user's cfp invite reason")
@@ -214,15 +212,11 @@ def user(user_id):
     if village_membership is not None:
         form.village_admin.data = village_membership.village_id
 
-    versions = user.versions.order_by(None).order_by(
-        version_class(User).transaction_id.desc()
-    )
+    versions = user.versions.order_by(None).order_by(version_class(User).transaction_id.desc())
 
     form.note.data = user.checkin_note
     form.cfp_invite_reason.data = user.cfp_invite_reason
-    return render_template(
-        "admin/users/user.html", user=user, form=form, permissions=permissions
-    )
+    return render_template("admin/users/user.html", user=user, form=form, permissions=permissions)
 
     return render_template(
         "admin/users/user.html",
@@ -265,8 +259,6 @@ def user_signup():
     code = None
     if form.validate_on_submit():
         app.logger.info("User %s creating signup link", current_user)
-        code = generate_signup_code(
-            app.config["SECRET_KEY"], time.time(), current_user.id
-        )
+        code = generate_signup_code(app.config["SECRET_KEY"], time.time(), current_user.id)
 
     return render_template("admin/users/signup.html", form=form, code=code)

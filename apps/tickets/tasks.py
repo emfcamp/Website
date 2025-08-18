@@ -35,7 +35,13 @@ def create_product_groups():
     for name, expires, capacity, redeemable in top_level_groups:
         if ProductGroup.get_by_name(name):
             continue
-        pg = ProductGroup(name=name, type=name, capacity_max=capacity, expires=expires, attributes={"is_redeemable": redeemable})
+        pg = ProductGroup(
+            name=name,
+            type=name,
+            capacity_max=capacity,
+            expires=expires,
+            attributes={"is_redeemable": redeemable},
+        )
         db.session.add(pg)
 
     db.session.flush()
@@ -196,9 +202,7 @@ def create_product_groups():
             continue
 
         group = ProductGroup.get_by_name(name)
-        product = Product(
-            name=name, display_name=display_name, description=description, parent=group
-        )
+        product = Product(name=name, display_name=display_name, description=description, parent=group)
         pt = PriceTier(name=name, personal_limit=personal_limit, parent=product, vat_rate=vat_rate)
         db.session.add(pt)
         db.session.add(Price(currency="GBP", price_int=gbp * 100, price_tier=pt))
@@ -269,9 +273,7 @@ def create_merch():
         if Product.get_by_name(badge_group.name, name):
             continue
 
-        product = Product(
-            name=name, display_name=display_name, description=description, parent=badge_group
-        )
+        product = Product(name=name, display_name=display_name, description=description, parent=badge_group)
         pt = PriceTier(name=name, parent=product, vat_rate=vat_rate)
         db.session.add(pt)
         db.session.add(Price(currency="GBP", price_int=gbp * 100, price_tier=pt))
@@ -281,22 +283,27 @@ def create_merch():
         order += 1
 
     # name, display_name, GBP, EUR
-    shirt_types = [
-        (f"unisex-{size}", f"Unisex T-shirt ({size})", 12, 14) for size in ["small", "medium", "large", "XL", "2XL", "3XL", "4XL", "5XL"]
-    ] + [
-        (f"womens-{size}", f"Womens T-shirt ({size})", 12, 14) for size in ["small", "medium", "large", "XL", "2XL"]
-    ] + [
-        (f"kids-{ages}", f"Kids T-shirt (age {ages})", 6, 7) for ages in ["3-4", "5-6", "7-8", "9-11", "12-13"]
-    ]
+    shirt_types = (
+        [
+            (f"unisex-{size}", f"Unisex T-shirt ({size})", 12, 14)
+            for size in ["small", "medium", "large", "XL", "2XL", "3XL", "4XL", "5XL"]
+        ]
+        + [
+            (f"womens-{size}", f"Womens T-shirt ({size})", 12, 14)
+            for size in ["small", "medium", "large", "XL", "2XL"]
+        ]
+        + [
+            (f"kids-{ages}", f"Kids T-shirt (age {ages})", 6, 7)
+            for ages in ["3-4", "5-6", "7-8", "9-11", "12-13"]
+        ]
+    )
 
     order = 0
     for name, display_name, gbp, eur in shirt_types:
         if Product.get_by_name(tees_group.name, name):
             continue
 
-        product = Product(
-            name=name, display_name=display_name, parent=tees_group
-        )
+        product = Product(name=name, display_name=display_name, parent=tees_group)
         pt = PriceTier(name=name, parent=product, vat_rate=vat_rate)
         db.session.add(pt)
         db.session.add(Price(currency="GBP", price_int=gbp * 100, price_tier=pt))
@@ -323,9 +330,7 @@ def expire_reserved():
     else:
         stalled_payment_grace_period = timedelta(days=3)
 
-    app.logger.info(
-        "Cancelling reserved tickets with grace period %s", stalled_payment_grace_period
-    )
+    app.logger.info("Cancelling reserved tickets with grace period %s", stalled_payment_grace_period)
 
     # Payments where someone started the process but didn't complete
     payments = (
@@ -410,7 +415,7 @@ def email_tickets():
     ctx = app.test_request_context()
     ctx.push()
 
-    if not feature_enabled('ISSUE_TICKETS'):
+    if not feature_enabled("ISSUE_TICKETS"):
         app.logger.warn("Not emailing tickets as ISSUE_TICKETS is disabled")
         return
 
@@ -435,15 +440,11 @@ def email_tickets():
         )
 
         already_emailed = set_tickets_emailed(user)
-        msg.body = render_template(
-            "emails/receipt.txt", user=user, already_emailed=already_emailed
-        )
+        msg.body = render_template("emails/receipt.txt", user=user, already_emailed=already_emailed)
 
         attach_tickets(msg, user)
 
-        app.logger.info(
-            "Emailing %s receipt for %s tickets", user.email, purchase_count
-        )
+        app.logger.info("Emailing %s receipt for %s tickets", user.email, purchase_count)
         msg.send()
 
         db.session.commit()

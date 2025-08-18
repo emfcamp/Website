@@ -7,7 +7,7 @@ from .product import Product
 
 
 class ArrivalsView(BaseModel):
-    """An analog to a ProductView, except for checking in items rather than selling them.""" 
+    """An analog to a ProductView, except for checking in items rather than selling them."""
 
     __tablename__ = "arrivals_view"
     __versioned__: dict = {}
@@ -33,10 +33,7 @@ class ArrivalsView(BaseModel):
     @classmethod
     def get_export_data(cls):
         data = {}
-        query = (
-            db.select(ArrivalsView)
-            .options(selectinload(ArrivalsView.required_permission))
-        )
+        query = db.select(ArrivalsView).options(selectinload(ArrivalsView.required_permission))
         for view in db.session.scalars(query):
             data[view.name] = {
                 "name": view.name,
@@ -58,6 +55,4 @@ class ArrivalsViewProduct(BaseModel):
         self.product = product
 
     def __repr__(self):
-        return "<ArrivalsViewProduct: view {}, product {}>".format(
-            self.view_id, self.product_id
-        )
+        return "<ArrivalsViewProduct: view {}, product {}>".format(self.view_id, self.product_id)

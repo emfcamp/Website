@@ -1,4 +1,4 @@
-""" Views for dealing with external schedules provided by villages."""
+"""Views for dealing with external schedules provided by villages."""
 
 from wtforms import StringField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, URL
@@ -16,9 +16,7 @@ from . import schedule
 
 
 @schedule.route("/schedule/<int:year>/external/<int:event_id>", methods=["GET", "POST"])
-@schedule.route(
-    "/schedule/<int:year>/external/<int:event_id>-<slug>", methods=["GET", "POST"]
-)
+@schedule.route("/schedule/<int:year>/external/<int:event_id>-<slug>", methods=["GET", "POST"])
 @feature_flag("LINE_UP")
 def item_external(year, event_id, slug=None):
     if year != event_year():
@@ -40,14 +38,10 @@ def item_external(year, event_id, slug=None):
             msg = 'Added "%s" to favourites' % event.title
         db.session.commit()
         flash(msg)
-        return redirect(
-            url_for(".item_external", year=year, event_id=event.id, slug=event.slug)
-        )
+        return redirect(url_for(".item_external", year=year, event_id=event.id, slug=event.slug))
 
     if slug != event.slug:
-        return redirect(
-            url_for(".item_external", year=year, event_id=event.id, slug=event.slug)
-        )
+        return redirect(url_for(".item_external", year=year, event_id=event.id, slug=event.slug))
 
     return render_template(
         "schedule/item-external.html",
@@ -75,9 +69,7 @@ def external_feeds():
 
     if form.validate_on_submit():
         url = form.url.data.strip()
-        source = CalendarSource.query.filter_by(
-            user_id=current_user.id, url=url
-        ).one_or_none()
+        source = CalendarSource.query.filter_by(user_id=current_user.id, url=url).one_or_none()
 
         if not source:
             source = CalendarSource(url=url, user=current_user)
@@ -86,9 +78,7 @@ def external_feeds():
         return redirect(url_for(".external_feed", source_id=source.id))
 
     calendars = current_user.calendar_sources
-    return render_template(
-        "schedule/external/feeds.html", form=form, calendars=calendars
-    )
+    return render_template("schedule/external/feeds.html", form=form, calendars=calendars)
 
 
 class UpdateExternalFeedForm(Form):

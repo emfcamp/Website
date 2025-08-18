@@ -1,13 +1,14 @@
-""" Payment handler for Stripe credit card payments.
+"""Payment handler for Stripe credit card payments.
 
-    This takes credit card payments using Stripe's
-    [Payment Intents](https://stripe.com/docs/payments/payment-intents) API.
+This takes credit card payments using Stripe's
+[Payment Intents](https://stripe.com/docs/payments/payment-intents) API.
 
-    In theory we could use this handler to take payments for other methods which
-    Stripe supports, such as iDEAL. However, Payment Intents doesn't support these
-    (as of Nov 2019), so it would involve using a different flow which would
-    complicate this code.
+In theory we could use this handler to take payments for other methods which
+Stripe supports, such as iDEAL. However, Payment Intents doesn't support these
+(as of Nov 2019), so it would involve using a different flow which would
+complicate this code.
 """
+
 import logging
 from typing import Optional
 
@@ -103,9 +104,7 @@ def stripe_capture(payment_id):
             return redirect(url_for(".stripe_waiting", payment_id=payment_id))
 
         if intent.payment_method:
-            logger.warn(
-                f"Intent already has payment method {intent.payment_method}, this will likely fail"
-            )
+            logger.warn(f"Intent already has payment method {intent.payment_method}, this will likely fail")
 
     logger.info(
         "Starting checkout for Stripe payment %s with intent %s",
@@ -140,9 +139,7 @@ class StripeCancelForm(Form):
 @payments.route("/pay/stripe/<int:payment_id>/cancel", methods=["GET", "POST"])
 @login_required
 def stripe_cancel(payment_id):
-    payment = lock_user_payment_or_abort(
-        payment_id, "stripe", valid_states=["new", "captured", "failed"]
-    )
+    payment = lock_user_payment_or_abort(payment_id, "stripe", valid_states=["new", "captured", "failed"])
 
     form = StripeCancelForm()
     if form.validate_on_submit():
@@ -162,9 +159,7 @@ def stripe_cancel(payment_id):
 @payments.route("/pay/stripe/<int:payment_id>/waiting")
 @login_required
 def stripe_waiting(payment_id):
-    payment = get_user_payment_or_abort(
-        payment_id, "stripe", valid_states=["charging", "paid"]
-    )
+    payment = get_user_payment_or_abort(payment_id, "stripe", valid_states=["charging", "paid"])
     return render_template(
         "payments/stripe-waiting.html",
         payment=payment,
@@ -259,9 +254,7 @@ def stripe_update_payment(
                 f"Charge ID for intent {intent.id} has changed from {payment.charge_id} to {charge.id}"
             )
         else:
-            logger.warn(
-                f"Charge ID {charge.id} for intent {intent.id} is out of date, ignoring"
-            )
+            logger.warn(f"Charge ID {charge.id} for intent {intent.id} is out of date, ignoring")
             return
 
     payment.charge_id = charge.id
@@ -336,9 +329,7 @@ def stripe_payment_part_refunded(payment: StripePayment, charge):
     # Payments can be marked as "refunded" if the user has requested a full refund with
     # donation. This is a part-refund on Stripe's end.
     if payment.state in ("partrefunded", "refunded", "refunding"):
-        logger.info(
-            f"Payment {payment.id} is {payment.state}, ignoring part-refund webhook"
-        )
+        logger.info(f"Payment {payment.id} is {payment.state}, ignoring part-refund webhook")
         return
 
     ticket_admin_email(
@@ -365,9 +356,7 @@ def stripe_payment_failed(payment):
 
 def lock_payment_or_abort_by_intent(intent_id: str) -> StripePayment:
     try:
-        return (
-            StripePayment.query.filter_by(intent_id=intent_id).with_for_update().one()
-        )
+        return StripePayment.query.filter_by(intent_id=intent_id).with_for_update().one()
     except NoResultFound:
         logger.error("Payment for intent %s not found", intent_id)
         abort(409)
@@ -375,9 +364,7 @@ def lock_payment_or_abort_by_intent(intent_id: str) -> StripePayment:
 
 def lock_payment_or_abort_by_charge(charge_id: str) -> StripePayment:
     try:
-        return (
-            StripePayment.query.filter_by(charge_id=charge_id).with_for_update().one()
-        )
+        return StripePayment.query.filter_by(charge_id=charge_id).with_for_update().one()
     except NoResultFound:
         logger.error("Payment for charge %s not found", charge_id)
         abort(409)
@@ -467,9 +454,7 @@ def stripe_validate():
         result.append((True, f"{len(webhooks)} webhook(s) configured: {webhook_urls}"))
         for webhook in webhooks:
             if webhook["status"] != "enabled":
-                result.append(
-                    (False, f"Webhook {webhook['url']} is {webhook['status']}")
-                )
+                result.append((False, f"Webhook {webhook['url']} is {webhook['status']}"))
     else:
         result.append((False, "No webhooks configured"))
 

@@ -33,7 +33,5 @@ UserPermission: sqlalchemy.Table = db.Table(
     "user_permission",
     BaseModel.metadata,
     db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
-    db.Column(
-        "permission_id", db.Integer, db.ForeignKey("permission.id"), primary_key=True
-    ),
+    db.Column("permission_id", db.Integer, db.ForeignKey("permission.id"), primary_key=True),
 )

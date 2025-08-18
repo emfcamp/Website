@@ -66,7 +66,9 @@ def get_email_reason(dest: str) -> str:
     elif dest == "villages":
         return f"You're receiving this email because you have registered a village for {event}."
     elif dest == "ticket_and_cfp":
-        return f"You're receiving this email because you have a ticket or a talk/workshop accepted for {event}."
+        return (
+            f"You're receiving this email because you have a ticket or a talk/workshop accepted for {event}."
+        )
     else:
         raise ValueError("Invalid email destination set: %s" % dest)
 
@@ -87,17 +89,13 @@ def email():
         if form.preview.data is True:
             return render_template(
                 "admin/email.html",
-                html=format_trusted_html_email(
-                    form.text.data, form.subject.data, reason=reason
-                ),
+                html=format_trusted_html_email(form.text.data, form.subject.data, reason=reason),
                 form=form,
                 count=len(users),
             )
 
         if form.send_preview.data is True:
-            preview_trusted_email(
-                form.send_preview_address.data, form.subject.data, form.text.data
-            )
+            preview_trusted_email(form.send_preview_address.data, form.subject.data, form.text.data)
 
             flash("Email preview sent to %s" % form.send_preview_address.data)
             return render_template(

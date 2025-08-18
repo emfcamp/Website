@@ -65,9 +65,7 @@ def get_user_purchases(query):
 
 @admin.route("/products")
 def products():
-    root_groups = (
-        ProductGroup.query.filter_by(parent_id=None).order_by(ProductGroup.id).all()
-    )
+    root_groups = ProductGroup.query.filter_by(parent_id=None).order_by(ProductGroup.id).all()
     return render_template("admin/products/overview.html", root_groups=root_groups)
 
 
@@ -83,9 +81,7 @@ def edit_product(product_id):
         return redirect(url_for(".product_details", product_id=product_id))
 
     form.init_with_product(product)
-    return render_template(
-        "admin/products/edit-product.html", product=product, form=form
-    )
+    return render_template("admin/products/edit-product.html", product=product, form=form)
 
 
 @admin.route(
@@ -124,17 +120,13 @@ def new_product(copy_id, parent_id):
     if copy_id:
         form.init_with_product(Product.query.get(copy_id))
 
-    return render_template(
-        "admin/products/new-product.html", parent=parent, product_id=copy_id, form=form
-    )
+    return render_template("admin/products/new-product.html", parent=parent, product_id=copy_id, form=form)
 
 
 @admin.route("/products/<int:product_id>")
 def product_details(product_id):
     product = Product.query.get_or_404(product_id)
-    user_purchases = get_user_purchases(
-        PriceTier.query.filter_by(product_id=product_id)
-    )
+    user_purchases = get_user_purchases(PriceTier.query.filter_by(product_id=product_id))
 
     return render_template(
         "admin/products/product-details.html",
@@ -165,9 +157,7 @@ def new_price_tier(product_id):
         db.session.commit()
         return redirect(url_for(".price_tier_details", tier_id=pt.id))
 
-    return render_template(
-        "admin/products/price-tier-new.html", product=product, form=form
-    )
+    return render_template("admin/products/price-tier-new.html", product=product, form=form)
 
 
 @admin.route("/products/price-tiers/<int:tier_id>")
@@ -253,9 +243,7 @@ def product_group_details(group_id):
         return [group] + [g for c in group.children for g in get_all_child_groups(c)]
 
     group_ids = [g.id for g in get_all_child_groups(group)]
-    price_tiers = ProductGroup.query.filter(ProductGroup.id.in_(group_ids)).join(
-        Product, PriceTier
-    )
+    price_tiers = ProductGroup.query.filter(ProductGroup.id.in_(group_ids)).join(Product, PriceTier)
     user_purchases = get_user_purchases(price_tiers)
     return render_template(
         "admin/products/product-group-details.html",
@@ -288,9 +276,7 @@ def product_group_new():
         flash("ProductGroup created")
         return redirect(url_for(".product_group_details", group_id=pg.id))
 
-    return render_template(
-        "admin/products/product-group-edit.html", method="new", parent=parent, form=form
-    )
+    return render_template("admin/products/product-group-edit.html", method="new", parent=parent, form=form)
 
 
 @admin.route("/products/group/<int:group_id>/edit", methods=["GET", "POST"])
@@ -306,9 +292,7 @@ def product_group_edit(group_id):
 
     form.init_with_pg(group)
 
-    return render_template(
-        "admin/products/product-group-edit.html", method="edit", group=group, form=form
-    )
+    return render_template("admin/products/product-group-edit.html", method="edit", group=group, form=form)
 
 
 @admin.route("/products/group/<int:group_id>/copy", methods=["GET", "POST"])
@@ -369,9 +353,7 @@ def product_group_copy(group_id):
         flash("ProductGroup copied")
         return redirect(url_for(".product_group_details", group_id=new_group.id))
 
-    return render_template(
-        "admin/products/product-group-copy.html", group=group, form=form
-    )
+    return render_template("admin/products/product-group-copy.html", group=group, form=form)
 
 
 @admin.route("/tees")
@@ -458,22 +440,15 @@ def product_view(view_id):
         db.session.commit()
 
     active_vouchers = Voucher.query.filter_by(view=view).filter(
-        not_(
-            Voucher.expiry.isnot(None)
-            & (Voucher.expiry + VOUCHER_GRACE_PERIOD < func.now())
-        )
+        not_(Voucher.expiry.isnot(None) & (Voucher.expiry + VOUCHER_GRACE_PERIOD < func.now()))
         & not_(Voucher.is_used)
     )
     stats = {
         "active": active_vouchers.count(),
-        "total_tickets": active_vouchers.with_entities(
-            func.sum(Voucher.tickets_remaining)
-        ).scalar(),
+        "total_tickets": active_vouchers.with_entities(func.sum(Voucher.tickets_remaining)).scalar(),
     }
 
-    return render_template(
-        "admin/products/view-edit.html", view=view, form=form, voucher_stats=stats
-    )
+    return render_template("admin/products/view-edit.html", view=view, form=form, voucher_stats=stats)
 
 
 @admin.route("/product_views/<int:view_id>/add", methods=["GET", "POST"])
@@ -486,9 +461,7 @@ def product_view_add(view_id, group_id=None, product_id=None):
     view = ProductView.query.get_or_404(view_id)
     form = AddProductViewProductForm()
 
-    root_groups = (
-        ProductGroup.query.filter_by(parent_id=None).order_by(ProductGroup.id).all()
-    )
+    root_groups = ProductGroup.query.filter_by(parent_id=None).order_by(ProductGroup.id).all()
 
     if product_id is not None:
         product = Product.query.get(product_id)
@@ -534,15 +507,10 @@ def product_view_voucher_list(view_id):
 
     if not request.args.get("expired"):
         vouchers = vouchers.filter(
-            not_(
-                Voucher.expiry.isnot(None)
-                & (Voucher.expiry + VOUCHER_GRACE_PERIOD < func.now())
-            )
+            not_(Voucher.expiry.isnot(None) & (Voucher.expiry + VOUCHER_GRACE_PERIOD < func.now()))
         )
 
-    return render_template(
-        "admin/products/view-vouchers.html", view=view, vouchers=vouchers
-    )
+    return render_template("admin/products/view-vouchers.html", view=view, vouchers=vouchers)
 
 
 @admin.route("/product_views/<int:view_id>/voucher/<string:voucher_code>")
@@ -551,9 +519,7 @@ def product_view_voucher_detail(view_id, voucher_code):
     voucher = Voucher.get_by_code(voucher_code)
     if voucher is None:
         abort(404)
-    return render_template(
-        "admin/products/view-voucher.html", view=view, voucher=voucher
-    )
+    return render_template("admin/products/view-voucher.html", view=view, voucher=voucher)
 
 
 @admin.route("/product_views/<int:view_id>/voucher/add", methods=["GET", "POST"])
@@ -607,9 +573,7 @@ def product_view_edit_voucher(view_id, voucher_code):
 
     form.init_with_voucher(voucher)
 
-    return render_template(
-        "admin/products/view-edit-voucher.html", view=view, voucher=voucher, form=form
-    )
+    return render_template("admin/products/view-edit-voucher.html", view=view, voucher=voucher, form=form)
 
 
 @admin.route("/product_views/<int:view_id>/voucher/bulk_add", methods=["GET", "POST"])
@@ -639,9 +603,7 @@ def product_view_bulk_add_vouchers_by_email(view_id):
 
     if len(emails) >= 250:
         flash("More than 250 emails provided. Please submit <250 at a time.")
-        return redirect(
-            url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id)
-        )
+        return redirect(url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id))
 
     added = existing = sent_total = 0
 
@@ -660,9 +622,7 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 tickets_remaining=form.num_tickets.data,
             )
 
-            voucher_url = external_url(
-                "tickets.tickets_voucher", voucher_code=voucher.code
-            )
+            voucher_url = external_url("tickets.tickets_voucher", voucher_code=voucher.code)
 
             plaintext = format_trusted_plaintext_email(
                 form.text.data, voucher_url=voucher_url, expiry=form.expires.data
@@ -689,10 +649,6 @@ def product_view_bulk_add_vouchers_by_email(view_id):
             sent_total += sent_count
             added += 1
 
-    flash(
-        f"{added} vouchers added, {sent_total} emails sent, {existing} duplicates skipped."
-    )
+    flash(f"{added} vouchers added, {sent_total} emails sent, {existing} duplicates skipped.")
 
-    return redirect(
-        url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id)
-    )
+    return redirect(url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id))

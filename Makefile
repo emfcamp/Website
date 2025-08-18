@@ -8,18 +8,18 @@ endif
 
 .PHONY: test check-syntax fix-syntax
 
-test:
-	ruff check ./main.py ./apps ./models ./tests
-	mypy ./*.py ./apps ./models
+test: check-syntax
 	SETTINGS_FILE=$(TEST_SETTINGS) pytest --random-order --cov=apps --cov=models ./tests/ ./models/
 #ifdef COVERALLS_REPO_TOKEN
 #	coveralls
 #endif
 
 check-syntax:
+	ruff format --check ./main.py ./apps ./models ./tests
 	ruff check ./main.py ./apps ./models ./tests
 	mypy ./*.py ./apps ./models
 
 fix-syntax:
+	ruff format ./main.py ./apps ./models ./tests
 	ruff check --fix ./main.py ./apps ./models ./tests
 	mypy ./*.py ./apps ./models

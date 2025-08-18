@@ -94,42 +94,28 @@ class CalendarSource(BaseModel):
 
                 uid = str(component["uid"])
                 if uid in uids_seen:
-                    alerts.append(
-                        ("danger", "{} has duplicate UID {}".format(name, uid))
-                    )
+                    alerts.append(("danger", "{} has duplicate UID {}".format(name, uid)))
                     continue
                 uids_seen.add(uid)
 
                 if "rrule" in component:
-                    alerts.append(
-                        ("warning", "{} has rrule, which is not processed".format(uid))
-                    )
+                    alerts.append(("warning", "{} has rrule, which is not processed".format(uid)))
 
                 # Allow a bit of slop for build-up events
-                if (
-                    start_dt < event_start() - pendulum.duration(days=2)
-                    and not out_of_range_event
-                ):
+                if start_dt < event_start() - pendulum.duration(days=2) and not out_of_range_event:
                     alerts.append(
                         (
                             "warning",
-                            "At least one event ({}) is before the start of the event".format(
-                                uid
-                            ),
+                            "At least one event ({}) is before the start of the event".format(uid),
                         )
                     )
                     out_of_range_event = True
 
-                if (
-                    end_dt > event_end() + pendulum.duration(days=1)
-                    and not out_of_range_event
-                ):
+                if end_dt > event_end() + pendulum.duration(days=1) and not out_of_range_event:
                     alerts.append(
                         (
                             "warning",
-                            "At least one event ({}) is after the end of the event".format(
-                                uid
-                            ),
+                            "At least one event ({}) is after the end of the event".format(uid),
                         )
                     )
                     out_of_range_event = True
@@ -144,9 +130,7 @@ class CalendarSource(BaseModel):
                     out_of_range_event = True
 
                 try:
-                    event = CalendarEvent.query.filter_by(
-                        source_id=self.id, uid=uid
-                    ).one()
+                    event = CalendarEvent.query.filter_by(source_id=self.id, uid=uid).one()
 
                 except NoResultFound:
                     event = CalendarEvent(uid=uid)
@@ -186,9 +170,7 @@ FavouriteCalendarEvent = db.Table(
     "favourite_calendar_event",
     BaseModel.metadata,
     db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
-    db.Column(
-        "event_id", db.Integer, db.ForeignKey("calendar_event.id"), primary_key=True
-    ),
+    db.Column("event_id", db.Integer, db.ForeignKey("calendar_event.id"), primary_key=True),
 )
 
 
@@ -201,9 +183,7 @@ class CalendarEvent(BaseModel):
     end_dt = db.Column(db.DateTime(), nullable=False)
     displayed = db.Column(db.Boolean, nullable=False, default=True)
 
-    source_id = db.Column(
-        db.Integer, db.ForeignKey(CalendarSource.id), nullable=False, index=True
-    )
+    source_id = db.Column(db.Integer, db.ForeignKey(CalendarSource.id), nullable=False, index=True)
     summary = db.Column(db.String, nullable=True)
     description = db.Column(db.String, nullable=True)
     location = db.Column(db.String, nullable=True)

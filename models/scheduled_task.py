@@ -1,20 +1,21 @@
-""" A simple job scheduler, because everything else is too complicated.
+"""A simple job scheduler, because everything else is too complicated.
 
-    To schedule a task:
-    ```
-    from models.scheduled_task import scheduled_task
+To schedule a task:
+```
+from models.scheduled_task import scheduled_task
 
-    @scheduled_task(minutes=30)
-    def my_function():
-        ...
-    ```
+@scheduled_task(minutes=30)
+def my_function():
+    ...
+```
 
-    The return value or any exception raised is recorded.
+The return value or any exception raised is recorded.
 
-    Tasks are run in a separate process by the `flask periodic` command
-    and do not run by default in dev. This process is run by cron so
-    granularity is no better than a few minutes.
+Tasks are run in a separate process by the `flask periodic` command
+and do not run by default in dev. This process is run by cron so
+granularity is no better than a few minutes.
 """
+
 import pendulum
 import logging
 from sqlalchemy.orm import Session
@@ -73,9 +74,7 @@ class ScheduledTaskResult(BaseModel):
         """Delete results older than a week"""
         if session is None:
             session = db.session
-        session.query(cls).filter(
-            cls.start_time < pendulum.now() - pendulum.duration(days=7)
-        ).delete()
+        session.query(cls).filter(cls.start_time < pendulum.now() - pendulum.duration(days=7)).delete()
 
 
 def scheduled_task(**kwargs):
@@ -98,9 +97,7 @@ def execute_scheduled_tasks(force=False):
     # Create a new session, so tasks calling commit don't free our lock
     with Session(db.engine, autocommit=False) as lock_session:
         # Take an exclusive lock on the ScheduledTaskResult table to prevent tasks colliding
-        lock_session.execute(
-            f"LOCK TABLE {ScheduledTaskResult.__tablename__} IN EXCLUSIVE MODE"
-        )
+        lock_session.execute(f"LOCK TABLE {ScheduledTaskResult.__tablename__} IN EXCLUSIVE MODE")
 
         tasks_to_run = []
         if force:

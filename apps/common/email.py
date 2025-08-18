@@ -96,7 +96,9 @@ def format_trusted_html_email(markdown_text, subject, reason=None, **kwargs):
     markdown_html = Markup(markdown.markdown(markdown_text, extensions=extensions))
 
     if not reason:
-        reason = f"You're receiving this email because you have a ticket for Electromagnetic Field {event_year()}."
+        reason = (
+            f"You're receiving this email because you have a ticket for Electromagnetic Field {event_year()}."
+        )
 
     inliner = CSSInliner()
     return inliner.inline(

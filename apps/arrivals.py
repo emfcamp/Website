@@ -51,7 +51,12 @@ def arrivals_required(f, *args, **kwargs):
     if current_user.has_permission("admin"):
         views = ArrivalsView.query.all()
     else:
-        views = ArrivalsView.query.join(ArrivalsView.required_permission).join(Permission.user).where(User.id == current_user.id).all()
+        views = (
+            ArrivalsView.query.join(ArrivalsView.required_permission)
+            .join(Permission.user)
+            .where(User.id == current_user.id)
+            .all()
+        )
     if not views:
         abort(404)
     g.arrivals_views = views
@@ -92,9 +97,7 @@ def user_from_code(query):
         return None
 
     # QR code
-    match = re.match(
-        re.escape(app.config.get("CHECKIN_BASE")) + "(%s)$" % checkin_code_re, query
-    )
+    match = re.match(re.escape(app.config.get("CHECKIN_BASE")) + "(%s)$" % checkin_code_re, query)
     if not match:
         return None
 
@@ -111,18 +114,10 @@ def users_from_query(query):
         return like.replace("^", "^^").replace("%", "^%")
 
     def name_match(pattern, query):
-        return (
-            names.filter(User.name.ilike(pattern.format(query), escape="^"))
-            .limit(10)
-            .all()
-        )
+        return names.filter(User.name.ilike(pattern.format(query), escape="^")).limit(10).all()
 
     def email_match(pattern, query):
-        return (
-            emails.filter(User.email.ilike(pattern.format(query), escape="^"))
-            .limit(10)
-            .all()
-        )
+        return emails.filter(User.email.ilike(pattern.format(query), escape="^")).limit(10).all()
 
     fulls = []
     starts = []
@@ -223,15 +218,13 @@ def checkin(user_id, source=None):
 
     product_ids = [p.id for p in g.arrivals_view.products]
     purchases = (
-        user.owned_purchases
-        .filter(Purchase.product_id.in_(product_ids))
+        user.owned_purchases.filter(Purchase.product_id.in_(product_ids))
         .filter_by(is_paid_for=True)
         .order_by(Purchase.id)
         .all()
     )
     other_purchases = (
-        user.owned_purchases
-        .filter(Purchase.product_id.not_in(product_ids))
+        user.owned_purchases.filter(Purchase.product_id.not_in(product_ids))
         .filter_by(is_paid_for=True)
         .order_by(Purchase.id)
         .all()
@@ -251,10 +244,7 @@ def checkin(user_id, source=None):
         if failed:
             failed_str = ", ".join(str(p.id) for p in failed)
             success_count = len(purchases) - len(failed)
-            flash(
-                "Checked in %s purchases. Already checked in: %s"
-                % (success_count, failed_str)
-            )
+            flash("Checked in %s purchases. Already checked in: %s" % (success_count, failed_str))
 
             return redirect(url_for(".checkin", user_id=user.id))
 
@@ -302,7 +292,7 @@ def redeem_purchase(purchase_id):
     db.session.commit()
     flash(f"Redeemed {purchase.product.display_name} owned by {purchase.owner.name}")
 
-    back = int(request.args.get('back', purchase.owner.id))
+    back = int(request.args.get("back", purchase.owner.id))
     return redirect(url_for(".checkin", user_id=back))
 
 
@@ -321,5 +311,5 @@ def unredeem_purchase(purchase_id):
     db.session.commit()
     flash(f"Undid redemption of {purchase.product.display_name} owned by {purchase.owner.name}")
 
-    back = int(request.args.get('back', purchase.owner.id))
+    back = int(request.args.get("back", purchase.owner.id))
     return redirect(url_for(".checkin", user_id=back))

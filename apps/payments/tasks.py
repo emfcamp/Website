@@ -57,9 +57,7 @@ def bulk_refund(yes, number, provider):
     if yes:
         app.logger.info(f"{count} refunds processed")
     else:
-        app.logger.info(
-            f"{count} refunds would be processed. Pass the -y option to refund these for real."
-        )
+        app.logger.info(f"{count} refunds would be processed. Pass the -y option to refund these for real.")
 
 
 @payments.cli.command("transferwise_refund")

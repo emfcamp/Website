@@ -78,9 +78,7 @@ def main():
             )
 
         if form.send_preview.data is True:
-            preview_trusted_notify(
-                form.send_preview_address.data, form.subject.data, form.text.data
-            )
+            preview_trusted_notify(form.send_preview_address.data, form.subject.data, form.text.data)
 
             flash("Email preview sent to %s" % form.send_preview_address.data)
             return render_template(

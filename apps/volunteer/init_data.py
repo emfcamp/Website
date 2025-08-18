@@ -24,4 +24,3 @@ def load_initial_venues() -> list[dict[str, Any]]:
 def load_initial_roles() -> list[dict[str, Any]]:
     """Loads role data."""
     return load_from_yaml("apps/volunteer/data/roles/*.yml")
-

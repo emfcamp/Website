@@ -1,9 +1,10 @@
 exclude: ^(migrations/.*)$
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.7
+    rev: v0.12.9
     hooks:
-      - id: ruff
+      - id: ruff-format
+      - id: ruff-check
 
   - repo: git@github.com:pre-commit/pre-commit-hooks
     rev: v3.4.0

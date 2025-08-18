@@ -9,13 +9,15 @@ nullsector_shifts = {
                 "min": 2,
                 "max": 3,
             }
-        ] + [
+        ]
+        + [
             {
                 "first": edt(d[0], "12:00:00"),
                 "final": edt(d[1], "00:00:00"),
                 "min": 2,
                 "max": 3,
-            } for d in [("sat", "sun"), ("sun", "mon")]
+            }
+            for d in [("sat", "sun"), ("sun", "mon")]
         ]
     }
 }

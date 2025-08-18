@@ -30,9 +30,7 @@ def review_list():
     last_visit = session.get("review_visit_dt")
     if not last_visit:
         last_vote_cast = (
-            CFPVote.query.filter_by(user_id=current_user.id)
-            .order_by(CFPVote.modified.desc())
-            .first()
+            CFPVote.query.filter_by(user_id=current_user.id).order_by(CFPVote.modified.desc()).first()
         )
 
         if last_vote_cast:
@@ -55,13 +53,9 @@ def review_list():
     to_review_old = []
     reviewed = []
 
-    user_votes = aliased(
-        CFPVote, CFPVote.query.filter_by(user_id=current_user.id).subquery()
-    )
+    user_votes = aliased(CFPVote, CFPVote.query.filter_by(user_id=current_user.id).subquery())
 
-    for proposal, vote in (
-        proposal_query.outerjoin(user_votes).with_entities(Proposal, user_votes).all()
-    ):
+    for proposal, vote in proposal_query.outerjoin(user_votes).with_entities(Proposal, user_votes).all():
         proposal.user_vote = vote
         if vote:
             if vote.state in ["new", "resolved", "stale"]:
@@ -71,11 +65,7 @@ def review_list():
                 reviewed.append(((vote.state, vote.vote or 0, vote.modified), proposal))
         else:
             # modified doesn't really describe when proposals are "new", but it's near enough
-            if (
-                last_visit is None
-                or review_order_dt is None
-                or proposal.modified < review_order_dt
-            ):
+            if last_visit is None or review_order_dt is None or proposal.modified < review_order_dt:
                 to_review_old.append(proposal)
             else:
                 proposal.is_new = True
@@ -87,13 +77,7 @@ def review_list():
     if (
         review_order is None
         or not set([p.id for p in to_review_again]).issubset(review_order)
-        or (
-            to_review_new
-            and (
-                last_visit is None
-                or datetime.utcnow() - last_visit > timedelta(hours=1)
-            )
-        )
+        or (to_review_new and (last_visit is None or datetime.utcnow() - last_visit > timedelta(hours=1)))
     ):
         random.shuffle(to_review_again)
         random.shuffle(to_review_new)
@@ -117,18 +101,12 @@ def review_list():
 
     else:
         # Sort proposals based on the previous review order
-        to_review_dict = dict(
-            (p.id, p) for p in to_review_again + to_review_new + to_review_old
-        )
-        to_review = [
-            to_review_dict[i] for i in session["review_order"] if i in to_review_dict
-        ]
+        to_review_dict = dict((p.id, p) for p in to_review_again + to_review_new + to_review_old)
+        to_review = [to_review_dict[i] for i in session["review_order"] if i in to_review_dict]
 
         session["review_visit_dt"] = datetime.utcnow()
 
-    return render_template(
-        "cfp_review/review_list.html", to_review=to_review, reviewed=reviewed, form=form
-    )
+    return render_template("cfp_review/review_list.html", to_review=to_review, reviewed=reviewed, form=form)
 
 
 def can_review_proposal(proposal):
@@ -209,13 +187,7 @@ def review_proposal(proposal_id):
             vote.has_been_read = True
 
         vote_value = (
-            2
-            if form.vote_excellent.data
-            else 1
-            if form.vote_ok.data
-            else 0
-            if form.vote_poor.data
-            else None
+            2 if form.vote_excellent.data else 1 if form.vote_ok.data else 0 if form.vote_poor.data else None
         )
 
         try:

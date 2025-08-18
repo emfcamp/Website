@@ -29,9 +29,7 @@ class AdminMessage(BaseModel):
     created_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    modified = db.Column(
-        db.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow
-    )
+    modified = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow)
 
     creator = db.relationship("User", backref="admin_messages")
 

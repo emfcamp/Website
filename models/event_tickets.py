@@ -86,9 +86,7 @@ class EventTicket(BaseModel):
         return [
             t
             for t in self.user.event_tickets
-            if t.state == "entered-lottery"
-            and t != self
-            and t.proposal.type == self.proposal.type
+            if t.state == "entered-lottery" and t != self and t.proposal.type == self.proposal.type
         ]
 
     def is_in_lottery_round(self, round_rank):
@@ -167,9 +165,7 @@ class EventTicket(BaseModel):
 
     @classmethod
     def get_event_ticket(cls, user: User, proposal: Proposal):
-        return EventTicket.query.filter_by(
-            user_id=user.id, proposal_id=proposal.id
-        ).one_or_none()
+        return EventTicket.query.filter_by(user_id=user.id, proposal_id=proposal.id).one_or_none()
 
     @classmethod
     def create_ticket(self, user, proposal, ticket_count=1):
@@ -177,30 +173,32 @@ class EventTicket(BaseModel):
 
         if signup_state == "issue-lottery-tickets":
             rank = get_max_rank_for_user(user, proposal.type)
-            return EventTicket(
-                user.id, proposal.id, "entered-lottery", ticket_count, rank
-            )
+            return EventTicket(user.id, proposal.id, "entered-lottery", ticket_count, rank)
         elif signup_state == "issue-event-tickets" and (ticket_count <= proposal.get_total_capacity()):
             return EventTicket(user.id, proposal.id, "ticket", ticket_count).issue_codes()
 
-        elif (
-            signup_state == "issue-event-tickets" and not (ticket_count < proposal.get_total_capacity())
-        ):
-            raise EventTicketException(
-                f"This {proposal.human_type} is currently full."
-            )
+        elif signup_state == "issue-event-tickets" and not (ticket_count < proposal.get_total_capacity()):
+            raise EventTicketException(f"This {proposal.human_type} is currently full.")
 
         raise EventTicketException("Tickets are not currently being issued")
 
-
     @classmethod
     def get_export_data(cls):
-        user_count_subq = db.select(cls.user_id, db.func.count().label("user_count")).group_by(cls.user_id).subquery()
-        user_count_q = db.select(user_count_subq.c.user_count, db.func.count()).group_by(user_count_subq.c.user_count)
+        user_count_subq = (
+            db.select(cls.user_id, db.func.count().label("user_count")).group_by(cls.user_id).subquery()
+        )
+        user_count_q = db.select(user_count_subq.c.user_count, db.func.count()).group_by(
+            user_count_subq.c.user_count
+        )
 
-        proposal_count_subq = db.select(cls.proposal_id, db.func.count().label("proposal_count")).group_by(cls.proposal_id).subquery()
-        proposal_count_q = db.select(proposal_count_subq.c.proposal_count, db.func.count()).group_by(proposal_count_subq.c.proposal_count)
-
+        proposal_count_subq = (
+            db.select(cls.proposal_id, db.func.count().label("proposal_count"))
+            .group_by(cls.proposal_id)
+            .subquery()
+        )
+        proposal_count_q = db.select(proposal_count_subq.c.proposal_count, db.func.count()).group_by(
+            proposal_count_subq.c.proposal_count
+        )
 
         data = {
             "public": {
@@ -216,7 +214,7 @@ class EventTicket(BaseModel):
                 }
             }
         }
-        data["public"]["counts"].update(export_attr_counts(cls, ['state', 'rank', 'ticket_count']))
+        data["public"]["counts"].update(export_attr_counts(cls, ["state", "rank", "ticket_count"]))
         return data
 
 

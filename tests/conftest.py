@@ -1,4 +1,5 @@
-" PyTest Config. This contains global-level pytest fixtures. "
+"PyTest Config. This contains global-level pytest fixtures."
+
 import os
 import os.path
 import pytest

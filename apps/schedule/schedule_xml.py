@@ -1,7 +1,8 @@
-""" Utils to format schedule in the de facto standard Frab XML format.
+"""Utils to format schedule in the de facto standard Frab XML format.
 
-    Frab XML is consumed by a number of external tools such as C3VOC.
+Frab XML is consumed by a number of external tools such as C3VOC.
 """
+
 from uuid import uuid5, NAMESPACE_URL
 from datetime import time, datetime, timedelta
 from lxml import etree
@@ -55,9 +56,7 @@ def make_root():
 
     conference = etree.SubElement(root, "conference")
 
-    _add_sub_with_text(
-        conference, "title", "Electromagnetic Field {}".format(event_year())
-    )
+    _add_sub_with_text(conference, "title", "Electromagnetic Field {}".format(event_year()))
     _add_sub_with_text(conference, "acronym", "emf{}".format(event_year()))
     _add_sub_with_text(conference, "start", event_start().strftime("%Y-%m-%d"))
     _add_sub_with_text(conference, "end", event_end().strftime("%Y-%m-%d"))
@@ -83,13 +82,9 @@ def add_room(day, name):
 
 
 def add_event(room, event):
-    url = external_url(
-        "schedule.item", year=event_year(), proposal_id=event["id"], slug=event["slug"]
-    )
+    url = external_url("schedule.item", year=event_year(), proposal_id=event["id"], slug=event["slug"])
 
-    event_node = etree.SubElement(
-        room, "event", id=str(event["id"]), guid=str(uuid5(NAMESPACE_URL, url))
-    )
+    event_node = etree.SubElement(room, "event", id=str(event["id"]), guid=str(uuid5(NAMESPACE_URL, url)))
 
     _add_sub_with_text(event_node, "room", room.attrib["name"])
     _add_sub_with_text(event_node, "title", event["title"])
@@ -124,12 +119,9 @@ def add_event(room, event):
 
 
 def add_persons(event_node, event):
-
     persons_node = etree.SubElement(event_node, "persons")
 
-    _add_sub_with_text(
-        persons_node, "person", event["speaker"], id=str(event["user_id"])
-    )
+    _add_sub_with_text(persons_node, "person", event["speaker"], id=str(event["user_id"]))
 
 
 def add_recording(event_node, event):

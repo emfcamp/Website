@@ -1,8 +1,8 @@
 """
-    Pages under /about - content about the event.
+Pages under /about - content about the event.
 
-    Content about EMF the organisation should go in /organisation (organisation.py),
-    although some legacy content remains here.
+Content about EMF the organisation should go in /organisation (organisation.py),
+although some legacy content remains here.
 """
 
 import json

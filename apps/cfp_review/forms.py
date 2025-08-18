@@ -69,13 +69,13 @@ class UpdateProposalForm(Form):
     telephone_number = StringField("Telephone")
     eventphone_number = StringField("On-site extension")
     video_privacy = SelectField(
-      "Recording",
-      choices=[
-        ("public", "Stream and record"),
-        ("review", "Do not stream, and do not publish until reviewed"),
-        ("none", "Do not stream or record"),
-      ],
-      validators=[Optional()],
+        "Recording",
+        choices=[
+            ("public", "Stream and record"),
+            ("review", "Do not stream, and do not publish until reviewed"),
+            ("none", "Do not stream or record"),
+        ],
+        validators=[Optional()],
     )
     needs_laptop = SelectField(
         "Needs laptop",
@@ -119,9 +119,7 @@ class UpdateProposalForm(Form):
                     parse_date(start)
                     parse_date(end)
         except ValueError:
-            raise ValidationError(
-                "Unparsable Allowed Times. Fmt: datetime > datetime per line"
-            )
+            raise ValidationError("Unparsable Allowed Times. Fmt: datetime > datetime per line")
 
     def update_proposal(self, proposal):
         proposal.title = self.title.data
@@ -188,10 +186,7 @@ class UpdateProposalForm(Form):
 
         # Windows users :(
         stripped_allowed_times = self.allowed_times.data.strip().replace("\r\n", "\n")
-        if (
-            proposal.get_allowed_time_periods_serialised().strip()
-            != stripped_allowed_times
-        ):
+        if proposal.get_allowed_time_periods_serialised().strip() != stripped_allowed_times:
             if stripped_allowed_times:
                 proposal.allowed_times = stripped_allowed_times
             else:
@@ -221,9 +216,7 @@ class UpdateProposalForm(Form):
         else:
             proposal.potential_venue = None
 
-        proposal.allowed_venues = Venue.query.filter(
-            Venue.id.in_(self.allowed_venues.data)
-        ).all()
+        proposal.allowed_venues = Venue.query.filter(Venue.id.in_(self.allowed_venues.data)).all()
 
 
 class ConvertProposalForm(Form):
@@ -283,9 +276,7 @@ class UpdateWorkshopForm(UpdateProposalForm):
         if self.published_cost.raw_data:
             proposal.published_cost = self.published_cost.data
         if self.published_participant_equipment.raw_data:
-            proposal.published_participant_equipment = (
-                self.published_participant_equipment.data
-            )
+            proposal.published_participant_equipment = self.published_participant_equipment.data
         if self.published_age_range.raw_data:
             proposal.published_age_range = self.published_age_range.data
         super(UpdateWorkshopForm, self).update_proposal(proposal)
@@ -324,9 +315,7 @@ class UpdateYouthWorkshopForm(UpdateProposalForm):
         if self.published_cost.raw_data:
             proposal.published_cost = self.published_cost.data
         if self.published_participant_equipment.raw_data:
-            proposal.published_participant_equipment = (
-                self.published_participant_equipment.data
-            )
+            proposal.published_participant_equipment = self.published_participant_equipment.data
         if self.published_age_range.raw_data:
             proposal.published_age_range = self.published_age_range.data
         if self.valid_dbs.raw_data:
@@ -388,9 +377,7 @@ class VoteForm(Form):
 
 
 class CloseRoundForm(Form):
-    min_votes = IntegerField(
-        "Minimum number of votes", default=10, validators=[NumberRange(min=1)]
-    )
+    min_votes = IntegerField("Minimum number of votes", default=10, validators=[NumberRange(min=1)])
     close_round = SubmitField("Close this round...")
     confirm = SubmitField("Confirm")
     cancel = SubmitField("Cancel")
@@ -440,9 +427,7 @@ class AddNoteForm(Form):
 
 
 class ChangeProposalOwner(Form):
-    user_email = EmailField(
-        "Which email address to associate this proposal with", [DataRequired()]
-    )
+    user_email = EmailField("Which email address to associate this proposal with", [DataRequired()])
     user_name = StringField("User name (if creating new user)")
     submit = SubmitField("Change proposal owner")
 

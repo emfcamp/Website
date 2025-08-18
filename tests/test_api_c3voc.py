@@ -234,7 +234,7 @@ def test_update_thumbnail_with_path(client, app, db, proposal, valid_auth_header
     assert rv.status_code == 204
 
     proposal = Proposal.query.get(proposal.id)
-    assert proposal.thumbnail_url  == "https://static.media.ccc.de/media/thumb.jpg"
+    assert proposal.thumbnail_url == "https://static.media.ccc.de/media/thumb.jpg"
     assert proposal.c3voc_url is None
     assert proposal.youtube_url is None
 
@@ -262,7 +262,7 @@ def test_update_thumbnail_with_url(client, app, db, proposal, valid_auth_headers
     assert rv.status_code == 204
 
     proposal = Proposal.query.get(proposal.id)
-    assert proposal.thumbnail_url  == "https://example.com/thumb.jpg"
+    assert proposal.thumbnail_url == "https://example.com/thumb.jpg"
     assert proposal.c3voc_url is None
     assert proposal.youtube_url is None
 

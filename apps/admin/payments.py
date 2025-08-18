@@ -109,9 +109,7 @@ def reset_expiry(payment_id):
             flash("Expiry reset for payment %s" % payment.id)
             return redirect(url_for("admin.expiring"))
 
-    return render_template(
-        "admin/payments/payment-reset-expiry.html", payment=payment, form=form
-    )
+    return render_template("admin/payments/payment-reset-expiry.html", payment=payment, form=form)
 
 
 class SendReminderForm(Form):
@@ -137,9 +135,7 @@ def send_reminder(payment_id):
 
             if payment.reminder_sent_at:
                 app.logger.error("Reminder for payment %s already sent", payment.id)
-                flash(
-                    "Cannot send duplicate reminder email for payment %s" % payment.id
-                )
+                flash("Cannot send duplicate reminder email for payment %s" % payment.id)
                 return redirect(url_for("admin.expiring"))
 
             msg = EmailMessage(
@@ -197,22 +193,16 @@ def update_payment(payment_id):
                 except StripeUpdateConflict as e:
                     app.logger.warn(f"StripeUpdateConflict updating payment: {e}")
                     flash("Unable to update due to a status conflict")
-                    return redirect(
-                        url_for("admin.update_payment", payment_id=payment.id)
-                    )
+                    return redirect(url_for("admin.update_payment", payment_id=payment.id))
                 except StripeUpdateUnexpected as e:
                     app.logger.warn(f"StripeUpdateUnexpected updating payment: {e}")
                     flash("Unable to update due to an unexpected response from Stripe")
-                    return redirect(
-                        url_for("admin.update_payment", payment_id=payment.id)
-                    )
+                    return redirect(url_for("admin.update_payment", payment_id=payment.id))
 
             flash("Payment status updated")
             return redirect(url_for("admin.update_payment", payment_id=payment.id))
 
-    return render_template(
-        "admin/payments/payment-update.html", payment=payment, form=form
-    )
+    return render_template("admin/payments/payment-update.html", payment=payment, form=form)
 
 
 class CancelPaymentForm(Form):
@@ -232,9 +222,7 @@ def cancel_payment(payment_id):
     form = CancelPaymentForm()
     if form.validate_on_submit():
         if form.cancel.data and (payment.provider in {"banktransfer"}):
-            app.logger.info(
-                "%s manually cancelling payment %s", current_user.name, payment.id
-            )
+            app.logger.info("%s manually cancelling payment %s", current_user.name, payment.id)
 
             payment.lock()
 
@@ -251,9 +239,7 @@ def cancel_payment(payment_id):
             flash("Payment %s cancelled" % payment.id)
             return redirect(url_for("admin.expiring"))
 
-    return render_template(
-        "admin/payments/payment-cancel.html", payment=payment, form=form
-    )
+    return render_template("admin/payments/payment-cancel.html", payment=payment, form=form)
 
 
 @admin.route("/payment/refunds")
@@ -343,9 +329,7 @@ def delete_refund_request(req_id):
         flash("Refund request deleted")
         return redirect(url_for(".refunds"))
 
-    return render_template(
-        "admin/payments/refund_request_delete.html", req=req, form=form
-    )
+    return render_template("admin/payments/refund_request_delete.html", req=req, form=form)
 
 
 class ManualRefundForm(Form):
@@ -384,9 +368,7 @@ def manual_refund(payment_id):
             flash("Payment {} refunded".format(payment.id))
             return redirect(url_for("admin.payments"))
 
-    return render_template(
-        "admin/payments/manual-refund.html", payment=payment, form=form
-    )
+    return render_template("admin/payments/manual-refund.html", payment=payment, form=form)
 
 
 class RefundForm(Form):
@@ -426,18 +408,16 @@ def refund(payment_id):
 
     if form.validate_on_submit():
         if form.refund.data or form.stripe_refund.data:
-
             payment.lock()
 
             purchases = [
                 purchases_dict[f.purchase_id.data]
                 for f in form.purchases
-                if f.refund.data and purchases_dict[f.purchase_id.data].is_refundable(ignore_event_refund_state=True)
+                if f.refund.data
+                and purchases_dict[f.purchase_id.data].is_refundable(ignore_event_refund_state=True)
             ]
 
-            total = sum(
-                p.price_tier.get_price(payment.currency).value for p in purchases
-            )
+            total = sum(p.price_tier.get_price(payment.currency).value for p in purchases)
 
             if not total:
                 flash(
@@ -484,14 +464,10 @@ def refund(payment_id):
                     purchase.refund_purchase(refund)
 
             priced_purchases = [
-                p
-                for p in payment.purchases
-                if p.price_tier.get_price(payment.currency).value
+                p for p in payment.purchases if p.price_tier.get_price(payment.currency).value
             ]
             unpriced_purchases = [
-                p
-                for p in payment.purchases
-                if not p.price_tier.get_price(payment.currency).value
+                p for p in payment.purchases if not p.price_tier.get_price(payment.currency).value
             ]
 
             all_refunded = False
@@ -506,9 +482,7 @@ def refund(payment_id):
                         )
                         if not purchase.is_paid_for:
                             # The only thing keeping this purchase from being valid was the payment
-                            app.logger.info(
-                                "Setting orphaned free purchase %s to paid", purchase.id
-                            )
+                            app.logger.info("Setting orphaned free purchase %s to paid", purchase.id)
                             purchase.state = "paid"
 
                             # Should we even put free purchases in a Payment?
@@ -529,9 +503,7 @@ def refund(payment_id):
 
                 except Exception as e:
                     app.logger.exception("Exception %r refunding payment", e)
-                    flash(
-                        "An error occurred refunding with Stripe. Please check the state of the payment."
-                    )
+                    flash("An error occurred refunding with Stripe. Please check the state of the payment.")
                     return redirect(url_for(".refund", payment_id=payment.id))
 
                 refund.refundid = stripe_refund.id
@@ -541,9 +513,7 @@ def refund(payment_id):
                         "Refund status is %s, not pending or succeeded",
                         stripe_refund.status,
                     )
-                    flash(
-                        "The refund with Stripe was not successful. Please check the state of the payment."
-                    )
+                    flash("The refund with Stripe was not successful. Please check the state of the payment.")
                     return redirect(url_for(".refund", payment_id=payment.id))
 
             if all_refunded:
@@ -569,9 +539,7 @@ def refund(payment_id):
             )
             msg.send()
 
-            app.logger.info(
-                "Payment %s refund complete for a total of %s", payment.id, total
-            )
+            app.logger.info("Payment %s refund complete for a total of %s", payment.id, total)
             flash("Refund for %s %s complete" % (total, payment.currency))
 
         return redirect(url_for(".refunds"))
@@ -598,10 +566,7 @@ class ChangeCurrencyForm(Form):
 @admin.route("/payment/<int:payment_id>/change_currency", methods=["GET", "POST"])
 def change_currency(payment_id):
     payment = Payment.query.get_or_404(payment_id)
-    if not (
-        payment.state == "new"
-        or (payment.provider == "banktransfer" and payment.state == "inprogress")
-    ):
+    if not (payment.state == "new" or (payment.provider == "banktransfer" and payment.state == "inprogress")):
         return abort(400)
 
     if payment.currency == "GBP":
@@ -649,9 +614,7 @@ def cancel_purchase(payment_id: int, purchase_id: int) -> ResponseReturnValue:
     form = CancelPurchaseForm()
     if form.validate_on_submit():
         if form.cancel.data:
-            app.logger.info(
-                "%s manually cancelling purchase %s", current_user.name, purchase.id
-            )
+            app.logger.info("%s manually cancelling purchase %s", current_user.name, purchase.id)
             payment.lock()
 
             try:

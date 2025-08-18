@@ -61,16 +61,9 @@ def calc_sales_state(date):
     view = ProductView.query.filter_by(name="main")
     product = view.join(ProductViewProduct, Product).filter_by(name="full")
     try:
-        tier = (
-            product.join(Product.price_tiers)
-            .filter_by(active=True)
-            .with_entities(PriceTier)
-            .one_or_none()
-        )
+        tier = product.join(Product.price_tiers).filter_by(active=True).with_entities(PriceTier).one_or_none()
     except MultipleResultsFound:
-        log.error(
-            "Multiple active PriceTiers found. Forcing sales state to unavailable."
-        )
+        log.error("Multiple active PriceTiers found. Forcing sales state to unavailable.")
         return "unavailable"
 
     if tier is None or tier.has_expired() or tier.get_total_remaining_capacity() <= 0:

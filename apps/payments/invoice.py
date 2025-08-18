@@ -35,13 +35,16 @@ class InvoiceForm(Form):
     update = SubmitField("Update")
 
 
-InvoiceLine = namedtuple("InvoiceLine", [
-    "price_tier",
-    "quantity",
-    "vat_rate",
-    "vat_amount",
-    "price",
-])
+InvoiceLine = namedtuple(
+    "InvoiceLine",
+    [
+        "price_tier",
+        "quantity",
+        "vat_rate",
+        "vat_amount",
+        "price",
+    ],
+)
 
 
 @payments.route("/payment/<int:payment_id>/receipt", methods=["GET", "POST"])

@@ -98,18 +98,14 @@ def transaction_suggest_payments(txn_id):
     payments = list(reversed(payments[-20:]))
 
     app.logger.info("Suggesting %s payments for txn %s", len(payments), txn.id)
-    return render_template(
-        "admin/accounts/txn-suggest-payments.html", txn=txn, payments=payments
-    )
+    return render_template("admin/accounts/txn-suggest-payments.html", txn=txn, payments=payments)
 
 
 class ManualReconcilePaymentForm(Form):
     reconcile = SubmitField("Reconcile")
 
 
-@admin.route(
-    "/transaction/<int:txn_id>/reconcile/<int:payment_id>", methods=["GET", "POST"]
-)
+@admin.route("/transaction/<int:txn_id>/reconcile/<int:payment_id>", methods=["GET", "POST"])
 def transaction_reconcile(txn_id, payment_id):
     txn = BankTransaction.query.get_or_404(txn_id)
     payment = BankPayment.query.get_or_404(payment_id)
@@ -163,6 +159,4 @@ def transaction_reconcile(txn_id, payment_id):
             flash("Payment ID %s marked as paid" % payment.id)
             return redirect(url_for("admin.transactions"))
 
-    return render_template(
-        "admin/accounts/txn-reconcile.html", txn=txn, payment=payment, form=form
-    )
+    return render_template("admin/accounts/txn-reconcile.html", txn=txn, payment=payment, form=form)

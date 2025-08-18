@@ -87,11 +87,7 @@ def purchases():
     tickets = purchases.filter_by(is_ticket=True).all()
     other_items = purchases.filter_by(is_ticket=False).all()
 
-    payments = (
-        current_user.payments.filter(Payment.state != "cancelled")
-        .order_by(Payment.state)
-        .all()
-    )
+    payments = current_user.payments.filter(Payment.state != "cancelled").order_by(Payment.state).all()
 
     if not tickets and not payments:
         return redirect(url_for("tickets.main"))

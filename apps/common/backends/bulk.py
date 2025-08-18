@@ -29,5 +29,5 @@ class BulkEmailBackend(EmailBackend):
             timeout=app.config.get("BULK_MAIL_TIMEOUT"),
             ssl_keyfile=app.config.get("BULK_MAIL_SSL_KEYFILE"),
             ssl_certfile=app.config.get("BULK_MAIL_SSL_CERTFILE"),
-            **kwargs
+            **kwargs,
         )

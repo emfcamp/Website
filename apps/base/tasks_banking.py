@@ -24,9 +24,7 @@ def sync_wisetransfer(profile_id):
     tw_accounts = wise_retrieve_accounts(profile_id)
     for tw_account in tw_accounts:
         # Each sync is performed in a separate transaction
-        sync_wise_statement(
-            profile_id, tw_account.borderless_account_id, tw_account.currency
-        )
+        sync_wise_statement(profile_id, tw_account.borderless_account_id, tw_account.currency)
 
 
 @base.cli.command("check_wisetransfer_ids")
@@ -77,14 +75,10 @@ def check_wisetransfer_ids(profile_id):
                 payee=transaction.details.paymentReference,
             ).all()
             if len(txns) == 0:
-                app.logger.error(
-                    f"Could not find transaction (did you run sync first?): {transaction}"
-                )
+                app.logger.error(f"Could not find transaction (did you run sync first?): {transaction}")
                 continue
             if len(txns) > 1:
-                app.logger.error(
-                    f"Found matching {len(txns)} matching transactions for: {transaction}"
-                )
+                app.logger.error(f"Found matching {len(txns)} matching transactions for: {transaction}")
                 continue
 
             txn = txns[0]
@@ -92,9 +86,7 @@ def check_wisetransfer_ids(profile_id):
                 txn.wise_id = transaction.referenceNumber
                 continue
             if txn.wise_id != transaction.referenceNumber:
-                app.logger.error(
-                    f"referenceNumber has changed from {txn.wise_id}: {transaction}"
-                )
+                app.logger.error(f"referenceNumber has changed from {txn.wise_id}: {transaction}")
                 continue
 
         db.session.commit()
@@ -103,7 +95,5 @@ def check_wisetransfer_ids(profile_id):
 @base.cli.command("reconcile")
 @click.option("-d", "--doit", is_flag=True, help="set this to actually change the db")
 def reconcile(doit):
-    outstanding_txns = BankTransaction.query.filter_by(
-        payment_id=None, suppressed=False
-    )
+    outstanding_txns = BankTransaction.query.filter_by(payment_id=None, suppressed=False)
     reconcile_txns(outstanding_txns, doit)

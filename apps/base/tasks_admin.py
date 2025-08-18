@@ -22,9 +22,7 @@ def periodic(force):
 
 
 @app.cli.command("make_admin")
-@click.option(
-    "-u", "--user-id", type=int, help="The user_id to make an admin (defaults to first)"
-)
+@click.option("-u", "--user-id", type=int, help="The user_id to make an admin (defaults to first)")
 @click.option(
     "-e",
     "--email",

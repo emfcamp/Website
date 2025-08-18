@@ -27,6 +27,7 @@ from .forms import (
     AddArrivalsViewProductForm,
 )
 
+
 @admin.route("/arrivals/views")
 def arrivals_views():
     view_counts = (
@@ -96,9 +97,7 @@ def arrivals_view(view_id):
 
         db.session.commit()
 
-    return render_template(
-        "admin/arrivals/view-edit.html", view=view, form=form
-    )
+    return render_template("admin/arrivals/view-edit.html", view=view, form=form)
 
 
 @admin.route("/arrivals/views/<int:view_id>/add", methods=["GET", "POST"])
@@ -111,9 +110,7 @@ def arrivals_view_add(view_id, group_id=None, product_id=None):
     view = ArrivalsView.query.get_or_404(view_id)
     form = AddArrivalsViewProductForm()
 
-    root_groups = (
-        ProductGroup.query.filter_by(parent_id=None).order_by(ProductGroup.id).all()
-    )
+    root_groups = ProductGroup.query.filter_by(parent_id=None).order_by(ProductGroup.id).all()
 
     if product_id is not None:
         product = Product.query.get(product_id)
@@ -135,14 +132,18 @@ def arrivals_view_add(view_id, group_id=None, product_id=None):
             db.session.commit()
 
         elif form.add_all_products_recursive.data:
+
             def _fetch_all_products(group) -> list[dict[str, int]]:
                 out = []
                 for product in group.products:
-                    out.append({'view_id': view.id, 'product_id': product.id})
+                    out.append({"view_id": view.id, "product_id": product.id})
                 for group in group.children:
                     out.extend(_fetch_all_products(group))
                 return out
-            db.session.execute(insert(ArrivalsViewProduct).values(_fetch_all_products(group)).on_conflict_do_nothing())
+
+            db.session.execute(
+                insert(ArrivalsViewProduct).values(_fetch_all_products(group)).on_conflict_do_nothing()
+            )
             flash(f"Added all products under {group.name} recursively to {view.name}")
             db.session.commit()
 

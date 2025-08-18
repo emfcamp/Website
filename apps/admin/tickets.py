@@ -88,9 +88,7 @@ def tickets_issue_free(email):
 
     if form.validate_on_submit():
         if not user:
-            app.logger.info(
-                "Creating new user with email %s and name %s", email, form.name.data
-            )
+            app.logger.info("Creating new user with email %s and name %s", email, form.name.data)
             user = User(email, form.name.data)
             db.session.add(user)
             flash("Created account for %s" % email)
@@ -140,9 +138,7 @@ def tickets_issue_free(email):
 
         flash(f"Allocated {len(basket.purchases)} {ticket_noun}")
         return redirect(url_for(".tickets_issue"))
-    return render_template(
-        "admin/tickets/tickets-issue-free.html", form=form, user=user, email=email
-    )
+    return render_template("admin/tickets/tickets-issue-free.html", form=form, user=user, email=email)
 
 
 @admin.route("/tickets/list-free")
@@ -154,17 +150,13 @@ def list_free_tickets():
         .filter(
             Purchase.is_paid_for,
             Purchase.payment_id.is_(None),
-            ~PurchaseTransfer.query.filter(
-                PurchaseTransfer.purchase.expression
-            ).exists(),
+            ~PurchaseTransfer.query.filter(PurchaseTransfer.purchase.expression).exists(),
         )
         .order_by(Purchase.owner_id, Purchase.id)
         .all()
     )
 
-    return render_template(
-        "admin/tickets/tickets-list-free.html", free_tickets=free_tickets
-    )
+    return render_template("admin/tickets/tickets-list-free.html", free_tickets=free_tickets)
 
 
 @admin.route("/ticket/<int:ticket_id>", methods=["GET"])
@@ -191,15 +183,11 @@ def cancel_free_ticket(ticket_id):
             flash("Ticket cancelled")
             return redirect(url_for("admin.list_free_tickets"))
 
-    return render_template(
-        "admin/tickets/ticket-cancel-free.html", ticket=ticket, form=form
-    )
+    return render_template("admin/tickets/ticket-cancel-free.html", ticket=ticket, form=form)
 
 
 @admin.route("/ticket/<int:ticket_id>/convert")
-@admin.route(
-    "/ticket/<int:ticket_id>/convert/<int:price_tier_id>", methods=["GET", "POST"]
-)
+@admin.route("/ticket/<int:ticket_id>/convert/<int:price_tier_id>", methods=["GET", "POST"])
 def convert_ticket(ticket_id, price_tier_id=None):
     ticket = Purchase.query.get_or_404(ticket_id)
 
@@ -244,9 +232,7 @@ def convert_ticket(ticket_id, price_tier_id=None):
             return redirect(url_for(".convert_ticket", ticket_id=ticket.id))
 
     convertible_tiers = (
-        Price.query.filter_by(
-            currency=ticket.price.currency, price_int=ticket.price.price_int
-        )
+        Price.query.filter_by(currency=ticket.price.currency, price_int=ticket.price.price_int)
         .join(PriceTier)
         .with_entities(PriceTier)
         .order_by(PriceTier.id)
@@ -330,18 +316,14 @@ def tickets_reserve(email):
         flash(f"Reserved {ticket_noun} and emailed {user.email}")
         return redirect(url_for(".tickets_issue"))
 
-    return render_template(
-        "admin/tickets/tickets-reserve.html", form=form, pts=pts, user=user
-    )
+    return render_template("admin/tickets/tickets-reserve.html", form=form, pts=pts, user=user)
 
 
 @admin.route("/tickets/<int:ticket_id>/transfer", methods=["GET", "POST"])
 def transfer_ticket(ticket_id):
     form = TransferTicketInitialForm()
     if form.validate_on_submit():
-        return redirect(
-            url_for(".transfer_ticket_user", ticket_id=ticket_id, email=form.email.data)
-        )
+        return redirect(url_for(".transfer_ticket_user", ticket_id=ticket_id, email=form.email.data))
     return render_template("admin/tickets/transfer-ticket.html", form=form)
 
 
@@ -380,18 +362,14 @@ def transfer_ticket_user(ticket_id, email):
         ticket.transfer(from_user=previous_owner, to_user=user)
         db.session.commit()
 
-        app.logger.info(
-            "Ticket %s transferred from %s to %s", ticket, previous_owner, user
-        )
+        app.logger.info("Ticket %s transferred from %s to %s", ticket, previous_owner, user)
 
         # We don't send any emails because this is an admin operation
 
         flash("Transferred ticket {}".format(ticket.id))
         return redirect(url_for(".user", user_id=user.id))
 
-    return render_template(
-        "admin/tickets/transfer-ticket-user.html", form=form, ticket=ticket, user=user
-    )
+    return render_template("admin/tickets/transfer-ticket-user.html", form=form, ticket=ticket, user=user)
 
 
 @admin.route("/user/<int:user_id>/tickets")
@@ -403,8 +381,6 @@ def user_tickets(user_id, ext=None):
 
     if ext == ".pdf":
         url = external_url(".user_tickets", user_id=user_id)
-        return send_file(
-            render_pdf(url, receipt), mimetype="application/pdf", max_age=60
-        )
+        return send_file(render_pdf(url, receipt), mimetype="application/pdf", max_age=60)
 
     return receipt

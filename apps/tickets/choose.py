@@ -103,9 +103,7 @@ def main(flow="main"):
         # again. I'm not sure what to do about this. It usually won't matter.
         available = any(p.product in products for p in basket.purchases)
 
-    if form.validate_on_submit() and (
-        form.buy_tickets.data or form.buy_hire.data or form.buy_other.data
-    ):
+    if form.validate_on_submit() and (form.buy_tickets.data or form.buy_hire.data or form.buy_other.data):
         # User has selected some tickets to buy.
         if not available:
             # Tickets are out :(
@@ -119,9 +117,7 @@ def main(flow="main"):
         # User has changed their currency but they don't have javascript enabled,
         # so a page reload has been caused.
         if form.set_currency.validate(form):
-            app.logger.info(
-                "Updating currency to %s (no-JS path)", form.set_currency.data
-            )
+            app.logger.info("Updating currency to %s (no-JS path)", form.set_currency.data)
             set_user_currency(form.set_currency.data)
             db.session.commit()
 
@@ -129,9 +125,7 @@ def main(flow="main"):
                 field.errors = []
 
     form.currency_code.data = get_user_currency()
-    return render_template(
-        "tickets/choose.html", form=form, flow=flow, view=view, available=available
-    )
+    return render_template("tickets/choose.html", form=form, flow=flow, view=view, available=available)
 
 
 def products_for_view(product_view) -> list[ProductViewProduct]:

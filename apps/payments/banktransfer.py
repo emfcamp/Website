@@ -71,9 +71,7 @@ class TransferChangeCurrencyForm(Form):
 def transfer_waiting(payment_id):
     form = TransferChangeCurrencyForm()
 
-    payment = get_user_payment_or_abort(
-        payment_id, "banktransfer", valid_states=["inprogress", "paid"]
-    )
+    payment = get_user_payment_or_abort(payment_id, "banktransfer", valid_states=["inprogress", "paid"])
 
     if payment.currency == "GBP":
         form.currency.data = "EUR"
@@ -92,9 +90,7 @@ def transfer_waiting(payment_id):
 @payments.route("/pay/transfer/<int:payment_id>/change-currency", methods=["POST"])
 @login_required
 def transfer_change_currency(payment_id):
-    payment = lock_user_payment_or_abort(
-        payment_id, "banktransfer", valid_states=["inprogress"]
-    )
+    payment = lock_user_payment_or_abort(payment_id, "banktransfer", valid_states=["inprogress"])
 
     form = TransferChangeCurrencyForm()
     if form.validate_on_submit():
@@ -105,9 +101,7 @@ def transfer_change_currency(payment_id):
 
             if currency == payment.currency:
                 flash("Currency is already {}".format(currency))
-                return redirect(
-                    url_for("payments.transfer_waiting", payment_id=payment.id)
-                )
+                return redirect(url_for("payments.transfer_waiting", payment_id=payment.id))
 
             payment.change_currency(currency)
             db.session.commit()
@@ -159,9 +153,7 @@ def reconcile_txns(txns: list[BankTransaction], doit: bool = False):
         if txn.type.lower() not in ("other", "directdep", "deposit"):
             raise ValueError("Unexpected transaction type for %s: %s", txn.id, txn.type)
 
-        if txn.payee.startswith("STRIPE PAYMENTS EU ") or txn.payee.startswith(
-            "STRIPE STRIPE"
-        ):
+        if txn.payee.startswith("STRIPE PAYMENTS EU ") or txn.payee.startswith("STRIPE STRIPE"):
             app.logger.info("Suppressing Stripe transfer %s", txn.id)
             if doit:
                 txn.suppressed = True

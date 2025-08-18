@@ -50,10 +50,7 @@ VOUCHER_GRACE_PERIOD = timedelta(hours=36)
 def random_voucher():
     return "".join(
         random.choices(
-            list(
-                set(string.ascii_lowercase) - {"a", "e", "i", "o", "u"}
-                | set(string.digits)
-            ),
+            list(set(string.ascii_lowercase) - {"a", "e", "i", "o", "u"} | set(string.digits)),
             k=RANDOM_VOUCHER_LENGTH,
         )
     )
@@ -99,9 +96,7 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
     type = db.Column(db.String, nullable=False)
     name = db.Column(db.String, unique=True, nullable=False)
 
-    products = db.relationship(
-        "Product", backref="parent", cascade="all", order_by="Product.id"
-    )
+    products = db.relationship("Product", backref="parent", cascade="all", order_by="Product.id")
     children = db.relationship(
         "ProductGroup",
         backref=db.backref("parent", remote_side=[id]),
@@ -139,11 +134,7 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
             ProductGroup capacity.
         """
 
-        if (
-            self.capacity_used is not None
-            and capacity_max is not None
-            and capacity_max < self.capacity_used
-        ):
+        if self.capacity_used is not None and capacity_max is not None and capacity_max < self.capacity_used:
             raise ValueError("capacity_max cannot be lower than capacity_used")
 
         with db.session.no_autoflush:
@@ -158,9 +149,7 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
 
         if capacity_max is None:
             if any(sibling.capacity_max for sibling in siblings):
-                raise ValueError(
-                    "capacity_max must be provided if siblings have capacity_max set."
-                )
+                raise ValueError("capacity_max must be provided if siblings have capacity_max set.")
         else:
             if any(sibling.capacity_max is None for sibling in siblings):
                 raise ValueError(
@@ -269,9 +258,7 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
     name = db.Column(db.String, nullable=False)
     display_name = db.Column(db.String)
     description = db.Column(db.String)
-    price_tiers = db.relationship(
-        "PriceTier", backref="parent", cascade="all", order_by="PriceTier.id"
-    )
+    price_tiers = db.relationship("PriceTier", backref="parent", cascade="all", order_by="PriceTier.id")
     product_view_products = db.relationship(
         "ProductViewProduct", backref="product", cascade="all, delete-orphan"
     )
@@ -285,9 +272,7 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
     @classmethod
     def get_by_name(cls, group_name, product_name) -> Optional[Product]:
         group = ProductGroup.query.filter_by(name=group_name)
-        product = (
-            group.join(Product).filter_by(name=product_name).with_entities(Product)
-        )
+        product = group.join(Product).filter_by(name=product_name).with_entities(Product)
         return product.one_or_none()
 
     @property
@@ -326,9 +311,7 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
         """
         # FIXME: Make this less awful, we need a less brittle way of detecting this
         return self.parent.type == "admissions" and (
-            self.name.startswith("full")
-            or self.name.startswith("u18")
-            or self.name.startswith("day")
+            self.name.startswith("full") or self.name.startswith("u18") or self.name.startswith("day")
         )
 
     @property
@@ -370,9 +353,7 @@ class PriceTier(BaseModel, CapacityMixin):
     __table_args__ = (UniqueConstraint("name", "product_id"),)
     __export_data__ = False  # Exported by ProductGroup
 
-    prices = db.relationship(
-        "Price", backref="price_tier", cascade="all", order_by="Price.id"
-    )
+    prices = db.relationship("Price", backref="price_tier", cascade="all", order_by="Price.id")
 
     def __init__(self, name=None, **kwargs):
         super().__init__(name=name, **kwargs)
@@ -380,12 +361,8 @@ class PriceTier(BaseModel, CapacityMixin):
     @classmethod
     def get_by_name(cls, group_name, product_name, tier_name) -> Optional[PriceTier]:
         group = ProductGroup.query.filter_by(name=group_name)
-        product = (
-            group.join(Product).filter_by(name=product_name).with_entities(Product)
-        )
-        tier = (
-            product.join(PriceTier).filter_by(name=tier_name).with_entities(PriceTier)
-        )
+        product = group.join(Product).filter_by(name=product_name).with_entities(Product)
+        tier = product.join(PriceTier).filter_by(name=tier_name).with_entities(PriceTier)
         return tier.one_or_none()
 
     @property
@@ -449,9 +426,7 @@ class Price(BaseModel):
     __export_data__ = False  # Exported by ProductGroup
 
     id = db.Column(db.Integer, primary_key=True)
-    price_tier_id = db.Column(
-        db.Integer, db.ForeignKey("price_tier.id"), nullable=False
-    )
+    price_tier_id = db.Column(db.Integer, db.ForeignKey("price_tier.id"), nullable=False)
     currency: Currency = db.Column(db.String, nullable=False)
     price_int = db.Column(db.Integer, nullable=False)
 
@@ -551,10 +526,7 @@ class Voucher(BaseModel):
     def is_expired(self) -> bool:
         # Note: this should be a column_property but getting the current time in the DB
         # interacts badly with the fact that we fake the date in tests.
-        return (
-            self.expiry is not None
-            and (self.expiry + VOUCHER_GRACE_PERIOD) < datetime.utcnow()
-        )
+        return self.expiry is not None and (self.expiry + VOUCHER_GRACE_PERIOD) < datetime.utcnow()
 
     def check_capacity(self, basket: Basket):
         """Check if there is enough capacity in this voucher to buy
@@ -563,9 +535,7 @@ class Voucher(BaseModel):
         if self.purchases_remaining < 1:
             return False
 
-        adult_tickets = sum(
-            line.count for line in basket._lines if line.tier.parent.is_adult_ticket()
-        )
+        adult_tickets = sum(line.count for line in basket._lines if line.tier.parent.is_adult_ticket())
 
         if self.tickets_remaining < adult_tickets:
             return False
@@ -574,16 +544,10 @@ class Voucher(BaseModel):
     def consume_capacity(self, payment: Payment):
         """Decrease the voucher's capacity based on tickets in a payment."""
         if self.purchases_remaining < 1:
-            raise VoucherUsedError(
-                f"Attempting to use voucher with no remaining purchases: {self}"
-            )
+            raise VoucherUsedError(f"Attempting to use voucher with no remaining purchases: {self}")
 
         adult_tickets = len(
-            [
-                purchase
-                for purchase in payment.purchases
-                if purchase.product.is_adult_ticket()
-            ]
+            [purchase for purchase in payment.purchases if purchase.product.is_adult_ticket()]
         )
 
         if self.tickets_remaining < adult_tickets:
@@ -598,11 +562,7 @@ class Voucher(BaseModel):
     def return_capacity(self, payment: Payment):
         """Return capacity to this voucher based on tickets in a payment."""
         adult_tickets = len(
-            [
-                purchase
-                for purchase in payment.purchases
-                if purchase.product.is_adult_ticket()
-            ]
+            [purchase for purchase in payment.purchases if purchase.product.is_adult_ticket()]
         )
         log.info("Returning 1 purchase and %s tickets to %s", adult_tickets, self)
         self.purchases_remaining = Voucher.purchases_remaining + 1
@@ -644,9 +604,7 @@ class ProductView(BaseModel):
     cfp_accepted_only = db.Column(db.Boolean, nullable=False, default=False)
 
     # Whether this productview is only accessible with a voucher associated with this productview
-    vouchers_only = db.Column(
-        db.Boolean, nullable=False, default=False, server_default="False"
-    )
+    vouchers_only = db.Column(db.Boolean, nullable=False, default=False, server_default="False")
 
     product_view_products = db.relationship(
         "ProductViewProduct",
@@ -655,9 +613,7 @@ class ProductView(BaseModel):
         cascade="all, delete-orphan",
     )
 
-    vouchers = db.relationship(
-        "Voucher", backref="view", cascade="all, delete-orphan", lazy=True
-    )
+    vouchers = db.relationship("Voucher", backref="view", cascade="all, delete-orphan", lazy=True)
 
     products = association_proxy("product_view_products", "product")
 

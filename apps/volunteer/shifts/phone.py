@@ -9,7 +9,8 @@ phone_shifts = {
                 "min": 1,
                 "max": 1,
                 "base_duration": 180,
-            } for d in ["fri", "sat", "sun"]
+            }
+            for d in ["fri", "sat", "sun"]
         ]
     }
 }

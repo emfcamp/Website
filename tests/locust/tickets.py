@@ -63,9 +63,7 @@ class ReserveTicketsUser(HttpUser):
 
     @task(10)
     def reserve_family(self):
-        self.reserve_tickets(
-            {"Full Camp Ticket": 2, "Under-18": 2, "Parking Ticket": 1}
-        )
+        self.reserve_tickets({"Full Camp Ticket": 2, "Under-18": 2, "Parking Ticket": 1})
 
     def reserve_tickets(self, tickets):
         # Make sure we have a clean session
@@ -77,11 +75,7 @@ class ReserveTicketsUser(HttpUser):
 
         html = lxml.html.fromstring(resp.content)
         form = html.get_element_by_id("choose_tickets")
-        amounts = {
-            i.label.text_content(): i.name
-            for i in form.inputs
-            if i.name.endswith("-amount")
-        }
+        amounts = {i.label.text_content(): i.name for i in form.inputs if i.name.endswith("-amount")}
 
         data = dict(**form.fields)
         for display_name, count in tickets.items():

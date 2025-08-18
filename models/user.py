@@ -68,9 +68,7 @@ def verify_timed_hmac(prefix, key, current_timestamp, code, valid_hours):
 
     expected_code = generate_timed_hmac(prefix, key, timestamp, uid)
     if hmac.compare_digest(expected_code, code):
-        age = datetime.fromtimestamp(current_timestamp) - datetime.fromtimestamp(
-            timestamp
-        )
+        age = datetime.fromtimestamp(current_timestamp) - datetime.fromtimestamp(timestamp)
         if age > timedelta(hours=valid_hours):
             return None
         else:
@@ -192,9 +190,7 @@ class User(BaseModel, UserMixin):
     email = db.Column(db.String, unique=True, index=True)
     name = db.Column(db.String, nullable=False, index=True)
     company = db.Column(db.String)
-    will_have_ticket = db.Column(
-        db.Boolean, nullable=False, default=False
-    )  # for CfP filtering
+    will_have_ticket = db.Column(db.Boolean, nullable=False, default=False)  # for CfP filtering
     checkin_note = db.Column(db.String, nullable=True)
     # Whether the user has opted in to receive promo emails after this event:
     promo_opt_in = db.Column(db.Boolean, nullable=False, default=False)
@@ -208,12 +204,8 @@ class User(BaseModel, UserMixin):
         secondary=CFPReviewerTags,
     )
 
-    diversity = db.relationship(
-        "UserDiversity", uselist=False, backref="user", cascade="all, delete-orphan"
-    )
-    shipping = db.relationship(
-        "UserShipping", uselist=False, backref="user", cascade="all, delete-orphan"
-    )
+    diversity = db.relationship("UserDiversity", uselist=False, backref="user", cascade="all, delete-orphan")
+    shipping = db.relationship("UserShipping", uselist=False, backref="user", cascade="all, delete-orphan")
     payments = db.relationship("Payment", lazy="dynamic", backref="user", cascade="all")
     permissions = db.relationship(
         "Permission",
@@ -248,13 +240,9 @@ class User(BaseModel, UserMixin):
 
     event_tickets = db.relationship("EventTicket", backref="user", lazy="dynamic")
 
-    purchases = db.relationship(
-        "Purchase", lazy="dynamic", primaryjoin="Purchase.purchaser_id == User.id"
-    )
+    purchases = db.relationship("Purchase", lazy="dynamic", primaryjoin="Purchase.purchaser_id == User.id")
 
-    owned_purchases = db.relationship(
-        "Purchase", lazy="dynamic", primaryjoin="Purchase.owner_id == User.id"
-    )
+    owned_purchases = db.relationship("Purchase", lazy="dynamic", primaryjoin="Purchase.owner_id == User.id")
 
     owned_tickets = db.relationship(
         "Ticket", lazy="select", primaryjoin="Ticket.owner_id == User.id", viewonly=True
@@ -304,9 +292,9 @@ class User(BaseModel, UserMixin):
                 "volunteer_emails": [u.email for u in User.query.join(ShiftEntry)],
                 "speaker_emails": [
                     u.email
-                    for u in User.query.join(
-                        Proposal, Proposal.user_id == User.id
-                    ).filter(Proposal.is_accepted)
+                    for u in User.query.join(Proposal, Proposal.user_id == User.id).filter(
+                        Proposal.is_accepted
+                    )
                 ],
             },
         }
@@ -324,12 +312,7 @@ class User(BaseModel, UserMixin):
     def get_owned_tickets(self, paid=None, type=None):
         "Get tickets owned by a user, filtered by type and payment state."
         for ticket in self.owned_tickets:
-            if (
-                paid is True
-                and not ticket.is_paid_for
-                or paid is False
-                and ticket.is_paid_for
-            ):
+            if paid is True and not ticket.is_paid_for or paid is False and ticket.is_paid_for:
                 continue
             if type is not None and ticket.type != type:
                 continue
@@ -353,11 +336,7 @@ class User(BaseModel, UserMixin):
         if cascade:
             if name != "admin" and self.has_permission("admin"):
                 return True
-            if (
-                name.startswith("cfp_")
-                and name != "cfp_admin"
-                and self.has_permission("cfp_admin")
-            ):
+            if name.startswith("cfp_") and name != "cfp_admin" and self.has_permission("cfp_admin"):
                 return True
         for permission in self.permissions:
             if permission.name == name:
@@ -378,21 +357,11 @@ class User(BaseModel, UserMixin):
                 self.permissions.remove(user_perm)
 
     def has_ticket_for_event(self, proposal_id: int) -> bool:
-        return any(
-            [
-                t
-                for t in self.event_tickets
-                if t.proposal_id == proposal_id and t.state == "ticket"
-            ]
-        )
+        return any([t for t in self.event_tickets if t.proposal_id == proposal_id and t.state == "ticket"])
 
     def has_lottery_ticket_for_event(self, proposal_id: int) -> bool:
         return any(
-            [
-                t
-                for t in self.event_tickets
-                if t.proposal_id == proposal_id and t.state == "entered-lottery"
-            ]
+            [t for t in self.event_tickets if t.proposal_id == proposal_id and t.state == "entered-lottery"]
         )
 
     def __repr__(self):
@@ -400,9 +369,7 @@ class User(BaseModel, UserMixin):
 
     @classmethod
     def get_by_email(cls, email) -> Optional[User]:
-        return User.query.filter(
-            func.lower(User.email) == func.lower(email)
-        ).one_or_none()
+        return User.query.filter(func.lower(User.email) == func.lower(email)).one_or_none()
 
     @classmethod
     def does_user_exist(cls, email):
@@ -461,16 +428,12 @@ Index(
     text("to_tsvector('simple', replace(email, '@', ' '))"),
     postgresql_using="gin",
 )
-Index(
-    "ix_user_name_tsearch", text("to_tsvector('simple', name)"), postgresql_using="gin"
-)
+Index("ix_user_name_tsearch", text("to_tsvector('simple', name)"), postgresql_using="gin")
 
 
 class UserShipping(BaseModel):
     __tablename__ = "shipping"
-    user_id = db.Column(
-        db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True
-    )
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True)
     name = db.Column(db.String)
     address_1 = db.Column(db.String)
     address_2 = db.Column(db.String)
@@ -499,9 +462,7 @@ def load_anonymous_user():
     if "anon_id" in session:
         au = AnonymousUser(session["anon_id"])
     else:
-        aid = "".join(
-            random.choice(string.ascii_lowercase + string.digits) for _ in range(8)
-        )
+        aid = "".join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))
         session["anon_id"] = aid
         au = AnonymousUser(aid)
 

@@ -1,4 +1,5 @@
-""" Schedule CLI tasks """
+"""Schedule CLI tasks"""
+
 import json
 from collections import OrderedDict
 

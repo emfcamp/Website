@@ -114,9 +114,7 @@ def login():
             session.permanent = True
             return redirect(get_next_url())
         else:
-            flash(
-                "Your login link was invalid. Please enter your email address below to receive a new link."
-            )
+            flash("Your login link was invalid. Please enter your email address below to receive a new link.")
 
     form = LoginForm(request.form)
     if form.validate_on_submit():
@@ -168,8 +166,7 @@ class SignupForm(Form):
 
             msg = Markup(
                 render_template_string(
-                    "Account already exists. "
-                    'Please <a href="{{ url }}">click here</a> to log in.',
+                    'Account already exists. Please <a href="{{ url }}">click here</a> to log in.',
                     url=url_for("users.login", email=field.data),
                 )
             )
@@ -181,13 +178,9 @@ def signup():
     if not request.args.get("code"):
         abort(404)
 
-    uid = verify_signup_code(
-        app.config["SECRET_KEY"], time.time(), request.args.get("code")
-    )
+    uid = verify_signup_code(app.config["SECRET_KEY"], time.time(), request.args.get("code"))
     if uid is None:
-        flash(
-            "Your signup link was invalid. Please note that they expire after 6 hours."
-        )
+        flash("Your signup link was invalid. Please note that they expire after 6 hours.")
         abort(404)
 
     user = User.query.get_or_404(uid)
@@ -241,7 +234,6 @@ def set_currency():
 
 @users.route("/sso/<site>")
 def sso(site=None):
-
     volunteer_sites = [app.config["VOLUNTEER_SITE"]]
     if "VOLUNTEER_CAMP_SITE" in app.config:
         volunteer_sites.append(app.config["VOLUNTEER_CAMP_SITE"])

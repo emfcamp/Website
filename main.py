@@ -92,16 +92,12 @@ def check_cache_configuration():
     """Check the cache configuration is appropriate for production"""
     if cache.cache.__class__.__name__ == "SimpleCache":
         # SimpleCache is per-process, not appropriate for prod
-        logging.warning(
-            "Per-process cache being used outside dev server - refreshing will not work"
-        )
+        logging.warning("Per-process cache being used outside dev server - refreshing will not work")
 
     TEST_CACHE_KEY = "emf_test_cache_key"
     cache.set(TEST_CACHE_KEY, "exists")
     if cache.get(TEST_CACHE_KEY) != "exists":
-        logging.warning(
-            "Flask-Caching backend does not appear to be working. Performance may be affected."
-        )
+        logging.warning("Flask-Caching backend does not appear to be working. Performance may be affected.")
 
 
 def create_app(dev_server=False, config_override=None):
@@ -135,12 +131,8 @@ def create_app(dev_server=False, config_override=None):
                 time.time() - request._start_time
             )
         except AttributeError:
-            logging.exception(
-                "Request without _start_time - check app.before_request ordering"
-            )
-        request_total.labels(
-            request.endpoint, request.method, response.status_code
-        ).inc()
+            logging.exception("Request without _start_time - check app.before_request ordering")
+        request_total.labels(request.endpoint, request.method, response.status_code).inc()
         return response
 
     for extension in (cache, db, mail, static_digest, toolbar):
@@ -241,9 +233,7 @@ def create_app(dev_server=False, config_override=None):
 
         if app.config.get("DEBUG_TB_ENABLED"):
             # This hash is for the flask debug toolbar. It may break once they upgrade it.
-            csp["script-src"].append(
-                "'sha256-zWl5GfUhAzM8qz2mveQVnvu/VPnCS6QL7Niu6uLmoWU='"
-            )
+            csp["script-src"].append("'sha256-zWl5GfUhAzM8qz2mveQVnvu/VPnCS6QL7Niu6uLmoWU='")
 
         if "csp_nonce" in g:
             csp["script-src"].append(f"'nonce-{g.csp_nonce}'")
@@ -256,9 +246,9 @@ def create_app(dev_server=False, config_override=None):
             response.headers["Content-Security-Policy-Report-Only"] = (
                 value + "; report-uri https://emfcamp.report-uri.com/r/d/csp/reportOnly"
             )
-            response.headers[
-                "Report-To"
-            ] = '{"group":"default","max_age":31536000,"endpoints":[{"url":"https://emfcamp.report-uri.com/a/d/g"}],"include_subdomains":false}'
+            response.headers["Report-To"] = (
+                '{"group":"default","max_age":31536000,"endpoints":[{"url":"https://emfcamp.report-uri.com/a/d/g"}],"include_subdomains":false}'
+            )
 
             # Disable Network Error Logging.
             # This doesn't seem to be very useful and it's using up our report-uri quota.
@@ -302,7 +292,7 @@ def create_app(dev_server=False, config_override=None):
 
         return ctx
 
-    if (app.config['DEBUG'] or app.testing):
+    if app.config["DEBUG"] or app.testing:
         if not email_validator.TEST_ENVIRONMENT:
             email_validator.TEST_ENVIRONMENT = True
             email_validator.SPECIAL_USE_DOMAIN_NAMES.remove("invalid")

@@ -63,13 +63,11 @@ def pay(flow="main"):
         if current_user.is_authenticated:
             basket.load_purchases_from_db()
 
-        if any([p.state == 'reserved' for p in basket.purchases]):
+        if any([p.state == "reserved" for p in basket.purchases]):
             # We've lost the user's state, but we can still show them all
             # tickets they've reserved and let them empty their basket.
             # Don't show this if the user only has admin-reserved purchases.
-            flash(
-                "Your browser doesn't seem to be storing cookies. This may break some parts of the site."
-            )
+            flash("Your browser doesn't seem to be storing cookies. This may break some parts of the site.")
             app.logger.warn(
                 "Basket is empty, so showing reserved tickets (%s)",
                 request.headers.get("User-Agent"),
@@ -84,9 +82,7 @@ def pay(flow="main"):
         else:
             # This should never normally happen. The user wants to pay
             # for something, but we have no handle on them. Give up.
-            app.logger.info(
-                "Empty basket for anonymous user, redirecting back to choose tickets"
-            )
+            app.logger.info("Empty basket for anonymous user, redirecting back to choose tickets")
             phrase = "item to buy"
             if view.type == "tickets":
                 phrase = "ticket to buy"
@@ -204,8 +200,7 @@ def start_payment(form: TicketPaymentForm, basket: Basket, flow: str):
         # Voucher has been used since we last checked it at the "choose" stage.
         app.logger.exception("Voucher used at payment stage")
         flash(
-            "The voucher you've used does not allow you to buy this many adult tickets. "
-            "Please choose fewer tickets."
+            "The voucher you've used does not allow you to buy this many adult tickets. Please choose fewer tickets."
         )
         db.session.rollback()
         return redirect(url_for("tickets.main", flow=flow))
@@ -224,9 +219,7 @@ def start_payment(form: TicketPaymentForm, basket: Basket, flow: str):
     if not payment:
         empty_baskets.inc()
         app.logger.warn("User tried to pay for empty basket")
-        flash(
-            "We're sorry, your session information has been lost. Please try ordering again."
-        )
+        flash("We're sorry, your session information has been lost. Please try ordering again.")
         return redirect(url_for("tickets.main", flow=flow))
 
     if payment_type == BankPayment:

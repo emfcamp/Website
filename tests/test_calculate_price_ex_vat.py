@@ -20,4 +20,3 @@ def test_calculating_price_ex_vat():
     assert price.value_ex_vat == Decimal("17")
     price.value_ex_vat = Decimal("23")
     assert price.value == Decimal("23")
-

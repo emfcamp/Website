@@ -115,7 +115,6 @@ def make_qr_png(url):
     return make_qrfile(url, kind="png", scale=3)
 
 
-
 def attach_tickets(msg, user):
     # Attach tickets to a mail Message
     page = render_receipt(user, pdf=True)

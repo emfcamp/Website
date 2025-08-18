@@ -1,13 +1,13 @@
-""" Monitors static_url_for calls and inserts HTTP Link rel=preload headers
-    for them.
+"""Monitors static_url_for calls and inserts HTTP Link rel=preload headers
+for them.
 
-    If the "nopush" option is not set, the upstream NGINX server will use
-    HTTP/2 server push to send these assets along with the page, which is
-    a significant performance improvement on first page load. However, it's
-    wasteful to push the same assets on subsequent page loads.
+If the "nopush" option is not set, the upstream NGINX server will use
+HTTP/2 server push to send these assets along with the page, which is
+a significant performance improvement on first page load. However, it's
+wasteful to push the same assets on subsequent page loads.
 
-    Otherwise, the browser still knows about the asset earlier and can start
-    loading them before it's parsed the HTML.
+Otherwise, the browser still knows about the asset earlier and can start
+loading them before it's parsed the HTML.
 """
 
 from main import static_digest
@@ -55,10 +55,7 @@ def init_preload(app_obj):
 
         do_push = False
         # Has the hashed URL of the push trigger file changed?
-        if (
-            PUSH_TRIGGER_FILE in g.static_urls
-            and session.get("push") != g.static_urls[PUSH_TRIGGER_FILE]
-        ):
+        if PUSH_TRIGGER_FILE in g.static_urls and session.get("push") != g.static_urls[PUSH_TRIGGER_FILE]:
             do_push = True
             session["push"] = g.static_urls[PUSH_TRIGGER_FILE]
 

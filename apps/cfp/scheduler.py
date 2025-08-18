@@ -22,9 +22,7 @@ class Scheduler(object):
     def set_rough_durations(self):
         proposals = (
             Proposal.query.filter_by(scheduled_duration=None)
-            .filter(
-                Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"])
-            )
+            .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]))
             .filter(Proposal.is_accepted)
             .all()
         )
@@ -33,9 +31,7 @@ class Scheduler(object):
             try:
                 proposal.scheduled_duration = ROUGH_LENGTHS[proposal.length]
             except KeyError:
-                app.logger.warn(
-                    f"Invalid proposal length {repr(proposal.length)} for {proposal}, ignoring"
-                )
+                app.logger.warn(f"Invalid proposal length {repr(proposal.length)} for {proposal}, ignoring")
                 continue
 
             app.logger.info(
@@ -45,16 +41,12 @@ class Scheduler(object):
 
         db.session.commit()
 
-    def get_scheduler_data(
-        self, ignore_potential, type=["talk", "workshop", "youthworkshop"]
-    ):
+    def get_scheduler_data(self, ignore_potential, type=["talk", "workshop", "youthworkshop"]):
         proposals = (
             Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
             .filter(Proposal.is_accepted)
             .filter(Proposal.type.in_(type))
-            .filter(
-                Proposal.user_scheduled.is_(False)
-            )  # NOTE: This ignores all village-scheduled content
+            .filter(Proposal.user_scheduled.is_(False))  # NOTE: This ignores all village-scheduled content
             .filter(
                 Proposal.manually_scheduled.isnot(True)
             )  # Used when we manually schedule things into slots and we want the scheduler to ignore them
@@ -81,9 +73,7 @@ class Scheduler(object):
                 key=lambda k: capacity_by_type[type][k],
                 reverse=True,
             )
-            split_count = int(
-                len(proposals_by_type[type]) / len(capacity_by_type[type])
-            )
+            split_count = int(len(proposals_by_type[type]) / len(capacity_by_type[type]))
 
             count = 0
             for proposal in proposals:
@@ -192,9 +182,7 @@ class Scheduler(object):
 
             proposal = Proposal.query.filter_by(id=event["id"]).one()
             venue = Venue.query.get(event["venue"])
-            changes |= self.handle_schedule_change(
-                proposal, venue, event["time"], ignore_potential
-            )
+            changes |= self.handle_schedule_change(proposal, venue, event["time"], ignore_potential)
 
         if not changes:
             app.logger.info("No schedule changes generated")

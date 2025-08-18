@@ -293,13 +293,8 @@ def make_periods_contiguous(time_periods):
     time_periods.sort(key=lambda x: x.start)
     contiguous_periods = [time_periods.pop(0)]
     for time_period in time_periods:
-        if (
-            time_period.start <= contiguous_periods[-1].end
-            and contiguous_periods[-1].end < time_period.end
-        ):
-            contiguous_periods[-1] = cfp_period(
-                contiguous_periods[-1].start, time_period.end
-            )
+        if time_period.start <= contiguous_periods[-1].end and contiguous_periods[-1].end < time_period.end:
+            contiguous_periods[-1] = cfp_period(contiguous_periods[-1].start, time_period.end)
             continue
 
         contiguous_periods.append(time_period)
@@ -331,9 +326,7 @@ FavouriteProposal = db.Table(
 ProposalAllowedVenues = db.Table(
     "proposal_allowed_venues",
     BaseModel.metadata,
-    db.Column(
-        "proposal_id", db.Integer, db.ForeignKey("proposal.id"), primary_key=True
-    ),
+    db.Column("proposal_id", db.Integer, db.ForeignKey("proposal.id"), primary_key=True),
     db.Column("venue_id", db.Integer, db.ForeignKey("venue.id"), primary_key=True),
 )
 
@@ -346,9 +339,7 @@ class Proposal(BaseModel):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     anonymiser_id = db.Column(db.Integer, db.ForeignKey("user.id"), default=None)
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    modified = db.Column(
-        db.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow
-    )
+    modified = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow)
     state = db.Column(db.String, nullable=False, default="new")
     type = db.Column(db.String, nullable=False)  # talk, workshop or installation
 
@@ -383,9 +374,7 @@ class Proposal(BaseModel):
     # References to this table
     messages = db.relationship("CFPMessage", backref="proposal")
     votes = db.relationship("CFPVote", backref="proposal")
-    favourites = db.relationship(
-        User, secondary=FavouriteProposal, backref=db.backref("favourites")
-    )
+    favourites = db.relationship(User, secondary=FavouriteProposal, backref=db.backref("favourites"))
 
     # Convenience for individual objects. Use an outerjoin and groupby for more than a few records
     favourite_count = column_property(
@@ -433,9 +422,7 @@ class Proposal(BaseModel):
         backref="proposals",
         primaryjoin="Venue.id == Proposal.scheduled_venue_id",
     )
-    potential_venue = db.relationship(
-        "Venue", primaryjoin="Venue.id == Proposal.potential_venue_id"
-    )
+    potential_venue = db.relationship("Venue", primaryjoin="Venue.id == Proposal.potential_venue_id")
 
     # Video stuff
     c3voc_url = db.Column(db.String)
@@ -599,11 +586,7 @@ class Proposal(BaseModel):
                     # This is still called accepted, but might not 'just' be accepted (e.g. Lightning Talks)
                     "accepted": exported_public,
                 },
-                "favourites": {
-                    "counts": bucketise(
-                        favourite_counts, [0, 1, 10, 20, 30, 40, 50, 100, 200]
-                    )
-                },
+                "favourites": {"counts": bucketise(favourite_counts, [0, 1, 10, 20, 30, 40, 50, 100, 200])},
             },
             "tables": [
                 "proposal",
@@ -628,9 +611,7 @@ class Proposal(BaseModel):
             raise CfpStateException('"%s" is not a valid state' % state)
 
         if state not in CFP_STATES[self.state]:
-            raise CfpStateException(
-                '"%s->%s" is not a valid transition' % (self.state, state)
-            )
+            raise CfpStateException('"%s->%s" is not a valid transition' % (self.state, state))
 
         self.state = state
 
@@ -641,11 +622,7 @@ class Proposal(BaseModel):
         return len([v for v in self.votes if v.note and len(v.note) > 0])
 
     def get_unread_messages(self, user):
-        return [
-            m
-            for m in self.messages
-            if (not m.has_been_read and m.is_user_recipient(user))
-        ]
+        return [m for m in self.messages if (not m.has_been_read and m.is_user_recipient(user))]
 
     def get_unread_count(self, user):
         return len(self.get_unread_messages(user))
@@ -658,9 +635,7 @@ class Proposal(BaseModel):
 
     def has_ticket(self) -> bool:
         "Does the submitter have a ticket?"
-        admission_tickets = len(
-            list(self.user.get_owned_tickets(paid=True, type="admission_ticket"))
-        )
+        admission_tickets = len(list(self.user.get_owned_tickets(paid=True, type="admission_ticket")))
         return admission_tickets > 0 or self.user.will_have_ticket
 
     def get_allowed_venues(self) -> list["Venue"]:
@@ -680,9 +655,7 @@ class Proposal(BaseModel):
                     p.start.hour <= HARD_START_LIMIT[self.type][0]
                     and p.start.minute < HARD_START_LIMIT[self.type][1]
                 ):
-                    p = cfp_period(
-                        p.start.replace(minute=HARD_START_LIMIT[self.type][1]), p.end
-                    )
+                    p = cfp_period(p.start.replace(minute=HARD_START_LIMIT[self.type][1]), p.end)
                 trimmed_periods.append(p)
             time_periods = trimmed_periods
         return time_periods
@@ -695,11 +668,7 @@ class Proposal(BaseModel):
                 if p:
                     start, end = p.split(" > ")
                     try:
-                        time_periods.append(
-                            cfp_period(
-                                parse_date(start.strip()), parse_date(end.strip())
-                            )
-                        )
+                        time_periods.append(cfp_period(parse_date(start.strip()), parse_date(end.strip())))
                     # If someone has entered garbage, dump the lot
                     except ValueError as e:
                         time_periods = []
@@ -719,16 +688,13 @@ class Proposal(BaseModel):
         return make_periods_contiguous(time_periods)
 
     def get_allowed_time_periods_serialised(self):
-        return "\n".join(
-            ["%s > %s" % (v.start, v.end) for v in self.get_allowed_time_periods()]
-        )
+        return "\n".join(["%s > %s" % (v.start, v.end) for v in self.get_allowed_time_periods()])
 
     def get_allowed_time_periods_with_default(self):
         allowed_time_periods = self.get_allowed_time_periods()
         if not allowed_time_periods:
             allowed_time_periods = [
-                timeslot_to_period(ts, type=self.type)
-                for ts in PROPOSAL_TIMESLOTS[self.type]
+                timeslot_to_period(ts, type=self.type) for ts in PROPOSAL_TIMESLOTS[self.type]
             ]
 
         allowed_time_periods = self.fix_hard_time_limits(allowed_time_periods)
@@ -736,8 +702,7 @@ class Proposal(BaseModel):
 
     def get_preferred_time_periods_with_default(self):
         preferred_time_periods = [
-            timeslot_to_period(ts, type=self.type)
-            for ts in PREFERRED_TIMESLOTS.get(self.type, [])
+            timeslot_to_period(ts, type=self.type) for ts in PREFERRED_TIMESLOTS.get(self.type, [])
         ]
 
         preferred_time_periods = self.fix_hard_time_limits(preferred_time_periods)
@@ -765,10 +730,8 @@ class Proposal(BaseModel):
                 Proposal.scheduled_time.is_not(None),
                 Proposal.scheduled_duration.is_not(None),
             ).all()
-            if self.scheduled_time + timedelta(minutes=self.scheduled_duration)
-            > p.scheduled_time
-            and p.scheduled_time + timedelta(minutes=p.scheduled_duration)
-            > self.scheduled_time
+            if self.scheduled_time + timedelta(minutes=self.scheduled_duration) > p.scheduled_time
+            and p.scheduled_time + timedelta(minutes=p.scheduled_duration) > self.scheduled_time
         ]
 
     @property
@@ -924,10 +887,12 @@ class LightningTalkProposal(Proposal):
     slide_link = db.Column(db.String, nullable=True)
     session = db.Column(db.String, default="fri")
 
-    should_be_exported = column_property(or_(
-        Proposal.is_accepted.expression,
-        Proposal.state == "new",
-    ))
+    should_be_exported = column_property(
+        or_(
+            Proposal.is_accepted.expression,
+            Proposal.state == "new",
+        )
+    )
 
     @classmethod
     def public_export_columns(cls):
@@ -936,7 +901,6 @@ class LightningTalkProposal(Proposal):
             cls.title.label("published_title"),
             cls.description.label("published_description"),
             User.name.label("names"),
-
             # We omit fields that we don't have since they didn't go through CfP:
             # pronouns
             # may_record
@@ -945,7 +909,6 @@ class LightningTalkProposal(Proposal):
             # scheduled_duration
             # venue
             # venue_village_id
-
             # Lightning Talk specific fields:
             cls.session,
             cls.slide_link,
@@ -1073,9 +1036,7 @@ class CFPVote(BaseModel):
     has_been_read = db.Column(db.Boolean, nullable=False, default=False)
 
     created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    modified = db.Column(
-        db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
+    modified = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     vote = db.Column(db.Integer)  # Vote can be null for abstentions
     note = db.Column(db.String)
@@ -1091,9 +1052,7 @@ class CFPVote(BaseModel):
             raise CfpStateException('"%s" is not a valid state' % state)
 
         if state not in VOTE_STATES[self.state]:
-            raise CfpStateException(
-                '"%s->%s" is not a valid transition' % (self.state, state)
-            )
+            raise CfpStateException('"%s->%s" is not a valid transition' % (self.state, state))
 
         self.state = state
 
@@ -1123,9 +1082,7 @@ class Venue(BaseModel):
     __export_data__ = False
 
     id = db.Column(db.Integer, primary_key=True)
-    village_id = db.Column(
-        db.Integer, db.ForeignKey("village.id"), nullable=True, default=None
-    )
+    village_id = db.Column(db.Integer, db.ForeignKey("village.id"), nullable=True, default=None)
     name = db.Column(db.String, nullable=False)
 
     # Which type of proposals are allowed to be scheduled in this venue.
@@ -1133,9 +1090,7 @@ class Venue(BaseModel):
     allowed_types = db.Column(
         MutableList.as_mutable(ARRAY(db.String)),
         nullable=False,
-        server_default=text(
-            r"'{}'::varchar[]"
-        ),  # TODO(jayaddison): array([], type_=db.String)
+        server_default=text(r"'{}'::varchar[]"),  # TODO(jayaddison): array([], type_=db.String)
     )
 
     # What type of proposals are the default for this venue.
@@ -1143,9 +1098,7 @@ class Venue(BaseModel):
     default_for_types = db.Column(
         MutableList.as_mutable(ARRAY(db.String)),
         nullable=False,
-        server_default=text(
-            r"'{}'::varchar[]"
-        ),  # TODO(jayaddison): array([], type_=db.String)
+        server_default=text(r"'{}'::varchar[]"),  # TODO(jayaddison): array([], type_=db.String)
     )
     priority = db.Column(db.Integer, nullable=True, default=0)
     capacity = db.Column(db.Integer, nullable=True)
@@ -1186,9 +1139,7 @@ class Venue(BaseModel):
 
     @classmethod
     def emf_venues(cls):
-        return cls.query.filter(
-            db.func.array_length(cls.default_for_types, 1) > 0
-        ).all()
+        return cls.query.filter(db.func.array_length(cls.default_for_types, 1) > 0).all()
 
     @classmethod
     def emf_venue_names_by_type(cls):
@@ -1230,9 +1181,7 @@ class Venue(BaseModel):
 
 
 # TODO: change the relationships on User and Proposal to 1-to-1
-db.Index(
-    "ix_cfp_vote_user_id_proposal_id", CFPVote.user_id, CFPVote.proposal_id, unique=True
-)
+db.Index("ix_cfp_vote_user_id_proposal_id", CFPVote.user_id, CFPVote.proposal_id, unique=True)
 
 __all__ = [
     "HUMAN_CFP_TYPES",

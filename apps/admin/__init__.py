@@ -61,9 +61,7 @@ def admin_variables():
         return {}
 
     requested_refund_count = Payment.query.filter_by(state="refund-requested").count()
-    unreconciled_count = BankTransaction.query.filter_by(
-        payment_id=None, suppressed=False
-    ).count()
+    unreconciled_count = BankTransaction.query.filter_by(payment_id=None, suppressed=False).count()
 
     expiring_count = (
         BankPayment.query.join(Purchase)
@@ -99,8 +97,7 @@ class FeatureFlagForm(Form):
     new_feature = SelectField(
         "New feature name",
         [Optional()],
-        choices=[("", "Add a new flag")]
-        + list(zip(DB_FEATURE_FLAGS, DB_FEATURE_FLAGS)),
+        choices=[("", "Add a new flag")] + list(zip(DB_FEATURE_FLAGS, DB_FEATURE_FLAGS)),
     )
     new_enabled = BooleanField("New feature enabled", [Optional()])
     update = SubmitField("Update flags")
@@ -126,13 +123,9 @@ def feature_flags():
 
         # Add new flags if required
         if form.new_feature.data:
-            new_flag = FeatureFlag(
-                feature=form.new_feature.data, enabled=form.new_enabled.data
-            )
+            new_flag = FeatureFlag(feature=form.new_feature.data, enabled=form.new_enabled.data)
 
-            app.logger.info(
-                "Overriding new flag %s to %s", new_flag.feature, new_flag.enabled
-            )
+            app.logger.info("Overriding new flag %s to %s", new_flag.feature, new_flag.enabled)
             db.session.add(new_flag)
             db.session.commit()
             refresh_flags()
@@ -163,8 +156,7 @@ class SiteStateForm(Form):
     )
     sales_state = SelectField(
         "Sales",
-        choices=[("", "(automatic)")]
-        + list(zip(VALID_STATES["sales_state"], VALID_STATES["sales_state"])),
+        choices=[("", "(automatic)")] + list(zip(VALID_STATES["sales_state"], VALID_STATES["sales_state"])),
     )
     refund_state = SelectField(
         "Refunds",
@@ -272,9 +264,7 @@ def payment_config_verify():
             BankAccount.active.desc(), BankAccount.currency.desc()
         ).all(),
         form=form,
-        last_bank_payment=BankTransaction.query.order_by(
-            BankTransaction.id.desc()
-        ).first(),
+        last_bank_payment=BankTransaction.query.order_by(BankTransaction.id.desc()).first(),
     )
 
 
@@ -388,4 +378,4 @@ from . import email  # noqa: F401
 from . import hire  # noqa: F401
 from . import search  # noqa: F401
 from . import admin_message  # noqa: F401
-from . import arrivals # noqa: F401
+from . import arrivals  # noqa: F401

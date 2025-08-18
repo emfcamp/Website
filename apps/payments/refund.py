@@ -103,9 +103,7 @@ def handle_refund_request(request: RefundRequest) -> None:
 
     refund = None
     if refund_amount > 0:
-        refund = create_stripe_refund(
-            payment, refund_amount, metadata={"refund_request": request.id}
-        )
+        refund = create_stripe_refund(payment, refund_amount, metadata={"refund_request": request.id})
 
     with db.session.no_autoflush:
         for purchase in payment.purchases:

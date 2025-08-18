@@ -8,6 +8,8 @@ shop_shifts = {
                 "final": edt(d, "16:00:00"),
                 "min": 2,
                 "max": 3,
-            } for d in ["fri", "sat", "sun"]]
+            }
+            for d in ["fri", "sat", "sun"]
+        ]
     },
 }

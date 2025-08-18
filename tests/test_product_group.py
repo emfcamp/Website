@@ -22,9 +22,7 @@ from main import db
 def tent(db):
     item_template = "killer_tent{}"
     item_name = item_template.format(random_string(8))
-    item = ProductGroup(
-        type="tent", name=item_name, capacity_max=1, expires=datetime(2012, 8, 31)
-    )
+    item = ProductGroup(type="tent", name=item_name, capacity_max=1, expires=datetime(2012, 8, 31))
     db.session.add(item)
     db.session.commit()
     yield item
@@ -58,9 +56,7 @@ def create_purchases(tier, count, user):
 
 
 def random_string(length):
-    return "".join(
-        random.choice(string.ascii_lowercase + string.digits) for _ in range(length)
-    )
+    return "".join(random.choice(string.ascii_lowercase + string.digits) for _ in range(length))
 
 
 def test_has_capacity(tent):
@@ -307,9 +303,7 @@ def test_redemption(db, parent_group, user):
     assert purchase.redeemed is True
 
 
-@pytest.mark.skip(
-    reason="Intermittently fails on Github Actions with PurchaseTransferException"
-)
+@pytest.mark.skip(reason="Intermittently fails on Github Actions with PurchaseTransferException")
 def test_transfer(db, user, parent_group):
     user1 = user
     user2 = User("test_user_{}@test.invalid".format(random_string(8)), "test_user2")

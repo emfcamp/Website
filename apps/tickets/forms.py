@@ -42,9 +42,7 @@ class TicketAmountsForm(Form):
         self._tiers = self._get_price_tiers(products)
         super().__init__()
 
-    def _get_price_tiers(
-        _self, products: list[ProductViewProduct]
-    ) -> dict[int, PriceTier]:
+    def _get_price_tiers(_self, products: list[ProductViewProduct]) -> dict[int, PriceTier]:
         """Get the price tiers we want to show in this form"""
         # Order of tiers is important, but dict is ordered these days
         tiers = {}
@@ -110,9 +108,7 @@ class TicketAmountsForm(Form):
         for f in form.tiers:
             pt = f._tier
             if f.amount.data != basket.get(pt, 0):
-                app.logger.info(
-                    "Adding %s %s tickets to basket", f.amount.data, pt.name
-                )
+                app.logger.info("Adding %s %s tickets to basket", f.amount.data, pt.name)
                 basket[pt] = f.amount.data
 
     def validate_set_currency(form, field):
@@ -147,8 +143,7 @@ class TicketPaymentForm(Form):
 
             msg = Markup(
                 render_template_string(
-                    "Account already exists. "
-                    'Please <a href="{{ url }}">click here</a> to log in.',
+                    'Account already exists. Please <a href="{{ url }}">click here</a> to log in.',
                     url=url_for("users.login", next=pay_url, email=field.data),
                 )
             )

@@ -50,11 +50,7 @@ def exists(query):
 
 
 def to_dict(obj):
-    return OrderedDict(
-        (a.key, getattr(obj, a.key))
-        for a in inspect(obj).attrs
-        if a.loaded_value != NO_VALUE
-    )
+    return OrderedDict((a.key, getattr(obj, a.key)) for a in inspect(obj).attrs if a.loaded_value != NO_VALUE)
 
 
 def count_groups(selectable, *entities):
@@ -100,9 +96,7 @@ def bucketise(vals, boundaries) -> OrderedDict[str, int]:
 
         i = bisect(boundaries, val)
         if i == 0:
-            raise IndexError(
-                "{} is below the lowest boundary {}".format(val, boundaries[0])
-            )
+            raise IndexError("{} is below the lowest boundary {}".format(val, boundaries[0]))
         counts[ranges[i - 1]] += 1
 
     return counts

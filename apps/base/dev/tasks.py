@@ -1,4 +1,5 @@
-""" Development CLI tasks """
+"""Development CLI tasks"""
+
 import click
 from pendulum import Duration as Offset, parse
 from flask import current_app as app
@@ -54,7 +55,6 @@ def enable_cfp():
     db.session.flush()
     refresh_flags()
     refresh_states()
-
 
 
 @dev_cli.command("volunteer_data")
@@ -617,9 +617,7 @@ def create_bank_accounts():
     )
     for acct in [gbp, eur]:
         try:
-            BankAccount.query.filter_by(
-                acct_id=acct.acct_id, sort_code=acct.sort_code
-            ).one()
+            BankAccount.query.filter_by(acct_id=acct.acct_id, sort_code=acct.sort_code).one()
         except NoResultFound:
             app.logger.info(
                 "Adding %s account %s %s",

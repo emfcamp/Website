@@ -14,9 +14,7 @@ from .purchase import Purchase
 
 
 class Line:
-    def __init__(
-        self, tier: PriceTier, count: int, purchases: Optional[list[Purchase]] = None
-    ):
+    def __init__(self, tier: PriceTier, count: int, purchases: Optional[list[Purchase]] = None):
         self.tier = tier
         self.count = count
         if purchases is None:
@@ -128,9 +126,7 @@ class Basket(MutableMapping):
             if price is None:
                 # This is enforced when adding items but it's possible to get here in
                 # rare cases if the currency changes to one which has no price.
-                raise Exception(
-                    f"No price for tier {line.tier} in currency {self.currency}"
-                )
+                raise Exception(f"No price for tier {line.tier} in currency {self.currency}")
             total += price.value * line.count
 
         return total
@@ -145,19 +141,13 @@ class Basket(MutableMapping):
 
             if chosen_ids is not None:
                 purchases = [p for p in tier_purchases if p.id in chosen_ids]
-                surplus_purchases = [
-                    p for p in tier_purchases if p.id not in chosen_ids
-                ]
+                surplus_purchases = [p for p in tier_purchases if p.id not in chosen_ids]
             else:
                 purchases = tier_purchases
                 surplus_purchases = []
 
-            app.logger.debug(
-                "Basket line: %s %s %s", tier, purchases, surplus_purchases
-            )
-            self._lines.append(
-                Line(tier, len(purchases), purchases + surplus_purchases)
-            )
+            app.logger.debug("Basket line: %s %s %s", tier, purchases, surplus_purchases)
+            self._lines.append(Line(tier, len(purchases), purchases + surplus_purchases))
 
     def load_purchases_from_ids(self, chosen_ids, surplus_ids):
         chosen_ids = set(chosen_ids)
@@ -196,26 +186,16 @@ class Basket(MutableMapping):
                 if issue_count > 0:
                     # user_limit takes into account existing purchases
                     if issue_count > line.tier.user_limit():
-                        raise CapacityException(
-                            "Insufficient capacity for tier %s." % line.tier
-                        )
+                        raise CapacityException("Insufficient capacity for tier %s." % line.tier)
 
                     line.tier.issue_instances(issue_count)
 
                     product = line.tier.parent
-                    product_group_type = PRODUCT_GROUP_TYPES_DICT.get(
-                        product.parent.type
-                    )
-                    purchase_cls = (
-                        product_group_type.purchase_cls
-                        if product_group_type
-                        else Purchase
-                    )
+                    product_group_type = PRODUCT_GROUP_TYPES_DICT.get(product.parent.type)
+                    purchase_cls = product_group_type.purchase_cls if product_group_type else Purchase
 
                     price = line.tier.get_price(self.currency)
-                    purchases = [
-                        purchase_cls(price=price, user=user) for _ in range(issue_count)
-                    ]
+                    purchases = [purchase_cls(price=price, user=user) for _ in range(issue_count)]
                     line.purchases += purchases
                     purchases_to_flush += purchases
 
@@ -263,9 +243,7 @@ class Basket(MutableMapping):
 
     def check_out_free(self):
         if self.total != 0:
-            raise Exception(
-                "Cannot check out free basket with total of {}".format(self.total)
-            )
+            raise Exception("Cannot check out free basket with total of {}".format(self.total))
 
         if self.user is None:
             raise Exception("Cannot check out basket with no user")

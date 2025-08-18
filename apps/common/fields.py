@@ -72,14 +72,10 @@ class TelField(StringField):
             return
 
         if not re.search(r"^\+?[0-9 \-]+$", form.data):
-            raise ValidationError(
-                "A telephone number may only contain numbers, spaces or dashes."
-            )
+            raise ValidationError("A telephone number may only contain numbers, spaces or dashes.")
 
         if not form.min_length <= len(form.data) <= form.max_length:
-            raise ValidationError(
-                f"Must be between {form.min_length} and {form.max_length} digits."
-            )
+            raise ValidationError(f"Must be between {form.min_length} and {form.max_length} digits.")
 
 
 class JSONField(StringField):

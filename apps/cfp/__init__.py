@@ -1,4 +1,5 @@
-""" Call for Participation app """
+"""Call for Participation app"""
+
 from flask import Blueprint
 
 cfp = Blueprint("cfp", __name__)

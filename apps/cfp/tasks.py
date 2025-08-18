@@ -123,9 +123,7 @@ def email_reserve():
     )
 
     for proposal in proposals:
-        send_email_for_proposal(
-            proposal, reason="reserve-list", from_address=from_email("SPEAKERS_EMAIL")
-        )
+        send_email_for_proposal(proposal, reason="reserve-list", from_address=from_email("SPEAKERS_EMAIL"))
 
 
 @cfp.cli.command(
@@ -168,9 +166,7 @@ def delete_tags(tags_to_delete):
 
         if tag.proposals:
             tagged_proposals = [p.id for p in tag.proposals]
-            app.logger.info(
-                f"'{tag_name}' will be removed from the proposals with ids: {tagged_proposals}"
-            )
+            app.logger.info(f"'{tag_name}' will be removed from the proposals with ids: {tagged_proposals}")
 
         db.session.delete(tag)
         tags_deleted += 1

@@ -1,7 +1,8 @@
-""" Villages admin.
+"""Villages admin.
 
-    NOTE: make sure all admin views are tagged with the @village_admin_required decorator
+NOTE: make sure all admin views are tagged with the @village_admin_required decorator
 """
+
 from flask import render_template, abort, redirect, flash, url_for
 from wtforms import SubmitField, StringField
 from wtforms.validators import DataRequired
@@ -74,11 +75,7 @@ def admin_village(village_id):
 def admin_email_owners():
     form = EmailComposeForm()
     if form.validate_on_submit():
-        users = (
-            User.query.join(User.village_membership)
-            .filter(VillageMember.admin)
-            .distinct()
-        )
+        users = User.query.join(User.village_membership).filter(VillageMember.admin).distinct()
         if form.preview.data is True:
             return render_template(
                 "villages/admin/email.html",
@@ -88,9 +85,7 @@ def admin_email_owners():
             )
 
         if form.send_preview.data is True:
-            preview_trusted_email(
-                form.send_preview_address.data, form.subject.data, form.text.data
-            )
+            preview_trusted_email(form.send_preview_address.data, form.subject.data, form.text.data)
 
             flash("Email preview sent to %s" % form.send_preview_address.data)
             return render_template(

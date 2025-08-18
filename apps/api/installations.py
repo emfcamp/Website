@@ -27,9 +27,7 @@ def render_installation(installation: InstallationProposal):
 class Installations(Resource):
     def get(self):
         result = []
-        proposals = InstallationProposal.query.filter(
-            InstallationProposal.is_accepted
-        ).all()
+        proposals = InstallationProposal.query.filter(InstallationProposal.is_accepted).all()
         for proposal in proposals:
             result.append(render_installation(proposal))
         return result

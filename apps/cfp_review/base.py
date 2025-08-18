@@ -155,15 +155,11 @@ def filter_proposal_request() -> tuple[list[Proposal], bool]:
             flash("'untagged' in 'tags' arg, other tags ignored")
         filtered = True
         # join(..outer=True) == left outer join
-        proposal_query = proposal_query.join(Proposal.tags, isouter=True).filter(
-            Tag.id.is_(None)
-        )
+        proposal_query = proposal_query.join(Proposal.tags, isouter=True).filter(Tag.id.is_(None))
 
     elif tags:
         filtered = True
-        proposal_query = proposal_query.join(Proposal.tags).filter(
-            Proposal.tags.any(Tag.tag.in_(tags))
-        )
+        proposal_query = proposal_query.join(Proposal.tags).filter(Proposal.tags.any(Tag.tag.in_(tags)))
 
     sort_dict = get_proposal_sort_dict(request.args)
     proposal_query = (
@@ -190,8 +186,7 @@ def proposals():
         del non_sort_query_string["reverse"]
 
     tag_counts = dict(
-        db.session
-        .query(Tag.tag, db.func.count(ProposalTag.c.proposal_id))
+        db.session.query(Tag.tag, db.func.count(ProposalTag.c.proposal_id))
         .select_from(Tag)
         .outerjoin(ProposalTag)
         .group_by(Tag.tag)
@@ -297,10 +292,7 @@ def send_email_for_proposal(proposal, reason="still-considered", from_address=No
         template = "emails/cfp-rejected.txt"
 
     elif reason == "check-your-slot":
-        subject = (
-            "Your EMF proposal '%s' has been scheduled, please check your slot"
-            % proposal.title
-        )
+        subject = "Your EMF proposal '%s' has been scheduled, please check your slot" % proposal.title
         template = "emails/cfp-check-your-slot.txt"
 
     elif reason == "please-finalise":
@@ -381,9 +373,7 @@ def convert_proposal(proposal_id):
 
         return redirect(url_for(".update_proposal", proposal_id=proposal.id))
 
-    return render_template(
-        "cfp_review/convert_proposal.html", proposal=proposal, form=form
-    )
+    return render_template("cfp_review/convert_proposal.html", proposal=proposal, form=form)
 
 
 def find_next_proposal_id(prop):
@@ -556,9 +546,7 @@ def update_proposal(proposal_id):
         form.session.data = prop.session
         form.slide_link.data = prop.slide_link
 
-    return render_template(
-        "cfp_review/proposal.html", proposal=prop, form=form, next_id=next_id
-    )
+    return render_template("cfp_review/proposal.html", proposal=prop, form=form, next_id=next_id)
 
 
 def get_all_messages_sort_dict(parameters, user):
@@ -594,9 +582,7 @@ def all_messages():
     )
 
     if filter_type:
-        proposal_with_message = proposal_with_message.filter(
-            Proposal.type == filter_type
-        )
+        proposal_with_message = proposal_with_message.filter(Proposal.type == filter_type)
     else:
         filter_type = "all"
 
@@ -629,9 +615,7 @@ def message_proposer(proposal_id):
             db.session.add(msg)
             db.session.commit()
 
-            app.logger.info(
-                "Sending message from %s to %s", current_user.id, proposal.user_id
-            )
+            app.logger.info("Sending message from %s to %s", current_user.id, proposal.user_id)
 
             msg_url = external_url("cfp.proposal_messages", proposal_id=proposal_id)
             msg = EmailMessage(
@@ -650,16 +634,12 @@ def message_proposer(proposal_id):
 
         count = proposal.mark_messages_read(current_user)
         db.session.commit()
-        app.logger.info(
-            "Marked %s messages to admin on proposal %s as read" % (count, proposal.id)
-        )
+        app.logger.info("Marked %s messages to admin on proposal %s as read" % (count, proposal.id))
 
         return redirect(url_for(".message_proposer", proposal_id=proposal_id))
 
     # Admin can see all messages sent in relation to a proposal
-    messages = (
-        CFPMessage.query.filter_by(proposal_id=proposal_id).order_by("created").all()
-    )
+    messages = CFPMessage.query.filter_by(proposal_id=proposal_id).order_by("created").all()
 
     return render_template(
         "cfp_review/message_proposer.html",
@@ -685,14 +665,10 @@ def proposal_versions():
 def proposal_latest_version(proposal_id):
     prop = Proposal.query.get_or_404(proposal_id)
     last_txn_id = prop.versions[-1].transaction_id
-    return redirect(
-        url_for(".proposal_version", proposal_id=proposal_id, txn_id=last_txn_id)
-    )
+    return redirect(url_for(".proposal_version", proposal_id=proposal_id, txn_id=last_txn_id))
 
 
-@cfp_review.route(
-    "/proposals/<int:proposal_id>/versions/<int:txn_id>", methods=["GET", "POST"]
-)
+@cfp_review.route("/proposals/<int:proposal_id>/versions/<int:txn_id>", methods=["GET", "POST"])
 @admin_required
 def proposal_version(proposal_id, txn_id):
     form = ReversionForm()
@@ -703,9 +679,7 @@ def proposal_version(proposal_id, txn_id):
         # FIXME: when would this ever happen?
         if form.proposal_id.data != proposal_id or form.txn_id.data != txn_id:
             flash("Mismatched Ids, try again")
-            return redirect(
-                url_for(".proposal_version", proposal_id=proposal_id, txn_id=txn_id)
-            )
+            return redirect(url_for(".proposal_version", proposal_id=proposal_id, txn_id=txn_id))
 
         app.logger.info(f"reverting proposal {proposal_id} to transaction {txn_id}")
         version.revert()
@@ -741,9 +715,7 @@ def message_batch():
                 db.session.add(msg)
                 db.session.commit()
 
-                app.logger.info(
-                    "Sending message from %s to %s", current_user.id, proposal.user_id
-                )
+                app.logger.info("Sending message from %s to %s", current_user.id, proposal.user_id)
 
                 msg_url = external_url("cfp.proposal_messages", proposal_id=proposal.id)
                 msg = EmailMessage(
@@ -763,9 +735,7 @@ def message_batch():
             flash("Messaged %s proposals" % len(proposals), "info")
             return redirect(url_for(".proposals", **request.args))
 
-    return render_template(
-        "cfp_review/message_batch.html", form=form, proposals=proposals
-    )
+    return render_template("cfp_review/message_batch.html", form=form, proposals=proposals)
 
 
 def get_vote_summary_sort_args(parameters):
@@ -793,9 +763,7 @@ def get_vote_summary_sort_args(parameters):
 @admin_required
 def vote_summary():
     proposal_query = (
-        Proposal.query
-        if request.args.get("all", None)
-        else Proposal.query.filter_by(state="anonymised")
+        Proposal.query if request.args.get("all", None) else Proposal.query.filter_by(state="anonymised")
     )
 
     proposals = proposal_query.order_by("modified").all()
@@ -862,9 +830,7 @@ def proposal_votes(proposal_id):
         if form.set_all_stale.data:
             stale_count = 0
             states_to_set = (
-                ["voted", "blocked", "recused"]
-                if form.include_recused.data
-                else ["voted", "blocked"]
+                ["voted", "blocked", "recused"] if form.include_recused.data else ["voted", "blocked"]
             )
             for vote in all_votes.values():
                 if vote.state in states_to_set:
@@ -910,9 +876,7 @@ def proposal_votes(proposal_id):
         form.votes_to_resolve.append_entry()
         form.votes_to_resolve[-1]["id"].data = v_id
 
-    return render_template(
-        "cfp_review/proposal_votes.html", proposal=proposal, form=form, votes=all_votes
-    )
+    return render_template("cfp_review/proposal_votes.html", proposal=proposal, form=form, votes=all_votes)
 
 
 @cfp_review.route("/proposals/<int:proposal_id>/notes", methods=["GET", "POST"])
@@ -966,9 +930,7 @@ def proposal_change_owner(proposal_id):
 
         proposal.user = user
         db.session.commit()
-        app.logger.info(
-            "Transferred ownership of proposal %i to %s", proposal_id, user.name
-        )
+        app.logger.info("Transferred ownership of proposal %i to %s", proposal_id, user.name)
         flash("Transferred ownership of proposal %i to %s" % (proposal_id, user.name))
 
         return redirect(url_for(".update_proposal", proposal_id=proposal_id))
@@ -1011,18 +973,14 @@ def close_round():
 
             db.session.commit()
             del session["min_votes"]
-            app.logger.info(
-                "CFP Round closed. Set %s proposals to 'reviewed'" % len(proposals)
-            )
+            app.logger.info("CFP Round closed. Set %s proposals to 'reviewed'" % len(proposals))
 
             return redirect(url_for(".rank"))
 
         elif form.close_round.data:
             preview = True
             session["min_votes"] = form.min_votes.data
-            flash(
-                f'Proposals with more than {session["min_votes"]} (blue) will be marked as "reviewed"'
-            )
+            flash(f'Proposals with more than {session["min_votes"]} (blue) will be marked as "reviewed"')
 
         elif form.cancel.data:
             form.min_votes.data = form.min_votes.default
@@ -1111,10 +1069,7 @@ def rank():
             del session["min_score"]
 
     proposal_types = ["talk", "workshop", "performance", "youthworkshop"]
-    estimates = {
-        proposal_type: get_cfp_estimate(proposal_type)
-        for proposal_type in proposal_types
-    }
+    estimates = {proposal_type: get_cfp_estimate(proposal_type) for proposal_type in proposal_types}
 
     return render_template(
         "cfp_review/rank.html",
@@ -1146,9 +1101,7 @@ def potential_schedule_changes():
         if proposal.potential_venue:
             proposal.potential_venue_name = proposal.potential_venue.name
 
-    return render_template(
-        "cfp_review/potential_schedule_changes.html", proposals=proposals
-    )
+    return render_template("cfp_review/potential_schedule_changes.html", proposals=proposals)
 
 
 @cfp_review.route("/scheduler")
@@ -1161,16 +1114,11 @@ def scheduler():
         .all()
     )
 
-    shown_venues = [
-        {"key": v.id, "label": v.name}
-        for v in Venue.query.order_by(Venue.priority.desc()).all()
-    ]
+    shown_venues = [{"key": v.id, "label": v.name} for v in Venue.query.order_by(Venue.priority.desc()).all()]
 
     venues_to_show = request.args.getlist("venue")
     if venues_to_show:
-        shown_venues = [
-            venue for venue in shown_venues if venue["label"] in venues_to_show
-        ]
+        shown_venues = [venue for venue in shown_venues if venue["label"] in venues_to_show]
 
     venue_ids = [venue["key"] for venue in shown_venues]
 
@@ -1206,9 +1154,7 @@ def scheduler():
             export["is_potential"] = True
 
         if "start_date" in export:
-            export["end_date"] = export["start_date"] + timedelta(
-                minutes=proposal.scheduled_duration
-            )
+            export["end_date"] = export["start_date"] + timedelta(minutes=proposal.scheduled_duration)
             export["start_date"] = str(export["start_date"])
             export["end_date"] = str(export["end_date"])
 
@@ -1237,15 +1183,13 @@ def scheduler():
 @admin_required
 def scheduler_update():
     proposal = Proposal.query.filter_by(id=request.form["id"]).one()
-    proposal.potential_time = dateutil.parser.parse(request.form["time"]).replace(
-        tzinfo=None
-    )
+    proposal.potential_time = dateutil.parser.parse(request.form["time"]).replace(tzinfo=None)
     proposal.potential_venue_id = request.form["venue"]
 
     changed = True
-    if proposal.potential_time == proposal.scheduled_time and str(
-        proposal.potential_venue_id
-    ) == str(proposal.scheduled_venue_id):
+    if proposal.potential_time == proposal.scheduled_time and str(proposal.potential_venue_id) == str(
+        proposal.scheduled_venue_id
+    ):
         proposal.potential_time = None
         proposal.potential_venue = None
         changed = False
@@ -1363,9 +1307,7 @@ def invite_speaker():
         db.session.add(user)
         db.session.commit()
 
-        app.logger.info(
-            f"{current_user.id} created a new user {user} ({email}) to invite to the cfp"
-        )
+        app.logger.info(f"{current_user.id} created a new user {user} ({email}) to invite to the cfp")
 
         code = user.login_code(app.config["SECRET_KEY"])
 
@@ -1482,6 +1424,7 @@ def cfp_user(user_id):
         "cfp_review/cfp_user.html",
         user=user,
     )
+
 
 @cfp_review.route("/lottery")
 @admin_required

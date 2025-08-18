@@ -58,9 +58,6 @@ dependencies = [
     "lxml>=6.0.0",
 ]
 
-[tool.ruff]
-line-length = 110
-
 [dependency-groups]
 dev = [
     "pytest",
@@ -86,6 +83,9 @@ dev = [
     "sqlalchemy-stubs>=0.4,<0.5",
     "ruff==0.12.9",
 ]
+
+[tool.ruff]
+line-length = 110
 
 [tool.ruff.lint]
 # TODO: see if we can sensibly lose any of these ignores. We should probably add the

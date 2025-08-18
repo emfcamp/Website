@@ -47,18 +47,14 @@ class Payment(BaseModel):
 
     created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     expires = db.Column(db.DateTime, nullable=True)
-    voucher_code = db.Column(
-        db.String, db.ForeignKey("voucher.code"), nullable=True, default=None
-    )
+    voucher_code = db.Column(db.String, db.ForeignKey("voucher.code"), nullable=True, default=None)
 
     # VAT invoice number, if issued
     vat_invoice_number = db.Column(db.Integer, nullable=True)
 
     refunds = db.relationship("Refund", backref="payment", cascade="all")
     purchases = db.relationship("Purchase", backref="payment", cascade="all")
-    refund_requests = db.relationship(
-        "RefundRequest", backref="payment", cascade="all, delete-orphan"
-    )
+    refund_requests = db.relationship("RefundRequest", backref="payment", cascade="all, delete-orphan")
 
     __mapper_args__ = {"polymorphic_on": provider}
 
@@ -76,15 +72,9 @@ class Payment(BaseModel):
             return {}
 
         purchase_counts = (
-            cls.query.outerjoin(cls.purchases)
-            .group_by(cls.id)
-            .with_entities(func.count(Ticket.id))
+            cls.query.outerjoin(cls.purchases).group_by(cls.id).with_entities(func.count(Ticket.id))
         )
-        refund_counts = (
-            cls.query.outerjoin(cls.refunds)
-            .group_by(cls.id)
-            .with_entities(func.count(Refund.id))
-        )
+        refund_counts = cls.query.outerjoin(cls.refunds).group_by(cls.id).with_entities(func.count(Refund.id))
 
         cls_version = version_class(cls)
         cls_transaction = transaction_class(cls)
@@ -113,25 +103,20 @@ class Payment(BaseModel):
         )
 
         time_buckets = [timedelta(0), timedelta(minutes=1), timedelta(hours=1)] + [
-            timedelta(d)
-            for d in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 28, 60]
+            timedelta(d) for d in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 28, 60]
         ]
 
         data = {
             "public": {
                 "payments": {
                     "counts": {
-                        "purchases": bucketise(
-                            purchase_counts, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20]
-                        ),
+                        "purchases": bucketise(purchase_counts, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20]),
                         "refunds": bucketise(refund_counts, [0, 1, 2, 3, 4]),
                         "changes": bucketise(change_counts, range(10)),
                         "created_week": export_intervals(
                             first_changes, column("created"), "week", "YYYY-MM-DD"
                         ),
-                        "active_time": bucketise(
-                            [r.active_time for r in active_times], time_buckets
-                        ),
+                        "active_time": bucketise([r.active_time for r in active_times], time_buckets),
                         "amounts": bucketise(
                             cls.query.with_entities(cls.amount_int / 100),
                             [0, 10, 20, 30, 40, 50, 100, 150, 200],
@@ -143,9 +128,7 @@ class Payment(BaseModel):
         }
 
         count_attrs = ["state", "currency"]
-        data["public"]["payments"]["counts"].update(
-            export_attr_counts(cls, count_attrs)
-        )
+        data["public"]["payments"]["counts"].update(export_attr_counts(cls, count_attrs))
 
         return data
 
@@ -229,10 +212,7 @@ class Payment(BaseModel):
             for purchase in self.purchases:
                 if purchase.owner != self.user:
                     raise StateException("Cannot refund transferred purchase")
-                if (
-                    purchase.price_tier.get_price(self.currency).value > 0
-                    and not purchase.is_paid_for
-                ):
+                if purchase.price_tier.get_price(self.currency).value > 0 and not purchase.is_paid_for:
                     # This might turn out to be too strict
                     raise StateException("Purchase is not paid, so cannot be refunded")
 
@@ -259,11 +239,7 @@ class Payment(BaseModel):
         if not self.vat_invoice_number:
             sequence_name = "vat_invoice"
             try:
-                seq = (
-                    PaymentSequence.query.filter_by(name=sequence_name)
-                    .with_for_update()
-                    .one()
-                )
+                seq = PaymentSequence.query.filter_by(name=sequence_name).with_for_update().one()
                 seq.value += 1
             except NoResultFound:
                 seq = PaymentSequence()
@@ -306,9 +282,7 @@ class BankPayment(Payment):
 
     def manual_refund(self):
         if self.state not in {"paid", "refund-requested"}:
-            raise StateException(
-                "Only BankPayments that have been paid can be marked as refunded"
-            )
+            raise StateException("Only BankPayments that have been paid can be marked as refunded")
 
         super(BankPayment, self).manual_refund()
 
@@ -324,8 +298,7 @@ class BankPayment(Payment):
     def customer_reference(self):
         if self.id is None:
             raise Exception(
-                "Customer references can only be generated for payments that have "
-                "been persisted to the database."
+                "Customer references can only be generated for payments that have been persisted to the database."
             )
 
         # Derive an ISO-11649 payment reference for EUR-currency payments
@@ -404,17 +377,13 @@ class BankTransaction(BaseModel):
     amount_int = db.Column(db.Integer, nullable=False)
     fit_id = db.Column(db.String, index=True)  # allegedly unique, but don't trust it
     wise_id = db.Column(db.String, index=True)
-    payee = db.Column(
-        db.String, nullable=False
-    )  # this is what OFX calls it. it's really description
+    payee = db.Column(db.String, nullable=False)  # this is what OFX calls it. it's really description
     payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"))
     suppressed = db.Column(db.Boolean, nullable=False, default=False)
     account = db.relationship(BankAccount, backref="transactions")
     payment = db.relationship(BankPayment, backref="transactions")
 
-    def __init__(
-        self, account_id, posted, type, amount, payee, fit_id=None, wise_id=None
-    ):
+    def __init__(self, account_id, posted, type, amount, payee, fit_id=None, wise_id=None):
         self.account_id = account_id
         self.posted = posted
         self.type = type
@@ -525,9 +494,7 @@ class StripePayment(Payment):
 
     def cancel(self):
         if self.state in ["charged", "paid"]:
-            raise StateException(
-                "Cannot automatically cancel charging/charged Stripe payments"
-            )
+            raise StateException("Cannot automatically cancel charging/charged Stripe payments")
 
         super(StripePayment, self).cancel()
 
@@ -568,17 +535,13 @@ class Refund(BaseModel):
             return {}
 
         purchase_counts = (
-            cls.query.outerjoin(cls.purchases)
-            .group_by(cls.id)
-            .with_entities(func.count("Ticket.id"))
+            cls.query.outerjoin(cls.purchases).group_by(cls.id).with_entities(func.count("Ticket.id"))
         )
         data = {
             "public": {
                 "refunds": {
                     "counts": {
-                        "timestamp_week": export_intervals(
-                            cls.query, cls.timestamp, "week", "YYYY-MM-DD"
-                        ),
+                        "timestamp_week": export_intervals(cls.query, cls.timestamp, "week", "YYYY-MM-DD"),
                         "purchases": bucketise(purchase_counts, [0, 1, 2, 3, 4]),
                         "amounts": bucketise(
                             cls.query.with_entities(cls.amount_int / 100),
@@ -623,9 +586,7 @@ class RefundRequest(BaseModel):
     payee_name = db.Column(db.String)
     note = db.Column(db.String)
 
-    purchases = db.relationship(
-        "Purchase", backref=db.backref("refund_request", cascade="all")
-    )
+    purchases = db.relationship("Purchase", backref=db.backref("refund_request", cascade="all"))
 
     @property
     def method(self):
@@ -634,10 +595,7 @@ class RefundRequest(BaseModel):
         This will be "stripe" if the payment can be refunded through Stripe,
         and "banktransfer" otherwise.
         """
-        if (
-            type(self.payment) is StripePayment
-            and self.payment.currency == self.currency
-        ):
+        if type(self.payment) is StripePayment and self.payment.currency == self.currency:
             return "stripe"
         else:
             return "banktransfer"
@@ -654,7 +612,4 @@ class PaymentSequence(BaseModel):
     @classmethod
     def get_export_data(cls):
         rows = db.session.scalars(db.select(cls))
-        return {
-            "public": {r.name: r.value for r in rows}
-        }
-
+        return {"public": {r.name: r.value for r in rows}}

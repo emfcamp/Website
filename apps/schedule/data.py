@@ -75,9 +75,7 @@ def _get_ical_dict(event, favourites_ids):
         "may_record": False,
         "is_fave": event.id in favourites_ids,
         "source": "external",
-        "link": external_url(
-            ".item_external", year=event_year(), slug=event.slug, event_id=event.id
-        ),
+        "link": external_url(".item_external", year=event_year(), slug=event.slug, event_id=event.id),
     }
     if event.type in ["workshop", "youthworkshop"]:
         res["cost"] = event.display_cost
@@ -172,11 +170,7 @@ def _get_priority_sorted_venues(venues_to_allow):
     main_venue_names = [(v.name, "main", v.priority) for v in main_venues]
 
     ical_sources = CalendarSource.query.filter_by(enabled=True, published=True)
-    ical_source_names = [
-        (v.mapobj.name, "ical", v.priority)
-        for v in ical_sources
-        if v.mapobj and v.events
-    ]
+    ical_source_names = [(v.mapobj.name, "ical", v.priority) for v in ical_sources if v.mapobj and v.events]
 
     res = []
     seen_names = []

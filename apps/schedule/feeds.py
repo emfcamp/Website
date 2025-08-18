@@ -29,14 +29,14 @@ def _format_event_description(event):
 
     footer_block = []
     if event["link"]:
-        footer_block.append(f'Link: {event["link"]}')
+        footer_block.append(f"Link: {event['link']}")
     if event["venue"]:
         venue_str = event["venue"]
         if event["map_link"]:
-            venue_str = f'{venue_str} ({event["map_link"]})'
-        footer_block.append(f'Venue: {venue_str}')
+            venue_str = f"{venue_str} ({event['map_link']})"
+        footer_block.append(f"Venue: {venue_str}")
     if footer_block:
-        description += '\n\n' + '\n'.join(footer_block)
+        description += "\n\n" + "\n".join(footer_block)
 
     return description
 
@@ -47,7 +47,7 @@ def schedule_json(year):
     if year != event_year():
         return feed_historic(year, "json")
 
-    if not feature_enabled('SCHEDULE'):
+    if not feature_enabled("SCHEDULE"):
         abort(404)
 
     schedule = [_convert_time_to_str(p) for p in _get_scheduled_proposals(request.args)]
@@ -61,7 +61,7 @@ def schedule_frab(year):
     if year != event_year():
         return feed_historic(year, "frab")
 
-    if not feature_enabled('SCHEDULE'):
+    if not feature_enabled("SCHEDULE"):
         abort(404)
 
     schedule = (
@@ -88,7 +88,7 @@ def schedule_ical(year):
     if year != event_year():
         return feed_historic(year, "ics")
 
-    if not feature_enabled('SCHEDULE'):
+    if not feature_enabled("SCHEDULE"):
         abort(404)
 
     schedule = _get_scheduled_proposals(request.args)
@@ -174,9 +174,7 @@ def favourites_ical():
 
 @schedule.route("/schedule/now-and-next.json")
 def now_and_next_json():
-    return Response(
-        json.dumps(_get_upcoming(request.args)), mimetype="application/json"
-    )
+    return Response(json.dumps(_get_upcoming(request.args)), mimetype="application/json")
 
 
 @schedule.route("/schedule/<int:year>/<int:proposal_id>.json")
