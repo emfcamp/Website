@@ -1,14 +1,14 @@
 """Remove CalendarSource and external events
 
 Revision ID: bdcf93945e0c
-Revises: 09f776ea71f0
+Revises: c9d6fc727cf0
 Create Date: 2024-05-22 23:57:09.873592
 
 """
 
 # revision identifiers, used by Alembic.
 revision = 'bdcf93945e0c'
-down_revision = '09f776ea71f0'
+down_revision = 'c9d6fc727cf0'
 
 from alembic import op
 import sqlalchemy as sa
