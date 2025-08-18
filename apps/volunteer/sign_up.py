@@ -28,6 +28,7 @@ class VolunteerSignUpForm(Form):
     volunteer_email = StringField("Email", [Email(), DataRequired()])
     over_18 = BooleanField("I'm at least 18 years old")
     volunteer_phone = TelField("Phone", min_length=3)
+    dietary_requirements = StringField("Dietary requirements")
     sign_up = SubmitField("Sign Up")
     save = SubmitField("Save")
 
@@ -52,6 +53,7 @@ def update_volunteer_from_form(volunteer, form):
     volunteer.volunteer_email = form.volunteer_email.data
     volunteer.volunteer_phone = form.volunteer_phone.data
     volunteer.over_18 = form.over_18.data
+    volunteer.dietary_requirements = form.dietary_requirements.data
     return volunteer
 
 
