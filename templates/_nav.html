@@ -18,9 +18,6 @@
   <div id="menu-container" role="navigation" aria-label="Main">
     <ul class="menu" role="menu">
       <li role="presentation">
-        <a role="menuitem" href="https://cloud.orga.emfcamp.org/apps/forms/s/wr2iRdTAPi4j6fSt9CGNN2iq" target="blank">Feedback</a>
-      </li>
-      <li role="presentation">
         <a role="menuitem" href="{{ url_for('base.about') }}">About</a>
       </li>
       {% if SITE_STATE == 'sales' and SALES_STATE in ['available',
