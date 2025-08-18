@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 from collections import defaultdict
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from flask_login import UserMixin
-from sqlalchemy import Column, ForeignKey, Integer, Table, select
+from sqlalchemy import ARRAY, Column, ForeignKey, Integer, String, Table, select
+from sqlalchemy.ext.mutable import Mutable, MutableSet
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from main import db
@@ -19,6 +22,8 @@ __all__ = [
     "VolunteerRoleInterest",
     "VolunteerRoleTraining",
 ]
+
+_T = TypeVar("_T")
 
 # This effectively records the roles that a volunteer is interested in
 VolunteerRoleInterest = Table(
@@ -38,6 +43,16 @@ VolunteerRoleTraining = Table(
 )
 
 
+class MutableSetAsList(MutableSet[_T]):
+    @classmethod
+    def coerce(cls, index: str, value: Any) -> MutableSetAsList[_T] | None:
+        if not isinstance(value, cls):
+            if isinstance(value, set | list):
+                return cls(value)
+            return Mutable.coerce(index, value)
+        return value
+
+
 class Volunteer(BaseModel, UserMixin):
     """A volunteer, which is mapped 1:1 to a website :class:`User`."""
 
@@ -50,32 +65,38 @@ class Volunteer(BaseModel, UserMixin):
     volunteer_phone: Mapped[str | None]
     volunteer_email: Mapped[str | None]
     over_18: Mapped[bool] = mapped_column(default=False)
+    allergies: Mapped[set[str]] = mapped_column(MutableSetAsList.as_mutable(ARRAY(String)), default=set())
+    allergies_other: Mapped[str] = mapped_column(default="")
+    dietary_restrictions: Mapped[set[str]] = mapped_column(
+        MutableSetAsList.as_mutable(ARRAY(String)), default=set()
+    )
+    dietary_restrictions_other: Mapped[str] = mapped_column(default="")
     allow_comms_during_event: Mapped[bool] = mapped_column(default=False)
 
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
     #: The website user object for this volunteer
-    user: Mapped["User"] = relationship(back_populates="volunteer")
+    user: Mapped[User] = relationship(back_populates="volunteer")
 
     #: Roles a volunteer is interested in performing
-    interested_roles: Mapped[list["Role"]] = relationship(
+    interested_roles: Mapped[list[Role]] = relationship(
         back_populates="interested_volunteers",
         secondary=VolunteerRoleInterest,
         lazy="dynamic",
     )
 
     #: Roles a volunteer has been trained to perform
-    trained_roles: Mapped[list["Role"]] = relationship(
+    trained_roles: Mapped[list[Role]] = relationship(
         back_populates="trained_volunteers",
         secondary=VolunteerRoleTraining,
         lazy="dynamic",
     )
 
-    volunteer_admin_roles: Mapped[list["RoleAdmin"]] = relationship(
+    volunteer_admin_roles: Mapped[list[RoleAdmin]] = relationship(
         back_populates="volunteer", cascade="all, delete-orphan"
     )
 
-    administered_teams: Mapped[list["Team"]] = relationship(
+    administered_teams: Mapped[list[Team]] = relationship(
         "Team", secondary="volunteer_team_admin", back_populates="admins"
     )
 
@@ -98,7 +119,7 @@ class Volunteer(BaseModel, UserMixin):
         return cls.query.get_or_404(id)
 
     @classmethod
-    def get_by_email(cls, email_address: str) -> "Volunteer | None":
+    def get_by_email(cls, email_address: str) -> Volunteer | None:
         return db.session.scalar(select(cls).where(cls.volunteer_email == email_address))
 
     @classmethod
