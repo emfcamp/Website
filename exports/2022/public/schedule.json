@@ -5545,7 +5545,9 @@
     "start_time": "15:00",
     "end_time": "15:30",
     "video": {
-        "youtube": "https://www.youtube.com/watch?v=-ouMGoQ4HYU"
+        "youtube": "https://www.youtube.com/watch?v=-ouMGoQ4HYU",
+        "ccc": "https://media.ccc.de/v/emf2022-353-the-atomic-gardener",
+        "preview_image": "https://static.media.ccc.de/media/events/emf/2022/353-d5ec6b29-f35e-5312-8b67-b48db9973da6_preview.jpg"
     }
   },
   {
