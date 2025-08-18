@@ -1,7 +1,7 @@
 FROM node:20-alpine AS static
 WORKDIR "/app"
 COPY . /app
-RUN npm install --no-audit && npx gulp --production
+RUN npm install --no-audit && npx rsbuild build --mode production
 
 FROM ghcr.io/emfcamp/website-base:latest
 
@@ -13,7 +13,7 @@ RUN uv sync --no-dev \
 	&& uv run playwright install chromium \
 	&& rm -Rf ./static
 
-COPY --from=static /app/static /app/static
+COPY --from=static /app/dist /app/dist
 
 # The settings file doesn't matter for the purposes of the below command,
 # but it's needed for it to run.

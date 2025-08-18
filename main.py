@@ -101,7 +101,7 @@ def check_cache_configuration():
 
 
 def create_app(dev_server=False, config_override=None):
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder="dist/static")
     app.config.from_envvar("SETTINGS_FILE")
     if config_override:
         app.config.from_mapping(config_override)

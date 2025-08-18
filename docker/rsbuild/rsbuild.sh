@@ -2,4 +2,4 @@
 
 npm install --no-audit
 
-exec npx gulp watch
+exec npx rsbuild watch
