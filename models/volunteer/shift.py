@@ -1,7 +1,7 @@
 from typing import Literal, TypeAlias, Union
 import pytz
 
-from pendulum import period
+from pendulum import interval
 from sqlalchemy import select, func, text
 from sqlalchemy.ext.associationproxy import association_proxy
 
@@ -13,7 +13,11 @@ event_tz = pytz.timezone("Europe/London")
 
 # state: [allowed next state, ] pairs
 ShiftEntryState: TypeAlias = Union[
-    Literal["signed_up"], Literal["arrived"], Literal["abandoned"], Literal["completed"], Literal["no_show"]
+    Literal["signed_up"],
+    Literal["arrived"],
+    Literal["abandoned"],
+    Literal["completed"],
+    Literal["no_show"],
 ]
 
 SHIFT_ENTRY_STATES: dict[ShiftEntryState, list[ShiftEntryState]] = {
@@ -33,7 +37,9 @@ class ShiftEntry(BaseModel):
     __tablename__ = "volunteer_shift_entry"
     __versioned__: dict = {}
 
-    shift_id = db.Column(db.Integer, db.ForeignKey("volunteer_shift.id"), primary_key=True)
+    shift_id = db.Column(
+        db.Integer, db.ForeignKey("volunteer_shift.id"), primary_key=True
+    )
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
     state: ShiftEntryState = db.Column(db.String, default="signed_up")
 
@@ -45,7 +51,9 @@ class ShiftEntry(BaseModel):
             raise ShiftEntryStateException('"%s" is not a valid state' % state)
 
         if state not in SHIFT_ENTRY_STATES[self.state]:
-            raise ShiftEntryStateException('"%s->%s" is not a valid transition' % (self.state, state))
+            raise ShiftEntryStateException(
+                '"%s->%s" is not a valid transition' % (self.state, state)
+            )
 
         self.state = state
 
@@ -59,7 +67,9 @@ class Shift(BaseModel):
 
     id = db.Column(db.Integer, primary_key=True)
     role_id = db.Column(db.Integer, db.ForeignKey("volunteer_role.id"), nullable=False)
-    venue_id = db.Column(db.Integer, db.ForeignKey("volunteer_venue.id"), nullable=False)
+    venue_id = db.Column(
+        db.Integer, db.ForeignKey("volunteer_venue.id"), nullable=False
+    )
     proposal_id = db.Column(db.Integer, db.ForeignKey("proposal.id"), nullable=True)
     start = db.Column(db.DateTime)
     end = db.Column(db.DateTime)
@@ -103,7 +113,7 @@ class Shift(BaseModel):
                 }
                 for s in cls.get_all()
             ],
-            "tables": ["volunteer_venue", "volunteer_shift", "volunteer_shift_entry"]
+            "tables": ["volunteer_venue", "volunteer_shift", "volunteer_shift_entry"],
         }
 
     def is_clash(self, other):
@@ -113,7 +123,10 @@ class Shift(BaseModel):
 
         if self.venue == other.venue and self.role == other.role:
             return False
-        return other.start <= self.start <= other.end or self.start <= other.start <= self.end
+        return (
+            other.start <= self.start <= other.end
+            or self.start <= other.start <= self.end
+        )
 
     def __repr__(self):
         return "<Shift {0}/{1}@{2}>".format(self.role.name, self.venue.name, self.start)
@@ -150,13 +163,17 @@ class Shift(BaseModel):
         Return all shifts for the requested day.
         """
         return (
-            cls.query.where(text("lower(to_char(start, 'Dy'))=:day").bindparams(day=day.lower()))
+            cls.query.where(
+                text("lower(to_char(start, 'Dy'))=:day").bindparams(day=day.lower())
+            )
             .order_by(Shift.start, Shift.venue_id)
             .all()
         )
 
     @classmethod
-    def generate_for(cls, role, venue, first, final, min, max, base_duration=120, changeover=15):
+    def generate_for(
+        cls, role, venue, first, final, min, max, base_duration=120, changeover=15
+    ):
         """
         Will generate shifts between start and end times. The last shift will
         end at end.
@@ -172,7 +189,9 @@ class Shift(BaseModel):
 
         final_start = final.subtract(minutes=base_duration)
 
-        initial_start_times = list(period(first.naive(), final_start.naive()).range("minutes", base_duration))
+        initial_start_times = list(
+            interval(first.naive(), final_start.naive()).range("minutes", base_duration)
+        )
 
         return [
             Shift(

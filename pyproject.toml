@@ -3,7 +3,7 @@ name = "website"
 version = "0.1"
 description = "The Electromagnetic Field web site"
 authors = []
-requires-python = ">=3.11,<3.12"
+requires-python = ">=3.13,<3.14"
 dependencies = [
     "decorator",
     "iso8601",
@@ -27,7 +27,7 @@ dependencies = [
     "flask-debugtoolbar",
     "gunicorn~=22.0",
     "pillow~=10.3",
-    "icalendar==3.11.7",
+    "icalendar~=6.3",
     "pytz",
     "stripe~=8.0.0",
     "python-dateutil",
@@ -37,7 +37,7 @@ dependencies = [
     "pyyaml",
     "prometheus-client",
     "flask-admin",
-    "pendulum>=2.0,<3.0",
+    "pendulum~=3.1",
     "geoalchemy2~=0.13",
     "flask-restful~=0.3",
     "shapely~=2.0",
@@ -82,7 +82,7 @@ dev = [
     "types-pytz",
     "lxml-stubs>=0.3.1,<0.4",
     "sqlalchemy-stubs>=0.4,<0.5",
-    "ruff>=0.9.5,<0.10",
+    "ruff==0.12.9",
 ]
 
 [tool.ruff.lint]
