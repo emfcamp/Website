@@ -6,6 +6,11 @@
 <p class="ticket-actions">
 <a class="btn btn-success" href="{{ url_for('tickets.receipt') }}">Printable ticket</a>
 <a class="btn btn-primary" href="{{ url_for('tickets.receipt', format='pdf') }}">Download PDF</a>
+{% if feature_enabled("ISSUE_APPLE_PKPASS_TICKETS") %}
+  <a href="{{ url_for('users.pkpass_ticket')}}">
+    <img src="{{ static_url_for('static', filename='images/add_to_apple_wallet.svg') }}" alt="Add to Apple wallet" height="50px">
+  </a>
+{% endif %}
 </p>
 {% endif %}
 <table class="table tickets btns-table">
