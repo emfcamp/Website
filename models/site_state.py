@@ -4,8 +4,9 @@ from datetime import datetime
 from sqlalchemy.orm.exc import MultipleResultsFound
 
 from main import cache, db
-from . import config_date, BaseModel
-from .product import Product, ProductGroup, ProductView, ProductViewProduct, PriceTier
+
+from . import BaseModel, config_date
+from .product import PriceTier, Product, ProductGroup, ProductView, ProductViewProduct
 
 log = logging.getLogger(__name__)
 
@@ -54,7 +55,7 @@ def calc_sales_state(date):
     if site_capacity.get_total_remaining_capacity() < 1:
         # We've hit capacity - no more tickets will be sold
         return "sold-out"
-    elif date > config_date("EVENT_END"):
+    if date > config_date("EVENT_END"):
         return "sales-ended"
 
     # Active price tier for the full ticket product in the main flow.

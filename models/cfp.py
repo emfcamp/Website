@@ -673,7 +673,7 @@ class Proposal(BaseModel):
                     try:
                         time_periods.append(cfp_period(parse_date(start.strip()), parse_date(end.strip())))
                     # If someone has entered garbage, dump the lot
-                    except ValueError as e:
+                    except ValueError:
                         time_periods = []
                         break
 

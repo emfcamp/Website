@@ -1,10 +1,8 @@
-# coding=utf-8
-from flask import render_template, redirect, url_for, flash
+from flask import flash, redirect, render_template, url_for
 from flask_login import current_user
-
-from wtforms import BooleanField, DateField, StringField, SubmitField, SelectField
-from wtforms.widgets import TextArea
+from wtforms import BooleanField, DateField, SelectField, StringField, SubmitField
 from wtforms.validators import Optional, ValidationError
+from wtforms.widgets import TextArea
 
 from main import db
 from models.admin_message import AdminMessage

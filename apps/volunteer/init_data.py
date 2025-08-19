@@ -10,7 +10,7 @@ def load_from_yaml(path_glob: str) -> list[dict[str, Any]]:
     items = []
 
     for path in Path(app.root_path).glob(path_glob):
-        with open(path, "r") as file:
+        with open(path) as file:
             items.append(safe_load(file))
 
     return items

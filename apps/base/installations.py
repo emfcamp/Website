@@ -2,11 +2,12 @@
 Pages under /installations - the Installations programme
 """
 
-from flask import render_template, redirect, url_for
+from flask import redirect, render_template, url_for
+
+from apps.common import render_markdown
+from models import event_year
 
 from . import base
-from models import event_year
-from apps.common import render_markdown
 
 
 @base.route("/installations")

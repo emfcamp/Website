@@ -90,10 +90,33 @@ dev = [
 line-length = 110
 
 [tool.ruff.lint]
-# TODO: see if we can sensibly lose any of these ignores. We should probably add the
-# "UP", "SIM", and "B" selectors but that will need some work.
-select = ["E", "F"]
-ignore = ["E402", "F541", "F841", "E721", "E722", "E501", "E712"]
+select = ["E", "F", "UP", "SIM", "B", "RUF", "LOG", "G", "I", "T20", "RET"]
+ignore = [
+    "E402",  # module-import-not-at-top-of-file: we have lots of bottom-of-file imports
+    "E501",  # line-too-long - lots of lines are too long!
+    "E712",  # true-false-comparison: clashes frequently with sqlalchemy `filter(foo==bar)`
+
+    "RUF005",  # collection-literal-concatenation
+    "RUF010",  # explicit-f-string-type-conversion: we prefer `{repr(foo)}` to `{foo!r}`
+    "RUF046",  # unnecessary-cast-to-int: sometimes it's nice to be explicit
+
+    "G004",  # logging-f-string: f strings more readable and we don't care about the perf
+
+    # Unpopular flake8-simplify rules
+    # https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
+    "SIM102", "SIM103", "SIM105", "SIM108", "SIM110", "SIM113", "SIM114",
+
+    "RET504",  # unnecessary-assign: nice e.g. when constructing then returning big dicts
+]
+[tool.ruff.lint.per-file-ignores]
+# Excluding CFP from new lints until the CFP rework is done
+"models/cfp.py" = ["UP", "SIM", "B", "RUF", "LOG", "G", "I", "T20", "RET"]
+"apps/{cfp,cfp_review}/**/*.py}" = ["UP", "SIM", "B", "F541", "RUF", "LOG", "G", "I", "T20", "RET"]
+"tests/test_cfp*" = ["B017"]
+"models/*" = [
+    # mutable-class-default: gets triggered by __versioned__, __mapper_args__ etc in models
+    "RUF012",
+]
 
 [tool.uv]
 required-version=">=0.8"

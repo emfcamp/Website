@@ -10,8 +10,9 @@ Otherwise, the browser still knows about the asset earlier and can start
 loading them before it's parsed the HTML.
 """
 
-from main import static_digest
 from flask import g, session
+
+from main import static_digest
 
 # If this file changes its hash, content will be pushed.
 PUSH_TRIGGER_FILE = "css/main.css"
@@ -25,7 +26,7 @@ def get_link_type(url):
         "jpg": "image",
         "png": "image",
         "webp": "image",
-    }.get(ext, None)
+    }.get(ext)
 
 
 def static_url_for(endpoint, **values):

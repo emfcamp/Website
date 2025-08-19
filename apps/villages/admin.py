@@ -3,25 +3,24 @@
 NOTE: make sure all admin views are tagged with the @village_admin_required decorator
 """
 
-from flask import render_template, abort, redirect, flash, url_for
-from wtforms import SubmitField, StringField
+from flask import abort, flash, redirect, render_template, url_for
+from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from wtforms.widgets import TextArea
-from ..common.forms import Form
-from ..common.email import (
-    format_trusted_html_email,
-    enqueue_trusted_emails,
-    preview_trusted_email,
-)
 
 from main import db
-
-from models.village import Village, VillageMember
 from models.user import User
-from .forms import AdminVillageForm
+from models.village import Village, VillageMember
 
 from ..common import require_permission
+from ..common.email import (
+    enqueue_trusted_emails,
+    format_trusted_html_email,
+    preview_trusted_email,
+)
+from ..common.forms import Form
 from . import villages
+from .forms import AdminVillageForm
 
 village_admin_required = require_permission("villages")
 
@@ -87,7 +86,7 @@ def admin_email_owners():
         if form.send_preview.data is True:
             preview_trusted_email(form.send_preview_address.data, form.subject.data, form.text.data)
 
-            flash("Email preview sent to %s" % form.send_preview_address.data)
+            flash(f"Email preview sent to {form.send_preview_address.data}")
             return render_template(
                 "villages/admin/email.html",
                 html=format_trusted_html_email(form.text.data, form.subject.data),
@@ -97,7 +96,7 @@ def admin_email_owners():
 
         if form.send.data is True:
             enqueue_trusted_emails(users, form.subject.data, form.text.data)
-            flash("Email queued for sending to %s users" % users.count())
+            flash(f"Email queued for sending to {users.count()} users")
             return redirect(url_for(".admin_email_owners"))
 
     return render_template("villages/admin/email.html", form=form)

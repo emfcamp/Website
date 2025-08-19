@@ -1,26 +1,28 @@
 from flask import (
     current_app as app,
-    render_template,
-    redirect,
-    url_for,
-    flash,
-    request,
-    render_template_string,
 )
-from markupsafe import Markup
+from flask import (
+    flash,
+    redirect,
+    render_template,
+    render_template_string,
+    request,
+    url_for,
+)
 from flask_login import current_user
-from wtforms import StringField, SubmitField, BooleanField
+from markupsafe import Markup
+from wtforms import BooleanField, StringField, SubmitField
 from wtforms.validators import DataRequired, Email, ValidationError
 
-from main import db
-from models.volunteer import Volunteer as VolunteerUser
-from models.user import User
-
-from . import volunteer, v_user_required
-from ..common.forms import Form
-from ..common.fields import TelField
-from ..common import create_current_user, feature_flag
 from apps.users import get_next_url
+from main import db
+from models.user import User
+from models.volunteer import Volunteer as VolunteerUser
+
+from ..common import create_current_user, feature_flag
+from ..common.fields import TelField
+from ..common.forms import Form
+from . import v_user_required, volunteer
 
 
 class VolunteerSignUpForm(Form):

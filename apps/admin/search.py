@@ -1,7 +1,9 @@
-from flask import request, redirect, url_for, render_template
-from models.user import User
-from models.payment import StripePayment, BankPayment
+from flask import redirect, render_template, request, url_for
 from sqlalchemy import func
+
+from models.payment import BankPayment, StripePayment
+from models.user import User
+
 from . import admin
 
 

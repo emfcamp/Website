@@ -1,7 +1,8 @@
 import re
-import requests
+from typing import ClassVar
 
 import click
+import requests
 from flask import current_app as app
 
 from main import db
@@ -22,7 +23,7 @@ class MatchYouTube:
     yt_url = "https://www.googleapis.com/youtube/v3/"
 
     # https://developers.google.com/youtube/v3/docs/playlistItems/list
-    data = {
+    data: ClassVar = {
         "part": "snippet,status",
         "fields": "items(snippet(description,resourceId/videoId,thumbnails/high),status),nextPageToken",
         "maxResults": "50",
@@ -32,13 +33,13 @@ class MatchYouTube:
 
     video_re = re.compile(r"(?P<url>https://media.ccc.de/v/(?P<prefix>emf[0-9]+)-(?P<id>[0-9]+)-\S+)")
 
-    playlists = [
+    playlists = (
         # 'PL1Hr6VkuONaHy8EZtLIXIMZQ858315pmt',  # 2014
         # 'PL1Hr6VkuONaHIKlU5hqVU28jGyK6qAfjX',  # 2016
         # "PL1Hr6VkuONaE4XM52ThiV-s3vXAUT0JCR",  # 2018
         # "PL1Hr6VkuONaECQTb0-TxGPVrQomXTWhbm",  # 2022
         "PL1Hr6VkuONaHvvLPgjFn3uUEl4xH6xUhQ",  # 2024
-    ]
+    )
 
     def __init__(self, dry_run=True, force=False, thumbnails="none"):
         self.dry_run = dry_run
@@ -61,7 +62,7 @@ class MatchYouTube:
         )
 
         if self.thumbnails == "c3voc":
-            app.logger.debug(f"Fetching schedule from c3voc")
+            app.logger.debug("Fetching schedule from c3voc")
             c3voc_data = requests.get(f"https://media.ccc.de/public/conferences/{self.c3voc_slug}").json()
             self.c3voc_thumbnails = {e["frontend_link"]: e["poster_url"] for e in c3voc_data["events"]}
 
@@ -91,16 +92,16 @@ class MatchYouTube:
 
         desc = video["snippet"]["description"]
         if desc == "This video is unavailable.":
-            app.logger.warn(f"Ignoring unavailable video {youtube_url}")
+            app.logger.warning(f"Ignoring unavailable video {youtube_url}")
             return
 
         if desc == "This video is private.":
-            app.logger.warn(f"Ignoring private video {youtube_url}")
+            app.logger.warning(f"Ignoring private video {youtube_url}")
             return
 
         matches = self.video_re.search(desc)
         if not matches:
-            app.logger.warn(f"Could not find c3voc URL for {youtube_url} ({desc})")
+            app.logger.warning(f"Could not find c3voc URL for {youtube_url} ({desc})")
             return
 
         groups = matches.groupdict()
@@ -129,8 +130,8 @@ class MatchYouTube:
         proposal = Proposal.query.get(proposal_id)
 
         if not proposal:
-            app.logger.warn(f"Could not find proposal {proposal_id}")
-            app.logger.warn(f"Would have updated to {youtube_url}, {thumbnail_url}, {c3voc_url}")
+            app.logger.warning(f"Could not find proposal {proposal_id}")
+            app.logger.warning(f"Would have updated to {youtube_url}, {thumbnail_url}, {c3voc_url}")
             return
 
         old = (proposal.youtube_url, proposal.c3voc_url)
@@ -144,18 +145,18 @@ class MatchYouTube:
             return
 
         if not self.force and proposal.youtube_url and proposal.youtube_url != youtube_url:
-            app.logger.warn(f"Proposal already has different youtube_url, not updating")
+            app.logger.warning("Proposal already has different youtube_url, not updating")
         else:
             proposal.youtube_url = youtube_url
 
         if self.thumbnail:
             if not self.force and proposal.thumbnail_url and proposal.thumbnail_url != thumbnail_url:
-                app.logger.warn(f"Proposal already has different thumbnail_url, not updating")
+                app.logger.warning("Proposal already has different thumbnail_url, not updating")
             else:
                 proposal.thumbnail_url = thumbnail_url
 
         if not self.force and proposal.c3voc_url and proposal.c3voc_url != c3voc_url:
-            app.logger.warn(f"Proposal already has different c3voc_url, not updating")
+            app.logger.warning("Proposal already has different c3voc_url, not updating")
         else:
             proposal.c3voc_url = c3voc_url
 

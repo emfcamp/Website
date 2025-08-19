@@ -1,6 +1,9 @@
+import logging
 import random
+
 from faker import Faker
 
+from apps.cfp.scheduler import Scheduler
 from apps.common.forms import (
     AGE_CHOICES,
     DISABILITY_CHOICES,
@@ -8,27 +11,28 @@ from apps.common.forms import (
     GENDER_CHOICES,
     SEXUALITY_CHOICES,
 )
-from apps.cfp.scheduler import Scheduler
 from main import db
-from models.user import User
-from models.diversity import UserDiversity
+from models import Currency
 from models.basket import Basket
-from models.event_tickets import EventTicket, get_max_rank_for_user
-from models.product import PriceTier
-from models.payment import StripePayment, BankPayment
 from models.cfp import (
+    LENGTH_OPTIONS,
     CFPVote,
     InstallationProposal,
-    LENGTH_OPTIONS,
     LightningTalkProposal,
     PerformanceProposal,
     TalkProposal,
     WorkshopProposal,
     YouthWorkshopProposal,
 )
+from models.diversity import UserDiversity
+from models.event_tickets import EventTicket, get_max_rank_for_user
+from models.payment import BankPayment, StripePayment
+from models.product import PriceTier
+from models.user import User
 from models.village import Village, VillageMember, VillageRequirements
-
 from models.volunteer.volunteer import Volunteer
+
+logger = logging.getLogger(__name__)
 
 
 def random_state(states):
@@ -43,7 +47,7 @@ def random_state(states):
     for state, prob in cumulative:
         if r <= prob:
             return state
-    assert False
+    raise AssertionError()
 
 
 def randombool(probability):
@@ -52,11 +56,9 @@ def randombool(probability):
 
 def fake_location():
     # Rough Lat and Lon ranges of Eastnor
-    lon_range = (-2.37509, -2.38056)
-    lat_range = (52.0391, 52.0438)
-    return "SRID=4326;POINT({lon} {lat})".format(
-        lon=random.uniform(*lon_range), lat=random.uniform(*lat_range)
-    )
+    lon = random.uniform(-2.37509, -2.38056)
+    lat = random.uniform(52.0391, 52.0438)
+    return f"SRID=4326;POINT({lon} {lat})"
 
 
 def fake_proposal(fake, reviewers):
@@ -124,7 +126,7 @@ def fake_proposal(fake, reviewers):
     return cfp
 
 
-class FakeDataGenerator(object):
+class FakeDataGenerator:
     def __init__(self):
         self.fake = Faker("en_GB")
 
@@ -146,10 +148,10 @@ class FakeDataGenerator(object):
 
         reviewers = []
         for i in range(10):
-            email = "reviewer{}@test.invalid".format(i)
+            email = f"reviewer{i}@test.invalid"
             user = User.query.filter_by(email=email).first()
             if not user:
-                user = User(email, "Reviewer {}".format(i))
+                user = User(email, f"Reviewer {i}")
                 user.grant_permission("cfp_reviewer")
                 db.session.add(user)
             reviewers.append(user)
@@ -159,24 +161,24 @@ class FakeDataGenerator(object):
             user_arrivals.grant_permission("arrivals")
             db.session.add(user_arrivals)
 
-        for i in range(0, 160):
+        for _ in range(0, 160):
             email = self.fake.safe_email()
             if User.get_by_email(email):
                 continue
             user = User(email, self.fake.name())
 
-            for i in range(0, int(round(random.uniform(0, 2)))):
+            for _ in range(0, int(round(random.uniform(0, 2)))):
                 cfp = fake_proposal(self.fake, reviewers)
                 cfp.user = user
                 db.session.add(cfp)
-                print(f"created fake proposal -- {cfp.type}")
+                logger.info("created fake proposal -- %s", cfp.type)
 
                 if (
                     cfp.type in ["youthworkshop", "workshop"]
                     and cfp.state in ["finalised", "accepted"]
                     and cfp.requires_ticket
                 ):
-                    print(f"going to create_fake_lottery_tickets")
+                    logger.info("going to create_fake_lottery_tickets")
                     # User reviewers as a handy list of users
                     self.create_fake_lottery_tickets(reviewers, cfp)
 
@@ -229,11 +231,8 @@ class FakeDataGenerator(object):
         user.grant_permission("volunteer:user")
         db.session.add(vol)
 
-    def create_fake_tickets(self, user):
-        if random.random() < 0.2:
-            currency = "EUR"
-        else:
-            currency = "GBP"
+    def create_fake_tickets(self, user) -> None:
+        currency: Currency = "EUR" if random.random() < 0.2 else "GBP"
 
         # In this case we're going to use the same payment method if we make multiple payments.
         payment_type = {"bank": BankPayment, "stripe": StripePayment}.get(
@@ -242,7 +241,7 @@ class FakeDataGenerator(object):
 
         # Create a variable number of purchases per customer
         num_purchases = abs(round(random.gauss(0, 2)))
-        for i in range(0, num_purchases):
+        for _ in range(0, num_purchases):
             b = Basket(user, currency)
             pt = PriceTier.query.filter_by(name="full-std").one()
             b[pt] = int(round(random.uniform(1, 4)))

@@ -16,19 +16,21 @@ and do not run by default in dev. This process is run by cron so
 granularity is no better than a few minutes.
 """
 
-import pendulum
 import logging
-from sqlalchemy.orm import Session
 from functools import wraps
 
+import pendulum
+from sqlalchemy.orm import Session
+
 from main import db
+
 from . import BaseModel
 
 tasks = []
 log = logging.getLogger(__name__)
 
 
-class ScheduledTask(object):
+class ScheduledTask:
     def __init__(self, func, duration):
         self.func = func
         self.duration = duration

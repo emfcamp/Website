@@ -1,32 +1,34 @@
 import re
+
 from flask import (
-    render_template,
-    redirect,
-    flash,
-    request,
     abort,
+    flash,
+    redirect,
+    render_template,
+    request,
     url_for,
+)
+from flask import (
     current_app as app,
 )
 from flask_login import current_user
-
-from sqlalchemy.sql.functions import func
 from sqlalchemy import not_
+from sqlalchemy.sql.functions import func
 
-from main import db, mail, external_url
-from models.user import User
+from main import db, external_url, mail
 from models.product import (
     VOUCHER_GRACE_PERIOD,
-    ProductGroup,
     Price,
     PriceTier,
     Product,
+    ProductGroup,
     ProductView,
     ProductViewProduct,
-    random_voucher,
     Voucher,
+    random_voucher,
 )
 from models.purchase import Purchase
+from models.user import User
 
 from ..common.email import (
     format_trusted_html_email,
@@ -35,20 +37,20 @@ from ..common.email import (
 )
 from . import admin
 from .forms import (
+    AddProductViewProductForm,
+    BulkVoucherEmailForm,
+    CopyProductGroupForm,
+    EditPriceTierForm,
     EditProductForm,
+    EditProductGroupForm,
+    EditProductViewForm,
+    EditVoucherForm,
+    ModifyPriceTierForm,
+    NewPriceTierForm,
     NewProductForm,
     NewProductGroupForm,
-    EditProductGroupForm,
-    CopyProductGroupForm,
-    NewPriceTierForm,
-    EditPriceTierForm,
-    ModifyPriceTierForm,
     NewProductViewForm,
-    EditProductViewForm,
-    AddProductViewProductForm,
     NewVoucherForm,
-    EditVoucherForm,
-    BulkVoucherEmailForm,
 )
 
 
@@ -363,7 +365,7 @@ def tees():
         .join(Product, Purchase, Purchase.owner)
         .group_by(User.id, Product.id)
         .with_entities(User, Product, func.count(Purchase.id))
-        .filter(Purchase.is_paid_for == True)  # noqa: E712
+        .filter(Purchase.is_paid_for == True)
         .order_by(User.name, Product.name)
     )
 

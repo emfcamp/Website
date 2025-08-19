@@ -1,15 +1,16 @@
-from wtforms import (
-    SubmitField,
-    StringField,
-    SelectField,
-    TextAreaField,
-    IntegerField,
-)
-from wtforms.validators import Optional, Length, URL
 from geoalchemy2.shape import to_shape
+from wtforms import (
+    IntegerField,
+    SelectField,
+    StringField,
+    SubmitField,
+    TextAreaField,
+)
+from wtforms.validators import URL, Length, Optional
+
+from models import Village
 
 from ..common.forms import Form
-from models import Village
 
 
 class VillageForm(Form):
@@ -76,7 +77,7 @@ class AdminVillageForm(VillageForm):
             self.latlon.data = ""
         else:
             latlon = to_shape(village.location)
-            self.latlon.data = "{}, {}".format(latlon.x, latlon.y)
+            self.latlon.data = f"{latlon.x}, {latlon.y}"
 
     def populate_obj(self, village: Village) -> None:
         village.name = self.name.data

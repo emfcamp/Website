@@ -1,6 +1,6 @@
 from decorator import decorator
-
-from flask import Blueprint, request, current_app as app, redirect, url_for, abort
+from flask import Blueprint, abort, redirect, request, url_for
+from flask import current_app as app
 from flask_login import current_user
 
 from models.volunteer import Volunteer
@@ -34,11 +34,13 @@ def volunteer_variables():
     return {"view_name": request.url_rule.endpoint.replace("volunteer.", ".")}
 
 
-from . import main  # noqa: F401
-from . import schedule  # noqa: F401
-from . import sign_up  # noqa: F401
-from . import choose_roles  # noqa: F401
-from . import training  # noqa: F401
-from . import bar_training  # noqa: F401
-from . import stats  # noqa: F401
-from . import api  # noqa: F401
+from . import (
+    api,  # noqa: F401
+    bar_training,  # noqa: F401
+    choose_roles,  # noqa: F401
+    main,  # noqa: F401
+    schedule,  # noqa: F401
+    sign_up,  # noqa: F401
+    stats,  # noqa: F401
+    training,  # noqa: F401
+)

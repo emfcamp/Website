@@ -1,20 +1,21 @@
-from datetime import datetime, timedelta
 import logging
+from datetime import datetime, timedelta
 
-from flask import render_template, redirect, flash, url_for, current_app as app
-from flask_login import login_required, current_user
+from flask import current_app as app
+from flask import flash, redirect, render_template, url_for
+from flask_login import current_user, login_required
 from flask_mailman import EmailMessage
-from wtforms import SubmitField, HiddenField
-from wtforms.validators import DataRequired, AnyOf
+from wtforms import HiddenField, SubmitField
+from wtforms.validators import AnyOf, DataRequired
 
 from main import db
 from models.payment import BankPayment, BankTransaction
-from ..common import get_user_currency, feature_enabled
+
+from ..common import feature_enabled, get_user_currency
 from ..common.email import from_email
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
-from . import get_user_payment_or_abort, lock_user_payment_or_abort
-from . import payments
+from . import get_user_payment_or_abort, lock_user_payment_or_abort, payments
 
 logger = logging.getLogger(__name__)
 
@@ -100,14 +101,14 @@ def transfer_change_currency(payment_id):
             currency = form.currency.data
 
             if currency == payment.currency:
-                flash("Currency is already {}".format(currency))
+                flash(f"Currency is already {currency}")
                 return redirect(url_for("payments.transfer_waiting", payment_id=payment.id))
 
             payment.change_currency(currency)
             db.session.commit()
 
             logger.info("Payment %s changed to %s", payment.id, currency)
-            flash("Currency changed to {}".format(currency))
+            flash(f"Currency changed to {currency}")
 
         return redirect(url_for("payments.transfer_waiting", payment_id=payment.id))
 
@@ -164,7 +165,7 @@ def reconcile_txns(txns: list[BankTransaction], doit: bool = False):
 
         payment = txn.match_payment()
         if not payment:
-            app.logger.warn("Could not match payee, skipping")
+            app.logger.warning("Could not match payee, skipping")
             failed += 1
             continue
 
@@ -180,7 +181,7 @@ def reconcile_txns(txns: list[BankTransaction], doit: bool = False):
             payment.lock()
 
         if txn.amount != payment.amount:
-            app.logger.warn(
+            app.logger.warning(
                 "Transaction amount %s doesn't match %s, skipping",
                 txn.amount,
                 payment.amount,
@@ -190,7 +191,7 @@ def reconcile_txns(txns: list[BankTransaction], doit: bool = False):
             continue
 
         if txn.account.currency != payment.currency:
-            app.logger.warn(
+            app.logger.warning(
                 "Transaction currency %s doesn't match %s, skipping",
                 txn.account.currency,
                 payment.currency,

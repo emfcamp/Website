@@ -1,32 +1,36 @@
-from decorator import decorator
-from datetime import datetime
 import json
-import re
 import os.path
-from textwrap import wrap
-import pendulum
+import re
 from dataclasses import dataclass
+from datetime import datetime
+from os import path
+from pathlib import Path
+from textwrap import wrap
 
+import pendulum
+from decorator import decorator
 from flask import (
-    session,
     abort,
-    current_app as app,
     render_template,
     render_template_string,
+    session,
+)
+from flask import (
+    current_app as app,
 )
 from flask.json import jsonify
-from flask_login import login_user, current_user
+from flask_login import current_user, login_user
 from jinja2.utils import urlize
 from markdown import markdown
 from markupsafe import Markup
-from os import path
-from pathlib import Path
-from werkzeug.wrappers import Response
 from werkzeug.exceptions import HTTPException
+from werkzeug.wrappers import Response
 from yaml import safe_load as parse_yaml
 
 from main import db, external_url
+from models import User, event_end, event_start
 from models.basket import Basket
+from models.feature_flag import get_db_flags
 from models.product import Price
 from models.purchase import Ticket
 from models.site_state import (
@@ -35,8 +39,6 @@ from models.site_state import (
     get_signup_state,
     get_site_state,
 )
-from models.feature_flag import get_db_flags
-from models import User, event_start, event_end
 
 from .preload import init_preload
 
@@ -79,7 +81,7 @@ def load_utility_functions(app_obj):
             # TODO: look up after from CURRENCIES
         else:
             amount = price
-        amount = "{0:.2f}".format(amount)
+        amount = f"{amount:.2f}"
         symbol = CURRENCY_SYMBOLS[currency]
         if after:
             return amount + symbol
@@ -89,7 +91,7 @@ def load_utility_functions(app_obj):
     def format_bankref(bankref):
         if bankref.startswith("RF"):
             return " ".join(wrap(bankref, 4))
-        return "%s-%s" % (bankref[:4], bankref[4:])
+        return f"{bankref[:4]}-{bankref[4:]}"
 
     @app_obj.template_filter("vatrate")
     def format_vatrate(vat_rate):
@@ -155,7 +157,7 @@ def load_utility_functions(app_obj):
     def octicons_processor():
         def octicon(name, **kwargs):
             cls_list = kwargs.get("class", [])
-            if type(cls_list) != list:
+            if not isinstance(cls_list, list):
                 cls_list = list(cls_list)
             classes = " ".join(cls_list)
 
@@ -287,7 +289,7 @@ def json_response(f, *args, **kwargs):
         return jsonify(data), 500
 
     else:
-        if isinstance(response, (app.response_class, Response)):
+        if isinstance(response, app.response_class | Response):
             return response
 
         return jsonify(response), 200
@@ -328,7 +330,7 @@ def load_archive_file(year: int, *path, raise_404=True):
     json_path = archive_file(year, *path, raise_404=raise_404)
     if json_path is None:
         return None
-    return json.load(open(json_path, "r"))
+    return json.load(open(json_path))
 
 
 def page_template(metadata, template):
@@ -337,8 +339,7 @@ def page_template(metadata, template):
 
     if "show_nav" not in metadata or metadata["show_nav"] is True:
         return template
-    else:
-        return "static_page.html"
+    return "static_page.html"
 
 
 def render_markdown(source, template="about/template.html", **view_variables):
@@ -348,7 +349,7 @@ def render_markdown(source, template="about/template.html", **view_variables):
     if not source_file.is_relative_to(template_root) or not source_file.exists():
         return abort(404)
 
-    with open(source_file, "r") as f:
+    with open(source_file) as f:
         source = f.read()
         (metadata, content) = source.split("---", 2)
         metadata = parse_yaml(metadata)

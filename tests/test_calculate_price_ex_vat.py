@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from models.product import Price, PriceTier
 
 

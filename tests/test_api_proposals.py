@@ -1,6 +1,6 @@
 import pytest
 
-from models.cfp import TalkProposal, Proposal
+from models.cfp import Proposal, TalkProposal
 
 
 @pytest.fixture(scope="module")

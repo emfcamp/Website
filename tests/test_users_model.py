@@ -1,10 +1,10 @@
-from models.user import User
 from models.user import (
-    generate_login_code,
-    verify_login_code,
+    User,
     generate_api_token,
     generate_checkin_code,
+    generate_login_code,
     verify_checkin_code,
+    verify_login_code,
 )
 
 

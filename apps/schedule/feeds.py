@@ -1,23 +1,25 @@
 import json
-from icalendar import Calendar, Event
-from flask import request, abort, current_app as app, Response
+
+from flask import Response, abort, request
+from flask import current_app as app
 from flask_cors import cross_origin
 from flask_login import current_user
+from icalendar import Calendar, Event
 
 from models import event_year
-from models.user import User
 from models.cfp import Proposal
+from models.user import User
 
-from ..common import feature_flag, feature_enabled, json_response
-from .schedule_xml import export_frab
-from .historic import feed_historic
+from ..common import feature_enabled, feature_flag, json_response
+from . import schedule
 from .data import (
-    _get_scheduled_proposals,
-    _get_proposal_dict,
     _convert_time_to_str,
+    _get_proposal_dict,
+    _get_scheduled_proposals,
     _get_upcoming,
 )
-from . import schedule
+from .historic import feed_historic
+from .schedule_xml import export_frab
 
 
 def _format_event_description(event):
@@ -92,7 +94,7 @@ def schedule_ical(year):
         abort(404)
 
     schedule = _get_scheduled_proposals(request.args)
-    title = "EMF {}".format(event_year())
+    title = f"EMF {event_year()}"
 
     cal = Calendar()
     cal.add("summary", title)
@@ -102,7 +104,7 @@ def schedule_ical(year):
 
     for event in schedule:
         cal_event = Event()
-        cal_event.add("uid", "%s-%s" % (year, event["id"]))
+        cal_event.add("uid", "{}-{}".format(year, event["id"]))
         cal_event.add("summary", event["title"])
         cal_event.add("description", _format_event_description(event))
         cal_event.add("location", event["venue"])
@@ -149,7 +151,7 @@ def favourites_ical():
         abort(404)
 
     schedule = _get_scheduled_proposals(request.args, override_user=user)
-    title = "EMF {} Favourites for {}".format(event_year(), user.name)
+    title = f"EMF {event_year()} Favourites for {user.name}"
 
     cal = Calendar()
     cal.add("summary", title)
@@ -161,7 +163,7 @@ def favourites_ical():
         if not event["is_fave"]:
             continue
         cal_event = Event()
-        cal_event.add("uid", "%s-%s" % (event_year(), event["id"]))
+        cal_event.add("uid", "{}-{}".format(event_year(), event["id"]))
         cal_event.add("summary", event["title"])
         cal_event.add("description", _format_event_description(event))
         cal_event.add("location", event["venue"])

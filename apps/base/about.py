@@ -13,8 +13,9 @@ from flask import (
     url_for,
 )
 
-from . import base
 from apps.common import render_markdown
+
+from . import base
 
 
 @base.route("/about/branding")
@@ -30,11 +31,11 @@ def page(page_name: str):
 @base.route("/about/diversity/<int:year>")
 def yearly_diversity_stats(year: int):
     if year in (2018, 2022):
-        with open(f"exports/{year}/public/UserDiversity.json", "r") as raw_data:
+        with open(f"exports/{year}/public/UserDiversity.json") as raw_data:
             data = json.load(raw_data)
 
         return render_template(
-            f"about/diversity/pre-2024-stats.html",
+            "about/diversity/pre-2024-stats.html",
             year=year,
             data=data["diversity"],
         )

@@ -1,13 +1,14 @@
-import pendulum  # preferred over datetime
 from collections import defaultdict
-from werkzeug.datastructures import MultiDict
+
+import pendulum  # preferred over datetime
 from flask_login import current_user
 from slugify import slugify
+from werkzeug.datastructures import MultiDict
 
+from main import external_url
 from models import event_year
 from models.cfp import Proposal, Venue
 
-from main import external_url
 from . import event_tz
 
 
@@ -63,12 +64,14 @@ def _filter_obj_to_dict(filter_obj):
     """Request.args uses a MulitDict this lets us pass filter_obj as plain dicts
     and have everything work as expected.
     """
-    if type(filter_obj) == MultiDict:
+    if isinstance(filter_obj, MultiDict):
         return filter_obj.to_dict()
     return filter_obj
 
 
-def _get_scheduled_proposals(filter_obj={}, override_user=None):
+def _get_scheduled_proposals(filter_obj=None, override_user=None):
+    if filter_obj is None:
+        filter_obj = dict()
     filter_obj = _filter_obj_to_dict(filter_obj)
     if override_user:
         user = override_user
@@ -90,7 +93,7 @@ def _get_scheduled_proposals(filter_obj={}, override_user=None):
 
     schedule = [_get_proposal_dict(p, proposal_favourites) for p in schedule]
 
-    if "is_favourite" in filter_obj and filter_obj["is_favourite"]:
+    if filter_obj.get("is_favourite"):
         schedule = [s for s in schedule if s.get("is_fave", False)]
 
     if "venue" in filter_obj:
@@ -99,7 +102,9 @@ def _get_scheduled_proposals(filter_obj={}, override_user=None):
     return schedule
 
 
-def _get_upcoming(filter_obj={}, override_user=None):
+def _get_upcoming(filter_obj=None, override_user=None):
+    if filter_obj is None:
+        filter_obj = dict()
     filter_obj = _filter_obj_to_dict(filter_obj)
     now = pendulum.now(event_tz)
     proposals = _get_scheduled_proposals(filter_obj, override_user)

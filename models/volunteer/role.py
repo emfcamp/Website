@@ -1,8 +1,10 @@
 from itertools import groupby
 from operator import itemgetter
-from main import db
+
 from markdown import markdown
 from markupsafe import Markup
+
+from main import db
 
 from .. import BaseModel
 from .volunteer import VolunteerRoleInterest, VolunteerRoleTraining
@@ -21,7 +23,7 @@ class Role(BaseModel):
     requires_training = db.Column(db.Boolean, nullable=False, default=False)
 
     def __repr__(self):
-        return "<VolunteerRole {0}>".format(self.name)
+        return f"<VolunteerRole {self.name}>"
 
     def __str__(self):
         return self.name

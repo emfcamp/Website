@@ -1,14 +1,16 @@
 import logging
-
 from datetime import datetime, timedelta
-from flask import abort, current_app as app, request
+
+from flask import abort, request
+from flask import current_app as app
 from pywisetransfer.exceptions import InvalidWebhookSignature
 from pywisetransfer.webhooks import validate_request
 
+from main import db, wise
 from models.payment import BankAccount, BankTransaction
+
 from . import payments
 from .banktransfer import reconcile_txns
-from main import db, wise
 
 logger = logging.getLogger(__name__)
 
@@ -255,8 +257,7 @@ def wise_retrieve_accounts(profile_id):
     borderless_accounts = wise.borderless_accounts.list(profile_id=profile_id)
 
     for borderless_account in borderless_accounts:
-        for bank_account in _collect_bank_accounts(borderless_account):
-            yield bank_account
+        yield from _collect_bank_accounts(borderless_account)
 
 
 def wise_validate():

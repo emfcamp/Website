@@ -1,13 +1,12 @@
 import html
 import random
-import pendulum
-from datetime import datetime, timedelta
 from collections import defaultdict
+from datetime import datetime, timedelta
 
-from flask import render_template, redirect, url_for, flash, request, abort
-from flask_login import current_user
+import pendulum
+from flask import abort, flash, redirect, render_template, request, url_for
 from flask import current_app as app
-
+from flask_login import current_user
 from wtforms import (
     FieldList,
     FormField,
@@ -19,22 +18,20 @@ from wtforms import (
 
 from main import db
 from models import event_year
-from models.cfp import Proposal, Venue, HUMAN_CFP_TYPES, WorkshopProposal
-from models.user import generate_api_token
 from models.admin_message import AdminMessage
+from models.cfp import HUMAN_CFP_TYPES, Proposal, Venue, WorkshopProposal
 from models.event_tickets import EventTicket
 from models.site_state import get_signup_state
+from models.user import generate_api_token
 
-from ..common import feature_flag, feature_enabled
-from ..common.forms import Form
-from ..common.fields import HiddenIntegerField
-from ..volunteer import v_user_required
 from ..cfp_review import admin_required as cfp_admin_required
-
-from . import schedule, event_tz
-from .historic import talks_historic, item_historic, historic_talk_data
+from ..common import feature_enabled, feature_flag
+from ..common.fields import HiddenIntegerField
+from ..common.forms import Form
+from ..volunteer import v_user_required
+from . import event_tz, schedule
 from .data import _get_upcoming
-
+from .historic import historic_talk_data, item_historic, talks_historic
 
 # This controls both which types show on lineup and favourites, and in which order they are presented.
 LINEUP_TYPE_ORDER = ["talk", "workshop", "youthworkshop", "performance"]
@@ -54,14 +51,12 @@ def main_year(year):
         if feature_enabled("SCHEDULE"):
             # Schedule is ready, show it
             return schedule_current()
-        elif feature_enabled("LINE_UP"):
+        if feature_enabled("LINE_UP"):
             # Show the lineup (list of talks without times/venues)
             return line_up()
-        else:
-            # No schedule should be shown yet.
-            return render_template("schedule/no-schedule.html")
-    else:
-        return talks_historic(year)
+        # No schedule should be shown yet.
+        return render_template("schedule/no-schedule.html")
+    return talks_historic(year)
 
 
 def schedule_current():
@@ -122,7 +117,7 @@ def add_favourite():
         current_user.favourites.append(proposal)
 
     db.session.commit()
-    return redirect(url_for(".main_year", year=event_year()) + "#proposal-{}".format(proposal.id))
+    return redirect(url_for(".main_year", year=event_year()) + f"#proposal-{proposal.id}")
 
 
 @schedule.route("/favourites", methods=["GET", "POST"])
@@ -141,7 +136,7 @@ def favourites():
             current_user.favourites.append(proposal)
 
         db.session.commit()
-        return redirect(url_for(".favourites") + "#proposal-{}".format(proposal.id))
+        return redirect(url_for(".favourites") + f"#proposal-{proposal.id}")
 
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for(".favourites")))
@@ -164,8 +159,7 @@ def item(year, proposal_id, slug=None):
     """Display a detail page for a schedule item"""
     if year == event_year():
         return item_current(year, proposal_id, slug)
-    else:
-        return item_historic(year, proposal_id, slug)
+    return item_historic(year, proposal_id, slug)
 
 
 class ItemForm(Form):
@@ -222,7 +216,7 @@ def item_current(year, proposal_id, slug=None):
                     ticket.reenter_lottery()
                     msg = f'Re-entered lottery for "{proposal.display_title}" tickets'
                 else:
-                    msg = f"Updated ticket count"
+                    msg = "Updated ticket count"
                 ticket.ticket_count = form.ticket_count.data
 
             elif form.get_ticket.data:
@@ -233,7 +227,7 @@ def item_current(year, proposal_id, slug=None):
                 else:
                     # it's already in 'ticket' state so just re-issue codes
                     ticket.issue_codes()
-                    msg = f"Updated ticket count"
+                    msg = "Updated ticket count"
 
         elif form.get_ticket.data or form.enter_lottery.data:
             ticket = EventTicket.create_ticket(current_user, proposal, form.ticket_count.data)
@@ -358,8 +352,6 @@ def time_machine():
     now = pendulum.now(event_tz)
     now_time = now.time()
     now_weekday = now.weekday()
-
-    days = [4, 5, 6]  # Friday  # Saturday  # Sunday
 
     years = [2012, 2014, 2016, 2018, 2022]
 
@@ -554,7 +546,7 @@ def greenroom():
             db.session.add(msg)
             db.session.commit()
 
-            flash(f"Message sent")
+            flash("Message sent")
             return redirect(url_for(".greenroom"))
 
     messages = AdminMessage.get_all_for_topic("heralds")

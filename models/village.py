@@ -1,12 +1,13 @@
 from __future__ import annotations
-from typing import Optional
-from sqlalchemy.ext.associationproxy import association_proxy
 
 from geoalchemy2 import Geometry
 from geoalchemy2.shape import to_shape
 from sqlalchemy import Index
+from sqlalchemy.ext.associationproxy import association_proxy
+
 from main import db
 from models.user import User
+
 from . import BaseModel
 
 
@@ -25,11 +26,11 @@ class Village(BaseModel):
     members = association_proxy("village_memberships", "user")
 
     @classmethod
-    def get_by_name(cls, name) -> Optional[Village]:
+    def get_by_name(cls, name) -> Village | None:
         return cls.query.filter_by(name=name).one_or_none()
 
     @classmethod
-    def get_by_id(cls, id) -> Optional[Village]:
+    def get_by_id(cls, id) -> Village | None:
         return cls.query.filter_by(id=id).one_or_none()
 
     def admins(self) -> list[User]:
@@ -65,16 +66,11 @@ class Village(BaseModel):
         return None
 
     @property
-    def map_link(self) -> Optional[str]:
-        latlon = self.latlon
-        if latlon:
-            return "https://map.emfcamp.org/#18.5/%s/%s/m=%s,%s" % (
-                latlon[0],
-                latlon[1],
-                latlon[0],
-                latlon[1],
-            )
-        return None
+    def map_link(self) -> str | None:
+        if not self.latlon:
+            return None
+        lat, lon = self.latlon
+        return f"https://map.emfcamp.org/#18.5/{lat}/{lon}/m={lat},{lon}"
 
     @classmethod
     def get_export_data(cls):

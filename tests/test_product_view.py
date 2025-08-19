@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
-from models.product import VOUCHER_GRACE_PERIOD, ProductView, Voucher
 from models.cfp import TalkProposal
+from models.product import VOUCHER_GRACE_PERIOD, ProductView, Voucher
 
 
 def test_product_view_accessible(db, user, monkeypatch):

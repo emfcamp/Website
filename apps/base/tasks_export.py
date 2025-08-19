@@ -1,19 +1,19 @@
-from datetime import datetime
 import json
 import os
-from typing import Optional
+from datetime import datetime
 
 import click
 from flask import current_app as app
-from sqlalchemy_continuum.utils import version_class, is_versioned
+from sqlalchemy_continuum.utils import is_versioned, version_class
 
-from main import db
 from apps.common.json_export import ExportEncoder
+from main import db
 from models import event_year
+
 from . import base
 
 
-def get_export_data(table_filter: Optional[str] = None):
+def get_export_data(table_filter: str | None = None):
     """Export data to archive using the `get_export_data` method in the model class."""
     # As we go, we check against the list of all tables, in case we forget about some
     # new object type (e.g. association table).
@@ -67,7 +67,7 @@ def get_export_data(table_filter: Optional[str] = None):
             try:
                 export = model_class.get_export_data()
                 yield model, export
-            except Exception as e:
+            except Exception:
                 app.logger.error("Error exporting %s", model)
                 raise
 
@@ -110,20 +110,21 @@ def export_db(stdout, table):
     for model, export in get_export_data(table):
         for dirname in ["public", "private"]:
             if dirname in export:
-                filename = os.path.join(path, dirname, "{}.json".format(model))
+                filename = os.path.join(path, dirname, f"{model}.json")
                 try:
                     if stdout:
                         app.logger.info(json.dumps(export[dirname]))
                     else:
-                        json.dump(
-                            export[dirname],
-                            open(filename, "w"),
-                            indent=4,
-                            cls=ExportEncoder,
-                        )
-                except:
+                        with open(filename, "w") as f:
+                            json.dump(
+                                export[dirname],
+                                f,
+                                indent=4,
+                                cls=ExportEncoder,
+                            )
+                except Exception as e:
                     app.logger.exception("Error encoding export for %s", model)
-                    raise click.Abort()
+                    raise click.Abort() from e
                 app.logger.info("Exported data from %s to %s", model, filename)
 
     data = {
@@ -134,7 +135,8 @@ def export_db(stdout, table):
     if stdout:
         app.logger.info(json.dumps(data))
     else:
-        json.dump(data, open(filename, "w"), indent=4, cls=ExportEncoder)
+        with open(filename, "w") as f:
+            json.dump(data, f, indent=4, cls=ExportEncoder)
 
     if table:
         return

@@ -1,11 +1,11 @@
 from random import choices
 
 from main import db
-from . import BaseModel, export_attr_counts, bucketise
+
+from . import BaseModel, bucketise, export_attr_counts
+from .cfp import Proposal
 from .site_state import get_signup_state
 from .user import User
-from .cfp import Proposal
-
 
 # entered-lottery -- An entry in the lottery for a ticket
 # ticket -- either a converted lottery ticket or a simply issued ticket
@@ -96,7 +96,7 @@ class EventTicket(BaseModel):
         # The force option only exists for ease of resetting this in dev
         if force:
             self.state = new_state
-            return
+            return None
 
         if new_state == self.state:
             return self
@@ -115,10 +115,10 @@ class EventTicket(BaseModel):
                 raise EventTicketException(
                     f"invalid state transition {self.state} -> {new_state} whilst in {signup_state}"
                 )
-        except KeyError:
+        except KeyError as e:
             raise EventTicketException(
                 f"State, {self.state} not found in in {signup_state}, new state {new_state}"
-            )
+            ) from e
 
         self.state = new_state
         return self
@@ -128,7 +128,7 @@ class EventTicket(BaseModel):
         # These are in no way cryptographically secure etc but 1 in 308m should
         # be low enough odds for guessing.
         codes = []
-        for i in range(self.ticket_count):
+        for _ in range(self.ticket_count):
             codes.append("".join(choices(SAFECHARS, k=6)))
         self.ticket_codes = ",".join(codes)
         return self
@@ -174,10 +174,10 @@ class EventTicket(BaseModel):
         if signup_state == "issue-lottery-tickets":
             rank = get_max_rank_for_user(user, proposal.type)
             return EventTicket(user.id, proposal.id, "entered-lottery", ticket_count, rank)
-        elif signup_state == "issue-event-tickets" and (ticket_count <= proposal.get_total_capacity()):
+        if signup_state == "issue-event-tickets" and (ticket_count <= proposal.get_total_capacity()):
             return EventTicket(user.id, proposal.id, "ticket", ticket_count).issue_codes()
 
-        elif signup_state == "issue-event-tickets" and not (ticket_count < proposal.get_total_capacity()):
+        if signup_state == "issue-event-tickets" and not (ticket_count < proposal.get_total_capacity()):
             raise EventTicketException(f"This {proposal.human_type} is currently full.")
 
         raise EventTicketException("Tickets are not currently being issued")

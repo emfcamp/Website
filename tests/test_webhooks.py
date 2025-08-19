@@ -5,13 +5,13 @@ def load_webhook_fixture(name):
     fixture_path = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "webhook_fixtures", f"{name}.json"
     )
-    with open(fixture_path, "r") as f:
+    with open(fixture_path) as f:
         return f.read().strip()
 
 
 def load_webhook_signature(name):
     fixture_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "webhook_fixtures", f"{name}.sig")
-    with open(fixture_path, "r") as f:
+    with open(fixture_path) as f:
         return f.read().strip()
 
 

@@ -1,7 +1,9 @@
 from datetime import datetime
 
 from sqlalchemy import and_
+
 from models.volunteer.shift import Shift
+
 from . import volunteer
 
 

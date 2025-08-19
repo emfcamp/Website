@@ -1,5 +1,7 @@
 import json
+import re
 
+from email_validator import EmailNotValidError, validate_email
 from markupsafe import Markup
 from wtforms import (
     IntegerField,
@@ -8,11 +10,9 @@ from wtforms import (
     StringField,
     ValidationError,
 )
-from wtforms.widgets import Input, HiddenInput, CheckboxInput, ListWidget
-from wtforms.widgets.html5 import EmailInput
+from wtforms.widgets import CheckboxInput, HiddenInput, Input, ListWidget
 from wtforms.widgets.core import html_params
-from email_validator import validate_email, EmailNotValidError
-import re
+from wtforms.widgets.html5 import EmailInput
 
 
 class EmailField(StringField):
@@ -30,7 +30,7 @@ class EmailField(StringField):
             # Replace data with normalised version of email
             self.data = result["email"]
         except EmailNotValidError as e:
-            raise ValidationError(str(e))
+            raise ValidationError(str(e)) from e
 
 
 class IntegerSelectField(SelectField):
@@ -86,8 +86,8 @@ class JSONField(StringField):
         if valuelist and valuelist[0] != "":
             try:
                 self.data = json.loads(valuelist[0])
-            except ValueError:
-                raise ValueError("This field contains invalid JSON")
+            except ValueError as e:
+                raise ValueError("This field contains invalid JSON") from e
         else:
             self.data = {}
 
@@ -96,11 +96,11 @@ class JSONField(StringField):
         if self.data:
             try:
                 json.dumps(self.data)
-            except TypeError:
-                raise ValueError("This field contains invalid JSON")
+            except TypeError as e:
+                raise ValueError("This field contains invalid JSON") from e
 
 
-class StaticWidget(object):
+class StaticWidget:
     """
     Render a Bootstrap ``form-control-static`` div.
 
@@ -110,11 +110,11 @@ class StaticWidget(object):
     def __call__(self, field, **kwargs):
         kwargs.setdefault("id", field.id)
         if "class_" in kwargs:
-            kwargs["class_"] = "form-control-static %s" % kwargs["class_"]
+            kwargs["class_"] = "form-control-static {}".format(kwargs["class_"])
         else:
             kwargs["class_"] = "form-control-static"
 
-        return Markup("<div %s>%s</div>" % (html_params(**kwargs), field._value()))
+        return Markup(f"<div {html_params(**kwargs)}>{field._value()}</div>")
 
 
 class StaticField(StringField):

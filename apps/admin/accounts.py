@@ -1,12 +1,10 @@
-from . import admin
-
 import re
 
-from Levenshtein import ratio, jaro
-from flask import render_template, redirect, flash, url_for, current_app as app
+from flask import current_app as app
+from flask import flash, redirect, render_template, url_for
 from flask_login import current_user
 from flask_mailman import EmailMessage
-
+from Levenshtein import jaro, ratio
 from wtforms import SubmitField
 
 from main import db
@@ -16,6 +14,7 @@ from ..common import feature_enabled
 from ..common.email import from_email
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
+from . import admin
 
 
 @admin.route("/transactions")
@@ -41,7 +40,7 @@ def transaction_suppress(txn_id):
             app.logger.info("Transaction %s suppressed", txn.id)
 
             db.session.commit()
-            flash("Transaction %s suppressed" % txn.id)
+            flash(f"Transaction {txn.id} suppressed")
             return redirect(url_for("admin.transactions"))
 
     return render_template("admin/accounts/txn-suppress.html", txn=txn, form=form)
@@ -123,14 +122,14 @@ def transaction_reconcile(txn_id, payment_id):
 
             if txn.payment:
                 app.logger.error("Transaction already reconciled")
-                flash("Transaction %s already reconciled" % txn.id)
+                flash(f"Transaction {txn.id} already reconciled")
                 return redirect(url_for("admin.transactions"))
 
             payment.lock()
 
             if payment.state == "paid":
                 app.logger.error("Payment has already been paid")
-                flash("Payment %s already paid" % payment.id)
+                flash(f"Payment {payment.id} already paid")
                 return redirect(url_for("admin.transactions"))
 
             txn.payment = payment
@@ -156,7 +155,7 @@ def transaction_reconcile(txn_id, payment_id):
 
             msg.send()
 
-            flash("Payment ID %s marked as paid" % payment.id)
+            flash(f"Payment ID {payment.id} marked as paid")
             return redirect(url_for("admin.transactions"))
 
     return render_template("admin/accounts/txn-reconcile.html", txn=txn, payment=payment, form=form)

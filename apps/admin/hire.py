@@ -1,10 +1,9 @@
 from flask import render_template
-
 from sqlalchemy.sql.functions import func
 
-from models.user import User
-from models.product import ProductGroup, Product
+from models.product import Product, ProductGroup
 from models.purchase import Purchase
+from models.user import User
 
 from . import admin
 

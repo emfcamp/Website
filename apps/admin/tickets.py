@@ -1,38 +1,37 @@
-from . import admin
-
 from flask import (
-    render_template,
-    redirect,
-    flash,
-    url_for,
     current_app as app,
+)
+from flask import (
+    flash,
+    redirect,
+    render_template,
     send_file,
+    url_for,
 )
 from flask_mailman import EmailMessage
 
 from main import db, external_url
 from models.exc import CapacityException
+from models.product import Price, PriceTier, Product, ProductGroup
+from models.purchase import Purchase, PurchaseTransfer, Ticket
 from models.user import User
-from models.product import ProductGroup, Product, PriceTier, Price
-from models.purchase import Purchase, Ticket, PurchaseTransfer
-
-from .forms import (
-    IssueTicketsInitialForm,
-    IssueTicketsForm,
-    IssueFreeTicketsNewUserForm,
-    ReserveTicketsForm,
-    ReserveTicketsNewUserForm,
-    CancelTicketForm,
-    ConvertTicketForm,
-    TransferTicketInitialForm,
-    TransferTicketForm,
-    TransferTicketNewUserForm,
-)
 
 from ..common import feature_enabled
 from ..common.email import from_email
-from ..common.receipt import attach_tickets, set_tickets_emailed
-from ..common.receipt import render_receipt, render_pdf
+from ..common.receipt import attach_tickets, render_pdf, render_receipt, set_tickets_emailed
+from . import admin
+from .forms import (
+    CancelTicketForm,
+    ConvertTicketForm,
+    IssueFreeTicketsNewUserForm,
+    IssueTicketsForm,
+    IssueTicketsInitialForm,
+    ReserveTicketsForm,
+    ReserveTicketsNewUserForm,
+    TransferTicketForm,
+    TransferTicketInitialForm,
+    TransferTicketNewUserForm,
+)
 
 
 @admin.route("/tickets")
@@ -61,7 +60,7 @@ def tickets_issue():
     if form.validate_on_submit():
         if form.issue_free.data:
             return redirect(url_for(".tickets_issue_free", email=form.email.data))
-        elif form.reserve.data:
+        if form.reserve.data:
             return redirect(url_for(".tickets_reserve", email=form.email.data))
     return render_template("admin/tickets/tickets-issue.html", form=form)
 
@@ -91,7 +90,7 @@ def tickets_issue_free(email):
             app.logger.info("Creating new user with email %s and name %s", email, form.name.data)
             user = User(email, form.name.data)
             db.session.add(user)
-            flash("Created account for %s" % email)
+            flash(f"Created account for {email}")
 
         basket = form.create_basket(user)
         app.logger.info("Admin basket for %s %s", user.email, basket)
@@ -103,7 +102,7 @@ def tickets_issue_free(email):
 
         except CapacityException as e:
             db.session.rollback()
-            app.logger.warn("Limit exceeded creating admin tickets: %s", e)
+            app.logger.warning("Limit exceeded creating admin tickets: %s", e)
             return redirect(url_for(".tickets_issue_free", email=email))
 
         for p in basket.purchases:
@@ -272,7 +271,7 @@ def tickets_reserve(email):
 
             app.logger.info("Creating new user with email %s and name %s", email, name)
             user = User(email, name)
-            flash("Created account for %s" % name)
+            flash(f"Created account for {name}")
             db.session.add(user)
 
         basket = form.create_basket(user)
@@ -290,7 +289,7 @@ def tickets_reserve(email):
 
         except CapacityException as e:
             db.session.rollback()
-            app.logger.warn("Limit exceeded creating admin tickets: %s", e)
+            app.logger.warning("Limit exceeded creating admin tickets: %s", e)
             return redirect(url_for(".tickets_reserve", email=email))
 
         code = user.login_code(app.config["SECRET_KEY"])
@@ -352,7 +351,7 @@ def transfer_ticket_user(ticket_id, email):
 
             app.logger.info("Creating new user with email %s and name %s", email, name)
             user = User(email, name)
-            flash("Created account for %s" % name)
+            flash(f"Created account for {name}")
             db.session.add(user)
 
         ticket = Ticket.query.with_for_update().get(ticket.id)
@@ -366,7 +365,7 @@ def transfer_ticket_user(ticket_id, email):
 
         # We don't send any emails because this is an admin operation
 
-        flash("Transferred ticket {}".format(ticket.id))
+        flash(f"Transferred ticket {ticket.id}")
         return redirect(url_for(".user", user_id=user.id))
 
     return render_template("admin/tickets/transfer-ticket-user.html", form=form, ticket=ticket, user=user)

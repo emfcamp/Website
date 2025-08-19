@@ -1,8 +1,6 @@
-from locust import HttpUser, task, between
-from locust.exception import StopUser
-
 import lxml.html
-
+from locust import HttpUser, between, task
+from locust.exception import StopUser
 
 """
 Run this with e.g.:

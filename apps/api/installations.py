@@ -1,8 +1,9 @@
 from flask import url_for
 from flask_restful import Resource
+from geoalchemy2.shape import to_shape
+
 from models import event_year
 from models.cfp import InstallationProposal
-from geoalchemy2.shape import to_shape
 
 from . import api
 

@@ -1,8 +1,9 @@
 from datetime import datetime
-from main import db
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import column_property
+
+from main import db
 
 from . import BaseModel
 

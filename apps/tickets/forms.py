@@ -1,26 +1,25 @@
-import typing
-
-from flask import render_template_string, url_for, current_app as app
-from markupsafe import Markup
+from flask import current_app as app
+from flask import render_template_string, url_for
 from flask_login import current_user
-from wtforms.validators import DataRequired, InputRequired, Optional, ValidationError
+from markupsafe import Markup
 from wtforms import (
-    SubmitField,
-    StringField,
+    BooleanField,
     FieldList,
     FormField,
     HiddenField,
-    BooleanField,
+    StringField,
+    SubmitField,
 )
+from wtforms.validators import DataRequired, InputRequired, Optional, ValidationError
+
 from models.basket import Basket
-from models.product import PriceTier, ProductViewProduct, Voucher
-
-from models.user import User
 from models.payment import BankPayment, StripePayment
+from models.product import PriceTier, ProductViewProduct, Voucher
+from models.user import User
 
-from ..common.forms import Form
-from ..common.fields import IntegerSelectField, HiddenIntegerField, EmailField
 from ..common import CURRENCY_SYMBOLS
+from ..common.fields import EmailField, HiddenIntegerField, IntegerSelectField
+from ..common.forms import Form
 
 
 class TicketAmountForm(Form):
@@ -73,7 +72,7 @@ class TicketAmountsForm(Form):
 
             f.amount.data = basket.get(tier, 0)
 
-    def ensure_capacity(form, basket: Basket, voucher: typing.Optional[Voucher]):
+    def ensure_capacity(form, basket: Basket, voucher: Voucher | None):
         """
         This function updates the products on the form based on the current capacity
         so it will fail to validate if the requested ticket capacity is now unavailable.
@@ -113,7 +112,7 @@ class TicketAmountsForm(Form):
 
     def validate_set_currency(form, field):
         if field.data not in CURRENCY_SYMBOLS:
-            raise ValidationError("Invalid currency %s" % field.data)
+            raise ValidationError(f"Invalid currency {field.data}")
 
 
 class TicketTransferForm(Form):

@@ -23,7 +23,7 @@ events.
 """
 
 import pytz
-from flask import Blueprint, redirect, url_for, abort
+from flask import Blueprint, abort, redirect, url_for
 
 from models import event_year
 

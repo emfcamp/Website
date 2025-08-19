@@ -1,13 +1,12 @@
-from flask import render_template, flash, redirect, url_for, abort, request
-from flask_login import login_required, current_user
-
-from models import event_year
-from models.village import Village, VillageMember, VillageRequirements
-from models.cfp import Venue
+from flask import abort, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
 
 from main import db
+from models import event_year
+from models.cfp import Venue
+from models.village import Village, VillageMember, VillageRequirements
 
-from . import villages, load_village
+from . import load_village, villages
 from .forms import VillageForm
 
 

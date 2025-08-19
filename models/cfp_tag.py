@@ -1,7 +1,8 @@
-from main import db
 import sqlalchemy
-from . import BaseModel
 
+from main import db
+
+from . import BaseModel
 
 DEFAULT_TAGS = [
     "accessibility",

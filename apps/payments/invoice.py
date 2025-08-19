@@ -1,31 +1,33 @@
+import logging
+import os.path
+import shutil
 from collections import namedtuple
 from decimal import Decimal
-import logging
-import shutil
-import os.path
 
 from flask import (
     abort,
-    current_app as app,
-    request,
-    render_template,
-    redirect,
     flash,
-    url_for,
+    redirect,
+    render_template,
+    request,
     send_file,
+    url_for,
 )
-from flask_login import login_required, current_user
+from flask import (
+    current_app as app,
+)
+from flask_login import current_user, login_required
 from sqlalchemy.sql.functions import func
-from wtforms import TextAreaField, SubmitField
+from wtforms import SubmitField, TextAreaField
 
-from main import external_url, db
-from ..common.receipt import render_pdf
-from models.product import Product, PriceTier
+from main import db, external_url
+from models.product import PriceTier, Product
 from models.purchase import Purchase
+
 from ..common.epc import format_inline_epc_qr
 from ..common.forms import Form
-from . import get_user_payment_or_abort
-from . import payments
+from ..common.receipt import render_pdf
+from . import get_user_payment_or_abort, payments
 
 logger = logging.getLogger(__name__)
 
@@ -154,7 +156,7 @@ def invoice(payment_id, fmt=None):
     if mode == "invoice":
         invoice_dir = "/vat_invoices"
         if not os.path.exists(invoice_dir):
-            logger.warn(
+            logger.warning(
                 "Not exporting VAT invoice as directory (%s) does not exist",
                 invoice_dir,
             )

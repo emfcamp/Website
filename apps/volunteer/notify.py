@@ -1,11 +1,11 @@
-from models import event_year
-from models.volunteer.notify import VolunteerNotifyJob, VolunteerNotifyRecipient
-from main import db, mail
 from apps.common.email import (
     format_trusted_html_email,
     format_trusted_plaintext_email,
     from_email,
 )
+from main import db, mail
+from models import event_year
+from models.volunteer.notify import VolunteerNotifyJob, VolunteerNotifyRecipient
 
 
 def preview_trusted_notify(preview_address, subject, body):

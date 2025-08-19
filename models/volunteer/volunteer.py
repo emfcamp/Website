@@ -1,12 +1,12 @@
 from collections import defaultdict
-from sqlalchemy.orm import backref
+
 from flask_login import UserMixin
+from sqlalchemy.orm import backref
 
 from main import db
+
 from .. import BaseModel
-
 from .shift import ShiftEntry
-
 
 # This effectively records the roles that a volunteer is interested in
 VolunteerRoleInterest = db.Table(

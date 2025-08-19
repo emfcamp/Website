@@ -9,42 +9,43 @@ details.
 import re
 
 from flask import (
-    render_template,
-    redirect,
-    request,
-    flash,
     Blueprint,
-    url_for,
-    send_file,
     abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    url_for,
+)
+from flask import (
     current_app as app,
 )
-from flask_login import login_required, current_user
+from flask_login import current_user, login_required
 from flask_mailman import EmailMessage
 from prometheus_client import Counter
 from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, external_url
-from models.user import User, checkin_code_re
-from models.product import ProductView
 from models.basket import Basket
+from models.product import ProductView
 from models.purchase import Purchase, Ticket
+from models.user import User, checkin_code_re
 
 from ..common import (
     CURRENCY_SYMBOLS,
+    feature_enabled,
     get_user_currency,
     set_user_currency,
-    feature_enabled,
 )
 from ..common.email import from_email
 from ..common.receipt import (
+    attach_tickets,
     make_qrfile,
     render_pdf,
     render_receipt,
-    attach_tickets,
     set_tickets_emailed,
 )
-
 from .forms import TicketTransferForm
 
 tickets = Blueprint("tickets", __name__)
@@ -201,7 +202,7 @@ def receipt(user_id=None, format=None):
 # This used to be for xhtml2pdf, but is handy for creating a shareable image
 @tickets.route("/receipt/<checkin_code>/qr")
 def tickets_qrcode(checkin_code):
-    if not re.match("%s$" % checkin_code_re, checkin_code):
+    if not re.match(f"{checkin_code_re}$", checkin_code):
         abort(404)
 
     url = app.config.get("CHECKIN_BASE") + checkin_code

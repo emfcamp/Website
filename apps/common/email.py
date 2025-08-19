@@ -1,13 +1,13 @@
-from css_inline import CSSInliner
 import markdown
-from flask import render_template, url_for
-from markupsafe import Markup
+from css_inline import CSSInliner
 from flask import current_app as app
+from flask import render_template, url_for
 from jinja2.sandbox import ImmutableSandboxedEnvironment
+from markupsafe import Markup
 
+from main import db, mail
 from models import event_year
 from models.email import EmailJob, EmailJobRecipient
-from main import db, mail
 
 
 def create_sandbox_env():

@@ -1,27 +1,26 @@
 from flask import (
-    abort,
     Blueprint,
-    render_template,
-    redirect,
-    session,
+    abort,
     flash,
-    url_for,
+    redirect,
+    render_template,
     request,
+    session,
+    url_for,
 )
 from flask_login import current_user
-from wtforms import SubmitField, StringField
+from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from wtforms.widgets import TextArea
 
 from apps.common import require_permission
-from apps.common.forms import Form
 from apps.common.email import (
     format_trusted_html_email,
 )
+from apps.common.forms import Form
 from apps.volunteer.admin import volunteer_admin
-from apps.volunteer.notify import preview_trusted_notify, enqueue_trusted_notify
+from apps.volunteer.notify import enqueue_trusted_notify, preview_trusted_notify
 from models.volunteer import Volunteer
-
 
 notify = Blueprint("volunteer_admin_notify", __name__)
 
@@ -80,7 +79,7 @@ def main():
         if form.send_preview.data is True:
             preview_trusted_notify(form.send_preview_address.data, form.subject.data, form.text.data)
 
-            flash("Email preview sent to %s" % form.send_preview_address.data)
+            flash(f"Email preview sent to {form.send_preview_address.data}")
             return render_template(
                 "volunteer/admin/notify.html",
                 html=format_trusted_html_email(form.text.data, form.subject.data),
@@ -91,7 +90,7 @@ def main():
         if form.send.data is True:
             enqueue_trusted_notify(volunteers, form.subject.data, form.text.data)
             del session["recipients"]
-            flash("Email queued for sending to %s volunteers" % volunteers.count())
+            flash(f"Email queued for sending to {volunteers.count()} volunteers")
             return redirect(url_for("volunteer.main"))
 
     return render_template(

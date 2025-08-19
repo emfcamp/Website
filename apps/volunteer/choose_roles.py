@@ -1,33 +1,34 @@
+from datetime import datetime, timedelta
+
+from decorator import decorator
 from flask import (
-    render_template,
-    redirect,
-    url_for,
-    flash,
-    request,
     abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask import (
     current_app as app,
 )
 from flask_login import current_user
-from decorator import decorator
-
-from wtforms import SubmitField, BooleanField, FormField, FieldList
+from wtforms import BooleanField, FieldList, FormField, SubmitField
 from wtforms.validators import InputRequired
-
-from datetime import datetime, timedelta
 
 from main import db
 from models.volunteer.role import Role
-from models.volunteer.volunteer import Volunteer as VolunteerUser
 from models.volunteer.shift import (
     Shift,
     ShiftEntry,
     ShiftEntryStateException,
 )
+from models.volunteer.volunteer import Volunteer as VolunteerUser
 
-from . import volunteer, v_user_required
 from ..common import feature_enabled, feature_flag
-from ..common.forms import Form
 from ..common.fields import HiddenIntegerField
+from ..common.forms import Form
+from . import v_user_required, volunteer
 
 
 class RoleSelectForm(Form):
@@ -89,12 +90,11 @@ def choose_role():
         if feature_enabled("VOLUNTEERS_SCHEDULE"):
             flash("Your role list has been updated", "info")
             return redirect(url_for(".schedule"))
-        else:
-            flash(
-                "Thanks for volunteering! You'll be able to sign up for specific shifts soon.",
-                "info",
-            )
-            return redirect(url_for(".choose_role"))
+        flash(
+            "Thanks for volunteering! You'll be able to sign up for specific shifts soon.",
+            "info",
+        )
+        return redirect(url_for(".choose_role"))
 
     current_roles = current_volunteer.interested_roles.all()
     if current_roles:

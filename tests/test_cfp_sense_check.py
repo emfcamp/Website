@@ -1,11 +1,11 @@
-from collections import defaultdict
 import textwrap
+from collections import defaultdict
 
 import pytest
 from dateutil.parser import parse
 
-from models.cfp import TalkProposal, Venue
 from apps.cfp_review.sense_check import not_sensible_reasons
+from models.cfp import TalkProposal, Venue
 
 
 @pytest.fixture
@@ -294,6 +294,5 @@ def test_cfp_sense_check(override_event_time, inp, other_proposals, expected):
             proposal.user_id = 1
         proposals_by_speaker[proposal.user_id].add(proposal)
 
-    print(not_sensible_reasons(inp, proposals_by_speaker))
     not_sensible = set(not_sensible_reasons(inp, proposals_by_speaker).keys())
     assert not_sensible == expected

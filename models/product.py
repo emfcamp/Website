@@ -1,23 +1,25 @@
 from __future__ import annotations
-from dataclasses import dataclass
-from decimal import Decimal
-from collections import defaultdict
-from datetime import datetime, timedelta
-import logging
-import re
-import random
-import string
-from typing import Optional, TYPE_CHECKING
 
-from sqlalchemy import func, UniqueConstraint, inspect
-from sqlalchemy.orm import validates, column_property
+import logging
+import random
+import re
+import string
+from collections import defaultdict
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+from decimal import Decimal
+from typing import TYPE_CHECKING
+
+from sqlalchemy import UniqueConstraint, func, inspect
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import column_property, validates
 
 from main import db
-from .mixins import CapacityMixin, InheritedAttributesMixin
+
 from . import BaseModel
-from .purchase import Purchase, AdmissionTicket, Ticket
+from .mixins import CapacityMixin, InheritedAttributesMixin
 from .payment import Currency
+from .purchase import AdmissionTicket, Purchase, Ticket
 
 if TYPE_CHECKING:
     # Imports used only in type hints, can't be imported normally due to circular references.
@@ -119,7 +121,7 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
         super().__init__(type=type, parent=parent, parent_id=parent_id, **kwargs)
 
     @classmethod
-    def get_by_name(cls, group_name) -> Optional[ProductGroup]:
+    def get_by_name(cls, group_name) -> ProductGroup | None:
         return ProductGroup.query.filter_by(name=group_name).one_or_none()
 
     @validates("capacity_max")
@@ -160,14 +162,13 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
             sibling_capacity = sum(sibling.capacity_max for sibling in siblings)
             if sibling_capacity + capacity_max > self.parent.capacity_max:
                 raise ValueError(
-                    "New capacity_max (%s) + sum of sibling capacities (%s) exceeds "
-                    "parent ProductGroup capacity (%s)."
-                    % (capacity_max, sibling_capacity, self.parent.capacity_max)
+                    f"New capacity_max ({capacity_max}) + sum of sibling capacities ({sibling_capacity}) exceeds "
+                    f"parent ProductGroup capacity ({self.parent.capacity_max})."
                 )
         return capacity_max
 
     @property
-    def unallocated_capacity(self) -> Optional[int]:
+    def unallocated_capacity(self) -> int | None:
         """If this is an allocation-level ProductGroup (i.e. it has a capacity_max
         set, and all childen also do), return the total unallocated capacity.
 
@@ -244,7 +245,7 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
         return {"private": data}
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self.name)
+        return f"<{self.__class__.__name__}: {self.name}>"
 
     def __str__(self):
         return self.name
@@ -270,7 +271,7 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
     __export_data__ = False  # Exported by ProductGroup
 
     @classmethod
-    def get_by_name(cls, group_name, product_name) -> Optional[Product]:
+    def get_by_name(cls, group_name, product_name) -> Product | None:
         group = ProductGroup.query.filter_by(name=group_name)
         product = group.join(Product).filter_by(name=product_name).with_entities(Product)
         return product.one_or_none()
@@ -286,7 +287,7 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
 
         return dict(states)
 
-    def get_cheapest_price(self, currency="GBP") -> "Price":
+    def get_cheapest_price(self, currency="GBP") -> Price:
         price = (
             PriceTier.query.filter_by(product_id=self.id)
             .join(Price)
@@ -325,7 +326,7 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
         return tier.one_or_none()
 
     def __repr__(self):
-        return "<Product: %s>" % self.name
+        return f"<Product: {self.name}>"
 
     def __str__(self):
         return self.name
@@ -359,7 +360,7 @@ class PriceTier(BaseModel, CapacityMixin):
         super().__init__(name=name, **kwargs)
 
     @classmethod
-    def get_by_name(cls, group_name, product_name, tier_name) -> Optional[PriceTier]:
+    def get_by_name(cls, group_name, product_name, tier_name) -> PriceTier | None:
         group = ProductGroup.query.filter_by(name=group_name)
         product = group.join(Product).filter_by(name=product_name).with_entities(Product)
         tier = product.join(PriceTier).filter_by(name=tier_name).with_entities(PriceTier)
@@ -385,17 +386,16 @@ class PriceTier(BaseModel, CapacityMixin):
         """Whether this tier is unused and can be safely deleted."""
         return self.purchase_count == 0 and not self.active
 
-    def get_price(self, currency: Currency) -> Optional["Price"]:
+    def get_price(self, currency: Currency) -> Price | None:
         if "prices" in inspect(self).unloaded:
             return self.get_price_unloaded(currency)
-        else:
-            return self.get_price_loaded(currency)
+        return self.get_price_loaded(currency)
 
-    def get_price_unloaded(self, currency: Currency) -> Optional[Price]:
+    def get_price_unloaded(self, currency: Currency) -> Price | None:
         price = Price.query.filter_by(price_tier_id=self.id, currency=currency)
         return price.one_or_none()
 
-    def get_price_loaded(self, currency: Currency) -> Optional[Price]:
+    def get_price_loaded(self, currency: Currency) -> Price | None:
         prices = [p for p in self.prices if p.currency == currency]
         return one_or_none(prices)
 
@@ -406,7 +406,7 @@ class PriceTier(BaseModel, CapacityMixin):
         return min(self.personal_limit, self.get_total_remaining_capacity())
 
     def __repr__(self):
-        return "<PriceTier %s>" % self.name
+        return f"<PriceTier {self.name}>"
 
     def __str__(self):
         return self.name
@@ -463,10 +463,10 @@ class Price(BaseModel):
         return self.value_ex_vat * self.price_tier.vat_rate
 
     def __repr__(self):
-        return "<Price for %r: %.2f %s>" % (self.price_tier, self.value, self.currency)
+        return f"<Price for {self.price_tier!r}: {self.value:.2f} {self.currency}>"
 
     def __str__(self):
-        return "%0.2f %s" % (self.value, self.currency)
+        return f"{self.value:0.2f} {self.currency}"
 
 
 class Voucher(BaseModel):
@@ -493,7 +493,7 @@ class Voucher(BaseModel):
     is_used = column_property((purchases_remaining == 0) | (tickets_remaining == 0))
 
     @classmethod
-    def get_by_code(cls, code: str) -> Optional["Voucher"]:
+    def get_by_code(cls, code: str) -> Voucher | None:
         if not code:
             return None
         return Voucher.query.filter_by(code=code).one_or_none()
@@ -501,13 +501,13 @@ class Voucher(BaseModel):
     def __init__(
         self,
         view,
-        code: Optional[str] = None,
+        code: str | None = None,
         expiry=None,
-        email: Optional[str] = None,
+        email: str | None = None,
         purchases_remaining: int = 1,
         tickets_remaining: int = 2,
     ):
-        super(Voucher, self).__init__()
+        super().__init__()
         self.view = view
         self.email = email
         self.purchases_remaining = purchases_remaining
@@ -570,12 +570,8 @@ class Voucher(BaseModel):
 
     def __repr__(self):
         if self.expiry:
-            return "<Voucher: %s, view: %s, expiry: %s>" % (
-                self.code,
-                self.product_view_id,
-                self.expiry,
-            )
-        return "<Voucher: %s, view: %s>" % (self.code, self.product_view_id)
+            return f"<Voucher: {self.code}, view: {self.product_view_id}, expiry: {self.expiry}>"
+        return f"<Voucher: {self.code}, view: {self.product_view_id}>"
 
     def is_accessible(self, voucher):
         # voucher expired
@@ -632,7 +628,7 @@ class ProductView(BaseModel):
         return {"private": data}
 
     @classmethod
-    def get_by_name(cls, name) -> Optional[ProductView]:
+    def get_by_name(cls, name) -> ProductView | None:
         if name is None:
             return None
         return ProductView.query.filter_by(name=name).one_or_none()
@@ -666,7 +662,7 @@ class ProductView(BaseModel):
         return self.is_accessible_at(user, datetime.utcnow(), voucher=voucher)
 
     def __repr__(self):
-        return "<ProductView: %s>" % self.name
+        return f"<ProductView: {self.name}>"
 
     def __str__(self):
         return self.name
@@ -688,6 +684,4 @@ class ProductViewProduct(BaseModel):
             self.order = order
 
     def __repr__(self):
-        return "<ProductViewProduct: view {}, product {}, order {}>".format(
-            self.view_id, self.product_id, self.order
-        )
+        return f"<ProductViewProduct: view {self.view_id}, product {self.product_id}, order {self.order}>"

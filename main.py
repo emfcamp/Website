@@ -1,31 +1,31 @@
-import time
-import yaml
-import secrets
 import logging
 import logging.config
+import secrets
+import time
 from pathlib import Path
 
-from flask import Flask, url_for, render_template, request, g
-from flask_mailman import Mail
+import email_validator
+import pywisetransfer
+import stripe
+import yaml
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from flask import Flask, g, render_template, request, url_for
+from flask_caching import Cache
+from flask_cors import CORS
+from flask_debugtoolbar import DebugToolbarExtension
 from flask_login import LoginManager
-from flask_sqlalchemy import SQLAlchemy
+from flask_mailman import Mail
 from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+from flask_static_digest import FlaskStaticDigest
 from sqlalchemy import MetaData
 from sqlalchemy_continuum import make_versioned
 from sqlalchemy_continuum.manager import VersioningManager
 from sqlalchemy_continuum.plugins import FlaskPlugin
-from flask_static_digest import FlaskStaticDigest
-from flask_caching import Cache
-from flask_debugtoolbar import DebugToolbarExtension
-from flask_cors import CORS
-from loggingmanager import create_logging_manager, set_user_id
 from werkzeug.exceptions import HTTPException
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-import stripe
-import pywisetransfer
-import email_validator
 
+from loggingmanager import create_logging_manager, set_user_id
 
 # If we have logging handlers set up here, don't touch them.
 # This is especially problematic during testing as we don't
@@ -34,10 +34,10 @@ import email_validator
 # a default stderr StreamHandler.
 if len(logging.root.handlers) == 0:
     install_logging = True
-    with open("logging.yaml", "r") as f:
+    with open("logging.yaml") as f:
         conf = yaml.load(f, Loader=yaml.FullLoader)
         if Path("logging.override.yaml").is_file():
-            with open("logging.override.yaml", "r") as fo:
+            with open("logging.override.yaml") as fo:
                 conf_overrides = yaml.load(fo, Loader=yaml.FullLoader)
 
                 def update_logging(d, s):
@@ -54,6 +54,8 @@ if len(logging.root.handlers) == 0:
 
 else:
     install_logging = False
+
+logger = logging.getLogger(__name__)
 
 naming_convention = {
     "ix": "ix_%(column_0_label)s",
@@ -94,12 +96,12 @@ def check_cache_configuration():
     """Check the cache configuration is appropriate for production"""
     if cache.cache.__class__.__name__ == "SimpleCache":
         # SimpleCache is per-process, not appropriate for prod
-        logging.warning("Per-process cache being used outside dev server - refreshing will not work")
+        logger.warning("Per-process cache being used outside dev server - refreshing will not work")
 
     TEST_CACHE_KEY = "emf_test_cache_key"
     cache.set(TEST_CACHE_KEY, "exists")
     if cache.get(TEST_CACHE_KEY) != "exists":
-        logging.warning("Flask-Caching backend does not appear to be working. Performance may be affected.")
+        logger.warning("Flask-Caching backend does not appear to be working. Performance may be affected.")
 
 
 def derive_secret_key(app: Flask):
@@ -152,7 +154,7 @@ def create_app(dev_server=False, config_override=None):
                 time.time() - request._start_time
             )
         except AttributeError:
-            logging.exception("Request without _start_time - check app.before_request ordering")
+            logger.exception("Request without _start_time - check app.before_request ordering")
         request_total.labels(request.endpoint, request.method, response.status_code).inc()
         return response
 
@@ -178,8 +180,8 @@ def create_app(dev_server=False, config_override=None):
     login_manager.init_app(app, add_context_processor=True)
     app.login_manager.login_view = "users.login"
 
+    from models import feature_flag, site_state
     from models.user import User, load_anonymous_user
-    from models import site_state, feature_flag
 
     @login_manager.user_loader
     def load_user(userid):
@@ -219,7 +221,7 @@ def create_app(dev_server=False, config_override=None):
         use_hsts = app.config.get("HSTS", False)
         if use_hsts:
             max_age = app.config.get("HSTS_MAX_AGE", 3600 * 24 * 30 * 6)
-            response.headers["Strict-Transport-Security"] = "max-age=%s" % max_age
+            response.headers["Strict-Transport-Security"] = f"max-age={max_age}"
 
         response.headers["X-Frame-Options"] = "deny"
         response.headers["X-Content-Type-Options"] = "nosniff"
@@ -312,18 +314,18 @@ def create_app(dev_server=False, config_override=None):
 
     load_utility_functions(app)
 
+    from apps.admin import admin
+    from apps.api import api_bp
+    from apps.arrivals import arrivals
     from apps.base import base
-    from apps.metrics import metrics
-    from apps.users import users
-    from apps.tickets import tickets
-    from apps.payments import payments
     from apps.cfp import cfp
     from apps.cfp_review import cfp_review
+    from apps.metrics import metrics
+    from apps.payments import payments
     from apps.schedule import schedule
-    from apps.arrivals import arrivals
-    from apps.api import api_bp
+    from apps.tickets import tickets
+    from apps.users import users
     from apps.villages import villages
-    from apps.admin import admin
     from apps.volunteer import volunteer
     from apps.volunteer.admin import volunteer_admin
     from apps.volunteer.admin.notify import notify

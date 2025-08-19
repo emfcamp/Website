@@ -1,10 +1,11 @@
-import pendulum
 from datetime import datetime
 
+import pendulum
 from sqlalchemy import or_
 from sqlalchemy.sql.functions import func
 
 from main import db
+
 from . import BaseModel
 
 INITIAL_TOPICS = {
