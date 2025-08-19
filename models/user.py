@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from .payment import Payment
     from .purchase import AdmissionTicket, Purchase, PurchaseTransfer, Ticket
     from .village import VillageMember
-    from .volunteer import Volunteer
+    from .volunteer import BuildupVolunteer, Volunteer
 
 __all__ = [
     "AnonymousUser",
@@ -299,6 +299,9 @@ class User(BaseModel, UserMixin):
 
     admin_messages: Mapped[list[AdminMessage]] = relationship("AdminMessage", back_populates="creator")
 
+    buildup_volunteer: Mapped[BuildupVolunteer | None] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
     volunteer: Mapped[Volunteer | None] = relationship(back_populates="user", cascade="all, delete-orphan")
     shift_entries: Mapped[list[ShiftEntry]] = relationship(
         back_populates="user", cascade="all, delete-orphan"

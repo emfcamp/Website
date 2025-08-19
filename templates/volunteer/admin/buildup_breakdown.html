@@ -1,0 +1,69 @@
+{% extends "volunteer/admin/base.html" %}
+{% block title %}Buildup Breakdown{% endblock %}
+{% block body %}
+<h1>Buildup Breakdown</h1>
+
+<style>
+.breakdown-table-date {
+    width: 10rem;
+}
+.breakdown-table-ampm {
+    width: 2rem;
+}
+.breakdown-table-predicted-num, .breakdown-table-arrived-num {
+    width: 3rem;
+}
+
+</style>
+
+<table class="table table-hover breakdown-table">
+    <thead>
+        <tr>
+            <th scope="col" colspan="2">Date</th>
+            <th scope="col" colspan="2">Predicted</th>
+            <th scope="col" colspan="2">Actual</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% set ns = namespace(prev=0) %}
+        {% for data in days_data %}
+        {% if data.is_just_after_event %}
+        <tr class="info">
+            <th colspan="6">THE EVENT</th>
+        </tr>
+        {% endif %}
+        <tr>
+            {% if ns.prev != data.date_str %}
+                <th class="breakdown-table-date" scope="row"{% if data.am_or_pm == "AM" %} rowspan="2"{% endif %}>{{ data.date_str }}</th>
+            {% endif %}
+            <th class="breakdown-table-ampm" scope="row">{{ data.am_or_pm }}</th>
+            <td class="breakdown-table-predicted-num">
+                {{ data.predicted_onsite }}
+            </td>
+            <td class="breakdown-table-predicted-progress">
+                <div class="progress">
+                    <div
+                        class="progress-bar" role="progressbar"
+                        aria-valuenow="{{ data.predicted_onsite }}"
+                        aria-valuemin="0"
+                        aria-valuemax="{{ max_predicted }}"
+                        style="width: calc(100% * ({{ data.predicted_onsite }} / {{ max_predicted }}));"></div>
+                </div>
+            </td>
+            <td class="breakdown-table-arrived-num">{{ data.arrived_onsite }}</td>
+            <td class="breakdown-table-arrived-progress">
+                <div class="progress">
+                    <div
+                        class="progress-bar" role="progressbar"
+                        aria-valuenow="{{ data.arrived_onsite }}"
+                        aria-valuemin="0"
+                        aria-valuemax="{{ max_arrived }}"
+                        style="width: calc(100% * ({{ data.arrived_onsite }} / {{ max_arrived }}));"></div>
+                </div>
+            </td>
+        </tr>
+        {% set ns.prev = data.date_str %}
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
