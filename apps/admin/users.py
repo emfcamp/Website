@@ -216,7 +216,6 @@ def user(user_id):
 
     form.note.data = user.checkin_note
     form.cfp_invite_reason.data = user.cfp_invite_reason
-    return render_template("admin/users/user.html", user=user, form=form, permissions=permissions)
 
     return render_template(
         "admin/users/user.html",
