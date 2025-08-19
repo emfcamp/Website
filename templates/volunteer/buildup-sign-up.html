@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% from "_formhelpers.html" import render_field, render_checkbox %}
+{% from "volunteer/_details_form.html" import volunteer_details_form %}
+
+{% block title %}
+    EMF Build Up Registration
+{% endblock %}
+{% block body %}
+{% include "volunteer/_nav.html" %}
+
+<h2>Buildup/Teardown Registration</h2>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>Thank you for helping with Electromagnetic Field {{ event_year }} buildup/teardown!</h4>
+        {% if volunteer_form and not volunteer %}
+        <p>
+        {% if current_user.is_authenticated %}
+        We've pre-filled some of your data from your existing profile.
+        {% else %}
+        We need a little information about you first.
+        {% endif %}
+        This information will be made available to volunteer managers and, should you
+        volunteer during the event, other volunteers on adjacent shifts.
+        </p>
+        <div>
+        {% if current_user.is_authenticated %}
+        If you would like to be contacted via a different email, or use a
+        different name, feel free to update it here.
+        {% else %}
+        If you already have an account, please <a href="{{ url_for('users.login', next=url_for('.main'), email=volunteer_form.volunteer_email.data) }}">log in</a> first. {% if SITE_STATE == 'event' %}If you're arriving with someone else, you might want to ask them to transfer your ticket to you.{% endif %}
+        {% endif %}
+        </div>
+        {% endif %}
+        {% include "volunteer/_buildup-safety.html" %}
+    </div>
+
+    <div class="panel-body">
+        <form class="form-horizontal" method="post">
+            <fieldset>
+            {% if volunteer_form.volunteer_email.was_duplicate %}
+            <div class="alert alert-warning">
+                This email address already exists in our system.
+                Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('.main'), email=volunteer_form.volunteer_email.data) }}">click here</a> to log in.        </div>
+            {% endif %}
+
+            <div class="col-sm-12">
+            {{ volunteer_form.hidden_tag() }}
+            {{ volunteer_details_form(volunteer_form, False) }}
+            <hr>
+
+            {{ buildup_form.hidden_tag() }}
+            {% call render_field(buildup_form.arrival_date, horizontal=9, min=buildup_start.isoformat(), max=teardown_end.isoformat()) %}
+                A rough time estimate so we know which meals you'll be around for is all we need here.
+            {% endcall %}
+            {{ render_field(buildup_form.departure_date, horizontal=9, min=buildup_start.isoformat(), max=teardown_end.isoformat()) }}
+            {{ render_field(buildup_form.emergency_contact, horizontal=9) }}
+            {{ render_checkbox(buildup_form.health_and_safety_briefing, horizontal=9) }}
+
+            {{ buildup_form.save(class_="btn btn-primary debounce pull-right") }}
+            </div>
+            </fieldset>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -17,6 +17,9 @@
         {% endif %}
         {{ menuitem('Bar Training', '.bar_training') }}
         {{ menuitem('Handbook', '.info') }}
+        {% if current_user.has_permission('volunteer:buildup') %}
+            {{ menuitem('Buildup/Teardown Registration', '.buildup_amend')}}
+        {% endif %}
         {% if current_user.has_permission('volunteer:admin') or current_user.has_permission('volunteer:manager') or current_user.volunteer_admin_roles %}
             {{ menuitem('Role Admin', '.role_admin_index')}}
         {% endif %}
