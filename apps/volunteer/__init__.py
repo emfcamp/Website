@@ -42,3 +42,4 @@ from . import training  # noqa: F401
 from . import bar_training  # noqa: F401
 from . import stats  # noqa: F401
 from . import api  # noqa: F401
+from . import buildup  # noqa: F401
