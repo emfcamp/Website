@@ -6,11 +6,13 @@ from typing import Any
 import requests
 from dateutil.parser import parse as parse_date
 from flask import current_app as app
-from flask import flash, redirect, render_template, request, url_for
+from flask import abort, flash, redirect, render_template, request, send_file, url_for
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 from wtforms import BooleanField, StringField, SubmitField
 from wtforms.validators import DataRequired
+from apps.common import feature_enabled
+from apps.common.pkpass import generate_pkpass
 
 from main import db
 from models.payment import Payment
@@ -161,3 +163,16 @@ def cancellation_refund():
     )
 
     return render_template("account/cancellation-refund.html", payments=payments)
+
+
+@users.route("/account/pkpass")
+@login_required
+def pkpass_ticket():
+    if not feature_enabled("ISSUE_APPLE_PKPASS_TICKETS"):
+        abort(403)
+    return send_file(
+        generate_pkpass(current_user),
+        "application/vnd.apple.pkpass",
+        as_attachment=True,
+        download_name="emf_ticket.pkpass",
+    )
