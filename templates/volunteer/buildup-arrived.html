@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Welcome to EMF Build Up
+{% endblock %}
+{% block body %}
+{% include "volunteer/_nav.html" %}
+
+<h2>EMF Build Up</h2>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>Thank you for helping with Electromagnetic Field {{ event_year }} build up!</h4>
+    </div>
+    <div class="panel-body">
+        <p>
+            You're now recorded as being on site for build up. Welcome!
+        </p>
+        {% if is_buildup %}
+        <h2>Communication</h2>
+        <p>
+            You should join the <a href="{{ buildup_signal_group }}">EMF {{ event_year }} Build Up</a> Signal group chat.
+        </p>
+        {% endif %}
+        {% include "volunteer/_buildup-safety.html" %}
+    </div>
+</div>
+{% endblock %}
