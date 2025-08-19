@@ -1,4 +1,5 @@
 from main import db
+
 from .. import BaseModel
 
 
@@ -9,7 +10,7 @@ class VolunteerVenue(BaseModel):
     mapref = db.Column(db.String)
 
     def __repr__(self):
-        return "<VolunteerVenue {0}>".format(self.name)
+        return f"<VolunteerVenue {self.name}>"
 
     def __str__(self):
         return self.name

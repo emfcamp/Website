@@ -1,27 +1,25 @@
-# coding=utf-8
-import pendulum
-from icalendar import Calendar, Event
-from datetime import datetime
-from flask import render_template, request, redirect, url_for, flash, abort, session, Response
-from flask import current_app as app
 from collections import defaultdict
+from datetime import datetime
+
+import pendulum
+from flask import Response, abort, flash, redirect, render_template, request, session, url_for
+from flask import current_app as app
 from flask_login import current_user
+from icalendar import Calendar, Event
 from sqlalchemy.orm import joinedload
 
 from main import db
-from models import event_year
+from models import config_date, event_year
 from models.user import User, generate_api_token
-
 from models.volunteer.role import Role
-from models.volunteer.venue import VolunteerVenue
 from models.volunteer.shift import Shift, ShiftEntry
+from models.volunteer.venue import VolunteerVenue
 from models.volunteer.volunteer import Volunteer
-from models import config_date
 
+from ..common import feature_flag
 from ..schedule import event_tz
 from ..users import get_next_url
-from ..common import feature_flag
-from . import volunteer, v_user_required, v_admin_required
+from . import v_admin_required, v_user_required, volunteer
 
 
 def _get_roles_with_user_data(user):
@@ -109,7 +107,7 @@ def schedule_ical():
     if not user:
         abort(404)
 
-    title = "EMF {} Volunteer Shifts for {}".format(event_year(), user.name)
+    title = f"EMF {event_year()} Volunteer Shifts for {user.name}"
 
     cal = Calendar()
     cal.add("summary", title)
@@ -125,8 +123,8 @@ def schedule_ical():
 
     for shift in shifts:
         cal_event = Event()
-        cal_event.add("uid", "%s-%s" % (event_year(), shift.id))
-        cal_event.add("summary", "%s at %s" % (shift.role.name, shift.venue.name))
+        cal_event.add("uid", f"{event_year()}-{shift.id}")
+        cal_event.add("summary", f"{shift.role.name} at {shift.venue.name}")
         cal_event.add("location", shift.venue.name)
         cal_event.add("dtstart", event_tz.localize(shift.start))
         cal_event.add("dtend", event_tz.localize(shift.end))

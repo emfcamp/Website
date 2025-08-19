@@ -1,21 +1,22 @@
-from flask import Response, Blueprint
-from prometheus_client import (
-    PlatformCollector,
-    CollectorRegistry,
-    generate_latest,
-    CONTENT_TYPE_LATEST,
-)
-from prometheus_client.core import GaugeMetricFamily, Histogram, Counter
-from prometheus_client.multiprocess import MultiProcessCollector
-from sqlalchemy import cast, String, case, func
 from datetime import datetime
 
+from flask import Blueprint, Response
+from prometheus_client import (
+    CONTENT_TYPE_LATEST,
+    CollectorRegistry,
+    PlatformCollector,
+    generate_latest,
+)
+from prometheus_client.core import Counter, GaugeMetricFamily, Histogram
+from prometheus_client.multiprocess import MultiProcessCollector
+from sqlalchemy import String, case, cast, func
+
 from models import count_groups
+from models.cfp import Proposal
 from models.email import EmailJobRecipient
 from models.payment import Payment
-from models.product import Product, ProductView, Voucher, VOUCHER_GRACE_PERIOD
-from models.purchase import Purchase, AdmissionTicket
-from models.cfp import Proposal
+from models.product import VOUCHER_GRACE_PERIOD, Product, ProductView, Voucher
+from models.purchase import AdmissionTicket, Purchase
 from models.volunteer.role import Role
 from models.volunteer.shift import Shift, ShiftEntry
 from models.volunteer.volunteer import Volunteer
@@ -88,12 +89,12 @@ class ExternalMetrics:
             Voucher.query.join(ProductView),
             ProductView.name,
             case(
-                (Voucher.is_used == True, "used"),  # noqa: E712
+                (Voucher.is_used == True, "used"),
                 (
                     (Voucher.expiry != None)  # noqa: E711
                     & (Voucher.expiry < datetime.utcnow() - VOUCHER_GRACE_PERIOD),
                     "expired",
-                ),  # noqa: E712
+                ),
                 else_="active",
             ),
         )

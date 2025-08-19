@@ -1,11 +1,13 @@
 from decimal import Decimal
-from stripe import StripeError
-from flask import current_app as app, render_template
-from flask_mailman import EmailMessage
-from typing import Optional
 
-from models.payment import RefundRequest, StripePayment, StripeRefund, BankRefund
-from main import get_stripe_client, db
+from flask import current_app as app
+from flask import render_template
+from flask_mailman import EmailMessage
+from stripe import StripeError
+
+from main import db, get_stripe_client
+from models.payment import BankRefund, RefundRequest, StripePayment, StripeRefund
+
 from ..common.email import from_email
 
 
@@ -18,9 +20,11 @@ class ManualRefundRequired(RefundException):
 
 
 def create_stripe_refund(
-    payment: StripePayment, amount: Decimal, metadata: dict = {}
-) -> Optional[StripeRefund]:
+    payment: StripePayment, amount: Decimal, metadata: dict | None = None
+) -> StripeRefund | None:
     """Initiate a stripe refund, and return the StripeRefund object."""
+    if metadata is None:
+        metadata = dict()
     # TODO: This should probably live in the stripe module.
     stripe_client = get_stripe_client(app.config)
     assert amount > 0

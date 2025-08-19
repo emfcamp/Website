@@ -19,4 +19,4 @@ URLS = [
 @pytest.mark.parametrize("url", URLS)
 def test_url(client, url):
     rv = client.get(url)
-    assert rv.status_code == 200, "Fetching %s results in HTTP 200" % url
+    assert rv.status_code == 200, f"Fetching {url} results in HTTP 200"

@@ -1,11 +1,13 @@
 from datetime import datetime, timedelta
-from sqlalchemy.orm import column_property, validates, aliased
-from sqlalchemy_continuum.version import VersionClassBase
-from sqlalchemy_continuum.utils import version_class, transaction_class
-from main import db
-from .user import User
-from . import BaseModel, Currency, bucketise, export_intervals, export_attr_counts
 
+from sqlalchemy.orm import aliased, column_property, validates
+from sqlalchemy_continuum.utils import transaction_class, version_class
+from sqlalchemy_continuum.version import VersionClassBase
+
+from main import db
+
+from . import BaseModel, Currency, bucketise, export_attr_counts, export_intervals
+from .user import User
 
 # The type of a product determines how we handle it after purchase.
 #
@@ -91,7 +93,7 @@ class Purchase(BaseModel):
 
     def __init__(self, price, user=None, state=None, **kwargs):
         if user is None and state is not None and state not in anon_states:
-            raise PurchaseStateException("%s is not a valid state for unclaimed purchases" % state)
+            raise PurchaseStateException(f"{state} is not a valid state for unclaimed purchases")
 
         super().__init__(
             price=price,
@@ -105,8 +107,8 @@ class Purchase(BaseModel):
 
     def __repr__(self):
         if self.id is None:
-            return "<Purchase -- %s: %s>" % (self.price_tier.name, self.state)
-        return "<Purchase %s %s: %s>" % (self.id, self.price_tier.name, self.state)
+            return f"<Purchase -- {self.price_tier.name}: {self.state}>"
+        return f"<Purchase {self.id} {self.price_tier.name}: {self.state}>"
 
     @property
     def is_transferable(self):
@@ -145,20 +147,20 @@ class Purchase(BaseModel):
             return
 
         if new_state not in PURCHASE_STATES:
-            raise PurchaseStateException('"%s" is not a valid state.' % new_state)
+            raise PurchaseStateException(f'"{new_state}" is not a valid state.')
 
         if new_state not in PURCHASE_STATES[self.state]:
-            raise PurchaseStateException('"%s->%s" is not a valid transition' % (self.state, new_state))
+            raise PurchaseStateException(f'"{self.state}->{new_state}" is not a valid transition')
 
         if self.owner_id is None or self.purchaser_id is None:
             if new_state not in anon_states:
-                raise PurchaseStateException("%s is not a valid state for unclaimed purchases" % new_state)
+                raise PurchaseStateException(f"{new_state} is not a valid state for unclaimed purchases")
 
         self.state = new_state
 
     def cancel(self):
         if self.state == "cancelled":
-            raise PurchaseStateException("{} is already cancelled".format(self))
+            raise PurchaseStateException(f"{self} is already cancelled")
 
         if self.state in ["reserved", "admin-reserved", "payment-pending", "paid"]:
             self.price_tier.return_instances(1)
@@ -167,7 +169,7 @@ class Purchase(BaseModel):
 
     def refund_purchase(self, refund=None):
         if self.state == "refunded":
-            raise PurchaseStateException("{} is already refunded".format(self))
+            raise PurchaseStateException(f"{self} is already refunded")
 
         if self.state in ["reserved", "admin-reserved", "payment-pending", "paid"]:
             self.price_tier.return_instances(1)
@@ -177,7 +179,7 @@ class Purchase(BaseModel):
 
     def un_refund(self):
         if self.state != "refunded":
-            raise PurchaseStateException("{} is not refunded".format(self))
+            raise PurchaseStateException(f"{self} is not refunded")
 
         self.price_tier.issue_instances(1)
         self.state = "paid"
@@ -195,7 +197,7 @@ class Purchase(BaseModel):
             raise PurchaseTransferException("This item is not transferable.")
 
         if self.owner != from_user:
-            raise PurchaseTransferException("%s does not own this item" % from_user)
+            raise PurchaseTransferException(f"{from_user} does not own this item")
 
         # The ticket will need to be re-issued via email
         self.ticket_issued = False
@@ -314,12 +316,7 @@ class PurchaseTransfer(BaseModel):
         super().__init__(purchase=purchase, to_user_id=to_user.id, from_user_id=from_user.id)
 
     def __repr__(self):
-        return "<Purchase Transfer: %s from %s to %s on %s>" % (
-            self.purchase_id,
-            self.from_user_id,
-            self.to_user_id,
-            self.timestamp,
-        )
+        return f"<Purchase Transfer: {self.purchase_id} from {self.from_user_id} to {self.to_user_id} on {self.timestamp}>"
 
     @classmethod
     def get_export_data(cls):

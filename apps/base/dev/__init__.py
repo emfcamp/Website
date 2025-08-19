@@ -3,6 +3,7 @@ such as for generating fake data.
 """
 
 from flask.cli import AppGroup
+
 from .. import base
 
 dev_cli = AppGroup("dev")

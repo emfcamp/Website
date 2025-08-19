@@ -2,6 +2,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import selectinload
 
 from main import db
+
 from . import BaseModel
 from .product import Product
 
@@ -55,4 +56,4 @@ class ArrivalsViewProduct(BaseModel):
         self.product = product
 
     def __repr__(self):
-        return "<ArrivalsViewProduct: view {}, product {}>".format(self.view_id, self.product_id)
+        return f"<ArrivalsViewProduct: view {self.view_id}, product {self.product_id}>"

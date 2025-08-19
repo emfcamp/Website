@@ -1,33 +1,34 @@
 from datetime import datetime, timedelta
-from wtforms.validators import Optional, DataRequired, InputRequired, ValidationError
-from wtforms.widgets import TextArea
+
 from wtforms import (
-    SubmitField,
-    StringField,
-    SelectField,
-    IntegerField,
+    BooleanField,
     DecimalField,
     FieldList,
     FormField,
     HiddenField,
-    BooleanField,
+    IntegerField,
+    SelectField,
+    StringField,
+    SubmitField,
     TextAreaField,
 )
 from wtforms.fields.html5 import DateField
+from wtforms.validators import DataRequired, InputRequired, Optional, ValidationError
+from wtforms.widgets import TextArea
 from wtforms_sqlalchemy.fields import QuerySelectField
 
-from models.permission import Permission
-from models.product import ProductGroup, PRODUCT_GROUP_TYPES
 from models.basket import Basket
+from models.permission import Permission
+from models.product import PRODUCT_GROUP_TYPES, ProductGroup
 
 from ..common import CURRENCY_SYMBOLS
-from ..common.forms import Form
 from ..common.fields import (
-    IntegerSelectField,
-    HiddenIntegerField,
-    JSONField,
     EmailField,
+    HiddenIntegerField,
+    IntegerSelectField,
+    JSONField,
 )
+from ..common.forms import Form
 
 
 class ProductForm(Form):

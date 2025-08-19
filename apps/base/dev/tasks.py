@@ -1,20 +1,19 @@
 """Development CLI tasks"""
 
 import click
-from pendulum import Duration as Offset, parse
 from flask import current_app as app
-from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-
-from main import db
-
-from models.volunteer.venue import VolunteerVenue
-from models.volunteer.shift import Shift
-from models.volunteer.role import Role
+from pendulum import Duration as Offset
+from pendulum import parse
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from apps.cfp.tasks import create_tags
+from main import db
+from models.feature_flag import FeatureFlag, refresh_flags
 from models.payment import BankAccount
 from models.site_state import SiteState, refresh_states
-from models.feature_flag import FeatureFlag, refresh_flags
+from models.volunteer.role import Role
+from models.volunteer.shift import Shift
+from models.volunteer.venue import VolunteerVenue
 
 from . import dev_cli
 from .fake import FakeDataGenerator
@@ -564,7 +563,7 @@ def volunteer_shifts():
         role = Role.get_by_name(shift_role)
 
         if role.shifts:
-            app.logger.info("Skipping making shifts for role: %s" % role.name)
+            app.logger.info(f"Skipping making shifts for role: {role.name}")
             continue
 
         for shift_venue in shift_list[shift_role]:

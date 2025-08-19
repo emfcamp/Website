@@ -1,27 +1,28 @@
 import random
 import re
-from decimal import Decimal
+from collections.abc import Iterable
 from datetime import datetime, timedelta
-from typing import Iterable, Optional
+from decimal import Decimal
 
-from sqlalchemy import event, func, column
+from sqlalchemy import column, event, func
 from sqlalchemy.orm import Session, aliased
-from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-from sqlalchemy_continuum.utils import version_class, transaction_class
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
+from sqlalchemy_continuum.utils import transaction_class, version_class
 from stdnum import iso11649
 from stdnum.iso7064 import mod_97_10
 
 from main import db
+
 from . import (
-    export_attr_counts,
-    export_intervals,
-    bucketise,
-    event_year,
     BaseModel,
     Currency,
+    bucketise,
+    event_year,
+    export_attr_counts,
+    export_intervals,
 )
-from .purchase import Ticket
 from .product import Voucher
+from .purchase import Ticket
 from .site_state import get_refund_state
 
 safechars = "2346789BCDFGHJKMPQRTVWXY"
@@ -58,7 +59,7 @@ class Payment(BaseModel):
 
     __mapper_args__ = {"polymorphic_on": provider}
 
-    def __init__(self, currency: Currency, amount, voucher_code: Optional[str] = None):
+    def __init__(self, currency: Currency, amount, voucher_code: str | None = None):
         self.currency = currency
         self.amount = amount
 
@@ -154,7 +155,7 @@ class Payment(BaseModel):
             raise StateException("Cannot change currency after payment is reconciled")
 
         if self.currency == currency:
-            raise Exception("Currency is already {}".format(currency))
+            raise Exception(f"Currency is already {currency}")
 
         # Sanity check
         assert self.amount == sum(p.price.value for p in self.purchases)
@@ -178,7 +179,7 @@ class Payment(BaseModel):
         if self.state == "cancelled":
             raise StateException("Payment is already cancelled")
 
-        elif self.state == "refunded":
+        if self.state == "refunded":
             raise StateException("Refunded payments cannot be cancelled")
 
         with db.session.no_autoflush:
@@ -203,7 +204,7 @@ class Payment(BaseModel):
         if self.state == "refunded":
             raise StateException("Payment is already refunded")
 
-        elif self.state == "cancelled":
+        if self.state == "cancelled":
             # If we receive money for a cancelled payment, it will be set to paid
             raise StateException("Refunded payments cannot be cancelled")
 
@@ -233,7 +234,7 @@ class Payment(BaseModel):
 
     def order_number(self):
         """Note this is not a VAT invoice number."""
-        return "WEB-%s-%05d" % (event_year(), self.id)
+        return f"WEB-{event_year()}-{self.id:05d}"
 
     def issue_vat_invoice_number(self):
         if not self.vat_invoice_number:
@@ -248,7 +249,7 @@ class Payment(BaseModel):
                 db.session.add(seq)
 
             self.vat_invoice_number = seq.value
-        return "WEBV-%s-%05d" % (event_year(), self.vat_invoice_number)
+        return f"WEBV-{event_year()}-{self.vat_invoice_number:05d}"
 
     @property
     def expires_in(self):
@@ -271,20 +272,20 @@ class BankPayment(Payment):
     __mapper_args__ = {"polymorphic_identity": "banktransfer"}
     bankref = db.Column(db.String, unique=True)
 
-    def __init__(self, currency: Currency, amount, voucher_code: Optional[str] = None):
+    def __init__(self, currency: Currency, amount, voucher_code: str | None = None):
         Payment.__init__(self, currency, amount, voucher_code)
 
         # not cryptographic
         self.bankref = "".join(random.sample(safechars, 8))
 
     def __repr__(self):
-        return "<BankPayment: %s %s>" % (self.state, self.bankref)
+        return f"<BankPayment: {self.state} {self.bankref}>"
 
     def manual_refund(self):
         if self.state not in {"paid", "refund-requested"}:
             raise StateException("Only BankPayments that have been paid can be marked as refunded")
 
-        super(BankPayment, self).manual_refund()
+        super().manual_refund()
 
     @property
     def recommended_destination(self):
@@ -293,6 +294,7 @@ class BankPayment(Payment):
                 return BankAccount.query.filter_by(currency=currency, active=True).one()
             except (MultipleResultsFound, NoResultFound):
                 continue
+        return None
 
     @property
     def customer_reference(self):
@@ -307,8 +309,7 @@ class BankPayment(Payment):
             customer_reference = f"RF{order_check_digits}{self.bankref}"
             assert iso11649.is_valid(customer_reference)
             return customer_reference
-        else:
-            return self.bankref
+        return self.bankref
 
 
 class BankAccount(BaseModel):
@@ -355,7 +356,7 @@ class BankAccount(BaseModel):
         return cls.query.filter_by(acct_id=acct_id, sort_code=sort_code).one()
 
     def __repr__(self):
-        return "<BankAccount: %s %s>" % (self.sort_code, self.acct_id)
+        return f"<BankAccount: {self.sort_code} {self.acct_id}>"
 
 
 db.Index(
@@ -393,7 +394,7 @@ class BankTransaction(BaseModel):
         self.wise_id = wise_id
 
     def __repr__(self):
-        return "<BankTransaction: %s, %s>" % (self.amount, self.payee)
+        return f"<BankTransaction: {self.amount}, {self.payee}>"
 
     @property
     def amount(self):
@@ -414,7 +415,7 @@ class BankTransaction(BaseModel):
         )
         return matching
 
-    def match_payment(self) -> Optional[BankPayment]:
+    def match_payment(self) -> BankPayment | None:
         for bankref in self._recognized_bankrefs:
             try:
                 return BankPayment.query.filter_by(bankref=bankref).one()
@@ -465,7 +466,7 @@ class BankTransaction(BaseModel):
         ref = self.payee.upper()
         hdr = "(RF[0-9][0-9] ?)?"  # optional ISO11649 header + check-digits
 
-        found = re.findall("%s([%s]{4}[- ]?[%s]{4})" % (hdr, safechars, safechars), ref)
+        found = re.findall(f"{hdr}([{safechars}]{{4}}[- ]?[{safechars}]{{4}})", ref)
         for iso_header, f in found:
             bankref = f.replace("-", "").replace(" ", "")
             if iso_header and not iso11649.is_valid(iso_header + bankref):
@@ -496,11 +497,11 @@ class StripePayment(Payment):
         if self.state in ["charged", "paid"]:
             raise StateException("Cannot automatically cancel charging/charged Stripe payments")
 
-        super(StripePayment, self).cancel()
+        super().cancel()
 
     @property
     def description(self):
-        return "EMF {} purchase".format(event_year())
+        return f"EMF {event_year()} purchase"
 
     def manual_refund(self):
         if self.state not in {"charged", "paid", "refund-requested"}:
@@ -508,7 +509,7 @@ class StripePayment(Payment):
                 "Only StripePayments that have been paid or charged can be marked as refunded"
             )
 
-        super(StripePayment, self).manual_refund()
+        super().manual_refund()
 
 
 class Refund(BaseModel):
@@ -597,8 +598,7 @@ class RefundRequest(BaseModel):
         """
         if type(self.payment) is StripePayment and self.payment.currency == self.currency:
             return "stripe"
-        else:
-            return "banktransfer"
+        return "banktransfer"
 
 
 class PaymentSequence(BaseModel):

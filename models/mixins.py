@@ -1,13 +1,14 @@
-from main import db
-from sqlalchemy import event
+from sqlalchemy import FetchedValue, and_, event, func
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import column_property
 from sqlalchemy.orm.attributes import get_history
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy import and_, func, FetchedValue
+
+from main import db
+
 from .exc import CapacityException
 
 
-class CapacityMixin(object):
+class CapacityMixin:
     """Defines a database object which has an optional maximum capacity and an optional parent
     (which must also inherit CapacityMixin). Objects also have an expiry date.
 
@@ -133,7 +134,7 @@ class CapacityMixin(object):
         self.capacity_used -= count
 
 
-class InheritedAttributesMixin(object):
+class InheritedAttributesMixin:
     """Create a JSON column to store arbitrary attributes. When fetching attributes, cascade up to the parent (which
     must also inherit this mixin).
 

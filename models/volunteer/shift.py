@@ -1,24 +1,25 @@
-from typing import Literal, TypeAlias, Union
-import pytz
+from typing import Literal
 
+import pytz
 from pendulum import interval
-from sqlalchemy import select, func, text
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from main import db
+
 from .. import BaseModel
 
 event_tz = pytz.timezone("Europe/London")
 
 
 # state: [allowed next state, ] pairs
-ShiftEntryState: TypeAlias = Union[
-    Literal["signed_up"],
-    Literal["arrived"],
-    Literal["abandoned"],
-    Literal["completed"],
-    Literal["no_show"],
-]
+type ShiftEntryState = (
+    Literal["signed_up"]
+    | Literal["arrived"]
+    | Literal["abandoned"]
+    | Literal["completed"]
+    | Literal["no_show"]
+)
 
 SHIFT_ENTRY_STATES: dict[ShiftEntryState, list[ShiftEntryState]] = {
     "signed_up": ["arrived", "completed", "abandoned", "no_show"],
@@ -46,10 +47,10 @@ class ShiftEntry(BaseModel):
 
     def set_state(self, state: ShiftEntryState):
         if state not in SHIFT_ENTRY_STATES:
-            raise ShiftEntryStateException('"%s" is not a valid state' % state)
+            raise ShiftEntryStateException(f'"{state}" is not a valid state')
 
         if state not in SHIFT_ENTRY_STATES[self.state]:
-            raise ShiftEntryStateException('"%s->%s" is not a valid transition' % (self.state, state))
+            raise ShiftEntryStateException(f'"{self.state}->{state}" is not a valid transition')
 
         self.state = state
 
@@ -123,7 +124,7 @@ class Shift(BaseModel):
         return other.start <= self.start <= other.end or self.start <= other.start <= self.end
 
     def __repr__(self):
-        return "<Shift {0}/{1}@{2}>".format(self.role.name, self.venue.name, self.start)
+        return f"<Shift {self.role.name}/{self.venue.name}@{self.start}>"
 
     def duration_in_minutes(self):
         return (self.start - self.end).total_seconds() // 60

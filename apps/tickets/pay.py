@@ -1,31 +1,32 @@
 from decimal import Decimal
 
 from flask import (
-    render_template,
-    redirect,
-    request,
-    flash,
-    url_for,
-    session,
     abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
+from flask import (
     current_app as app,
 )
-from markupsafe import Markup
 from flask_login import current_user
+from markupsafe import Markup
 from sqlalchemy.exc import IntegrityError
 
 from main import db
-from models.user import UserShipping
 from models.basket import Basket
-from models.product import VoucherUsedError
 from models.payment import BankPayment, StripePayment
+from models.product import VoucherUsedError
+from models.user import UserShipping
 
-from ..common import get_user_currency, set_user_currency, create_current_user
+from ..common import create_current_user, get_user_currency, set_user_currency
 from ..payments.banktransfer import transfer_start
 from ..payments.stripe import stripe_start
-
+from . import empty_baskets, get_product_view, price_changed, tickets
 from .forms import TicketPaymentForm, TicketPaymentShippingForm
-from . import tickets, price_changed, empty_baskets, get_product_view
 
 
 @tickets.route("/tickets/pay", methods=["GET", "POST"])
@@ -45,8 +46,7 @@ def pay(flow="main"):
             # Redirect user to their purchases page so they can see their
             # unpaid payment and retry it.
             return redirect(url_for("users.purchases"))
-        else:
-            abort(404)
+        abort(404)
 
     if request.form.get("change_currency") in ("GBP", "EUR"):
         currency = request.form.get("change_currency")
@@ -68,7 +68,7 @@ def pay(flow="main"):
             # tickets they've reserved and let them empty their basket.
             # Don't show this if the user only has admin-reserved purchases.
             flash("Your browser doesn't seem to be storing cookies. This may break some parts of the site.")
-            app.logger.warn(
+            app.logger.warning(
                 "Basket is empty, so showing reserved tickets (%s)",
                 request.headers.get("User-Agent"),
             )
@@ -135,9 +135,7 @@ def pay(flow="main"):
 
     # Whether the user has any purchases in their basket which require an admission ticket,
     # such as parking or live-in vehicle tickets.
-    requires_admission_ticket = any(
-        p.parent.get_attribute("requires_admission_ticket", True) for p in basket.keys()
-    )
+    requires_admission_ticket = any(p.parent.get_attribute("requires_admission_ticket", True) for p in basket)
 
     return render_template(
         "tickets/payment-choose.html",
@@ -154,7 +152,7 @@ def start_payment(form: TicketPaymentForm, basket: Basket, flow: str):
     if Decimal(form.basket_total.data) != Decimal(basket.total):
         # Check that the user's basket approximately matches what we told them they were paying.
         price_changed.inc()
-        app.logger.warn(
+        app.logger.warning(
             "User's basket has changed value %s -> %s",
             form.basket_total.data,
             basket.total,
@@ -171,7 +169,7 @@ def start_payment(form: TicketPaymentForm, basket: Basket, flow: str):
         try:
             new_user = create_current_user(form.email.data, form.name.data)
         except IntegrityError as e:
-            app.logger.warn("Adding user raised %r, possible double-click", e)
+            app.logger.warning("Adding user raised %r, possible double-click", e)
             return redirect(url_for("tickets.pay", flow=flow))
 
         user = new_user
@@ -196,7 +194,7 @@ def start_payment(form: TicketPaymentForm, basket: Basket, flow: str):
     basket.user = user
     try:
         payment = basket.create_payment(payment_type)
-    except VoucherUsedError as e:
+    except VoucherUsedError:
         # Voucher has been used since we last checked it at the "choose" stage.
         app.logger.exception("Voucher used at payment stage")
         flash(
@@ -218,7 +216,7 @@ def start_payment(form: TicketPaymentForm, basket: Basket, flow: str):
 
     if not payment:
         empty_baskets.inc()
-        app.logger.warn("User tried to pay for empty basket")
+        app.logger.warning("User tried to pay for empty basket")
         flash("We're sorry, your session information has been lost. Please try ordering again.")
         return redirect(url_for("tickets.main", flow=flow))
 

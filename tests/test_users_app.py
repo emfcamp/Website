@@ -1,5 +1,6 @@
-import pytest
 import re
+
+import pytest
 
 login_link_re = r"(https?://[^\s/]*/login[^\s]*)"
 

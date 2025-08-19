@@ -6,6 +6,7 @@ Village registration and management
 
 from flask import Blueprint, abort
 from flask_login import current_user
+
 from models import event_year
 from models.village import Village
 

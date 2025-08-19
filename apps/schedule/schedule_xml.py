@@ -3,12 +3,13 @@
 Frab XML is consumed by a number of external tools such as C3VOC.
 """
 
-from uuid import uuid5, NAMESPACE_URL
-from datetime import time, datetime, timedelta
+from datetime import datetime, time, timedelta
+from uuid import NAMESPACE_URL, uuid5
+
 from lxml import etree
 
 from main import external_url
-from models import event_year, event_start, event_end
+from models import event_end, event_start, event_year
 
 from . import event_tz
 
@@ -56,8 +57,8 @@ def make_root():
 
     conference = etree.SubElement(root, "conference")
 
-    _add_sub_with_text(conference, "title", "Electromagnetic Field {}".format(event_year()))
-    _add_sub_with_text(conference, "acronym", "emf{}".format(event_year()))
+    _add_sub_with_text(conference, "title", f"Electromagnetic Field {event_year()}")
+    _add_sub_with_text(conference, "acronym", f"emf{event_year()}")
     _add_sub_with_text(conference, "start", event_start().strftime("%Y-%m-%d"))
     _add_sub_with_text(conference, "end", event_end().strftime("%Y-%m-%d"))
     _add_sub_with_text(conference, "days", "3")
@@ -109,7 +110,7 @@ def add_event(room, event):
     _add_sub_with_text(
         event_node,
         "slug",
-        "emf%s-%s-%s" % (event_year(), event["id"], event["slug"]),
+        "emf{}-{}-{}".format(event_year(), event["id"], event["slug"]),
     )
 
     _add_sub_with_text(event_node, "subtitle", "")

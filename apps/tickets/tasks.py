@@ -1,26 +1,27 @@
 from datetime import datetime, timedelta
 
-from flask import current_app as app, render_template
+from flask import current_app as app
+from flask import render_template
 from flask_mailman import EmailMessage
 from sqlalchemy import func
 
-from main import db
 from apps.common import feature_enabled
-from ..common.email import from_email
-from apps.common.receipt import attach_tickets, set_tickets_emailed, RECEIPT_TYPES
+from apps.common.receipt import RECEIPT_TYPES, attach_tickets, set_tickets_emailed
+from main import db
 from models.payment import Payment
 from models.product import (
-    ProductGroup,
-    Product,
-    PriceTier,
     Price,
+    PriceTier,
+    Product,
+    ProductGroup,
     ProductView,
     ProductViewProduct,
 )
-from models.scheduled_task import scheduled_task
 from models.purchase import Purchase
+from models.scheduled_task import scheduled_task
 from models.user import User
 
+from ..common.email import from_email
 from . import tickets
 
 
@@ -197,7 +198,7 @@ def create_product_groups():
     ]
 
     order = 0
-    for name, display_name, cap, personal_limit, gbp, eur, description, vat_rate in misc:
+    for name, display_name, _cap, personal_limit, gbp, eur, description, vat_rate in misc:
         if Product.get_by_name(name, name):
             continue
 
@@ -269,7 +270,7 @@ def create_merch():
     ]
 
     order = 0
-    for name, display_name, personal_limit, gbp, eur, description, vat_rate in badge_def:
+    for name, display_name, _personal_limit, gbp, eur, description, vat_rate in badge_def:
         if Product.get_by_name(badge_group.name, name):
             continue
 
@@ -389,7 +390,7 @@ def email_transfer_reminders():
     pass
     # users_to_email = User.query.join(Ticket, TicketType).filter(
     #     TicketType.admits == 'full',
-    #     Ticket.paid == True,  # noqa: E712
+    #     Ticket.paid == True,
     #     Ticket.transfer_reminder_sent == False,
     # ).group_by(User).having(func.count() > 1)
 
@@ -416,7 +417,7 @@ def email_tickets():
     ctx.push()
 
     if not feature_enabled("ISSUE_TICKETS"):
-        app.logger.warn("Not emailing tickets as ISSUE_TICKETS is disabled")
+        app.logger.warning("Not emailing tickets as ISSUE_TICKETS is disabled")
         return
 
     users_purchase_counts = (
@@ -431,10 +432,10 @@ def email_tickets():
     )
 
     for user, purchase_count in users_purchase_counts:
-        plural = purchase_count != 1 and "s" or ""
+        plural = (purchase_count != 1 and "s") or ""
 
         msg = EmailMessage(
-            "Your Electromagnetic Field Ticket%s" % plural,
+            f"Your Electromagnetic Field Ticket{plural}",
             from_email=from_email("TICKETS_EMAIL"),
             to=[user.email],
         )

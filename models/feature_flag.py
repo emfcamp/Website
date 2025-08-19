@@ -1,4 +1,5 @@
-from main import db, cache
+from main import cache, db
+
 from . import BaseModel
 
 # feature flags that can be overridden in the DB

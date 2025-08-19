@@ -1,26 +1,26 @@
-# encoding=utf-8
 from datetime import timedelta
-from flask import redirect, url_for, current_app as app, abort
+
+from flask import abort, redirect, url_for
+from flask import current_app as app
 from flask_login import current_user
 from geoalchemy2.shape import to_shape
 from pendulum import parse
 
-from models.cfp import WorkshopProposal
-
-from . import volunteer, v_admin_required
-from ..common import feature_enabled, feature_flag
 from apps.common import render_markdown
-
 from main import db
+from models.cfp import WorkshopProposal
 from models.volunteer import (
-    Volunteer,
-    VolunteerVenue,
     Role,
     RoleAdmin,
     Shift,
     ShiftEntry,
+    Volunteer,
+    VolunteerVenue,
 )
-from .init_data import load_initial_venues, load_initial_roles
+
+from ..common import feature_enabled, feature_flag
+from . import v_admin_required, volunteer
+from .init_data import load_initial_roles, load_initial_venues
 from .shift_list import shift_list
 
 
@@ -48,7 +48,7 @@ def info_page(page_name: str):
 @volunteer.route("/info")
 @feature_flag("VOLUNTEERS_SIGNUP")
 def info():
-    return render_markdown(f"volunteer/info/index", page_name="index")
+    return render_markdown("volunteer/info/index", page_name="index")
 
 
 @volunteer.route("/init_shifts")
@@ -79,7 +79,7 @@ def init_shifts():
             continue
 
         if role.shifts:
-            app.logger.info("Skipping making shifts for role: %s" % role.name)
+            app.logger.info(f"Skipping making shifts for role: {role.name}")
             continue
 
         for shift_venue in shift_list[shift_role]:

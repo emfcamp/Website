@@ -1,29 +1,32 @@
-from decorator import decorator
-from collections import OrderedDict
 import re
+from collections import OrderedDict
 
+from decorator import decorator
 from flask import (
-    render_template,
-    redirect,
-    request,
-    flash,
-    url_for,
-    session,
-    current_app as app,
-    g,
     Blueprint,
     abort,
+    flash,
+    g,
+    redirect,
+    render_template,
     render_template_string,
+    request,
+    session,
+    url_for,
 )
-from markupsafe import Markup
+from flask import (
+    current_app as app,
+)
 from flask_login import current_user
+from markupsafe import Markup
 from sqlalchemy import func
 
 from main import db
 from models.arrivals import ArrivalsView
 from models.permission import Permission
-from models.purchase import Purchase, CheckinStateException
+from models.purchase import CheckinStateException, Purchase
 from models.user import User, checkin_code_re
+
 from .common import json_response
 
 arrivals = Blueprint("arrivals", __name__)
@@ -84,7 +87,7 @@ def change_arrivals_view(view):
 @arrivals.route("/arrivals/qrcode/<code>")
 @arrivals_required
 def checkin_qrcode(code):
-    match = re.match("%s$" % checkin_code_re, code)
+    match = re.match(f"{checkin_code_re}$", code)
     if not match:
         abort(404)
 
@@ -97,7 +100,7 @@ def user_from_code(query):
         return None
 
     # QR code
-    match = re.match(re.escape(app.config.get("CHECKIN_BASE")) + "(%s)$" % checkin_code_re, query)
+    match = re.match(re.escape(app.config.get("CHECKIN_BASE")) + f"({checkin_code_re})$", query)
     if not match:
         return None
 
@@ -151,7 +154,7 @@ def search(query=None):
         query = request.form.get("q")
 
     if query.startswith("fail"):
-        raise ValueError("User-requested failure: %s" % query)
+        raise ValueError(f"User-requested failure: {query}")
 
     if not query:
         abort(404)
@@ -244,7 +247,7 @@ def checkin(user_id, source=None):
         if failed:
             failed_str = ", ".join(str(p.id) for p in failed)
             success_count = len(purchases) - len(failed)
-            flash("Checked in %s purchases. Already checked in: %s" % (success_count, failed_str))
+            flash(f"Checked in {success_count} purchases. Already checked in: {failed_str}")
 
             return redirect(url_for(".checkin", user_id=user.id))
 

@@ -2,7 +2,6 @@ from PIL import Image
 from pyzbar.pyzbar import decode
 
 from apps.common.receipt import format_inline_qr, make_qrfile
-
 from tests._utils import render_svg
 
 

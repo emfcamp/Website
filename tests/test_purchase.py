@@ -1,30 +1,29 @@
-import pytest
-import os.path
 import json
+import os.path
+
+import pytest
 import stripe
 from flask_login import login_user
 
-from models.basket import Basket
-from models.product import PriceTier
-from models.payment import StripePayment, RefundRequest
-
+from apps.payments.refund import handle_refund_request
 from apps.payments.stripe import (
-    stripe_start,
     stripe_capture,
     stripe_capture_post,
-    stripe_payment_intent_updated,
     stripe_charge_refunded,
+    stripe_payment_intent_updated,
+    stripe_start,
 )
-from apps.payments.refund import handle_refund_request
-
 from main import db
+from models.basket import Basket
+from models.payment import RefundRequest, StripePayment
+from models.product import PriceTier
 
 
 def load_webhook_fixture(name):
     fixture_path = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "webhook_fixtures", f"{name}.json"
     )
-    with open(fixture_path, "r") as f:
+    with open(fixture_path) as f:
         return stripe.Event.construct_from(json.load(f), None)
 
 

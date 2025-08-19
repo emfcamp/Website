@@ -1,17 +1,19 @@
-from datetime import datetime, timedelta
-import click
 import csv
+from datetime import datetime, timedelta
 from io import StringIO
 
+import click
 from flask import current_app as app
-from models.payment import BankPayment, RefundRequest, Payment
+
 from main import db
+from models.payment import BankPayment, Payment, RefundRequest
+
 from . import payments
 from .refund import (
-    handle_refund_request,
-    manual_bank_refund,
     ManualRefundRequired,
     RefundException,
+    handle_refund_request,
+    manual_bank_refund,
 )
 
 
@@ -48,7 +50,7 @@ def bulk_refund(yes, number, provider):
         try:
             handle_refund_request(request)
         except ManualRefundRequired as e:
-            app.logger.warn(f"Manual refund required for request {request}: {e}")
+            app.logger.warning(f"Manual refund required for request {request}: {e}")
         except RefundException as e:
             app.logger.exception(f"Error refunding request {request}: {e}")
 

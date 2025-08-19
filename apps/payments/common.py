@@ -1,4 +1,5 @@
-from flask import current_app as app, abort
+from flask import abort
+from flask import current_app as app
 from flask_login import current_user
 
 from models.payment import Payment

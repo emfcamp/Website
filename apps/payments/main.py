@@ -1,23 +1,26 @@
 import requests
 from flask import (
-    render_template,
-    redirect,
     current_app as app,
+)
+from flask import (
     flash,
+    redirect,
+    render_template,
     request,
     url_for,
 )
 from flask_login import login_required
-from wtforms import StringField, SubmitField, FieldList, FormField
-from wtforms.validators import ValidationError
+from wtforms import FieldList, FormField, StringField, SubmitField
 from wtforms.fields.html5 import IntegerRangeField
+from wtforms.validators import ValidationError
 
-from . import payments
-from .common import get_user_payment_or_abort
-from ..common.forms import Form, RefundPurchaseForm, update_refund_purchase_form_details
 from main import db
 from models import RefundRequest
 from models.site_state import get_refund_state
+
+from ..common.forms import Form, RefundPurchaseForm, update_refund_purchase_form_details
+from . import payments
+from .common import get_user_payment_or_abort
 
 
 @payments.route("/pay/terms")

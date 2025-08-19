@@ -1,30 +1,31 @@
-# coding=utf-8
 from flask import (
-    render_template,
-    redirect,
+    current_app as app,
+)
+from flask import (
     flash,
+    redirect,
+    render_template,
     request,
     url_for,
-    current_app as app,
 )
 from sqlalchemy.dialects.postgresql import insert
 
 from main import db
-from models.permission import Permission
 from models.arrivals import (
     ArrivalsView,
     ArrivalsViewProduct,
 )
+from models.permission import Permission
 from models.product import (
-    ProductGroup,
     Product,
+    ProductGroup,
 )
 
 from . import admin
 from .forms import (
-    NewArrivalsViewForm,
-    EditArrivalsViewForm,
     AddArrivalsViewProductForm,
+    EditArrivalsViewForm,
+    NewArrivalsViewForm,
 )
 
 
@@ -137,8 +138,8 @@ def arrivals_view_add(view_id, group_id=None, product_id=None):
                 out = []
                 for product in group.products:
                     out.append({"view_id": view.id, "product_id": product.id})
-                for group in group.children:
-                    out.extend(_fetch_all_products(group))
+                for child_group in group.children:
+                    out.extend(_fetch_all_products(child_group))
                 return out
 
             db.session.execute(

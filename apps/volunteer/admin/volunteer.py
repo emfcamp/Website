@@ -1,13 +1,14 @@
-from ..flask_admin_base import VolunteerModelView
-
-from . import volunteer_admin
-from flask import redirect, session, url_for
 from flask import current_app as app
+from flask import redirect, session, url_for
 from flask_admin.actions import action
+from wtforms.validators import ValidationError
+
 from main import db
 from models.user import User
 from models.volunteer import Volunteer
-from wtforms.validators import ValidationError
+
+from ..flask_admin_base import VolunteerModelView
+from . import volunteer_admin
 
 
 class VolunteerUserModelView(VolunteerModelView):
@@ -24,7 +25,7 @@ class VolunteerUserModelView(VolunteerModelView):
         "allow_comms_during_event",
         "banned",
     )
-    column_filters = ["interested_roles", "allow_comms_during_event"]
+    column_filters = ("interested_roles", "allow_comms_during_event")
     column_list = (
         "nickname",
         "volunteer_email",

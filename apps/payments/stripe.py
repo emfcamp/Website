@@ -10,31 +10,32 @@ complicate this code.
 """
 
 import logging
-from typing import Optional
 
+import stripe
 from flask import (
-    render_template,
-    redirect,
-    request,
-    flash,
-    url_for,
     abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask import (
     current_app as app,
 )
-from flask_login import login_required, current_user
+from flask_login import current_user, login_required
 from flask_mailman import EmailMessage
-from wtforms import SubmitField
 from sqlalchemy.orm.exc import NoResultFound
-import stripe
+from wtforms import SubmitField
 
 from main import db, get_stripe_client
 from models.payment import StripePayment
+
 from ..common import feature_enabled
 from ..common.email import from_email
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
-from . import get_user_payment_or_abort, lock_user_payment_or_abort
-from . import payments, ticket_admin_email
+from . import get_user_payment_or_abort, lock_user_payment_or_abort, payments, ticket_admin_email
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +78,7 @@ def stripe_capture(payment_id):
     payment = lock_user_payment_or_abort(payment_id, "stripe", valid_states=["new"])
 
     if not feature_enabled("STRIPE"):
-        logger.warn("Unable to capture payment as Stripe is disabled")
+        logger.warning("Unable to capture payment as Stripe is disabled")
         flash("Card payments are currently unavailable. Please try again later")
         return redirect(url_for("users.purchases"))
     stripe_client = get_stripe_client(app.config)
@@ -98,13 +99,15 @@ def stripe_capture(payment_id):
         # Reuse a previously-created payment intent
         intent = stripe_client.payment_intents.retrieve(payment.intent_id)
         if intent.status == "succeeded":
-            logger.warn(f"Intent already succeeded, not capturing again")
+            logger.warning("Intent already succeeded, not capturing again")
             payment.state = "charging"
             db.session.commit()
             return redirect(url_for(".stripe_waiting", payment_id=payment_id))
 
         if intent.payment_method:
-            logger.warn(f"Intent already has payment method {intent.payment_method}, this will likely fail")
+            logger.warning(
+                f"Intent already has payment method {intent.payment_method}, this will likely fail"
+            )
 
     logger.info(
         "Starting checkout for Stripe payment %s with intent %s",
@@ -191,11 +194,11 @@ def stripe_webhook():
 
         try:
             handler = webhook_handlers[event.type]
-        except KeyError as e:
+        except KeyError:
             handler = webhook_handlers[None]
 
         return handler(event.type, event.data.object)
-    except Exception as e:
+    except Exception:
         logger.exception("Unhandled exception during Stripe webhook")
         logger.info("Webhook data: %s", request.data)
         abort(500)
@@ -215,7 +218,7 @@ def stripe_ping(_type, _obj):
 def stripe_update_payment(
     stripe_client: stripe.StripeClient,
     payment: StripePayment,
-    intent: Optional[stripe.PaymentIntent] = None,
+    intent: stripe.PaymentIntent | None = None,
 ):
     """Update a Stripe payment.
     If a PaymentIntent object is not passed in, this will fetch the payment details from
@@ -230,7 +233,7 @@ def stripe_update_payment(
 
     if intent.latest_charge is None:
         # Intent does not have a charge (yet?), do nothing
-        return
+        return None
 
     if isinstance(intent.latest_charge, stripe.Charge):
         # The payment intent object has been expanded already
@@ -250,20 +253,20 @@ def stripe_update_payment(
             )
 
         if fresh_intent.latest_charge == charge.id:
-            logger.warn(
+            logger.warning(
                 f"Charge ID for intent {intent.id} has changed from {payment.charge_id} to {charge.id}"
             )
         else:
-            logger.warn(f"Charge ID {charge.id} for intent {intent.id} is out of date, ignoring")
-            return
+            logger.warning(f"Charge ID {charge.id} for intent {intent.id} is out of date, ignoring")
+            return None
 
     payment.charge_id = charge.id
 
     if charge.refunded:
         return stripe_payment_refunded(payment)
-    elif charge.paid:
+    if charge.paid:
         return stripe_payment_paid(payment)
-    elif charge.status == "failed":
+    if charge.status == "failed":
         return stripe_payment_failed(payment)
 
     raise StripeUpdateUnexpected("Charge object is not paid, refunded or failed")

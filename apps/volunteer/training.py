@@ -1,19 +1,16 @@
-# coding=utf-8
-
-from flask import render_template, flash, current_app as app, redirect, url_for
-
-from wtforms import SubmitField, BooleanField, FormField, FieldList
+from flask import current_app as app
+from flask import flash, redirect, render_template, url_for
+from wtforms import BooleanField, FieldList, FormField, SubmitField
 from wtforms.validators import InputRequired
 
 from apps.volunteer.choose_roles import role_admin_required
 from main import db
-
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer
 
-from . import volunteer
-from ..common.forms import Form
 from ..common.fields import HiddenIntegerField
+from ..common.forms import Form
+from . import volunteer
 
 
 class VolunteerSelectForm(Form):
@@ -60,8 +57,8 @@ def train_users(role_id):
                 role.trained_volunteers.remove(v._volunteer)
 
         db.session.commit()
-        flash("Trained %d volunteers" % changes)
-        app.logger.info("Trained %d volunteers" % changes)
+        flash(f"Trained {changes} volunteers")
+        app.logger.info(f"Trained {changes} volunteers")
 
         return redirect(url_for(".train_users", role_id=role_id))
 

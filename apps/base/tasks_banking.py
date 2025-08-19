@@ -1,16 +1,16 @@
-import click
 from datetime import datetime, timedelta
 
+import click
 from flask import current_app as app
 
-from main import db, wise
 from apps.base import base
 from apps.payments.banktransfer import reconcile_txns
 from apps.payments.wise import (
-    wise_retrieve_accounts,
-    wise_business_profile,
     sync_wise_statement,
+    wise_business_profile,
+    wise_retrieve_accounts,
 )
+from main import db, wise
 from models.payment import BankAccount, BankTransaction
 
 

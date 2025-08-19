@@ -3,12 +3,13 @@
 These are served from static files in this repository as the database is wiped every year.
 """
 
-from flask import render_template, abort, redirect, url_for, send_file
 from dateutil.parser import parse as date_parse
+from flask import abort, redirect, render_template, send_file, url_for
 
 from models import event_year
 from models.cfp import proposal_slug
-from ..common import load_archive_file, archive_file
+
+from ..common import archive_file, load_archive_file
 
 
 def abort_if_invalid_year(year):

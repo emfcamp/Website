@@ -1,17 +1,20 @@
 "PyTest Config. This contains global-level pytest fixtures."
 
+import datetime
 import os
 import os.path
-import pytest
 import shutil
-import datetime
+
+import pytest
 from freezegun import freeze_time
 from sqlalchemy import text
-from models.site_state import SiteState
-from models.user import User
-from main import create_app, db as db_obj, Mail
+
 from apps.base.dev.tasks import create_bank_accounts
 from apps.tickets.tasks import create_product_groups
+from main import Mail, create_app
+from main import db as db_obj
+from models.site_state import SiteState
+from models.user import User
 
 
 @pytest.fixture(scope="module")
@@ -65,7 +68,7 @@ def app_factory(cache):
     with app.app_context():
         try:
             db_obj.session.close()
-        except:
+        except Exception:
             pass
 
         db_obj.drop_all()

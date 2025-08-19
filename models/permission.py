@@ -1,8 +1,9 @@
-from main import db
-from . import BaseModel
 import sqlalchemy
 
 import models
+from main import db
+
+from . import BaseModel
 
 
 class Permission(BaseModel):

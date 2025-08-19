@@ -1,35 +1,36 @@
 import time
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urljoin, urlparse
 
 from flask import (
-    render_template,
-    redirect,
-    request,
-    flash,
-    url_for,
-    abort,
     Blueprint,
-    current_app as app,
-    session,
+    abort,
+    flash,
+    redirect,
+    render_template,
     render_template_string,
+    request,
+    session,
+    url_for,
 )
-from markupsafe import Markup
-from flask_login import login_user, login_required, logout_user, current_user
+from flask import (
+    current_app as app,
+)
+from flask_login import current_user, login_required, login_user, logout_user
 from flask_mailman import EmailMessage
+from markupsafe import Markup
 from sqlalchemy import or_
-from wtforms import StringField, SubmitField, BooleanField
+from wtforms import BooleanField, StringField, SubmitField
 from wtforms.validators import DataRequired, ValidationError
 
 from main import db
-from models.user import User, verify_signup_code
-from models.cfp import Proposal, CFPMessage
 from models.basket import Basket
+from models.cfp import CFPMessage, Proposal
+from models.user import User, verify_signup_code
 
-from ..common import set_user_currency, feature_flag
+from ..common import feature_flag, set_user_currency
 from ..common.email import from_email
-from ..common.forms import Form
 from ..common.fields import EmailField
-
+from ..common.forms import Form
 
 users = Blueprint("users", __name__)
 
@@ -113,8 +114,7 @@ def login():
             login_user(user)
             session.permanent = True
             return redirect(get_next_url())
-        else:
-            flash("Your login link was invalid. Please enter your email address below to receive a new link.")
+        flash("Your login link was invalid. Please enter your email address below to receive a new link.")
 
     form = LoginForm(request.form)
     if form.validate_on_submit():
@@ -185,7 +185,7 @@ def signup():
 
     user = User.query.get_or_404(uid)
     if not user.has_permission("admin"):
-        app.logger.warn("Signup link resolves to non-admin user %s", user)
+        app.logger.warning("Signup link resolves to non-admin user %s", user)
         abort(404)
 
     form = SignupForm()

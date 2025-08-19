@@ -1,43 +1,43 @@
 from datetime import datetime, timedelta
 
-from . import admin
-
 from flask import (
-    render_template,
-    redirect,
-    request,
-    flash,
-    url_for,
     abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask import (
     current_app as app,
 )
 from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from flask_mailman import EmailMessage
-
-from wtforms import SubmitField, FieldList, FormField
-
 from sqlalchemy.sql.functions import func
+from wtforms import FieldList, FormField, SubmitField
 
 from main import db, get_stripe_client
 from models.payment import (
-    Payment,
-    RefundRequest,
     BankPayment,
     BankRefund,
-    StripeRefund,
+    Payment,
+    RefundRequest,
     StateException,
+    StripeRefund,
 )
-from models.purchase import Purchase
 from models.product import Price
+from models.purchase import Purchase
+
 from ..common.email import from_email
 from ..common.forms import Form, RefundPurchaseForm, update_refund_purchase_form_details
 from ..payments.stripe import (
-    StripeUpdateUnexpected,
     StripeUpdateConflict,
-    stripe_update_payment,
+    StripeUpdateUnexpected,
     stripe_payment_refunded,
+    stripe_update_payment,
 )
+from . import admin
 
 
 @admin.route("/payments")
@@ -106,7 +106,7 @@ def reset_expiry(payment_id):
 
             app.logger.info("Reset expiry by %s days", days)
 
-            flash("Expiry reset for payment %s" % payment.id)
+            flash(f"Expiry reset for payment {payment.id}")
             return redirect(url_for("admin.expiring"))
 
     return render_template("admin/payments/payment-reset-expiry.html", payment=payment, form=form)
@@ -135,7 +135,7 @@ def send_reminder(payment_id):
 
             if payment.reminder_sent_at:
                 app.logger.error("Reminder for payment %s already sent", payment.id)
-                flash("Cannot send duplicate reminder email for payment %s" % payment.id)
+                flash(f"Cannot send duplicate reminder email for payment {payment.id}")
                 return redirect(url_for("admin.expiring"))
 
             msg = EmailMessage(
@@ -153,7 +153,7 @@ def send_reminder(payment_id):
             payment.reminder_sent_at = datetime.utcnow()
             db.session.commit()
 
-            flash("Reminder email for payment %s sent" % payment.id)
+            flash(f"Reminder email for payment {payment.id} sent")
             return redirect(url_for("admin.expiring"))
 
     return render_template(
@@ -191,11 +191,11 @@ def update_payment(payment_id):
                 try:
                     stripe_update_payment(stripe_client, payment)
                 except StripeUpdateConflict as e:
-                    app.logger.warn(f"StripeUpdateConflict updating payment: {e}")
+                    app.logger.warning(f"StripeUpdateConflict updating payment: {e}")
                     flash("Unable to update due to a status conflict")
                     return redirect(url_for("admin.update_payment", payment_id=payment.id))
                 except StripeUpdateUnexpected as e:
-                    app.logger.warn(f"StripeUpdateUnexpected updating payment: {e}")
+                    app.logger.warning(f"StripeUpdateUnexpected updating payment: {e}")
                     flash("Unable to update due to an unexpected response from Stripe")
                     return redirect(url_for("admin.update_payment", payment_id=payment.id))
 
@@ -214,8 +214,8 @@ def cancel_payment(payment_id):
     payment = Payment.query.get_or_404(payment_id)
 
     if payment.provider == "stripe":
-        msg = "Cannot cancel stripe payment (id: %s)." % payment_id
-        app.logger.warn(msg)
+        msg = f"Cannot cancel stripe payment (id: {payment_id})."
+        app.logger.warning(msg)
         flash(msg)
         return redirect(url_for("admin.payments"))
 
@@ -229,14 +229,14 @@ def cancel_payment(payment_id):
             try:
                 payment.cancel()
             except StateException as e:
-                msg = "Could not cancel payment %s: %s" % (payment_id, e)
-                app.logger.warn(msg)
+                msg = f"Could not cancel payment {payment_id}: {e}"
+                app.logger.warning(msg)
                 flash(msg)
                 return redirect(url_for("admin.payments"))
 
             db.session.commit()
 
-            flash("Payment %s cancelled" % payment.id)
+            flash(f"Payment {payment.id} cancelled")
             return redirect(url_for("admin.expiring"))
 
     return render_template("admin/payments/payment-cancel.html", payment=payment, form=form)
@@ -346,7 +346,7 @@ def manual_refund(payment_id):
     payment = Payment.query.get_or_404(payment_id)
 
     if payment.refund_requests:
-        app.logger.warn("Showing refund requests for payment %s", payment.id)
+        app.logger.warning("Showing refund requests for payment %s", payment.id)
 
     form = ManualRefundForm()
     if form.validate_on_submit():
@@ -359,13 +359,13 @@ def manual_refund(payment_id):
                 payment.manual_refund()
 
             except StateException as e:
-                app.logger.warn("Could not refund payment %s: %s", payment_id, e)
+                app.logger.warning("Could not refund payment %s: %s", payment_id, e)
                 flash("Could not refund payment due to a state error")
                 return redirect(url_for("admin.payments"))
 
             db.session.commit()
 
-            flash("Payment {} refunded".format(payment.id))
+            flash(f"Payment {payment.id} refunded")
             return redirect(url_for("admin.payments"))
 
     return render_template("admin/payments/manual-refund.html", payment=payment, form=form)
@@ -509,7 +509,7 @@ def refund(payment_id):
                 refund.refundid = stripe_refund.id
                 if stripe_refund.status not in ("pending", "succeeded"):
                     # Should never happen according to the docs
-                    app.logger.warn(
+                    app.logger.warning(
                         "Refund status is %s, not pending or succeeded",
                         stripe_refund.status,
                     )
@@ -540,7 +540,7 @@ def refund(payment_id):
             msg.send()
 
             app.logger.info("Payment %s refund complete for a total of %s", payment.id, total)
-            flash("Refund for %s %s complete" % (total, payment.currency))
+            flash(f"Refund for {total} {payment.currency} complete")
 
         return redirect(url_for(".refunds"))
 
@@ -620,8 +620,8 @@ def cancel_purchase(payment_id: int, purchase_id: int) -> ResponseReturnValue:
             try:
                 purchase.cancel()
             except StateException as e:
-                msg = "Could not cancel purchase %s: %s" % (purchase_id, e)
-                app.logger.warn(msg)
+                msg = f"Could not cancel purchase {purchase_id}: {e}"
+                app.logger.warning(msg)
                 flash(msg)
                 return redirect(url_for("admin.payment", payment_id=payment.id))
 
@@ -630,7 +630,7 @@ def cancel_purchase(payment_id: int, purchase_id: int) -> ResponseReturnValue:
 
             db.session.commit()
 
-            flash("Purchase %s cancelled" % purchase.id)
+            flash(f"Purchase {purchase.id} cancelled")
             return redirect(url_for("admin.payment", payment_id=payment.id))
 
     return render_template(

@@ -1,13 +1,14 @@
 from flask import abort, request
 from flask_login import current_user
 from flask_restful import Resource
-from models.user import User
-from models.village import Village, VillageMember
-from models.cfp import Venue
+from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import Point
-from geoalchemy2.shape import to_shape, from_shape
 
 from main import db
+from models.cfp import Venue
+from models.user import User
+from models.village import Village, VillageMember
+
 from . import api
 
 
@@ -87,10 +88,11 @@ class VillageResource(Resource):
         data = request.get_json()
 
         if "location" not in data:
-            return
+            return None
 
         obj.location = from_shape(Point(data["location"]), srid=4326)
         db.session.commit()
+        return None
 
 
 class VenuesMap(Resource):

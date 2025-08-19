@@ -1,8 +1,8 @@
-from hypothesis import given, assume, settings
+from hypothesis import assume, given, settings
 from hypothesis.strategies import text
 
-from models.cfp import TalkProposal
 from apps.cfp_review.base import send_email_for_proposal
+from models.cfp import TalkProposal
 
 
 def test_cfp(db, app, user, outbox):

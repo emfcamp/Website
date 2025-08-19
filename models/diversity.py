@@ -1,13 +1,12 @@
 import re
-
 from collections import defaultdict
-from typing import Pattern
+from re import Pattern
 
 from flask import current_app as app
 
 from main import db
-from . import BaseModel
 
+from . import BaseModel
 
 OPT_OUT = [
     ("", "Prefer not to say"),

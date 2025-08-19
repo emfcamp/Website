@@ -1,25 +1,23 @@
 from flask_wtf import FlaskForm
-
-from wtforms import SelectField, BooleanField, ValidationError
+from wtforms import BooleanField, SelectField, ValidationError
 from wtforms.validators import InputRequired
 
-from models.diversity import UserDiversity
-from models.cfp_tag import Tag
-from models.purchase import AdmissionTicket
-
-from .fields import HiddenIntegerField, MultiCheckboxField
+from models.cfp_tag import DEFAULT_TAGS, Tag
 from models.diversity import (
-    guess_age,
-    guess_ethnicity,
-    guess_gender,
     AGE_CHOICES,
     DISABILITY_CHOICES,
     ETHNICITY_CHOICES,
     GENDER_CHOICES,
     OPT_OUT,
     SEXUALITY_CHOICES,
+    UserDiversity,
+    guess_age,
+    guess_ethnicity,
+    guess_gender,
 )
-from models.cfp_tag import DEFAULT_TAGS
+from models.purchase import AdmissionTicket
+
+from .fields import HiddenIntegerField, MultiCheckboxField
 
 
 class Form(FlaskForm):
@@ -98,7 +96,7 @@ class DiversityForm(Form):
     def validate_disability(form, field):
         if len(field.data) > 1 and "none" in field.data:
             raise ValidationError("Cannot select 'no disability' and a disability")
-        elif len(field.data) > 1 and "" in field.data:
+        if len(field.data) > 1 and "" in field.data:
             raise ValidationError("Cannot select 'prefer not to say' and a disability")
 
     def validate(self, extra_validators=None):
@@ -126,10 +124,7 @@ class RefundPurchaseForm(Form):
 
 def update_refund_purchase_form_details(f, purchase, ignore_event_refund_state=False):
     f._purchase = purchase
-    f.refund.label.text = "%s - %s" % (
-        f._purchase.id,
-        f._purchase.product.display_name,
-    )
+    f.refund.label.text = f"{f._purchase.id} - {f._purchase.product.display_name}"
 
     f.refund.data = False
 

@@ -1,12 +1,16 @@
+import logging
+
 import click
 
-from main import db
 from apps.base import base as app
-from models.user import User
+from main import db
+from models.feature_flag import DB_FEATURE_FLAGS, FeatureFlag, refresh_flags
 from models.permission import Permission
 from models.scheduled_task import execute_scheduled_tasks
-from models.feature_flag import FeatureFlag, refresh_flags, DB_FEATURE_FLAGS
-from models.site_state import SiteState, refresh_states, VALID_STATES
+from models.site_state import VALID_STATES, SiteState, refresh_states
+from models.user import User
+
+logger = logging.getLogger(__name__)
 
 
 @app.cli.command("periodic")
@@ -47,7 +51,7 @@ def make_admin(user_id, email):
     user.grant_permission("admin")
     db.session.commit()
 
-    click.echo("%r is now an admin" % user.name)
+    click.echo(f"{user.name!r} is now an admin")
 
 
 @app.cli.command("create_perms")
@@ -83,12 +87,12 @@ def set_flag(flag_names, enable):
             db.session.add(FeatureFlag(feature=flag, enabled=enable))
 
         if enable:
-            print(f"enabling flag: '{flag}'")
+            logger.info("enabling flag: '%s'", flag)
         else:
-            print(f"disabling flag: '{flag}'")
+            logger.info("disabling flag: '%s'", flag)
 
         if flag not in DB_FEATURE_FLAGS:
-            print(f"[WARN] flag ({flag}) not in DB_FEATURE_FLAGS")
+            logger.warning("flag (%s) not in DB_FEATURE_FLAGS", flag)
     db.session.commit()
     refresh_flags()
 
@@ -98,15 +102,15 @@ def set_flag(flag_names, enable):
 @click.argument("state", nargs=1)
 def set_site_state(state_name, state):
     if state_name not in VALID_STATES:
-        print(f"[WARN] state name ({state_name}) not in VALID_STATES")
+        logger.warning("state name (%s) not in VALID_STATES", state_name)
     elif state not in VALID_STATES[state_name]:
-        print(f"[WARN] state ({state}) not found in valid states for {state_name}")
+        logger.warning("state (%s) not found in valid states for %s", state, state_name)
 
     current = SiteState.query.filter_by(name=state_name).one_or_none()
     if not current:
         db.session.add(SiteState(name=state_name, state=state))
     else:
         current.state = state
-    print(f"set '{state_name}' to state '{state}'")
+    logger.info("set '%s' to state '%s'", state_name, state)
     db.session.commit()
     refresh_states()

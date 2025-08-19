@@ -31,7 +31,7 @@ def valid_auth_headers():
 
 def test_denies_request_without_api_key(client, app, proposal):
     rv = client.post(
-        f"/api/proposal/c3voc-publishing-webhook",
+        "/api/proposal/c3voc-publishing-webhook",
         json={
             "is_master": True,
             "fahrplan": {
@@ -51,7 +51,7 @@ def test_denies_request_without_api_key(client, app, proposal):
 
 def test_denies_request_no_master(client, app, proposal, valid_auth_headers):
     rv = client.post(
-        f"/api/proposal/c3voc-publishing-webhook",
+        "/api/proposal/c3voc-publishing-webhook",
         headers=valid_auth_headers,
         json={
             "is_master": False,
@@ -72,7 +72,7 @@ def test_denies_request_no_master(client, app, proposal, valid_auth_headers):
 
 def test_denies_request_wrong_year(client, app, proposal, valid_auth_headers):
     rv = client.post(
-        f"/api/proposal/c3voc-publishing-webhook",
+        "/api/proposal/c3voc-publishing-webhook",
         headers=valid_auth_headers,
         json={
             "is_master": True,
@@ -93,7 +93,7 @@ def test_denies_request_wrong_year(client, app, proposal, valid_auth_headers):
 
 def test_request_none_unchanged(client, app, db, proposal, valid_auth_headers):
     rv = client.post(
-        f"/api/proposal/c3voc-publishing-webhook",
+        "/api/proposal/c3voc-publishing-webhook",
         headers=valid_auth_headers,
         json={
             "is_master": True,
@@ -122,7 +122,7 @@ def test_update_voctoweb_with_correct_url(client, app, db, proposal, valid_auth_
     db.session.commit()
 
     rv = client.post(
-        f"/api/proposal/c3voc-publishing-webhook",
+        "/api/proposal/c3voc-publishing-webhook",
         headers=valid_auth_headers,
         json={
             "is_master": True,
@@ -155,7 +155,7 @@ def test_denies_voctoweb_with_wrong_url(client, app, db, proposal, valid_auth_he
     db.session.commit()
 
     rv = client.post(
-        f"/api/proposal/c3voc-publishing-webhook",
+        "/api/proposal/c3voc-publishing-webhook",
         headers=valid_auth_headers,
         json={
             "is_master": True,
@@ -187,7 +187,7 @@ def test_clears_voctoweb(client, app, db, proposal, valid_auth_headers):
     db.session.commit()
 
     rv = client.post(
-        f"/api/proposal/c3voc-publishing-webhook",
+        "/api/proposal/c3voc-publishing-webhook",
         headers=valid_auth_headers,
         json={
             "is_master": True,
@@ -213,7 +213,7 @@ def test_clears_voctoweb(client, app, db, proposal, valid_auth_headers):
 
 def test_update_thumbnail_with_path(client, app, db, proposal, valid_auth_headers):
     rv = client.post(
-        f"/api/proposal/c3voc-publishing-webhook",
+        "/api/proposal/c3voc-publishing-webhook",
         headers=valid_auth_headers,
         json={
             "is_master": True,
@@ -241,7 +241,7 @@ def test_update_thumbnail_with_path(client, app, db, proposal, valid_auth_header
 
 def test_update_thumbnail_with_url(client, app, db, proposal, valid_auth_headers):
     rv = client.post(
-        f"/api/proposal/c3voc-publishing-webhook",
+        "/api/proposal/c3voc-publishing-webhook",
         headers=valid_auth_headers,
         json={
             "is_master": True,
@@ -273,7 +273,7 @@ def test_denies_thumbnail_not_url(client, app, db, proposal, valid_auth_headers)
     db.session.commit()
 
     rv = client.post(
-        f"/api/proposal/c3voc-publishing-webhook",
+        "/api/proposal/c3voc-publishing-webhook",
         headers=valid_auth_headers,
         json={
             "is_master": True,
@@ -303,7 +303,7 @@ def test_clears_thumbnail(client, app, db, proposal, valid_auth_headers):
     db.session.commit()
 
     rv = client.post(
-        f"/api/proposal/c3voc-publishing-webhook",
+        "/api/proposal/c3voc-publishing-webhook",
         headers=valid_auth_headers,
         json={
             "is_master": True,
@@ -333,7 +333,7 @@ def test_update_from_youtube_with_correct_url(client, app, db, proposal, valid_a
     db.session.commit()
 
     rv = client.post(
-        f"/api/proposal/c3voc-publishing-webhook",
+        "/api/proposal/c3voc-publishing-webhook",
         headers=valid_auth_headers,
         json={
             "is_master": True,
@@ -367,7 +367,7 @@ def test_denies_youtube_update_with_existing_url(client, app, db, proposal, vali
     db.session.commit()
 
     rv = client.post(
-        f"/api/proposal/c3voc-publishing-webhook",
+        "/api/proposal/c3voc-publishing-webhook",
         headers=valid_auth_headers,
         json={
             "is_master": True,
@@ -401,7 +401,7 @@ def test_denies_youtube_update_with_wrong_url(client, app, db, proposal, valid_a
     db.session.commit()
 
     rv = client.post(
-        f"/api/proposal/c3voc-publishing-webhook",
+        "/api/proposal/c3voc-publishing-webhook",
         headers=valid_auth_headers,
         json={
             "is_master": True,
@@ -434,7 +434,7 @@ def test_clears_youtube(client, app, db, proposal, valid_auth_headers):
     db.session.commit()
 
     rv = client.post(
-        f"/api/proposal/c3voc-publishing-webhook",
+        "/api/proposal/c3voc-publishing-webhook",
         headers=valid_auth_headers,
         json={
             "is_master": True,

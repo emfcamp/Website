@@ -1,16 +1,19 @@
-from hmac import compare_digest
 from functools import wraps
+from hmac import compare_digest
+from typing import ClassVar
 
-from flask import request, current_app as app
+from flask import current_app as app
+from flask import request
 from flask_login import current_user
 from flask_restful import Resource, abort
 
-from . import api
 from main import db
 from models import event_year
-from models.cfp import Proposal
 from models.admin_message import AdminMessage
+from models.cfp import Proposal
 from models.event_tickets import EventTicket
+
+from . import api
 
 
 def _require_video_api_key(func):
@@ -33,7 +36,7 @@ def _require_video_api_key(func):
 
 
 class ProposalResource(Resource):
-    method_decorators = {"patch": [_require_video_api_key]}
+    method_decorators: ClassVar = {"patch": [_require_video_api_key]}
 
     def patch(self, proposal_id):
         if not request.is_json:
@@ -137,7 +140,7 @@ class UpdateLotteryPreferences(Resource):
 
 
 class ProposalC3VOCPublishingWebhook(Resource):
-    method_decorators = {"post": [_require_video_api_key]}
+    method_decorators: ClassVar = {"post": [_require_video_api_key]}
 
     def post(self):
         if not request.is_json:

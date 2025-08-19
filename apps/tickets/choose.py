@@ -1,11 +1,13 @@
 from flask import (
-    render_template,
-    redirect,
-    request,
-    flash,
-    url_for,
-    session,
     abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
+from flask import (
     current_app as app,
 )
 from flask_login import current_user
@@ -13,18 +15,16 @@ from flask_mailman import EmailMessage
 from sqlalchemy.orm import joinedload
 
 from main import db
-from models.exc import CapacityException
-from models.product import PriceTier, ProductView, ProductViewProduct, Product, Voucher
 from models.basket import Basket
-from models.site_state import get_site_state, get_sales_state
-from typing import Optional
+from models.exc import CapacityException
+from models.product import PriceTier, Product, ProductView, ProductViewProduct, Voucher
+from models.site_state import get_sales_state, get_site_state
 
-from ..common import get_user_currency, set_user_currency, feature_enabled
+from ..common import feature_enabled, get_user_currency, set_user_currency
 from ..common.email import from_email
 from ..common.receipt import attach_tickets, set_tickets_emailed
-
+from . import empty_baskets, get_product_view, invalid_vouchers, no_capacity, tickets
 from .forms import TicketAmountsForm
-from . import tickets, empty_baskets, no_capacity, invalid_vouchers, get_product_view
 
 
 @tickets.route("/tickets", methods=["GET", "POST"])
@@ -107,7 +107,7 @@ def main(flow="main"):
         # User has selected some tickets to buy.
         if not available:
             # Tickets are out :(
-            app.logger.warn("User has no reservations, enforcing unavailable state")
+            app.logger.warning("User has no reservations, enforcing unavailable state")
             basket.save_to_session()
             return redirect(url_for("tickets.main", flow=flow))
 
@@ -206,7 +206,7 @@ def handle_ticket_selection(form, view: ProductView, flow: str, basket: Basket):
         # Redirect back to show what's currently in the basket
         db.session.rollback()
         no_capacity.inc()
-        app.logger.warn("Limit exceeded creating tickets: %s", e)
+        app.logger.warning("Limit exceeded creating tickets: %s", e)
         flash(
             "We're very sorry, but there is not enough capacity available to "
             "allocate these tickets. You may be able to try again with a smaller amount."
@@ -218,8 +218,7 @@ def handle_ticket_selection(form, view: ProductView, flow: str, basket: Basket):
     if basket.total != 0:
         # Send the user off to pay
         return redirect(url_for("tickets.pay", flow=flow))
-    else:
-        return handle_free_tickets(flow, view, basket)
+    return handle_free_tickets(flow, view, basket)
 
 
 def handle_free_tickets(flow: str, view: ProductView, basket: Basket):
@@ -230,7 +229,7 @@ def handle_free_tickets(flow: str, view: ProductView, basket: Basket):
     """
     # They must be authenticated for this.
     if not current_user.is_authenticated:
-        app.logger.warn("User is not authenticated, sending to login")
+        app.logger.warning("User is not authenticated, sending to login")
         flash("You must be logged in to buy additional free tickets")
         return redirect(url_for("users.login", next=url_for("tickets.main", flow=flow)))
 
@@ -239,7 +238,7 @@ def handle_free_tickets(flow: str, view: ProductView, basket: Basket):
     # However, CfP users need to be able to buy day and parking tickets.
     admissions_tickets = current_user.get_owned_tickets(type="admission_ticket")
     if not any(admissions_tickets) and not view.cfp_accepted_only:
-        app.logger.warn("User trying to buy free add-ons without an admission ticket")
+        app.logger.warning("User trying to buy free add-ons without an admission ticket")
         flash("You must have an admissions ticket to buy additional free tickets")
         return redirect(url_for("tickets.main", flow=flow))
 
@@ -277,7 +276,7 @@ def handle_free_tickets(flow: str, view: ProductView, basket: Basket):
 
 @tickets.route("/tickets/clear")
 @tickets.route("/tickets/<flow>/clear")
-def tickets_clear(flow: Optional[str] = None):
+def tickets_clear(flow: str | None = None):
     app.logger.info("Clearing basket")
     basket = Basket.from_session(current_user, get_user_currency())
     if not any(basket.values()):
@@ -302,7 +301,7 @@ def tickets_voucher_clear():
 
 @tickets.route("/tickets/voucher/")
 @tickets.route("/tickets/voucher/<voucher_code>")
-def tickets_voucher(voucher_code: Optional[str] = None):
+def tickets_voucher(voucher_code: str | None = None):
     """
     A user reaches this endpoint if they're sent a voucher code by email.
     Set up the voucher details in the session and redirect them to choose their tickets.
@@ -323,14 +322,13 @@ def tickets_voucher(voucher_code: Optional[str] = None):
                 """
             )
             return redirect(url_for("users.purchases"))
-        else:
-            flash(
-                """The voucher you have supplied has been used.
-                   If it was you who used it, please log in to view your purchases.
-                   Cancelling the payment made with the voucher will reactivate it so you can try again.
-                """
-            )
-            return redirect(url_for("users.purchases"))
+        flash(
+            """The voucher you have supplied has been used.
+                If it was you who used it, please log in to view your purchases.
+                Cancelling the payment made with the voucher will reactivate it so you can try again.
+            """
+        )
+        return redirect(url_for("users.purchases"))
 
     view = voucher.view
     if view:

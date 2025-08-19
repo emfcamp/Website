@@ -1,21 +1,22 @@
-from decimal import Decimal
-from datetime import datetime
-import pytest
 import random
 import string
+from datetime import datetime
+from decimal import Decimal
 
+import pytest
+
+from main import db
 from models.basket import Basket
 from models.exc import CapacityException
 from models.payment import BankPayment
-from models.product import Product, ProductGroup, PriceTier, Price
+from models.product import Price, PriceTier, Product, ProductGroup
 from models.purchase import (
-    PurchaseStateException,
-    PurchaseTransferException,
     PURCHASE_STATES,
     CheckinStateException,
+    PurchaseStateException,
+    PurchaseTransferException,
 )
 from models.user import User
-from main import db
 
 
 @pytest.fixture()
@@ -306,7 +307,7 @@ def test_redemption(db, parent_group, user):
 @pytest.mark.skip(reason="Intermittently fails on Github Actions with PurchaseTransferException")
 def test_transfer(db, user, parent_group):
     user1 = user
-    user2 = User("test_user_{}@test.invalid".format(random_string(8)), "test_user2")
+    user2 = User(f"test_user_{random_string(8)}@test.invalid", "test_user2")
     db.session.add(user2)
 
     product = Product(name="product", parent=parent_group)

@@ -1,44 +1,45 @@
 from datetime import datetime, timedelta
 
+import logging_tree
 from flask import (
-    render_template,
-    redirect,
-    request,
-    flash,
-    url_for,
-    current_app as app,
     Blueprint,
     abort,
+    flash,
     make_response,
+    redirect,
+    render_template,
+    request,
+    url_for,
 )
-
+from flask import (
+    current_app as app,
+)
 from flask_login import current_user
-
-from wtforms.validators import Optional, DataRequired
 from wtforms import (
-    SubmitField,
     BooleanField,
-    HiddenField,
     FieldList,
     FormField,
+    HiddenField,
     SelectField,
+    SubmitField,
 )
-import logging_tree
+from wtforms.validators import DataRequired, Optional
 
 from main import db
-from models.payment import Payment, BankAccount, BankPayment, BankTransaction
+from models.feature_flag import DB_FEATURE_FLAGS, FeatureFlag, refresh_flags
+from models.payment import BankAccount, BankPayment, BankTransaction, Payment
 from models.purchase import Purchase
-from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
-from models.site_state import SiteState, VALID_STATES, refresh_states, get_states
-from models.scheduled_task import tasks, ScheduledTaskResult
-from ..payments.stripe import stripe_validate
-from ..payments.wise import (
-    wise_validate,
-    wise_business_profile,
-    wise_retrieve_accounts,
-)
+from models.scheduled_task import ScheduledTaskResult, tasks
+from models.site_state import VALID_STATES, SiteState, get_states, refresh_states
+
 from ..common import require_permission
 from ..common.forms import Form
+from ..payments.stripe import stripe_validate
+from ..payments.wise import (
+    wise_business_profile,
+    wise_retrieve_accounts,
+    wise_validate,
+)
 
 admin = Blueprint("admin", __name__)
 
@@ -94,7 +95,7 @@ class FeatureFlagForm(Form):
     new_feature = SelectField(
         "New feature name",
         [Optional()],
-        choices=[("", "Add a new flag")] + list(zip(DB_FEATURE_FLAGS, DB_FEATURE_FLAGS)),
+        choices=[("", "Add a new flag")] + [(f, f) for f in DB_FEATURE_FLAGS],
     )
     new_enabled = BooleanField("New feature enabled", [Optional()])
     update = SubmitField("Update flags")
@@ -134,7 +135,7 @@ def feature_flags():
             form.new_enabled.data = ""
 
     # Clear the list of flags (which may be stale)
-    for old_field in range(len(form.flags)):
+    for _ in range(len(form.flags)):
         form.flags.pop_entry()
 
     # Build the list of flags to display
@@ -149,19 +150,19 @@ def feature_flags():
 class SiteStateForm(Form):
     site_state = SelectField(
         "Site",
-        choices=list(zip(VALID_STATES["site_state"], VALID_STATES["site_state"])),
+        choices=[(s, s) for s in VALID_STATES["site_state"]],
     )
     sales_state = SelectField(
         "Sales",
-        choices=[("", "(automatic)")] + list(zip(VALID_STATES["sales_state"], VALID_STATES["sales_state"])),
+        choices=[("", "(automatic)")] + [(s, s) for s in VALID_STATES["sales_state"]],
     )
     refund_state = SelectField(
         "Refunds",
-        choices=list(zip(VALID_STATES["refund_state"], VALID_STATES["refund_state"])),
+        choices=[(s, s) for s in VALID_STATES["refund_state"]],
     )
     signup_state = SelectField(
         "Signups",
-        choices=list(zip(VALID_STATES["signup_state"], VALID_STATES["signup_state"])),
+        choices=[(s, s) for s in VALID_STATES["signup_state"]],
     )
     update = SubmitField("Update states")
 
@@ -176,7 +177,7 @@ def site_states():
 
     if request.method != "POST":
         # Empty form
-        for name in VALID_STATES.keys():
+        for name in VALID_STATES:
             # sales_state has an "automatic" state which we should preserve
             if name in db_states:
                 getattr(form, name).data = db_states[name].state
@@ -184,7 +185,7 @@ def site_states():
                 getattr(form, name).data = current_states[name]
 
     if form.validate_on_submit():
-        for name in VALID_STATES.keys():
+        for name in VALID_STATES:
             state_form = getattr(form, name)
             if state_form.data == "":
                 state_form.data = None
@@ -285,14 +286,16 @@ def logging_config():
     return response
 
 
-from . import accounts  # noqa: F401
-from . import payments  # noqa: F401
-from . import products  # noqa: F401
-from . import reports  # noqa: F401
-from . import tickets  # noqa: F401
-from . import users  # noqa: F401
-from . import email  # noqa: F401
-from . import hire  # noqa: F401
-from . import search  # noqa: F401
-from . import admin_message  # noqa: F401
-from . import arrivals  # noqa: F401
+from . import (
+    accounts,  # noqa: F401
+    admin_message,  # noqa: F401
+    arrivals,  # noqa: F401
+    email,  # noqa: F401
+    hire,  # noqa: F401
+    payments,  # noqa: F401
+    products,  # noqa: F401
+    reports,  # noqa: F401
+    search,  # noqa: F401
+    tickets,  # noqa: F401
+    users,  # noqa: F401
+)

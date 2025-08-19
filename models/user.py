@@ -1,28 +1,30 @@
 from __future__ import annotations
+
 import base64
-import hmac
 import hashlib
+import hmac
 import random
 import string
-from datetime import datetime, timedelta
-import time
 import struct
-from typing import Optional
+import time
+from datetime import datetime, timedelta
 
-from sqlalchemy import func, Index, text, Table
+from flask import current_app as app
+from flask import session
+from flask_login import AnonymousUserMixin, UserMixin
+from sqlalchemy import Index, Table, func, text
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.exc import NoResultFound
-from flask import current_app as app, session
-from flask_login import UserMixin, AnonymousUserMixin
 
-from main import db
 from loggingmanager import set_user_id
+from main import db
+
 from . import BaseModel
-from .permission import UserPermission, Permission
+from .permission import Permission, UserPermission
 from .volunteer.shift import ShiftEntry
 
 CHECKIN_CODE_LEN = 16
-checkin_code_re = r"[0-9a-zA-Z_-]{%s}" % CHECKIN_CODE_LEN
+checkin_code_re = rf"[0-9a-zA-Z_-]{{{CHECKIN_CODE_LEN}}}"
 
 
 def _generate_hmac(prefix, key, msg):
@@ -48,13 +50,13 @@ def _generate_hmac(prefix, key, msg):
 def generate_timed_hmac(prefix, key, timestamp, uid):
     """Typical time-limited HMAC used for logins, etc"""
     timestamp = int(timestamp)  # to truncate floating point, not coerce strings
-    msg = "{}-{}".format(timestamp, uid)
+    msg = f"{timestamp}-{uid}"
     return _generate_hmac(prefix, key, msg).decode("ascii")
 
 
 def generate_unlimited_hmac(prefix, key, uid):
     """Intended for user tokens, long-lived but low-importance"""
-    msg = "{}".format(uid)
+    msg = f"{uid}"
     return _generate_hmac(prefix, key, msg).decode("ascii")
 
 
@@ -71,8 +73,7 @@ def verify_timed_hmac(prefix, key, current_timestamp, code, valid_hours):
         age = datetime.fromtimestamp(current_timestamp) - datetime.fromtimestamp(timestamp)
         if age > timedelta(hours=valid_hours):
             return None
-        else:
-            return uid
+        return uid
 
     return None
 
@@ -304,7 +305,7 @@ class User(BaseModel, UserMixin):
     def get_owned_tickets(self, paid=None, type=None):
         "Get tickets owned by a user, filtered by type and payment state."
         for ticket in self.owned_tickets:
-            if paid is True and not ticket.is_paid_for or paid is False and ticket.is_paid_for:
+            if (paid is True and not ticket.is_paid_for) or (paid is False and ticket.is_paid_for):
                 continue
             if type is not None and ticket.type != type:
                 continue
@@ -354,10 +355,10 @@ class User(BaseModel, UserMixin):
         )
 
     def __repr__(self):
-        return "<User %s>" % self.email
+        return f"<User {self.email}>"
 
     @classmethod
-    def get_by_email(cls, email) -> Optional[User]:
+    def get_by_email(cls, email) -> User | None:
         return User.query.filter(func.lower(User.email) == func.lower(email)).one_or_none()
 
     @classmethod
@@ -365,7 +366,7 @@ class User(BaseModel, UserMixin):
         return bool(User.get_by_email(email))
 
     @classmethod
-    def get_by_code(cls, key, code) -> Optional[User]:
+    def get_by_code(cls, key, code) -> User | None:
         uid = verify_login_code(key, time.time(), code)
         if uid is None:
             return None
@@ -373,7 +374,7 @@ class User(BaseModel, UserMixin):
         return User.query.filter_by(id=uid).one()
 
     @classmethod
-    def get_by_checkin_code(cls, key, code) -> Optional[User]:
+    def get_by_checkin_code(cls, key, code) -> User | None:
         uid = verify_checkin_code(key, code)
         if uid is None:
             return None
@@ -381,7 +382,7 @@ class User(BaseModel, UserMixin):
         return User.query.filter_by(id=uid).one()
 
     @classmethod
-    def get_by_api_token(cls, key, code) -> Optional[User]:
+    def get_by_api_token(cls, key, code) -> User | None:
         uid = verify_api_token(key, code)
         if uid is None:
             # FIXME: raise an exception instead of returning None
@@ -406,7 +407,7 @@ class User(BaseModel, UserMixin):
 
     @property
     def has_proposals(self):
-        for proposal in self.proposals:
+        for _ in self.proposals:
             return True
         return False
 
@@ -459,4 +460,4 @@ def load_anonymous_user():
     return au
 
 
-from .cfp import Proposal  # noqa
+from .cfp import Proposal
