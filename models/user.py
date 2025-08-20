@@ -130,10 +130,6 @@ def generate_login_code(key, timestamp, uid):
     return generate_timed_hmac("login-", key, timestamp, uid)
 
 
-def generate_sso_code(key, timestamp, uid):
-    return generate_timed_hmac("sso-", key, timestamp, uid)
-
-
 def generate_signup_code(key, timestamp, uid):
     return generate_timed_hmac("signup-", key, timestamp, uid)
 
@@ -152,10 +148,6 @@ def generate_checkin_code(key, uid, version=1):
 
 def verify_login_code(key, current_timestamp, code):
     return verify_timed_hmac("login-", key, current_timestamp, code, valid_hours=6)
-
-
-def verify_sso_code(key, current_timestamp, code):
-    return verify_timed_hmac("sso-", key, current_timestamp, code, valid_hours=6)
 
 
 def verify_signup_code(key, current_timestamp, code):
@@ -320,9 +312,6 @@ class User(BaseModel, UserMixin):
 
     def login_code(self, key):
         return generate_login_code(key, int(time.time()), self.id)
-
-    def sso_code(self, key):
-        return generate_sso_code(key, int(time.time()), self.id)
 
     @property
     def checkin_code(self):

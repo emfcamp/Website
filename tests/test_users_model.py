@@ -3,7 +3,6 @@ from models.user import (
     generate_login_code,
     verify_login_code,
     generate_api_token,
-    generate_sso_code,
     generate_checkin_code,
     verify_checkin_code,
 )
@@ -38,12 +37,6 @@ def test_verify_login_code():
 
     bad_code_result = verify_login_code("ab", good_time, code)
     assert bad_code_result is None
-
-
-def test_generate_sso_code():
-    expected = "84400-1-NB7m7JbQQB4NxKUzFgsv"
-    result = generate_sso_code(b"abc", 84400, 1)
-    assert expected == result
 
 
 def test_api_token():

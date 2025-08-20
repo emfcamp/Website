@@ -232,22 +232,4 @@ def set_currency():
     return redirect(url_for("tickets.main"))
 
 
-@users.route("/sso/<site>")
-def sso(site=None):
-    volunteer_sites = [app.config["VOLUNTEER_SITE"]]
-    if "VOLUNTEER_CAMP_SITE" in app.config:
-        volunteer_sites.append(app.config["VOLUNTEER_CAMP_SITE"])
-
-    if site not in volunteer_sites:
-        abort(404)
-
-    if not current_user.is_authenticated:
-        return redirect(url_for(".login", next=url_for(".sso", site=site)))
-
-    key = app.config["VOLUNTEER_SECRET_KEY"]
-    sso_code = current_user.sso_code(key)
-
-    return redirect("https://%s/?p=sso&c=%s" % (site, sso_code))
-
-
 from . import account  # noqa
