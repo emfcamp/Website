@@ -110,7 +110,7 @@ def create_app(dev_server=False, config_override=None):
     if install_logging:
         create_logging_manager(app)
         # Flask has now kindly installed its own log handler which we will summarily remove.
-        app.logger.propagate = 1
+        app.logger.propagate = True
         app.logger.handlers = []
         if not app.debug:
             logging.root.setLevel(logging.INFO)
