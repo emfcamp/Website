@@ -20,6 +20,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask_cors import CORS
 from loggingmanager import create_logging_manager, set_user_id
 from werkzeug.exceptions import HTTPException
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 import stripe
 import pywisetransfer
 import email_validator
@@ -100,11 +102,30 @@ def check_cache_configuration():
         logging.warning("Flask-Caching backend does not appear to be working. Performance may be affected.")
 
 
+def derive_secret_key(app: Flask):
+    """The database is cleared between events, but the secret key may not be reset, which raises the
+    risk of reuse of generated tokens (including ticket barcodes) from previous years.
+
+    Make extra sure this doesn't happen by mixing the event year into the secret key.
+    """
+    if "SECRET_KEY" not in app.config:
+        raise RuntimeError("SECRET_KEY must be set in the app config")
+
+    # We can't use the event_year() helper here due to circular dependencies.
+    year = app.config["EVENT_START"].split("-")[0].encode("utf-8")
+
+    kdf = HKDF(algorithm=hashes.SHA256(), length=32, salt=None, info=year)
+    app.config["SECRET_KEY"] = kdf.derive(bytes(app.config["SECRET_KEY"], "utf-8"))
+
+
 def create_app(dev_server=False, config_override=None):
     app = Flask(__name__, static_folder="dist/static")
     app.config.from_envvar("SETTINGS_FILE")
     if config_override:
         app.config.from_mapping(config_override)
+
+    derive_secret_key(app)
+
     app.jinja_env.add_extension("jinja2.ext.do")
 
     if install_logging:
