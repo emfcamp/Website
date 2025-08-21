@@ -60,7 +60,7 @@ def calc_sales_state(date):
 
     # Active price tier for the full ticket product in the main flow.
     view = ProductView.query.filter_by(name="main")
-    product = view.join(ProductViewProduct, Product).filter_by(name="full")
+    product = view.join(ProductViewProduct).join(Product).filter_by(name="full")
     try:
         tier = product.join(Product.price_tiers).filter_by(active=True).with_entities(PriceTier).one_or_none()
     except MultipleResultsFound:

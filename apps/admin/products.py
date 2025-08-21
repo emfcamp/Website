@@ -245,7 +245,7 @@ def product_group_details(group_id):
         return [group] + [g for c in group.children for g in get_all_child_groups(c)]
 
     group_ids = [g.id for g in get_all_child_groups(group)]
-    price_tiers = ProductGroup.query.filter(ProductGroup.id.in_(group_ids)).join(Product, PriceTier)
+    price_tiers = ProductGroup.query.filter(ProductGroup.id.in_(group_ids)).join(Product).join(PriceTier)
     user_purchases = get_user_purchases(price_tiers)
     return render_template(
         "admin/products/product-group-details.html",
@@ -362,7 +362,9 @@ def product_group_copy(group_id):
 def tees():
     purchases = (
         ProductGroup.query.filter_by(type="tees")
-        .join(Product, Purchase, Purchase.owner)
+        .join(Product)
+        .join(Purchase)
+        .join(Purchase.owner)
         .group_by(User.id, Product.id)
         .with_entities(User, Product, func.count(Purchase.id))
         .filter(Purchase.is_paid_for == True)
