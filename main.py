@@ -110,7 +110,7 @@ def create_app(dev_server=False, config_override=None):
     if install_logging:
         create_logging_manager(app)
         # Flask has now kindly installed its own log handler which we will summarily remove.
-        app.logger.propagate = 1
+        app.logger.propagate = True
         app.logger.handlers = []
         if not app.debug:
             logging.root.setLevel(logging.INFO)
@@ -242,17 +242,7 @@ def create_app(dev_server=False, config_override=None):
 
         if app.config.get("DEBUG"):
             response.headers["Content-Security-Policy"] = value
-        else:
-            response.headers["Content-Security-Policy-Report-Only"] = (
-                value + "; report-uri https://emfcamp.report-uri.com/r/d/csp/reportOnly"
-            )
-            response.headers["Report-To"] = (
-                '{"group":"default","max_age":31536000,"endpoints":[{"url":"https://emfcamp.report-uri.com/a/d/g"}],"include_subdomains":false}'
-            )
 
-            # Disable Network Error Logging.
-            # This doesn't seem to be very useful and it's using up our report-uri quota.
-            response.headers["NEL"] = '{"max_age":0}'
         return response
 
     if not app.debug:
