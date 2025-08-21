@@ -2090,6 +2090,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "alembic" },
     { name = "awesome-slugify" },
+    { name = "cryptography" },
     { name = "css-inline" },
     { name = "decorator" },
     { name = "email-validator" },
@@ -2170,6 +2171,7 @@ dev = [
 requires-dist = [
     { name = "alembic", specifier = "~=1.1" },
     { name = "awesome-slugify" },
+    { name = "cryptography", specifier = ">=44.0.3" },
     { name = "css-inline", specifier = ">=0.14.0,<0.15" },
     { name = "decorator" },
     { name = "email-validator", specifier = "~=1.0" },

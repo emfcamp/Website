@@ -56,6 +56,7 @@ dependencies = [
     "css-inline>=0.14.0,<0.15",
     "wtforms-sqlalchemy~=0.3.0",
     "lxml>=6.0.0",
+    "cryptography>=44.0.3",
 ]
 
 [dependency-groups]
