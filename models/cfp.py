@@ -381,7 +381,7 @@ class Proposal(BaseModel):
 
     # Convenience for individual objects. Use an outerjoin and groupby for more than a few records
     favourite_count = column_property(
-        select([func.count(FavouriteProposal.c.proposal_id)])
+        select(func.count(FavouriteProposal.c.proposal_id))
         .where(FavouriteProposal.c.proposal_id == id)
         .scalar_subquery(),  # type: ignore[attr-defined]
         deferred=True,
@@ -1151,7 +1151,7 @@ class Venue(BaseModel):
         return {
             type: venue_names
             for venue_names, type in db.engine.execute(
-                db.select([db.func.array_agg(cls.name), unnest.column])
+                db.select(db.func.array_agg(cls.name), unnest.column)
                 .join(unnest, db.true())
                 .group_by(unnest.column)
             )
