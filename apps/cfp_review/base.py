@@ -1201,7 +1201,7 @@ def scheduler_update():
 @cfp_review.route("/clashfinder")
 @schedule_required
 def clashfinder():
-    select_st = select([FavouriteProposal])
+    select_st = select(FavouriteProposal)
     res = db.session.execute(select_st)
 
     user_counts = defaultdict(list)
