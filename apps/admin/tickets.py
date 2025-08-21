@@ -145,7 +145,8 @@ def list_free_tickets():
     # Complimentary tickets and transferred tickets can both have no payment.
     # This page is actually intended to be a list of complimentary tickets.
     free_tickets = (
-        Purchase.query.join(PriceTier, Product)
+        Purchase.query.join(PriceTier)
+        .join(Product)
         .filter(
             Purchase.is_paid_for,
             Purchase.payment_id.is_(None),
@@ -258,7 +259,8 @@ def tickets_reserve(email):
         new_user = False
 
     pts = (
-        PriceTier.query.join(Product, ProductGroup)
+        PriceTier.query.join(Product)
+        .join(ProductGroup)
         .order_by(ProductGroup.name, Product.display_name, Product.id)
         .all()
     )

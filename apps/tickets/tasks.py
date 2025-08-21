@@ -422,7 +422,9 @@ def email_tickets():
 
     users_purchase_counts = (
         Purchase.query.filter_by(is_paid_for=True)
-        .join(PriceTier, Product, ProductGroup)
+        .join(PriceTier)
+        .join(Product)
+        .join(ProductGroup)
         .filter(ProductGroup.type.in_(RECEIPT_TYPES))
         .filter(Purchase.ticket_issued == False)
         .join(Purchase.owner)

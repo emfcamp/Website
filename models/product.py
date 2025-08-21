@@ -278,7 +278,8 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
     @property
     def purchase_count_by_state(self):
         states = (
-            Purchase.query.join(PriceTier, Product)
+            Purchase.query.join(PriceTier)
+            .join(Product)
             .filter(Product.id == self.id)
             .with_entities(Purchase.state, func.count(Purchase.id))
             .group_by(Purchase.state)
