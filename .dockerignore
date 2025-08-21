@@ -15,4 +15,3 @@ __pycache__
 dist/
 docs/
 error_pages/
-docker/
