@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy.orm import aliased, column_property, validates
 from sqlalchemy_continuum.utils import transaction_class, version_class
@@ -63,8 +63,10 @@ class Purchase(BaseModel):
     refund_request_id = db.Column(db.Integer, db.ForeignKey("refund_request.id"))
 
     # History
-    created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    modified = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow)
+    created = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    modified = db.Column(
+        db.DateTime, default=lambda: datetime.now(UTC), nullable=False, onupdate=lambda: datetime.now(UTC)
+    )
 
     # State tracking info
     state = db.Column(db.String, default="reserved", nullable=False)
@@ -306,7 +308,7 @@ class PurchaseTransfer(BaseModel):
     purchase_id = db.Column(db.Integer, db.ForeignKey("purchase.id"), nullable=False)
     to_user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     from_user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(UTC))
 
     purchase = db.relationship(Purchase, backref=db.backref("transfers", cascade="all"))
 

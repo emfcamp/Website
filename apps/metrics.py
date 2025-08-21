@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from flask import Blueprint, Response
 from prometheus_client import (
@@ -92,7 +92,7 @@ class ExternalMetrics:
                 (Voucher.is_used == True, "used"),
                 (
                     (Voucher.expiry != None)  # noqa: E711
-                    & (Voucher.expiry < datetime.utcnow() - VOUCHER_GRACE_PERIOD),
+                    & (Voucher.expiry < datetime.now(UTC) - VOUCHER_GRACE_PERIOD),
                     "expired",
                 ),
                 else_="active",

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta, time, UTC
 import typing
 from collections import namedtuple
 from typing import Optional
@@ -348,8 +348,10 @@ class Proposal(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     anonymiser_id = db.Column(db.Integer, db.ForeignKey("user.id"), default=None)
-    created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    modified = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow)
+    created = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    modified = db.Column(
+        db.DateTime, default=lambda: datetime.now(UTC), nullable=False, onupdate=lambda: datetime.now(UTC)
+    )
     state = db.Column(db.String, nullable=False, default="new")
     type = db.Column(db.String, nullable=False)  # talk, workshop or installation
 
@@ -977,7 +979,7 @@ PYTHON_CFP_TYPES = {
 class CFPMessage(BaseModel):
     __tablename__ = "cfp_message"
     id = db.Column(db.Integer, primary_key=True)
-    created = db.Column(db.DateTime, default=datetime.utcnow)
+    created = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
     from_user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     proposal_id = db.Column(db.Integer, db.ForeignKey("proposal.id"), nullable=False)
 
@@ -1044,8 +1046,10 @@ class CFPVote(BaseModel):
     state = db.Column(db.String, nullable=False)
     has_been_read = db.Column(db.Boolean, nullable=False, default=False)
 
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    modified = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    modified = db.Column(
+        db.DateTime, nullable=False, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
+    )
 
     vote = db.Column(db.Integer)  # Vote can be null for abstentions
     note = db.Column(db.String)

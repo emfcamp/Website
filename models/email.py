@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import column_property
@@ -14,7 +14,7 @@ class EmailJob(BaseModel):
     subject = db.Column(db.String, nullable=False)
     text_body = db.Column(db.String, nullable=False)
     html_body = db.Column(db.String, nullable=False)
-    created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    created = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     def __init__(self, subject, text_body, html_body):
         self.subject = subject

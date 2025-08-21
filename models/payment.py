@@ -4,7 +4,7 @@ import random
 import re
 import typing
 from collections.abc import Iterable
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 from sqlalchemy import column, event, func
@@ -52,7 +52,7 @@ class Payment(BaseModel):
     state = db.Column(db.String, nullable=False, default="new")
     reminder_sent_at = db.Column(db.DateTime, nullable=True)
 
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(UTC))
     expires = db.Column(db.DateTime, nullable=True)
     voucher_code = db.Column(db.String, db.ForeignKey("voucher.code"), nullable=True, default=None)
 
@@ -261,7 +261,7 @@ class Payment(BaseModel):
 
     @property
     def expires_in(self):
-        return self.expires - datetime.utcnow()
+        return self.expires - datetime.now(UTC)
 
     def lock(self):
         Payment.query.with_for_update().get(self.id)
@@ -527,7 +527,7 @@ class Refund(BaseModel):
     payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"), nullable=False)
     provider = db.Column(db.String, nullable=False)
     amount_int = db.Column(db.Integer, nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(UTC))
     purchases: Mapped[list[Purchase]] = relationship(backref=db.backref("refund", cascade="all"))
 
     __mapper_args__ = {"polymorphic_on": provider}

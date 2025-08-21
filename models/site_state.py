@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy.orm.exc import MultipleResultsFound
 
@@ -79,7 +79,7 @@ def get_states() -> dict[str, str]:
     states = SiteState.query.all()
     states = {s.name: s.state for s in states}
 
-    date = datetime.utcnow()
+    date = datetime.now(UTC)
 
     if states.get("site_state") is None:
         states["site_state"] = "before-sales"

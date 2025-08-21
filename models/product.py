@@ -6,7 +6,7 @@ import re
 import string
 from collections import defaultdict
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING, cast
 
@@ -529,7 +529,7 @@ class Voucher(BaseModel):
     def is_expired(self) -> bool:
         # Note: this should be a column_property but getting the current time in the DB
         # interacts badly with the fact that we fake the date in tests.
-        return self.expiry is not None and (self.expiry + VOUCHER_GRACE_PERIOD) < datetime.utcnow()
+        return self.expiry is not None and (self.expiry + VOUCHER_GRACE_PERIOD) < datetime.now(UTC)
 
     def check_capacity(self, basket: Basket):
         """Check if there is enough capacity in this voucher to buy
@@ -661,7 +661,7 @@ class ProductView(BaseModel):
         return True
 
     def is_accessible(self, user, voucher=None):
-        return self.is_accessible_at(user, datetime.utcnow(), voucher=voucher)
+        return self.is_accessible_at(user, datetime.now(UTC), voucher=voucher)
 
     def __repr__(self):
         return f"<ProductView: {self.name}>"

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from flask import (
     abort,
@@ -59,7 +59,7 @@ def expiring():
         BankPayment.query.join(Purchase)
         .filter(
             BankPayment.state == "inprogress",
-            BankPayment.expires < datetime.utcnow() + timedelta(days=3),
+            BankPayment.expires < datetime.now(UTC) + timedelta(days=3),
         )
         .with_entities(BankPayment, func.count(Purchase.id).label("purchase_count"))
         .group_by(BankPayment)
@@ -101,7 +101,7 @@ def reset_expiry(payment_id):
             elif payment.currency == "EUR":
                 days = app.config.get("EXPIRY_DAYS_TRANSFER_EURO")
 
-            payment.expires = datetime.utcnow() + timedelta(days=days)
+            payment.expires = datetime.now(UTC) + timedelta(days=days)
             db.session.commit()
 
             app.logger.info("Reset expiry by %s days", days)
@@ -150,7 +150,7 @@ def send_reminder(payment_id):
             )
             msg.send()
 
-            payment.reminder_sent_at = datetime.utcnow()
+            payment.reminder_sent_at = datetime.now(UTC)
             db.session.commit()
 
             flash(f"Reminder email for payment {payment.id} sent")
