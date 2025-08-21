@@ -24,9 +24,9 @@ RUN apt-get update && \
 RUN pip3 install uv && \
     uv sync --no-dev --no-managed-python
 
-RUN uv run playwright install-deps && \
+RUN uv run --no-dev playwright install-deps && \
     rm -rf /var/lib/apt/lists/*
 
-RUN uv run playwright install chromium && \
+RUN uv run --no-dev playwright install chromium && \
     rm -rf /var/lib/apt/lists/*
 
