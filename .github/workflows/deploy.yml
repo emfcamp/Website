@@ -35,6 +35,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create git revision stamp
+        run: git rev-parse HEAD > .git-revision
       - name: Build app image
         run: docker build -t ghcr.io/emfcamp/website:latest -f ./Dockerfile.prod .
       - name: Build static image

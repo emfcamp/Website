@@ -13,7 +13,7 @@ send() {
 
 db_head=$(uv run flask db current)
 heads=$(uv run flask db heads)
-git_head=$(git rev-parse HEAD|cut -c -8)
+git_head=$(cat /app/.git-revision | cut -c -8)
 
 msg="%BOLDWebsite%NORMAL starting (%DGREEN${git_head}%NORMAL),"
 if [[ "$db_head" == "$heads" ]]; then
