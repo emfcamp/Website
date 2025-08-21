@@ -81,10 +81,10 @@ class Payment(BaseModel):
         cls_transaction = transaction_class(cls)
         changes = cls.query.join(cls.versions).group_by(cls.id)
         change_counts = changes.with_entities(func.count(cls_version.id))
-        first_changes = (
+        first_changes = db.select(column("created")).select_from(
             changes.join(cls_version.transaction)
             .with_entities(func.min(cls_transaction.issued_at).label("created"))
-            .from_self()
+            .subquery()
         )
 
         cls_ver_new = aliased(cls_version)
