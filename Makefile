@@ -15,6 +15,7 @@ test: check-syntax
 #endif
 
 check-syntax:
+	uv lock --check
 	ruff format --check ./main.py ./apps ./models ./tests
 	ruff check ./main.py ./apps ./models ./tests
 	mypy ./*.py ./apps ./models
