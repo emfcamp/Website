@@ -239,7 +239,7 @@ def payment_config_verify():
         tw_accounts = wise_retrieve_accounts(profile_id)
         for tw_account in tw_accounts:
             existing_account = BankAccount.query.filter_by(
-                borderless_account_id=tw_account.borderless_account_id,
+                wise_account_id=tw_account.wise_account_id,
                 currency=tw_account.currency,
             ).first()
             if existing_account:

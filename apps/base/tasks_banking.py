@@ -24,7 +24,7 @@ def sync_wisetransfer(profile_id):
     tw_accounts = wise_retrieve_accounts(profile_id)
     for tw_account in tw_accounts:
         # Each sync is performed in a separate transaction
-        sync_wise_statement(profile_id, tw_account.borderless_account_id, tw_account.currency)
+        sync_wise_statement(profile_id, tw_account.wise_account_id, tw_account.currency)
 
 
 @base.cli.command("check_wisetransfer_ids")
@@ -40,7 +40,7 @@ def check_wisetransfer_ids(profile_id):
         interval_start = interval_end - timedelta(days=120)
         statement = wise.balance_statements.statement(
             profile_id,
-            tw_account.borderless_account_id,
+            tw_account.wise_account_id,
             tw_account.currency,
             interval_start.isoformat() + "Z",
             interval_end.isoformat() + "Z",
@@ -49,14 +49,14 @@ def check_wisetransfer_ids(profile_id):
         bank_account = (
             BankAccount.query.with_for_update()
             .filter_by(
-                borderless_account_id=tw_account.borderless_account_id,
+                wise_account_id=tw_account.wise_account_id,
                 currency=tw_account.currency,
             )
             .one()
         )
         if not bank_account.active:
             app.logger.info(
-                f"BankAccount for borderless account {tw_account.borderless_account_id} and {tw_account.currency} is not active, not checking"
+                f"BankAccount for Wise account {tw_account.wise_account_id} and {tw_account.currency} is not active, not checking"
             )
             db.session.commit()
             continue

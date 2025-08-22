@@ -334,7 +334,7 @@ class BankAccount(BaseModel):
     address = db.Column(db.String, nullable=False)
     swift = db.Column(db.String)
     iban = db.Column(db.String)
-    borderless_account_id = db.Column(db.Integer)
+    wise_account_id = db.Column(db.Integer)
 
     def __init__(
         self,
@@ -347,7 +347,7 @@ class BankAccount(BaseModel):
         address,
         swift,
         iban,
-        borderless_account_id=None,
+        wise_account_id=None,
     ):
         self.sort_code = sort_code
         self.acct_id = acct_id
@@ -358,7 +358,7 @@ class BankAccount(BaseModel):
         self.address = address
         self.swift = swift
         self.iban = iban
-        self.borderless_account_id = borderless_account_id
+        self.wise_account_id = wise_account_id
 
     @classmethod
     def get(cls, sort_code, acct_id):
