@@ -117,7 +117,7 @@ def sync_wise_statement(profile_id, borderless_account_id, currency):
     # Retrieve an account transaction statement for the past week
     interval_end = datetime.utcnow()
     interval_start = interval_end - timedelta(days=7)
-    statement = wise.borderless_accounts.statement(
+    statement = wise.balance_statements.statement(
         profile_id,
         borderless_account_id,
         currency,
@@ -185,8 +185,8 @@ def sync_wise_statement(profile_id, borderless_account_id, currency):
 def wise_business_profile():
     if app.config.get("TRANSFERWISE_PROFILE_ID"):
         id = int(app.config["TRANSFERWISE_PROFILE_ID"])
-        borderless_accounts = list(wise.borderless_accounts.list(profile_id=id))
-        if len(borderless_accounts) == 0:
+        accounts = list(wise.account_details.list(profile_id=id))
+        if len(accounts) == 0:
             raise Exception("Provided TRANSFERWISE_PROFILE_ID has no accoutns")
     else:
         # Wise bug:
@@ -202,12 +202,11 @@ def wise_business_profile():
     return id
 
 
-def _collect_bank_accounts(borderless_account):
+def wise_retrieve_accounts(profile_id):
     # Wise creates the concept of a multi-currency account by calling normal
-    # bank accounts "balances", and collecting them into a "borderless account",
-    # one balance per currency. As far as we're concerned, "balances" are bank
+    # bank accounts "balances". As far as we're concerned, "balances" are bank
     # accounts, as that's what people will be sending money to.
-    for account in borderless_account.balances:
+    for account in wise.balances.list(profile_id=profile_id):
         try:
             if not account.bankDetails:
                 continue
@@ -249,15 +248,8 @@ def _collect_bank_accounts(borderless_account):
             swift=account.bankDetails.get("swift"),
             iban=account.bankDetails.get("iban"),
             # Webhooks only include the borderlessAccountId
-            borderless_account_id=borderless_account.id,
+            borderless_account_id=account.id,
         )
-
-
-def wise_retrieve_accounts(profile_id):
-    borderless_accounts = wise.borderless_accounts.list(profile_id=profile_id)
-
-    for borderless_account in borderless_accounts:
-        yield from _collect_bank_accounts(borderless_account)
 
 
 def wise_validate():

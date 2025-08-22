@@ -38,7 +38,7 @@ def check_wisetransfer_ids(profile_id):
     for tw_account in tw_accounts:
         interval_end = datetime.utcnow()
         interval_start = interval_end - timedelta(days=120)
-        statement = wise.borderless_accounts.statement(
+        statement = wise.balance_statements.statement(
             profile_id,
             tw_account.borderless_account_id,
             tw_account.currency,
