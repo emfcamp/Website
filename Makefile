@@ -10,9 +10,6 @@ endif
 
 test: check-syntax
 	SETTINGS_FILE=$(TEST_SETTINGS) pytest --random-order --cov=apps --cov=models ./tests/ ./models/
-#ifdef COVERALLS_REPO_TOKEN
-#	coveralls
-#endif
 
 check-syntax:
 	uv lock --check

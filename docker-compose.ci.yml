@@ -2,6 +2,3 @@ services:
   app:
     environment:
       SETTINGS_FILE: ./config/test.cfg
-      # Override for CI to pass coveralls variables through
-      COVERALLS_REPO_TOKEN: ${COVERALLS_REPO_TOKEN}
-      COVERALLS_GIT_BRANCH: ${COVERALLS_GIT_BRANCH}
