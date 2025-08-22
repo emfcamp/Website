@@ -2,19 +2,11 @@ name: Test
 
 on: [pull_request]
 
-env:
-  COMPOSE_INTERACTIVE_NO_CLI: 1
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build containers
-        run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml build --parallel
-      - name: Test
-        run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml run -T app uv run make test
+    name: Run tests
+    uses: ./.github/workflows/test.yml
