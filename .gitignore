@@ -117,6 +117,7 @@ static/.webassets-cache/
 
 config/live.cfg*
 config/development.cfg
+logging.override.yaml
 
 .inside-vagrant
 .vagrant
