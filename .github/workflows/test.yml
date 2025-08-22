@@ -1,0 +1,17 @@
+# Reusable workflow for running tests
+on:
+  workflow_call:
+
+env:
+  COMPOSE_INTERACTIVE_NO_CLI: 1
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build containers
+        run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml build --parallel
+      - name: Test
+        run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml run --quiet-pull -T app uv run make test
