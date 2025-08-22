@@ -11,7 +11,7 @@ from sqlalchemy.ext.mutable import MutableList
 
 from sqlalchemy import UniqueConstraint, func, select, text, or_
 from sqlalchemy.orm import column_property
-from slugify import slugify_unicode
+from slugify import slugify
 from models import (
     export_attr_counts,
     export_attr_edits,
@@ -247,13 +247,16 @@ def get_days_map():
 
 
 def proposal_slug(title) -> str:
-    slug = slugify_unicode(title).lower()
+    replacements = [
+        ["'", ""],
+    ]
+    slug = slugify(title, replacements=replacements, allow_unicode=True)
     if len(slug) > 60:
         words = re.split(" +|[,.;:!?]+", title)
         break_words = ["and", "which", "with", "without", "for", "-", ""]
 
         for i, word in reversed(list(enumerate(words))):
-            new_slug = slugify_unicode(" ".join(words[:i])).lower()
+            new_slug = slugify(" ".join(words[:i]), replacements=replacements, allow_unicode=True)
             if word in break_words:
                 if len(new_slug) > 10 and not len(new_slug) > 60:
                     slug = new_slug

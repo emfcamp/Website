@@ -2,7 +2,7 @@ import pendulum  # preferred over datetime
 from collections import defaultdict
 from werkzeug.datastructures import MultiDict
 from flask_login import current_user
-from slugify import slugify_unicode as slugify
+from slugify import slugify
 
 from models import event_year
 from models.cfp import Proposal, Venue
