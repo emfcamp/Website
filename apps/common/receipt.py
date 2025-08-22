@@ -1,3 +1,4 @@
+from collections import namedtuple
 import io
 import asyncio
 
@@ -15,41 +16,48 @@ from models.purchase import Purchase, PurchaseTransfer
 
 RECEIPT_TYPES = ["admissions", "parking", "campervan", "merchandise", "hire"]
 
+TicketMeta = namedtuple(
+    "TicketMeta",
+    ["admissions", "parking_tickets", "campervan_tickets", "merch", "hires", "transferred_tickets"],
+)
 
-def render_receipt(user, png=False, pdf=False):
+
+def get_purchase_metadata(user) -> TicketMeta:
     purchases = (
         user.owned_purchases.filter_by(is_paid_for=True)
         .join(PriceTier, Product, ProductGroup)
         .with_entities(Purchase)
         .order_by(Purchase.id)
     )
-
-    admissions = purchases.filter(ProductGroup.type == "admissions").all()
-
-    parking_tickets = purchases.filter(ProductGroup.type == "parking").all()
-    campervan_tickets = purchases.filter(ProductGroup.type == "campervan").all()
-
-    merch = purchases.filter(ProductGroup.type == "merchandise").all()
-    hires = purchases.filter(ProductGroup.type == "hire").all()
-
-    transferred_tickets = (
-        user.transfers_from.join(Purchase)
-        .filter_by(state="paid")
-        .with_entities(PurchaseTransfer)
-        .order_by("timestamp")
-        .all()
+    return TicketMeta(
+        admissions=purchases.filter(ProductGroup.type == "admissions").all(),
+        parking_tickets=purchases.filter(ProductGroup.type == "parking").all(),
+        campervan_tickets=purchases.filter(ProductGroup.type == "campervan").all(),
+        merch=purchases.filter(ProductGroup.type == "merchandise").all(),
+        hires=purchases.filter(ProductGroup.type == "hire").all(),
+        transferred_tickets=(
+            user.transfers_from.join(Purchase)
+            .filter_by(state="paid")
+            .with_entities(PurchaseTransfer)
+            .order_by("timestamp")
+            .all()
+        ),
     )
+
+
+def render_receipt(user, png=False, pdf=False):
+    meta = get_purchase_metadata(user)
 
     return render_template(
         "receipt.html",
         user=user,
         format_inline_qr=format_inline_qr,
-        admissions=admissions,
-        parking_tickets=parking_tickets,
-        campervan_tickets=campervan_tickets,
-        transferred_tickets=transferred_tickets,
-        merch=merch,
-        hires=hires,
+        admissions=meta.admissions,
+        parking_tickets=meta.parking_tickets,
+        campervan_tickets=meta.campervan_tickets,
+        transferred_tickets=meta.transferred_tickets,
+        merch=meta.merch,
+        hires=meta.hires,
         pdf=pdf,
         png=png,
     )
