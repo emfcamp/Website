@@ -55,7 +55,7 @@ def upgrade():
     sa.Column('address', sa.String(), nullable=False),
     sa.Column('swift', sa.String(), nullable=True),
     sa.Column('iban', sa.String(), nullable=True),
-    sa.Column('wise_account_id', sa.Integer(), nullable=True),
+    sa.Column('wise_balance_id', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_bank_account'))
     )
     op.create_index('ix_bank_account_sort_code_acct_id', 'bank_account', ['sort_code', 'acct_id'], unique=True)
