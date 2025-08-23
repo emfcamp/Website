@@ -75,7 +75,7 @@ def wise_balance_credit(event_type, event):
 
     wise_balance_id = event.get("data", {}).get("resource", {}).get("id")
     if wise_balance_id is None:
-        logger.exception("Missing wise_balance_id in Wise webhook")
+        logger.exception("Missing balance-account id in Wise webhook")
         # logger.info("Webhook data: %s", request.data)
         abort(400)
 
