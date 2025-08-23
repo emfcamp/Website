@@ -1,7 +1,7 @@
 from PIL import Image
 from pyzbar.pyzbar import decode
 
-from apps.common.receipt import format_inline_qr, make_qr_png
+from apps.common.receipt import format_inline_qr, make_qrfile
 
 from tests._utils import render_svg
 
@@ -21,7 +21,7 @@ def test_format_inline_qr():
 def test_make_qr_png():
     data = "https://www.example.org"
 
-    qr_file = make_qr_png(data)
+    qr_file = make_qrfile(data, kind="png", scale=3)
     qr_image = Image.open(qr_file)
 
     decoded = decode(qr_image)

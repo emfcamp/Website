@@ -1,3 +1,4 @@
+from typing import IO
 import io
 import asyncio
 
@@ -86,33 +87,17 @@ def render_pdf(url, html):
     return pdffile
 
 
-def make_qrfile(data, **kwargs):
+def make_qrfile(data: str, kind: str = "svg", **kwargs) -> IO[bytes]:
     qrfile = io.BytesIO()
     qr = segno.make_qr(data)
-    qr.save(qrfile, **kwargs)
+    qr.save(qrfile, kind=kind, **kwargs)
     qrfile.seek(0)
     return qrfile
 
 
-def qrfile_to_svg(qrfile):
-    return Markup(qrfile.getvalue().decode("utf-8"))
-
-
-def format_inline_qr(data):
-    qrfile = make_qrfile(
-        data,
-        kind="svg",
-        svgclass=None,
-        omitsize=True,
-        xmldecl=False,
-        svgns=False,
-        nl=False,
-    )
-    return qrfile_to_svg(qrfile)
-
-
-def make_qr_png(url):
-    return make_qrfile(url, kind="png", scale=3)
+def format_inline_qr(data: str) -> Markup:
+    qr = segno.make(data)
+    return Markup(qr.svg_inline(svgclass=None, omitsize=True))
 
 
 def attach_tickets(msg, user):

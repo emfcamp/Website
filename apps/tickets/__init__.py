@@ -38,7 +38,7 @@ from ..common import (
 )
 from ..common.email import from_email
 from ..common.receipt import (
-    make_qr_png,
+    make_qrfile,
     render_pdf,
     render_receipt,
     attach_tickets,
@@ -198,10 +198,7 @@ def receipt(user_id=None, format=None):
     return page
 
 
-# Generate a PNG-based QR code as xhtml2pdf doesn't support SVG.
-#
-# This only accepts the code on purpose - we can't authenticate the
-# user from the PDF renderer, and a full URL is awkward to validate.
+# This used to be for xhtml2pdf, but is handy for creating a shareable image
 @tickets.route("/receipt/<checkin_code>/qr")
 def tickets_qrcode(checkin_code):
     if not re.match("%s$" % checkin_code_re, checkin_code):
@@ -209,7 +206,7 @@ def tickets_qrcode(checkin_code):
 
     url = app.config.get("CHECKIN_BASE") + checkin_code
 
-    qrfile = make_qr_png(url)
+    qrfile = make_qrfile(url, kind="png", scale=3)
     return send_file(qrfile, mimetype="image/png")
 
 
