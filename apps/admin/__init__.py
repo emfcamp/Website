@@ -236,15 +236,15 @@ def payment_config_verify():
             flash("Cannot identify Wise profile", "warning")
             return redirect(url_for(".payment_config_verify"), 303)
 
-        tw_accounts = wise_retrieve_accounts(profile_id)
-        for tw_account in tw_accounts:
+        accounts = wise_retrieve_accounts(profile_id)
+        for account in accounts:
             existing_account = BankAccount.query.filter_by(
-                wise_balance_id=tw_account.wise_balance_id,
-                currency=tw_account.currency,
+                wise_balance_id=account.wise_balance_id,
+                currency=account.currency,
             ).first()
             if existing_account:
                 continue
-            db.session.add(tw_account)
+            db.session.add(account)
 
         if db.session.new:
             db.session.commit()

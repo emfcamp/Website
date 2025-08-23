@@ -21,10 +21,10 @@ def sync_wisetransfer(profile_id):
     if profile_id is None:
         profile_id = wise_business_profile()
 
-    tw_accounts = wise_retrieve_accounts(profile_id)
-    for tw_account in tw_accounts:
+    accounts = wise_retrieve_accounts(profile_id)
+    for account in accounts:
         # Each sync is performed in a separate transaction
-        sync_wise_statement(profile_id, tw_account.wise_balance_id, tw_account.currency)
+        sync_wise_statement(profile_id, account.wise_balance_id, account.currency)
 
 
 @base.cli.command("check_wisetransfer_ids")
@@ -34,14 +34,14 @@ def check_wisetransfer_ids(profile_id):
     if profile_id is None:
         profile_id = wise_business_profile()
 
-    tw_accounts = wise_retrieve_accounts(profile_id)
-    for tw_account in tw_accounts:
+    accounts = wise_retrieve_accounts(profile_id)
+    for account in accounts:
         interval_end = datetime.utcnow()
         interval_start = interval_end - timedelta(days=120)
         statement = wise.balance_statements.statement(
             profile_id,
-            tw_account.wise_balance_id,
-            tw_account.currency,
+            account.wise_balance_id,
+            account.currency,
             interval_start.isoformat() + "Z",
             interval_end.isoformat() + "Z",
         )
@@ -49,14 +49,14 @@ def check_wisetransfer_ids(profile_id):
         bank_account = (
             BankAccount.query.with_for_update()
             .filter_by(
-                wise_balance_id=tw_account.wise_balance_id,
-                currency=tw_account.currency,
+                wise_balance_id=account.wise_balance_id,
+                currency=account.currency,
             )
             .one()
         )
         if not bank_account.active:
             app.logger.info(
-                f"BankAccount for Wise balance account {tw_account.wise_balance_id} and {tw_account.currency} is not active, not checking"
+                f"BankAccount for Wise balance account {account.wise_balance_id} and {account.currency} is not active, not checking"
             )
             db.session.commit()
             continue
