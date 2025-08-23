@@ -208,7 +208,7 @@ def site_states():
 
 
 class BankAccountRefreshForm(Form):
-    import_accounts = SubmitField("Import new TransferWise accounts")
+    import_accounts = SubmitField("Import new Wise accounts")
 
 
 @admin.route("/payment-config/activate", methods=["POST"])
@@ -248,9 +248,9 @@ def payment_config_verify():
 
         if db.session.new:
             db.session.commit()
-            flash("New TransferWise bank accounts have been imported", "info")
+            flash("New Wise bank accounts have been imported", "info")
         else:
-            flash("No new TransferWise bank accounts have been imported", "warning")
+            flash("No new Wise bank accounts have been imported", "warning")
 
         return redirect(url_for(".payment_config_verify"), 303)
 
