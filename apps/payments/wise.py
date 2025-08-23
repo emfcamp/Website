@@ -80,7 +80,7 @@ def wise_balance_credit(event_type, event):
         abort(400)
 
     if wise_balance_id == 0:
-        # A credit event with an account ID of 0 is sent when webhook connections are configured.
+        # A credit event with a balance account ID of 0 is sent when webhook connections are configured.
         return ("", 204)
 
     currency = event.get("data", {}).get("currency")
@@ -137,7 +137,7 @@ def sync_wise_statement(profile_id, wise_balance_id, currency):
     )
     if not bank_account.active:
         logger.info(
-            f"BankAccount for Wise account {wise_balance_id} and {currency} is not active, not syncing"
+            f"BankAccount for Wise balance account {wise_balance_id} and {currency} is not active, not syncing"
         )
         db.session.commit()
         return
