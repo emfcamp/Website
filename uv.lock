@@ -248,20 +248,6 @@ wheels = [
 ]
 
 [[package]]
-name = "coveralls"
-version = "4.0.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "coverage" },
-    { name = "docopt" },
-    { name = "requests" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/61/75/a454fb443eb6a053833f61603a432ffbd7dd6ae53a11159bacfadb9d6219/coveralls-4.0.1.tar.gz", hash = "sha256:7b2a0a2bcef94f295e3cf28dcc55ca40b71c77d1c2446b538e85f0f7bc21aa69", size = 12419, upload-time = "2024-05-15T12:56:14.297Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/63/e5/6708c75e2a4cfca929302d4d9b53b862c6dc65bd75e6933ea3d20016d41d/coveralls-4.0.1-py3-none-any.whl", hash = "sha256:7a6b1fa9848332c7b2221afb20f3df90272ac0167060f41b5fe90429b30b1809", size = 13599, upload-time = "2024-05-15T12:56:12.342Z" },
-]
-
-[[package]]
 name = "cryptography"
 version = "44.0.3"
 source = { registry = "https://pypi.org/simple" }
@@ -354,12 +340,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/b5/4a/263763cb2ba3816dd
 wheels = [
     { url = "https://files.pythonhosted.org/packages/68/1b/e0a87d256e40e8c888847551b20a017a6b98139178505dc7ffb96f04e954/dnspython-2.7.0-py3-none-any.whl", hash = "sha256:b4c34b7d10b51bcc3a5071e7b8dee77939f1e878477eeecc965e9835f63c6c86", size = 313632, upload-time = "2024-10-05T20:14:57.687Z" },
 ]
-
-[[package]]
-name = "docopt"
-version = "0.6.2"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a2/55/8f8cab2afd404cf578136ef2cc5dfb50baa1761b68c9da1fb1e4eed343c9/docopt-0.6.2.tar.gz", hash = "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491", size = 25901, upload-time = "2014-06-16T11:18:57.406Z" }
 
 [[package]]
 name = "email-validator"
@@ -2150,7 +2130,6 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "cairosvg" },
-    { name = "coveralls" },
     { name = "hypothesis" },
     { name = "ipdb" },
     { name = "locust" },
@@ -2232,7 +2211,6 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "cairosvg", specifier = ">=2.4.2,<3" },
-    { name = "coveralls" },
     { name = "hypothesis" },
     { name = "ipdb" },
     { name = "locust" },
