@@ -36,6 +36,7 @@ class Volunteer(BaseModel, UserMixin):
     volunteer_phone = db.Column(db.String)
     volunteer_email = db.Column(db.String)
     over_18 = db.Column(db.Boolean, nullable=False, default=False)
+    dietary_requirements = db.Column(db.String)
     allow_comms_during_event = db.Column(db.Boolean, nullable=False, default=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
