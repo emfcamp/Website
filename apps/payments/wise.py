@@ -73,13 +73,13 @@ def wise_balance_credit(event_type, event):
         # logger.info("Webhook data: %s", request.data)
         abort(400)
 
-    wise_account_id = event.get("data", {}).get("resource", {}).get("id")
-    if wise_account_id is None:
-        logger.exception("Missing wise_account_id in Wise webhook")
+    wise_balance_id = event.get("data", {}).get("resource", {}).get("id")
+    if wise_balance_id is None:
+        logger.exception("Missing wise_balance_id in Wise webhook")
         # logger.info("Webhook data: %s", request.data)
         abort(400)
 
-    if wise_account_id == 0:
+    if wise_balance_id == 0:
         # A credit event with an account ID of 0 is sent when webhook connections are configured.
         return ("", 204)
 
@@ -90,13 +90,13 @@ def wise_balance_credit(event_type, event):
         abort(400)
 
     logger.info(
-        "Checking Wise details for wise_account_id %s and currency %s",
-        wise_account_id,
+        "Checking Wise details for wise_balance_id %s and currency %s",
+        wise_balance_id,
         currency,
     )
     # Find the Wise bank account in the application database
     bank_account = BankAccount.query.filter_by(
-        wise_account_id=wise_account_id,
+        wise_balance_id=wise_balance_id,
         currency=currency,
         active=True,
     ).first()
@@ -105,7 +105,7 @@ def wise_balance_credit(event_type, event):
         return ("", 204)
 
     try:
-        sync_wise_statement(profile_id, wise_account_id, currency)
+        sync_wise_statement(profile_id, wise_balance_id, currency)
     except Exception:
         logger.exception("Error fetching statement")
         return ("", 500)
@@ -113,13 +113,13 @@ def wise_balance_credit(event_type, event):
     return ("", 204)
 
 
-def sync_wise_statement(profile_id, wise_account_id, currency):
+def sync_wise_statement(profile_id, wise_balance_id, currency):
     # Retrieve an account transaction statement for the past week
     interval_end = datetime.utcnow()
     interval_start = interval_end - timedelta(days=7)
     statement = wise.balance_statements.statement(
         profile_id,
-        wise_account_id,
+        wise_balance_id,
         currency,
         interval_start.isoformat() + "Z",
         interval_end.isoformat() + "Z",
@@ -130,14 +130,14 @@ def sync_wise_statement(profile_id, wise_account_id, currency):
     bank_account = (
         BankAccount.query.with_for_update()
         .filter_by(
-            wise_account_id=wise_account_id,
+            wise_balance_id=wise_balance_id,
             currency=currency,
         )
         .one()
     )
     if not bank_account.active:
         logger.info(
-            f"BankAccount for Wise account {wise_account_id} and {currency} is not active, not syncing"
+            f"BankAccount for Wise account {wise_balance_id} and {currency} is not active, not syncing"
         )
         db.session.commit()
         return
@@ -248,7 +248,7 @@ def wise_retrieve_accounts(profile_id):
             swift=account.bankDetails.get("swift"),
             iban=account.bankDetails.get("iban"),
             # Webhooks only include the borderlessAccountId
-            wise_account_id=account.id,
+            wise_balance_id=account.id,
         )
 
 
