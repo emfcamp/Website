@@ -31,9 +31,9 @@
 {% for purchase in payment.purchases %}
 <tr>
   <td>{{ purchase.product.parent.name }}</td>
-  <td><a href="{{url_for('admin.product_details', product_id=purchase.product.id)}}">{{ purchase.product.name}}</a></td>
+  <td><a href="{{url_for('admin.products.product_details', product_id=purchase.product.id)}}">{{ purchase.product.name}}</a></td>
   <td>{{ purchase.product.display_name }}</td>
-  <td><a href="{{url_for('admin.price_tier_details', tier_id=purchase.price_tier.id)}}">{{ purchase.price_tier.name }}</a></td>
+  <td><a href="{{url_for('admin.products.price_tier_details', tier_id=purchase.price_tier.id)}}">{{ purchase.price_tier.name }}</a></td>
   <td>{{ purchase.price_tier.get_price(payment.currency) | price }}</td>
   <td>{{ purchase.state }}</td>
   <td>

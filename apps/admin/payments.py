@@ -563,7 +563,7 @@ class ChangeCurrencyForm(Form):
     change = SubmitField("Change Currency")
 
 
-@admin.route("/payment/<int:payment_id>/change_currency", methods=["GET", "POST"])
+@admin.route("/payment/<int:payment_id>/change-currency", methods=["GET", "POST"])
 def change_currency(payment_id):
     payment = Payment.query.get_or_404(payment_id)
     if not (payment.state == "new" or (payment.provider == "banktransfer" and payment.state == "inprogress")):
@@ -594,7 +594,7 @@ class CancelPurchaseForm(Form):
 
 
 @admin.route(
-    "/payment/<int:payment_id>/cancel_purchase/<int:purchase_id>",
+    "/payment/<int:payment_id>/cancel-purchase/<int:purchase_id>",
     methods=["GET", "POST"],
 )
 def cancel_purchase(payment_id: int, purchase_id: int) -> ResponseReturnValue:

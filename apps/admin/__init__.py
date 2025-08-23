@@ -39,10 +39,14 @@ from ..payments.wise import (
 )
 from ..common import require_permission
 from ..common.forms import Form
+from .products import product_views, products
 
 admin = Blueprint("admin", __name__)
 
 admin_required = require_permission("admin")  # Decorator to require admin permissions
+
+admin.register_blueprint(product_views, url_prefix="product-views")
+admin.register_blueprint(products, url_prefix="products")
 
 
 @admin.before_request
@@ -287,7 +291,6 @@ def logging_config():
 
 from . import accounts  # noqa: F401
 from . import payments  # noqa: F401
-from . import products  # noqa: F401
 from . import reports  # noqa: F401
 from . import tickets  # noqa: F401
 from . import users  # noqa: F401
