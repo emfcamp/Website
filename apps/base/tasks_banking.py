@@ -56,7 +56,7 @@ def check_wisetransfer_ids(profile_id):
         )
         if not bank_account.active:
             app.logger.info(
-                f"BankAccount for Wise account {tw_account.wise_balance_id} and {tw_account.currency} is not active, not checking"
+                f"BankAccount for Wise balance account {tw_account.wise_balance_id} and {tw_account.currency} is not active, not checking"
             )
             db.session.commit()
             continue
