@@ -1,3 +1,5 @@
 images
 exports
 .mypy_cache
+uv.lock
+package-lock.json
