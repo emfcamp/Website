@@ -13,13 +13,7 @@ event_tz = pytz.timezone("Europe/London")
 
 
 # state: [allowed next state, ] pairs
-type ShiftEntryState = (
-    Literal["signed_up"]
-    | Literal["arrived"]
-    | Literal["abandoned"]
-    | Literal["completed"]
-    | Literal["no_show"]
-)
+type ShiftEntryState = Literal["signed_up", "arrived", "abandoned", "completed", "no_show"]
 
 SHIFT_ENTRY_STATES: dict[ShiftEntryState, list[ShiftEntryState]] = {
     "signed_up": ["arrived", "completed", "abandoned", "no_show"],
