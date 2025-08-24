@@ -82,7 +82,7 @@ dev = [
     "lxml-stubs<0.6",
     "sqlalchemy-stubs>=0.4,<0.5",
     # Ruff version should also be updated in .pre-commit-config.yaml
-    "ruff==0.12.9",
+    "ruff==0.12.10",
     "types-shapely>=2.1.0.20250822",
     "pytest-github-actions-annotate-failures>=0.3.0",
 ]
