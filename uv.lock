@@ -1927,6 +1927,31 @@ wheels = [
 ]
 
 [[package]]
+name = "types-flask-cors"
+version = "6.0.0.20250809"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "flask" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/45/e0/e5dd841bf475765fb61cb04c1e70d2fd0675a0d4ddfacd50a333eafe7267/types_flask_cors-6.0.0.20250809.tar.gz", hash = "sha256:24380a2b82548634c0931d50b9aafab214eea9f85dcc04f15ab1518752a7e6aa", size = 9951, upload-time = "2025-08-09T03:16:37.454Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9f/5e/1e60c29eb5796233d4d627ca4979c4ae8da962fd0aae0cdb6e3e6a807bbc/types_flask_cors-6.0.0.20250809-py3-none-any.whl", hash = "sha256:f6d660dddab946779f4263cb561bffe275d86cb8747ce02e9fec8d340780131b", size = 9971, upload-time = "2025-08-09T03:16:36.593Z" },
+]
+
+[[package]]
+name = "types-icalendar"
+version = "6.3.1.20250822"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "types-python-dateutil" },
+    { name = "types-pytz" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ce/98/a993422a2ab89d949fb465e71fea0b82827a08360df13188e7e7d7913227/types_icalendar-6.3.1.20250822.tar.gz", hash = "sha256:66cc2017eb651b924a94bbdc3c0bc5fc6349c8a2a039a564780f0eaea53df9c9", size = 17992, upload-time = "2025-08-22T03:03:58.596Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7c/48/3c4e90871a522e6235b7d797619da7d8e338481d86ad19aa957361529254/types_icalendar-6.3.1.20250822-py3-none-any.whl", hash = "sha256:8a1d49dfc5c7080749bee88a3dab0f5f10804954ac79478d8a9e149c3dfaac1e", size = 23054, upload-time = "2025-08-22T03:03:57.711Z" },
+]
+
+[[package]]
 name = "types-markdown"
 version = "3.8.0.20250809"
 source = { registry = "https://pypi.org/simple" }
@@ -2151,6 +2176,8 @@ dev = [
     { name = "ruff" },
     { name = "sqlalchemy-stubs" },
     { name = "types-decorator" },
+    { name = "types-flask-cors" },
+    { name = "types-icalendar" },
     { name = "types-markdown" },
     { name = "types-python-dateutil" },
     { name = "types-pytz" },
@@ -2233,6 +2260,8 @@ dev = [
     { name = "ruff", specifier = "==0.12.10" },
     { name = "sqlalchemy-stubs", specifier = ">=0.4,<0.5" },
     { name = "types-decorator", specifier = ">=5.1.4,<6" },
+    { name = "types-flask-cors", specifier = ">=6.0.0.20250809" },
+    { name = "types-icalendar", specifier = ">=6.3.1.20250822" },
     { name = "types-markdown", specifier = ">=3.3.12,<4" },
     { name = "types-python-dateutil", specifier = ">=2.8.9,<3" },
     { name = "types-pytz" },
