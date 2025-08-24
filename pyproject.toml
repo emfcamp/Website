@@ -18,7 +18,7 @@ dependencies = [
     "flask-cors~=5.0",
     "flask-debugtoolbar",
     "flask-login~=0.6",
-    "flask-mailman>=0.3.0,<0.4",
+    "flask-mailman<1.2",
     "Flask-Migrate>=3.1,<3.2",
     "flask-restful~=0.3",
     "flask-shell-ipython",
