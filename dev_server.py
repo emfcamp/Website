@@ -2,8 +2,6 @@ import os
 import random
 import shutil
 
-from flask import _request_ctx_stack, request
-
 from main import create_app, db
 
 prometheus_dir = "var/prometheus"
@@ -35,15 +33,3 @@ def prometheus_cleanup(response):
     # other metrics will hang around until restart
     prometheus_client.multiprocess.mark_process_dead(os.getpid())
     return response
-
-
-if app.config.get("FIX_URL_SCHEME"):
-    # The Flask debug server doesn't process _FORWARDED_ headers,
-    # so there's no other way to set the wsgi.url_scheme.
-    # Consider using an actual WSGI host (perhaps with ProxyFix) instead.
-
-    @app.before_request
-    def fix_url_scheme():
-        if request.environ.get("HTTP_X_FORWARDED_PROTO") == "https":
-            request.environ["wsgi.url_scheme"] = "https"
-            _request_ctx_stack.top.url_adapter.url_scheme = "https"
