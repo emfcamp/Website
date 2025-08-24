@@ -169,8 +169,8 @@ def create_app(dev_server=False, config_override=None):
     CORS(
         app,
         resources={
-            r"/api/*": {"origins": cors_origins},
-            r"/static/*": {"origins": cors_origins},
+            r"/api/.*": {"origins": cors_origins},
+            r"/static/.*": {"origins": cors_origins},
         },
         supports_credentials=True,
     )

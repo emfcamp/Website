@@ -15,7 +15,7 @@ dependencies = [
     "faker",
     "flask-admin",
     "flask-caching~=2.0",
-    "flask-cors~=5.0",
+    "flask-cors<6.2",
     "flask-debugtoolbar",
     "flask-login~=0.6",
     "flask-mailman<1.2",
