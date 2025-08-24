@@ -16,9 +16,8 @@ from sqlalchemy.orm import column_property, validates
 
 from main import db
 
-from . import BaseModel
+from . import BaseModel, Currency
 from .mixins import CapacityMixin, InheritedAttributesMixin
-from .payment import Currency
 from .purchase import AdmissionTicket, Purchase, Ticket
 
 if TYPE_CHECKING:
