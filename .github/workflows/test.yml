@@ -12,6 +12,8 @@ jobs:
   lint:
     name: Run linting checks
     runs-on: ubuntu-latest
+    env:
+      RUFF_OUTPUT_FORMAT: github
     steps:
       - uses: actions/checkout@v4
       - name: "Set up Python"
