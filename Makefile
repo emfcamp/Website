@@ -6,9 +6,11 @@ ifeq ("$(TEST_SETTINGS)", "")
 	TEST_SETTINGS=./config/test.cfg
 endif
 
-.PHONY: test check-syntax fix-syntax
+.PHONY: test check-syntax fix-syntax pytest
 
-test: check-syntax
+test: check-syntax pytest
+	
+pytest:
 	SETTINGS_FILE=$(TEST_SETTINGS) pytest --random-order --cov=apps --cov=models ./tests/ ./models/
 
 check-syntax:
