@@ -2,9 +2,9 @@ import os
 import random
 import shutil
 
-from main import create_app, db
-from flask import request, _request_ctx_stack
+from flask import _request_ctx_stack, request
 
+from main import create_app, db
 
 prometheus_dir = "var/prometheus"
 os.environ["PROMETHEUS_MULTIPROC_DIR"] = prometheus_dir
@@ -26,7 +26,7 @@ def fix_shared_state():
         random.seed()
 
 
-import prometheus_client.multiprocess  # noqa
+import prometheus_client.multiprocess
 
 
 @app.after_request

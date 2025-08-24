@@ -15,11 +15,11 @@ pytest:
 
 check-syntax:
 	uv lock --check
-	ruff format --check ./main.py ./apps ./models ./tests
-	ruff check ./main.py ./apps ./models ./tests
+	ruff format --check ./*.py ./apps ./models ./tests
+	ruff check ./*.py ./apps ./models ./tests
 	mypy ./*.py ./apps ./models
 
 fix-syntax:
-	ruff format ./main.py ./apps ./models ./tests
-	ruff check --fix ./main.py ./apps ./models ./tests
+	ruff format ./*.py ./apps ./models ./tests
+	ruff check --fix ./*.py ./apps ./models ./tests
 	mypy ./*.py ./apps ./models

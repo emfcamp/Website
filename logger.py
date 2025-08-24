@@ -1,6 +1,7 @@
-from enum import Enum
 import logging
 import os
+import typing
+from enum import Enum
 
 
 class AnsiColors(Enum):
@@ -20,18 +21,14 @@ class AnsiColors(Enum):
 
     @classmethod
     def sgr(cls, *codes):
-        return (
-            AnsiColors.CSI.value
-            + ";".join([str(AnsiColors[c].value) for c in codes])
-            + "m"
-        )
+        return AnsiColors.CSI.value + ";".join([str(AnsiColors[c].value) for c in codes]) + "m"
 
 
 # modified from http://plumberjack.blogspot.co.uk/2010/12/colorizing-logging-output-in-terminals.html
 
 
 class ColorizingStreamHandler(logging.StreamHandler):
-    DEFAULT_COLORS = {
+    DEFAULT_COLORS: typing.ClassVar = {
         "DEBUG": "BLUE",
         "WARNING": "YELLOW",
         "ERROR": "RED",
@@ -46,7 +43,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
         colors = dict(**self.DEFAULT_COLORS, **colors)
         self.colors = {}
         for k, v in colors.items():
-            if not isinstance(v, (list, tuple)):
+            if not isinstance(v, list | tuple):
                 v = [v]
             self.colors[k] = AnsiColors.sgr(*v)
 
