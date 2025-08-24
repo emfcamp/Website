@@ -139,15 +139,13 @@ def create_tags(tags_to_create):
     tags_created = 0
     for tag in tags_to_create:
         if Tag.query.filter_by(tag=tag).all():
-            app.logger.info(f"'{tag}' already exists, skipping.")
             continue
 
         db.session.add(Tag(tag))
         tags_created += 1
-        app.logger.info(f"'{tag}' added to session.")
 
     db.session.commit()
-    app.logger.info(f"Successfully created {tags_created} new tags.")
+    app.logger.info(f"Created {tags_created}/{len(tags_to_create)} tags.")
 
 
 @cfp.cli.command(

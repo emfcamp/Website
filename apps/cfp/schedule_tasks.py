@@ -150,22 +150,23 @@ _EMF_VENUES = [
 @cfp.cli.command("create_venues")
 def create_venues():
     """Create venues defined in code"""
+    created = updated = 0
     for venue_definition in _EMF_VENUES:
         name = venue_definition.name
         venue = Venue.query.filter_by(name=name).all()
 
         if len(venue) == 1 and venue[0].location is None:
             venue[0].location = venue_definition.location
-            app.logger.info(f"Updating venue {name} with new latlon")
+            updated += 1
             continue
         elif venue:
-            app.logger.info(f"Venue {name} already exists")
             continue
 
         db.session.add(venue_definition.as_venue())
-        app.logger.info(f"Adding venue {name}")
+        created += 1
 
     db.session.commit()
+    app.logger.info(f"Created {created} and updated {updated} venues.")
 
 
 @cfp.cli.command("create_village_venues")
