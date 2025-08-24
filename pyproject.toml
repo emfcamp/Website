@@ -5,87 +5,96 @@ description = "The Electromagnetic Field web site"
 authors = []
 # When upgrading Python versions, you'll need to update docker/Dockerfile.base.
 requires-python = ">=3.13,<3.14"
+
 dependencies = [
-    "decorator",
-    "iso8601",
-    "python-levenshtein~=0.12",
-    "simplejson",
-    "requests~=2.29",
-    "markdown~=3.1",
-    "flask~=2.3",
-    "flask-caching~=2.0",
-    "python-memcached<2.0",
-    "flask-sqlalchemy~=3.0",
-    "SQLAlchemy<2.0",
-    "psycopg2~=2.8",
-    "sqlalchemy-utils~=0.34",
-    "sqlalchemy-continuum~=1.3",
-    "Flask-Migrate>=3.1,<3.2",
     "alembic~=1.1",
-    "flask-wtf~=1.0",
-    "wtforms~=2.3",
-    "flask-login~=0.6",
-    "flask-debugtoolbar",
-    "gunicorn~=23.0",
-    "pillow<12.0",
-    "icalendar~=6.3",
-    "pytz",
-    "stripe<13.0",
-    "python-dateutil",
-    "slotmachine",
-    "faker",
-    "pyyaml",
-    "prometheus-client",
-    "flask-admin",
-    "pendulum~=3.1",
-    "geoalchemy2~=0.13",
-    "flask-restful~=0.3",
-    "shapely~=2.0",
-    "flask-cors~=5.0",
-    "flask-shell-ipython",
-    "Flask-Static-Digest~=0.3",
-    "email-validator<2.3.0",
-    "segno>=1.0.0,<2",
-    "pywisetransfer>=0.3.1,<0.4",
-    "freezegun>=1.1.0,<2",
-    "logging_tree~=1.9",
-    "flask-mailman>=0.3.0,<0.4",
-    "python-stdnum<2.2",
-    "playwright>=1.43.0,<2",
-    "css-inline<0.18",
-    "wtforms-sqlalchemy~=0.3.0",
-    "lxml>=6.0.0",
     "cryptography>=44.0.3",
+    "css-inline<0.18",
+    "decorator",
+    "email-validator<2.3.0",
+    "faker",
+    "flask-admin",
+    "flask-caching~=2.0",
+    "flask-cors~=5.0",
+    "flask-debugtoolbar",
+    "flask-login~=0.6",
+    "flask-mailman>=0.3.0,<0.4",
+    "Flask-Migrate>=3.1,<3.2",
+    "flask-restful~=0.3",
+    "flask-shell-ipython",
+    "flask-sqlalchemy~=3.0",
+    "Flask-Static-Digest~=0.3",
+    "flask-wtf~=1.0",
+    "flask~=2.3",
+    "freezegun>=1.1.0,<2",
+    "geoalchemy2~=0.13",
+    "gunicorn~=23.0",
+    "icalendar~=6.3",
+    "iso8601",
+    "logging_tree~=1.9",
+    "lxml>=6.0.0",
+    "markdown~=3.1",
+    "pendulum~=3.1",
+    "pillow<12.0",
+    "playwright>=1.43.0,<2",
+    "prometheus-client",
+    "psycopg2~=2.8",
+    "python-dateutil",
+    "python-levenshtein~=0.12",
+    "python-memcached<2.0",
     "python-slugify>=8.0.4",
+    "python-stdnum<2.2",
+    "pytz",
+    "pywisetransfer>=0.3.1,<0.4",
+    "pyyaml",
+    "requests~=2.29",
+    "segno>=1.0.0,<2",
+    "shapely~=2.0",
+    "simplejson",
+    "slotmachine",
+    "sqlalchemy-continuum~=1.3",
+    "sqlalchemy-utils~=0.34",
+    "SQLAlchemy<2.0",
+    "stripe<13.0",
+    "wtforms-sqlalchemy~=0.3.0",
+    "wtforms~=2.3",
 ]
 
 [dependency-groups]
 dev = [
-    "pytest",
-    "mock",
-    "locust",
-    "ipdb",
-    "hypothesis",
-    "pytest-random-order",
-    "pytest-cov",
-    "pytest-vcr>=1.0.2,<2",
-    "pyzbar>=0.1.8,<0.2",
     "cairosvg>=2.4.2,<3",
-    "mypy>=1.2.0,<2",
-    "types-requests>=2.27.8,<3",
-    "types-simplejson>=3.17.3,<4",
-    "types-decorator>=5.1.4,<6",
-    "types-python-dateutil>=2.8.9,<3",
-    "types-PyYAML>=6.0.4,<7",
-    "types-Markdown>=3.3.12,<4",
-    "types-pytz",
+    "hypothesis",
+    "ipdb",
+    "locust",
     "lxml-stubs<0.6",
-    "sqlalchemy-stubs>=0.4,<0.5",
+    "mock",
+    "mypy>=1.2.0,<2",
+    "pytest-cov",
+    "pytest-github-actions-annotate-failures>=0.3.0",
+    "pytest-random-order",
+    "pytest-vcr>=1.0.2,<2",
+    "pytest",
+    "pyzbar>=0.1.8,<0.2",
     # Ruff version should also be updated in .pre-commit-config.yaml
     "ruff==0.12.10",
+    "sqlalchemy-stubs>=0.4,<0.5",
+    "types-decorator>=5.1.4,<6",
+    "types-Markdown>=3.3.12,<4",
+    "types-python-dateutil>=2.8.9,<3",
+    "types-pytz",
+    "types-PyYAML>=6.0.4,<7",
+    "types-requests>=2.27.8,<3",
     "types-shapely>=2.1.0.20250822",
-    "pytest-github-actions-annotate-failures>=0.3.0",
+    "types-simplejson>=3.17.3,<4",
 ]
+
+
+[tool.uv]
+required-version=">=0.8"
+
+[tool.uv.sources]
+slotmachine = { git = "https://github.com/emfcamp/slotmachine.git" }
+
 
 [tool.ruff]
 line-length = 110
@@ -109,18 +118,13 @@ ignore = [
 
     "RET504",  # unnecessary-assign: nice e.g. when constructing then returning big dicts
 ]
+
 [tool.ruff.lint.per-file-ignores]
-# Excluding CFP from new lints until the CFP rework is done
-"models/cfp.py" = ["UP", "SIM", "B", "RUF", "LOG", "G", "I", "T20", "RET"]
-"apps/{cfp,cfp_review}/**/*.py}" = ["UP", "SIM", "B", "F541", "RUF", "LOG", "G", "I", "T20", "RET"]
-"tests/test_cfp*" = ["B017"]
-"models/*" = [
-    # mutable-class-default: gets triggered by __versioned__, __mapper_args__ etc in models
-    "RUF012",
-]
-
-[tool.uv]
-required-version=">=0.8"
-
-[tool.uv.sources]
-slotmachine = { git = "https://github.com/emfcamp/slotmachine.git" }
+    # Excluding CFP from new lints until the CFP rework is done
+    "models/cfp.py" = ["UP", "SIM", "B", "RUF", "LOG", "G", "I", "T20", "RET"]
+    "apps/{cfp,cfp_review}/**/*.py}" = ["UP", "SIM", "B", "F541", "RUF", "LOG", "G", "I", "T20", "RET"]
+    "tests/test_cfp*" = ["B017"]
+    "models/*" = [
+        # mutable-class-default: gets triggered by __versioned__, __mapper_args__ etc in models
+        "RUF012",
+    ]
