@@ -38,4 +38,4 @@ jobs:
       - name: Build containers
         run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml build --parallel
       - name: Test
-        run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml run --quiet-pull -T app uv run make pytest
+        run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml run --quiet-pull -e GITHUB_ACTIONS=true -T app uv run make pytest

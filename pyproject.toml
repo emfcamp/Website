@@ -84,6 +84,7 @@ dev = [
     # Ruff version should also be updated in .pre-commit-config.yaml
     "ruff==0.12.9",
     "types-shapely>=2.1.0.20250822",
+    "pytest-github-actions-annotate-failures>=0.3.0",
 ]
 
 [tool.ruff]
