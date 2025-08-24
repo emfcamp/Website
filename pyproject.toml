@@ -86,6 +86,8 @@ dev = [
     "types-requests>=2.27.8,<3",
     "types-shapely>=2.1.0.20250822",
     "types-simplejson>=3.17.3,<4",
+    "types-flask-cors>=6.0.0.20250809",
+    "types-icalendar>=6.3.1.20250822",
 ]
 
 
@@ -128,3 +130,26 @@ ignore = [
         # mutable-class-default: gets triggered by __versioned__, __mapper_args__ etc in models
         "RUF012",
     ]
+
+[tool.mypy]
+plugins = [ "sqlmypy" ]
+
+
+[[tool.mypy.overrides]]
+module = [
+    "flask_admin.*",
+    "flask_login",
+    "flask_mailman.*",
+    "flask_migrate",  # types-flask-migrate exists for v4
+    "flask_restful",
+    "flask_static_digest",
+    "flask_wtf",
+    "logging_tree",
+    "pywisetransfer.*",
+    "slotmachine",
+    "sqlalchemy_continuum.*",
+    "sqlalchemy.engine.row",
+    "wtforms_sqlalchemy.*",
+    "wtforms.*",
+]
+ignore_missing_imports = true
