@@ -2,7 +2,7 @@ import json
 import re
 
 from email_validator import EmailNotValidError, validate_email
-from markupsafe import Markup
+from markupsafe import Markup, escape
 from wtforms import (
     IntegerField,
     SelectField,
@@ -113,7 +113,7 @@ class StaticWidget:
         else:
             kwargs["class_"] = "form-control-static"
 
-        return Markup(f"<div {html_params(**kwargs)}>{field._value()}</div>")
+        return Markup(f"<div {html_params(**kwargs)}>{escape(field._value())}</div>")
 
 
 class StaticField(StringField):
