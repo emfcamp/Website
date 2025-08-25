@@ -1,11 +1,14 @@
+from __future__ import annotations
+
 import random
 import re
+import typing
 from collections.abc import Iterable
 from datetime import datetime, timedelta
 from decimal import Decimal
 
 from sqlalchemy import column, event, func
-from sqlalchemy.orm import Session, aliased
+from sqlalchemy.orm import Mapped, Session, aliased, relationship
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from sqlalchemy_continuum.utils import transaction_class, version_class
 from stdnum import iso11649
@@ -26,6 +29,9 @@ from .purchase import Ticket
 from .site_state import get_refund_state
 
 safechars = "2346789BCDFGHJKMPQRTVWXY"
+
+if typing.TYPE_CHECKING:
+    from .purchase import Purchase
 
 
 class StateException(Exception):
@@ -53,9 +59,11 @@ class Payment(BaseModel):
     # VAT invoice number, if issued
     vat_invoice_number = db.Column(db.Integer, nullable=True)
 
-    refunds = db.relationship("Refund", backref="payment", cascade="all")
-    purchases = db.relationship("Purchase", backref="payment", cascade="all")
-    refund_requests = db.relationship("RefundRequest", backref="payment", cascade="all, delete-orphan")
+    refunds: Mapped[list[Refund]] = relationship(backref="payment", cascade="all")
+    purchases: Mapped[list[Purchase]] = relationship(backref="payment", cascade="all")
+    refund_requests: Mapped[list[RefundRequest]] = relationship(
+        backref="payment", cascade="all, delete-orphan"
+    )
 
     __mapper_args__ = {"polymorphic_on": provider}
 
@@ -381,8 +389,8 @@ class BankTransaction(BaseModel):
     payee = db.Column(db.String, nullable=False)  # this is what OFX calls it. it's really description
     payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"))
     suppressed = db.Column(db.Boolean, nullable=False, default=False)
-    account = db.relationship(BankAccount, backref="transactions")
-    payment = db.relationship(BankPayment, backref="transactions")
+    account: Mapped[BankAccount] = relationship(backref="transactions")
+    payment: Mapped[BankPayment] = relationship(backref="transactions")
 
     def __init__(self, account_id, posted, type, amount, payee, fit_id=None, wise_id=None):
         self.account_id = account_id
@@ -520,7 +528,7 @@ class Refund(BaseModel):
     provider = db.Column(db.String, nullable=False)
     amount_int = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    purchases = db.relationship("Purchase", backref=db.backref("refund", cascade="all"))
+    purchases: Mapped[list[Purchase]] = relationship(backref=db.backref("refund", cascade="all"))
 
     __mapper_args__ = {"polymorphic_on": provider}
 
@@ -587,7 +595,7 @@ class RefundRequest(BaseModel):
     payee_name = db.Column(db.String)
     note = db.Column(db.String)
 
-    purchases = db.relationship("Purchase", backref=db.backref("refund_request", cascade="all"))
+    purchases: Mapped[list[Purchase]] = relationship(backref=db.backref("refund_request", cascade="all"))
 
     @property
     def method(self):
