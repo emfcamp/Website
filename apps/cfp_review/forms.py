@@ -442,5 +442,5 @@ class InviteSpeakerForm(NewUserForm):
     invite_reason = StringField("Why are they being invited?", [DataRequired()])
     proposal_type = SelectField(
         "Proposal Type",
-        choices=[tuple(i) for i in HUMAN_CFP_TYPES.items() if i[0] != "lightning"],
+        choices=[i for i in HUMAN_CFP_TYPES.items() if i[0] != "lightning"],
     )

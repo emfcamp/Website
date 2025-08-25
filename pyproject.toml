@@ -56,8 +56,8 @@ dependencies = [
     "sqlalchemy-utils~=0.34",
     "SQLAlchemy<2.0",
     "stripe<13.0",
-    "wtforms-sqlalchemy~=0.3.0",
-    "wtforms~=2.3",
+    "wtforms-sqlalchemy<0.5",
+    "wtforms<3.3",
 ]
 
 [dependency-groups]
@@ -88,6 +88,7 @@ dev = [
     "types-simplejson>=3.17.3,<4",
     "types-flask-cors>=6.0.0.20250809",
     "types-icalendar>=6.3.1.20250822",
+    "types-wtforms>=3.2.1.20250809",
 ]
 
 
@@ -149,6 +150,5 @@ module = [
     "sqlalchemy_continuum.*",
     "sqlalchemy.engine.row",
     "wtforms_sqlalchemy.*",
-    "wtforms.*",
 ]
 ignore_missing_imports = true

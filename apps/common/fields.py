@@ -10,9 +10,8 @@ from wtforms import (
     StringField,
     ValidationError,
 )
-from wtforms.widgets import CheckboxInput, HiddenInput, Input, ListWidget
+from wtforms.widgets import CheckboxInput, EmailInput, HiddenInput, Input, ListWidget
 from wtforms.widgets.core import html_params
-from wtforms.widgets.html5 import EmailInput
 
 
 class EmailField(StringField):

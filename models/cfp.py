@@ -28,7 +28,7 @@ from .village import Village
 from . import BaseModel
 
 
-HUMAN_CFP_TYPES = {
+HUMAN_CFP_TYPES: dict[str, str] = {
     "performance": "performance",
     "talk": "talk",
     "workshop": "workshop",

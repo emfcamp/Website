@@ -10,8 +10,7 @@ from flask import (
     url_for,
 )
 from flask_login import login_required
-from wtforms import FieldList, FormField, StringField, SubmitField
-from wtforms.fields.html5 import IntegerRangeField
+from wtforms import FieldList, FormField, IntegerRangeField, StringField, SubmitField
 from wtforms.validators import ValidationError
 
 from main import db

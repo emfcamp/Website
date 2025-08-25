@@ -2009,6 +2009,18 @@ wheels = [
 ]
 
 [[package]]
+name = "types-wtforms"
+version = "3.2.1.20250809"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "markupsafe" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/2e/f7/72ca8564a59f118dd5ce5b6afcdbb38c297d04950dcaf49873dae8c6ff45/types_wtforms-3.2.1.20250809.tar.gz", hash = "sha256:9108399333be3bde66179f69a610a5d05c25485024f698d5adc3f6a9df20d029", size = 17194, upload-time = "2025-08-09T03:17:24.73Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fe/5a/ecedecb8a1ccff7ea936fb77a359f8295da36fb7e7985cb4fc147110a091/types_wtforms-3.2.1.20250809-py3-none-any.whl", hash = "sha256:d254cf027c6725e21ad50044da692d57586dd29f38abd3a6b4ec10993f6741cc", size = 24294, upload-time = "2025-08-09T03:17:24.008Z" },
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.14.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2173,6 +2185,7 @@ dev = [
     { name = "types-requests" },
     { name = "types-shapely" },
     { name = "types-simplejson" },
+    { name = "types-wtforms" },
 ]
 
 [package.metadata]
@@ -2226,8 +2239,8 @@ requires-dist = [
     { name = "sqlalchemy-continuum", specifier = "~=1.3" },
     { name = "sqlalchemy-utils", specifier = "~=0.34" },
     { name = "stripe", specifier = "<13.0" },
-    { name = "wtforms", specifier = "~=2.3" },
-    { name = "wtforms-sqlalchemy", specifier = "~=0.3.0" },
+    { name = "wtforms", specifier = "<3.3" },
+    { name = "wtforms-sqlalchemy", specifier = "<0.5" },
 ]
 
 [package.metadata.requires-dev]
@@ -2257,6 +2270,7 @@ dev = [
     { name = "types-requests", specifier = ">=2.27.8,<3" },
     { name = "types-shapely", specifier = ">=2.1.0.20250822" },
     { name = "types-simplejson", specifier = ">=3.17.3,<4" },
+    { name = "types-wtforms", specifier = ">=3.2.1.20250809" },
 ]
 
 [[package]]
@@ -2313,27 +2327,27 @@ wheels = [
 
 [[package]]
 name = "wtforms"
-version = "2.3.3"
+version = "3.2.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markupsafe" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/dd/3f/f25d26b1c66896e2876124a12cd8be8f606abf4e1890a20f3ca04e4a1555/WTForms-2.3.3.tar.gz", hash = "sha256:81195de0ac94fbc8368abbaf9197b88c4f3ffd6c2719b5bf5fc9da744f3d829c", size = 162945, upload-time = "2020-07-30T17:08:26.883Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/01/e4/633d080897e769ed5712dcfad626e55dbd6cf45db0ff4d9884315c6a82da/wtforms-3.2.1.tar.gz", hash = "sha256:df3e6b70f3192e92623128123ec8dca3067df9cfadd43d59681e210cfb8d4682", size = 137801, upload-time = "2024-10-21T11:34:00.108Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e0/31/614fc7dc7d76005b0acb8c0c8920d962b83d7422b4ba912886dfb63f86ff/WTForms-2.3.3-py2.py3-none-any.whl", hash = "sha256:7b504fc724d0d1d4d5d5c114e778ec88c37ea53144683e084215eed5155ada4c", size = 169106, upload-time = "2020-07-30T17:08:25.026Z" },
+    { url = "https://files.pythonhosted.org/packages/08/c9/2088fb5645cd289c99ebe0d4cdcc723922a1d8e1beaefb0f6f76dff9b21c/wtforms-3.2.1-py3-none-any.whl", hash = "sha256:583bad77ba1dd7286463f21e11aa3043ca4869d03575921d1a1698d0715e0fd4", size = 152454, upload-time = "2024-10-21T11:33:58.44Z" },
 ]
 
 [[package]]
 name = "wtforms-sqlalchemy"
-version = "0.3"
+version = "0.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "sqlalchemy" },
     { name = "wtforms" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e4/ee/38d30e57764a62cd514851fe34647992d640fbd4c38466655fbf2e7cc1ca/WTForms-SQLAlchemy-0.3.tar.gz", hash = "sha256:7ca42824ad7c453a036f502b42d9c17d4ad8398ff9248a62ed538d1ce0bc41c3", size = 17246, upload-time = "2021-11-06T16:21:50.331Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8c/39/58e06f6b38b220820a831a957b20035ae8c9e763d654da883c9dc282cfca/wtforms_sqlalchemy-0.4.2.tar.gz", hash = "sha256:638f23372e654eded3c19ea605a2d318062e26234772977b9bb1619160eed798", size = 17412, upload-time = "2024-10-25T11:04:32.239Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/62/71/a5624ff63f4024d27489263b56e3ab6a5122087eb432d14617cfed90ec3d/WTForms_SQLAlchemy-0.3-py3-none-any.whl", hash = "sha256:90195d7592bf256d82498c42c79d416832e4a4e6fbca4f1e745a018f66d26c47", size = 8831, upload-time = "2021-11-06T16:21:48.688Z" },
+    { url = "https://files.pythonhosted.org/packages/4e/2e/0182ee7e62816f4bc6dea4e369f61c365c74d15caeb82b87be9c96d9e8b5/wtforms_sqlalchemy-0.4.2-py3-none-any.whl", hash = "sha256:5dfa6b9cd8c0fab644178af6a90adc057c1c2695a17c20a074f1f3c4d49a434d", size = 9881, upload-time = "2024-10-25T11:04:30.886Z" },
 ]
 
 [[package]]
