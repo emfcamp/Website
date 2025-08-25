@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from flask import current_app as app
 from flask import flash, redirect, render_template, url_for
@@ -9,6 +9,7 @@ from wtforms import HiddenField, SubmitField
 from wtforms.validators import AnyOf, DataRequired
 
 from main import db
+from models import naive_utcnow
 from models.payment import BankPayment, BankTransaction
 
 from ..common import feature_enabled, get_user_currency
@@ -39,7 +40,7 @@ def transfer_start(payment: BankPayment):
     if days is None:
         raise Exception("EXPIRY_DAYS_TRANSFER(_EURO) not set")
 
-    payment.expires = datetime.utcnow() + timedelta(days=days)
+    payment.expires = naive_utcnow() + timedelta(days=days)
     payment.state = "inprogress"
 
     for purchase in payment.purchases:

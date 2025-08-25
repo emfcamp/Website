@@ -2,7 +2,6 @@ import json
 import os.path
 import re
 from dataclasses import dataclass
-from datetime import datetime
 from os import path
 from pathlib import Path
 from textwrap import wrap
@@ -28,7 +27,7 @@ from werkzeug.wrappers import Response
 from yaml import safe_load as parse_yaml
 
 from main import db, external_url
-from models import User, event_end, event_start
+from models import User, event_end, event_start, naive_utcnow
 from models.basket import Basket
 from models.feature_flag import get_db_flags
 from models.product import Price
@@ -119,7 +118,7 @@ def load_utility_functions(app_obj):
             external_url=external_url,
             feature_enabled=feature_enabled,
             get_user_currency=get_user_currency,
-            year=datetime.utcnow().year,
+            year=naive_utcnow().year,
         )
 
     @app_obj.context_processor

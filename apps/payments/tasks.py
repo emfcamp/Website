@@ -1,11 +1,12 @@
 import csv
-from datetime import datetime, timedelta
+from datetime import timedelta
 from io import StringIO
 
 import click
 from flask import current_app as app
 
 from main import db
+from models import naive_utcnow
 from models.payment import BankPayment, Payment, RefundRequest
 
 from . import payments
@@ -169,8 +170,8 @@ def expire_pending_payments(yes):
         app.logger.info("Not expiring payments. Pass the -y option to do so.")
     query = (
         BankPayment.query.filter(BankPayment.state == "inprogress")
-        .filter(BankPayment.expires < datetime.utcnow())
-        .filter(BankPayment.reminder_sent_at < datetime.utcnow() - timedelta(days=5))
+        .filter(BankPayment.expires < naive_utcnow())
+        .filter(BankPayment.reminder_sent_at < naive_utcnow() - timedelta(days=5))
     )
     for payment in query:
         if yes:

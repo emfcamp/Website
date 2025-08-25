@@ -1,12 +1,10 @@
-from datetime import datetime
-
 import pendulum
 from sqlalchemy import or_
 from sqlalchemy.sql.functions import func
 
 from main import db
 
-from . import BaseModel
+from . import BaseModel, naive_utcnow
 
 INITIAL_TOPICS = {
     "heralds",
@@ -29,8 +27,8 @@ class AdminMessage(BaseModel):
 
     created_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
-    created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    modified = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow)
+    created = db.Column(db.DateTime, default=naive_utcnow, nullable=False)
+    modified = db.Column(db.DateTime, default=naive_utcnow, nullable=False, onupdate=naive_utcnow)
 
     creator = db.relationship("User", backref="admin_messages")
 
@@ -51,7 +49,7 @@ class AdminMessage(BaseModel):
 
     @property
     def is_visible(self):
-        return self.show and (self.end is None or self.end > datetime.utcnow())
+        return self.show and (self.end is None or self.end > naive_utcnow())
 
     @classmethod
     def get_visible_messages(cls):
@@ -70,7 +68,7 @@ class AdminMessage(BaseModel):
         return AdminMessage.query.filter(
             AdminMessage.topic == topic,
             or_(
-                AdminMessage.end > datetime.utcnow(),
+                AdminMessage.end > naive_utcnow(),
                 AdminMessage.end == None,  # noqa: E711
             ),
         ).all()

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from flask import current_app as app
 from flask import render_template
@@ -8,6 +8,7 @@ from sqlalchemy import func
 from apps.common import feature_enabled
 from apps.common.receipt import RECEIPT_TYPES, attach_tickets, set_tickets_emailed
 from main import db
+from models import naive_utcnow
 from models.payment import Payment
 from models.product import (
     Price,
@@ -342,7 +343,7 @@ def expire_reserved():
     payments = (
         Purchase.query.filter(
             Purchase.state == "reserved",
-            Purchase.modified < datetime.utcnow() - stalled_payment_grace_period,
+            Purchase.modified < naive_utcnow() - stalled_payment_grace_period,
             ~Purchase.payment_id.is_(None),
         )
         .join(Payment)
@@ -368,7 +369,7 @@ def expire_reserved():
 
     purchases = Purchase.query.filter(
         Purchase.state == "reserved",
-        Purchase.modified < datetime.utcnow() - incomplete_purchase_grace_period,
+        Purchase.modified < naive_utcnow() - incomplete_purchase_grace_period,
         Purchase.payment_id.is_(None),
     )
     for purchase in purchases:
@@ -380,7 +381,7 @@ def expire_reserved():
 
     purchases = Purchase.query.filter(
         Purchase.state == "admin-reserved",
-        Purchase.modified < datetime.utcnow() - admin_reservation_grace_period,
+        Purchase.modified < naive_utcnow() - admin_reservation_grace_period,
         Purchase.payment_id.is_(None),
     )
     for purchase in purchases:

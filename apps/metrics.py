@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from flask import Blueprint, Response
 from prometheus_client import (
     CONTENT_TYPE_LATEST,
@@ -11,7 +9,7 @@ from prometheus_client.core import Counter, GaugeMetricFamily, Histogram
 from prometheus_client.multiprocess import MultiProcessCollector
 from sqlalchemy import String, case, cast, func
 
-from models import count_groups
+from models import count_groups, naive_utcnow
 from models.cfp import Proposal
 from models.email import EmailJobRecipient
 from models.payment import Payment
@@ -92,7 +90,7 @@ class ExternalMetrics:
                 (Voucher.is_used == True, "used"),
                 (
                     (Voucher.expiry != None)  # noqa: E711
-                    & (Voucher.expiry < datetime.utcnow() - VOUCHER_GRACE_PERIOD),
+                    & (Voucher.expiry < naive_utcnow() - VOUCHER_GRACE_PERIOD),
                     "expired",
                 ),
                 else_="active",

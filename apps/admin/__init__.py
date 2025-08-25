@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import logging_tree
 from flask import (
@@ -26,6 +26,7 @@ from wtforms import (
 from wtforms.validators import DataRequired, Optional
 
 from main import db
+from models import naive_utcnow
 from models.feature_flag import DB_FEATURE_FLAGS, FeatureFlag, refresh_flags
 from models.payment import BankAccount, BankPayment, BankTransaction, Payment
 from models.purchase import Purchase
@@ -65,7 +66,7 @@ def admin_variables():
         BankPayment.query.join(Purchase)
         .filter(
             BankPayment.state == "inprogress",
-            BankPayment.expires < datetime.utcnow() + timedelta(days=3),
+            BankPayment.expires < naive_utcnow() + timedelta(days=3),
         )
         .group_by(BankPayment.id)
         .count()
