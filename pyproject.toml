@@ -146,7 +146,6 @@ module = [
     "flask_wtf",
     "logging_tree",
     "pywisetransfer.*",
-    "slotmachine",
     "sqlalchemy_continuum.*",
     "sqlalchemy.engine.row",
     "wtforms_sqlalchemy.*",
