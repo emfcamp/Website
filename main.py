@@ -321,6 +321,8 @@ def create_app(dev_server=False, config_override=None):
     from apps.cfp import cfp
     from apps.cfp_review import cfp_review
     from apps.metrics import metrics
+    from apps.oidc.oauth import init_oauth
+    from apps.oidc.routes import oidc
     from apps.payments import payments
     from apps.schedule import schedule
     from apps.tickets import tickets
@@ -344,7 +346,9 @@ def create_app(dev_server=False, config_override=None):
     app.register_blueprint(admin, url_prefix="/admin")
     app.register_blueprint(volunteer, url_prefix="/volunteer")
     app.register_blueprint(notify, url_prefix="/volunteer/admin/notify")
+    app.register_blueprint(oidc)
 
+    init_oauth(app)
     volunteer_admin.init_app(app)
 
     return app

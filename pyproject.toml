@@ -8,6 +8,7 @@ requires-python = ">=3.13,<3.14"
 
 dependencies = [
     "alembic~=1.1",
+    "authlib>=1.6.2",
     "cryptography>=44.0.3",
     "css-inline<0.18",
     "decorator",
@@ -146,5 +147,6 @@ module = [
     "sqlalchemy_continuum.*",
     "sqlalchemy.engine.row",
     "wtforms_sqlalchemy.*",
+    "authlib.*",  # Annoyingly authlib has typeshed stubs... but they suck
 ]
 ignore_missing_imports = true
