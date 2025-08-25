@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta, time
+import typing
 from collections import namedtuple
 from typing import Optional
 from dateutil.parser import parse as parse_date
@@ -10,8 +13,8 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.mutable import MutableList
 
 from sqlalchemy import UniqueConstraint, func, select, text, or_
-from sqlalchemy.orm import column_property
-from slugify import slugify
+from sqlalchemy.orm import column_property, relationship, Mapped
+from slugify.slugify import slugify
 from models import (
     export_attr_counts,
     export_attr_edits,
@@ -26,6 +29,10 @@ from .user import User
 from .cfp_tag import ProposalTag
 from .village import Village
 from . import BaseModel
+
+if typing.TYPE_CHECKING:
+    from .cfp_tag import Tag
+    from .event_tickets import EventTicket
 
 
 HUMAN_CFP_TYPES: dict[str, str] = {
@@ -346,8 +353,8 @@ class Proposal(BaseModel):
     state = db.Column(db.String, nullable=False, default="new")
     type = db.Column(db.String, nullable=False)  # talk, workshop or installation
 
-    is_accepted = column_property(state.in_(["accepted", "finalised"]))
-    should_be_exported = column_property(is_accepted.expression)
+    is_accepted: Mapped[bool] = column_property(state.in_(["accepted", "finalised"]))
+    should_be_exported: Mapped[bool] = column_property(state.in_(["accepted", "finalised"]))
 
     # Core information
     title = db.Column(db.String, nullable=False)
@@ -360,8 +367,7 @@ class Proposal(BaseModel):
     notice_required = db.Column(db.String)
     private_notes = db.Column(db.String)
 
-    tags = db.relationship(
-        "Tag",
+    tags: Mapped[list[Tag]] = relationship(
         backref="proposals",
         cascade="all",
         secondary=ProposalTag,
@@ -375,9 +381,11 @@ class Proposal(BaseModel):
     user_scheduled = db.Column(db.Boolean, nullable=False, default=False)
 
     # References to this table
-    messages = db.relationship("CFPMessage", backref="proposal")
-    votes = db.relationship("CFPVote", backref="proposal")
-    favourites = db.relationship(User, secondary=FavouriteProposal, backref=db.backref("favourites"))
+    messages: Mapped[list[CFPMessage]] = relationship(backref="proposal")
+    votes: Mapped[list[CFPVote]] = relationship(backref="proposal")
+    favourites: Mapped[list[User]] = relationship(
+        secondary=FavouriteProposal, backref=db.backref("favourites")
+    )
 
     # Convenience for individual objects. Use an outerjoin and groupby for more than a few records
     favourite_count = column_property(
@@ -408,8 +416,7 @@ class Proposal(BaseModel):
     hide_from_schedule = db.Column(db.Boolean, default=False, nullable=False)
     # manually_scheduled -- make the scheduler ignore this
     manually_scheduled = db.Column(db.Boolean, default=False, nullable=False)
-    allowed_venues = db.relationship(
-        "Venue",
+    allowed_venues: Mapped[list[Venue]] = relationship(
         secondary=ProposalAllowedVenues,
         backref="allowed_proposals",
     )
@@ -420,12 +427,11 @@ class Proposal(BaseModel):
     potential_time = db.Column(db.DateTime, nullable=True)
     potential_venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"))
 
-    scheduled_venue = db.relationship(
-        "Venue",
+    scheduled_venue: Mapped[Venue] = relationship(
         backref="proposals",
         primaryjoin="Venue.id == Proposal.scheduled_venue_id",
     )
-    potential_venue = db.relationship("Venue", primaryjoin="Venue.id == Proposal.potential_venue_id")
+    potential_venue: Mapped[Venue] = relationship(primaryjoin="Venue.id == Proposal.potential_venue_id")
 
     # Video stuff
     c3voc_url = db.Column(db.String)
@@ -434,7 +440,7 @@ class Proposal(BaseModel):
     video_recording_lost = db.Column(db.Boolean, default=False)
 
     type_might_require_ticket = False
-    tickets = db.relationship("EventTicket", backref="proposal")
+    tickets: Mapped[list[EventTicket]] = relationship(backref="proposal")
 
     __mapper_args__ = {"polymorphic_on": type}
 
@@ -1107,8 +1113,7 @@ class Venue(BaseModel):
     capacity = db.Column(db.Integer, nullable=True)
     location = db.Column(Geometry("POINT", srid=4326))
     scheduled_content_only = db.Column(db.Boolean)
-    village = db.relationship(
-        "Village",
+    village: Mapped[Village] = relationship(
         backref="venues",
         primaryjoin="Village.id == Venue.village_id",
     )
