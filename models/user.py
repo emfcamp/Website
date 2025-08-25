@@ -7,6 +7,7 @@ import random
 import string
 import struct
 import time
+import typing
 from datetime import datetime, timedelta
 
 from flask import current_app as app
@@ -14,6 +15,7 @@ from flask import session
 from flask_login import AnonymousUserMixin, UserMixin
 from sqlalchemy import Index, Table, func, text
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm.exc import NoResultFound
 
 from loggingmanager import set_user_id
@@ -22,6 +24,15 @@ from main import db
 from . import BaseModel
 from .permission import Permission, UserPermission
 from .volunteer.shift import ShiftEntry
+
+if typing.TYPE_CHECKING:
+    from .cfp import CFPMessage, CFPVote
+    from .cfp_tag import Tag
+    from .diversity import UserDiversity
+    from .event_tickets import EventTicket
+    from .payment import Payment
+    from .purchase import AdmissionTicket, Purchase, PurchaseTransfer, Ticket
+    from .village import VillageMember
 
 CHECKIN_CODE_LEN = 16
 checkin_code_re = rf"[0-9a-zA-Z_-]{{{CHECKIN_CODE_LEN}}}"
@@ -190,81 +201,77 @@ class User(BaseModel, UserMixin):
 
     cfp_invite_reason = db.Column(db.String, nullable=True)
 
-    cfp_reviewer_tags = db.relationship(
-        "Tag",
+    cfp_reviewer_tags: Mapped[list[Tag]] = relationship(
         backref="reviewers",
         cascade="all",
         secondary=CFPReviewerTags,
     )
 
-    diversity = db.relationship("UserDiversity", uselist=False, backref="user", cascade="all, delete-orphan")
-    shipping = db.relationship("UserShipping", uselist=False, backref="user", cascade="all, delete-orphan")
-    payments = db.relationship("Payment", lazy="dynamic", backref="user", cascade="all")
-    permissions = db.relationship(
+    diversity: Mapped[UserDiversity] = relationship(backref="user", cascade="all, delete-orphan")
+    shipping: Mapped[UserShipping] = relationship(backref="user", cascade="all, delete-orphan")
+    payments: Mapped[list[Payment]] = relationship(lazy="dynamic", backref="user", cascade="all")
+    permissions: Mapped[list[Permission]] = relationship(
         "Permission",
         backref="user",
         cascade="all",
         secondary=UserPermission,
         lazy="joined",
     )
-    votes = db.relationship("CFPVote", backref="user", lazy="dynamic")
+    votes: Mapped[list[CFPVote]] = relationship(backref="user", lazy="dynamic")
 
-    proposals = db.relationship(
-        "Proposal",
+    proposals: Mapped[list[Proposal]] = relationship(
         primaryjoin="Proposal.user_id == User.id",
         backref="user",
         lazy="dynamic",
         cascade="all, delete-orphan",
     )
-    anonymised_proposals = db.relationship(
-        "Proposal",
+    anonymised_proposals: Mapped[list[Proposal]] = relationship(
         primaryjoin="Proposal.anonymiser_id == User.id",
         backref="anonymiser",
         lazy="dynamic",
         cascade="all, delete-orphan",
     )
 
-    messages_from = db.relationship(
-        "CFPMessage",
+    messages_from: Mapped[list[CFPMessage]] = relationship(
         primaryjoin="CFPMessage.from_user_id == User.id",
         backref="from_user",
         lazy="dynamic",
     )
 
-    event_tickets = db.relationship("EventTicket", backref="user", lazy="dynamic")
+    event_tickets: Mapped[list[EventTicket]] = relationship(backref="user", lazy="dynamic")
 
-    purchases = db.relationship("Purchase", lazy="dynamic", primaryjoin="Purchase.purchaser_id == User.id")
-
-    owned_purchases = db.relationship("Purchase", lazy="dynamic", primaryjoin="Purchase.owner_id == User.id")
-
-    owned_tickets = db.relationship(
-        "Ticket", lazy="select", primaryjoin="Ticket.owner_id == User.id", viewonly=True
+    purchases: Mapped[list[Purchase]] = relationship(
+        lazy="dynamic", primaryjoin="Purchase.purchaser_id == User.id"
     )
 
-    owned_admission_tickets = db.relationship(
-        "AdmissionTicket",
+    owned_purchases: Mapped[list[Purchase]] = relationship(
+        lazy="dynamic", primaryjoin="Purchase.owner_id == User.id"
+    )
+
+    owned_tickets: Mapped[list[Ticket]] = relationship(
+        lazy="select", primaryjoin="Ticket.owner_id == User.id", viewonly=True
+    )
+
+    owned_admission_tickets: Mapped[list[AdmissionTicket]] = relationship(
         lazy="select",
         primaryjoin="AdmissionTicket.owner_id == User.id",
         viewonly=True,
     )
 
-    transfers_to = db.relationship(
-        "PurchaseTransfer",
+    transfers_to: Mapped[list[PurchaseTransfer]] = relationship(
         backref="to_user",
         lazy="dynamic",
         primaryjoin="PurchaseTransfer.to_user_id == User.id",
         cascade="all, delete-orphan",
     )
-    transfers_from = db.relationship(
-        "PurchaseTransfer",
+    transfers_from: Mapped[list[PurchaseTransfer]] = relationship(
         backref="from_user",
         lazy="dynamic",
         primaryjoin="PurchaseTransfer.from_user_id == User.id",
         cascade="all, delete-orphan",
     )
 
-    village_membership = db.relationship(
-        "VillageMember",
+    village_membership: Mapped[VillageMember] = relationship(
         cascade="all, delete-orphan",
         back_populates="user",
         uselist=False,

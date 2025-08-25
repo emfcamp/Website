@@ -19,7 +19,9 @@ RECEIPT_TYPES = ["admissions", "parking", "campervan", "merchandise", "hire"]
 def render_receipt(user, png=False, pdf=False):
     purchases = (
         user.owned_purchases.filter_by(is_paid_for=True)
-        .join(PriceTier, Product, ProductGroup)
+        .join(PriceTier)
+        .join(Product)
+        .join(ProductGroup)
         .with_entities(Purchase)
         .order_by(Purchase.id)
     )
@@ -114,7 +116,9 @@ def set_tickets_emailed(user):
 
     purchases = (
         user.owned_purchases.filter_by(is_paid_for=True)
-        .join(PriceTier, Product, ProductGroup)
+        .join(PriceTier)
+        .join(Product)
+        .join(ProductGroup)
         .filter(ProductGroup.type.in_(RECEIPT_TYPES))
         .with_entities(Purchase)
         .group_by(Purchase)

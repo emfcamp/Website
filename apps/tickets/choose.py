@@ -17,7 +17,7 @@ from sqlalchemy.orm import joinedload
 from main import db
 from models.basket import Basket
 from models.exc import CapacityException
-from models.product import PriceTier, Product, ProductView, ProductViewProduct, Voucher
+from models.product import PriceTier, Product, ProductGroup, ProductView, ProductViewProduct, Voucher
 from models.site_state import get_sales_state, get_site_state
 
 from ..common import feature_enabled, get_user_currency, set_user_currency
@@ -138,8 +138,7 @@ def products_for_view(product_view) -> list[ProductViewProduct]:
         .with_entities(Product)
         .order_by(ProductViewProduct.order)
         .options(joinedload(Product.price_tiers).joinedload(PriceTier.prices))
-        .options(joinedload(Product.parent))
-        .options(joinedload("parent.parent"))
+        .options(joinedload(Product.parent).joinedload(ProductGroup.parent))
     ).all()
 
 

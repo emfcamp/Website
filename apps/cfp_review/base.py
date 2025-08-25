@@ -163,8 +163,7 @@ def filter_proposal_request() -> tuple[list[Proposal], bool]:
 
     sort_dict = get_proposal_sort_dict(request.args)
     proposal_query = (
-        proposal_query.options(joinedload(Proposal.user))
-        .options(joinedload("user.owned_tickets"))
+        proposal_query.options(joinedload(Proposal.user).joinedload(User.owned_tickets))
         .options(joinedload(Proposal.tags))
         .options(undefer(Proposal.favourite_count))
     )
@@ -1201,7 +1200,7 @@ def scheduler_update():
 @cfp_review.route("/clashfinder")
 @schedule_required
 def clashfinder():
-    select_st = select([FavouriteProposal])
+    select_st = select(FavouriteProposal)
     res = db.session.execute(select_st)
 
     user_counts = defaultdict(list)

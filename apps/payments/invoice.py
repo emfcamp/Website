@@ -80,7 +80,8 @@ def invoice(payment_id, fmt=None):
 
     invoice_lines_query = (
         Purchase.query.filter_by(payment_id=payment_id)
-        .join(PriceTier, Product)
+        .join(PriceTier)
+        .join(Product)
         .with_entities(PriceTier, func.count(Purchase.price_tier_id))
         .group_by(PriceTier, Product.name)
         .order_by(Product.name)

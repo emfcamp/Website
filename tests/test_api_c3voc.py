@@ -111,7 +111,7 @@ def test_request_none_unchanged(client, app, db, proposal, valid_auth_headers):
     )
     assert rv.status_code == 204
 
-    proposal = Proposal.query.get(proposal.id)
+    proposal = db.session.get(Proposal, proposal.id)
     assert proposal.youtube_url is None
     assert proposal.c3voc_url is None
 
@@ -142,7 +142,7 @@ def test_update_voctoweb_with_correct_url(client, app, db, proposal, valid_auth_
     )
     assert rv.status_code == 204
 
-    proposal = Proposal.query.get(proposal.id)
+    proposal = db.session.get(Proposal, proposal.id)
     assert proposal.c3voc_url == "https://media.ccc.de/"
     assert proposal.video_recording_lost is False
     assert proposal.youtube_url is None
@@ -175,7 +175,7 @@ def test_denies_voctoweb_with_wrong_url(client, app, db, proposal, valid_auth_he
     )
     assert rv.status_code == 406
 
-    proposal = Proposal.query.get(proposal.id)
+    proposal = db.session.get(Proposal, proposal.id)
     # setup sets this to true, the api should not change that
     assert proposal.video_recording_lost is True
     assert proposal.c3voc_url == "https://example.com"
@@ -207,7 +207,7 @@ def test_clears_voctoweb(client, app, db, proposal, valid_auth_headers):
     )
     assert rv.status_code == 204
 
-    proposal = Proposal.query.get(proposal.id)
+    proposal = db.session.get(Proposal, proposal.id)
     assert proposal.c3voc_url is None
 
 
@@ -233,7 +233,7 @@ def test_update_thumbnail_with_path(client, app, db, proposal, valid_auth_header
     )
     assert rv.status_code == 204
 
-    proposal = Proposal.query.get(proposal.id)
+    proposal = db.session.get(Proposal, proposal.id)
     assert proposal.thumbnail_url == "https://static.media.ccc.de/media/thumb.jpg"
     assert proposal.c3voc_url is None
     assert proposal.youtube_url is None
@@ -261,7 +261,7 @@ def test_update_thumbnail_with_url(client, app, db, proposal, valid_auth_headers
     )
     assert rv.status_code == 204
 
-    proposal = Proposal.query.get(proposal.id)
+    proposal = db.session.get(Proposal, proposal.id)
     assert proposal.thumbnail_url == "https://example.com/thumb.jpg"
     assert proposal.c3voc_url is None
     assert proposal.youtube_url is None
@@ -293,7 +293,7 @@ def test_denies_thumbnail_not_url(client, app, db, proposal, valid_auth_headers)
     )
     assert rv.status_code == 406
 
-    proposal = Proposal.query.get(proposal.id)
+    proposal = db.session.get(Proposal, proposal.id)
     assert proposal.thumbnail_url == "https://example.com/thumb.jpg"
 
 
@@ -323,7 +323,7 @@ def test_clears_thumbnail(client, app, db, proposal, valid_auth_headers):
     )
     assert rv.status_code == 204
 
-    proposal = Proposal.query.get(proposal.id)
+    proposal = db.session.get(Proposal, proposal.id)
     assert proposal.thumbnail_url is None
 
 
@@ -354,7 +354,7 @@ def test_update_from_youtube_with_correct_url(client, app, db, proposal, valid_a
     )
     assert rv.status_code == 204
 
-    proposal = Proposal.query.get(proposal.id)
+    proposal = db.session.get(Proposal, proposal.id)
     assert proposal.c3voc_url is None
     assert proposal.video_recording_lost is False
     assert proposal.youtube_url == "https://www.youtube.com/watch"
@@ -388,7 +388,7 @@ def test_denies_youtube_update_with_existing_url(client, app, db, proposal, vali
     )
     assert rv.status_code == 204
 
-    proposal = Proposal.query.get(proposal.id)
+    proposal = db.session.get(Proposal, proposal.id)
     # setup sets this to true, the api should not change that
     assert proposal.video_recording_lost is True
     assert proposal.youtube_url == "https://example.com"
@@ -422,7 +422,7 @@ def test_denies_youtube_update_with_wrong_url(client, app, db, proposal, valid_a
     )
     assert rv.status_code == 406
 
-    proposal = Proposal.query.get(proposal.id)
+    proposal = db.session.get(Proposal, proposal.id)
     # setup sets this to true, the api should not change that
     assert proposal.video_recording_lost is True
     assert proposal.youtube_url == "https://example.com"
@@ -453,5 +453,5 @@ def test_clears_youtube(client, app, db, proposal, valid_auth_headers):
     )
     assert rv.status_code == 204
 
-    proposal = Proposal.query.get(proposal.id)
+    proposal = db.session.get(Proposal, proposal.id)
     assert proposal.youtube_url is None

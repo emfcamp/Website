@@ -17,7 +17,8 @@ class Permission(BaseModel):
     @classmethod
     def get_export_data(cls):
         users = (
-            cls.query.join(UserPermission, models.User)
+            cls.query.join(UserPermission)
+            .join(models.User)
             .with_entities(models.User.id, models.User.email, Permission.name)
             .order_by(models.User.id, Permission.id)
         )

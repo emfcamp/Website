@@ -99,6 +99,7 @@ def test_validate_capacity_max(db, parent_group):
 
     # If that was OK, we can give it a name and check it flushes successfully.
     group.name = group_name
+    db.session.add(group)
     db.session.flush()
     assert group.id is not None
 
@@ -259,7 +260,9 @@ def test_product_group_get_counts_by_state(db, parent_group, user):
 
     # Add another purchase in another tier
     tier2 = PriceTier(name="2", parent=product)
+    db.session.add(tier2)
     price = Price(price_tier=tier2, currency="GBP", price_int=666)
+    db.session.add(price)
     db.session.commit()
     create_purchases(tier2, 1, user)
 

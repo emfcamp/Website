@@ -18,7 +18,9 @@ def report_reconcile():
         paid = defaultdict(Decimal)
         pending = defaultdict(Decimal)
         q = (
-            Purchase.query.join(PriceTier, Product, ProductGroup)
+            Purchase.query.join(PriceTier)
+            .join(Product)
+            .join(ProductGroup)
             .filter(ProductGroup.id == Product.group_id)
             .filter(ProductGroup.id == pg.id)
         )

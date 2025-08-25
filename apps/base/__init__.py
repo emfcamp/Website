@@ -27,7 +27,9 @@ base = Blueprint("base", __name__, cli_group=None)
 def get_full_price() -> Price | None:
     full = (
         ProductView.query.filter_by(name="main")
-        .join(ProductViewProduct, Product, PriceTier)
+        .join(ProductViewProduct)
+        .join(Product)
+        .join(PriceTier)
         .filter_by(active=True)
         .order_by(ProductViewProduct.order)
         .with_entities(PriceTier)

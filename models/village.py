@@ -4,6 +4,7 @@ from geoalchemy2 import Geometry
 from geoalchemy2.shape import to_shape
 from sqlalchemy import Index
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import Mapped, relationship
 
 from main import db
 from models.user import User
@@ -22,7 +23,8 @@ class Village(BaseModel):
     url = db.Column(db.String)
     location = db.Column(Geometry("POINT", srid=4326, spatial_index=False))
 
-    village_memberships = db.relationship("VillageMember", back_populates="village")
+    village_memberships: Mapped[list[VillageMember]] = relationship(back_populates="village")
+    requirements: Mapped[VillageRequirements] = relationship(back_populates="village")
     members = association_proxy("village_memberships", "user")
 
     @classmethod
@@ -116,8 +118,8 @@ class VillageMember(BaseModel):
     village_id = db.Column(db.Integer, db.ForeignKey("village.id"), nullable=False)
     admin = db.Column(db.Boolean, default=False)
 
-    village = db.relationship("Village", back_populates="village_memberships", uselist=False)
-    user = db.relationship("User", back_populates="village_membership", uselist=False)
+    village: Mapped[list[Village]] = relationship(back_populates="village_memberships")
+    user: Mapped[User] = relationship(back_populates="village_membership")
 
     def __repr__(self):
         return f"<VillageMember {self.user} member of {self.village}>"
@@ -127,12 +129,12 @@ class VillageRequirements(BaseModel):
     __tablename__ = "village_requirements"
 
     village_id = db.Column(db.Integer, db.ForeignKey("village.id"), primary_key=True)
-    village = db.relationship("Village", backref=db.backref("requirements", uselist=False))
+    village: Mapped[Village] = relationship(back_populates="requirements")
 
-    num_attendees = db.Column(db.Integer)
-    size_sqm = db.Column(db.Integer)
+    num_attendees: Mapped[int | None]
+    size_sqm: Mapped[int | None]
 
-    power_requirements = db.Column(db.String)
-    noise = db.Column(db.String)
+    power_requirements: Mapped[str | None]
+    noise: Mapped[str | None]
 
-    structures = db.Column(db.String)
+    structures: Mapped[str | None]

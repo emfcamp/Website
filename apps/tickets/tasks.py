@@ -59,7 +59,7 @@ def create_product_groups():
     for name, capacity in allocations:
         if ProductGroup.get_by_name(name):
             continue
-        ProductGroup(name=name, capacity_max=capacity, parent=admissions)
+        db.session.add(ProductGroup(name=name, capacity_max=capacity, parent=admissions))
 
     view = ProductView.get_by_name("main")
     if not view:
@@ -140,6 +140,7 @@ def create_product_groups():
             parent=general,
             attributes={"is_transferable": has_xfer},
         )
+        db.session.add(product)
 
         for index, (price_cap, gbp, eur) in enumerate(prices):
             if len(prices) == 1 or index == 0:
@@ -165,10 +166,11 @@ def create_product_groups():
                 parent=product,
                 active=active,
             )
-            Price(currency="GBP", price_int=gbp * 100, price_tier=pt)
-            Price(currency="EUR", price_int=eur * 100, price_tier=pt)
+            db.session.add(pt)
+            db.session.add(Price(currency="GBP", price_int=gbp * 100, price_tier=pt))
+            db.session.add(Price(currency="EUR", price_int=eur * 100, price_tier=pt))
 
-        ProductViewProduct(view, product, order)
+        db.session.add(ProductViewProduct(view, product, order))
         order += 1
 
     db.session.flush()
@@ -204,12 +206,13 @@ def create_product_groups():
 
         group = ProductGroup.get_by_name(name)
         product = Product(name=name, display_name=display_name, description=description, parent=group)
+        db.session.add(product)
         pt = PriceTier(name=name, personal_limit=personal_limit, parent=product, vat_rate=vat_rate)
         db.session.add(pt)
         db.session.add(Price(currency="GBP", price_int=gbp * 100, price_tier=pt))
         db.session.add(Price(currency="EUR", price_int=eur * 100, price_tier=pt))
 
-        ProductViewProduct(view, product, order)
+        db.session.add(ProductViewProduct(view, product, order))
         order += 1
 
     db.session.commit()
@@ -275,12 +278,13 @@ def create_merch():
             continue
 
         product = Product(name=name, display_name=display_name, description=description, parent=badge_group)
+        db.session.add(product)
         pt = PriceTier(name=name, parent=product, vat_rate=vat_rate)
         db.session.add(pt)
         db.session.add(Price(currency="GBP", price_int=gbp * 100, price_tier=pt))
         db.session.add(Price(currency="EUR", price_int=eur * 100, price_tier=pt))
 
-        ProductViewProduct(badge_view, product, order)
+        db.session.add(ProductViewProduct(badge_view, product, order))
         order += 1
 
     # name, display_name, GBP, EUR
@@ -305,12 +309,13 @@ def create_merch():
             continue
 
         product = Product(name=name, display_name=display_name, parent=tees_group)
+        db.session.add(product)
         pt = PriceTier(name=name, parent=product, vat_rate=vat_rate)
         db.session.add(pt)
         db.session.add(Price(currency="GBP", price_int=gbp * 100, price_tier=pt))
         db.session.add(Price(currency="EUR", price_int=eur * 100, price_tier=pt))
 
-        ProductViewProduct(tees_view, product, order)
+        db.session.add(ProductViewProduct(tees_view, product, order))
         order += 1
 
     db.session.commit()
@@ -422,7 +427,9 @@ def email_tickets():
 
     users_purchase_counts = (
         Purchase.query.filter_by(is_paid_for=True)
-        .join(PriceTier, Product, ProductGroup)
+        .join(PriceTier)
+        .join(Product)
+        .join(ProductGroup)
         .filter(ProductGroup.type.in_(RECEIPT_TYPES))
         .filter(Purchase.ticket_issued == False)
         .join(Purchase.owner)

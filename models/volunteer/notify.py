@@ -38,7 +38,7 @@ class VolunteerNotifyRecipient(BaseModel):
 
 
 VolunteerNotifyJob.recipient_count = column_property(
-    select([func.count(VolunteerNotifyRecipient.job_id)])
+    select(func.count(VolunteerNotifyRecipient.job_id))
     .where(VolunteerNotifyRecipient.job_id == VolunteerNotifyJob.id)
     .scalar_subquery(),  # type: ignore[attr-defined]
     deferred=True,
