@@ -73,14 +73,14 @@ def wise_balance_credit(event_type, event):
         # logger.info("Webhook data: %s", request.data)
         abort(400)
 
-    borderless_account_id = event.get("data", {}).get("resource", {}).get("id")
-    if borderless_account_id is None:
-        logger.exception("Missing borderless_account_id in Wise webhook")
+    wise_balance_id = event.get("data", {}).get("resource", {}).get("id")
+    if wise_balance_id is None:
+        logger.exception("Missing balance-account id in Wise webhook")
         # logger.info("Webhook data: %s", request.data)
         abort(400)
 
-    if borderless_account_id == 0:
-        # A credit event with an account ID of 0 is sent when webhook connections are configured.
+    if wise_balance_id == 0:
+        # A credit event with a balance account ID of 0 is sent when webhook connections are configured.
         return ("", 204)
 
     currency = event.get("data", {}).get("currency")
@@ -90,13 +90,13 @@ def wise_balance_credit(event_type, event):
         abort(400)
 
     logger.info(
-        "Checking Wise details for borderless_account_id %s and currency %s",
-        borderless_account_id,
+        "Checking Wise details for wise_balance_id %s and currency %s",
+        wise_balance_id,
         currency,
     )
     # Find the Wise bank account in the application database
     bank_account = BankAccount.query.filter_by(
-        borderless_account_id=borderless_account_id,
+        wise_balance_id=wise_balance_id,
         currency=currency,
         active=True,
     ).first()
@@ -105,7 +105,7 @@ def wise_balance_credit(event_type, event):
         return ("", 204)
 
     try:
-        sync_wise_statement(profile_id, borderless_account_id, currency)
+        sync_wise_statement(profile_id, wise_balance_id, currency)
     except Exception:
         logger.exception("Error fetching statement")
         return ("", 500)
@@ -113,13 +113,13 @@ def wise_balance_credit(event_type, event):
     return ("", 204)
 
 
-def sync_wise_statement(profile_id, borderless_account_id, currency):
+def sync_wise_statement(profile_id, wise_balance_id, currency):
     # Retrieve an account transaction statement for the past week
     interval_end = datetime.utcnow()
     interval_start = interval_end - timedelta(days=7)
-    statement = wise.borderless_accounts.statement(
+    statement = wise.balance_statements.statement(
         profile_id,
-        borderless_account_id,
+        wise_balance_id,
         currency,
         interval_start.isoformat() + "Z",
         interval_end.isoformat() + "Z",
@@ -130,14 +130,14 @@ def sync_wise_statement(profile_id, borderless_account_id, currency):
     bank_account = (
         BankAccount.query.with_for_update()
         .filter_by(
-            borderless_account_id=borderless_account_id,
+            wise_balance_id=wise_balance_id,
             currency=currency,
         )
         .one()
     )
     if not bank_account.active:
         logger.info(
-            f"BankAccount for borderless account {borderless_account_id} and {currency} is not active, not syncing"
+            f"BankAccount for Wise balance account {wise_balance_id} and {currency} is not active, not syncing"
         )
         db.session.commit()
         return
@@ -185,8 +185,8 @@ def sync_wise_statement(profile_id, borderless_account_id, currency):
 def wise_business_profile():
     if app.config.get("TRANSFERWISE_PROFILE_ID"):
         id = int(app.config["TRANSFERWISE_PROFILE_ID"])
-        borderless_accounts = list(wise.borderless_accounts.list(profile_id=id))
-        if len(borderless_accounts) == 0:
+        accounts = list(wise.account_details.list(profile_id=id))
+        if len(accounts) == 0:
             raise Exception("Provided TRANSFERWISE_PROFILE_ID has no accoutns")
     else:
         # Wise bug:
@@ -202,12 +202,11 @@ def wise_business_profile():
     return id
 
 
-def _collect_bank_accounts(borderless_account):
+def wise_retrieve_accounts(profile_id):
     # Wise creates the concept of a multi-currency account by calling normal
-    # bank accounts "balances", and collecting them into a "borderless account",
-    # one balance per currency. As far as we're concerned, "balances" are bank
+    # bank accounts "balances". As far as we're concerned, "balances" are bank
     # accounts, as that's what people will be sending money to.
-    for account in borderless_account.balances:
+    for account in wise.balances.list(profile_id=profile_id):
         try:
             if not account.bankDetails:
                 continue
@@ -249,15 +248,8 @@ def _collect_bank_accounts(borderless_account):
             swift=account.bankDetails.get("swift"),
             iban=account.bankDetails.get("iban"),
             # Webhooks only include the borderlessAccountId
-            borderless_account_id=borderless_account.id,
+            wise_balance_id=account.id,
         )
-
-
-def wise_retrieve_accounts(profile_id):
-    borderless_accounts = wise.borderless_accounts.list(profile_id=profile_id)
-
-    for borderless_account in borderless_accounts:
-        yield from _collect_bank_accounts(borderless_account)
 
 
 def wise_validate():

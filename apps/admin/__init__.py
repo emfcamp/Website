@@ -208,7 +208,7 @@ def site_states():
 
 
 class BankAccountRefreshForm(Form):
-    import_accounts = SubmitField("Import new TransferWise accounts")
+    import_accounts = SubmitField("Import new Wise accounts")
 
 
 @admin.route("/payment-config/activate", methods=["POST"])
@@ -236,21 +236,21 @@ def payment_config_verify():
             flash("Cannot identify Wise profile", "warning")
             return redirect(url_for(".payment_config_verify"), 303)
 
-        tw_accounts = wise_retrieve_accounts(profile_id)
-        for tw_account in tw_accounts:
+        accounts = wise_retrieve_accounts(profile_id)
+        for account in accounts:
             existing_account = BankAccount.query.filter_by(
-                borderless_account_id=tw_account.borderless_account_id,
-                currency=tw_account.currency,
+                wise_balance_id=account.wise_balance_id,
+                currency=account.currency,
             ).first()
             if existing_account:
                 continue
-            db.session.add(tw_account)
+            db.session.add(account)
 
         if db.session.new:
             db.session.commit()
-            flash("New TransferWise bank accounts have been imported", "info")
+            flash("New Wise bank accounts have been imported", "info")
         else:
-            flash("No new TransferWise bank accounts have been imported", "warning")
+            flash("No new Wise bank accounts have been imported", "warning")
 
         return redirect(url_for(".payment_config_verify"), 303)
 
