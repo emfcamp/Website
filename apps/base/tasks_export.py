@@ -1,6 +1,5 @@
 import json
 import os
-from datetime import datetime
 from typing import cast
 
 import click
@@ -10,7 +9,7 @@ from sqlalchemy_continuum.utils import is_versioned, version_class
 
 from apps.common.json_export import ExportEncoder
 from main import db
-from models import event_year
+from models import event_year, naive_utcnow
 
 from . import base
 
@@ -130,7 +129,7 @@ def export_db(stdout, table):
                 app.logger.info("Exported data from %s to %s", model, filename)
 
     data = {
-        "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+        "timestamp": naive_utcnow().strftime("%Y-%m-%d %H:%M:%S"),
     }
     filename = os.path.join(path, "export.json")
 

@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from flask import abort, request
 from flask import current_app as app
@@ -7,6 +7,7 @@ from pywisetransfer.exceptions import InvalidWebhookSignature
 from pywisetransfer.webhooks import validate_request
 
 from main import db, wise
+from models import naive_utcnow
 from models.payment import BankAccount, BankTransaction
 
 from . import payments
@@ -115,7 +116,7 @@ def wise_balance_credit(event_type, event):
 
 def sync_wise_statement(profile_id, wise_balance_id, currency):
     # Retrieve an account transaction statement for the past week
-    interval_end = datetime.utcnow()
+    interval_end = naive_utcnow()
     interval_start = interval_end - timedelta(days=7)
     statement = wise.balance_statements.statement(
         profile_id,

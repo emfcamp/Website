@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from flask import (
     abort,
@@ -18,6 +18,7 @@ from sqlalchemy.sql.functions import func
 from wtforms import FieldList, FormField, SubmitField
 
 from main import db, get_stripe_client
+from models import naive_utcnow
 from models.payment import (
     BankPayment,
     BankRefund,
@@ -59,7 +60,7 @@ def expiring():
         BankPayment.query.join(Purchase)
         .filter(
             BankPayment.state == "inprogress",
-            BankPayment.expires < datetime.utcnow() + timedelta(days=3),
+            BankPayment.expires < naive_utcnow() + timedelta(days=3),
         )
         .with_entities(BankPayment, func.count(Purchase.id).label("purchase_count"))
         .group_by(BankPayment)
@@ -101,7 +102,7 @@ def reset_expiry(payment_id):
             elif payment.currency == "EUR":
                 days = app.config.get("EXPIRY_DAYS_TRANSFER_EURO")
 
-            payment.expires = datetime.utcnow() + timedelta(days=days)
+            payment.expires = naive_utcnow() + timedelta(days=days)
             db.session.commit()
 
             app.logger.info("Reset expiry by %s days", days)
@@ -150,7 +151,7 @@ def send_reminder(payment_id):
             )
             msg.send()
 
-            payment.reminder_sent_at = datetime.utcnow()
+            payment.reminder_sent_at = naive_utcnow()
             db.session.commit()
 
             flash(f"Reminder email for payment {payment.id} sent")

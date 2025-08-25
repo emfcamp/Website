@@ -1,9 +1,11 @@
 from bisect import bisect
 from collections import OrderedDict
+from datetime import UTC, datetime
 from decimal import Decimal
 from itertools import groupby, pairwise
 from typing import Literal, TypeAlias
 
+import datetype
 from dateutil.parser import parse
 from flask import current_app as app
 from sqlalchemy import inspect, true
@@ -26,6 +28,10 @@ BaseModel: TypeAlias = db.Model  # type: ignore[name-defined] # noqa: UP040
 # Ideally needs to be unified with the Currency class in app/common/__init__.py, but this is
 # non-trivial.
 type Currency = Literal["GBP", "EUR"]
+
+
+def naive_utcnow() -> datetype.DateTime[None]:
+    return datetype.naive(datetime.now(UTC).replace(tzinfo=None))
 
 
 def event_start():

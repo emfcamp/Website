@@ -17,6 +17,7 @@ from sqlalchemy.orm import column_property, relationship, Mapped
 from slugify.slugify import slugify
 from models import (
     export_attr_counts,
+    naive_utcnow,
     export_attr_edits,
     export_intervals,
     bucketise,
@@ -348,8 +349,8 @@ class Proposal(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     anonymiser_id = db.Column(db.Integer, db.ForeignKey("user.id"), default=None)
-    created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    modified = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow)
+    created = db.Column(db.DateTime, default=naive_utcnow, nullable=False)
+    modified = db.Column(db.DateTime, default=naive_utcnow, nullable=False, onupdate=naive_utcnow)
     state = db.Column(db.String, nullable=False, default="new")
     type = db.Column(db.String, nullable=False)  # talk, workshop or installation
 
@@ -977,7 +978,7 @@ PYTHON_CFP_TYPES = {
 class CFPMessage(BaseModel):
     __tablename__ = "cfp_message"
     id = db.Column(db.Integer, primary_key=True)
-    created = db.Column(db.DateTime, default=datetime.utcnow)
+    created = db.Column(db.DateTime, default=naive_utcnow)
     from_user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     proposal_id = db.Column(db.Integer, db.ForeignKey("proposal.id"), nullable=False)
 
@@ -1044,8 +1045,8 @@ class CFPVote(BaseModel):
     state = db.Column(db.String, nullable=False)
     has_been_read = db.Column(db.Boolean, nullable=False, default=False)
 
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    modified = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created = db.Column(db.DateTime, nullable=False, default=naive_utcnow)
+    modified = db.Column(db.DateTime, nullable=False, default=naive_utcnow, onupdate=naive_utcnow)
 
     vote = db.Column(db.Integer)  # Vote can be null for abstentions
     note = db.Column(db.String)

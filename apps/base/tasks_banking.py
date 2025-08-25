@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import click
 from flask import current_app as app
@@ -11,6 +11,7 @@ from apps.payments.wise import (
     wise_retrieve_accounts,
 )
 from main import db, wise
+from models import naive_utcnow
 from models.payment import BankAccount, BankTransaction
 
 
@@ -36,7 +37,7 @@ def check_wisetransfer_ids(profile_id):
 
     accounts = wise_retrieve_accounts(profile_id)
     for account in accounts:
-        interval_end = datetime.utcnow()
+        interval_end = naive_utcnow()
         interval_start = interval_end - timedelta(days=120)
         statement = wise.balance_statements.statement(
             profile_id,

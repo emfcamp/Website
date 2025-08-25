@@ -1,11 +1,10 @@
 import logging
-from datetime import datetime
 
 from sqlalchemy.orm.exc import MultipleResultsFound
 
 from main import cache, db
 
-from . import BaseModel, config_date
+from . import BaseModel, config_date, naive_utcnow
 from .product import PriceTier, Product, ProductGroup, ProductView, ProductViewProduct
 
 log = logging.getLogger(__name__)
@@ -79,7 +78,7 @@ def get_states() -> dict[str, str]:
     states = SiteState.query.all()
     states = {s.name: s.state for s in states}
 
-    date = datetime.utcnow()
+    date = naive_utcnow()
 
     if states.get("site_state") is None:
         states["site_state"] = "before-sales"

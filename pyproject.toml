@@ -10,6 +10,7 @@ dependencies = [
     "alembic~=1.1",
     "cryptography>=44.0.3",
     "css-inline<0.18",
+    "datetype",
     "decorator",
     "email-validator<2.3.0",
     "faker",

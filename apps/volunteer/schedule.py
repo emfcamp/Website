@@ -1,5 +1,4 @@
 from collections import defaultdict
-from datetime import datetime
 
 import pendulum
 from flask import Response, abort, flash, redirect, render_template, request, session, url_for
@@ -9,7 +8,7 @@ from icalendar import Calendar, Event
 from sqlalchemy.orm import joinedload
 
 from main import db
-from models import config_date, event_year
+from models import config_date, event_year, naive_utcnow
 from models.user import User, generate_api_token
 from models.volunteer.role import Role
 from models.volunteer.shift import Shift, ShiftEntry
@@ -54,9 +53,9 @@ def redirect_next_or_schedule(message: str | None = None):
 @feature_flag("VOLUNTEERS_SCHEDULE")
 @v_user_required
 def schedule():
-    if datetime.utcnow() < config_date("EVENT_START"):
+    if naive_utcnow() < config_date("EVENT_START"):
         default_day = "wed"
-    elif datetime.utcnow() > config_date("EVENT_END"):
+    elif naive_utcnow() > config_date("EVENT_END"):
         default_day = "mon"
     else:
         default_day = pendulum.now().strftime("%a").lower()
