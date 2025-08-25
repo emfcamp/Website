@@ -25,6 +25,9 @@ then
 	cp /app/config/development-example.cfg /app/config/development.cfg
 fi;
 
+# uv run doesn't remove dependencies, so run uv sync explicitly to do this.
+uv sync
+
 echo "Initialising database..."
 uv run flask db upgrade
 
