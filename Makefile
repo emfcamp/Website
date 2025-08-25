@@ -12,6 +12,7 @@ test: check-syntax pytest
 	
 pytest:
 	SETTINGS_FILE=$(TEST_SETTINGS) pytest --random-order --cov=apps --cov=models ./tests/ ./models/
+	flask db check
 
 check-syntax:
 	uv lock --check
