@@ -1,9 +1,11 @@
 import json
 import os
 from datetime import datetime
+from typing import cast
 
 import click
 from flask import current_app as app
+from sqlalchemy.orm.decl_api import DeclarativeBase
 from sqlalchemy_continuum.utils import is_versioned, version_class
 
 from apps.common.json_export import ExportEncoder
@@ -24,7 +26,7 @@ def get_export_data(table_filter: str | None = None):
 
     all_model_classes = {
         cls
-        for cls in db.Model.registry._class_registry.values()
+        for cls in cast(type[DeclarativeBase], db.Model).registry._class_registry.values()
         if isinstance(cls, type) and issubclass(cls, db.Model)
     }
 
