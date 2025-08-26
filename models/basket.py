@@ -205,6 +205,7 @@ class Basket(MutableMapping):
 
         # Insert the purchases right away, as column_property and
         # polymorphic columns are reloaded from the DB after insert
+        db.session.add_all(purchases_to_flush)
         db.session.flush(purchases_to_flush)
 
     def ensure_purchase_capacity(self):
@@ -281,6 +282,7 @@ class Basket(MutableMapping):
                 raise Exception(f"Purchase {purchase.id} has a payment already")
 
         payment = payment_cls(self.currency, self.total, self.voucher)
+        db.session.add(payment)
 
         # This is where you'd add the premium if it existed
 
@@ -307,7 +309,6 @@ class Basket(MutableMapping):
                 raise Exception(f"Voucher with code {self.voucher} not found")
 
             voucher_obj.consume_capacity(payment)
-            db.session.add(voucher_obj)
 
         return payment
 

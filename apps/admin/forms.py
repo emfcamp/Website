@@ -2,7 +2,9 @@ from datetime import datetime, timedelta
 
 from wtforms import (
     BooleanField,
+    DateField,
     DecimalField,
+    Field,
     FieldList,
     FormField,
     HiddenField,
@@ -12,7 +14,6 @@ from wtforms import (
     SubmitField,
     TextAreaField,
 )
-from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, InputRequired, Optional, ValidationError
 from wtforms.widgets import TextArea
 from wtforms_sqlalchemy.fields import QuerySelectField
@@ -243,7 +244,7 @@ class TicketAmountForm(Form):
 class IssueTicketsForm(Form):
     price_tiers = FieldList(FormField(TicketAmountForm))
     allocate = SubmitField("Allocate tickets")
-    currency = HiddenField("Currency", default="GBP")
+    currency: Field = HiddenField("Currency", default="GBP")
 
     def validate_price_tiers(self, field):
         if not any(f.amount.data for f in field):

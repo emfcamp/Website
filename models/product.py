@@ -8,11 +8,11 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from sqlalchemy import UniqueConstraint, func, inspect
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import column_property, validates
+from sqlalchemy.orm import InstanceState, Mapped, column_property, relationship, validates
 
 from main import db
 
@@ -22,6 +22,7 @@ from .purchase import AdmissionTicket, Purchase, Ticket
 
 if TYPE_CHECKING:
     # Imports used only in type hints, can't be imported normally due to circular references.
+    from .arrivals import ArrivalsViewProduct
     from .basket import Basket
     from .payment import Payment
 
@@ -97,9 +98,8 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
     type = db.Column(db.String, nullable=False)
     name = db.Column(db.String, unique=True, nullable=False)
 
-    products = db.relationship("Product", backref="parent", cascade="all", order_by="Product.id")
-    children = db.relationship(
-        "ProductGroup",
+    products: Mapped[list[Product]] = relationship(backref="parent", cascade="all", order_by="Product.id")
+    children: Mapped[list[ProductGroup]] = relationship(
         backref=db.backref("parent", remote_side=[id]),
         cascade="all",
         order_by="ProductGroup.id",
@@ -258,12 +258,14 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
     name = db.Column(db.String, nullable=False)
     display_name = db.Column(db.String)
     description = db.Column(db.String)
-    price_tiers = db.relationship("PriceTier", backref="parent", cascade="all", order_by="PriceTier.id")
-    product_view_products = db.relationship(
-        "ProductViewProduct", backref="product", cascade="all, delete-orphan"
+    price_tiers: Mapped[list[PriceTier]] = relationship(
+        backref="parent", cascade="all", order_by="PriceTier.id"
     )
-    arrivals_view_products = db.relationship(
-        "ArrivalsViewProduct", backref="product", cascade="all, delete-orphan"
+    product_view_products: Mapped[list[ProductViewProduct]] = relationship(
+        backref="product", cascade="all, delete-orphan"
+    )
+    arrivals_view_products: Mapped[list[ArrivalsViewProduct]] = relationship(
+        backref="product", cascade="all, delete-orphan"
     )
 
     __table_args__ = (UniqueConstraint("name", "group_id"),)
@@ -278,7 +280,8 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
     @property
     def purchase_count_by_state(self):
         states = (
-            Purchase.query.join(PriceTier, Product)
+            Purchase.query.join(PriceTier)
+            .join(Product)
             .filter(Product.id == self.id)
             .with_entities(Purchase.state, func.count(Purchase.id))
             .group_by(Purchase.state)
@@ -353,7 +356,7 @@ class PriceTier(BaseModel, CapacityMixin):
     __table_args__ = (UniqueConstraint("name", "product_id"),)
     __export_data__ = False  # Exported by ProductGroup
 
-    prices = db.relationship("Price", backref="price_tier", cascade="all", order_by="Price.id")
+    prices: Mapped[list[Price]] = relationship(backref="price_tier", cascade="all", order_by="Price.id")
 
     def __init__(self, name=None, **kwargs):
         super().__init__(name=name, **kwargs)
@@ -386,7 +389,8 @@ class PriceTier(BaseModel, CapacityMixin):
         return self.purchase_count == 0 and not self.active
 
     def get_price(self, currency: Currency) -> Price | None:
-        if "prices" in inspect(self).unloaded:
+        instance_state = cast(InstanceState, inspect(self))
+        if "prices" in instance_state.unloaded:
             return self.get_price_unloaded(currency)
         return self.get_price_loaded(currency)
 
@@ -481,7 +485,7 @@ class Voucher(BaseModel):
 
     product_view_id = db.Column(db.Integer, db.ForeignKey("product_view.id"))
 
-    payment = db.relationship("Payment", backref="voucher")
+    payment: Mapped[list[Payment]] = relationship(backref="voucher")
 
     # The number of purchases remaining on this voucher
     purchases_remaining = db.Column(db.Integer, nullable=False, server_default="1")
@@ -601,14 +605,13 @@ class ProductView(BaseModel):
     # Whether this productview is only accessible with a voucher associated with this productview
     vouchers_only = db.Column(db.Boolean, nullable=False, default=False, server_default="False")
 
-    product_view_products = db.relationship(
-        "ProductViewProduct",
+    product_view_products: Mapped[list[ProductViewProduct]] = relationship(
         backref="view",
         order_by="ProductViewProduct.order",
         cascade="all, delete-orphan",
     )
 
-    vouchers = db.relationship("Voucher", backref="view", cascade="all, delete-orphan", lazy=True)
+    vouchers: Mapped[list[Voucher]] = relationship(backref="view", cascade="all, delete-orphan", lazy=True)
 
     products = association_proxy("product_view_products", "product")
 

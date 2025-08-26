@@ -470,16 +470,16 @@ wheels = [
 
 [[package]]
 name = "flask-migrate"
-version = "3.1.0"
+version = "4.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "alembic" },
     { name = "flask" },
     { name = "flask-sqlalchemy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e2/65/cca3c4fa6dcdf7a3c4fe8aa0822944f8f9f20961f831a04b7a0685ab000a/Flask-Migrate-3.1.0.tar.gz", hash = "sha256:57d6060839e3a7f150eaab6fe4e726d9e3e7cffe2150fb223d73f92421c6d1d9", size = 12654, upload-time = "2021-08-01T10:46:48.847Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5a/8e/47c7b3c93855ceffc2eabfa271782332942443321a07de193e4198f920cf/flask_migrate-4.1.0.tar.gz", hash = "sha256:1a336b06eb2c3ace005f5f2ded8641d534c18798d64061f6ff11f79e1434126d", size = 21965, upload-time = "2025-01-10T18:51:11.848Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a8/48/b64a6a2fee01b03f3318cba3aea1c0055ab5f4a933b2d4f5a2d75140c229/Flask_Migrate-3.1.0-py3-none-any.whl", hash = "sha256:a6498706241aba6be7a251078de9cf166d74307bca41a4ca3e403c9d39e2f897", size = 20260, upload-time = "2021-08-01T10:46:46.988Z" },
+    { url = "https://files.pythonhosted.org/packages/d2/c4/3f329b23d769fe7628a5fc57ad36956f1fb7132cf8837be6da762b197327/Flask_Migrate-4.1.0-py3-none-any.whl", hash = "sha256:24d8051af161782e0743af1b04a152d007bad9772b2bca67b7ec1e8ceeb3910d", size = 21237, upload-time = "2025-01-10T18:51:09.527Z" },
 ]
 
 [[package]]
@@ -513,15 +513,15 @@ wheels = [
 
 [[package]]
 name = "flask-sqlalchemy"
-version = "3.0.5"
+version = "3.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "flask" },
     { name = "sqlalchemy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c6/4e/0991354600fe3e1223cd9f025dbde900b1c1fe231762e18cdaffbe55938e/flask_sqlalchemy-3.0.5.tar.gz", hash = "sha256:c5765e58ca145401b52106c0f46178569243c5da25556be2c231ecc60867c5b1", size = 78504, upload-time = "2023-06-21T16:47:21.595Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/91/53/b0a9fcc1b1297f51e68b69ed3b7c3c40d8c45be1391d77ae198712914392/flask_sqlalchemy-3.1.1.tar.gz", hash = "sha256:e4b68bb881802dda1a7d878b2fc84c06d1ee57fb40b874d3dc97dabfa36b8312", size = 81899, upload-time = "2023-09-11T21:42:36.147Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d8/1d/c3c5afdaebd5d5f82d2c25762f5356416bd7bc109a550c79247134e48ca3/flask_sqlalchemy-3.0.5-py3-none-any.whl", hash = "sha256:cabb6600ddd819a9f859f36515bb1bd8e7dbf30206cc679d2b081dff9e383283", size = 24842, upload-time = "2023-06-21T16:47:19.82Z" },
+    { url = "https://files.pythonhosted.org/packages/1d/6a/89963a5c6ecf166e8be29e0d1bf6806051ee8fe6c82e232842e3aeac9204/flask_sqlalchemy-3.1.1-py3-none-any.whl", hash = "sha256:4ba4be7f419dc72f4efd8802d69974803c37259dd42f3913b0dcf75c9447e0a0", size = 25125, upload-time = "2023-09-11T21:42:34.514Z" },
 ]
 
 [[package]]
@@ -1803,12 +1803,24 @@ wheels = [
 
 [[package]]
 name = "sqlalchemy"
-version = "1.4.54"
+version = "2.0.43"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "greenlet", marker = "platform_machine == 'AMD64' or platform_machine == 'WIN32' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'ppc64le' or platform_machine == 'win32' or platform_machine == 'x86_64'" },
+    { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ce/af/20290b55d469e873cba9d41c0206ab5461ff49d759989b3fe65010f9d265/sqlalchemy-1.4.54.tar.gz", hash = "sha256:4470fbed088c35dc20b78a39aaf4ae54fe81790c783b3264872a0224f437c31a", size = 8470350, upload-time = "2024-09-05T15:54:10.398Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d7/bc/d59b5d97d27229b0e009bd9098cd81af71c2fa5549c580a0a67b9bed0496/sqlalchemy-2.0.43.tar.gz", hash = "sha256:788bfcef6787a7764169cfe9859fe425bf44559619e1d9f56f5bddf2ebf6f417", size = 9762949, upload-time = "2025-08-11T14:24:58.438Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/41/1c/a7260bd47a6fae7e03768bf66451437b36451143f36b285522b865987ced/sqlalchemy-2.0.43-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:e7c08f57f75a2bb62d7ee80a89686a5e5669f199235c6d1dac75cd59374091c3", size = 2130598, upload-time = "2025-08-11T15:51:15.903Z" },
+    { url = "https://files.pythonhosted.org/packages/8e/84/8a337454e82388283830b3586ad7847aa9c76fdd4f1df09cdd1f94591873/sqlalchemy-2.0.43-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:14111d22c29efad445cd5021a70a8b42f7d9152d8ba7f73304c4d82460946aaa", size = 2118415, upload-time = "2025-08-11T15:51:17.256Z" },
+    { url = "https://files.pythonhosted.org/packages/cf/ff/22ab2328148492c4d71899d62a0e65370ea66c877aea017a244a35733685/sqlalchemy-2.0.43-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:21b27b56eb2f82653168cefe6cb8e970cdaf4f3a6cb2c5e3c3c1cf3158968ff9", size = 3248707, upload-time = "2025-08-11T15:52:38.444Z" },
+    { url = "https://files.pythonhosted.org/packages/dc/29/11ae2c2b981de60187f7cbc84277d9d21f101093d1b2e945c63774477aba/sqlalchemy-2.0.43-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9c5a9da957c56e43d72126a3f5845603da00e0293720b03bde0aacffcf2dc04f", size = 3253602, upload-time = "2025-08-11T15:56:37.348Z" },
+    { url = "https://files.pythonhosted.org/packages/b8/61/987b6c23b12c56d2be451bc70900f67dd7d989d52b1ee64f239cf19aec69/sqlalchemy-2.0.43-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:5d79f9fdc9584ec83d1b3c75e9f4595c49017f5594fee1a2217117647225d738", size = 3183248, upload-time = "2025-08-11T15:52:39.865Z" },
+    { url = "https://files.pythonhosted.org/packages/86/85/29d216002d4593c2ce1c0ec2cec46dda77bfbcd221e24caa6e85eff53d89/sqlalchemy-2.0.43-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:9df7126fd9db49e3a5a3999442cc67e9ee8971f3cb9644250107d7296cb2a164", size = 3219363, upload-time = "2025-08-11T15:56:39.11Z" },
+    { url = "https://files.pythonhosted.org/packages/b6/e4/bd78b01919c524f190b4905d47e7630bf4130b9f48fd971ae1c6225b6f6a/sqlalchemy-2.0.43-cp313-cp313-win32.whl", hash = "sha256:7f1ac7828857fcedb0361b48b9ac4821469f7694089d15550bbcf9ab22564a1d", size = 2096718, upload-time = "2025-08-11T15:55:05.349Z" },
+    { url = "https://files.pythonhosted.org/packages/ac/a5/ca2f07a2a201f9497de1928f787926613db6307992fe5cda97624eb07c2f/sqlalchemy-2.0.43-cp313-cp313-win_amd64.whl", hash = "sha256:971ba928fcde01869361f504fcff3b7143b47d30de188b11c6357c0505824197", size = 2123200, upload-time = "2025-08-11T15:55:07.932Z" },
+    { url = "https://files.pythonhosted.org/packages/b8/d9/13bdde6521f322861fab67473cec4b1cc8999f3871953531cf61945fad92/sqlalchemy-2.0.43-py3-none-any.whl", hash = "sha256:1681c21dd2ccee222c2fe0bef671d1aef7c504087c9c4e800371cfcc8ac966fc", size = 1924759, upload-time = "2025-08-11T15:39:53.024Z" },
+]
 
 [[package]]
 name = "sqlalchemy-continuum"
@@ -1821,19 +1833,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/05/81/76e0b16ca8575463ba83e014afe8a89443bbc6a896dad3c48068ce571611/sqlalchemy_continuum-1.4.2.tar.gz", hash = "sha256:0fd2be79f718eda47c2206879d92ec4ebf1889364637b3caf3ee5d34bd19c8e3", size = 81713, upload-time = "2024-05-02T20:03:43.192Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/84/d4/c404ce46dc2d53e536f470e76d7f657de46cf091d5ba05d19040d420d825/SQLAlchemy_Continuum-1.4.2-py3-none-any.whl", hash = "sha256:154588d79deb8b1683b5f39c130e6f0ad793c0b2f27e8c210565c23fb6fe74de", size = 44789, upload-time = "2024-05-02T20:03:41.009Z" },
-]
-
-[[package]]
-name = "sqlalchemy-stubs"
-version = "0.4"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "mypy" },
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/81/60/db082788267740b17eac2c00666bbea1c8c5a94b569e8b1ea76b0cf42d57/sqlalchemy-stubs-0.4.tar.gz", hash = "sha256:c665d6dd4482ef642f01027fa06c3d5e91befabb219dc71fc2a09e7d7695f7ae", size = 70682, upload-time = "2021-01-12T14:02:04.438Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/62/ae/cb215ab25b76228bc90c90444b87e323ffba58c212321a53d5bc92903098/sqlalchemy_stubs-0.4-py3-none-any.whl", hash = "sha256:5eec7aa110adf9b957b631799a72fef396b23ff99fe296df726645d01e312aa5", size = 116067, upload-time = "2021-01-12T14:02:02.723Z" },
 ]
 
 [[package]]
@@ -1927,6 +1926,19 @@ wheels = [
 ]
 
 [[package]]
+name = "types-flask-migrate"
+version = "4.1.0.20250809"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "flask" },
+    { name = "flask-sqlalchemy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d5/d1/d11799471725b7db070c4f1caa3161f556230d4fb5dad76d23559da1be4d/types_flask_migrate-4.1.0.20250809.tar.gz", hash = "sha256:fdf97a262c86aca494d75874a2374e84f2d37bef6467d9540fa3b054b67db04e", size = 8636, upload-time = "2025-08-09T03:17:03.957Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b4/53/f5fd40fb6c21c1f8e7da8325f3504492d027a7921d5c80061cd434c3a0fc/types_flask_migrate-4.1.0.20250809-py3-none-any.whl", hash = "sha256:92ad2c0d4000a53bf1e2f7813dd067edbbcc4c503961158a763e2b0ae297555d", size = 8648, upload-time = "2025-08-09T03:17:02.952Z" },
+]
+
+[[package]]
 name = "types-icalendar"
 version = "6.3.1.20250822"
 source = { registry = "https://pypi.org/simple" }
@@ -2006,6 +2018,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/df/6b/96d43a90cd202bd552cdd871858a11c138fe5ef11aeb4ed8e8dc51389257/types_simplejson-3.20.0.20250822.tar.gz", hash = "sha256:2b0bfd57a6beed3b932fd2c3c7f8e2f48a7df3978c9bba43023a32b3741a95b0", size = 10608, upload-time = "2025-08-22T03:03:35.36Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/3c/9f/8e2c9e6aee9a2ff34f2ffce6ccd9c26edeef6dfd366fde611dc2e2c00ab9/types_simplejson-3.20.0.20250822-py3-none-any.whl", hash = "sha256:b5e63ae220ac7a1b0bb9af43b9cb8652237c947981b2708b0c776d3b5d8fa169", size = 10417, upload-time = "2025-08-22T03:03:34.485Z" },
+]
+
+[[package]]
+name = "types-wtforms"
+version = "3.2.1.20250809"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "markupsafe" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/2e/f7/72ca8564a59f118dd5ce5b6afcdbb38c297d04950dcaf49873dae8c6ff45/types_wtforms-3.2.1.20250809.tar.gz", hash = "sha256:9108399333be3bde66179f69a610a5d05c25485024f698d5adc3f6a9df20d029", size = 17194, upload-time = "2025-08-09T03:17:24.73Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fe/5a/ecedecb8a1ccff7ea936fb77a359f8295da36fb7e7985cb4fc147110a091/types_wtforms-3.2.1.20250809-py3-none-any.whl", hash = "sha256:d254cf027c6725e21ad50044da692d57586dd29f38abd3a6b4ec10993f6741cc", size = 24294, upload-time = "2025-08-09T03:17:24.008Z" },
 ]
 
 [[package]]
@@ -2162,9 +2186,9 @@ dev = [
     { name = "pytest-vcr" },
     { name = "pyzbar" },
     { name = "ruff" },
-    { name = "sqlalchemy-stubs" },
     { name = "types-decorator" },
     { name = "types-flask-cors" },
+    { name = "types-flask-migrate" },
     { name = "types-icalendar" },
     { name = "types-markdown" },
     { name = "types-python-dateutil" },
@@ -2173,6 +2197,7 @@ dev = [
     { name = "types-requests" },
     { name = "types-shapely" },
     { name = "types-simplejson" },
+    { name = "types-wtforms" },
 ]
 
 [package.metadata]
@@ -2190,10 +2215,10 @@ requires-dist = [
     { name = "flask-debugtoolbar" },
     { name = "flask-login", specifier = "~=0.6" },
     { name = "flask-mailman", specifier = "<1.2" },
-    { name = "flask-migrate", specifier = ">=3.1,<3.2" },
+    { name = "flask-migrate", specifier = "~=4.1.0" },
     { name = "flask-restful", specifier = "~=0.3" },
     { name = "flask-shell-ipython" },
-    { name = "flask-sqlalchemy", specifier = "~=3.0" },
+    { name = "flask-sqlalchemy", specifier = "~=3.1" },
     { name = "flask-static-digest", specifier = "~=0.3" },
     { name = "flask-wtf", specifier = "~=1.0" },
     { name = "freezegun", specifier = ">=1.1.0,<2" },
@@ -2222,12 +2247,12 @@ requires-dist = [
     { name = "shapely", specifier = "~=2.0" },
     { name = "simplejson" },
     { name = "slotmachine", git = "https://github.com/emfcamp/slotmachine.git" },
-    { name = "sqlalchemy", specifier = "<2.0" },
-    { name = "sqlalchemy-continuum", specifier = "~=1.3" },
-    { name = "sqlalchemy-utils", specifier = "~=0.34" },
+    { name = "sqlalchemy", specifier = "~=2.0" },
+    { name = "sqlalchemy-continuum", specifier = "~=1.4.2" },
+    { name = "sqlalchemy-utils", specifier = "~=0.41" },
     { name = "stripe", specifier = "<13.0" },
-    { name = "wtforms", specifier = "~=2.3" },
-    { name = "wtforms-sqlalchemy", specifier = "~=0.3.0" },
+    { name = "wtforms", specifier = "<3.3" },
+    { name = "wtforms-sqlalchemy", specifier = "<0.5" },
 ]
 
 [package.metadata.requires-dev]
@@ -2246,9 +2271,9 @@ dev = [
     { name = "pytest-vcr", specifier = ">=1.0.2,<2" },
     { name = "pyzbar", specifier = ">=0.1.8,<0.2" },
     { name = "ruff", specifier = "==0.12.10" },
-    { name = "sqlalchemy-stubs", specifier = ">=0.4,<0.5" },
     { name = "types-decorator", specifier = ">=5.1.4,<6" },
     { name = "types-flask-cors", specifier = ">=6.0.0.20250809" },
+    { name = "types-flask-migrate", specifier = "~=4.1.0.20250809" },
     { name = "types-icalendar", specifier = ">=6.3.1.20250822" },
     { name = "types-markdown", specifier = ">=3.3.12,<4" },
     { name = "types-python-dateutil", specifier = ">=2.8.9,<3" },
@@ -2257,6 +2282,7 @@ dev = [
     { name = "types-requests", specifier = ">=2.27.8,<3" },
     { name = "types-shapely", specifier = ">=2.1.0.20250822" },
     { name = "types-simplejson", specifier = ">=3.17.3,<4" },
+    { name = "types-wtforms", specifier = ">=3.2.1.20250809" },
 ]
 
 [[package]]
@@ -2313,27 +2339,27 @@ wheels = [
 
 [[package]]
 name = "wtforms"
-version = "2.3.3"
+version = "3.2.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markupsafe" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/dd/3f/f25d26b1c66896e2876124a12cd8be8f606abf4e1890a20f3ca04e4a1555/WTForms-2.3.3.tar.gz", hash = "sha256:81195de0ac94fbc8368abbaf9197b88c4f3ffd6c2719b5bf5fc9da744f3d829c", size = 162945, upload-time = "2020-07-30T17:08:26.883Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/01/e4/633d080897e769ed5712dcfad626e55dbd6cf45db0ff4d9884315c6a82da/wtforms-3.2.1.tar.gz", hash = "sha256:df3e6b70f3192e92623128123ec8dca3067df9cfadd43d59681e210cfb8d4682", size = 137801, upload-time = "2024-10-21T11:34:00.108Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e0/31/614fc7dc7d76005b0acb8c0c8920d962b83d7422b4ba912886dfb63f86ff/WTForms-2.3.3-py2.py3-none-any.whl", hash = "sha256:7b504fc724d0d1d4d5d5c114e778ec88c37ea53144683e084215eed5155ada4c", size = 169106, upload-time = "2020-07-30T17:08:25.026Z" },
+    { url = "https://files.pythonhosted.org/packages/08/c9/2088fb5645cd289c99ebe0d4cdcc723922a1d8e1beaefb0f6f76dff9b21c/wtforms-3.2.1-py3-none-any.whl", hash = "sha256:583bad77ba1dd7286463f21e11aa3043ca4869d03575921d1a1698d0715e0fd4", size = 152454, upload-time = "2024-10-21T11:33:58.44Z" },
 ]
 
 [[package]]
 name = "wtforms-sqlalchemy"
-version = "0.3"
+version = "0.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "sqlalchemy" },
     { name = "wtforms" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e4/ee/38d30e57764a62cd514851fe34647992d640fbd4c38466655fbf2e7cc1ca/WTForms-SQLAlchemy-0.3.tar.gz", hash = "sha256:7ca42824ad7c453a036f502b42d9c17d4ad8398ff9248a62ed538d1ce0bc41c3", size = 17246, upload-time = "2021-11-06T16:21:50.331Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8c/39/58e06f6b38b220820a831a957b20035ae8c9e763d654da883c9dc282cfca/wtforms_sqlalchemy-0.4.2.tar.gz", hash = "sha256:638f23372e654eded3c19ea605a2d318062e26234772977b9bb1619160eed798", size = 17412, upload-time = "2024-10-25T11:04:32.239Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/62/71/a5624ff63f4024d27489263b56e3ab6a5122087eb432d14617cfed90ec3d/WTForms_SQLAlchemy-0.3-py3-none-any.whl", hash = "sha256:90195d7592bf256d82498c42c79d416832e4a4e6fbca4f1e745a018f66d26c47", size = 8831, upload-time = "2021-11-06T16:21:48.688Z" },
+    { url = "https://files.pythonhosted.org/packages/4e/2e/0182ee7e62816f4bc6dea4e369f61c365c74d15caeb82b87be9c96d9e8b5/wtforms_sqlalchemy-0.4.2-py3-none-any.whl", hash = "sha256:5dfa6b9cd8c0fab644178af6a90adc057c1c2695a17c20a074f1f3c4d49a434d", size = 9881, upload-time = "2024-10-25T11:04:30.886Z" },
 ]
 
 [[package]]

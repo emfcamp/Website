@@ -87,6 +87,12 @@ def app_factory(cache):
 
         yield app
 
+        # For unclear reasons we're picking up an `alembic_version` table even though
+        # we're not using Alembic here. Drop it to avoid confusing future users of the test database.
+        db_obj.session.rollback()
+        db_obj.session.execute(text("DROP TABLE IF EXISTS alembic_version"))
+        db_obj.session.commit()
+
         db_obj.session.close()
         db_obj.drop_all()
     freezer.stop()

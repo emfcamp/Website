@@ -175,7 +175,7 @@ def shift_sign_up(shift_id):
                 f"This shift clashes with your {clash_role} shift at {clash_time}, you have not been signed up."
             )
 
-    shift.entries.append(ShiftEntry(user=user, shift=shift))
+    db.session.add(ShiftEntry(user=user, shift=shift))
     db.session.commit()
 
     return redirect_next_or_schedule(f"Signed up {shift.role.name} shift")
