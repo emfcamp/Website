@@ -60,7 +60,6 @@ class ProposalResource(Resource):
             if attribute in payload:
                 setattr(proposal, attribute, payload[attribute])
 
-        db.session.add(proposal)
         db.session.commit()
 
         return {
@@ -229,7 +228,6 @@ class ProposalC3VOCPublishingWebhook(Resource):
                     )
                     proposal.youtube_url = None
 
-            db.session.add(proposal)
             db.session.commit()
         except KeyError as e:
             abort(400, message=f"Missing required field: {e}")

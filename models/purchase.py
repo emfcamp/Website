@@ -203,7 +203,8 @@ class Purchase(BaseModel):
         self.ticket_issued = False
         self.owner = to_user
 
-        PurchaseTransfer(purchase=self, to_user=to_user, from_user=from_user)
+        transfer = PurchaseTransfer(purchase=self, to_user=to_user, from_user=from_user)
+        db.session.add(transfer)
 
     def redeem(self):
         if not self.product.get_attribute("is_redeemable"):

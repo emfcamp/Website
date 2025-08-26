@@ -149,7 +149,7 @@ def pay(flow="main"):
 
 
 def start_payment(form: TicketPaymentForm, basket: Basket, flow: str):
-    if Decimal(form.basket_total.data) != Decimal(basket.total):
+    if Decimal(form.basket_total.data or 0) != Decimal(basket.total):
         # Check that the user's basket approximately matches what we told them they were paying.
         price_changed.inc()
         app.logger.warning(
@@ -167,6 +167,7 @@ def start_payment(form: TicketPaymentForm, basket: Basket, flow: str):
 
     if user.is_anonymous:
         try:
+            assert form.email.data and form.name.data
             new_user = create_current_user(form.email.data, form.name.data)
         except IntegrityError as e:
             app.logger.warning("Adding user raised %r, possible double-click", e)

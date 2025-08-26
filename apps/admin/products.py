@@ -156,6 +156,7 @@ def new_price_tier(product_id):
         # Only activate this price tier if it's the first one added.
         pt.active = len(product.price_tiers) == 0
         product.price_tiers.append(pt)
+        db.session.add(pt)
         db.session.commit()
         return redirect(url_for(".price_tier_details", tier_id=pt.id))
 
@@ -245,7 +246,7 @@ def product_group_details(group_id):
         return [group] + [g for c in group.children for g in get_all_child_groups(c)]
 
     group_ids = [g.id for g in get_all_child_groups(group)]
-    price_tiers = ProductGroup.query.filter(ProductGroup.id.in_(group_ids)).join(Product, PriceTier)
+    price_tiers = ProductGroup.query.filter(ProductGroup.id.in_(group_ids)).join(Product).join(PriceTier)
     user_purchases = get_user_purchases(price_tiers)
     return render_template(
         "admin/products/product-group-details.html",
@@ -362,7 +363,9 @@ def product_group_copy(group_id):
 def tees():
     purchases = (
         ProductGroup.query.filter_by(type="tees")
-        .join(Product, Purchase, Purchase.owner)
+        .join(Product)
+        .join(Purchase)
+        .join(Purchase.owner)
         .group_by(User.id, Product.id)
         .with_entities(User, Product, func.count(Purchase.id))
         .filter(Purchase.is_paid_for == True)
@@ -480,11 +483,11 @@ def product_view_add(view_id, group_id=None, product_id=None):
     if form.validate_on_submit():
         if form.add_all_products.data:
             for product in group.products:
-                ProductViewProduct(view, product)
+                db.session.add(ProductViewProduct(view, product))
             db.session.commit()
 
         elif form.add_product.data:
-            ProductViewProduct(view, product)
+            db.session.add(ProductViewProduct(view, product))
             db.session.commit()
 
         return redirect(url_for(".product_view", view_id=view.id))
@@ -537,6 +540,7 @@ def product_view_add_voucher(view_id):
             purchases_remaining=form.num_purchases.data,
             tickets_remaining=form.num_tickets.data,
         )
+        db.session.add(voucher)
         db.session.commit()
         flash("Voucher successfully created")
         return redirect(
@@ -647,6 +651,8 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 connection=conn,
                 html_message=html,
             )
+
+            db.session.add(voucher)
             db.session.commit()
             sent_total += sent_count
             added += 1

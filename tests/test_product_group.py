@@ -99,6 +99,7 @@ def test_validate_capacity_max(db, parent_group):
 
     # If that was OK, we can give it a name and check it flushes successfully.
     group.name = group_name
+    db.session.add(group)
     db.session.flush()
     assert group.id is not None
 
@@ -116,6 +117,7 @@ def test_capacity_propagation(db, parent_group, user):
     product2 = Product(name="product2", parent=parent_group)
     tier3 = PriceTier(name="tier3", parent=product2)
     Price(price_tier=tier3, currency="GBP", price_int=30)
+    db.session.add(tier3)
     db.session.commit()
 
     # Check all our items have the correct initial capacity
@@ -259,7 +261,9 @@ def test_product_group_get_counts_by_state(db, parent_group, user):
 
     # Add another purchase in another tier
     tier2 = PriceTier(name="2", parent=product)
+    db.session.add(tier2)
     price = Price(price_tier=tier2, currency="GBP", price_int=666)
+    db.session.add(price)
     db.session.commit()
     create_purchases(tier2, 1, user)
 

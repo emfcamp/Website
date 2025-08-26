@@ -169,6 +169,7 @@ def load_utility_functions(app_obj):
     @app_obj.template_filter("pretty_text")
     def pretty_text(text):
         text = text.strip(" \n\r")
+        # urlize calls markupsafe.escape before anything else
         text = urlize(text, trim_url_limit=40)
         text = "\n".join(f"<p>{para}</p>" for para in re.split(r"[\r\n]+", text))
         return Markup(text)

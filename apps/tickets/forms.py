@@ -77,12 +77,16 @@ class TicketAmountsForm(Form):
         This function updates the products on the form based on the current capacity
         so it will fail to validate if the requested ticket capacity is now unavailable.
         """
+
+        # FIXME: We're storing data in random attributes of the FormField object here,
+        # which the typechecker doesn't really like.
+
         # Whether submitted or not, update the allowed amounts before validating
         capacity_available = True
         for f in form.tiers:
             pt_id = f.tier_id.data
             tier = form._tiers[pt_id]
-            f._tier = tier
+            f._tier = tier  # type: ignore[attr-defined]
 
             # If they've already got reserved tickets, they can keep them
             # because they've been reserved in the database
@@ -98,8 +102,8 @@ class TicketAmountsForm(Form):
                 capacity_available = False
 
             values = range(user_limit + 1)
-            f.amount.values = values
-            f._any = any(values)
+            f.form.amount.values = values
+            f._any = any(values)  # type: ignore[attr-defined]
         return capacity_available
 
     def add_to_basket(form, basket):

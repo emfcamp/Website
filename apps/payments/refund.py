@@ -116,6 +116,8 @@ def handle_refund_request(request: RefundRequest) -> None:
     # TODO: set partrefunded state if we have not refunded the whole payment
     payment.state = "refunded"
 
+    if refund:
+        db.session.add(refund)
     db.session.commit()
     send_refund_email(request, refund_amount)
 
@@ -139,6 +141,7 @@ def manual_bank_refund(request: RefundRequest) -> None:
             purchase.refund_purchase(refund)
 
     payment.state = "refunded"
+    db.session.add(refund)
 
     db.session.commit()
     send_refund_email(request, refund_amount)

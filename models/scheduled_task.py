@@ -20,6 +20,7 @@ import logging
 from functools import wraps
 
 import pendulum
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from main import db
@@ -99,7 +100,7 @@ def execute_scheduled_tasks(force=False):
     # Create a new session, so tasks calling commit don't free our lock
     with Session(db.engine, autocommit=False) as lock_session:
         # Take an exclusive lock on the ScheduledTaskResult table to prevent tasks colliding
-        lock_session.execute(f"LOCK TABLE {ScheduledTaskResult.__tablename__} IN EXCLUSIVE MODE")
+        lock_session.execute(text(f"LOCK TABLE {ScheduledTaskResult.__tablename__} IN EXCLUSIVE MODE"))
 
         tasks_to_run = []
         if force:
