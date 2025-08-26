@@ -192,9 +192,9 @@ class FakeDataGenerator:
                 self.create_village(user)
 
             db.session.add(user)
-            self.create_fake_tickets(user)
-
             db.session.commit()
+
+            self.create_fake_tickets(user)
 
         scheduler = Scheduler()
         scheduler.set_rough_durations()
@@ -270,6 +270,8 @@ class FakeDataGenerator:
             if random.random() < 0.2:
                 payment.manual_refund()
                 db.session.commit()
+
+        db.session.commit()
 
     def create_fake_lottery_tickets(self, users_list: list[User], proposal):
         n_lottery_tickets = random.randint(0, len(users_list))

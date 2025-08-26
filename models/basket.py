@@ -287,7 +287,6 @@ class Basket(MutableMapping):
         # This is where you'd add the premium if it existed
 
         self.user.payments.append(payment)
-        db.session.add(self.user)
 
         app.logger.info("Creating payment for basket %s", self)
         app.logger.info(
@@ -310,7 +309,6 @@ class Basket(MutableMapping):
                 raise Exception(f"Voucher with code {self.voucher} not found")
 
             voucher_obj.consume_capacity(payment)
-            db.session.add(voucher_obj)
 
         return payment
 

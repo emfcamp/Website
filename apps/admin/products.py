@@ -156,6 +156,7 @@ def new_price_tier(product_id):
         # Only activate this price tier if it's the first one added.
         pt.active = len(product.price_tiers) == 0
         product.price_tiers.append(pt)
+        db.session.add(pt)
         db.session.commit()
         return redirect(url_for(".price_tier_details", tier_id=pt.id))
 
@@ -482,11 +483,11 @@ def product_view_add(view_id, group_id=None, product_id=None):
     if form.validate_on_submit():
         if form.add_all_products.data:
             for product in group.products:
-                ProductViewProduct(view, product)
+                db.session.add(ProductViewProduct(view, product))
             db.session.commit()
 
         elif form.add_product.data:
-            ProductViewProduct(view, product)
+            db.session.add(ProductViewProduct(view, product))
             db.session.commit()
 
         return redirect(url_for(".product_view", view_id=view.id))
@@ -539,6 +540,7 @@ def product_view_add_voucher(view_id):
             purchases_remaining=form.num_purchases.data,
             tickets_remaining=form.num_tickets.data,
         )
+        db.session.add(voucher)
         db.session.commit()
         flash("Voucher successfully created")
         return redirect(
@@ -649,6 +651,8 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 connection=conn,
                 html_message=html,
             )
+
+            db.session.add(voucher)
             db.session.commit()
             sent_total += sent_count
             added += 1

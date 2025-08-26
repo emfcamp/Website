@@ -155,11 +155,10 @@ def init_workshop_shifts():
             shift.end = proposal.scheduled_time + time_after_start
             shift.min_needed = 1
             shift.max_needed = 1
-            db.session.add(shift)
 
+            db.session.add(shift)
             db.session.commit()
 
-    db.session.commit()
     return redirect(url_for(".schedule"))
 
 

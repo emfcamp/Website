@@ -31,7 +31,6 @@ def send_email(conn, rec):
     )
     if sent_count > 0:
         rec.sent = True
-        db.session.add(rec)
         db.session.commit()
     return sent_count
 
@@ -58,6 +57,5 @@ def send_volunteer_email(conn, rec):
     )
     if sent_count > 0:
         rec.sent = True
-        db.session.add(rec)
         db.session.commit()
     return sent_count

@@ -227,6 +227,7 @@ class Payment(BaseModel):
 
                 purchase.refund_purchase(refund)
 
+        db.session.add(refund)
         self.state = "refunded"
 
     # TESTME
