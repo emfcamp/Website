@@ -9,19 +9,18 @@ from wtforms import (
     SelectMultipleField,
     StringField,
     ValidationError,
+    fields,
 )
-from wtforms.widgets import CheckboxInput, EmailInput, HiddenInput, Input, ListWidget
+from wtforms.widgets import CheckboxInput, HiddenInput, ListWidget
 from wtforms.widgets.core import html_params
 
 
-class EmailField(StringField):
+class EmailField(fields.EmailField):
     """HTML5 email field using the email_validator package to perform
     enhanced email validation.
 
     You don't need to provide additional validators to this field.
     """
-
-    widget = EmailInput()
 
     def pre_validate(self, form):
         try:
@@ -37,7 +36,7 @@ class IntegerSelectField(SelectField):
         kwargs["coerce"] = int
         self.fmt = kwargs.pop("fmt", str)
         self.values = kwargs.pop("values", [])
-        SelectField.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def values(self):
@@ -53,17 +52,11 @@ class HiddenIntegerField(IntegerField):
     widget = HiddenInput()
 
 
-class TelInput(Input):
-    input_type = "tel"
-
-
-class TelField(StringField):
-    widget = TelInput()
-
+class TelField(fields.TelField):
     def __init__(self, *args, **kwargs):
         self.min_length = kwargs.pop("min_length", 8)
         self.max_length = kwargs.pop("max_length", 20)
-        StringField.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def pre_validate(form, field):
         if re.search(r"^\s*$", form.data):
