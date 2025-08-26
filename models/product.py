@@ -488,10 +488,10 @@ class Voucher(BaseModel):
     payment: Mapped[list[Payment]] = relationship(backref="voucher")
 
     # The number of purchases remaining on this voucher
-    purchases_remaining = db.Column(db.Integer, nullable=False, server_default="1")
+    purchases_remaining = db.Column(db.Integer, nullable=False, default=1)
 
     # The number of adult tickets remaining to purchase on this voucher
-    tickets_remaining = db.Column(db.Integer, nullable=False, server_default="2")
+    tickets_remaining = db.Column(db.Integer, nullable=False, default=2)
 
     is_used = column_property((purchases_remaining == 0) | (tickets_remaining == 0))
 
@@ -603,7 +603,7 @@ class ProductView(BaseModel):
     cfp_accepted_only = db.Column(db.Boolean, nullable=False, default=False)
 
     # Whether this productview is only accessible with a voucher associated with this productview
-    vouchers_only = db.Column(db.Boolean, nullable=False, default=False, server_default="False")
+    vouchers_only = db.Column(db.Boolean, nullable=False, default=False)
 
     product_view_products: Mapped[list[ProductViewProduct]] = relationship(
         backref="view",

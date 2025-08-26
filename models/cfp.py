@@ -12,7 +12,7 @@ from geoalchemy2.shape import to_shape
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.mutable import MutableList
 
-from sqlalchemy import UniqueConstraint, func, select, text, or_
+from sqlalchemy import UniqueConstraint, func, select, or_
 from sqlalchemy.orm import column_property, relationship, Mapped
 from slugify.slugify import slugify
 from models import (
@@ -1099,7 +1099,7 @@ class Venue(BaseModel):
     allowed_types = db.Column(
         MutableList.as_mutable(ARRAY(db.String)),
         nullable=False,
-        server_default=text(r"'{}'::varchar[]"),  # TODO(jayaddison): array([], type_=db.String)
+        default=lambda: [],
     )
 
     # What type of proposals are the default for this venue.
@@ -1107,7 +1107,7 @@ class Venue(BaseModel):
     default_for_types = db.Column(
         MutableList.as_mutable(ARRAY(db.String)),
         nullable=False,
-        server_default=text(r"'{}'::varchar[]"),  # TODO(jayaddison): array([], type_=db.String)
+        default=lambda: [],
     )
     priority = db.Column(db.Integer, nullable=True, default=0)
     capacity = db.Column(db.Integer, nullable=True)

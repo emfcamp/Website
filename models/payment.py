@@ -587,7 +587,7 @@ class StripeRefund(Refund):
 class RefundRequest(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"))
-    donation = db.Column(db.Numeric, server_default="0", nullable=False)
+    donation = db.Column(db.Numeric, nullable=False, default=0)
     currency = db.Column(db.String)
     sort_code = db.Column(db.String)
     account = db.Column(db.String)
