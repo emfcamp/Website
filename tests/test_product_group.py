@@ -117,6 +117,7 @@ def test_capacity_propagation(db, parent_group, user):
     product2 = Product(name="product2", parent=parent_group)
     tier3 = PriceTier(name="tier3", parent=product2)
     Price(price_tier=tier3, currency="GBP", price_int=30)
+    db.session.add(tier3)
     db.session.commit()
 
     # Check all our items have the correct initial capacity
