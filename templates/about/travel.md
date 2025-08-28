@@ -4,11 +4,7 @@ title: Travelling to Electromagnetic Field
 
 EMF will be held at the Eastnor Castle Deer Park, just east of Ledbury, Herefordshire.
 
-To experience the full event, you should aim to arrive on Thursday 16 July and depart midday Monday 20 July, with presentations from the 16th-19th. You won't be allowed on site outside of those times unless you've [volunteered](/about/volunteering) to help with setup or teardown.
-
-{# 2024
-You can arrive after 10am on Thursday 30 May and you can stay until midday on Monday 3 June. You won't be allowed on site outside those times unless you've [volunteered](/about/volunteering) to help with setup or teardown.
-#}
+To experience the full event, you should aim to arrive on Thursday 16 July and depart midday Monday 20 July. Our main programme of content will run from Friday morning until Sunday evening. You won't be allowed on site outside of these dates unless you've [volunteered](/about/volunteering) to help with setup or teardown.
 
 ## By Train
 If you are unfamiliar with the UK train system, please refer to [this wikivoyage page](https://en.wikivoyage.org/wiki/Rail_travel_in_Great_Britain) and follow their general guidance.
@@ -34,7 +30,9 @@ Once you're near the site, you'll see yellow temporary road signs for EMF - fol
 
 Unless you are travelling in a live-in vehicle, you will be parked in the main car park which is adjacent to the event site, at most a 300m walk from the main gate. [More information for live-in vehicles](/about/live-in-vehicles).
 
- <!-- We encourage attendees to carpool where possible. There's a [lift sharing](https://wiki.emfcamp.org/wiki/Location/Lift_sharing) page on the wiki to find other people on the same route. -->
+{# 2024
+We encourage attendees to carpool where possible. There's a [lift sharing](https://wiki.emfcamp.org/wiki/Lift_sharing) page on the wiki to find other people on the same route.
+#}
 
 ### Electric Vehicles
 We do not provide electric vehicle charging at EMF. We ask that you arrive at the event with enough charge to leave at the end of the event. We will be able to provide EV charging in an emergency.
@@ -50,5 +48,6 @@ For those travelling long-haul, BHX is likely to be most useful followed by LHR.
 
 ## Between Ledbury and EMF
 We will be providing a free shuttle bus service between Ledbury station and the EMF site during the event, but not during setup and tear down. Ride share services such as Uber and [taxi service](https://www.malvern-taxis.co.uk/ledbury-taxi-service/) are extremely limited and unlikely to be available.
+
 Timetables and further information can be found on the [shuttle bus page](https://bus.emf.camp/about/).
 
