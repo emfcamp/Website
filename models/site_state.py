@@ -1,8 +1,9 @@
 import logging
 
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm.exc import MultipleResultsFound
 
-from main import cache, db
+from main import cache
 
 from . import BaseModel, config_date, naive_utcnow
 from .product import PriceTier, Product, ProductGroup, ProductView, ProductViewProduct
@@ -14,8 +15,9 @@ class SiteState(BaseModel):
     __tablename__ = "site_state"
     __export_data__ = False
     __versioned__: dict = {}
-    name = db.Column(db.String, primary_key=True)
-    state = db.Column(db.String)
+    name: Mapped[str] = mapped_column(primary_key=True)
+    # TODO: probably shouldn't be nullable
+    state: Mapped[str | None] = mapped_column()
 
     def __init__(self, name, state=None):
         self.name = name

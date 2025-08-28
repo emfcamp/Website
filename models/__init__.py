@@ -3,7 +3,7 @@ from collections import OrderedDict
 from datetime import UTC, datetime
 from decimal import Decimal
 from itertools import groupby, pairwise
-from typing import Literal, TypeAlias
+from typing import TYPE_CHECKING, Literal
 
 import datetype
 from dateutil.parser import parse
@@ -17,11 +17,12 @@ from sqlalchemy_continuum.utils import transaction_class, version_class
 
 from main import db
 
-# This alias *was* required to apply type annotations to the model objects,
-# but I don't think it even does that any more.
-# MyPy doesn't support this nested class syntax which flask-sqlalchemy uses,
-# even though type annotations are now present. https://github.com/pallets-eco/flask-sqlalchemy/issues/1112
-BaseModel: TypeAlias = db.Model  # type: ignore[name-defined] # noqa: UP040
+# If we're type checking, we want models to inherit from the BaseModel (trivial subclass
+# of DeclarativeBase) as mypy can't handle using the sqlalchemy-flask generated db.Model
+if TYPE_CHECKING:
+    from main import BaseModel
+else:
+    BaseModel = db.Model
 
 """ Type alias for ISO currency (GBP or EUR currently). """
 

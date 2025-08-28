@@ -17,11 +17,13 @@ granularity is no better than a few minutes.
 """
 
 import logging
+from datetime import datetime, timedelta
 from functools import wraps
+from typing import Any
 
 import pendulum
-from sqlalchemy import text
-from sqlalchemy.orm import Session
+from sqlalchemy import JSON, DateTime, Interval, text
+from sqlalchemy.orm import Mapped, Session, mapped_column
 
 from main import db
 
@@ -46,11 +48,11 @@ class ScheduledTask:
 
 class ScheduledTaskResult(BaseModel):
     __tablename__ = "scheduled_task_result"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    start_time = db.Column(db.DateTime(True), nullable=False)
-    duration = db.Column(db.Interval, nullable=False)
-    result = db.Column(db.JSON, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column()
+    start_time: Mapped[datetime] = mapped_column(DateTime(True))
+    duration: Mapped[timedelta] = mapped_column(Interval)
+    result: Mapped[dict[str, Any]] = mapped_column(JSON)
 
     def __init__(self, job_name):
         self.name = job_name

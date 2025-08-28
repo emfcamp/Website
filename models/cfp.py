@@ -7,13 +7,13 @@ from typing import Optional
 from dateutil.parser import parse as parse_date
 import re
 from itertools import groupby
-from geoalchemy2 import Geometry
+from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import to_shape
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.mutable import MutableList
 
-from sqlalchemy import UniqueConstraint, func, select, or_
-from sqlalchemy.orm import column_property, relationship, Mapped
+from sqlalchemy import Column, ForeignKey, Integer, Table, UniqueConstraint, func, select, or_
+from sqlalchemy.orm import column_property, relationship, Mapped, mapped_column
 from slugify.slugify import slugify
 from models import (
     export_attr_counts,
@@ -34,6 +34,7 @@ from . import BaseModel
 if typing.TYPE_CHECKING:
     from .cfp_tag import Tag
     from .event_tickets import EventTicket
+    from .volunteer.shift import Shift
 
 
 HUMAN_CFP_TYPES: dict[str, str] = {
@@ -320,25 +321,25 @@ class InvalidVenueException(Exception):
     pass
 
 
-FavouriteProposal = db.Table(
+FavouriteProposal = Table(
     "favourite_proposal",
     BaseModel.metadata,
-    db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
-    db.Column(
+    Column("user_id", Integer, ForeignKey("user.id"), primary_key=True),
+    Column(
         "proposal_id",
-        db.Integer,
-        db.ForeignKey("proposal.id"),
+        Integer,
+        ForeignKey("proposal.id"),
         primary_key=True,
         index=True,
     ),
 )
 
 
-ProposalAllowedVenues = db.Table(
+ProposalAllowedVenues = Table(
     "proposal_allowed_venues",
     BaseModel.metadata,
-    db.Column("proposal_id", db.Integer, db.ForeignKey("proposal.id"), primary_key=True),
-    db.Column("venue_id", db.Integer, db.ForeignKey("venue.id"), primary_key=True),
+    Column("proposal_id", Integer, ForeignKey("proposal.id"), primary_key=True),
+    Column("venue_id", Integer, ForeignKey("venue.id"), primary_key=True),
 )
 
 
@@ -346,47 +347,53 @@ class Proposal(BaseModel):
     __versioned__ = {"exclude": ["favourites", "favourite_count"]}
     __tablename__ = "proposal"
 
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    anonymiser_id = db.Column(db.Integer, db.ForeignKey("user.id"), default=None)
-    created = db.Column(db.DateTime, default=naive_utcnow, nullable=False)
-    modified = db.Column(db.DateTime, default=naive_utcnow, nullable=False, onupdate=naive_utcnow)
-    state = db.Column(db.String, nullable=False, default="new")
-    type = db.Column(db.String, nullable=False)  # talk, workshop or installation
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    anonymiser_id: Mapped[int | None] = mapped_column(ForeignKey("user.id"), default=None)
+    created: Mapped[datetime] = mapped_column(default=naive_utcnow)
+    modified: Mapped[datetime] = mapped_column(default=naive_utcnow, onupdate=naive_utcnow)
+    state: Mapped[str] = mapped_column(default="new")
+    type: Mapped[str] = mapped_column()  # talk, workshop or installation
 
     is_accepted: Mapped[bool] = column_property(state.in_(["accepted", "finalised"]))
     should_be_exported: Mapped[bool] = column_property(state.in_(["accepted", "finalised"]))
 
     # Core information
-    title = db.Column(db.String, nullable=False)
-    description = db.Column(db.String, nullable=False)
+    title: Mapped[str] = mapped_column()
+    description: Mapped[str] = mapped_column()
 
-    equipment_required = db.Column(db.String)
-    funding_required = db.Column(db.String)
-    additional_info = db.Column(db.String)
-    length = db.Column(db.String)  # only used for talks and workshops
-    notice_required = db.Column(db.String)
-    private_notes = db.Column(db.String)
+    equipment_required: Mapped[str | None] = mapped_column()
+    funding_required: Mapped[str | None] = mapped_column()
+    additional_info: Mapped[str | None] = mapped_column()
+    length: Mapped[str | None] = mapped_column()  # only used for talks and workshops
+    notice_required: Mapped[str | None] = mapped_column()
+    private_notes: Mapped[str | None] = mapped_column()
 
     tags: Mapped[list[Tag]] = relationship(
-        backref="proposals",
+        back_populates="proposals",
         cascade="all",
         secondary=ProposalTag,
     )
 
     # Flags
-    needs_help = db.Column(db.Boolean, nullable=False, default=False)
-    needs_money = db.Column(db.Boolean, nullable=False, default=False)
-    one_day = db.Column(db.Boolean, nullable=False, default=False)
-    has_rejected_email = db.Column(db.Boolean, nullable=False, default=False)
-    user_scheduled = db.Column(db.Boolean, nullable=False, default=False)
+    needs_help: Mapped[bool] = mapped_column(default=False)
+    needs_money: Mapped[bool] = mapped_column(default=False)
+    one_day: Mapped[bool] = mapped_column(default=False)
+    has_rejected_email: Mapped[bool] = mapped_column(default=False)
+    user_scheduled: Mapped[bool] = mapped_column(default=False)
 
     # References to this table
-    messages: Mapped[list[CFPMessage]] = relationship(backref="proposal")
-    votes: Mapped[list[CFPVote]] = relationship(backref="proposal")
+    messages: Mapped[list[CFPMessage]] = relationship(back_populates="proposal")
+    votes: Mapped[list[CFPVote]] = relationship(back_populates="proposal")
     favourites: Mapped[list[User]] = relationship(
-        secondary=FavouriteProposal, backref=db.backref("favourites")
+        secondary=FavouriteProposal,
+        back_populates="favourites",
     )
+    user: Mapped[User] = relationship(back_populates="proposals", foreign_keys=[user_id])
+    anonymiser: Mapped[User | None] = relationship(
+        back_populates="anonymised_proposals", foreign_keys=[anonymiser_id]
+    )
+    shifts: Mapped[list["Shift"]] = relationship(back_populates="proposal")
 
     # Convenience for individual objects. Use an outerjoin and groupby for more than a few records
     favourite_count = column_property(
@@ -397,53 +404,55 @@ class Proposal(BaseModel):
     )
 
     # Fields for finalised info
-    published_names = db.Column(db.String)
-    published_pronouns = db.Column(db.String)
-    published_title = db.Column(db.String)
-    published_description = db.Column(db.String)
-    arrival_period = db.Column(db.String)
-    departure_period = db.Column(db.String)
-    telephone_number = db.Column(db.String)
-    eventphone_number = db.Column(db.String)
-    may_record = db.Column(db.Boolean)
-    video_privacy = db.Column(db.String)
-    needs_laptop = db.Column(db.Boolean)
-    available_times = db.Column(db.String)
-    family_friendly = db.Column(db.Boolean, default=False)
-    content_note = db.Column(db.String, nullable=True)
+    published_names: Mapped[str | None] = mapped_column()
+    published_pronouns: Mapped[str | None] = mapped_column()
+    published_title: Mapped[str | None] = mapped_column()
+    published_description: Mapped[str | None] = mapped_column()
+    arrival_period: Mapped[str | None] = mapped_column()
+    departure_period: Mapped[str | None] = mapped_column()
+    telephone_number: Mapped[str | None] = mapped_column()
+    eventphone_number: Mapped[str | None] = mapped_column()
+    may_record: Mapped[bool | None] = mapped_column()
+    video_privacy: Mapped[str | None] = mapped_column()
+    needs_laptop: Mapped[bool | None] = mapped_column()
+    available_times: Mapped[str | None] = mapped_column()
+    family_friendly: Mapped[bool | None] = mapped_column(default=False)
+    content_note: Mapped[str | None] = mapped_column()
 
     # Fields for scheduling
     # hide_from_schedule -- do not display this item
-    hide_from_schedule = db.Column(db.Boolean, default=False, nullable=False)
+    hide_from_schedule: Mapped[bool] = mapped_column(default=False)
     # manually_scheduled -- make the scheduler ignore this
-    manually_scheduled = db.Column(db.Boolean, default=False, nullable=False)
+    manually_scheduled: Mapped[bool] = mapped_column(default=False)
     allowed_venues: Mapped[list[Venue]] = relationship(
         secondary=ProposalAllowedVenues,
-        backref="allowed_proposals",
+        back_populates="allowed_proposals",
     )
-    allowed_times = db.Column(db.String, nullable=True)
-    scheduled_duration = db.Column(db.Integer, nullable=True)
-    scheduled_time = db.Column(db.DateTime, nullable=True)
-    scheduled_venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"))
-    potential_time = db.Column(db.DateTime, nullable=True)
-    potential_venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"))
+    allowed_times: Mapped[str | None] = mapped_column()
+    scheduled_duration: Mapped[int | None] = mapped_column()
+    scheduled_time: Mapped[datetime | None] = mapped_column()
+    scheduled_venue_id: Mapped[int | None] = mapped_column(ForeignKey("venue.id"))
+    potential_time: Mapped[datetime | None] = mapped_column()
+    potential_venue_id: Mapped[int | None] = mapped_column(ForeignKey("venue.id"))
 
-    scheduled_venue: Mapped[Venue] = relationship(
-        backref="proposals",
+    scheduled_venue: Mapped[Venue | None] = relationship(
+        back_populates="proposals",
         primaryjoin="Venue.id == Proposal.scheduled_venue_id",
     )
-    potential_venue: Mapped[Venue] = relationship(primaryjoin="Venue.id == Proposal.potential_venue_id")
+    potential_venue: Mapped[Venue | None] = relationship(
+        primaryjoin="Venue.id == Proposal.potential_venue_id"
+    )
 
     # Video stuff
-    c3voc_url = db.Column(db.String)
-    youtube_url = db.Column(db.String)
-    thumbnail_url = db.Column(db.String)
-    video_recording_lost = db.Column(db.Boolean, default=False)
+    c3voc_url: Mapped[str | None] = mapped_column()
+    youtube_url: Mapped[str | None] = mapped_column()
+    thumbnail_url: Mapped[str | None] = mapped_column()
+    video_recording_lost: Mapped[bool | None] = mapped_column(default=False)
 
     type_might_require_ticket = False
-    tickets: Mapped[list[EventTicket]] = relationship(backref="proposal")
+    tickets: Mapped[list[EventTicket]] = relationship(back_populates="proposal")
 
-    __mapper_args__ = {"polymorphic_on": type}
+    __mapper_args__ = {"polymorphic_on": "type"}
 
     @classmethod
     def query_accepted(cls, include_user_scheduled=False):
@@ -843,17 +852,17 @@ class TalkProposal(Proposal):
 class WorkshopProposal(Proposal):
     __mapper_args__ = {"polymorphic_identity": "workshop"}
     human_type = HUMAN_CFP_TYPES["workshop"]
-    attendees = db.Column(db.String)
-    cost = db.Column(db.String)
-    age_range = db.Column(db.String)
-    participant_equipment = db.Column(db.String)
-    published_age_range = db.Column(db.String)
-    published_cost = db.Column(db.String)
-    published_participant_equipment = db.Column(db.String)
+    attendees: Mapped[str | None] = mapped_column()
+    cost: Mapped[str | None] = mapped_column()
+    age_range: Mapped[str | None] = mapped_column()
+    participant_equipment: Mapped[str | None] = mapped_column()
+    published_age_range: Mapped[str | None] = mapped_column()
+    published_cost: Mapped[str | None] = mapped_column()
+    published_participant_equipment: Mapped[str | None] = mapped_column()
 
-    requires_ticket = db.Column(db.Boolean, default=False, nullable=True)
-    total_tickets = db.Column(db.Integer, nullable=True)
-    non_lottery_tickets = db.Column(db.Integer, default=5, nullable=True)
+    requires_ticket: Mapped[bool | None] = mapped_column(default=False)
+    total_tickets: Mapped[int | None] = mapped_column()
+    non_lottery_tickets: Mapped[int | None] = mapped_column(default=5)
     max_tickets_per_person = 2
     type_might_require_ticket = True
 
@@ -880,22 +889,22 @@ class WorkshopProposal(Proposal):
 class YouthWorkshopProposal(WorkshopProposal):
     __mapper_args__ = {"polymorphic_identity": "youthworkshop"}
     human_type = HUMAN_CFP_TYPES["youthworkshop"]
-    valid_dbs = db.Column(db.Boolean, nullable=False, default=False)
+    valid_dbs: Mapped[bool] = mapped_column(default=False)
     max_tickets_per_person = 2
 
 
 class InstallationProposal(Proposal):
     __mapper_args__ = {"polymorphic_identity": "installation"}
     human_type = HUMAN_CFP_TYPES["installation"]
-    size = db.Column(db.String)
-    installation_funding = db.Column(db.String, nullable=True)
+    size: Mapped[str | None] = mapped_column()
+    installation_funding: Mapped[str | None] = mapped_column()
 
 
 class LightningTalkProposal(Proposal):
     __mapper_args__ = {"polymorphic_identity": "lightning"}
     human_type = HUMAN_CFP_TYPES["lightning"]
-    slide_link = db.Column(db.String, nullable=True)
-    session = db.Column(db.String, default="fri")
+    slide_link: Mapped[str | None] = mapped_column()
+    session: Mapped[str | None] = mapped_column(default="fri")
 
     should_be_exported = column_property(
         or_(
@@ -977,15 +986,18 @@ PYTHON_CFP_TYPES = {
 
 class CFPMessage(BaseModel):
     __tablename__ = "cfp_message"
-    id = db.Column(db.Integer, primary_key=True)
-    created = db.Column(db.DateTime, default=naive_utcnow)
-    from_user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    proposal_id = db.Column(db.Integer, db.ForeignKey("proposal.id"), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    created: Mapped[datetime | None] = mapped_column(default=naive_utcnow)
+    from_user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    proposal_id: Mapped[int] = mapped_column(ForeignKey("proposal.id"))
 
-    message = db.Column(db.String, nullable=False)
+    message: Mapped[str] = mapped_column()
     # Flags
-    is_to_admin = db.Column(db.Boolean)
-    has_been_read = db.Column(db.Boolean, default=False)
+    is_to_admin: Mapped[bool | None] = mapped_column()
+    has_been_read: Mapped[bool | None] = mapped_column(default=False)
+
+    from_user: Mapped[User] = relationship(back_populates="messages_from")
+    proposal: Mapped[Proposal] = relationship(back_populates="messages")
 
     def is_user_recipient(self, user):
         """
@@ -1039,17 +1051,20 @@ class CFPMessage(BaseModel):
 class CFPVote(BaseModel):
     __versioned__: dict = {}
     __tablename__ = "cfp_vote"
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    proposal_id = db.Column(db.Integer, db.ForeignKey("proposal.id"), nullable=False)
-    state = db.Column(db.String, nullable=False)
-    has_been_read = db.Column(db.Boolean, nullable=False, default=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    proposal_id: Mapped[int] = mapped_column(ForeignKey("proposal.id"))
+    state: Mapped[str] = mapped_column()
+    has_been_read: Mapped[bool] = mapped_column(default=False)
 
-    created = db.Column(db.DateTime, nullable=False, default=naive_utcnow)
-    modified = db.Column(db.DateTime, nullable=False, default=naive_utcnow, onupdate=naive_utcnow)
+    created: Mapped[datetime] = mapped_column(default=naive_utcnow)
+    modified: Mapped[datetime] = mapped_column(default=naive_utcnow, onupdate=naive_utcnow)
 
-    vote = db.Column(db.Integer)  # Vote can be null for abstentions
-    note = db.Column(db.String)
+    vote: Mapped[int | None] = mapped_column()  # Vote can be null for abstentions
+    note: Mapped[str | None] = mapped_column()
+
+    user: Mapped[User] = relationship(back_populates="votes")
+    proposal: Mapped[Proposal] = relationship(back_populates="votes")
 
     def __init__(self, user: User, proposal: Proposal):
         self.user = user
@@ -1091,32 +1106,37 @@ class Venue(BaseModel):
     __tablename__ = "venue"
     __export_data__ = False
 
-    id = db.Column(db.Integer, primary_key=True)
-    village_id = db.Column(db.Integer, db.ForeignKey("village.id"), nullable=True, default=None)
-    name = db.Column(db.String, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    village_id: Mapped[int | None] = mapped_column(ForeignKey("village.id"), default=None)
+    name: Mapped[str] = mapped_column()
 
     # Which type of proposals are allowed to be scheduled in this venue.
     # (This is not really used yet.)
-    allowed_types = db.Column(
+    allowed_types: Mapped[list[str]] = mapped_column(
         MutableList.as_mutable(ARRAY(db.String)),
-        nullable=False,
         default=lambda: [],
     )
 
     # What type of proposals are the default for this venue.
     # These are where the automatic scheduler will put proposals.
-    default_for_types = db.Column(
+    default_for_types: Mapped[list[str]] = mapped_column(
         MutableList.as_mutable(ARRAY(db.String)),
-        nullable=False,
         default=lambda: [],
     )
-    priority = db.Column(db.Integer, nullable=True, default=0)
-    capacity = db.Column(db.Integer, nullable=True)
-    location = db.Column(Geometry("POINT", srid=4326))
-    scheduled_content_only = db.Column(db.Boolean)
+    priority: Mapped[int | None] = mapped_column(default=0)
+    capacity: Mapped[int | None] = mapped_column()
+    location: Mapped[WKBElement | None] = mapped_column(Geometry("POINT", srid=4326))
+    scheduled_content_only: Mapped[bool | None] = mapped_column()
+
     village: Mapped[Village] = relationship(
-        backref="venues",
+        back_populates="venues",
         primaryjoin="Village.id == Venue.village_id",
+    )
+    proposals: Mapped[list[Proposal]] = relationship(
+        back_populates="scheduled_venue", foreign_keys=[Proposal.scheduled_venue_id]
+    )
+    allowed_proposals: Mapped[list[Proposal]] = relationship(
+        back_populates="allowed_venues", secondary=ProposalAllowedVenues
     )
 
     __table_args__ = (UniqueConstraint("name", name="_venue_name_uniq"),)

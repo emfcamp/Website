@@ -1,18 +1,20 @@
-from sqlalchemy import func, select
-from sqlalchemy.orm import column_property
+from datetime import datetime
 
-from main import db
+from sqlalchemy import ForeignKey, func, select
+from sqlalchemy.orm import Mapped, column_property, mapped_column, relationship
+
+from models.user import User
 
 from . import BaseModel, naive_utcnow
 
 
 class EmailJob(BaseModel):
     __tablename__ = "email_job"
-    id = db.Column(db.Integer, primary_key=True)
-    subject = db.Column(db.String, nullable=False)
-    text_body = db.Column(db.String, nullable=False)
-    html_body = db.Column(db.String, nullable=False)
-    created = db.Column(db.DateTime, default=naive_utcnow, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    subject: Mapped[str] = mapped_column()
+    text_body: Mapped[str] = mapped_column()
+    html_body: Mapped[str] = mapped_column()
+    created: Mapped[datetime] = mapped_column(default=naive_utcnow)
 
     def __init__(self, subject, text_body, html_body):
         self.subject = subject
@@ -31,13 +33,14 @@ class EmailJob(BaseModel):
 
 class EmailJobRecipient(BaseModel):
     __tablename__ = "email_recipient"
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    job_id = db.Column(db.Integer, db.ForeignKey("email_job.id"), nullable=False)
-    sent = db.Column(db.Boolean, default=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    job_id: Mapped[int] = mapped_column(ForeignKey("email_job.id"))
+    # TODO: probably shouldn't be nullable
+    sent: Mapped[bool | None] = mapped_column(default=False)
 
-    user = db.relationship("User")
-    job = db.relationship("EmailJob")
+    user: Mapped[User] = relationship()
+    job: Mapped[EmailJob] = relationship()
 
     def __init__(self, job, user):
         self.job = job
