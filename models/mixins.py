@@ -1,9 +1,9 @@
-from sqlalchemy import FetchedValue, and_, event, func
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import column_property
-from sqlalchemy.orm.attributes import get_history
+from datetime import datetime
 
-from main import db
+from sqlalchemy import JSON, FetchedValue, and_, event, func
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import Mapped, column_property, mapped_column
+from sqlalchemy.orm.attributes import get_history
 
 from .exc import CapacityException
 
@@ -19,10 +19,10 @@ class CapacityMixin:
     """
 
     # A max capacity of None implies no max (or use parent's if set)
-    capacity_max = db.Column(db.Integer, default=None)
-    capacity_used = db.Column(db.Integer, default=0, nullable=False, server_onupdate=FetchedValue())
+    capacity_max: Mapped[int | None] = mapped_column(default=None)
+    capacity_used: Mapped[int] = mapped_column(default=0, server_onupdate=FetchedValue())
 
-    expires = db.Column(db.DateTime)
+    expires: Mapped[datetime | None] = mapped_column()
 
     @declared_attr
     def __expired(cls):
@@ -141,7 +141,7 @@ class InheritedAttributesMixin:
     Objects which inherit this mixin must have a "parent" relationship.
     """
 
-    attributes = db.Column(db.JSON, default={})
+    attributes = mapped_column(JSON, default={})
 
     def get_attribute(self, name, default=None):
         if name in self.attributes:

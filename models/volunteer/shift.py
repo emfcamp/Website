@@ -1,13 +1,21 @@
-from typing import Literal
+from datetime import datetime
+from typing import TYPE_CHECKING, Literal
 
 import pytz
 from pendulum import interval
-from sqlalchemy import func, select, text
+from sqlalchemy import ForeignKey, func, select, text
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import Mapped, column_property, mapped_column, relationship
 
 from main import db
 
 from .. import BaseModel
+
+if TYPE_CHECKING:
+    from ..cfp import Proposal
+    from ..user import User
+    from .role import Role
+    from .venue import VolunteerVenue
 
 event_tz = pytz.timezone("Europe/London")
 
@@ -32,12 +40,12 @@ class ShiftEntry(BaseModel):
     __tablename__ = "volunteer_shift_entry"
     __versioned__: dict = {}
 
-    shift_id = db.Column(db.Integer, db.ForeignKey("volunteer_shift.id"), primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
-    state: ShiftEntryState = db.Column(db.String, default="signed_up")
+    shift_id: Mapped[int] = mapped_column(ForeignKey("volunteer_shift.id"), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
+    state: Mapped[ShiftEntryState | None] = mapped_column(default="signed_up")
 
-    user = db.relationship("User", backref="shift_entries")
-    shift = db.relationship("Shift", backref="entries")
+    user: Mapped["User"] = relationship(back_populates="shift_entries")
+    shift: Mapped["Shift"] = relationship(back_populates="entries")
 
     def set_state(self, state: ShiftEntryState):
         if state not in SHIFT_ENTRY_STATES:
@@ -56,27 +64,29 @@ class Shift(BaseModel):
     __tablename__ = "volunteer_shift"
     __versioned__: dict = {}
 
-    id = db.Column(db.Integer, primary_key=True)
-    role_id = db.Column(db.Integer, db.ForeignKey("volunteer_role.id"), nullable=False)
-    venue_id = db.Column(db.Integer, db.ForeignKey("volunteer_venue.id"), nullable=False)
-    proposal_id = db.Column(db.Integer, db.ForeignKey("proposal.id"), nullable=True)
-    start = db.Column(db.DateTime)
-    end = db.Column(db.DateTime)
-    min_needed = db.Column(db.Integer, nullable=False, default=0)
-    max_needed = db.Column(db.Integer, nullable=False, default=0)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    role_id: Mapped[int] = mapped_column(ForeignKey("volunteer_role.id"))
+    venue_id: Mapped[int] = mapped_column(ForeignKey("volunteer_venue.id"))
+    proposal_id: Mapped[int | None] = mapped_column(ForeignKey("proposal.id"))
+    # TODO: should start and end be not nullable?
+    start: Mapped[datetime | None] = mapped_column()
+    end: Mapped[datetime | None] = mapped_column()
+    min_needed: Mapped[int] = mapped_column(default=0)
+    max_needed: Mapped[int] = mapped_column(default=0)
 
-    role = db.relationship("Role", backref="shifts")
-    venue = db.relationship("VolunteerVenue", backref="shifts")
-    proposal = db.relationship("Proposal", backref="shift")
+    role: Mapped["Role"] = relationship(back_populates="shifts")
+    venue: Mapped["VolunteerVenue"] = relationship(back_populates="shifts")
+    proposal: Mapped["Proposal"] = relationship(back_populates="shifts")
+    entries: Mapped[list[ShiftEntry]] = relationship(back_populates="shift")
 
-    current_count = db.column_property(
+    current_count = column_property(
         select(func.count(ShiftEntry.shift_id))
         .where(ShiftEntry.shift_id == id)
         .correlate_except(ShiftEntry)  # type: ignore[arg-type]
         .scalar_subquery()  # type: ignore[attr-defined]
     )
 
-    duration = db.column_property(end - start)
+    duration = column_property(end - start)
 
     volunteers = association_proxy("entries", "user")
 

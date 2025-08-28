@@ -1,5 +1,8 @@
 from random import choices
 
+from sqlalchemy import ForeignKey, func, select
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from main import db
 
 from . import BaseModel, bucketise, export_attr_counts
@@ -42,13 +45,16 @@ class EventTicketException(Exception):
 class EventTicket(BaseModel):
     __tablename__ = "event_ticket"
 
-    id = db.Column(db.Integer, primary_key=True)
-    state = db.Column(db.String, nullable=False)
-    proposal_id = db.Column(db.Integer, db.ForeignKey("proposal.id"), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    rank = db.Column(db.Integer, nullable=True)
-    ticket_count = db.Column(db.Integer, nullable=False, default=1)
-    ticket_codes = db.Column(db.String, nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    state: Mapped[str] = mapped_column()
+    proposal_id: Mapped[int] = mapped_column(ForeignKey("proposal.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    rank: Mapped[int | None] = mapped_column()
+    ticket_count: Mapped[int] = mapped_column(default=1)
+    ticket_codes: Mapped[str | None] = mapped_column()
+
+    proposal: Mapped[Proposal] = relationship(back_populates="tickets")
+    user: Mapped[User] = relationship(back_populates="event_tickets")
 
     def __init__(self, user_id, proposal_id, state, ticket_count=1, rank=None):
         if state not in EVENT_TICKET_STATES:
@@ -185,18 +191,16 @@ class EventTicket(BaseModel):
     @classmethod
     def get_export_data(cls):
         user_count_subq = (
-            db.select(cls.user_id, db.func.count().label("user_count")).group_by(cls.user_id).subquery()
+            select(cls.user_id, func.count().label("user_count")).group_by(cls.user_id).subquery()
         )
-        user_count_q = db.select(user_count_subq.c.user_count, db.func.count()).group_by(
+        user_count_q = select(user_count_subq.c.user_count, func.count()).group_by(
             user_count_subq.c.user_count
         )
 
         proposal_count_subq = (
-            db.select(cls.proposal_id, db.func.count().label("proposal_count"))
-            .group_by(cls.proposal_id)
-            .subquery()
+            select(cls.proposal_id, func.count().label("proposal_count")).group_by(cls.proposal_id).subquery()
         )
-        proposal_count_q = db.select(proposal_count_subq.c.proposal_count, db.func.count()).group_by(
+        proposal_count_q = select(proposal_count_subq.c.proposal_count, func.count()).group_by(
             proposal_count_subq.c.proposal_count
         )
 

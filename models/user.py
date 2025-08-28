@@ -13,9 +13,9 @@ from datetime import datetime, timedelta
 from flask import current_app as app
 from flask import session
 from flask_login import AnonymousUserMixin, UserMixin
-from sqlalchemy import Index, Table, func, text
+from sqlalchemy import Column, ForeignKey, Index, Integer, Table, func, text
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import Mapped, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm.exc import NoResultFound
 
 from loggingmanager import set_user_id
@@ -26,6 +26,7 @@ from .permission import Permission, UserPermission
 from .volunteer.shift import ShiftEntry
 
 if typing.TYPE_CHECKING:
+    from .admin_message import AdminMessage
     from .cfp import CFPMessage, CFPVote
     from .cfp_tag import Tag
     from .diversity import UserDiversity
@@ -33,6 +34,7 @@ if typing.TYPE_CHECKING:
     from .payment import Payment
     from .purchase import AdmissionTicket, Purchase, PurchaseTransfer, Ticket
     from .village import VillageMember
+    from .volunteer import RoleAdmin, Volunteer
 
 CHECKIN_CODE_LEN = 16
 checkin_code_re = rf"[0-9a-zA-Z_-]{{{CHECKIN_CODE_LEN}}}"
@@ -178,11 +180,11 @@ def verify_checkin_code(key, uid):
     return verify_unlimited_short_hmac("checkin-", key, uid)
 
 
-CFPReviewerTags: Table = db.Table(
+CFPReviewerTags = Table(
     "cfp_reviewer_tags",
     BaseModel.metadata,
-    db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
-    db.Column("tag_id", db.Integer, db.ForeignKey("tag.id"), primary_key=True),
+    Column("user_id", Integer, ForeignKey("user.id"), primary_key=True),
+    Column("tag_id", Integer, ForeignKey("tag.id"), primary_key=True),
 )
 
 
@@ -190,55 +192,59 @@ class User(BaseModel, UserMixin):
     __tablename__ = "user"
     __versioned__ = {"exclude": ["favourites"]}
 
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String, unique=True, index=True)
-    name = db.Column(db.String, nullable=False, index=True)
-    company = db.Column(db.String)
-    will_have_ticket = db.Column(db.Boolean, nullable=False, default=False)  # for CfP filtering
-    checkin_note = db.Column(db.String, nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str | None] = mapped_column(unique=True, index=True)
+    name: Mapped[str] = mapped_column(index=True)
+    company: Mapped[str | None] = mapped_column()
+    will_have_ticket: Mapped[bool] = mapped_column(default=False)  # for CfP filtering
+    checkin_note: Mapped[str | None] = mapped_column()
     # Whether the user has opted in to receive promo emails after this event:
-    promo_opt_in = db.Column(db.Boolean, nullable=False, default=False)
+    promo_opt_in: Mapped[bool] = mapped_column(default=False)
 
-    cfp_invite_reason = db.Column(db.String, nullable=True)
+    cfp_invite_reason: Mapped[str | None] = mapped_column()
 
     cfp_reviewer_tags: Mapped[list[Tag]] = relationship(
-        backref="reviewers",
+        back_populates="reviewers",
         cascade="all",
         secondary=CFPReviewerTags,
     )
 
-    diversity: Mapped[UserDiversity] = relationship(backref="user", cascade="all, delete-orphan")
-    shipping: Mapped[UserShipping] = relationship(backref="user", cascade="all, delete-orphan")
-    payments: Mapped[list[Payment]] = relationship(lazy="dynamic", backref="user", cascade="all")
+    diversity: Mapped[UserDiversity | None] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    shipping: Mapped[UserShipping | None] = relationship(back_populates="user", cascade="all, delete-orphan")
+    payments: Mapped[list[Payment]] = relationship(lazy="dynamic", back_populates="user", cascade="all")
     permissions: Mapped[list[Permission]] = relationship(
-        "Permission",
-        backref="user",
+        back_populates="user",
         cascade="all",
         secondary=UserPermission,
         lazy="joined",
     )
-    votes: Mapped[list[CFPVote]] = relationship(backref="user", lazy="dynamic")
+    votes: Mapped[list[CFPVote]] = relationship(back_populates="user", lazy="dynamic")
 
     proposals: Mapped[list[Proposal]] = relationship(
         primaryjoin="Proposal.user_id == User.id",
-        backref="user",
+        back_populates="user",
         lazy="dynamic",
         cascade="all, delete-orphan",
     )
     anonymised_proposals: Mapped[list[Proposal]] = relationship(
         primaryjoin="Proposal.anonymiser_id == User.id",
-        backref="anonymiser",
+        back_populates="anonymiser",
         lazy="dynamic",
         cascade="all, delete-orphan",
+    )
+    favourites: Mapped[list[Proposal]] = relationship(
+        back_populates="favourites", secondary="favourite_proposal"
     )
 
     messages_from: Mapped[list[CFPMessage]] = relationship(
         primaryjoin="CFPMessage.from_user_id == User.id",
-        backref="from_user",
+        back_populates="from_user",
         lazy="dynamic",
     )
 
-    event_tickets: Mapped[list[EventTicket]] = relationship(backref="user", lazy="dynamic")
+    event_tickets: Mapped[list[EventTicket]] = relationship(back_populates="user", lazy="dynamic")
 
     purchases: Mapped[list[Purchase]] = relationship(
         lazy="dynamic", primaryjoin="Purchase.purchaser_id == User.id"
@@ -259,13 +265,13 @@ class User(BaseModel, UserMixin):
     )
 
     transfers_to: Mapped[list[PurchaseTransfer]] = relationship(
-        backref="to_user",
+        back_populates="to_user",
         lazy="dynamic",
         primaryjoin="PurchaseTransfer.to_user_id == User.id",
         cascade="all, delete-orphan",
     )
     transfers_from: Mapped[list[PurchaseTransfer]] = relationship(
-        backref="from_user",
+        back_populates="from_user",
         lazy="dynamic",
         primaryjoin="PurchaseTransfer.from_user_id == User.id",
         cascade="all, delete-orphan",
@@ -277,6 +283,12 @@ class User(BaseModel, UserMixin):
         uselist=False,
     )
     village = association_proxy("village_membership", "village")
+
+    admin_messages: Mapped[list[AdminMessage]] = relationship("AdminMessage", back_populates="creator")
+
+    volunteer: Mapped[Volunteer | None] = relationship(back_populates="user")
+    volunteer_admin_roles: Mapped[list[RoleAdmin]] = relationship(back_populates="user")
+    shift_entries: Mapped[list[ShiftEntry]] = relationship(back_populates="user")
 
     def __init__(self, email: str, name: str):
         self.email = email
@@ -430,13 +442,15 @@ Index("ix_user_name_tsearch", text("to_tsvector('simple', name)"), postgresql_us
 
 class UserShipping(BaseModel):
     __tablename__ = "shipping"
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True)
-    name = db.Column(db.String)
-    address_1 = db.Column(db.String)
-    address_2 = db.Column(db.String)
-    town = db.Column(db.String)
-    postcode = db.Column(db.String)
-    country = db.Column(db.String)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
+    name: Mapped[str | None] = mapped_column()
+    address_1: Mapped[str | None] = mapped_column()
+    address_2: Mapped[str | None] = mapped_column()
+    town: Mapped[str | None] = mapped_column()
+    postcode: Mapped[str | None] = mapped_column()
+    country: Mapped[str | None] = mapped_column()
+
+    user: Mapped[User] = relationship(back_populates="shipping")
 
 
 class AnonymousUser(AnonymousUserMixin):

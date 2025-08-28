@@ -1,55 +1,58 @@
 from collections import defaultdict
+from typing import TYPE_CHECKING
 
 from flask_login import UserMixin
-from sqlalchemy.orm import backref
-
-from main import db
+from sqlalchemy import Column, ForeignKey, Integer, Table
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .. import BaseModel
 from .shift import ShiftEntry
 
+if TYPE_CHECKING:
+    from ..user import User
+    from .role import Role
+
 # This effectively records the roles that a volunteer is interested in
-VolunteerRoleInterest = db.Table(
+VolunteerRoleInterest = Table(
     "volunteer_role_interest",
-    db.Model.metadata,
-    db.Column("volunteer_id", db.Integer, db.ForeignKey("volunteer.id"), primary_key=True),
-    db.Column("role_id", db.Integer, db.ForeignKey("volunteer_role.id"), primary_key=True),
+    BaseModel.metadata,
+    Column("volunteer_id", Integer, ForeignKey("volunteer.id"), primary_key=True),
+    Column("role_id", Integer, ForeignKey("volunteer_role.id"), primary_key=True),
 )
 
 
 # Which roles has the volunteer been trained for
-VolunteerRoleTraining = db.Table(
+VolunteerRoleTraining = Table(
     "volunteer_role_training",
-    db.Model.metadata,
-    db.Column("volunteer_id", db.Integer, db.ForeignKey("volunteer.id"), primary_key=True),
-    db.Column("role_id", db.Integer, db.ForeignKey("volunteer_role.id"), primary_key=True),
+    BaseModel.metadata,
+    Column("volunteer_id", Integer, ForeignKey("volunteer.id"), primary_key=True),
+    Column("role_id", Integer, ForeignKey("volunteer_role.id"), primary_key=True),
 )
 
 
 class Volunteer(BaseModel, UserMixin):
-    __table_name__ = "volunteer"
+    __tablename__ = "volunteer"
     __versioned__: dict = {}
 
-    id = db.Column(db.Integer, primary_key=True)
-    nickname = db.Column(db.String)
-    banned = db.Column(db.Boolean, nullable=False, default=False)
-    volunteer_phone = db.Column(db.String)
-    volunteer_email = db.Column(db.String)
-    over_18 = db.Column(db.Boolean, nullable=False, default=False)
-    allow_comms_during_event = db.Column(db.Boolean, nullable=False, default=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    nickname: Mapped[str | None] = mapped_column()
+    banned: Mapped[bool] = mapped_column(default=False)
+    volunteer_phone: Mapped[str | None] = mapped_column()
+    volunteer_email: Mapped[str | None] = mapped_column()
+    over_18: Mapped[bool] = mapped_column(default=False)
+    allow_comms_during_event: Mapped[bool] = mapped_column(default=False)
 
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    user = db.relationship("User", backref=backref("volunteer", uselist=False))
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
-    interested_roles = db.relationship(
-        "Role",
-        backref="interested_volunteers",
+    user: Mapped["User"] = relationship(back_populates="volunteer")
+
+    interested_roles: Mapped[list["Role"]] = relationship(
+        back_populates="interested_volunteers",
         secondary=VolunteerRoleInterest,
         lazy="dynamic",
     )
-    trained_roles = db.relationship(
-        "Role",
-        backref="trained_volunteers",
+    trained_roles: Mapped[list["Role"]] = relationship(
+        back_populates="trained_volunteers",
         secondary=VolunteerRoleTraining,
         lazy="dynamic",
     )
@@ -97,10 +100,10 @@ class Volunteer(BaseModel, UserMixin):
 
 """
 class Messages(db.Model):
-    from_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    to_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    sent = db.Column(db.DateTime)
-    text = db.Column(db.String)
-    is_read = db.Column(db.Boolean, nullable=False, default=False)
-    shift_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    from_user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
+    to_user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
+    sent: Mapped[datetime | None] = mapped_column()
+    text: Mapped[str] = mapped_column()
+    is_read: Mapped[bool] = mapped_column(default=False)
+    shift_id: Mapped[int | None] = mapped_column(ForeignKey('user.id'))
 """
