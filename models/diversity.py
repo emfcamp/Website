@@ -3,8 +3,10 @@ from collections import defaultdict
 from re import Pattern
 
 from flask import current_app as app
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from main import db
+from models.user import User
 
 from . import BaseModel
 
@@ -96,12 +98,14 @@ def guess_ethnicity(ethnicity_str: str) -> str:
 
 class UserDiversity(BaseModel):
     __tablename__ = "diversity"
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True)
-    age = db.Column(db.String)
-    gender = db.Column(db.String)
-    ethnicity = db.Column(db.String)
-    disability = db.Column(db.String)
-    sexuality = db.Column(db.String)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
+    age: Mapped[str | None] = mapped_column()
+    gender: Mapped[str | None] = mapped_column()
+    ethnicity: Mapped[str | None] = mapped_column()
+    disability: Mapped[str | None] = mapped_column()
+    sexuality: Mapped[str | None] = mapped_column()
+
+    user: Mapped[User] = relationship(back_populates="diversity")
 
     @classmethod
     def get_export_data(cls):

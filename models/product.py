@@ -6,13 +6,20 @@ import re
 import string
 from collections import defaultdict
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING, cast
 
-from sqlalchemy import UniqueConstraint, func, inspect
+from sqlalchemy import ForeignKey, Numeric, UniqueConstraint, func, inspect
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import InstanceState, Mapped, column_property, relationship, validates
+from sqlalchemy.orm import (
+    InstanceState,
+    Mapped,
+    column_property,
+    mapped_column,
+    relationship,
+    validates,
+)
 
 from main import db
 
@@ -92,17 +99,19 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
 
     __tablename__ = "product_group"
 
-    id = db.Column(db.Integer, primary_key=True)
-    parent_id = db.Column(db.Integer, db.ForeignKey("product_group.id"))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    parent_id: Mapped[int | None] = mapped_column(ForeignKey("product_group.id"))
     # Whether this is a ticket or hire item.
-    type = db.Column(db.String, nullable=False)
-    name = db.Column(db.String, unique=True, nullable=False)
+    type: Mapped[str] = mapped_column()
+    name: Mapped[str] = mapped_column(unique=True)
 
-    products: Mapped[list[Product]] = relationship(backref="parent", cascade="all", order_by="Product.id")
+    products: Mapped[list[Product]] = relationship(
+        back_populates="parent", cascade="all", order_by="Product.id"
+    )
+    parent: Mapped[ProductGroup | None] = relationship(back_populates="children", remote_side=[id])
     children: Mapped[list[ProductGroup]] = relationship(
-        backref=db.backref("parent", remote_side=[id]),
         cascade="all",
-        order_by="ProductGroup.id",
+        order_by=id,
     )
 
     def __init__(self, type=None, parent=None, parent_id=None, **kwargs):
@@ -253,20 +262,25 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
 class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
     """A product (ticket or other item) which is for sale."""
 
-    id = db.Column(db.Integer, primary_key=True)
-    group_id = db.Column(db.Integer, db.ForeignKey(ProductGroup.id), nullable=False)
-    name = db.Column(db.String, nullable=False)
-    display_name = db.Column(db.String)
-    description = db.Column(db.String)
+    __tablename__ = "product"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    group_id: Mapped[int] = mapped_column(ForeignKey(ProductGroup.id))
+    name: Mapped[str] = mapped_column()
+    display_name: Mapped[str | None] = mapped_column()
+    description: Mapped[str | None] = mapped_column()
+
     price_tiers: Mapped[list[PriceTier]] = relationship(
-        backref="parent", cascade="all", order_by="PriceTier.id"
+        back_populates="parent", cascade="all", order_by="PriceTier.id"
     )
     product_view_products: Mapped[list[ProductViewProduct]] = relationship(
-        backref="product", cascade="all, delete-orphan"
+        back_populates="product", cascade="all, delete-orphan"
     )
     arrivals_view_products: Mapped[list[ArrivalsViewProduct]] = relationship(
-        backref="product", cascade="all, delete-orphan"
+        back_populates="product", cascade="all, delete-orphan"
     )
+    purchases: Mapped[list[Purchase]] = relationship(back_populates="product")
+    parent: Mapped[ProductGroup] = relationship(back_populates="products")
 
     __table_args__ = (UniqueConstraint("name", "group_id"),)
     __export_data__ = False  # Exported by ProductGroup
@@ -345,18 +359,24 @@ class PriceTier(BaseModel, CapacityMixin):
     For now, only one PriceTier is active (unexpired) per Product at once.
     """
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey(Product.id), nullable=False)
+    __tablename__ = "price_tier"
 
-    personal_limit = db.Column(db.Integer, default=10, nullable=False)
-    active = db.Column(db.Boolean, default=True, nullable=False)
-    vat_rate = db.Column(db.Numeric(4, 3), nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column()
+    product_id: Mapped[int] = mapped_column(ForeignKey(Product.id))
+
+    personal_limit: Mapped[int] = mapped_column(default=10)
+    active: Mapped[bool] = mapped_column(default=True)
+    vat_rate: Mapped[Decimal | None] = mapped_column(Numeric(4, 3))
 
     __table_args__ = (UniqueConstraint("name", "product_id"),)
     __export_data__ = False  # Exported by ProductGroup
 
-    prices: Mapped[list[Price]] = relationship(backref="price_tier", cascade="all", order_by="Price.id")
+    prices: Mapped[list[Price]] = relationship(
+        back_populates="price_tier", cascade="all", order_by="Price.id"
+    )
+    purchases: Mapped[list[Purchase]] = relationship(back_populates="price_tier")
+    parent: Mapped[Product] = relationship(back_populates="price_tiers")
 
     def __init__(self, name=None, **kwargs):
         super().__init__(name=name, **kwargs)
@@ -428,10 +448,13 @@ class Price(BaseModel):
     __tablename__ = "price"
     __export_data__ = False  # Exported by ProductGroup
 
-    id = db.Column(db.Integer, primary_key=True)
-    price_tier_id = db.Column(db.Integer, db.ForeignKey("price_tier.id"), nullable=False)
-    currency: Currency = db.Column(db.String, nullable=False)
-    price_int = db.Column(db.Integer, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    price_tier_id: Mapped[int] = mapped_column(ForeignKey("price_tier.id"))
+    currency: Mapped[Currency] = mapped_column()
+    price_int: Mapped[int] = mapped_column()
+
+    purchases: Mapped[list[Purchase]] = relationship(back_populates="price")
+    price_tier: Mapped[list[PriceTier]] = relationship(back_populates="prices")
 
     def __init__(self, currency, value=None, **kwargs):
         super().__init__(currency=currency.upper(), **kwargs)
@@ -478,20 +501,21 @@ class Voucher(BaseModel):
     __tablename__ = "voucher"
     __export_data__ = False  # Exported by ProductView
 
-    code = db.Column(db.String, primary_key=True)
-    expiry = db.Column(db.DateTime, nullable=True)
+    code: Mapped[str] = mapped_column(primary_key=True)
+    expiry: Mapped[datetime | None] = mapped_column()
 
-    email = db.Column(db.String, nullable=True, index=True)
+    email: Mapped[str | None] = mapped_column(index=True)
 
-    product_view_id = db.Column(db.Integer, db.ForeignKey("product_view.id"))
-
-    payment: Mapped[list[Payment]] = relationship(backref="voucher")
+    product_view_id: Mapped[int | None] = mapped_column(ForeignKey("product_view.id"))
 
     # The number of purchases remaining on this voucher
-    purchases_remaining = db.Column(db.Integer, nullable=False, default=1)
+    purchases_remaining: Mapped[int] = mapped_column(default=1)
 
     # The number of adult tickets remaining to purchase on this voucher
-    tickets_remaining = db.Column(db.Integer, nullable=False, default=2)
+    tickets_remaining: Mapped[int] = mapped_column(default=2)
+
+    payment: Mapped[list[Payment]] = relationship(back_populates="voucher")
+    view: Mapped[ProductView | None] = relationship(back_populates="vouchers")
 
     is_used = column_property((purchases_remaining == 0) | (tickets_remaining == 0))
 
@@ -593,25 +617,27 @@ class Voucher(BaseModel):
 class ProductView(BaseModel):
     """A selection of products to be shown together for sale."""
 
-    __table_name__ = "product_view"
+    __tablename__ = "product_view"
 
-    id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String, nullable=False)
-    name = db.Column(db.String, nullable=False, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    type: Mapped[str] = mapped_column()
+    name: Mapped[str] = mapped_column(index=True)
 
     # Whether this productview is only accessible to users with an accepted CfP proposal
-    cfp_accepted_only = db.Column(db.Boolean, nullable=False, default=False)
+    cfp_accepted_only: Mapped[bool] = mapped_column(default=False)
 
     # Whether this productview is only accessible with a voucher associated with this productview
-    vouchers_only = db.Column(db.Boolean, nullable=False, default=False)
+    vouchers_only: Mapped[bool] = mapped_column(default=False)
 
     product_view_products: Mapped[list[ProductViewProduct]] = relationship(
-        backref="view",
+        back_populates="view",
         order_by="ProductViewProduct.order",
         cascade="all, delete-orphan",
     )
 
-    vouchers: Mapped[list[Voucher]] = relationship(backref="view", cascade="all, delete-orphan", lazy=True)
+    vouchers: Mapped[list[Voucher]] = relationship(
+        back_populates="view", cascade="all, delete-orphan", lazy=True
+    )
 
     products = association_proxy("product_view_products", "product")
 
@@ -671,13 +697,16 @@ class ProductView(BaseModel):
 
 
 class ProductViewProduct(BaseModel):
-    __table_name__ = "product_view_product"
+    __tablename__ = "product_view_product"
     __export_data__ = False  # Exported by ProductView
 
-    view_id = db.Column(db.Integer, db.ForeignKey(ProductView.id), primary_key=True)
-    product_id = db.Column(db.Integer, db.ForeignKey(Product.id), primary_key=True)
+    view_id: Mapped[int] = mapped_column(ForeignKey(ProductView.id), primary_key=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey(Product.id), primary_key=True)
 
-    order = db.Column(db.Integer, nullable=False, default=0)
+    order: Mapped[int] = mapped_column(default=0)
+
+    view: Mapped[ProductView] = relationship(back_populates="product_view_products")
+    product: Mapped[Product] = relationship(back_populates="product_view_products")
 
     def __init__(self, view, product, order=None):
         self.view = view

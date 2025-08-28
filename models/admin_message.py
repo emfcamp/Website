@@ -1,10 +1,12 @@
+from datetime import datetime
+
 import pendulum
-from sqlalchemy import or_
+from sqlalchemy import ForeignKey, or_
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.functions import func
 
-from main import db
-
 from . import BaseModel, naive_utcnow
+from .user import User
 
 INITIAL_TOPICS = {
     "heralds",
@@ -17,20 +19,20 @@ class AdminMessage(BaseModel):
     __tablename__ = "admin_message"
     __versioned__: dict = {}
 
-    id = db.Column(db.Integer, primary_key=True)
-    message = db.Column(db.String, nullable=False)
-    show = db.Column(db.Boolean, nullable=False, default=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    message: Mapped[str] = mapped_column()
+    show: Mapped[bool] = mapped_column(default=False)
 
-    topic = db.Column(db.String, nullable=True)
+    topic: Mapped[str | None] = mapped_column()
 
-    end = db.Column(db.DateTime)
+    end: Mapped[datetime | None] = mapped_column()
 
-    created_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    created_by: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
-    created = db.Column(db.DateTime, default=naive_utcnow, nullable=False)
-    modified = db.Column(db.DateTime, default=naive_utcnow, nullable=False, onupdate=naive_utcnow)
+    created: Mapped[datetime] = mapped_column(default=naive_utcnow)
+    modified: Mapped[datetime] = mapped_column(default=naive_utcnow, onupdate=naive_utcnow)
 
-    creator = db.relationship("User", backref="admin_messages")
+    creator: Mapped[User] = relationship(back_populates="admin_messages")
 
     def __init__(self, message, user, end=None, show=False, topic=None):
         self.message = message

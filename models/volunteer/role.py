@@ -1,26 +1,42 @@
 from itertools import groupby
 from operator import itemgetter
+from typing import TYPE_CHECKING
 
 from markdown import markdown
 from markupsafe import Markup
+from sqlalchemy import ForeignKey, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from main import db
 
 from .. import BaseModel
-from .volunteer import VolunteerRoleInterest, VolunteerRoleTraining
+from .volunteer import Volunteer, VolunteerRoleInterest, VolunteerRoleTraining
+
+if TYPE_CHECKING:
+    from ..user import User
+    from .shift import Shift
 
 
 class Role(BaseModel):
     __tablename__ = "volunteer_role"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False, unique=True, index=True)
-    description = db.Column(db.String)
-    full_description_md = db.Column(db.Text)
-    instructions_url = db.Column(db.String)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True, index=True)
+    description: Mapped[str | None] = mapped_column()
+    full_description_md: Mapped[str | None] = mapped_column(Text)
+    instructions_url: Mapped[str | None] = mapped_column()
     # Things to know for the shift
-    role_notes = db.Column(db.String)
-    over_18_only = db.Column(db.Boolean, nullable=False, default=False)
-    requires_training = db.Column(db.Boolean, nullable=False, default=False)
+    role_notes: Mapped[str | None] = mapped_column()
+    over_18_only: Mapped[bool] = mapped_column(default=False)
+    requires_training: Mapped[bool] = mapped_column(default=False)
+
+    admins: Mapped[list["RoleAdmin"]] = relationship(back_populates="role")
+    shifts: Mapped[list["Shift"]] = relationship(back_populates="role")
+    interested_volunteers: Mapped[list["Volunteer"]] = relationship(
+        back_populates="interested_roles", secondary=VolunteerRoleInterest
+    )
+    trained_volunteers: Mapped[list["Volunteer"]] = relationship(
+        back_populates="trained_roles", secondary=VolunteerRoleTraining
+    )
 
     def __repr__(self):
         return f"<VolunteerRole {self.name}>"
@@ -114,16 +130,18 @@ class RolePermission(BaseModel):
     __versioned__: dict = {}
     __tablename__ = "volunteer_role_permission"
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # TODO: shouldn't be nullable
+    name: Mapped[str | None] = mapped_column(unique=True, index=True)
 
 
 class RoleAdmin(BaseModel):
     __tablename__ = "volunteer_role_admin"
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True)
-    user = db.relationship("User", backref="volunteer_admin_roles")
-    role_id = db.Column(db.Integer, db.ForeignKey("volunteer_role.id"), nullable=False, primary_key=True)
-    role = db.relationship("Role", backref="admins")
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
+    role_id: Mapped[int] = mapped_column(ForeignKey("volunteer_role.id"), primary_key=True)
+
+    user: Mapped["User"] = relationship(back_populates="volunteer_admin_roles")
+    role: Mapped[Role] = relationship(back_populates="admins")
 
 
 """
@@ -137,18 +155,18 @@ Qualifications include:
 
 class Qual(db.Model):
     __tablename__ = 'volunteer_qual'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True, index=True)
 
 class RoleQuals(db.Model):
     __tablename__ = 'volunteer_role_qual'
-    role_id = db.Column(db.Integer, db.ForeignKey('role.id'), primary_key=True)
-    qual_id = db.Column(db.Integer, db.ForeignKey('qual.id'), primary_key=True)
-    required = db.Column(db.Boolean, nullable=False, default=False)
-    self_certified = db.Column(db.Boolean, nullable=False, default=False)
+    role_id: Mapped[int] = mapped_column(ForeignKey('role.id'), primary_key=True)
+    qual_id: Mapped[int] = mapped_column(ForeignKey('qual.id'), primary_key=True)
+    required: Mapped[bool] = mapped_column(default=False)
+    self_certified: Mapped[bool] = mapped_column(default=False)
 
 class UserQuals(db.Model):
     __tablename__ = 'user_role_qual'
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    qual_id = db.Column(db.Integer, db.ForeignKey('qual.id'), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('user.id'), primary_key=True)
+    qual_id: Mapped[int] = mapped_column(ForeignKey('qual.id'), primary_key=True)
 """

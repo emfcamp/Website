@@ -1,7 +1,9 @@
+from sqlalchemy import ForeignKey
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import Mapped, mapped_column, relationship, selectinload
 
 from main import db
+from models.permission import Permission
 
 from . import BaseModel
 from .product import Product
@@ -13,15 +15,18 @@ class ArrivalsView(BaseModel):
     __tablename__ = "arrivals_view"
     __versioned__: dict = {}
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(index=True)
 
-    required_permission_id = db.Column(db.Integer, db.ForeignKey("permission.id"), index=True, nullable=False)
-    required_permission = db.relationship("Permission")
+    required_permission_id: Mapped[int] = mapped_column(
+        ForeignKey("permission.id"),
+        index=True,
+    )
+    required_permission: Mapped[Permission] = relationship()
 
-    arrivals_view_products = db.relationship(
+    arrivals_view_products: Mapped[list["ArrivalsViewProduct"]] = relationship(
         "ArrivalsViewProduct",
-        backref="view",
+        back_populates="view",
         cascade="all, delete-orphan",
     )
 
@@ -45,11 +50,14 @@ class ArrivalsView(BaseModel):
 
 
 class ArrivalsViewProduct(BaseModel):
-    __table_name__ = "arrivals_view_product"
+    __tablename__ = "arrivals_view_product"
     __export_data__ = False  # Exported by ArrivalsView
 
-    view_id = db.Column(db.Integer, db.ForeignKey(ArrivalsView.id), primary_key=True)
-    product_id = db.Column(db.Integer, db.ForeignKey(Product.id), primary_key=True)
+    view_id: Mapped[int] = mapped_column(ForeignKey(ArrivalsView.id), primary_key=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey(Product.id), primary_key=True)
+
+    view: Mapped[ArrivalsView] = relationship(back_populates="arrivals_view_products")
+    product: Mapped[Product] = relationship(back_populates="arrivals_view_products")
 
     def __init__(self, view, product):
         self.view = view

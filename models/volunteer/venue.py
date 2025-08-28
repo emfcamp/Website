@@ -1,13 +1,21 @@
-from main import db
+from typing import TYPE_CHECKING
+
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .. import BaseModel
+
+if TYPE_CHECKING:
+    from .shift import Shift
 
 
 class VolunteerVenue(BaseModel):
     __tablename__ = "volunteer_venue"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True, index=True)
-    mapref = db.Column(db.String)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # TODO: shouldn't be nullable
+    name: Mapped[str | None] = mapped_column(unique=True, index=True)
+    mapref: Mapped[str | None] = mapped_column()
+
+    shifts: Mapped[list["Shift"]] = relationship(back_populates="venue")
 
     def __repr__(self):
         return f"<VolunteerVenue {self.name}>"

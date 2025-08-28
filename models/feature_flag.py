@@ -1,4 +1,6 @@
-from main import cache, db
+from sqlalchemy.orm import Mapped, mapped_column
+
+from main import cache
 
 from . import BaseModel
 
@@ -30,8 +32,8 @@ class FeatureFlag(BaseModel):
     __tablename__ = "feature_flag"
     __export_data__ = False
     __versioned__: dict = {}
-    feature = db.Column(db.String, primary_key=True)
-    enabled = db.Column(db.Boolean, nullable=False)
+    feature: Mapped[str] = mapped_column(primary_key=True)
+    enabled: Mapped[bool] = mapped_column()
 
     def __init__(self, feature, enabled=False):
         self.feature = feature
