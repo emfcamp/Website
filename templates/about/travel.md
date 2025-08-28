@@ -4,7 +4,7 @@ title: Travelling to Electromagnetic Field
 
 EMF will be held at the Eastnor Castle Deer Park, just east of Ledbury, Herefordshire.
 
-To experience the full event, you should aim to arrive on Thursday 16 July and depart mid-day Sunday 19 July, with presentations beginning on Friday 17 July. You won't be allowed on site outside of those times unless you've [volunteered](/about/volunteering) to help with setup or teardown.
+To experience the full event, you should aim to arrive on Thursday 16 July and depart midday Monday 20 July, with presentations from the 16th-19th. You won't be allowed on site outside of those times unless you've [volunteered](/about/volunteering) to help with setup or teardown.
 
 {# 2024
 You can arrive after 10am on Thursday 30 May and you can stay until midday on Monday 3 June. You won't be allowed on site outside those times unless you've [volunteered](/about/volunteering) to help with setup or teardown.
