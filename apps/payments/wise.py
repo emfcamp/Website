@@ -203,51 +203,51 @@ def wise_business_profile():
     return id
 
 
+def _retrieve_detail(details, requested_type):
+    """Helper method to retrieve content from attribute-value details recordsets"""
+    for detail in details:
+        if detail.type == requested_type:
+            return detail.body
+
+
 def wise_retrieve_accounts(profile_id):
-    # Wise creates the concept of a multi-currency account by calling normal
-    # bank accounts "balances". As far as we're concerned, "balances" are bank
-    # accounts, as that's what people will be sending money to.
-    for account in wise.balances.list(profile_id=profile_id):
-        try:
-            if not account.bankDetails:
-                continue
-            if not account.bankDetails.bankAddress:
-                continue
-        except AttributeError:
-            continue
+    for account in wise.accounts.list(profile_id=profile_id):
 
-        address = ", ".join(
-            [
-                account.bankDetails.bankAddress.addressFirstLine,
-                account.bankDetails.bankAddress.city + " " + (account.bankDetails.bankAddress.postCode or ""),
-                account.bankDetails.bankAddress.country,
-            ]
-        )
+        account_holder = bank_name = bank_address = sort_code = account_number = swift = iban = None
 
-        sort_code = account_number = None
+        if account.currency.code == "GBP":
 
-        if account.bankDetails.currency == "GBP":
-            # bankCode is the SWIFT code for non-GBP accounts.
-            sort_code = account.bankDetails.bankCode.replace("-", "")
+            for receive_options in account.receiveOptions:
 
-            if len(account.bankDetails.accountNumber) == 8:
-                account_number = account.bankDetails.accountNumber
-            else:
-                # Wise bug:
-                # accountNumber is sometimes erroneously the IBAN for GBP accounts.
-                # Extract the account number from the IBAN.
-                account_number = account.bankDetails.accountNumber.replace(" ", "")[-8:]
+                account_holder = _retrieve_detail(details, "ACCOUNT_HOLDER")
+                bank_info = _retrieve_detail(details, "BANK_NAME_AND_ADDRESS")
+
+                if receive_options.type == "LOCAL":
+                    sort_code = _retrieve_detail(details, "BANK_CODE").replace("-", "")
+                    account_number = _retrieve_detail(details, "ACCOUNT_NUMBER")
+
+                elif receive_options.type == "INTERNATIONAL":
+                    swift = _retrieve_detail(details, "SWIFT_CODE")
+                    iban = _retrieve_detail(details, "IBAN")
+
+             if not bank_info:
+                 continue
+
+             bank_name, _, bank_address = bank_info.partition("\n")
+
+             if not bank_name or not bank_address:
+                 continue
 
         yield BankAccount(
             sort_code=sort_code,
             acct_id=account_number,
-            currency=account.bankDetails.currency,
+            currency=account.currency.code,
             active=False,
-            payee_name=account.bankDetails.get("accountHolderName"),
-            institution=account.bankDetails.bankName,
-            address=address,
-            swift=account.bankDetails.get("swift"),
-            iban=account.bankDetails.get("iban"),
+            payee_name=account_holder,
+            institution=bank_name,
+            address=bank_address,
+            swift=swift,
+            iban=iban,
             # Webhooks only include the borderlessAccountId
             wise_balance_id=account.id,
         )
