@@ -1,30 +1,35 @@
 from __future__ import annotations
 
-from geoalchemy2 import Geometry
-from geoalchemy2.shape import to_shape
-from sqlalchemy import Index
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import Mapped, relationship
+from typing import TYPE_CHECKING
 
-from main import db
+from geoalchemy2 import Geometry, WKBElement
+from geoalchemy2.shape import to_shape
+from sqlalchemy import ForeignKey, Index
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from models.user import User
 
 from . import BaseModel
+
+if TYPE_CHECKING:
+    from .cfp import Venue
 
 
 class Village(BaseModel):
     __tablename__ = "village"
     __versioned__: dict = {}
 
-    id = db.Column(db.Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
 
-    name = db.Column(db.String, nullable=False, unique=True)
-    description = db.Column(db.String)
-    url = db.Column(db.String)
-    location = db.Column(Geometry("POINT", srid=4326, spatial_index=False))
+    name: Mapped[str] = mapped_column(unique=True)
+    description: Mapped[str | None] = mapped_column()
+    url: Mapped[str | None] = mapped_column()
+    location: Mapped[WKBElement | None] = mapped_column(Geometry("POINT", srid=4326, spatial_index=False))
 
     village_memberships: Mapped[list[VillageMember]] = relationship(back_populates="village")
     requirements: Mapped[VillageRequirements] = relationship(back_populates="village")
+    venues: Mapped[list[Venue]] = relationship(back_populates="village")
     members = association_proxy("village_memberships", "user")
 
     @classmethod
@@ -112,11 +117,12 @@ Index("ix_village_location", Village.location, postgresql_using="gist")
 class VillageMember(BaseModel):
     __tablename__ = "village_member"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
     # We only allow one village per user. TODO: make this the primary key
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), unique=True, nullable=False)
-    village_id = db.Column(db.Integer, db.ForeignKey("village.id"), nullable=False)
-    admin = db.Column(db.Boolean, default=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), unique=True)
+    village_id: Mapped[int] = mapped_column(ForeignKey("village.id"))
+    # TODO: probably shouldn't be nullable
+    admin: Mapped[bool | None] = mapped_column(default=False)
 
     village: Mapped[list[Village]] = relationship(back_populates="village_memberships")
     user: Mapped[User] = relationship(back_populates="village_membership")
@@ -128,7 +134,7 @@ class VillageMember(BaseModel):
 class VillageRequirements(BaseModel):
     __tablename__ = "village_requirements"
 
-    village_id = db.Column(db.Integer, db.ForeignKey("village.id"), primary_key=True)
+    village_id: Mapped[int] = mapped_column(ForeignKey("village.id"), primary_key=True)
     village: Mapped[Village] = relationship(back_populates="requirements")
 
     num_attendees: Mapped[int | None]

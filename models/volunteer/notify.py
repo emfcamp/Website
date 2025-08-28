@@ -1,7 +1,7 @@
-from sqlalchemy import func, select
-from sqlalchemy.orm import column_property
+from datetime import datetime
 
-from main import db
+from sqlalchemy import ForeignKey, func, select
+from sqlalchemy.orm import Mapped, column_property, mapped_column, relationship
 
 from .. import naive_utcnow
 from . import BaseModel
@@ -9,11 +9,11 @@ from . import BaseModel
 
 class VolunteerNotifyJob(BaseModel):
     __tablename__ = "volunteer_notify_job"
-    id = db.Column(db.Integer, primary_key=True)
-    subject = db.Column(db.String, nullable=False)
-    text_body = db.Column(db.String, nullable=False)
-    html_body = db.Column(db.String, nullable=False)
-    created = db.Column(db.DateTime, default=naive_utcnow, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    subject: Mapped[str] = mapped_column()
+    text_body: Mapped[str] = mapped_column()
+    html_body: Mapped[str] = mapped_column()
+    created: Mapped[datetime] = mapped_column(default=naive_utcnow)
 
     def __init__(self, subject, text_body, html_body):
         self.subject = subject
@@ -23,13 +23,14 @@ class VolunteerNotifyJob(BaseModel):
 
 class VolunteerNotifyRecipient(BaseModel):
     __tablename__ = "volunteer_notify_recipient"
-    id = db.Column(db.Integer, primary_key=True)
-    volunteer_id = db.Column(db.Integer, db.ForeignKey("volunteer.id"), nullable=False)
-    job_id = db.Column(db.Integer, db.ForeignKey("volunteer_notify_job.id"), nullable=False)
-    sent = db.Column(db.Boolean, default=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    volunteer_id: Mapped[int] = mapped_column(ForeignKey("volunteer.id"))
+    job_id: Mapped[int] = mapped_column(ForeignKey("volunteer_notify_job.id"))
+    # TODO: shouldn't be nullable
+    sent: Mapped[bool | None] = mapped_column(default=False)
 
-    volunteer = db.relationship("Volunteer")
-    job = db.relationship("VolunteerNotifyJob")
+    volunteer = relationship("Volunteer")
+    job = relationship("VolunteerNotifyJob")
 
     def __init__(self, job, volunteer):
         self.job = job

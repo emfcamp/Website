@@ -20,6 +20,7 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_static_digest import FlaskStaticDigest
 from sqlalchemy import MetaData
+from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy_continuum import make_versioned
 from sqlalchemy_continuum.manager import VersioningManager
 from sqlalchemy_continuum.plugins import FlaskPlugin
@@ -64,7 +65,13 @@ naming_convention = {
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
     "pk": "pk_%(table_name)s",
 }
-db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
+
+
+class BaseModel(DeclarativeBase):
+    metadata = MetaData(naming_convention=naming_convention)
+
+
+db = SQLAlchemy(model_class=BaseModel)
 
 
 def include_object(object, name, type_, reflected, compare_to):

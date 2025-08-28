@@ -4,15 +4,19 @@ import random
 import re
 import typing
 from collections.abc import Iterable
-from datetime import timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
 
-from sqlalchemy import column, event, func
-from sqlalchemy.orm import Mapped, Session, aliased, relationship
+from sqlalchemy import ForeignKey, Index, Numeric, column, event, func, select
+from sqlalchemy.orm import Mapped, Session, aliased, mapped_column, relationship
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from sqlalchemy_continuum.utils import transaction_class, version_class
 from stdnum import iso11649
 from stdnum.iso7064 import mod_97_10
+
+if typing.TYPE_CHECKING:
+    from .purchase import Purchase
+    from .user import User
 
 from main import db
 
@@ -31,9 +35,6 @@ from .site_state import get_refund_state
 
 safechars = "2346789BCDFGHJKMPQRTVWXY"
 
-if typing.TYPE_CHECKING:
-    from .purchase import Purchase
-
 
 class StateException(Exception):
     pass
@@ -43,30 +44,32 @@ class Payment(BaseModel):
     __tablename__ = "payment"
     __versioned__: dict = {}
 
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
-    provider = db.Column(db.String, nullable=False)
-    currency = db.Column(db.String, nullable=False)
-    amount_int = db.Column(db.Integer, nullable=False)
+    provider: Mapped[str] = mapped_column()
+    currency: Mapped[str] = mapped_column()
+    amount_int: Mapped[int] = mapped_column()
 
-    state = db.Column(db.String, nullable=False, default="new")
-    reminder_sent_at = db.Column(db.DateTime, nullable=True)
+    state: Mapped[str] = mapped_column(default="new")
+    reminder_sent_at: Mapped[datetime | None] = mapped_column()
 
-    created = db.Column(db.DateTime, nullable=False, default=naive_utcnow)
-    expires = db.Column(db.DateTime, nullable=True)
-    voucher_code = db.Column(db.String, db.ForeignKey("voucher.code"), nullable=True, default=None)
+    created: Mapped[datetime] = mapped_column(default=naive_utcnow)
+    expires: Mapped[datetime | None] = mapped_column()
+    voucher_code: Mapped[str | None] = mapped_column(ForeignKey("voucher.code"), default=None)
 
     # VAT invoice number, if issued
-    vat_invoice_number = db.Column(db.Integer, nullable=True)
+    vat_invoice_number: Mapped[int | None] = mapped_column()
 
-    refunds: Mapped[list[Refund]] = relationship(backref="payment", cascade="all")
-    purchases: Mapped[list[Purchase]] = relationship(backref="payment", cascade="all")
+    refunds: Mapped[list[Refund]] = relationship(back_populates="payment", cascade="all")
+    purchases: Mapped[list[Purchase]] = relationship(back_populates="payment", cascade="all")
     refund_requests: Mapped[list[RefundRequest]] = relationship(
-        backref="payment", cascade="all, delete-orphan"
+        back_populates="payment", cascade="all, delete-orphan"
     )
+    voucher: Mapped[Voucher | None] = relationship(back_populates="payment")
+    user: Mapped[User] = relationship("User", back_populates="payments")
 
-    __mapper_args__ = {"polymorphic_on": provider}
+    __mapper_args__ = {"polymorphic_on": "provider"}
 
     def __init__(self, currency: Currency, amount, voucher_code: str | None = None):
         self.currency = currency
@@ -90,7 +93,7 @@ class Payment(BaseModel):
         cls_transaction = transaction_class(cls)
         changes = cls.query.join(cls.versions).group_by(cls.id)
         change_counts = changes.with_entities(func.count(cls_version.id))
-        first_changes = db.select(column("created")).select_from(
+        first_changes = select(column("created")).select_from(
             changes.join(cls_version.transaction)
             .with_entities(func.min(cls_transaction.issued_at).label("created"))
             .subquery()
@@ -280,7 +283,9 @@ class BankPayment(Payment):
     name = "Bank transfer"
 
     __mapper_args__ = {"polymorphic_identity": "banktransfer"}
-    bankref = db.Column(db.String, unique=True)
+    bankref: Mapped[str | None] = mapped_column(unique=True)
+
+    transactions: Mapped[list[BankTransaction]] = relationship(back_populates="payment")
 
     def __init__(self, currency: Currency, amount, voucher_code: str | None = None):
         Payment.__init__(self, currency, amount, voucher_code)
@@ -325,17 +330,27 @@ class BankPayment(Payment):
 class BankAccount(BaseModel):
     __tablename__ = "bank_account"
     __export_data__ = False
-    id = db.Column(db.Integer, primary_key=True)
-    sort_code = db.Column(db.String)
-    acct_id = db.Column(db.String)
-    currency = db.Column(db.String, nullable=False)
-    active = db.Column(db.Boolean)
-    payee_name = db.Column(db.String)
-    institution = db.Column(db.String, nullable=False)
-    address = db.Column(db.String, nullable=False)
-    swift = db.Column(db.String)
-    iban = db.Column(db.String)
-    wise_balance_id = db.Column(db.Integer)
+    __table_args__ = (
+        Index(
+            "ix_bank_account_sort_code_acct_id",
+            "sort_code",
+            "acct_id",
+            unique=True,
+        ),
+    )
+    id: Mapped[int] = mapped_column(primary_key=True)
+    sort_code: Mapped[str | None] = mapped_column()
+    acct_id: Mapped[str | None] = mapped_column()
+    currency: Mapped[str] = mapped_column()
+    active: Mapped[bool | None] = mapped_column()
+    payee_name: Mapped[str | None] = mapped_column()
+    institution: Mapped[str] = mapped_column()
+    address: Mapped[str] = mapped_column()
+    swift: Mapped[str | None] = mapped_column()
+    iban: Mapped[str | None] = mapped_column()
+    wise_balance_id: Mapped[int | None] = mapped_column()
+
+    transactions: Mapped[list[BankTransaction]] = relationship(back_populates="account")
 
     def __init__(
         self,
@@ -369,30 +384,35 @@ class BankAccount(BaseModel):
         return f"<BankAccount: {self.sort_code} {self.acct_id}>"
 
 
-db.Index(
-    "ix_bank_account_sort_code_acct_id",
-    BankAccount.sort_code,
-    BankAccount.acct_id,
-    unique=True,
-)
-
-
 class BankTransaction(BaseModel):
     __tablename__ = "bank_transaction"
     __export_data__ = False
+    __table_args__ = (
+        Index(
+            "ix_bank_transaction_u1",
+            "account_id",
+            "posted",
+            "type",
+            "amount_int",
+            "payee",
+            "fit_id",
+            unique=True,
+        ),
+    )
 
-    id = db.Column(db.Integer, primary_key=True)
-    account_id = db.Column(db.Integer, db.ForeignKey(BankAccount.id), nullable=False)
-    posted = db.Column(db.DateTime, nullable=False)
-    type = db.Column(db.String, nullable=False)
-    amount_int = db.Column(db.Integer, nullable=False)
-    fit_id = db.Column(db.String, index=True)  # allegedly unique, but don't trust it
-    wise_id = db.Column(db.String, index=True)
-    payee = db.Column(db.String, nullable=False)  # this is what OFX calls it. it's really description
-    payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"))
-    suppressed = db.Column(db.Boolean, nullable=False, default=False)
-    account: Mapped[BankAccount] = relationship(backref="transactions")
-    payment: Mapped[BankPayment] = relationship(backref="transactions")
+    id: Mapped[int] = mapped_column(primary_key=True)
+    account_id: Mapped[int] = mapped_column(ForeignKey(BankAccount.id))
+    posted: Mapped[datetime] = mapped_column()
+    type: Mapped[str] = mapped_column()
+    amount_int: Mapped[int] = mapped_column()
+    fit_id: Mapped[str | None] = mapped_column(index=True)  # allegedly unique, but don't trust it
+    wise_id: Mapped[str | None] = mapped_column(index=True)
+    payee: Mapped[str] = mapped_column()  # this is what OFX calls it. it's really description
+    payment_id: Mapped[int | None] = mapped_column(ForeignKey("payment.id"))
+    suppressed: Mapped[bool] = mapped_column(default=False)
+
+    account: Mapped[BankAccount] = relationship(back_populates="transactions")
+    payment: Mapped[BankPayment | None] = relationship(back_populates="transactions")
 
     def __init__(self, account_id, posted, type, amount, payee, fit_id=None, wise_id=None):
         self.account_id = account_id
@@ -484,24 +504,12 @@ class BankTransaction(BaseModel):
             yield bankref
 
 
-db.Index(
-    "ix_bank_transaction_u1",
-    BankTransaction.account_id,
-    BankTransaction.posted,
-    BankTransaction.type,
-    BankTransaction.amount_int,
-    BankTransaction.payee,
-    BankTransaction.fit_id,
-    unique=True,
-)
-
-
 class StripePayment(Payment):
     name = "Stripe payment"
 
     __mapper_args__ = {"polymorphic_identity": "stripe"}
-    intent_id = db.Column(db.String, unique=True)
-    charge_id = db.Column(db.String, unique=True)
+    intent_id: Mapped[str | None] = mapped_column(unique=True)
+    charge_id: Mapped[str | None] = mapped_column(unique=True)
 
     def cancel(self):
         if self.state in ["charged", "paid"]:
@@ -525,14 +533,16 @@ class StripePayment(Payment):
 class Refund(BaseModel):
     __versioned__: dict = {}
     __tablename__ = "refund"
-    id = db.Column(db.Integer, primary_key=True)
-    payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"), nullable=False)
-    provider = db.Column(db.String, nullable=False)
-    amount_int = db.Column(db.Integer, nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False, default=naive_utcnow)
-    purchases: Mapped[list[Purchase]] = relationship(backref=db.backref("refund", cascade="all"))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    payment_id: Mapped[int] = mapped_column(ForeignKey("payment.id"))
+    provider: Mapped[str] = mapped_column()
+    amount_int: Mapped[int] = mapped_column()
+    timestamp: Mapped[datetime] = mapped_column(default=naive_utcnow)
 
-    __mapper_args__ = {"polymorphic_on": provider}
+    purchases: Mapped[list[Purchase]] = relationship(back_populates="refund")
+    payment: Mapped[Payment] = relationship(back_populates="refunds")
+
+    __mapper_args__ = {"polymorphic_on": "provider"}
 
     def __init__(self, payment, amount):
         self.payment_id = payment.id
@@ -582,22 +592,25 @@ class BankRefund(Refund):
 class StripeRefund(Refund):
     __mapper_args__ = {"polymorphic_identity": "stripe"}
 
-    refundid = db.Column(db.String, unique=True)
+    refundid: Mapped[str | None] = mapped_column(unique=True)
 
 
 class RefundRequest(BaseModel):
-    id = db.Column(db.Integer, primary_key=True)
-    payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"))
-    donation = db.Column(db.Numeric, nullable=False, default=0)
-    currency = db.Column(db.String)
-    sort_code = db.Column(db.String)
-    account = db.Column(db.String)
-    swiftbic = db.Column(db.String)
-    iban = db.Column(db.String)
-    payee_name = db.Column(db.String)
-    note = db.Column(db.String)
+    __tablename__ = "refund_request"
 
-    purchases: Mapped[list[Purchase]] = relationship(backref=db.backref("refund_request", cascade="all"))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    payment_id: Mapped[int | None] = mapped_column(ForeignKey("payment.id"))
+    donation: Mapped[Decimal] = mapped_column(Numeric, default=0)
+    currency: Mapped[str | None] = mapped_column()
+    sort_code: Mapped[str | None] = mapped_column()
+    account: Mapped[str | None] = mapped_column()
+    swiftbic: Mapped[str | None] = mapped_column()
+    iban: Mapped[str | None] = mapped_column()
+    payee_name: Mapped[str | None] = mapped_column()
+    note: Mapped[str | None] = mapped_column()
+
+    purchases: Mapped[list[Purchase]] = relationship(back_populates="refund_request")
+    payment: Mapped[Payment | None] = relationship(back_populates="refund_requests")
 
     @property
     def method(self):
@@ -616,10 +629,12 @@ class PaymentSequence(BaseModel):
     Currently used for storing VAT invoice sequences, which must be monotonic.
     """
 
-    name = db.Column(db.String, primary_key=True)
-    value = db.Column(db.Integer, nullable=False)
+    __tablename__ = "payment_sequence"
+
+    name: Mapped[str] = mapped_column(primary_key=True)
+    value: Mapped[int] = mapped_column()
 
     @classmethod
     def get_export_data(cls):
-        rows = db.session.scalars(db.select(cls))
+        rows = db.session.scalars(select(cls))
         return {"public": {r.name: r.value for r in rows}}
