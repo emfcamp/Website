@@ -4,17 +4,21 @@ title: Travelling to Electromagnetic Field
 
 EMF will be held at the Eastnor Castle Deer Park, just east of Ledbury, Herefordshire.
 
+To experience the full event, you should aim to arrive on Thursday 16 July and depart mid-day Sunday 19 July, with presentations beginning on Friday 17 July. You won't be allowed on site outside of those times unless you've [volunteered](/about/volunteering) to help with setup or teardown.
+
 {# 2024
 You can arrive after 10am on Thursday 30 May and you can stay until midday on Monday 3 June. You won't be allowed on site outside those times unless you've [volunteered](/about/volunteering) to help with setup or teardown.
 #}
 
 ## By Train
-EMF is close to Ledbury station which is around [three hours](https://traintimes.org.uk/london+paddington/ledbury/) from London Paddington (on [GWR](https://www.gwr.com)) and [one hour](https://traintimes.org.uk/birmingham+new+street/ledbury) from Birmingham New Street (on [West Midlands Railway](https://www.westmidlandsrailway.co.uk/)).
+If you are unfamiliar with the UK train system, please refer to [this wikivoyage page](https://en.wikivoyage.org/wiki/Rail_travel_in_Great_Britain) and follow their general guidance.
+
+EMF is close (5 km) to Ledbury station which is around [three hours](https://traintimes.org.uk/london+paddington/ledbury/) from London Paddington (on [GWR](https://www.gwr.com)) and [one hour](https://traintimes.org.uk/birmingham+new+street/ledbury) from Birmingham New Street (on [West Midlands Railway](https://www.westmidlandsrailway.co.uk/)).
 
 The station at Ledbury has short platforms, so if you are on one of the long 9-coach trains direct
 from Paddington, you will need to be in the front three coaches to get off the train.
 
-We will be providing a free shuttle bus service between Ledbury station and the EMF site.
+We will be providing a free shuttle bus service between Ledbury station and the EMF site during the event. 
 Timetables and further information can be found on the [shuttle bus page](https://bus.emf.camp/about/).
 
 {# 2024
@@ -40,6 +44,11 @@ We do not provide electric vehicle charging at EMF. We ask that you arrive at th
 While we do not have any dedicated bike parking, EMF is an extremely safe event and you are welcome to lock your bike to our perimeter fence or other structures as long as it's out of the way.
 
 ## By Air
-The closest major airport is [Birmingham (BHX)](https://en.wikipedia.org/wiki/Birmingham_Airport), which is around 1:40 by train to Ledbury station; or an hour by road. [Bristol (BRS)](https://en.wikipedia.org/wiki/Bristol_Airport) and [Cardiff (CWL)](https://en.wikipedia.org/wiki/Cardiff_Airport) are around 1:40 by road, but poorly connected by public transport.
+The closest major airport is [Birmingham (BHX)](https://en.wikipedia.org/wiki/Birmingham_Airport), which [has free shuttles to the train station](https://www.thetrainline.com/airport-transfers/united-kingdom/trains-from-birmingham-airport) and is around 1:40 by train to Ledbury station; or an hour by road. [Bristol (BRS)](https://en.wikipedia.org/wiki/Bristol_Airport) and [Cardiff (CWL)](https://en.wikipedia.org/wiki/Cardiff_Airport) are around 1:40 by road, but poorly connected by public transport.
 
-For those travelling long-haul, BHX is likely to be most useful followed by LHR.
+For those travelling long-haul, BHX is likely to be most useful followed by LHR. GWR offers [integrated rail tickets between LHR and Ledbury](https://www.gwr.com/travel-information/travel-connections/gwr-air).
+
+## Between Ledbury and EMF
+We will be providing a free shuttle bus service between Ledbury station and the EMF site during the event, but not during setup and tear down. Ride share services such as Uber and [taxi service](https://www.malvern-taxis.co.uk/ledbury-taxi-service/) are extremely limited and unlikely to be available.
+Timetables and further information can be found on the [shuttle bus page](https://bus.emf.camp/about/).
+
