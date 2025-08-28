@@ -16,8 +16,7 @@ class SiteState(BaseModel):
     __export_data__ = False
     __versioned__: dict = {}
     name: Mapped[str] = mapped_column(primary_key=True)
-    # TODO: probably shouldn't be nullable
-    state: Mapped[str | None] = mapped_column()
+    state: Mapped[str] = mapped_column()
 
     def __init__(self, name, state=None):
         self.name = name
