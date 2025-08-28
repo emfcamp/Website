@@ -599,7 +599,7 @@ class RefundRequest(BaseModel):
     __tablename__ = "refund_request"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    payment_id: Mapped[int | None] = mapped_column(ForeignKey("payment.id"))
+    payment_id: Mapped[int] = mapped_column(ForeignKey("payment.id"))
     donation: Mapped[Decimal] = mapped_column(Numeric, default=0)
     currency: Mapped[str | None] = mapped_column()
     sort_code: Mapped[str | None] = mapped_column()
@@ -610,7 +610,7 @@ class RefundRequest(BaseModel):
     note: Mapped[str | None] = mapped_column()
 
     purchases: Mapped[list[Purchase]] = relationship(back_populates="refund_request")
-    payment: Mapped[Payment | None] = relationship(back_populates="refund_requests")
+    payment: Mapped[Payment] = relationship(back_populates="refund_requests")
 
     @property
     def method(self):
