@@ -211,14 +211,14 @@ def _retrieve_detail(details, requested_type):
 
 
 def wise_retrieve_accounts(profile_id):
-    for account in wise.accounts.list(profile_id=profile_id):
+    for account in wise.account_details.list(profile_id=profile_id):
 
         account_holder = bank_name = bank_address = sort_code = account_number = swift = iban = None
 
         if account.currency.code == "GBP":
 
             for receive_options in account.receiveOptions:
-
+                details = receive_options.details
                 account_holder = _retrieve_detail(details, "ACCOUNT_HOLDER")
                 bank_info = _retrieve_detail(details, "BANK_NAME_AND_ADDRESS")
 
@@ -230,13 +230,19 @@ def wise_retrieve_accounts(profile_id):
                     swift = _retrieve_detail(details, "SWIFT_CODE")
                     iban = _retrieve_detail(details, "IBAN")
 
-             if not bank_info:
-                 continue
+            if not bank_info:
+                continue
 
-             bank_name, _, bank_address = bank_info.partition("\n")
+            bank_name, _, bank_address = bank_info.partition("\n")
 
-             if not bank_name or not bank_address:
-                 continue
+        if not bank_name or not bank_address:
+            continue
+
+        wise_balance_id = account.id
+
+        # Workaround: the Wise Sandbox API returns a null/empty account ID; populate a value
+        if account.id is None and app.config.get("TRANSFERWISE_ENVIRONMENT") == "sandbox":
+            wise_balance_id = 0
 
         yield BankAccount(
             sort_code=sort_code,
@@ -248,8 +254,7 @@ def wise_retrieve_accounts(profile_id):
             address=bank_address,
             swift=swift,
             iban=iban,
-            # Webhooks only include the borderlessAccountId
-            wise_balance_id=account.id,
+            wise_balance_id=wise_balance_id,
         )
 
 
