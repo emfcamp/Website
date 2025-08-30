@@ -208,15 +208,14 @@ def _retrieve_detail(details, requested_type):
     for detail in details:
         if detail.type == requested_type:
             return detail.body
+    raise AttributeError(f"Failed to find requested {requested_type} attribute in account details")
 
 
 def wise_retrieve_accounts(profile_id):
     for account in wise.account_details.list(profile_id=profile_id):
-
         account_holder = bank_name = bank_address = sort_code = account_number = swift = iban = None
 
         if account.currency.code == "GBP":
-
             for receive_options in account.receiveOptions:
                 details = receive_options.details
                 account_holder = _retrieve_detail(details, "ACCOUNT_HOLDER")
