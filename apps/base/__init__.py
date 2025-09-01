@@ -217,6 +217,7 @@ from . import organisation  # noqa
 from . import scheduled_tasks  # noqa
 from . import tasks_admin  # noqa
 from . import tasks_banking  # noqa
+from . import tasks_content  # noqa
 from . import tasks_export  # noqa
 from . import tasks_videos  # noqa
 from . import dev  # noqa

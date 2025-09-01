@@ -1,0 +1,13 @@
+{
+  "talk": {
+    "length": {"default_value": "30min", "display_name": "talk duration"}
+  },
+  "workshop": {
+    "capacity": {"default_value": "15", "display_name": "workshop capacity"},
+    "length": {"default_value": "1hour", "display_name": "workshop duration"},
+    "ticketed": {"default_value": "False"}
+  },
+  "installation": {
+    "size": {"default_value": "phone booth"}
+  }
+}
