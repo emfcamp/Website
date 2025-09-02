@@ -21,6 +21,7 @@ from models.volunteer.role import Role
 from models.volunteer.shift import (
     Shift,
     ShiftEntry,
+    ShiftEntryState,
     ShiftEntryStateException,
 )
 from models.volunteer.volunteer import Volunteer as VolunteerUser
@@ -196,7 +197,7 @@ def role_admin(role_id):
     )
 
     active_shift_entries = (
-        ShiftEntry.query.filter(ShiftEntry.state == "arrived")
+        ShiftEntry.query.filter(ShiftEntry.state == ShiftEntryState.ARRIVED)
         .join(ShiftEntry.shift)
         .filter(Shift.role_id == role.id)
         .all()
@@ -204,7 +205,9 @@ def role_admin(role_id):
     pending_shift_entries = (
         ShiftEntry.query.join(ShiftEntry.shift)
         .filter(
-            Shift.start <= now - timedelta(minutes=15), Shift.role == role, ShiftEntry.state == "signed_up"
+            Shift.start <= now - timedelta(minutes=15),
+            Shift.role == role,
+            ShiftEntry.state == ShiftEntryState.SIGNED_UP,
         )
         .all()
     )

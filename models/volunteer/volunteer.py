@@ -6,7 +6,7 @@ from sqlalchemy import Column, ForeignKey, Integer, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .. import BaseModel
-from .shift import ShiftEntry
+from .shift import ShiftEntry, ShiftEntryState
 
 if TYPE_CHECKING:
     from ..user import User
@@ -67,7 +67,7 @@ class Volunteer(BaseModel, UserMixin):
         shifts = ShiftEntry.query.filter(
             ShiftEntry.shift.has(role=role),
             ShiftEntry.user == self.user,
-            ShiftEntry.state == "completed",
+            ShiftEntry.state == ShiftEntryState.COMPLETED,
         ).all()
         return bool(shifts)
 
