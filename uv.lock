@@ -21,6 +21,15 @@ wheels = [
 ]
 
 [[package]]
+name = "alembic-autogenerate-enums"
+version = "0.1.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/15/33/e395de48fcc4d9ac0b3c0d934d3eb128031da0888d2f32edd6a28d0a4c7c/alembic-autogenerate-enums-0.1.2.tar.gz", hash = "sha256:467adc76f1ef32576e514ef55c400c28900547800b676dec349293519751c128", size = 4886, upload-time = "2023-07-19T23:08:46.382Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e9/11/5b63dac59e3761ca021359141ab0fab50e4cbca3ba6da90a7c7d2847328c/alembic_autogenerate_enums-0.1.2-py3-none-any.whl", hash = "sha256:07b8fa63b2fca107effc61d3dc86d7ff848dd73b0e6cc9c292e904edcaeb8278", size = 5228, upload-time = "2023-07-19T23:08:47.183Z" },
+]
+
+[[package]]
 name = "aniso8601"
 version = "10.0.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2182,6 +2191,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "alembic-autogenerate-enums" },
     { name = "cairosvg" },
     { name = "hypothesis" },
     { name = "ipdb" },
@@ -2268,6 +2278,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "alembic-autogenerate-enums", specifier = ">=0.1.2" },
     { name = "cairosvg", specifier = ">=2.4.2,<3" },
     { name = "hypothesis" },
     { name = "ipdb" },

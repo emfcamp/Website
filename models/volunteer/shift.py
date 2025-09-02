@@ -1,5 +1,6 @@
+import enum
 from datetime import datetime
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING
 
 import pytz
 from pendulum import interval
@@ -20,15 +21,30 @@ if TYPE_CHECKING:
 event_tz = pytz.timezone("Europe/London")
 
 
-# state: [allowed next state, ] pairs
-type ShiftEntryState = Literal["signed_up", "arrived", "abandoned", "completed", "no_show"]
+class ShiftEntryState(enum.StrEnum):
+    SIGNED_UP = "signed_up"
+    ARRIVED = "arrived"
+    ABANDONED = "abandoned"
+    COMPLETED = "completed"
+    NO_SHOW = "no_show"
 
+
+# state: [allowed next state, ] pairs
 SHIFT_ENTRY_STATES: dict[ShiftEntryState, list[ShiftEntryState]] = {
-    "signed_up": ["arrived", "completed", "abandoned", "no_show"],
-    "arrived": ["completed", "abandoned", "signed_up"],
-    "abandoned": ["arrived"],
-    "completed": ["arrived"],
-    "no_show": ["arrived"],
+    ShiftEntryState.SIGNED_UP: [
+        ShiftEntryState.ARRIVED,
+        ShiftEntryState.COMPLETED,
+        ShiftEntryState.ABANDONED,
+        ShiftEntryState.NO_SHOW,
+    ],
+    ShiftEntryState.ARRIVED: [
+        ShiftEntryState.COMPLETED,
+        ShiftEntryState.ABANDONED,
+        ShiftEntryState.SIGNED_UP,
+    ],
+    ShiftEntryState.ABANDONED: [ShiftEntryState.ARRIVED],
+    ShiftEntryState.COMPLETED: [ShiftEntryState.ARRIVED],
+    ShiftEntryState.NO_SHOW: [ShiftEntryState.ARRIVED],
 }
 
 
@@ -42,16 +58,19 @@ class ShiftEntry(BaseModel):
 
     shift_id: Mapped[int] = mapped_column(ForeignKey("volunteer_shift.id"), primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
-    state: Mapped[ShiftEntryState | None] = mapped_column(default="signed_up")
+    state: Mapped[ShiftEntryState] = mapped_column(default=ShiftEntryState.SIGNED_UP)
 
     user: Mapped["User"] = relationship(back_populates="shift_entries")
     shift: Mapped["Shift"] = relationship(back_populates="entries")
 
-    def set_state(self, state: ShiftEntryState):
-        if state not in SHIFT_ENTRY_STATES:
-            raise ShiftEntryStateException(f'"{state}" is not a valid state')
+    def set_state(self, state: str | ShiftEntryState):
+        if isinstance(state, str):
+            try:
+                state = ShiftEntryState(state)
+            except ValueError as e:
+                raise ShiftEntryStateException(f'"{state}" is not a valid state') from e
 
-        if state not in SHIFT_ENTRY_STATES[self.state]:
+        if state not in self.valid_states():
             raise ShiftEntryStateException(f'"{self.state}->{state}" is not a valid transition')
 
         self.state = state
