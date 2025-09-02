@@ -7,7 +7,7 @@ from flask_login import current_user
 from icalendar import Calendar, Event
 from sqlalchemy.orm import joinedload
 
-from main import db
+from main import db, get_or_404
 from models import config_date, event_year, naive_utcnow
 from models.user import User, generate_api_token
 from models.volunteer.role import Role
@@ -136,7 +136,7 @@ def schedule_ical():
 @feature_flag("VOLUNTEERS_SCHEDULE")
 @v_admin_required
 def shift(shift_id):
-    shift = Shift.query.get_or_404(shift_id)
+    shift = get_or_404(db, Shift, shift_id)
     all_volunteers = Volunteer.query.order_by(Volunteer.nickname).all()
 
     return render_template("volunteer/shift.html", shift=shift, all_volunteers=all_volunteers)
@@ -146,7 +146,7 @@ def shift(shift_id):
 @feature_flag("VOLUNTEERS_SCHEDULE")
 @v_user_required
 def shift_sign_up(shift_id):
-    shift = Shift.query.get_or_404(shift_id)
+    shift = get_or_404(db, Shift, shift_id)
     if current_user.has_permission("volunteer:admin") and "user_id" in request.form:
         user = User.query.get(request.form["user_id"])
     else:
@@ -184,7 +184,7 @@ def shift_sign_up(shift_id):
 @feature_flag("VOLUNTEERS_SCHEDULE")
 @v_user_required
 def shift_cancel(shift_id):
-    shift = Shift.query.get_or_404(shift_id)
+    shift = get_or_404(db, Shift, shift_id)
 
     user = current_user
     shift_entry = ShiftEntry.query.filter_by(user_id=user.id, shift_id=shift.id).first()
@@ -199,6 +199,6 @@ def shift_cancel(shift_id):
 @feature_flag("VOLUNTEERS_SCHEDULE")
 @v_admin_required
 def shift_contact(shift_id):
-    shift = Shift.query.get_or_404(shift_id)
+    shift = get_or_404(db, Shift, shift_id)
     session["recipients"] = [u.volunteer.id for u in shift.volunteers]
     return redirect(url_for("volunteer_admin_notify.main"))

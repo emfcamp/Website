@@ -16,7 +16,7 @@ from wtforms import (
 from wtforms.validators import DataRequired, Optional
 from geoalchemy2.shape import to_shape
 
-from main import db
+from main import db, get_or_404
 from models.cfp import Venue, Proposal, HUMAN_CFP_TYPES
 from models.village import Village
 from . import (
@@ -93,7 +93,7 @@ def venues():
 @cfp_review.route("/venues/<int:venue_id>", methods=["GET", "POST"])
 @admin_required
 def edit_venue(venue_id):
-    venue = Venue.query.get_or_404(venue_id)
+    venue = get_or_404(db, Venue, venue_id)
     form = VenueForm(obj=venue)
     if form.validate_on_submit():
         if form.delete.data:

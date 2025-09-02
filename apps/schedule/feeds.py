@@ -6,6 +6,7 @@ from flask_cors import cross_origin
 from flask_login import current_user
 from icalendar import Calendar, Event
 
+from main import db, get_or_404
 from models import event_year
 from models.cfp import Proposal
 from models.user import User
@@ -186,7 +187,7 @@ def now_and_next_json():
 def item_json(year, proposal_id, slug=None):
     if year != event_year():
         abort(404)
-    proposal = Proposal.query.get_or_404(proposal_id)
+    proposal = get_or_404(db, Proposal, proposal_id)
     if not proposal.is_accepted:
         abort(404)
 

@@ -17,7 +17,7 @@ import collections
 
 from sqlalchemy.exc import IntegrityError
 
-from main import db, external_url
+from main import db, external_url, get_or_404
 from models.user import User
 from models.cfp import (
     TalkProposal,
@@ -394,7 +394,7 @@ def edit_proposal(proposal_id):
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for(".edit_proposal", proposal_id=proposal_id)))
 
-    proposal = Proposal.query.get_or_404(proposal_id)
+    proposal = get_or_404(db, Proposal, proposal_id)
     if proposal.user != current_user:
         abort(404)
 
@@ -508,7 +508,7 @@ def withdraw_proposal(proposal_id):
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for(".edit_proposal", proposal_id=proposal_id)))
 
-    proposal = Proposal.query.get_or_404(proposal_id)
+    proposal = get_or_404(db, Proposal, proposal_id)
     if proposal.user != current_user:
         abort(404)
 
@@ -638,7 +638,7 @@ def finalise_proposal(proposal_id):
             )
         )
 
-    proposal = Proposal.query.get_or_404(proposal_id)
+    proposal = get_or_404(db, Proposal, proposal_id)
     if proposal.user != current_user:
         abort(404)
 
@@ -822,7 +822,7 @@ def proposal_messages(proposal_id):
                 next=url_for(".proposal_messages", proposal_id=proposal_id),
             )
         )
-    proposal = Proposal.query.get_or_404(proposal_id)
+    proposal = get_or_404(db, Proposal, proposal_id)
     if proposal.user_id != current_user.id:
         abort(404)
 

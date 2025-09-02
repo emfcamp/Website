@@ -10,7 +10,7 @@ import stripe
 import yaml
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from flask import Flask, g, render_template, request, url_for
+from flask import Flask, abort, g, render_template, request, url_for
 from flask_caching import Cache
 from flask_cors import CORS
 from flask_debugtoolbar import DebugToolbarExtension
@@ -20,6 +20,7 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_static_digest import FlaskStaticDigest
 from sqlalchemy import MetaData
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy_continuum import make_versioned
 from sqlalchemy_continuum.manager import VersioningManager
@@ -69,6 +70,13 @@ naming_convention = {
 
 class BaseModel(DeclarativeBase):
     metadata = MetaData(naming_convention=naming_convention)
+
+
+def get_or_404[M: BaseModel](db: SQLAlchemy, model: type[M], id: int) -> M:
+    try:
+        return db.session.get_one(model, id)
+    except NoResultFound:
+        abort(404)
 
 
 db = SQLAlchemy(model_class=BaseModel)

@@ -7,7 +7,7 @@ from flask_mailman import EmailMessage
 from Levenshtein import jaro, ratio
 from wtforms import SubmitField
 
-from main import db
+from main import db, get_or_404
 from models.payment import BankPayment, BankTransaction
 
 from ..common import feature_enabled
@@ -31,7 +31,7 @@ class TransactionSuppressForm(Form):
 
 @admin.route("/transaction/<int:txn_id>/suppress", methods=["GET", "POST"])
 def transaction_suppress(txn_id):
-    txn = BankTransaction.query.get_or_404(txn_id)
+    txn = get_or_404(db, BankTransaction, txn_id)
 
     form = TransactionSuppressForm()
     if form.validate_on_submit():
@@ -85,7 +85,7 @@ def score_reconciliation(txn, payment):
 
 @admin.route("/transaction/<int:txn_id>/reconcile")
 def transaction_suggest_payments(txn_id):
-    txn = BankTransaction.query.get_or_404(txn_id)
+    txn = get_or_404(db, BankTransaction, txn_id)
 
     payments = (
         BankPayment.query.filter_by(state="inprogress")
@@ -106,8 +106,8 @@ class ManualReconcilePaymentForm(Form):
 
 @admin.route("/transaction/<int:txn_id>/reconcile/<int:payment_id>", methods=["GET", "POST"])
 def transaction_reconcile(txn_id, payment_id):
-    txn = BankTransaction.query.get_or_404(txn_id)
-    payment = BankPayment.query.get_or_404(payment_id)
+    txn = get_or_404(db, BankTransaction, txn_id)
+    payment = get_or_404(db, BankPayment, payment_id)
 
     form = ManualReconcilePaymentForm()
     if form.validate_on_submit():

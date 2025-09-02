@@ -10,7 +10,7 @@ from flask import (
 )
 from sqlalchemy.dialects.postgresql import insert
 
-from main import db
+from main import db, get_or_404
 from models.arrivals import (
     ArrivalsView,
     ArrivalsViewProduct,
@@ -62,7 +62,7 @@ def arrivals_view_new():
 
 @admin.route("/arrivals/views/<int:view_id>", methods=["GET", "POST"])
 def arrivals_view(view_id):
-    view = ArrivalsView.query.get_or_404(view_id)
+    view = get_or_404(db, ArrivalsView, view_id)
 
     form = EditArrivalsViewForm(obj=view)
     if request.method != "POST":
@@ -108,7 +108,7 @@ def arrivals_view(view_id):
     methods=["GET", "POST"],
 )
 def arrivals_view_add(view_id, group_id=None, product_id=None):
-    view = ArrivalsView.query.get_or_404(view_id)
+    view = get_or_404(db, ArrivalsView, view_id)
     form = AddArrivalsViewProductForm()
 
     root_groups = ProductGroup.query.filter_by(parent_id=None).order_by(ProductGroup.id).all()

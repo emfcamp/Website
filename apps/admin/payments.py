@@ -17,7 +17,7 @@ from flask_mailman import EmailMessage
 from sqlalchemy.sql.functions import func
 from wtforms import FieldList, FormField, SubmitField
 
-from main import db, get_stripe_client
+from main import db, get_or_404, get_stripe_client
 from models import naive_utcnow
 from models.payment import (
     BankPayment,
@@ -73,7 +73,7 @@ def expiring():
 
 @admin.route("/payment/<int:payment_id>")
 def payment(payment_id):
-    payment = Payment.query.get_or_404(payment_id)
+    payment = get_or_404(db, Payment, payment_id)
 
     return render_template("admin/payments/payment.html", payment=payment)
 
@@ -83,8 +83,8 @@ class ResetExpiryForm(Form):
 
 
 @admin.route("/payment/<int:payment_id>/reset-expiry", methods=["GET", "POST"])
-def reset_expiry(payment_id):
-    payment = BankPayment.query.get_or_404(payment_id)
+def reset_expiry(payment_id) -> ResponseReturnValue:
+    payment = get_or_404(db, BankPayment, payment_id)
 
     form = ResetExpiryForm()
     if form.validate_on_submit():
@@ -119,7 +119,7 @@ class SendReminderForm(Form):
 
 @admin.route("/payment/<int:payment_id>/reminder", methods=["GET", "POST"])
 def send_reminder(payment_id):
-    payment = BankPayment.query.get_or_404(payment_id)
+    payment = get_or_404(db, BankPayment, payment_id)
 
     form = SendReminderForm()
     if form.validate_on_submit():
@@ -171,7 +171,7 @@ class UpdatePaymentForm(Form):
 
 @admin.route("/payment/<int:payment_id>/update", methods=["GET", "POST"])
 def update_payment(payment_id):
-    payment = Payment.query.get_or_404(payment_id)
+    payment = get_or_404(db, Payment, payment_id)
 
     if payment.provider not in {"stripe"}:
         abort(404)
@@ -212,7 +212,7 @@ class CancelPaymentForm(Form):
 
 @admin.route("/payment/<int:payment_id>/cancel", methods=["GET", "POST"])
 def cancel_payment(payment_id):
-    payment = Payment.query.get_or_404(payment_id)
+    payment = get_or_404(db, Payment, payment_id)
 
     if payment.provider == "stripe":
         msg = f"Cannot cancel stripe payment (id: {payment_id})."
@@ -304,7 +304,7 @@ class DeleteRefundRequestForm(Form):
 def delete_refund_request(req_id):
     """Delete a refund request. This can only be called if the payment is in the
     refund-requested state, or if it's "refunded" but with a 100% donation."""
-    req = RefundRequest.query.get_or_404(req_id)
+    req = get_or_404(db, RefundRequest, req_id)
 
     # TODO: this does not handle partial refunds!
     # It can also fail if there's insufficient capacity to return the ticket state.
@@ -344,7 +344,7 @@ def manual_refund(payment_id):
 
     # TODO: this is old! We should move manual refund handling to the other refund endpoint for consistency.
 
-    payment = Payment.query.get_or_404(payment_id)
+    payment = get_or_404(db, Payment, payment_id)
 
     if payment.refund_requests:
         app.logger.warning("Showing refund requests for payment %s", payment.id)
@@ -383,7 +383,7 @@ def refund(payment_id):
     # TODO: This is all old and needs fixing
     # For partial refunds, we need to let *users* select which tickets they want to refund (see ticket #900)
     # Refund business logic needs moving to apps.payments.refund module, some is already there.
-    payment = Payment.query.get_or_404(payment_id)
+    payment = get_or_404(db, Payment, payment_id)
 
     if not payment.is_refundable(ignore_event_refund_state=True):
         app.logger.warning(
@@ -566,7 +566,7 @@ class ChangeCurrencyForm(Form):
 
 @admin.route("/payment/<int:payment_id>/change_currency", methods=["GET", "POST"])
 def change_currency(payment_id):
-    payment = Payment.query.get_or_404(payment_id)
+    payment = get_or_404(db, Payment, payment_id)
     if not (payment.state == "new" or (payment.provider == "banktransfer" and payment.state == "inprogress")):
         return abort(400)
 
@@ -603,8 +603,8 @@ def cancel_purchase(payment_id: int, purchase_id: int) -> ResponseReturnValue:
 
     This is used when the purchaser changes their mind before they've sent us the money.
     """
-    payment: Payment = Payment.query.get_or_404(payment_id)
-    purchase: Purchase = Purchase.query.get_or_404(purchase_id)
+    payment = get_or_404(db, Payment, payment_id)
+    purchase = get_or_404(db, Purchase, purchase_id)
 
     if purchase.payment != payment:
         return abort(400)

@@ -15,7 +15,7 @@ from flask_login import current_user
 from sqlalchemy import not_
 from sqlalchemy.sql.functions import func
 
-from main import db, external_url, mail
+from main import db, external_url, get_or_404, mail
 from models.product import (
     VOUCHER_GRACE_PERIOD,
     Price,
@@ -75,7 +75,7 @@ def products():
 def edit_product(product_id):
     form = EditProductForm()
 
-    product = Product.query.get_or_404(product_id)
+    product = get_or_404(db, Product, product_id)
     if form.validate_on_submit():
         app.logger.info("%s editing product %s", current_user.name, product_id)
         form.update_product(product)
@@ -98,7 +98,7 @@ def edit_product(product_id):
 )
 def new_product(copy_id, parent_id):
     if parent_id:
-        parent = ProductGroup.query.get_or_404(parent_id)
+        parent = get_or_404(db, ProductGroup, parent_id)
     else:
         parent = Product.query.get(copy_id).parent
 
@@ -127,7 +127,7 @@ def new_product(copy_id, parent_id):
 
 @admin.route("/products/<int:product_id>")
 def product_details(product_id):
-    product = Product.query.get_or_404(product_id)
+    product = get_or_404(db, Product, product_id)
     user_purchases = get_user_purchases(PriceTier.query.filter_by(product_id=product_id))
 
     return render_template(
@@ -140,7 +140,7 @@ def product_details(product_id):
 @admin.route("/products/<int:product_id>/new-tier", methods=["GET", "POST"])
 def new_price_tier(product_id):
     form = NewPriceTierForm()
-    product = Product.query.get_or_404(product_id)
+    product = get_or_404(db, Product, product_id)
 
     if form.validate_on_submit():
         pt = PriceTier(
@@ -165,7 +165,7 @@ def new_price_tier(product_id):
 
 @admin.route("/products/price-tiers/<int:tier_id>")
 def price_tier_details(tier_id):
-    tier = PriceTier.query.get_or_404(tier_id)
+    tier = get_or_404(db, PriceTier, tier_id)
     form = ModifyPriceTierForm()
     user_purchases = get_user_purchases(PriceTier.query.filter_by(id=tier.id))
     return render_template(
@@ -179,7 +179,7 @@ def price_tier_details(tier_id):
 @admin.route("/products/price-tiers/<int:tier_id>", methods=["POST"])
 def price_tier_modify(tier_id):
     form = ModifyPriceTierForm()
-    tier = PriceTier.query.get_or_404(tier_id)
+    tier = get_or_404(db, PriceTier, tier_id)
 
     if form.validate_on_submit():
         if form.delete.data and tier.unused:
@@ -208,7 +208,7 @@ def price_tier_modify(tier_id):
 
 @admin.route("/products/price-tiers/<int:tier_id>/edit", methods=["GET", "POST"])
 def price_tier_edit(tier_id):
-    tier = PriceTier.query.get_or_404(tier_id)
+    tier = get_or_404(db, PriceTier, tier_id)
     form = EditPriceTierForm(obj=tier)
 
     if form.validate_on_submit():
@@ -240,7 +240,7 @@ def price_tier_edit(tier_id):
 
 @admin.route("/products/group/<int:group_id>")
 def product_group_details(group_id):
-    group = ProductGroup.query.get_or_404(group_id)
+    group = get_or_404(db, ProductGroup, group_id)
 
     def get_all_child_groups(group):
         return [group] + [g for c in group.children for g in get_all_child_groups(c)]
@@ -258,7 +258,7 @@ def product_group_details(group_id):
 @admin.route("/products/group/new", methods=["GET", "POST"])
 def product_group_new():
     if request.args.get("parent"):
-        parent = ProductGroup.query.get_or_404(request.args.get("parent"))
+        parent = get_or_404(db, ProductGroup, request.args.get("parent"))
     else:
         parent = None
 
@@ -284,7 +284,7 @@ def product_group_new():
 
 @admin.route("/products/group/<int:group_id>/edit", methods=["GET", "POST"])
 def product_group_edit(group_id):
-    group = ProductGroup.query.get_or_404(group_id)
+    group = get_or_404(db, ProductGroup, group_id)
     form = EditProductGroupForm()
     if form.validate_on_submit():
         group = form.update_pg(group)
@@ -300,7 +300,7 @@ def product_group_edit(group_id):
 
 @admin.route("/products/group/<int:group_id>/copy", methods=["GET", "POST"])
 def product_group_copy(group_id):
-    group = ProductGroup.query.get_or_404(group_id)
+    group = get_or_404(db, ProductGroup, group_id)
     form = CopyProductGroupForm()
 
     if group.children:
@@ -409,7 +409,7 @@ def product_view_new():
 
 @admin.route("/product_views/<int:view_id>", methods=["GET", "POST"])
 def product_view(view_id):
-    view = ProductView.query.get_or_404(view_id)
+    view = get_or_404(db, ProductView, view_id)
 
     form = EditProductViewForm(obj=view)
     if request.method != "POST":
@@ -463,7 +463,7 @@ def product_view(view_id):
     methods=["GET", "POST"],
 )
 def product_view_add(view_id, group_id=None, product_id=None):
-    view = ProductView.query.get_or_404(view_id)
+    view = get_or_404(db, ProductView, view_id)
     form = AddProductViewProductForm()
 
     root_groups = ProductGroup.query.filter_by(parent_id=None).order_by(ProductGroup.id).all()
@@ -504,7 +504,7 @@ def product_view_add(view_id, group_id=None, product_id=None):
 
 @admin.route("/product_views/<int:view_id>/voucher")
 def product_view_voucher_list(view_id):
-    view = ProductView.query.get_or_404(view_id)
+    view = get_or_404(db, ProductView, view_id)
     vouchers = Voucher.query.filter_by(view=view)
 
     if not request.args.get("used"):
@@ -520,7 +520,7 @@ def product_view_voucher_list(view_id):
 
 @admin.route("/product_views/<int:view_id>/voucher/<string:voucher_code>")
 def product_view_voucher_detail(view_id, voucher_code):
-    view = ProductView.query.get_or_404(view_id)
+    view = get_or_404(db, ProductView, view_id)
     voucher = Voucher.get_by_code(voucher_code)
     if voucher is None:
         abort(404)
@@ -529,7 +529,7 @@ def product_view_voucher_detail(view_id, voucher_code):
 
 @admin.route("/product_views/<int:view_id>/voucher/add", methods=["GET", "POST"])
 def product_view_add_voucher(view_id):
-    view = ProductView.query.get_or_404(view_id)
+    view = get_or_404(db, ProductView, view_id)
     form = NewVoucherForm()
 
     if form.validate_on_submit():
@@ -559,7 +559,7 @@ def product_view_add_voucher(view_id):
     methods=["GET", "POST"],
 )
 def product_view_edit_voucher(view_id, voucher_code):
-    view = ProductView.query.get_or_404(view_id)
+    view = get_or_404(db, ProductView, view_id)
     voucher = Voucher.get_by_code(voucher_code)
     if voucher is None:
         abort(404)
@@ -584,7 +584,7 @@ def product_view_edit_voucher(view_id, voucher_code):
 
 @admin.route("/product_views/<int:view_id>/voucher/bulk_add", methods=["GET", "POST"])
 def product_view_bulk_add_vouchers_by_email(view_id):
-    view = ProductView.query.get_or_404(view_id)
+    view = get_or_404(db, ProductView, view_id)
     form = BulkVoucherEmailForm()
 
     if not form.validate_on_submit() or form.preview.data:

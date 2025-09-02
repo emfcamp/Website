@@ -5,7 +5,7 @@ from flask_login import current_user
 
 from sqlalchemy.orm import aliased
 
-from main import db
+from main import db, get_or_404
 from models import naive_utcnow
 from models.cfp import CFPVote, Proposal, CfpStateException
 
@@ -153,7 +153,7 @@ def review_proposal_next(proposal_id):
 @cfp_review.route("/review/<int:proposal_id>", methods=["GET", "POST"])
 @review_required
 def review_proposal(proposal_id):
-    prop = Proposal.query.get_or_404(proposal_id)
+    prop = get_or_404(db, Proposal, proposal_id)
 
     if not can_review_proposal(prop):
         app.logger.warn("Cannot review proposal %s", proposal_id)

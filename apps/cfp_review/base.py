@@ -26,7 +26,7 @@ from sqlalchemy import func, exists, select
 from sqlalchemy.orm import joinedload, undefer
 from sqlalchemy_continuum.utils import version_class
 
-from main import db, external_url
+from main import db, external_url, get_or_404
 from .estimation import get_cfp_estimate
 from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
@@ -339,7 +339,7 @@ def send_email_for_proposal(proposal, reason="still-considered", from_address=No
 @cfp_review.route("/proposals/<int:proposal_id>/convert", methods=["GET", "POST"])
 @admin_required
 def convert_proposal(proposal_id):
-    proposal = Proposal.query.get_or_404(proposal_id)
+    proposal = get_or_404(db, Proposal, proposal_id)
 
     form = ConvertProposalForm()
     types = {"talk", "workshop", "youthworkshop", "performance", "installation"}
@@ -368,7 +368,7 @@ def convert_proposal(proposal_id):
 
         db.session.commit()
 
-        proposal = Proposal.query.get_or_404(proposal_id)
+        proposal = get_or_404(db, Proposal, proposal_id)
 
         return redirect(url_for(".update_proposal", proposal_id=proposal.id))
 
@@ -399,7 +399,7 @@ def update_proposal(proposal_id):
 
         return redirect(url_for(next_page, proposal_id=proposal_id))
 
-    prop = Proposal.query.get_or_404(proposal_id)
+    prop = get_or_404(db, Proposal, proposal_id)
     next_id = find_next_proposal_id(prop)
 
     if prop.type == "talk":
@@ -601,7 +601,7 @@ def all_messages():
 @admin_required
 def message_proposer(proposal_id):
     form = SendMessageForm()
-    proposal = Proposal.query.get_or_404(proposal_id)
+    proposal = get_or_404(db, Proposal, proposal_id)
 
     if form.validate_on_submit():
         if form.send.data:
@@ -662,7 +662,7 @@ def proposal_versions():
 @cfp_review.route("/proposals/<int:proposal_id>/versions")
 @admin_required
 def proposal_latest_version(proposal_id):
-    prop = Proposal.query.get_or_404(proposal_id)
+    prop = get_or_404(db, Proposal, proposal_id)
     last_txn_id = prop.versions[-1].transaction_id
     return redirect(url_for(".proposal_version", proposal_id=proposal_id, txn_id=last_txn_id))
 
@@ -671,7 +671,7 @@ def proposal_latest_version(proposal_id):
 @admin_required
 def proposal_version(proposal_id, txn_id):
     form = ReversionForm()
-    prop = Proposal.query.get_or_404(proposal_id)
+    prop = get_or_404(db, Proposal, proposal_id)
     version = prop.versions.filter_by(transaction_id=txn_id).one()
 
     if form.validate_on_submit():
@@ -821,7 +821,7 @@ def vote_summary():
 @admin_required
 def proposal_votes(proposal_id):
     form = UpdateVotesForm()
-    proposal = Proposal.query.get_or_404(proposal_id)
+    proposal = get_or_404(db, Proposal, proposal_id)
     all_votes = {v.id: v for v in proposal.votes}
 
     if form.validate_on_submit():
@@ -882,7 +882,7 @@ def proposal_votes(proposal_id):
 @admin_required
 def proposal_notes(proposal_id):
     form = AddNoteForm()
-    proposal = Proposal.query.get_or_404(proposal_id)
+    proposal = get_or_404(db, Proposal, proposal_id)
 
     if form.validate_on_submit():
         if form.send.data:
@@ -908,7 +908,7 @@ def proposal_notes(proposal_id):
 @admin_required
 def proposal_change_owner(proposal_id):
     form = ChangeProposalOwner()
-    proposal = Proposal.query.get_or_404(proposal_id)
+    proposal = get_or_404(db, Proposal, proposal_id)
 
     if form.validate_on_submit and form.submit.data:
         user = User.get_by_email(form.user_email.data)
