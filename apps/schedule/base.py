@@ -16,7 +16,7 @@ from wtforms import (
     SubmitField,
 )
 
-from main import db
+from main import db, get_or_404
 from models import event_year
 from models.admin_message import AdminMessage
 from models.cfp import HUMAN_CFP_TYPES, Proposal, Venue, WorkshopProposal
@@ -110,7 +110,7 @@ def add_favourite():
     if event_type != "proposal":
         abort(400)
 
-    proposal = Proposal.query.get_or_404(event_id)
+    proposal = get_or_404(db, Proposal, event_id)
     if proposal in current_user.favourites:
         current_user.favourites.remove(proposal)
     else:
@@ -129,7 +129,7 @@ def favourites():
         if event_type != "proposal":
             abort(400)
 
-        proposal = Proposal.query.get_or_404(event_id)
+        proposal = get_or_404(db, Proposal, event_id)
         if proposal in current_user.favourites:
             current_user.favourites.remove(proposal)
         else:
@@ -172,7 +172,7 @@ class ItemForm(Form):
 
 def item_current(year, proposal_id, slug=None):
     """Display a detail page for a talk from the current event"""
-    proposal = Proposal.query.get_or_404(proposal_id)
+    proposal = get_or_404(db, Proposal, proposal_id)
     if not proposal.is_accepted or proposal.hide_from_schedule:
         abort(404)
 
@@ -315,7 +315,7 @@ def cancel_event_ticket(ticket_id):
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for("schedule.event_tickets")))
 
-    ticket = EventTicket.query.get_or_404(ticket_id)
+    ticket = get_or_404(db, EventTicket, ticket_id)
 
     if ticket.user != current_user:
         abort(401)
@@ -590,7 +590,7 @@ def workshop_steward_main():
 @schedule.route("/schedule/workshop-steward/<int:venue_id>")
 @v_user_required
 def workshop_steward_venue(venue_id: int):
-    venue = Venue.query.get_or_404(venue_id)
+    venue = get_or_404(db, Venue, venue_id)
     workshops = (
         WorkshopProposal.query.filter_by(scheduled_venue_id=venue_id)
         .filter(
@@ -611,7 +611,7 @@ def workshop_steward_venue(venue_id: int):
 @schedule.route("/schedule/workshop-steward/workshop/<int:workshop_id>", methods=["GET", "POST"])
 @v_user_required
 def workshop_steward(workshop_id):
-    workshop = WorkshopProposal.query.get_or_404(workshop_id)
+    workshop = get_or_404(db, WorkshopProposal, workshop_id)
     user_role_strs = [r.name for r in current_user.volunteer.interested_roles.all()]
 
     # Require that the user has the appropriate role & only show the attendee list the hour before

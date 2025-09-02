@@ -26,7 +26,7 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, NumberRange, Optional
 
-from main import db
+from main import db, get_or_404
 from models.cfp import AGE_RANGE_OPTIONS, PYTHON_CFP_TYPES, Proposal, Venue
 
 from ..common import feature_flag
@@ -198,7 +198,7 @@ class DeleteAttendeeContentForm(Form):
 @login_required
 @feature_flag("ATTENDEE_CONTENT")
 def attendee_content_delete(id):
-    proposal = Proposal.query.get_or_404(id)
+    proposal = get_or_404(db, Proposal, id)
     can_delete = proposal.user_id == current_user.id and proposal.user_scheduled
     if not can_delete:
         app.logger.warning(f"{current_user} cannot delete proposal {proposal}")

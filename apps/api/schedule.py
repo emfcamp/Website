@@ -7,7 +7,7 @@ from flask import request
 from flask_login import current_user
 from flask_restful import Resource, abort
 
-from main import db
+from main import db, get_or_404
 from models import event_year
 from models.admin_message import AdminMessage
 from models.cfp import Proposal
@@ -41,7 +41,7 @@ class ProposalResource(Resource):
     def patch(self, proposal_id):
         if not request.is_json:
             abort(415)
-        proposal = Proposal.query.get_or_404(proposal_id)
+        proposal = get_or_404(db, Proposal, proposal_id)
 
         payload = request.get_json()
         if not payload:
@@ -77,7 +77,7 @@ class FavouriteProposal(Resource):
         if not current_user.is_authenticated:
             abort(401)
 
-        proposal = Proposal.query.get_or_404(proposal_id)
+        proposal = get_or_404(db, Proposal, proposal_id)
         current_state = proposal in current_user.favourites
 
         return {"is_favourite": current_state}
@@ -87,7 +87,7 @@ class FavouriteProposal(Resource):
         if not current_user.is_authenticated:
             abort(401)
 
-        proposal = Proposal.query.get_or_404(proposal_id)
+        proposal = get_or_404(db, Proposal, proposal_id)
         current_state = proposal in current_user.favourites
 
         data = request.get_json()
@@ -163,7 +163,7 @@ class ProposalC3VOCPublishingWebhook(Resource):
                     message="The request did not reference the current event year, and has not been processed.",
                 )
 
-            proposal = Proposal.query.get_or_404(proposal_id)
+            proposal = get_or_404(db, Proposal, proposal_id)
 
             if payload["voctoweb"]["enabled"]:
                 if payload["voctoweb"]["frontend_url"]:

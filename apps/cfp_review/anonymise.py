@@ -2,7 +2,7 @@ from flask import redirect, url_for, request, render_template, current_app as ap
 from flask_login import current_user
 from models.cfp import Proposal
 
-from main import db
+from main import db, get_or_404
 from . import cfp_review, anon_required, get_proposal_sort_dict, get_next_proposal_to
 from .forms import AnonymiseProposalForm
 
@@ -32,7 +32,7 @@ def anonymisation():
 @cfp_review.route("/anonymisation/<int:proposal_id>", methods=["GET", "POST"])
 @anon_required
 def anonymise_proposal(proposal_id):
-    prop = Proposal.query.get_or_404(proposal_id)
+    prop = get_or_404(db, Proposal, proposal_id)
     if prop.state in ["new", "edit", "locked"]:
         # Make sure people only see proposals that are ready
         return abort(404)

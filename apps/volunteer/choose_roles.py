@@ -16,7 +16,7 @@ from flask_login import current_user
 from wtforms import BooleanField, FieldList, FormField, SubmitField
 from wtforms.validators import InputRequired
 
-from main import db
+from main import db, get_or_404
 from models.volunteer.role import Role
 from models.volunteer.shift import (
     Shift,
@@ -135,7 +135,7 @@ def role_admin_index():
 @feature_flag("VOLUNTEERS_SIGNUP")
 @v_user_required
 def role(role_id):
-    role = Role.query.get_or_404(role_id)
+    role = get_or_404(db, Role, role_id)
     current_volunteer = VolunteerUser.get_for_user(current_user)
     current_role_ids = [r.id for r in current_volunteer.interested_roles]
 
@@ -184,7 +184,7 @@ def role_admin(role_id):
 
     limit = int(request.args.get("limit", "5"))
     offset = int(request.args.get("offset", "0"))
-    role = Role.query.get_or_404(role_id)
+    role = get_or_404(db, Role, role_id)
     cutoff = now - timedelta(minutes=30)
     shifts = (
         Shift.query.filter_by(role=role)
@@ -242,7 +242,7 @@ def set_state(role_id: int, shift_id: int, user_id: int):
 @volunteer.route("role/<int:role_id>/<int:shift_id>", methods=["POST"])
 @role_admin_required
 def update_shift(role_id: int, shift_id: int):
-    shift = Shift.query.get_or_404(shift_id)
+    shift = get_or_404(db, Shift, shift_id)
     shift.min_needed = int(request.form["min_needed"])
     shift.max_needed = int(request.form["max_needed"])
     db.session.add(shift)
@@ -255,7 +255,7 @@ def update_shift(role_id: int, shift_id: int):
 @volunteer.route("role/<int:role_id>/volunteers")
 @role_admin_required
 def role_volunteers(role_id):
-    role = Role.query.get_or_404(role_id)
+    role = get_or_404(db, Role, role_id)
     interested = VolunteerUser.query.join(VolunteerUser.interested_roles).filter(Role.id == role_id).all()
     entries = ShiftEntry.query.join(ShiftEntry.shift).filter(Shift.role_id == role_id).all()
     signed_up = list(set([se.user.volunteer for se in entries]))

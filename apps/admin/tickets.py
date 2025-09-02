@@ -10,7 +10,7 @@ from flask import (
 )
 from flask_mailman import EmailMessage
 
-from main import db, external_url
+from main import db, external_url, get_or_404
 from models.exc import CapacityException
 from models.product import Price, PriceTier, Product, ProductGroup
 from models.purchase import Purchase, PurchaseTransfer, Ticket
@@ -161,7 +161,7 @@ def list_free_tickets():
 
 @admin.route("/ticket/<int:ticket_id>", methods=["GET"])
 def view_ticket(ticket_id):
-    ticket = Ticket.query.get_or_404(ticket_id)
+    ticket = get_or_404(db, Ticket, ticket_id)
     return render_template(
         "admin/tickets/view_ticket.html",
         ticket=ticket,
@@ -170,7 +170,7 @@ def view_ticket(ticket_id):
 
 @admin.route("/ticket/<int:ticket_id>/cancel-free", methods=["GET", "POST"])
 def cancel_free_ticket(ticket_id):
-    ticket = Purchase.query.get_or_404(ticket_id)
+    ticket = get_or_404(db, Purchase, ticket_id)
 
     form = CancelTicketForm()
     if form.validate_on_submit():
@@ -189,7 +189,7 @@ def cancel_free_ticket(ticket_id):
 @admin.route("/ticket/<int:ticket_id>/convert")
 @admin.route("/ticket/<int:ticket_id>/convert/<int:price_tier_id>", methods=["GET", "POST"])
 def convert_ticket(ticket_id, price_tier_id=None):
-    ticket = Purchase.query.get_or_404(ticket_id)
+    ticket = get_or_404(db, Purchase, ticket_id)
 
     new_tier = None
     if price_tier_id is not None:
@@ -330,7 +330,7 @@ def transfer_ticket(ticket_id):
 
 @admin.route("/tickets/<int:ticket_id>/transfer/<email>", methods=["GET", "POST"])
 def transfer_ticket_user(ticket_id, email):
-    ticket = Ticket.query.get_or_404(ticket_id)
+    ticket = get_or_404(db, Ticket, ticket_id)
 
     if not ticket.is_paid_for:
         flash("Unpaid tickets cannot be transferred")
@@ -376,7 +376,7 @@ def transfer_ticket_user(ticket_id, email):
 @admin.route("/user/<int:user_id>/tickets")
 @admin.route("/user/<int:user_id>/tickets<ext>")
 def user_tickets(user_id, ext=None):
-    user = User.query.get_or_404(user_id)
+    user = get_or_404(db, User, user_id)
 
     receipt = render_receipt(user)
 

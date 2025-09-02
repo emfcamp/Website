@@ -22,7 +22,7 @@ from sqlalchemy import or_
 from wtforms import BooleanField, StringField, SubmitField
 from wtforms.validators import DataRequired, ValidationError
 
-from main import db
+from main import db, get_or_404
 from models.basket import Basket
 from models.cfp import CFPMessage, Proposal
 from models.user import User, verify_signup_code
@@ -183,7 +183,7 @@ def signup():
         flash("Your signup link was invalid. Please note that they expire after 6 hours.")
         abort(404)
 
-    user = User.query.get_or_404(uid)
+    user = get_or_404(db, User, uid)
     if not user.has_permission("admin"):
         app.logger.warning("Signup link resolves to non-admin user %s", user)
         abort(404)

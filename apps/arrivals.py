@@ -21,7 +21,7 @@ from flask_login import current_user
 from markupsafe import Markup
 from sqlalchemy import func
 
-from main import db
+from main import db, get_or_404
 from models.arrivals import ArrivalsView
 from models.permission import Permission
 from models.purchase import CheckinStateException, Purchase
@@ -214,7 +214,7 @@ def search(query=None):
 @arrivals.route("/arrivals/<int:user_id>/<source>", methods=["GET", "POST"])
 @arrivals_required
 def checkin(user_id, source=None):
-    user = User.query.get_or_404(user_id)
+    user = get_or_404(db, User, user_id)
 
     if source not in {None, "typed", "transfer", "code"}:
         abort(404)
@@ -283,7 +283,7 @@ def checkin(user_id, source=None):
 @arrivals.route("/arrivals/purchase/<purchase_id>", methods=["POST"])
 @arrivals_required
 def redeem_purchase(purchase_id):
-    purchase = Purchase.query.get_or_404(purchase_id)
+    purchase = get_or_404(db, Purchase, purchase_id)
     if not purchase.is_paid_for:
         abort(404)
 
@@ -302,7 +302,7 @@ def redeem_purchase(purchase_id):
 @arrivals.route("/arrivals/purchase/<purchase_id>/undo", methods=["POST"])
 @arrivals_required
 def unredeem_purchase(purchase_id):
-    purchase = Purchase.query.get_or_404(purchase_id)
+    purchase = get_or_404(db, Purchase, purchase_id)
     if not purchase.is_paid_for:
         abort(404)
 
