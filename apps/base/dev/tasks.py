@@ -4,7 +4,7 @@ import click
 from flask import current_app as app
 from pendulum import Duration as Offset
 from pendulum import parse
-from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
+from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 
 from apps.cfp.tasks import create_tags
 from main import db

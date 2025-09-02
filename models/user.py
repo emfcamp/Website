@@ -14,9 +14,9 @@ from flask import current_app as app
 from flask import session
 from flask_login import AnonymousUserMixin, UserMixin
 from sqlalchemy import Column, ForeignKey, Index, Integer, Table, func, text
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.orm.exc import NoResultFound
 
 from loggingmanager import set_user_id
 from main import db
