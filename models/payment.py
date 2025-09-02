@@ -8,8 +8,8 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 from sqlalchemy import ForeignKey, Index, Numeric, column, event, func, select
+from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 from sqlalchemy.orm import Mapped, Session, aliased, mapped_column, relationship
-from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from sqlalchemy_continuum.utils import transaction_class, version_class
 from stdnum import iso11649
 from stdnum.iso7064 import mod_97_10

@@ -1,7 +1,7 @@
 import logging
 
+from sqlalchemy.exc import MultipleResultsFound
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.orm.exc import MultipleResultsFound
 
 from main import cache
 

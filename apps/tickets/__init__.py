@@ -24,7 +24,7 @@ from flask import (
 from flask_login import current_user, login_required
 from flask_mailman import EmailMessage
 from prometheus_client import Counter
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
 
 from main import db, external_url
 from models.basket import Basket

@@ -25,7 +25,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from flask_mailman import EmailMessage
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
 from wtforms import SubmitField
 
 from main import db, get_stripe_client
