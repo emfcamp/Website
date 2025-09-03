@@ -175,8 +175,10 @@ class EventTicket(BaseModel):
         return self.change_state("entered-lottery", force=force)
 
     @classmethod
-    def get_event_ticket(cls, user: User, proposal: Proposal):
-        return EventTicket.query.filter_by(user_id=user.id, proposal_id=proposal.id).one_or_none()
+    def get_event_ticket(cls, user: User, proposal: Proposal) -> "EventTicket | None":
+        return db.session.execute(
+            select(EventTicket).where(EventTicket.user_id == user.id, EventTicket.proposal_id == proposal.id)
+        ).scalar_one_or_none()
 
     @classmethod
     def create_ticket(self, user, proposal, ticket_count=1):

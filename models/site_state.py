@@ -1,9 +1,10 @@
 import logging
 
+from sqlalchemy import select
 from sqlalchemy.exc import MultipleResultsFound
 from sqlalchemy.orm import Mapped, mapped_column
 
-from main import cache
+from main import cache, db
 
 from . import BaseModel, config_date, naive_utcnow
 from .product import PriceTier, Product, ProductGroup, ProductView, ProductViewProduct
@@ -80,8 +81,7 @@ def calc_sales_state(date):
 
 @cache.cached(timeout=60, key_prefix="get_states")
 def get_states() -> dict[str, str]:
-    states = SiteState.query.all()
-    states = {s.name: s.state for s in states}
+    states = {s.name: s.state for s in db.session.execute(select(SiteState)).scalars().all()}
 
     date = naive_utcnow()
 

@@ -25,6 +25,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from flask_mailman import EmailMessage
+from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from wtforms import SubmitField
 
@@ -359,7 +360,9 @@ def stripe_payment_failed(payment):
 
 def lock_payment_or_abort_by_intent(intent_id: str) -> StripePayment:
     try:
-        return StripePayment.query.filter_by(intent_id=intent_id).with_for_update().one()
+        return db.session.execute(
+            select(StripePayment).where(StripePayment.intent_id == intent_id).with_for_update()
+        ).scalar_one()
     except NoResultFound:
         logger.error("Payment for intent %s not found", intent_id)
         abort(409)
@@ -367,7 +370,9 @@ def lock_payment_or_abort_by_intent(intent_id: str) -> StripePayment:
 
 def lock_payment_or_abort_by_charge(charge_id: str) -> StripePayment:
     try:
-        return StripePayment.query.filter_by(charge_id=charge_id).with_for_update().one()
+        return db.session.execute(
+            select(StripePayment).where(StripePayment.charge_id == charge_id).with_for_update()
+        ).scalar_one()
     except NoResultFound:
         logger.error("Payment for charge %s not found", charge_id)
         abort(409)

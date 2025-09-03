@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from markdown import markdown
 from markupsafe import Markup
-from sqlalchemy import ForeignKey, Text
+from sqlalchemy import ForeignKey, Text, func, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from main import db
@@ -82,16 +82,14 @@ class Role(BaseModel):
         from . import Shift, ShiftEntry
 
         shift_counts_q = (
-            db.select(
-                Shift.role_id, ShiftEntry.user_id, db.func.count(ShiftEntry.shift_id).label("shift_count")
-            )
+            select(Shift.role_id, ShiftEntry.user_id, func.count(ShiftEntry.shift_id).label("shift_count"))
             .select_from(ShiftEntry)
             .join(Shift)
             .group_by(Shift.role_id, ShiftEntry.user_id)
             .cte("shift_counts")
         )
         shift_histogram_q = (
-            db.select(Role, shift_counts_q.c.shift_count, db.func.count(shift_counts_q.c.user_id))
+            select(Role, shift_counts_q.c.shift_count, func.count(shift_counts_q.c.user_id))
             .select_from(Role)
             .outerjoin(shift_counts_q)
             .group_by(Role, shift_counts_q.c.shift_count)
@@ -99,7 +97,7 @@ class Role(BaseModel):
         )
 
         interested_volunteers_q = (
-            db.select(VolunteerRoleInterest.c.role_id, db.func.count())
+            select(VolunteerRoleInterest.c.role_id, func.count())
             .select_from(VolunteerRoleInterest)
             .group_by(VolunteerRoleInterest.c.role_id)
         )
@@ -108,7 +106,7 @@ class Role(BaseModel):
         }
 
         trained_volunteers_q = (
-            db.select(VolunteerRoleTraining.c.role_id, db.func.count())
+            select(VolunteerRoleTraining.c.role_id, func.count())
             .select_from(VolunteerRoleTraining)
             .group_by(VolunteerRoleTraining.c.role_id)
         )

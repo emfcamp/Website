@@ -15,8 +15,9 @@ from flask import (
     current_app as app,
 )
 from flask_login import current_user
+from sqlalchemy import select
 
-from main import cache
+from main import cache, db
 from models import Currency
 from models.product import Price, PriceTier, Product, ProductView, ProductViewProduct
 from models.site_state import get_site_state
@@ -27,13 +28,17 @@ base = Blueprint("base", __name__, cli_group=None)
 @cache.cached(timeout=60, key_prefix="get_full_price")
 def get_full_price() -> Price | None:
     full = (
-        ProductView.query.filter_by(name="main")
-        .join(ProductViewProduct)
-        .join(Product)
-        .join(PriceTier)
-        .filter_by(active=True)
-        .order_by(ProductViewProduct.order)
-        .with_entities(PriceTier)
+        db.session.execute(
+            select(ProductView)
+            .where(ProductView.name == "main")
+            .join(ProductViewProduct)
+            .join(Product)
+            .join(PriceTier)
+            .filter_by(active=True)
+            .order_by(ProductViewProduct.order)
+            .with_only_columns(PriceTier)
+        )
+        .scalars()
         .first()
     )
 

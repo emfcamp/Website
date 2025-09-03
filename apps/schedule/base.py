@@ -7,6 +7,7 @@ import pendulum
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask import current_app as app
 from flask_login import current_user
+from sqlalchemy import select
 from wtforms import (
     FieldList,
     FormField,
@@ -592,17 +593,21 @@ def workshop_steward_main():
 def workshop_steward_venue(venue_id: int):
     venue = get_or_404(db, Venue, venue_id)
     workshops = (
-        WorkshopProposal.query.filter_by(scheduled_venue_id=venue_id)
-        .filter(
-            WorkshopProposal.type.in_(venue.allowed_types),
-            WorkshopProposal.is_accepted,
-            WorkshopProposal.scheduled_time > (pendulum.now(event_tz.zone).naive() - timedelta(hours=1)),
-            WorkshopProposal.scheduled_duration.isnot(None),
-            WorkshopProposal.hide_from_schedule.isnot(True),
-            WorkshopProposal.user_scheduled.isnot(True),
-            WorkshopProposal.requires_ticket.is_(True),
+        db.session.execute(
+            select(WorkshopProposal)
+            .where(
+                WorkshopProposal.scheduled_venue_id == venue_id,
+                WorkshopProposal.type.in_(venue.allowed_types),
+                WorkshopProposal.is_accepted,
+                WorkshopProposal.scheduled_time > (pendulum.now(event_tz.zone).naive() - timedelta(hours=1)),
+                WorkshopProposal.scheduled_duration.isnot(None),
+                WorkshopProposal.hide_from_schedule.isnot(True),
+                WorkshopProposal.user_scheduled.isnot(True),
+                WorkshopProposal.requires_ticket.is_(True),
+            )
+            .order_by(WorkshopProposal.scheduled_time)
         )
-        .order_by(WorkshopProposal.scheduled_time)
+        .scalars()
         .all()
     )
     return render_template("schedule/workshop-steward/venue.html", venue=venue, all_workshops=workshops)

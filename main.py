@@ -199,8 +199,8 @@ def create_app(dev_server=False, config_override=None):
     from models.user import User, load_anonymous_user
 
     @login_manager.user_loader
-    def load_user(userid):
-        user = User.query.filter_by(id=userid).first()
+    def load_user(userid: str) -> User | None:
+        user = db.session.get(User, userid)
         if user:
             set_user_id(user.email)
         return user

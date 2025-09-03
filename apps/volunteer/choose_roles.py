@@ -13,6 +13,7 @@ from flask import (
     current_app as app,
 )
 from flask_login import current_user
+from sqlalchemy import select
 from wtforms import BooleanField, FieldList, FormField, SubmitField
 from wtforms.validators import InputRequired
 
@@ -229,15 +230,22 @@ def role_admin(role_id):
 def set_state(role_id: int, shift_id: int, user_id: int):
     state = request.form["state"]
 
-    try:
-        se = ShiftEntry.query.filter(
-            ShiftEntry.shift_id == shift_id, ShiftEntry.user_id == user_id
-        ).first_or_404()
-        if se.state != state:
+    se = (
+        db.session.execute(
+            select(ShiftEntry).where(ShiftEntry.shift_id == shift_id, ShiftEntry.user_id == user_id)
+        )
+        .scalars()
+        .first()
+    )
+    if se is None:
+        abort(404)
+    if se.state != state:
+        try:
             se.set_state(state)
-        db.session.commit()
-    except ShiftEntryStateException:
-        flash(f"{state} is not a valid state for this shift.")
+        except ShiftEntryStateException:
+            flash(f"{state} is not a valid state for this shift.")
+        else:
+            db.session.commit()
 
     return redirect(url_for(".role_admin", role_id=role_id))
 

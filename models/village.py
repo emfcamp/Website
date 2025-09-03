@@ -4,10 +4,11 @@ from typing import TYPE_CHECKING
 
 from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import to_shape
-from sqlalchemy import ForeignKey, Index
+from sqlalchemy import ForeignKey, Index, select
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from main import db
 from models.user import User
 
 from . import BaseModel
@@ -40,11 +41,11 @@ class Village(BaseModel):
 
     @classmethod
     def get_by_name(cls, name) -> Village | None:
-        return cls.query.filter_by(name=name).one_or_none()
+        return db.session.execute(select(cls).where(cls.name == name)).scalar_one_or_none()
 
     @classmethod
     def get_by_id(cls, id) -> Village | None:
-        return cls.query.filter_by(id=id).one_or_none()
+        return db.session.execute(select(cls).where(cls.id == id)).scalar_one_or_none()
 
     def admins(self) -> list[User]:
         return [m.user for m in self.village_memberships if m.admin]

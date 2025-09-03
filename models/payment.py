@@ -463,7 +463,9 @@ class BankTransaction(BaseModel):
     def match_payment(self) -> BankPayment | None:
         for bankref in self._recognized_bankrefs:
             try:
-                return BankPayment.query.filter_by(bankref=bankref).one()
+                return db.session.execute(
+                    select(BankPayment).where(BankPayment.bankref == bankref)
+                ).scalar_one()
             except NoResultFound:
                 continue
 

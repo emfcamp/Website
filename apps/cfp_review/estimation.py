@@ -1,6 +1,9 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import timedelta
+from main import db
+
+from sqlalchemy import select
 from models.cfp import (
     PROPOSAL_TIMESLOTS,
     Proposal,
@@ -65,7 +68,11 @@ def get_cfp_estimate(proposal_type: str) -> CFPEstimate:
 
     num_days = len(get_days_map().items())
 
-    available_venues = Venue.query.filter(Venue.default_for_types.any(proposal_type)).all()
+    available_venues = list(
+        db.session.execute(select(Venue).where(Venue.default_for_types.any_() == proposal_type))
+        .scalars()
+        .all()
+    )
 
     # Correct for changeover period not being needed at the end of the day
     # This can go negative if there aren't many proposals accepted yet, so clamp to 0
