@@ -13,7 +13,6 @@ from typing import TYPE_CHECKING, cast
 from sqlalchemy import ForeignKey, Numeric, UniqueConstraint, func, inspect, select
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import (
-    InstanceState,
     Mapped,
     column_property,
     mapped_column,
@@ -450,7 +449,7 @@ class PriceTier(BaseModel, CapacityMixin):
         return self.purchase_count == 0 and not self.active
 
     def get_price(self, currency: Currency) -> Price | None:
-        instance_state = cast(InstanceState, inspect(self))
+        instance_state = inspect(self)
         if "prices" in instance_state.unloaded:
             return self.get_price_unloaded(currency)
         return self.get_price_loaded(currency)

@@ -74,7 +74,7 @@ def guess_age(age_str: str) -> str:
     return ""
 
 
-def __guess_value(match_str: str, matchers_dict: dict[str, Pattern]) -> str:
+def __guess_value(match_str: str, matchers_dict: dict[str, Pattern[str]]) -> str:
     match_str = match_str.lower().strip()
     for key, matcher in matchers_dict.items():
         if matcher.fullmatch(match_str):

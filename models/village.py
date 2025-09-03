@@ -25,7 +25,7 @@ __all__ = [
 
 class Village(BaseModel):
     __tablename__ = "village"
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
 
     id: Mapped[int] = mapped_column(primary_key=True)
 

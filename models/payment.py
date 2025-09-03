@@ -57,7 +57,7 @@ class StateException(Exception):
 
 class Payment(BaseModel):
     __tablename__ = "payment"
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
@@ -548,7 +548,7 @@ class StripePayment(Payment):
 
 
 class Refund(BaseModel):
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
     __tablename__ = "refund"
     id: Mapped[int] = mapped_column(primary_key=True)
     payment_id: Mapped[int] = mapped_column(ForeignKey("payment.id"))

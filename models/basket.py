@@ -28,7 +28,7 @@ class Line:
         self.purchases = purchases
 
 
-class Basket(MutableMapping):
+class Basket(MutableMapping[PriceTier, int]):
     """
     Helper class for basket-related operations. Tied to a user, and maps PriceTiers to counts.
 

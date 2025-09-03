@@ -62,7 +62,7 @@ class ShiftEntryStateException(ValueError):
 
 class ShiftEntry(BaseModel):
     __tablename__ = "volunteer_shift_entry"
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
 
     shift_id: Mapped[int] = mapped_column(ForeignKey("volunteer_shift.id"), primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
@@ -89,7 +89,7 @@ class ShiftEntry(BaseModel):
 
 class Shift(BaseModel):
     __tablename__ = "volunteer_shift"
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     role_id: Mapped[int] = mapped_column(ForeignKey("volunteer_role.id"))

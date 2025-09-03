@@ -36,7 +36,7 @@ DB_FEATURE_FLAGS = [
 class FeatureFlag(BaseModel):
     __tablename__ = "feature_flag"
     __export_data__ = False
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
     feature: Mapped[str] = mapped_column(primary_key=True)
     enabled: Mapped[bool]
 
