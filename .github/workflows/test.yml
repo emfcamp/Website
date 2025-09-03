@@ -28,6 +28,8 @@ jobs:
         run: uv sync --locked --all-extras --dev
       - name: Lint
         run: uv run make check-syntax
+      - name: Adding report
+        run: printf "\`\`\`\n%s\n\`\`\`" "$(cat mypy-report/index.txt)" >> $GITHUB_STEP_SUMMARY
 
   test:
     name: Run tests
