@@ -77,7 +77,7 @@ def main(flow="main"):
 
     # OK, looks like we can try and sell the user some stuff.
     products = products_for_view(view)
-    form = TicketAmountsForm(products)
+    form = TicketAmountsForm(list(products))
     basket = Basket.from_session(current_user, get_user_currency())
 
     if request.method != "POST":
@@ -87,7 +87,7 @@ def main(flow="main"):
     voucher = None
     if code := session.get("ticket_voucher"):
         voucher = Voucher.get_by_code(code)
-        if voucher.view != view:
+        if voucher is not None and voucher.view != view:
             # The user has a voucher but it's not what's allowing them access to this view
             voucher = None
     # Validate the capacity in the form, setting the maximum limits where available.

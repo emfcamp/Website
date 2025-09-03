@@ -225,6 +225,8 @@ def stripe_update_payment(
     If a PaymentIntent object is not passed in, this will fetch the payment details from
     the Stripe API.
     """
+    if payment.intent_id is None:
+        raise ValueError("Payment intent_id is None")
     intent_is_fresh = False
     if intent is None:
         intent = stripe_client.payment_intents.retrieve(

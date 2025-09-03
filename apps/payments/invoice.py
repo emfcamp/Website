@@ -97,6 +97,8 @@ def invoice(payment_id, fmt=None):
     prices = []
     for pt, count in price_tier_counts:
         price = pt.get_price(payment.currency)
+        if price is None:
+            raise ValueError(f"No pricetier '{pt}' price found for currency {payment.currency}")
         prices.append(
             {
                 "sum_ex_vat": price.value_ex_vat * count,

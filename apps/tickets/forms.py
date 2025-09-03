@@ -15,7 +15,7 @@ from wtforms.validators import DataRequired, InputRequired, Optional, Validation
 from models import Currency
 from models.basket import Basket
 from models.payment import BankPayment, StripePayment
-from models.product import PriceTier, ProductViewProduct, Voucher
+from models.product import PriceTier, Product, Voucher
 from models.user import User
 
 from ..common.fields import EmailField, HiddenIntegerField, IntegerSelectField
@@ -37,11 +37,11 @@ class TicketAmountsForm(Form):
     currency_code = HiddenField("Currency")
     set_currency = StringField("Set Currency", [Optional()])
 
-    def __init__(self, products: list[ProductViewProduct]):
+    def __init__(self, products: list[Product]):
         self._tiers = self._get_price_tiers(products)
         super().__init__()
 
-    def _get_price_tiers(_self, products: list[ProductViewProduct]) -> dict[int, PriceTier]:
+    def _get_price_tiers(_self, products: list[Product]) -> dict[int, PriceTier]:
         """Get the price tiers we want to show in this form"""
         # Order of tiers is important, but dict is ordered these days
         tiers = {}

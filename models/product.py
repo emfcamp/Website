@@ -206,7 +206,9 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
         ):
             return None
 
-        return self.capacity_max - sum(child.capacity_max for child in self.children)
+        # We check that all children have a non-None capacity_max above - but mypy isn't
+        # able to infer this, hence the cast
+        return self.capacity_max - sum(cast(int, child.capacity_max) for child in self.children)
 
     @property
     def purchase_count_by_state(self):

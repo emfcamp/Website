@@ -204,7 +204,10 @@ class Purchase(BaseModel):
         self.refund = None
 
     def change_currency(self, currency: Currency):
-        self.price = self.price_tier.get_price(currency)
+        new_price = self.price_tier.get_price(currency)
+        if new_price is None:
+            raise ValueError(f"No price for currency {currency.value}")
+        self.price = new_price
 
     def transfer(self, from_user, to_user):
         if not self.is_paid_for:
@@ -245,7 +248,7 @@ class Purchase(BaseModel):
             return None
         # This is inefficient without continuum's PropertyModTrackerPlugin
         # However: usually the only attribute that changes is the redemption bit
-        for ver in self.versions[::-1]:
+        for ver in self.versions[::-1]:  # type: ignore[attr-defined]
             if "redeemed" in ver.changeset:
                 return ver
         return None

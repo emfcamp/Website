@@ -53,6 +53,7 @@ class VillageForm(Form):
         self.structures.data = requirements.structures
 
     def populate_obj(self, village: Village) -> None:
+        assert self.name.data is not None
         village.name = self.name.data
         village.description = self.description.data
         village.url = self.url.data

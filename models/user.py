@@ -223,7 +223,7 @@ class User(BaseModel, UserMixin):
     permissions: Mapped[list[Permission]] = relationship(
         back_populates="user",
         cascade="all",
-        secondary=UserPermission,
+        secondary=UserPermission,  # type: ignore[has-type]  # mypy can't see that this is a Table for some reason
         lazy="joined",
     )
     votes: Mapped[list[CFPVote]] = relationship(back_populates="user", lazy="dynamic")
