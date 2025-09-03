@@ -1,5 +1,7 @@
-from geoalchemy2.shape import to_shape
+from geoalchemy2.shape import from_shape, to_shape
+from shapely import Point
 from wtforms import (
+    FloatField,
     IntegerField,
     SelectField,
     StringField,
@@ -69,27 +71,29 @@ class VillageForm(Form):
 
 
 class AdminVillageForm(VillageForm):
-    latlon = StringField("Location", [Optional()])
+    lat = FloatField("Latitude", [Optional()])
+    lon = FloatField("Longitude", [Optional()])
 
     def populate(self, village: Village) -> None:
         super().populate(village)
 
         if village.location is None:
-            self.latlon.data = ""
+            self.lat.data = None
+            self.lon.data = None
         else:
             latlon = to_shape(village.location)
-            self.latlon.data = f"{latlon.x}, {latlon.y}"
+            self.lat.data = latlon.y
+            self.lon.data = latlon.x
 
     def populate_obj(self, village: Village) -> None:
+        assert self.name.data is not None
         village.name = self.name.data
         village.description = self.description.data
         village.url = self.url.data
-        if self.latlon.data:
-            latlon = self.latlon.data.split(",")
-            location = f"POINT({latlon[0]} {latlon[1]})"
+        if self.lat.data is not None and self.lon.data is not None:
+            village.location = from_shape(Point(self.lon.data, self.lat.data))
         else:
-            location = None
-        village.location = location
+            village.location = None
 
         village.requirements.num_attendees = self.num_attendees.data
         village.requirements.size_sqm = self.size_sqm.data
