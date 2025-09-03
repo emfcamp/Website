@@ -94,7 +94,7 @@ class TicketAmountsForm(Form):
 
             # If a voucher is being used, limit the number of adult tickets by however
             # many remain on the voucher
-            if voucher and tier.parent.is_adult_ticket:
+            if voucher and tier.parent.is_adult_ticket():
                 user_limit = min(user_limit, voucher.tickets_remaining)
 
             if f.amount.data and f.amount.data > user_limit:
