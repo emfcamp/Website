@@ -10,6 +10,7 @@ import stripe
 import yaml
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from datetype import DateTime
 from flask import Flask, abort, g, render_template, request, url_for
 from flask_caching import Cache
 from flask_cors import CORS
@@ -19,7 +20,7 @@ from flask_mailman import Mail
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_static_digest import FlaskStaticDigest
-from sqlalchemy import MetaData
+from sqlalchemy import TIMESTAMP, MetaData
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy_continuum import make_versioned
@@ -79,7 +80,20 @@ def get_or_404[M: BaseModel](db: SQLAlchemy, model: type[M], id: int) -> M:
         abort(404)
 
 
+# Workaround for a weird issue where, with `DateTime[None]` in the type_annotation_map
+# directly, `Mapped[DateTime[None] \ None]` in models worked fine but
+# `Mapped[DateTime[None]]` resulted in "Could not locate SQLAlchemy Core type for Python
+# type datetype.DateTime[None]".
+NaiveDT = DateTime[None]
+
+# We can't use `type_annotation_map` directly in the BaseModel due to flask-sqlalchemy
+# https://github.com/pallets-eco/flask-sqlalchemy/issues/1361
 db = SQLAlchemy(model_class=BaseModel)
+db.Model.registry.update_type_annotation_map(  # type: ignore[attr-defined]
+    {
+        NaiveDT: TIMESTAMP(timezone=False),
+    }
+)
 
 
 def include_object(object, name, type_, reflected, compare_to):
