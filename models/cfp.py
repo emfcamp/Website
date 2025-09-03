@@ -765,6 +765,9 @@ class Proposal(BaseModel):
     def get_conflicting_content(self) -> list["Proposal"]:
         # This is for attendee content, so will only conflict with other attendee
         # content or workshops. Workshops may not have a scheduled time/duration.
+        if self.scheduled_time is None or self.scheduled_duration is None:
+            # TODO: should this just return [] ?
+            raise ValueError("scheduled_time or scheduled_duration are None")
         return [
             p
             for p in db.session.execute(
@@ -830,45 +833,6 @@ class Proposal(BaseModel):
     def display_title(self) -> str:
         return self.published_title or self.title
 
-    @property
-    def display_cost(self) -> str:
-        if self.cost is None and self.published_cost is None:
-            return ""
-
-        if self.published_cost is not None:
-            cost = self.published_cost.strip()
-        else:
-            cost = self.cost.strip()
-
-        # Some people put in a string, some just put in a £ amount
-        try:
-            floaty = float(cost)
-            # We don't want to return anything if it doesn't cost anything
-            if floaty > 0:
-                return "£" + cost
-            else:
-                return ""
-        except ValueError:
-            return cost
-
-    @property
-    def display_age_range(self) -> str:
-        if self.published_age_range is not None:
-            return self.published_age_range.strip()
-        if self.age_range is not None:
-            return self.age_range.strip()
-
-        return ""
-
-    @property
-    def display_participant_equipment(self) -> str:
-        if self.published_participant_equipment is not None:
-            return self.published_participant_equipment.strip()
-        if self.participant_equipment is not None:
-            return self.participant_equipment.strip()
-
-        return ""
-
 
 class PerformanceProposal(Proposal):
     __mapper_args__ = {"polymorphic_identity": "performance"}
@@ -915,6 +879,44 @@ class WorkshopProposal(Proposal):
         if not self.requires_ticket:
             return 0
         return sum([t.ticket_count for t in self.tickets if t.state == state])
+
+    @property
+    def display_cost(self) -> str:
+        if self.published_cost is not None:
+            cost = self.published_cost.strip()
+        elif self.cost is not None:
+            cost = self.cost.strip()
+        else:
+            return ""
+
+        # Some people put in a string, some just put in a £ amount
+        try:
+            floaty = float(cost)
+            # We don't want to return anything if it doesn't cost anything
+            if floaty > 0:
+                return "£" + cost
+            else:
+                return ""
+        except ValueError:
+            return cost
+
+    @property
+    def display_age_range(self) -> str:
+        if self.published_age_range is not None:
+            return self.published_age_range.strip()
+        if self.age_range is not None:
+            return self.age_range.strip()
+
+        return ""
+
+    @property
+    def display_participant_equipment(self) -> str:
+        if self.published_participant_equipment is not None:
+            return self.published_participant_equipment.strip()
+        if self.participant_equipment is not None:
+            return self.participant_equipment.strip()
+
+        return ""
 
 
 class YouthWorkshopProposal(WorkshopProposal):

@@ -7,12 +7,13 @@ from werkzeug.datastructures import MultiDict
 
 from main import external_url
 from models import event_year
-from models.cfp import Proposal, Venue
+from models.cfp import Proposal, Venue, WorkshopProposal, YouthWorkshopProposal
 
 from . import event_tz
 
 
 def _get_proposal_dict(proposal: Proposal, favourites_ids):
+    assert proposal.scheduled_venue is not None
     res = {
         "id": proposal.id,
         "slug": proposal.slug,
@@ -40,13 +41,13 @@ def _get_proposal_dict(proposal: Proposal, favourites_ids):
             slug=proposal.slug,
         ),
     }
-    if proposal.type in ["workshop", "youthworkshop"]:
+    if isinstance(proposal, WorkshopProposal | YouthWorkshopProposal):
         res["cost"] = proposal.display_cost
         res["equipment"] = proposal.display_participant_equipment
         res["age_range"] = proposal.display_age_range
         res["attendees"] = proposal.attendees
         res["requires_ticket"] = proposal.requires_ticket
-    video_res = {}
+    video_res: dict[str, str | bool] = {}
     if proposal.c3voc_url:
         video_res["ccc"] = proposal.c3voc_url
     if proposal.youtube_url:

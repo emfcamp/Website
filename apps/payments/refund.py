@@ -28,6 +28,9 @@ def create_stripe_refund(
     # TODO: This should probably live in the stripe module.
     stripe_client = get_stripe_client(app.config)
     assert amount > 0
+    if not payment.charge_id:
+        raise ValueError(f"Payment id {payment.id} has no charge_id!")
+
     charge = stripe_client.charges.retrieve(payment.charge_id)
     if charge.refunded:
         return None
@@ -86,6 +89,8 @@ def handle_refund_request(request: RefundRequest) -> None:
 
     if request.method != "stripe":
         raise ManualRefundRequired("Manual refund required for non-Stripe refund")
+    # This is ensured by request.method != "stripe" above, but mypy can't work that out
+    assert isinstance(payment, StripePayment)
 
     if request.note is not None and request.note != "":
         raise ManualRefundRequired("Refund request has note")

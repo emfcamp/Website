@@ -56,6 +56,8 @@ class VenueForm(Form):
 
     def populate_obj(self, venue: Venue):
         venue.scheduled_content_only = self.scheduled_content_only.data
+        assert self.allowed_types.data is not None
+        assert self.default_for_types.data is not None
         venue.allowed_types = self.allowed_types.data
         venue.default_for_types = self.default_for_types.data
         venue.capacity = self.capacity.data
