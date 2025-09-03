@@ -10,6 +10,10 @@ from . import BaseModel
 if TYPE_CHECKING:
     from .user import User
 
+__all__ = [
+    "Permission",
+    "UserPermission",
+]
 
 UserPermission = Table(
     "user_permission",

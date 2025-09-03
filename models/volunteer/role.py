@@ -16,6 +16,12 @@ if TYPE_CHECKING:
     from ..user import User
     from .shift import Shift
 
+__all__ = [
+    "Role",
+    "RoleAdmin",
+    "RolePermission",
+]
+
 
 class Role(BaseModel):
     __tablename__ = "volunteer_role"

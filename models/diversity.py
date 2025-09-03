@@ -10,6 +10,8 @@ from models.user import User
 
 from . import BaseModel
 
+__all__ = ["UserDiversity"]
+
 OPT_OUT = [
     ("", "Prefer not to say"),
 ]

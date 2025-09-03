@@ -10,6 +10,11 @@ from .cfp import Proposal
 from .site_state import get_signup_state
 from .user import User
 
+__all__ = [
+    "EventTicket",
+    "EventTicketException",
+]
+
 # entered-lottery -- An entry in the lottery for a ticket
 # ticket -- either a converted lottery ticket or a simply issued ticket
 # cancelled -- with drawn/returned. Either as an actual ticket or a lottery ticket

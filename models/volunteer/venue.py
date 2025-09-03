@@ -7,6 +7,8 @@ from .. import BaseModel
 if TYPE_CHECKING:
     from .shift import Shift
 
+__all__ = ["VolunteerVenue"]
+
 
 class VolunteerVenue(BaseModel):
     __tablename__ = "volunteer_venue"

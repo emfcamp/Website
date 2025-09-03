@@ -7,6 +7,8 @@ from models.user import User
 
 from . import BaseModel, naive_utcnow
 
+__all__ = ["EmailJob", "EmailJobRecipient"]
+
 
 class EmailJob(BaseModel):
     __tablename__ = "email_job"

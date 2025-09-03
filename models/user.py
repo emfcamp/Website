@@ -36,6 +36,12 @@ if typing.TYPE_CHECKING:
     from .village import VillageMember
     from .volunteer import RoleAdmin, Volunteer
 
+__all__ = [
+    "AnonymousUser",
+    "User",
+    "UserShipping",
+]
+
 CHECKIN_CODE_LEN = 16
 checkin_code_re = rf"[0-9a-zA-Z_-]{{{CHECKIN_CODE_LEN}}}"
 

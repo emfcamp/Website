@@ -15,6 +15,16 @@ if TYPE_CHECKING:
     from .payment import Payment, Refund, RefundRequest
     from .product import Price, PriceTier, Product
 
+__all__ = [
+    "AdmissionTicket",
+    "CheckinStateException",
+    "Purchase",
+    "PurchaseStateException",
+    "PurchaseTransfer",
+    "PurchaseTransferException",
+    "Ticket",
+]
+
 # The type of a product determines how we handle it after purchase.
 #
 # Both `admission_ticket` and `parking_ticket` will generate a ticket,

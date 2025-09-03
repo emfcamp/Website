@@ -8,6 +8,11 @@ from models.permission import Permission
 from . import BaseModel
 from .product import Product
 
+__all__ = [
+    "ArrivalsView",
+    "ArrivalsViewProduct",
+]
+
 
 class ArrivalsView(BaseModel):
     """An analog to a ProductView, except for checking in items rather than selling them."""

@@ -13,6 +13,11 @@ from .exc import CapacityException
 from .product import PRODUCT_GROUP_TYPES_DICT, PriceTier, Voucher
 from .purchase import Purchase
 
+__all__ = [
+    "Basket",
+    "Line",
+]
+
 
 class Line:
     def __init__(self, tier: PriceTier, count: int, purchases: list[Purchase] | None = None):
