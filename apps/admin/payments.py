@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import assert_never
 
 from flask import (
     abort,
@@ -18,7 +19,7 @@ from sqlalchemy.sql.functions import func
 from wtforms import FieldList, FormField, SubmitField
 
 from main import db, get_or_404, get_stripe_client
-from models import naive_utcnow
+from models import Currency, naive_utcnow
 from models.payment import (
     BankPayment,
     BankRefund,
@@ -97,15 +98,21 @@ def reset_expiry(payment_id) -> ResponseReturnValue:
 
             payment.lock()
 
-            if payment.currency == "GBP":
-                days = app.config.get("EXPIRY_DAYS_TRANSFER")
-            elif payment.currency == "EUR":
-                days = app.config.get("EXPIRY_DAYS_TRANSFER_EURO")
+            match payment.currency:
+                case Currency.GBP:
+                    days = app.config.get("EXPIRY_DAYS_TRANSFER")
+                case Currency.EUR:
+                    days = app.config.get("EXPIRY_DAYS_TRANSFER_EURO")
+                case _:
+                    assert_never(payment.currency)
+
+            if not isinstance(days, int):
+                raise Exception("EXPIRY_DAYS_TRANSFER(_EURO) not an int")
 
             payment.expires = naive_utcnow() + timedelta(days=days)
             db.session.commit()
 
-            app.logger.info("Reset expiry by %s days", days)
+            app.logger.info("Reset expiry to %s days from now", days)
 
             flash(f"Expiry reset for payment {payment.id}")
             return redirect(url_for("admin.expiring"))
@@ -570,10 +577,13 @@ def change_currency(payment_id):
     if not (payment.state == "new" or (payment.provider == "banktransfer" and payment.state == "inprogress")):
         return abort(400)
 
-    if payment.currency == "GBP":
-        new_currency = "EUR"
-    else:
-        new_currency = "GBP"
+    match payment.currency:
+        case Currency.GBP:
+            new_currency = Currency.EUR
+        case Currency.EUR:
+            new_currency = Currency.GBP
+        case _:
+            assert_never(payment.currency)
 
     form = ChangeCurrencyForm(request.form)
     if form.validate_on_submit():

@@ -12,12 +12,12 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, InputRequired, Optional, ValidationError
 
+from models import Currency
 from models.basket import Basket
 from models.payment import BankPayment, StripePayment
 from models.product import PriceTier, ProductViewProduct, Voucher
 from models.user import User
 
-from ..common import CURRENCY_SYMBOLS
 from ..common.fields import EmailField, HiddenIntegerField, IntegerSelectField
 from ..common.forms import Form
 
@@ -115,8 +115,10 @@ class TicketAmountsForm(Form):
                 basket[pt] = f.amount.data
 
     def validate_set_currency(form, field):
-        if field.data not in CURRENCY_SYMBOLS:
-            raise ValidationError(f"Invalid currency {field.data}")
+        try:
+            Currency(field.data)
+        except ValueError as e:
+            raise ValidationError(f"Invalid currency {field.data}") from e
 
 
 class TicketTransferForm(Form):

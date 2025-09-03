@@ -232,7 +232,7 @@ class FakeDataGenerator:
         db.session.add(vol)
 
     def create_fake_tickets(self, user) -> None:
-        currency: Currency = "EUR" if random.random() < 0.2 else "GBP"
+        currency = Currency.EUR if random.random() < 0.2 else Currency.GBP
 
         # In this case we're going to use the same payment method if we make multiple payments.
         payment_type = {"bank": BankPayment, "stripe": StripePayment}.get(

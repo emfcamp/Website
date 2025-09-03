@@ -17,6 +17,7 @@ from flask import (
 from flask_login import current_user
 
 from main import cache
+from models import Currency
 from models.product import Price, PriceTier, Product, ProductView, ProductViewProduct
 from models.site_state import get_site_state
 
@@ -37,7 +38,7 @@ def get_full_price() -> Price | None:
     )
 
     if full is not None:
-        return full.get_price("GBP")
+        return full.get_price(Currency.GBP)
 
     return None
 

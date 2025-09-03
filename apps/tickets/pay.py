@@ -48,11 +48,14 @@ def pay(flow="main"):
             return redirect(url_for("users.purchases"))
         abort(404)
 
-    if request.form.get("change_currency") in ("GBP", "EUR"):
-        currency = request.form.get("change_currency")
+    if currency := request.form.get("change_currency"):
         app.logger.info("Updating currency to %s", currency)
-        set_user_currency(currency)
-        db.session.commit()
+        try:
+            set_user_currency(currency)
+        except ValueError:
+            flash("Invalid currency!", "warning")
+        else:
+            db.session.commit()
 
         return redirect(url_for(".pay", flow=flow))
 
