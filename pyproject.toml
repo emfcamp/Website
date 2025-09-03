@@ -134,6 +134,8 @@ ignore = [
         "RUF012",
     ]
 
+[tool.mypy]
+warn_unused_ignores = true
 
 [[tool.mypy.overrides]]
 module = [
