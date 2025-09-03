@@ -62,19 +62,19 @@ class Payment(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
-    provider: Mapped[str] = mapped_column()
-    currency: Mapped[Currency] = mapped_column()
-    amount_int: Mapped[int] = mapped_column()
+    provider: Mapped[str]
+    currency: Mapped[Currency]
+    amount_int: Mapped[int]
 
     state: Mapped[str] = mapped_column(default="new")
-    reminder_sent_at: Mapped[datetime | None] = mapped_column()
+    reminder_sent_at: Mapped[datetime | None]
 
     created: Mapped[NaiveDT] = mapped_column(default=naive_utcnow)
-    expires: Mapped[NaiveDT | None] = mapped_column()
+    expires: Mapped[NaiveDT | None]
     voucher_code: Mapped[str | None] = mapped_column(ForeignKey("voucher.code"), default=None)
 
     # VAT invoice number, if issued
-    vat_invoice_number: Mapped[int | None] = mapped_column()
+    vat_invoice_number: Mapped[int | None]
 
     refunds: Mapped[list[Refund]] = relationship(back_populates="payment", cascade="all")
     purchases: Mapped[list[Purchase]] = relationship(back_populates="payment", cascade="all")
@@ -354,16 +354,16 @@ class BankAccount(BaseModel):
         ),
     )
     id: Mapped[int] = mapped_column(primary_key=True)
-    sort_code: Mapped[str | None] = mapped_column()
-    acct_id: Mapped[str | None] = mapped_column()
-    currency: Mapped[str] = mapped_column()
-    active: Mapped[bool | None] = mapped_column()
-    payee_name: Mapped[str | None] = mapped_column()
-    institution: Mapped[str] = mapped_column()
-    address: Mapped[str] = mapped_column()
-    swift: Mapped[str | None] = mapped_column()
-    iban: Mapped[str | None] = mapped_column()
-    wise_balance_id: Mapped[int | None] = mapped_column()
+    sort_code: Mapped[str | None]
+    acct_id: Mapped[str | None]
+    currency: Mapped[str]
+    active: Mapped[bool | None]
+    payee_name: Mapped[str | None]
+    institution: Mapped[str]
+    address: Mapped[str]
+    swift: Mapped[str | None]
+    iban: Mapped[str | None]
+    wise_balance_id: Mapped[int | None]
 
     transactions: Mapped[list[BankTransaction]] = relationship(back_populates="account")
 
@@ -417,12 +417,12 @@ class BankTransaction(BaseModel):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     account_id: Mapped[int] = mapped_column(ForeignKey(BankAccount.id))
-    posted: Mapped[datetime] = mapped_column()
-    type: Mapped[str] = mapped_column()
-    amount_int: Mapped[int] = mapped_column()
+    posted: Mapped[datetime]
+    type: Mapped[str]
+    amount_int: Mapped[int]
     fit_id: Mapped[str | None] = mapped_column(index=True)  # allegedly unique, but don't trust it
     wise_id: Mapped[str | None] = mapped_column(index=True)
-    payee: Mapped[str] = mapped_column()  # this is what OFX calls it. it's really description
+    payee: Mapped[str]  # this is what OFX calls it. it's really description
     payment_id: Mapped[int | None] = mapped_column(ForeignKey("payment.id"))
     suppressed: Mapped[bool] = mapped_column(default=False)
 
@@ -552,8 +552,8 @@ class Refund(BaseModel):
     __tablename__ = "refund"
     id: Mapped[int] = mapped_column(primary_key=True)
     payment_id: Mapped[int] = mapped_column(ForeignKey("payment.id"))
-    provider: Mapped[str] = mapped_column()
-    amount_int: Mapped[int] = mapped_column()
+    provider: Mapped[str]
+    amount_int: Mapped[int]
     timestamp: Mapped[datetime] = mapped_column(default=naive_utcnow)
 
     purchases: Mapped[list[Purchase]] = relationship(back_populates="refund")
@@ -618,13 +618,13 @@ class RefundRequest(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     payment_id: Mapped[int] = mapped_column(ForeignKey("payment.id"))
     donation: Mapped[Decimal] = mapped_column(Numeric, default=0)
-    currency: Mapped[str | None] = mapped_column()
-    sort_code: Mapped[str | None] = mapped_column()
-    account: Mapped[str | None] = mapped_column()
-    swiftbic: Mapped[str | None] = mapped_column()
-    iban: Mapped[str | None] = mapped_column()
-    payee_name: Mapped[str | None] = mapped_column()
-    note: Mapped[str | None] = mapped_column()
+    currency: Mapped[str | None]
+    sort_code: Mapped[str | None]
+    account: Mapped[str | None]
+    swiftbic: Mapped[str | None]
+    iban: Mapped[str | None]
+    payee_name: Mapped[str | None]
+    note: Mapped[str | None]
 
     purchases: Mapped[list[Purchase]] = relationship(back_populates="refund_request")
     payment: Mapped[Payment] = relationship(back_populates="refund_requests")
@@ -649,7 +649,7 @@ class PaymentSequence(BaseModel):
     __tablename__ = "payment_sequence"
 
     name: Mapped[str] = mapped_column(primary_key=True)
-    value: Mapped[int] = mapped_column()
+    value: Mapped[int]
 
     @classmethod
     def get_export_data(cls):

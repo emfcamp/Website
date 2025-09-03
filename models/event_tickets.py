@@ -51,12 +51,12 @@ class EventTicket(BaseModel):
     __tablename__ = "event_ticket"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    state: Mapped[str] = mapped_column()
+    state: Mapped[str]
     proposal_id: Mapped[int] = mapped_column(ForeignKey("proposal.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    rank: Mapped[int | None] = mapped_column()
+    rank: Mapped[int | None]
     ticket_count: Mapped[int] = mapped_column(default=1)
-    ticket_codes: Mapped[str | None] = mapped_column()
+    ticket_codes: Mapped[str | None]
 
     proposal: Mapped[Proposal] = relationship(back_populates="tickets")
     user: Mapped[User] = relationship(back_populates="event_tickets")

@@ -38,7 +38,7 @@ class FeatureFlag(BaseModel):
     __export_data__ = False
     __versioned__: dict = {}
     feature: Mapped[str] = mapped_column(primary_key=True)
-    enabled: Mapped[bool] = mapped_column()
+    enabled: Mapped[bool]
 
     def __init__(self, feature, enabled=False):
         self.feature = feature

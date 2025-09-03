@@ -30,8 +30,8 @@ class Village(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
 
     name: Mapped[str] = mapped_column(unique=True)
-    description: Mapped[str | None] = mapped_column()
-    url: Mapped[str | None] = mapped_column()
+    description: Mapped[str | None]
+    url: Mapped[str | None]
     location: Mapped[WKBElement | None] = mapped_column(Geometry("POINT", srid=4326, spatial_index=False))
 
     village_memberships: Mapped[list[VillageMember]] = relationship(back_populates="village")

@@ -21,7 +21,7 @@ class SiteState(BaseModel):
     __export_data__ = False
     __versioned__: dict = {}
     name: Mapped[str] = mapped_column(primary_key=True)
-    state: Mapped[str] = mapped_column()
+    state: Mapped[str]
 
     def __init__(self, name, state=None):
         self.name = name

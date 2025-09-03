@@ -9,9 +9,9 @@ from .. import BaseModel, naive_utcnow
 class VolunteerNotifyJob(BaseModel):
     __tablename__ = "volunteer_notify_job"
     id: Mapped[int] = mapped_column(primary_key=True)
-    subject: Mapped[str] = mapped_column()
-    text_body: Mapped[str] = mapped_column()
-    html_body: Mapped[str] = mapped_column()
+    subject: Mapped[str]
+    text_body: Mapped[str]
+    html_body: Mapped[str]
     created: Mapped[datetime] = mapped_column(default=naive_utcnow)
 
     def __init__(self, subject, text_body, html_body):

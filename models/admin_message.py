@@ -22,12 +22,12 @@ class AdminMessage(BaseModel):
     __versioned__: dict = {}
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    message: Mapped[str] = mapped_column()
+    message: Mapped[str]
     show: Mapped[bool] = mapped_column(default=False)
 
-    topic: Mapped[str | None] = mapped_column()
+    topic: Mapped[str | None]
 
-    end: Mapped[datetime | None] = mapped_column()
+    end: Mapped[datetime | None]
 
     created_by: Mapped[int] = mapped_column(ForeignKey("user.id"))
 

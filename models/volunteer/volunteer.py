@@ -41,10 +41,10 @@ class Volunteer(BaseModel, UserMixin):
     __versioned__: dict = {}
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    nickname: Mapped[str | None] = mapped_column()
+    nickname: Mapped[str | None]
     banned: Mapped[bool] = mapped_column(default=False)
-    volunteer_phone: Mapped[str | None] = mapped_column()
-    volunteer_email: Mapped[str | None] = mapped_column()
+    volunteer_phone: Mapped[str | None]
+    volunteer_email: Mapped[str | None]
     over_18: Mapped[bool] = mapped_column(default=False)
     allow_comms_during_event: Mapped[bool] = mapped_column(default=False)
 
@@ -108,8 +108,8 @@ class Volunteer(BaseModel, UserMixin):
 class Messages(db.Model):
     from_user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
     to_user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
-    sent: Mapped[datetime | None] = mapped_column()
-    text: Mapped[str] = mapped_column()
+    sent: Mapped[datetime | None]
+    text: Mapped[str]
     is_read: Mapped[bool] = mapped_column(default=False)
     shift_id: Mapped[int | None] = mapped_column(ForeignKey('user.id'))
 """

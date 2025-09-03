@@ -27,11 +27,11 @@ class Role(BaseModel):
     __tablename__ = "volunteer_role"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True, index=True)
-    description: Mapped[str | None] = mapped_column()
+    description: Mapped[str | None]
     full_description_md: Mapped[str | None] = mapped_column(Text)
-    instructions_url: Mapped[str | None] = mapped_column()
+    instructions_url: Mapped[str | None]
     # Things to know for the shift
-    role_notes: Mapped[str | None] = mapped_column()
+    role_notes: Mapped[str | None]
     over_18_only: Mapped[bool] = mapped_column(default=False)
     requires_training: Mapped[bool] = mapped_column(default=False)
 
