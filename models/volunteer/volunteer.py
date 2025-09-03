@@ -12,6 +12,12 @@ if TYPE_CHECKING:
     from ..user import User
     from .role import Role
 
+__all__ = [
+    "Volunteer",
+    "VolunteerRoleInterest",
+    "VolunteerRoleTraining",
+]
+
 # This effectively records the roles that a volunteer is interested in
 VolunteerRoleInterest = Table(
     "volunteer_role_interest",

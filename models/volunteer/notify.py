@@ -3,8 +3,7 @@ from datetime import datetime
 from sqlalchemy import ForeignKey, func, select
 from sqlalchemy.orm import Mapped, column_property, mapped_column, relationship
 
-from .. import naive_utcnow
-from . import BaseModel
+from .. import BaseModel, naive_utcnow
 
 
 class VolunteerNotifyJob(BaseModel):

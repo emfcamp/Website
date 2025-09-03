@@ -36,6 +36,19 @@ if typing.TYPE_CHECKING:
     from .event_tickets import EventTicket
     from .volunteer.shift import Shift
 
+__all__ = [
+    "Proposal",
+    "PerformanceProposal",
+    "TalkProposal",
+    "WorkshopProposal",
+    "YouthWorkshopProposal",
+    "InstallationProposal",
+    "LightningTalkProposal",
+    "CFPMessage",
+    "CFPVote",
+    "Venue",
+]
+
 
 HUMAN_CFP_TYPES: dict[str, str] = {
     "performance": "performance",

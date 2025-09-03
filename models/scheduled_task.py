@@ -29,6 +29,8 @@ from main import db
 
 from . import BaseModel
 
+__all__ = ["ScheduledTask", "ScheduledTaskResult"]
+
 tasks = []
 log = logging.getLogger(__name__)
 

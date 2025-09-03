@@ -18,6 +18,13 @@ if TYPE_CHECKING:
     from .role import Role
     from .venue import VolunteerVenue
 
+__all__ = [
+    "Shift",
+    "ShiftEntry",
+    "ShiftEntryState",
+    "ShiftEntryStateException",
+]
+
 event_tz = pytz.timezone("Europe/London")
 
 

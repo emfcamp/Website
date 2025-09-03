@@ -8,6 +8,8 @@ from sqlalchemy.sql.functions import func
 from . import BaseModel, naive_utcnow
 from .user import User
 
+__all__ = ["AdminMessage"]
+
 INITIAL_TOPICS = {
     "heralds",
     "admin",

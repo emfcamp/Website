@@ -4,6 +4,11 @@ from main import cache
 
 from . import BaseModel
 
+__all__ = [
+    "DB_FEATURE_FLAGS",
+    "FeatureFlag",
+]
+
 # feature flags that can be overridden in the DB
 DB_FEATURE_FLAGS = [
     "ATTENDEE_CONTENT",

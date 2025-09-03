@@ -15,6 +15,12 @@ from . import BaseModel
 if TYPE_CHECKING:
     from .cfp import Venue
 
+__all__ = [
+    "Village",
+    "VillageMember",
+    "VillageRequirements",
+]
+
 
 class Village(BaseModel):
     __tablename__ = "village"
