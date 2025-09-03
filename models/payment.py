@@ -63,7 +63,7 @@ class Payment(BaseModel):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
     provider: Mapped[str] = mapped_column()
-    currency: Mapped[str] = mapped_column()
+    currency: Mapped[Currency] = mapped_column()
     amount_int: Mapped[int] = mapped_column()
 
     state: Mapped[str] = mapped_column(default="new")

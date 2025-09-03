@@ -1,9 +1,10 @@
+import enum
 from bisect import bisect
 from collections import OrderedDict
 from datetime import UTC, datetime
 from decimal import Decimal
 from itertools import groupby, pairwise
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, assert_never
 
 import datetype
 from dateutil.parser import parse
@@ -28,7 +29,21 @@ else:
 
 # Ideally needs to be unified with the Currency class in app/common/__init__.py, but this is
 # non-trivial.
-type Currency = Literal["GBP", "EUR"]
+
+
+class Currency(enum.StrEnum):
+    GBP = "GBP"
+    EUR = "EUR"
+
+    @property
+    def symbol(self) -> str:
+        match self:
+            case Currency.GBP:
+                return "£"
+            case Currency.EUR:
+                return "€"
+            case _:
+                assert_never(self)
 
 
 def naive_utcnow() -> datetype.DateTime[None]:

@@ -9,7 +9,7 @@ from wtforms import HiddenField, SubmitField
 from wtforms.validators import AnyOf, DataRequired
 
 from main import db
-from models import naive_utcnow
+from models import Currency, naive_utcnow
 from models.payment import BankPayment, BankTransaction
 
 from ..common import feature_enabled, get_user_currency
@@ -25,7 +25,7 @@ def transfer_start(payment: BankPayment):
     if not feature_enabled("BANK_TRANSFER"):
         return redirect(url_for("tickets.pay"))
 
-    if get_user_currency() == "EUR" and not feature_enabled("BANK_TRANSFER_EURO"):
+    if get_user_currency() == Currency.EUR and not feature_enabled("BANK_TRANSFER_EURO"):
         return redirect(url_for("tickets.pay"))
 
     logger.info("Created bank payment %s (%s)", payment.id, payment.bankref)

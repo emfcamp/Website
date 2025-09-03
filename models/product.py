@@ -317,7 +317,7 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
 
         return dict(states)
 
-    def get_cheapest_price(self, currency="GBP") -> Price:
+    def get_cheapest_price(self, currency=Currency.GBP) -> Price:
         price = (
             PriceTier.query.filter_by(product_id=self.id)
             .join(Price)

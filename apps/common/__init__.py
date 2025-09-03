@@ -1,7 +1,8 @@
 import json
+import logging
 import os.path
 import re
-from dataclasses import dataclass
+from decimal import Decimal
 from os import path
 from pathlib import Path
 from textwrap import wrap
@@ -27,7 +28,7 @@ from werkzeug.wrappers import Response
 from yaml import safe_load as parse_yaml
 
 from main import db, external_url
-from models import User, event_end, event_start, naive_utcnow
+from models import Currency, User, event_end, event_start, naive_utcnow
 from models.basket import Basket
 from models.feature_flag import get_db_flags
 from models.product import Price
@@ -41,15 +42,9 @@ from models.site_state import (
 
 from .preload import init_preload
 
+logger = logging.getLogger(__name__)
 
-@dataclass
-class Currency:
-    code: str
-    symbol: str
-
-
-CURRENCIES = [Currency("GBP", "£"), Currency("EUR", "€")]
-CURRENCY_SYMBOLS = {c.code: c.symbol for c in CURRENCIES}
+CURRENCY_SYMBOLS = {c.value: c.symbol for c in Currency}
 
 
 def load_utility_functions(app_obj):
@@ -73,15 +68,20 @@ def load_utility_functions(app_obj):
         return "-".join(wrap(sort_code, 2))
 
     @app_obj.template_filter("price")
-    def format_price(price, currency=None, after=False):
-        if isinstance(price, Price):
-            currency = price.currency
-            amount = price.value
-            # TODO: look up after from CURRENCIES
-        else:
-            amount = price
-        amount = f"{amount:.2f}"
-        symbol = CURRENCY_SYMBOLS[currency]
+    def format_price(_price, _currency=None, after=False) -> str:
+        match _price, _currency:
+            case Price(), None:
+                amount = f"{_price.value:.2f}"
+                currency = _price.currency
+            case int() | float() | Decimal(), Currency():
+                amount = f"{_price:.2f}"
+                currency = _currency
+            case int() | float() | Decimal(), str():
+                amount = f"{_price:.2f}"
+                currency = Currency(_currency)
+            case _:
+                raise ValueError("Invalid use of price filter!")
+        symbol = currency.symbol
         if after:
             return amount + symbol
         return symbol + amount
@@ -113,7 +113,6 @@ def load_utility_functions(app_obj):
             SITE_STATE=SITE_STATE,
             REFUND_STATE=REFUND_STATE,
             SIGNUP_STATE=SIGNUP_STATE,
-            CURRENCIES=CURRENCIES,
             CURRENCY_SYMBOLS=CURRENCY_SYMBOLS,
             external_url=external_url,
             feature_enabled=feature_enabled,
@@ -223,14 +222,31 @@ def create_current_user(email: str, name: str):
     return user
 
 
-def get_user_currency(default="GBP"):
-    return session.get("currency", default)
+def get_user_currency(default=Currency.GBP) -> Currency:
+    """Fetch the user's currency from the session.
+
+    If it's missing or invalid, returns `default`
+    """
+    if from_session := session.get("currency", None):
+        try:
+            return Currency(from_session)
+        except ValueError:
+            logger.warning(
+                "Invalid currency retrieved from session '%s', defaulting to %s", from_session, default
+            )
+    return default
 
 
-def set_user_currency(currency):
+def set_user_currency(currency: Currency | str) -> None:
+    """Set the user's currency in their session.
+
+    If currency is str, raises ValueError if it's not one of the valid `Currency` options.
+    """
+    if isinstance(currency, str):
+        currency = Currency(currency)
     basket = Basket.from_session(current_user, get_user_currency())
     basket.set_currency(currency)
-    session["currency"] = currency
+    session["currency"] = currency.value
 
 
 def feature_flag(feature):

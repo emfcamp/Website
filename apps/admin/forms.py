@@ -18,6 +18,7 @@ from wtforms.validators import DataRequired, InputRequired, Optional, Validation
 from wtforms.widgets import TextArea
 from wtforms_sqlalchemy.fields import QuerySelectField
 
+from models import Currency
 from models.basket import Basket
 from models.permission import Permission
 from models.product import PRODUCT_GROUP_TYPES, ProductGroup
@@ -244,7 +245,7 @@ class TicketAmountForm(Form):
 class IssueTicketsForm(Form):
     price_tiers = FieldList(FormField(TicketAmountForm))
     allocate = SubmitField("Allocate tickets")
-    currency: Field = HiddenField("Currency", default="GBP")
+    currency: Field = HiddenField("Currency", default=Currency.GBP)
 
     def validate_price_tiers(self, field):
         if not any(f.amount.data for f in field):
@@ -273,7 +274,9 @@ class IssueTicketsForm(Form):
 
 
 class ReserveTicketsForm(IssueTicketsForm):
-    currency = SelectField("Currency", choices=[(None, "")] + list(CURRENCY_SYMBOLS.items()), default="GBP")
+    currency = SelectField(
+        "Currency", choices=[(None, "")] + list(CURRENCY_SYMBOLS.items()), default=Currency.GBP
+    )
 
 
 class ReserveTicketsNewUserForm(ReserveTicketsForm):
