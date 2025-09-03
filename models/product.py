@@ -116,7 +116,7 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
     id: Mapped[int] = mapped_column(primary_key=True)
     parent_id: Mapped[int | None] = mapped_column(ForeignKey("product_group.id"))
     # Whether this is a ticket or hire item.
-    type: Mapped[str] = mapped_column()
+    type: Mapped[str]
     name: Mapped[str] = mapped_column(unique=True)
 
     products: Mapped[list[Product]] = relationship(
@@ -284,9 +284,9 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     group_id: Mapped[int] = mapped_column(ForeignKey(ProductGroup.id))
-    name: Mapped[str] = mapped_column()
-    display_name: Mapped[str | None] = mapped_column()
-    description: Mapped[str | None] = mapped_column()
+    name: Mapped[str]
+    display_name: Mapped[str | None]
+    description: Mapped[str | None]
 
     price_tiers: Mapped[list[PriceTier]] = relationship(
         back_populates="parent", cascade="all", order_by="PriceTier.id"
@@ -392,7 +392,7 @@ class PriceTier(BaseModel, CapacityMixin):
     __tablename__ = "price_tier"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column()
+    name: Mapped[str]
     product_id: Mapped[int] = mapped_column(ForeignKey(Product.id))
 
     personal_limit: Mapped[int] = mapped_column(default=10)
@@ -492,8 +492,8 @@ class Price(BaseModel):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     price_tier_id: Mapped[int] = mapped_column(ForeignKey("price_tier.id"))
-    currency: Mapped[Currency] = mapped_column()
-    price_int: Mapped[int] = mapped_column()
+    currency: Mapped[Currency]
+    price_int: Mapped[int]
 
     purchases: Mapped[list[Purchase]] = relationship(back_populates="price")
     price_tier: Mapped[list[PriceTier]] = relationship(back_populates="prices")
@@ -544,7 +544,7 @@ class Voucher(BaseModel):
     __export_data__ = False  # Exported by ProductView
 
     code: Mapped[str] = mapped_column(primary_key=True)
-    expiry: Mapped[NaiveDT | None] = mapped_column()
+    expiry: Mapped[NaiveDT | None]
 
     email: Mapped[str | None] = mapped_column(index=True)
 
@@ -662,7 +662,7 @@ class ProductView(BaseModel):
     __tablename__ = "product_view"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    type: Mapped[str] = mapped_column()
+    type: Mapped[str]
     name: Mapped[str] = mapped_column(index=True)
 
     # Whether this productview is only accessible to users with an accepted CfP proposal

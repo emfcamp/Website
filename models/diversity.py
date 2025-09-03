@@ -101,11 +101,11 @@ def guess_ethnicity(ethnicity_str: str) -> str:
 class UserDiversity(BaseModel):
     __tablename__ = "diversity"
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
-    age: Mapped[str | None] = mapped_column()
-    gender: Mapped[str | None] = mapped_column()
-    ethnicity: Mapped[str | None] = mapped_column()
-    disability: Mapped[str | None] = mapped_column()
-    sexuality: Mapped[str | None] = mapped_column()
+    age: Mapped[str | None]
+    gender: Mapped[str | None]
+    ethnicity: Mapped[str | None]
+    disability: Mapped[str | None]
+    sexuality: Mapped[str | None]
 
     user: Mapped[User] = relationship(back_populates="diversity")
 

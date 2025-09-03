@@ -22,7 +22,7 @@ class CapacityMixin:
     capacity_max: Mapped[int | None] = mapped_column(default=None)
     capacity_used: Mapped[int] = mapped_column(default=0, server_onupdate=FetchedValue())
 
-    expires: Mapped[datetime | None] = mapped_column()
+    expires: Mapped[datetime | None]
 
     @declared_attr
     def __expired(cls):

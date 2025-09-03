@@ -201,13 +201,13 @@ class User(BaseModel, UserMixin):
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str | None] = mapped_column(unique=True, index=True)
     name: Mapped[str] = mapped_column(index=True)
-    company: Mapped[str | None] = mapped_column()
+    company: Mapped[str | None]
     will_have_ticket: Mapped[bool] = mapped_column(default=False)  # for CfP filtering
-    checkin_note: Mapped[str | None] = mapped_column()
+    checkin_note: Mapped[str | None]
     # Whether the user has opted in to receive promo emails after this event:
     promo_opt_in: Mapped[bool] = mapped_column(default=False)
 
-    cfp_invite_reason: Mapped[str | None] = mapped_column()
+    cfp_invite_reason: Mapped[str | None]
 
     cfp_reviewer_tags: Mapped[list[Tag]] = relationship(
         back_populates="reviewers",
@@ -449,12 +449,12 @@ Index("ix_user_name_tsearch", text("to_tsvector('simple', name)"), postgresql_us
 class UserShipping(BaseModel):
     __tablename__ = "shipping"
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
-    name: Mapped[str | None] = mapped_column()
-    address_1: Mapped[str | None] = mapped_column()
-    address_2: Mapped[str | None] = mapped_column()
-    town: Mapped[str | None] = mapped_column()
-    postcode: Mapped[str | None] = mapped_column()
-    country: Mapped[str | None] = mapped_column()
+    name: Mapped[str | None]
+    address_1: Mapped[str | None]
+    address_2: Mapped[str | None]
+    town: Mapped[str | None]
+    postcode: Mapped[str | None]
+    country: Mapped[str | None]
 
     user: Mapped[User] = relationship(back_populates="shipping")
 

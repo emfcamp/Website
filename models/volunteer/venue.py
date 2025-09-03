@@ -15,7 +15,7 @@ class VolunteerVenue(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     # TODO: shouldn't be nullable
     name: Mapped[str | None] = mapped_column(unique=True, index=True)
-    mapref: Mapped[str | None] = mapped_column()
+    mapref: Mapped[str | None]
 
     shifts: Mapped[list["Shift"]] = relationship(back_populates="venue")
 

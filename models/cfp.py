@@ -367,21 +367,21 @@ class Proposal(BaseModel):
     created: Mapped[datetime] = mapped_column(default=naive_utcnow)
     modified: Mapped[datetime] = mapped_column(default=naive_utcnow, onupdate=naive_utcnow)
     state: Mapped[str] = mapped_column(default="new")
-    type: Mapped[str] = mapped_column()  # talk, workshop or installation
+    type: Mapped[str]  # talk, workshop or installation
 
     is_accepted: Mapped[bool] = column_property(state.in_(["accepted", "finalised"]))
     should_be_exported: Mapped[bool] = column_property(state.in_(["accepted", "finalised"]))
 
     # Core information
-    title: Mapped[str] = mapped_column()
-    description: Mapped[str] = mapped_column()
+    title: Mapped[str]
+    description: Mapped[str]
 
-    equipment_required: Mapped[str | None] = mapped_column()
-    funding_required: Mapped[str | None] = mapped_column()
-    additional_info: Mapped[str | None] = mapped_column()
-    length: Mapped[str | None] = mapped_column()  # only used for talks and workshops
-    notice_required: Mapped[str | None] = mapped_column()
-    private_notes: Mapped[str | None] = mapped_column()
+    equipment_required: Mapped[str | None]
+    funding_required: Mapped[str | None]
+    additional_info: Mapped[str | None]
+    length: Mapped[str | None]  # only used for talks and workshops
+    notice_required: Mapped[str | None]
+    private_notes: Mapped[str | None]
 
     tags: Mapped[list[Tag]] = relationship(
         back_populates="proposals",
@@ -418,20 +418,20 @@ class Proposal(BaseModel):
     )
 
     # Fields for finalised info
-    published_names: Mapped[str | None] = mapped_column()
-    published_pronouns: Mapped[str | None] = mapped_column()
-    published_title: Mapped[str | None] = mapped_column()
-    published_description: Mapped[str | None] = mapped_column()
-    arrival_period: Mapped[str | None] = mapped_column()
-    departure_period: Mapped[str | None] = mapped_column()
-    telephone_number: Mapped[str | None] = mapped_column()
-    eventphone_number: Mapped[str | None] = mapped_column()
-    may_record: Mapped[bool | None] = mapped_column()
-    video_privacy: Mapped[str | None] = mapped_column()
-    needs_laptop: Mapped[bool | None] = mapped_column()
-    available_times: Mapped[str | None] = mapped_column()
+    published_names: Mapped[str | None]
+    published_pronouns: Mapped[str | None]
+    published_title: Mapped[str | None]
+    published_description: Mapped[str | None]
+    arrival_period: Mapped[str | None]
+    departure_period: Mapped[str | None]
+    telephone_number: Mapped[str | None]
+    eventphone_number: Mapped[str | None]
+    may_record: Mapped[bool | None]
+    video_privacy: Mapped[str | None]
+    needs_laptop: Mapped[bool | None]
+    available_times: Mapped[str | None]
     family_friendly: Mapped[bool | None] = mapped_column(default=False)
-    content_note: Mapped[str | None] = mapped_column()
+    content_note: Mapped[str | None]
 
     # Fields for scheduling
     # hide_from_schedule -- do not display this item
@@ -442,11 +442,11 @@ class Proposal(BaseModel):
         secondary=ProposalAllowedVenues,
         back_populates="allowed_proposals",
     )
-    allowed_times: Mapped[str | None] = mapped_column()
-    scheduled_duration: Mapped[int | None] = mapped_column()
-    scheduled_time: Mapped[datetime | None] = mapped_column()
+    allowed_times: Mapped[str | None]
+    scheduled_duration: Mapped[int | None]
+    scheduled_time: Mapped[datetime | None]
     scheduled_venue_id: Mapped[int | None] = mapped_column(ForeignKey("venue.id"))
-    potential_time: Mapped[datetime | None] = mapped_column()
+    potential_time: Mapped[datetime | None]
     potential_venue_id: Mapped[int | None] = mapped_column(ForeignKey("venue.id"))
 
     scheduled_venue: Mapped[Venue | None] = relationship(
@@ -458,9 +458,9 @@ class Proposal(BaseModel):
     )
 
     # Video stuff
-    c3voc_url: Mapped[str | None] = mapped_column()
-    youtube_url: Mapped[str | None] = mapped_column()
-    thumbnail_url: Mapped[str | None] = mapped_column()
+    c3voc_url: Mapped[str | None]
+    youtube_url: Mapped[str | None]
+    thumbnail_url: Mapped[str | None]
     video_recording_lost: Mapped[bool | None] = mapped_column(default=False)
 
     type_might_require_ticket = False
@@ -847,16 +847,16 @@ class TalkProposal(Proposal):
 class WorkshopProposal(Proposal):
     __mapper_args__ = {"polymorphic_identity": "workshop"}
     human_type = HUMAN_CFP_TYPES["workshop"]
-    attendees: Mapped[str | None] = mapped_column()
-    cost: Mapped[str | None] = mapped_column()
-    age_range: Mapped[str | None] = mapped_column()
-    participant_equipment: Mapped[str | None] = mapped_column()
-    published_age_range: Mapped[str | None] = mapped_column()
-    published_cost: Mapped[str | None] = mapped_column()
-    published_participant_equipment: Mapped[str | None] = mapped_column()
+    attendees: Mapped[str | None]
+    cost: Mapped[str | None]
+    age_range: Mapped[str | None]
+    participant_equipment: Mapped[str | None]
+    published_age_range: Mapped[str | None]
+    published_cost: Mapped[str | None]
+    published_participant_equipment: Mapped[str | None]
 
     requires_ticket: Mapped[bool | None] = mapped_column(default=False)
-    total_tickets: Mapped[int | None] = mapped_column()
+    total_tickets: Mapped[int | None]
     non_lottery_tickets: Mapped[int | None] = mapped_column(default=5)
     max_tickets_per_person = 2
     type_might_require_ticket = True
@@ -929,14 +929,14 @@ class YouthWorkshopProposal(WorkshopProposal):
 class InstallationProposal(Proposal):
     __mapper_args__ = {"polymorphic_identity": "installation"}
     human_type = HUMAN_CFP_TYPES["installation"]
-    size: Mapped[str | None] = mapped_column()
-    installation_funding: Mapped[str | None] = mapped_column()
+    size: Mapped[str | None]
+    installation_funding: Mapped[str | None]
 
 
 class LightningTalkProposal(Proposal):
     __mapper_args__ = {"polymorphic_identity": "lightning"}
     human_type = HUMAN_CFP_TYPES["lightning"]
-    slide_link: Mapped[str | None] = mapped_column()
+    slide_link: Mapped[str | None]
     session: Mapped[str | None] = mapped_column(default="fri")
 
     should_be_exported = column_property(
@@ -1024,9 +1024,9 @@ class CFPMessage(BaseModel):
     from_user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     proposal_id: Mapped[int] = mapped_column(ForeignKey("proposal.id"))
 
-    message: Mapped[str] = mapped_column()
+    message: Mapped[str]
     # Flags
-    is_to_admin: Mapped[bool | None] = mapped_column()
+    is_to_admin: Mapped[bool | None]
     has_been_read: Mapped[bool | None] = mapped_column(default=False)
 
     from_user: Mapped[User] = relationship(back_populates="messages_from")
@@ -1087,14 +1087,14 @@ class CFPVote(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     proposal_id: Mapped[int] = mapped_column(ForeignKey("proposal.id"))
-    state: Mapped[str] = mapped_column()
+    state: Mapped[str]
     has_been_read: Mapped[bool] = mapped_column(default=False)
 
     created: Mapped[datetime] = mapped_column(default=naive_utcnow)
     modified: Mapped[datetime] = mapped_column(default=naive_utcnow, onupdate=naive_utcnow)
 
-    vote: Mapped[int | None] = mapped_column()  # Vote can be null for abstentions
-    note: Mapped[str | None] = mapped_column()
+    vote: Mapped[int | None]  # Vote can be null for abstentions
+    note: Mapped[str | None]
 
     user: Mapped[User] = relationship(back_populates="votes")
     proposal: Mapped[Proposal] = relationship(back_populates="votes")
@@ -1141,7 +1141,7 @@ class Venue(BaseModel):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     village_id: Mapped[int | None] = mapped_column(ForeignKey("village.id"), default=None)
-    name: Mapped[str] = mapped_column()
+    name: Mapped[str]
 
     # Which type of proposals are allowed to be scheduled in this venue.
     # (This is not really used yet.)
@@ -1157,9 +1157,9 @@ class Venue(BaseModel):
         default=lambda: [],
     )
     priority: Mapped[int | None] = mapped_column(default=0)
-    capacity: Mapped[int | None] = mapped_column()
+    capacity: Mapped[int | None]
     location: Mapped[WKBElement | None] = mapped_column(Geometry("POINT", srid=4326))
-    scheduled_content_only: Mapped[bool | None] = mapped_column()
+    scheduled_content_only: Mapped[bool | None]
 
     village: Mapped[Village] = relationship(
         back_populates="venues",

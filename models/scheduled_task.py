@@ -51,7 +51,7 @@ class ScheduledTask:
 class ScheduledTaskResult(BaseModel):
     __tablename__ = "scheduled_task_result"
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column()
+    name: Mapped[str]
     start_time: Mapped[datetime] = mapped_column(DateTime(True))
     duration: Mapped[timedelta] = mapped_column(Interval)
     result: Mapped[dict[str, Any]] = mapped_column(JSON)
