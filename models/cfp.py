@@ -413,7 +413,7 @@ class Proposal(BaseModel):
     favourite_count = column_property(
         select(func.count(FavouriteProposal.c.proposal_id))
         .where(FavouriteProposal.c.proposal_id == id)
-        .scalar_subquery(),  # type: ignore[attr-defined]
+        .scalar_subquery(),
         deferred=True,
     )
 

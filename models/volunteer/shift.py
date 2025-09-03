@@ -109,8 +109,8 @@ class Shift(BaseModel):
     current_count = column_property(
         select(func.count(ShiftEntry.shift_id))
         .where(ShiftEntry.shift_id == id)
-        .correlate_except(ShiftEntry)  # type: ignore[arg-type]
-        .scalar_subquery()  # type: ignore[attr-defined]
+        .correlate_except(ShiftEntry)
+        .scalar_subquery()
     )
 
     duration = column_property(end - start)
