@@ -18,7 +18,7 @@ if typing.TYPE_CHECKING:
     from .purchase import Purchase
     from .user import User
 
-from main import db
+from main import NaiveDT, db
 
 from . import (
     BaseModel,
@@ -69,8 +69,8 @@ class Payment(BaseModel):
     state: Mapped[str] = mapped_column(default="new")
     reminder_sent_at: Mapped[datetime | None] = mapped_column()
 
-    created: Mapped[datetime] = mapped_column(default=naive_utcnow)
-    expires: Mapped[datetime | None] = mapped_column()
+    created: Mapped[NaiveDT] = mapped_column(default=naive_utcnow)
+    expires: Mapped[NaiveDT | None] = mapped_column()
     voucher_code: Mapped[str | None] = mapped_column(ForeignKey("voucher.code"), default=None)
 
     # VAT invoice number, if issued

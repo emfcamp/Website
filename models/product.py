@@ -6,7 +6,7 @@ import re
 import string
 from collections import defaultdict
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING, cast
 
@@ -21,7 +21,7 @@ from sqlalchemy.orm import (
     validates,
 )
 
-from main import db
+from main import NaiveDT, db
 
 from . import BaseModel, Currency, naive_utcnow
 from .mixins import CapacityMixin, InheritedAttributesMixin
@@ -544,7 +544,7 @@ class Voucher(BaseModel):
     __export_data__ = False  # Exported by ProductView
 
     code: Mapped[str] = mapped_column(primary_key=True)
-    expiry: Mapped[datetime | None] = mapped_column()
+    expiry: Mapped[NaiveDT | None] = mapped_column()
 
     email: Mapped[str | None] = mapped_column(index=True)
 
