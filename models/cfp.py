@@ -3,7 +3,8 @@ from __future__ import annotations
 from datetime import datetime, timedelta, time
 import typing
 from collections import namedtuple
-from typing import Optional
+from collections.abc import Sequence
+from typing import Optional, cast
 from dateutil.parser import parse as parse_date
 import re
 from itertools import groupby
@@ -633,9 +634,15 @@ class Proposal(BaseModel):
 
         return data
 
-    def get_user_vote(self, user) -> "CFPVote":
+    def get_user_vote(self, user) -> CFPVote | None:
         # there can't be more than one vote per user per proposal
-        return CFPVote.query.filter_by(proposal_id=self.id, user_id=user.id).first()
+        return (
+            db.session.execute(
+                select(CFPVote).where(CFPVote.proposal_id == self.id, CFPVote.user_id == user.id)
+            )
+            .scalars()
+            .first()
+        )
 
     def set_state(self, state):
         state = state.lower()
@@ -670,13 +677,17 @@ class Proposal(BaseModel):
         admission_tickets = len(list(self.user.get_owned_tickets(paid=True, type="admission_ticket")))
         return admission_tickets > 0 or self.user.will_have_ticket
 
-    def get_allowed_venues(self) -> list["Venue"]:
+    def get_allowed_venues(self) -> Sequence["Venue"]:
         if self.allowed_venues:
             return self.allowed_venues
         elif self.user_scheduled:
-            return Venue.query.filter(~Venue.scheduled_content_only).all()
+            return db.session.execute(select(Venue).where(~Venue.scheduled_content_only)).scalars().all()
         else:
-            return Venue.query.filter(Venue.default_for_types.any(self.type)).all()
+            return (
+                db.session.execute(select(Venue).where(Venue.default_for_types.any_() == self.type))
+                .scalars()
+                .all()
+            )
 
     def fix_hard_time_limits(self, time_periods):
         # This should be fixed by the string periods being burned and replaced
@@ -756,14 +767,21 @@ class Proposal(BaseModel):
         # content or workshops. Workshops may not have a scheduled time/duration.
         return [
             p
-            for p in Proposal.query.filter(
-                Proposal.id != self.id,
-                Proposal.scheduled_venue_id == self.scheduled_venue_id,
-                Proposal.scheduled_time.is_not(None),
-                Proposal.scheduled_duration.is_not(None),
-            ).all()
-            if self.scheduled_time + timedelta(minutes=self.scheduled_duration) > p.scheduled_time
-            and p.scheduled_time + timedelta(minutes=p.scheduled_duration) > self.scheduled_time
+            for p in db.session.execute(
+                select(Proposal).filter(
+                    Proposal.id != self.id,
+                    Proposal.scheduled_venue_id == self.scheduled_venue_id,
+                    Proposal.scheduled_time.is_not(None),
+                    Proposal.scheduled_duration.is_not(None),
+                )
+            )
+            .scalars()
+            .all()
+            # These casts are safe given the query above checks for NULL
+            if self.scheduled_time + timedelta(minutes=self.scheduled_duration)
+            > cast(datetime, p.scheduled_time)
+            and cast(datetime, p.scheduled_time) + timedelta(minutes=cast(int, p.scheduled_duration))
+            > self.scheduled_time
         ]
 
     @property

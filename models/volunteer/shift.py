@@ -1,6 +1,7 @@
 import enum
+from collections.abc import Sequence
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 import pytz
 from pendulum import interval
@@ -183,13 +184,17 @@ class Shift(BaseModel):
         return cls.query.order_by(Shift.start, Shift.venue_id).all()
 
     @classmethod
-    def get_all_for_day(cls, day: str):
+    def get_all_for_day(cls, day: str) -> Sequence[Self]:
         """
         Return all shifts for the requested day.
         """
         return (
-            cls.query.where(text("lower(to_char(start, 'Dy'))=:day").bindparams(day=day.lower()))
-            .order_by(Shift.start, Shift.venue_id)
+            db.session.execute(
+                select(cls)
+                .where(text("lower(to_char(start, 'Dy'))=:day").bindparams(day=day.lower()))
+                .order_by(Shift.start, Shift.venue_id)
+            )
+            .scalars()
             .all()
         )
 

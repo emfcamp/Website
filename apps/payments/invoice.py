@@ -17,6 +17,7 @@ from flask import (
     current_app as app,
 )
 from flask_login import current_user, login_required
+from sqlalchemy import select
 from sqlalchemy.sql.functions import func
 from wtforms import SubmitField, TextAreaField
 
@@ -78,19 +79,23 @@ def invoice(payment_id, fmt=None):
     if request.args.get("js") == "0":
         flash("Please use your browser's print feature or download the PDF")
 
-    invoice_lines_query = (
-        Purchase.query.filter_by(payment_id=payment_id)
-        .join(PriceTier)
-        .join(Product)
-        .with_entities(PriceTier, func.count(Purchase.price_tier_id))
-        .group_by(PriceTier, Product.name)
-        .order_by(Product.name)
+    price_tier_counts = (
+        db.session.execute(
+            select(Purchase)
+            .filter_by(payment_id=payment_id)
+            .join(PriceTier)
+            .join(Product)
+            .with_only_columns(PriceTier, func.count(Purchase.price_tier_id))
+            .group_by(PriceTier.id, Product.name)
+            .order_by(Product.name)
+        )
+        .tuples()
         .all()
     )
 
     invoice_lines = []
     prices = []
-    for pt, count in invoice_lines_query:
+    for pt, count in price_tier_counts:
         price = pt.get_price(payment.currency)
         prices.append(
             {

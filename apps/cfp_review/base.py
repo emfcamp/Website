@@ -111,14 +111,14 @@ def filter_proposal_request() -> tuple[list[Proposal], bool]:
     bool_vals = [request.args.get(n, type=bool_qs) for n in bool_names]
     bool_dict = {n: v for n, v in zip(bool_names, bool_vals) if v is not None}
 
-    proposal_query = Proposal.query.filter_by(**bool_dict)
+    proposal_query = select(Proposal).filter_by(**bool_dict)
 
     filtered = False
 
     types = request.args.getlist("type")
     if types:
         filtered = True
-        proposal_query = proposal_query.filter(Proposal.type.in_(types))
+        proposal_query = proposal_query.where(Proposal.type.in_(types))
 
     states = request.args.getlist("state")
     if states:
@@ -128,10 +128,10 @@ def filter_proposal_request() -> tuple[list[Proposal], bool]:
     show_user_scheduled = request.args.get("show_user_scheduled", type=bool_qs)
     if show_user_scheduled is None or show_user_scheduled is False:
         filtered = False
-        proposal_query = proposal_query.filter_by(user_scheduled=False)
+        proposal_query = proposal_query.where(Proposal.user_scheduled == False)
     else:
         filtered = True
-        proposal_query = proposal_query.filter_by(user_scheduled=True)
+        proposal_query = proposal_query.where(Proposal.user_scheduled == True)
 
     # This block has to be last because it will join to the user table
     needs_ticket = request.args.get("needs_ticket", type=bool_qs)
@@ -139,8 +139,8 @@ def filter_proposal_request() -> tuple[list[Proposal], bool]:
         filtered = True
         proposal_query = (
             proposal_query.join(Proposal.user)
-            .filter_by(will_have_ticket=False)
-            .filter(
+            .where(User.will_have_ticket == False)
+            .where(
                 ~exists().where(
                     Ticket.state.in_(("paid", "payment-pending"))
                     & (Ticket.type == "admission_ticket")
@@ -167,7 +167,7 @@ def filter_proposal_request() -> tuple[list[Proposal], bool]:
         .options(joinedload(Proposal.tags))
         .options(undefer(Proposal.favourite_count))
     )
-    proposals = proposal_query.all()
+    proposals = list(db.session.execute(proposal_query).scalars().all())
     proposals.sort(**sort_dict)
     return proposals, filtered
 

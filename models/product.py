@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING, cast
 
-from sqlalchemy import ForeignKey, Numeric, UniqueConstraint, func, inspect
+from sqlalchemy import ForeignKey, Numeric, UniqueConstraint, func, inspect, select
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import (
     InstanceState,
@@ -143,8 +143,10 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
         super().__init__(type=type, parent=parent, parent_id=parent_id, **kwargs)
 
     @classmethod
-    def get_by_name(cls, group_name) -> ProductGroup | None:
-        return ProductGroup.query.filter_by(name=group_name).one_or_none()
+    def get_by_name(cls, group_name: str) -> ProductGroup | None:
+        return db.session.execute(
+            select(ProductGroup).where(ProductGroup.name == group_name)
+        ).scalar_one_or_none()
 
     @validates("capacity_max")
     def validate_capacity_max(self, _, capacity_max):
@@ -300,30 +302,42 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
     __export_data__ = False  # Exported by ProductGroup
 
     @classmethod
-    def get_by_name(cls, group_name, product_name) -> Product | None:
-        group = ProductGroup.query.filter_by(name=group_name)
-        product = group.join(Product).filter_by(name=product_name).with_entities(Product)
-        return product.one_or_none()
+    def get_by_name(cls, group_name: str, product_name: str) -> Product | None:
+        return db.session.execute(
+            select(ProductGroup)
+            .where(ProductGroup.name == group_name)
+            .join(Product)
+            .where(Product.name == product_name)
+            .with_only_columns(Product)
+        ).scalar_one_or_none()
 
     @property
-    def purchase_count_by_state(self):
+    def purchase_count_by_state(self) -> dict[str, int]:
         states = (
-            Purchase.query.join(PriceTier)
-            .join(Product)
-            .filter(Product.id == self.id)
-            .with_entities(Purchase.state, func.count(Purchase.id))
-            .group_by(Purchase.state)
+            db.session.execute(
+                select(Purchase.state, func.count(Purchase.id))
+                .join(PriceTier)
+                .join(Product)
+                .where(Product.id == self.id)
+                .group_by(Purchase.state)
+            )
+            .tuples()
+            .all()
         )
 
         return dict(states)
 
-    def get_cheapest_price(self, currency=Currency.GBP) -> Price:
+    def get_cheapest_price(self, currency=Currency.GBP) -> Price | None:
         price = (
-            PriceTier.query.filter_by(product_id=self.id)
-            .join(Price)
-            .filter_by(currency=currency)
-            .with_entities(Price)
-            .order_by(Price.price_int)
+            db.session.execute(
+                select(PriceTier)
+                .where(PriceTier.product_id == self.id)
+                .join(Price)
+                .where(Price.currency == currency)
+                .with_only_columns(Price)
+                .order_by(Price.price_int)
+            )
+            .scalars()
             .first()
         )
         return price
@@ -396,26 +410,37 @@ class PriceTier(BaseModel, CapacityMixin):
         super().__init__(name=name, **kwargs)
 
     @classmethod
-    def get_by_name(cls, group_name, product_name, tier_name) -> PriceTier | None:
-        group = ProductGroup.query.filter_by(name=group_name)
-        product = group.join(Product).filter_by(name=product_name).with_entities(Product)
-        tier = product.join(PriceTier).filter_by(name=tier_name).with_entities(PriceTier)
-        return tier.one_or_none()
+    def get_by_name(cls, group_name: str, product_name: str, tier_name: str) -> PriceTier | None:
+        return db.session.execute(
+            select(ProductGroup)
+            .where(ProductGroup.name == group_name)
+            .join(Product)
+            .where(Product.name == product_name)
+            .join(PriceTier)
+            .where(PriceTier.name == tier_name)
+            .with_only_columns(PriceTier)
+        ).scalar_one_or_none()
 
     @property
-    def purchase_count_by_state(self):
+    def purchase_count_by_state(self) -> dict[str, int]:
         states = (
-            Purchase.query.join(PriceTier)
-            .filter(PriceTier.id == self.id)
-            .with_entities(Purchase.state, func.count(Purchase.id))
-            .group_by(Purchase.state)
+            db.session.execute(
+                select(Purchase.state, func.count(Purchase.id))
+                .join(PriceTier)
+                .where(PriceTier.id == self.id)
+                .group_by(Purchase.state)
+            )
+            .tuples()
+            .all()
         )
 
         return dict(states)
 
     @property
     def purchase_count(self) -> int:
-        return Purchase.query.join(PriceTier).filter(PriceTier.id == self.id).count()
+        return db.session.execute(
+            select(func.count()).select_from(Purchase).join(PriceTier).where(PriceTier.id == self.id)
+        ).scalar_one()
 
     @property
     def unused(self) -> bool:
@@ -429,8 +454,9 @@ class PriceTier(BaseModel, CapacityMixin):
         return self.get_price_loaded(currency)
 
     def get_price_unloaded(self, currency: Currency) -> Price | None:
-        price = Price.query.filter_by(price_tier_id=self.id, currency=currency)
-        return price.one_or_none()
+        return db.session.execute(
+            select(Price).where(Price.price_tier_id == self.id, Price.currency == currency)
+        ).scalar_one_or_none()
 
     def get_price_loaded(self, currency: Currency) -> Price | None:
         prices = [p for p in self.prices if p.currency == currency]
@@ -537,7 +563,7 @@ class Voucher(BaseModel):
     def get_by_code(cls, code: str) -> Voucher | None:
         if not code:
             return None
-        return Voucher.query.filter_by(code=code).one_or_none()
+        return db.session.execute(select(Voucher).where(Voucher.code == code)).scalar_one_or_none()
 
     def __init__(
         self,
@@ -670,10 +696,8 @@ class ProductView(BaseModel):
         return {"private": data}
 
     @classmethod
-    def get_by_name(cls, name) -> ProductView | None:
-        if name is None:
-            return None
-        return ProductView.query.filter_by(name=name).one_or_none()
+    def get_by_name(cls, name: str) -> ProductView | None:
+        return db.session.execute(select(ProductView).where(ProductView.name == name)).scalar_one_or_none()
 
     def is_accessible_at(self, user, dt, voucher=None) -> bool:
         "Whether this ProductView is accessible to a user."
@@ -691,7 +715,9 @@ class ProductView(BaseModel):
             if not voucher:
                 return False
 
-            voucher_obj = Voucher.query.filter_by(view=self, code=voucher).one_or_none()
+            voucher_obj = db.session.execute(
+                select(Voucher).where(Voucher.view == self, Voucher.code == voucher)
+            ).scalar_one_or_none()
 
             if not voucher_obj:
                 return False

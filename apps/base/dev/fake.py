@@ -2,6 +2,7 @@ import logging
 import random
 
 from faker import Faker
+from sqlalchemy import select
 
 from apps.cfp.scheduler import Scheduler
 from apps.common.forms import (
@@ -243,11 +244,11 @@ class FakeDataGenerator:
         num_purchases = abs(round(random.gauss(0, 2)))
         for _ in range(0, num_purchases):
             b = Basket(user, currency)
-            pt = PriceTier.query.filter_by(name="full-std").one()
+            pt = db.session.execute(select(PriceTier).where(PriceTier.name == "full-std")).scalar_one()
             b[pt] = int(round(random.uniform(1, 4)))
 
             if random.random() < 0.5:
-                pt = PriceTier.query.filter_by(name="parking").one()
+                pt = db.session.execute(select(PriceTier).where(PriceTier.name == "parking")).scalar_one()
                 b[pt] = 1
 
             b.create_purchases()

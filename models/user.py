@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from flask import current_app as app
 from flask import session
 from flask_login import AnonymousUserMixin, UserMixin
-from sqlalchemy import Column, ForeignKey, Index, Integer, Table, func, text
+from sqlalchemy import Column, ForeignKey, Index, Integer, Table, func, select, text
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -360,7 +360,7 @@ class User(BaseModel, UserMixin):
 
     def grant_permission(self, name: str):
         try:
-            perm = Permission.query.filter_by(name=name).one()
+            perm = db.session.execute(select(Permission).where(Permission.name == name)).scalar_one()
         except NoResultFound:
             perm = Permission(name)
             db.session.add(perm)
