@@ -73,13 +73,6 @@ def schedule_current():
     )
 
 
-def _group_proposals_by_human_type(proposals: list[Proposal]) -> dict[str, list[Proposal]]:
-    grouped = defaultdict(list)
-    for proposal in proposals:
-        grouped[proposal.human_type].append(proposal)
-    return grouped
-
-
 # FIXME this should probably work for other years
 @schedule.route("/schedule/line-up/2024")
 def line_up():
