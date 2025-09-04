@@ -71,7 +71,7 @@ class ShiftEntry(BaseModel):
     user: Mapped["User"] = relationship(back_populates="shift_entries")
     shift: Mapped["Shift"] = relationship(back_populates="entries")
 
-    def set_state(self, state: str | ShiftEntryState):
+    def set_state(self, state: str | ShiftEntryState) -> None:
         if isinstance(state, str):
             try:
                 state = ShiftEntryState(state)

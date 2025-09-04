@@ -86,7 +86,7 @@ class Payment(BaseModel):
 
     __mapper_args__ = {"polymorphic_on": "provider"}
 
-    def __init__(self, currency: Currency, amount, voucher_code: str | None = None):
+    def __init__(self, currency: Currency, amount: int | float, voucher_code: str | None = None):
         self.currency = currency
         self.amount = amount
 
@@ -160,7 +160,7 @@ class Payment(BaseModel):
 
         return data
 
-    def is_refundable(self, ignore_event_refund_state=False) -> bool:
+    def is_refundable(self, ignore_event_refund_state: bool = False) -> bool:
         return self.state in [
             "charged",
             "paid",
@@ -177,7 +177,7 @@ class Payment(BaseModel):
     def amount(self, val):
         self.amount_int = int(val * 100)
 
-    def change_currency(self, currency: Currency):
+    def change_currency(self, currency: Currency) -> None:
         if self.state in {"paid", "partrefunded", "refunded"}:
             raise StateException("Cannot change currency after payment is reconciled")
 
@@ -302,7 +302,7 @@ class BankPayment(Payment):
 
     transactions: Mapped[list[BankTransaction]] = relationship(back_populates="payment")
 
-    def __init__(self, currency: Currency, amount, voucher_code: str | None = None):
+    def __init__(self, currency: Currency, amount: int | float, voucher_code: str | None = None):
         Payment.__init__(self, currency, amount, voucher_code)
 
         # not cryptographic

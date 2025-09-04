@@ -1,6 +1,7 @@
 import enum
 from bisect import bisect
 from collections import OrderedDict
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from decimal import Decimal
 from itertools import groupby, pairwise
@@ -88,7 +89,9 @@ def nest_count_keys(rows):
     return tree
 
 
-def bucketise(vals, boundaries) -> OrderedDict[str, int]:
+def bucketise[T: int | float](
+    vals: Sequence[T] | Sequence[tuple[T]] | Sequence[Row[tuple[T]]], boundaries: Sequence[T]
+) -> OrderedDict[str, int]:
     """Sort values into bins, like pandas.cut"""
     ranges = [f"{a}-{b - 1}" if isinstance(b, int) and b - 1 > a else str(a) for a, b in pairwise(boundaries)]
     ranges.append(f"{boundaries[-1]}+")
@@ -97,7 +100,7 @@ def bucketise(vals, boundaries) -> OrderedDict[str, int]:
     for val in vals:
         if isinstance(val, tuple | Row):
             # As a convenience for fetching counts/single columns in sqla
-            val, *_ = val
+            val = val[0]
 
         i = bisect(boundaries, val)
         if i == 0:

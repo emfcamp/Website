@@ -28,7 +28,7 @@ def _dedent_periods(periods: str) -> str:
     return textwrap.dedent(periods).strip() + "\n"
 
 
-def _talk_with_time_period(periods) -> TalkProposal:
+def _talk_with_time_period(periods: str) -> TalkProposal:
     return TalkProposal(
         scheduled_time=parse("2024-05-30 12:00:00"),
         scheduled_venue=VENUE_TALK,

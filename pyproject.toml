@@ -137,6 +137,8 @@ ignore = [
 [tool.mypy]
 warn_unused_ignores = true
 disallow_any_generics = true
+# Eventually the goal would be to replace this with disallow_untyped_defs
+disallow_incomplete_defs = true
 
 [[tool.mypy.overrides]]
 module = [
@@ -153,3 +155,11 @@ module = [
     "wtforms_sqlalchemy.*",
 ]
 ignore_missing_imports = true
+
+# TODO: Remove once CFP rework is in
+[[tool.mypy.overrides]]
+module = [
+    "apps.cfp_review.*",
+    "models.cfp",
+]
+disallow_incomplete_defs = false

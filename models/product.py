@@ -21,6 +21,7 @@ from sqlalchemy.orm import (
 )
 
 from main import NaiveDT, db
+from models.user import User
 
 from . import BaseModel, Currency, naive_utcnow
 from .mixins import CapacityMixin, InheritedAttributesMixin
@@ -328,7 +329,7 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
 
         return dict(states)
 
-    def get_cheapest_price(self, currency=Currency.GBP) -> Price | None:
+    def get_cheapest_price(self, currency: Currency = Currency.GBP) -> Price | None:
         price = (
             db.session.execute(
                 select(PriceTier)
@@ -568,9 +569,9 @@ class Voucher(BaseModel):
 
     def __init__(
         self,
-        view,
+        view: ProductView,
         code: str | None = None,
-        expiry=None,
+        expiry: NaiveDT | None = None,
         email: str | None = None,
         purchases_remaining: int = 1,
         tickets_remaining: int = 2,
@@ -596,7 +597,7 @@ class Voucher(BaseModel):
         # interacts badly with the fact that we fake the date in tests.
         return self.expiry is not None and (self.expiry + VOUCHER_GRACE_PERIOD) < naive_utcnow()
 
-    def check_capacity(self, basket: Basket):
+    def check_capacity(self, basket: Basket) -> bool:
         """Check if there is enough capacity in this voucher to buy
         the tickets in the provided basket.
         """
@@ -609,7 +610,7 @@ class Voucher(BaseModel):
             return False
         return True
 
-    def consume_capacity(self, payment: Payment):
+    def consume_capacity(self, payment: Payment) -> None:
         """Decrease the voucher's capacity based on tickets in a payment."""
         if self.purchases_remaining < 1:
             raise VoucherUsedError(f"Attempting to use voucher with no remaining purchases: {self}")
@@ -627,7 +628,7 @@ class Voucher(BaseModel):
         self.purchases_remaining = Voucher.purchases_remaining - 1
         self.tickets_remaining = Voucher.tickets_remaining - adult_tickets
 
-    def return_capacity(self, payment: Payment):
+    def return_capacity(self, payment: Payment) -> None:
         """Return capacity to this voucher based on tickets in a payment."""
         adult_tickets = len(
             [purchase for purchase in payment.purchases if purchase.product.is_adult_ticket()]
@@ -700,7 +701,7 @@ class ProductView(BaseModel):
     def get_by_name(cls, name: str) -> ProductView | None:
         return db.session.execute(select(ProductView).where(ProductView.name == name)).scalar_one_or_none()
 
-    def is_accessible_at(self, user, dt, voucher=None) -> bool:
+    def is_accessible_at(self, user: User, voucher: str | None = None) -> bool:
         "Whether this ProductView is accessible to a user."
         if user.is_authenticated and user.has_permission("admin"):
             # Admins always have access
@@ -728,7 +729,7 @@ class ProductView(BaseModel):
         return True
 
     def is_accessible(self, user, voucher=None):
-        return self.is_accessible_at(user, naive_utcnow(), voucher=voucher)
+        return self.is_accessible_at(user, voucher=voucher)
 
     def __repr__(self):
         return f"<ProductView: {self.name}>"

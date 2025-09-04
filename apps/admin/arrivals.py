@@ -134,7 +134,7 @@ def arrivals_view_add(view_id, group_id=None, product_id=None):
 
         elif form.add_all_products_recursive.data:
 
-            def _fetch_all_products(group) -> list[dict[str, int]]:
+            def _fetch_all_products(group: ProductGroup) -> list[dict[str, int]]:
                 out = []
                 for product in group.products:
                     out.append({"view_id": view.id, "product_id": product.id})

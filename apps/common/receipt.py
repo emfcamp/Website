@@ -1,6 +1,6 @@
 import asyncio
 import io
-from typing import IO
+from typing import IO, Any
 
 import segno
 from flask import render_template
@@ -88,7 +88,7 @@ def render_pdf(url, html):
     return pdffile
 
 
-def make_qrfile(data: str, kind: str = "svg", **kwargs) -> IO[bytes]:
+def make_qrfile(data: str, kind: str = "svg", **kwargs: dict[str, Any]) -> IO[bytes]:
     qrfile = io.BytesIO()
     qr = segno.make_qr(data)
     qr.save(qrfile, kind=kind, **kwargs)

@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from flask import current_app as app
 from flask import flash, redirect, render_template, url_for
+from flask.typing import ResponseValue
 from flask_login import current_user, login_required
 from flask_mailman import EmailMessage
 from wtforms import HiddenField, SubmitField
@@ -21,7 +22,7 @@ from . import get_user_payment_or_abort, lock_user_payment_or_abort, payments
 logger = logging.getLogger(__name__)
 
 
-def transfer_start(payment: BankPayment):
+def transfer_start(payment: BankPayment) -> ResponseValue:
     if not feature_enabled("BANK_TRANSFER"):
         return redirect(url_for("tickets.pay"))
 
@@ -147,7 +148,7 @@ def transfer_cancel(payment_id):
     return render_template("payments/transfer-cancel.html", payment=payment, form=form)
 
 
-def reconcile_txns(txns: list[BankTransaction], doit: bool = False):
+def reconcile_txns(txns: list[BankTransaction], doit: bool = False) -> None:
     paid = 0
     failed = 0
 
@@ -221,7 +222,7 @@ def reconcile_txns(txns: list[BankTransaction], doit: bool = False):
     app.logger.info("Reconciliation complete: %s paid, %s failed", paid, failed)
 
 
-def send_confirmation(payment: BankPayment):
+def send_confirmation(payment: BankPayment) -> None:
     msg = EmailMessage(
         "Electromagnetic Field ticket purchase update",
         from_email=from_email("TICKETS_EMAIL"),

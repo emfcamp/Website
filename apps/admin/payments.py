@@ -84,7 +84,7 @@ class ResetExpiryForm(Form):
 
 
 @admin.route("/payment/<int:payment_id>/reset-expiry", methods=["GET", "POST"])
-def reset_expiry(payment_id) -> ResponseReturnValue:
+def reset_expiry(payment_id: int) -> ResponseReturnValue:
     payment = get_or_404(db, BankPayment, payment_id)
 
     form = ResetExpiryForm()

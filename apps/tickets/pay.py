@@ -12,6 +12,7 @@ from flask import (
 from flask import (
     current_app as app,
 )
+from flask.typing import ResponseValue
 from flask_login import current_user
 from markupsafe import Markup
 from sqlalchemy.exc import IntegrityError
@@ -151,7 +152,7 @@ def pay(flow="main"):
     )
 
 
-def start_payment(form: TicketPaymentForm, basket: Basket, flow: str):
+def start_payment(form: TicketPaymentForm, basket: Basket, flow: str) -> ResponseValue:
     if Decimal(form.basket_total.data or 0) != Decimal(basket.total):
         # Check that the user's basket approximately matches what we told them they were paying.
         price_changed.inc()

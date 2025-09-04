@@ -31,7 +31,7 @@ from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import Response
 from yaml import safe_load as parse_yaml
 
-from main import db, external_url
+from main import JSONValue, db, external_url
 from models import Currency, User, event_end, event_start, naive_utcnow
 from models.basket import Basket
 from models.feature_flag import get_db_flags
@@ -72,7 +72,9 @@ def load_utility_functions(app_obj):
         return "-".join(wrap(sort_code, 2))
 
     @app_obj.template_filter("price")
-    def format_price(_price, _currency=None, after=False) -> str:
+    def format_price(
+        _price: Price | int | float | Decimal, _currency: Currency | str | None = None, after: bool = False
+    ) -> str:
         match _price, _currency:
             case Price(), None:
                 amount = f"{_price.value:.2f}"
@@ -189,7 +191,7 @@ def load_utility_functions(app_obj):
         return {"mailing_list": mailing_list}
 
     @app_obj.template_filter("ticket_state_label")
-    def ticket_state_label(ticket: Ticket):
+    def ticket_state_label(ticket: Ticket) -> Markup:
         # see docs/ticket_states.md
 
         match ticket.state:
@@ -211,7 +213,7 @@ def load_utility_functions(app_obj):
         return Markup(f'<span class="label label-{cls}">{ticket.state}</span>')
 
 
-def create_current_user(email: str, name: str):
+def create_current_user(email: str, name: str) -> User:
     user = User(email, name)
 
     db.session.add(user)
@@ -224,7 +226,7 @@ def create_current_user(email: str, name: str):
     return user
 
 
-def get_user_currency(default=Currency.GBP) -> Currency:
+def get_user_currency(default: Currency = Currency.GBP) -> Currency:
     """Fetch the user's currency from the session.
 
     If it's missing or invalid, returns `default`
@@ -313,7 +315,7 @@ def json_response(f, *args, **kwargs):
         return jsonify(response), 200
 
 
-def feature_enabled(feature) -> bool:
+def feature_enabled(feature: str) -> bool:
     """
     If a feature flag is defined in the database return that,
     otherwise fall back to the config setting.
@@ -341,7 +343,7 @@ def archive_file(year, *path, raise_404=True):
     return file_path
 
 
-def load_archive_file(year: int, *path, raise_404=True):
+def load_archive_file(year: int, *path: str, raise_404: bool = True) -> JSONValue:
     """Load the contents of a JSON file from the archive, and optionally
     abort with a 404 if it doesn't exist.
     """
