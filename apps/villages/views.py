@@ -1,5 +1,7 @@
 from flask import abort, flash, redirect, render_template, request, url_for
+from flask.typing import ResponseValue
 from flask_login import current_user, login_required
+from sqlalchemy import exists, select
 
 from main import db
 from models import event_year
@@ -69,13 +71,17 @@ def main(year):
 
 @villages.route("/<int:year>/<int:village_id>/edit", methods=["GET", "POST"])
 @login_required
-def edit(year, village_id):
+def edit(year: int, village_id: int) -> ResponseValue:
     village = load_village(year, village_id, require_admin=True)
 
     form = VillageForm()
     if form.validate_on_submit():
-        if Village.get_by_name(form.name.data):
+        if db.session.execute(
+            select(exists().where(Village.name == form.name.data, Village.id != village.id))
+        ).scalar_one():
             # FIXME: this should be a WTForms validation
+            # ALTHOUGH: it's annoying to implement in a wtforms validator since you need a
+            # way of telling if the name has changed ;)
             flash("A village already exists with that name, please choose another")
             return redirect(url_for(".register"))
 
