@@ -384,7 +384,11 @@ class User(BaseModel, UserMixin):
 
     @classmethod
     def get_by_email(cls, email: str) -> User | None:
-        return User.query.filter(func.lower(User.email) == func.lower(email)).one_or_none()
+        return (
+            db.session.execute(select(User).where(func.lower(User.email) == func.lower(email)))
+            .unique()
+            .scalar_one_or_none()
+        )
 
     @classmethod
     def does_user_exist(cls, email):
@@ -395,16 +399,14 @@ class User(BaseModel, UserMixin):
         uid = verify_login_code(key, time.time(), code)
         if uid is None:
             return None
-
-        return User.query.filter_by(id=uid).one()
+        return db.session.get_one(User, uid)
 
     @classmethod
     def get_by_checkin_code(cls, key: str, code: str) -> User | None:
         uid = verify_checkin_code(key, code)
         if uid is None:
             return None
-
-        return User.query.filter_by(id=uid).one()
+        return db.session.get_one(User, uid)
 
     @classmethod
     def get_by_api_token(cls, key: str, code: str) -> User | None:
@@ -412,8 +414,7 @@ class User(BaseModel, UserMixin):
         if uid is None:
             # FIXME: raise an exception instead of returning None
             return None
-
-        return User.query.filter_by(id=uid).one()
+        return db.session.get_one(User, uid)
 
     @classmethod
     def get_by_bar_training_token(cls, code: str) -> User:
@@ -421,7 +422,7 @@ class User(BaseModel, UserMixin):
         if uid is None:
             raise ValueError("Invalid token")
 
-        return User.query.filter_by(id=uid).one()
+        return db.session.get_one(User, uid)
 
     @property
     def is_cfp_accepted(self):

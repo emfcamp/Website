@@ -1,6 +1,7 @@
+from sqlalchemy import select
 from sqlalchemy.orm import Mapped, mapped_column
 
-from main import cache
+from main import cache, db
 
 from . import BaseModel
 
@@ -46,11 +47,9 @@ class FeatureFlag(BaseModel):
 
 
 @cache.cached(timeout=60, key_prefix="get_db_flags")
-def get_db_flags():
-    flags = FeatureFlag.query.all()
-    flags = {f.feature: f.enabled for f in flags}
-
-    return flags
+def get_db_flags() -> dict[str, bool]:
+    flags = db.session.execute(select(FeatureFlag)).scalars().all()
+    return {f.feature: f.enabled for f in flags}
 
 
 def refresh_flags():

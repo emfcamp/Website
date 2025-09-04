@@ -6,7 +6,7 @@ from decimal import Decimal
 from os import path
 from pathlib import Path
 from textwrap import wrap
-from typing import overload
+from typing import Any, cast, overload
 from urllib.parse import urljoin, urlparse, urlunparse
 
 import pendulum
@@ -320,12 +320,17 @@ def feature_enabled(feature: str) -> bool:
     If a feature flag is defined in the database return that,
     otherwise fall back to the config setting.
     """
-    db_flags = get_db_flags()
+    # the cache decorator doesn't pass through types, so we have to cast here
+    db_flags = cast(dict[str, bool], get_db_flags())
 
     if feature in db_flags:
         return db_flags[feature]
 
-    return app.config.get(feature, False)
+    from_conf = app.config.get(feature, False)
+    if isinstance(from_conf, bool):
+        return from_conf
+    logger.warning("Feature '%s' read from config was not a boolean! using bool()")
+    return bool(from_conf)
 
 
 def archive_file(year, *path, raise_404=True):
@@ -350,7 +355,7 @@ def load_archive_file(year: int, *path: str, raise_404: bool = True) -> JSONValu
     json_path = archive_file(year, *path, raise_404=raise_404)
     if json_path is None:
         return None
-    return json.load(open(json_path))
+    return cast(JSONValue, json.load(open(json_path)))
 
 
 def page_template(metadata, template):
@@ -362,7 +367,8 @@ def page_template(metadata, template):
     return "static_page.html"
 
 
-def render_markdown(source, template="about/template.html", **view_variables):
+def render_markdown(source: str, template: str = "about/template.html", **view_variables: Any) -> str:
+    assert app.template_folder is not None
     template_root = Path(path.join(app.root_path, app.template_folder)).resolve()
     source_file = template_root.joinpath(f"{source}.md").resolve()
 

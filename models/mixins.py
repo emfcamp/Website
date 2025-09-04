@@ -1,3 +1,5 @@
+import sys
+from abc import abstractmethod
 from datetime import datetime
 
 from sqlalchemy import JSON, FetchedValue, and_, event, func
@@ -23,6 +25,10 @@ class CapacityMixin:
     capacity_used: Mapped[int] = mapped_column(default=0, server_onupdate=FetchedValue())
 
     expires: Mapped[datetime | None]
+
+    @property
+    @abstractmethod
+    def parent(self) -> "CapacityMixin | None": ...
 
     @declared_attr
     def __expired(cls):
@@ -76,16 +82,16 @@ class CapacityMixin:
 
         return count <= self.get_total_remaining_capacity()
 
-    def remaining_capacity(self):
+    def remaining_capacity(self) -> int:
         """
         Return remaining capacity or inf if
         capacity_max is not set (i.e. None).
         """
         if self.capacity_max is None:
-            return float("inf")
+            return sys.maxsize
         return self.capacity_max - self.capacity_used
 
-    def get_total_remaining_capacity(self):
+    def get_total_remaining_capacity(self) -> int:
         """
         Get the capacity remaining to this object, and all its ancestors.
 

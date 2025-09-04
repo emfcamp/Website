@@ -139,6 +139,8 @@ warn_unused_ignores = true
 disallow_any_generics = true
 # Eventually the goal would be to replace this with disallow_untyped_defs
 disallow_incomplete_defs = true
+warn_redundant_casts = true
+warn_return_any = true
 
 [[tool.mypy.overrides]]
 module = [
@@ -163,3 +165,4 @@ module = [
     "models.cfp",
 ]
 disallow_incomplete_defs = false
+warn_return_any = false

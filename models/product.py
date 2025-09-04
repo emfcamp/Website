@@ -5,6 +5,7 @@ import random
 import re
 import string
 from collections import defaultdict
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import timedelta
 from decimal import Decimal
@@ -79,7 +80,7 @@ def random_voucher():
     )
 
 
-def one_or_none(result):
+def one_or_none[T](result: Sequence[T]) -> T | None:
     if len(result) == 1:
         return result[0]
     if len(result) == 0:
@@ -642,7 +643,7 @@ class Voucher(BaseModel):
             return f"<Voucher: {self.code}, view: {self.product_view_id}, expiry: {self.expiry}>"
         return f"<Voucher: {self.code}, view: {self.product_view_id}>"
 
-    def is_accessible(self, voucher):
+    def is_accessible(self, voucher: str) -> bool:
         # voucher expired
         if self.is_expired:
             return False
