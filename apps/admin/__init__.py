@@ -41,10 +41,14 @@ from ..payments.wise import (
     wise_retrieve_accounts,
     wise_validate,
 )
+from .products import product_views, products
 
 admin = Blueprint("admin", __name__)
 
 admin_required = require_permission("admin")  # Decorator to require admin permissions
+
+admin.register_blueprint(product_views, url_prefix="product-views")
+admin.register_blueprint(products, url_prefix="products")
 
 
 @admin.before_request
@@ -294,7 +298,6 @@ from . import (
     email,  # noqa: F401
     hire,  # noqa: F401
     payments,  # noqa: F401
-    products,  # noqa: F401
     reports,  # noqa: F401
     search,  # noqa: F401
     tickets,  # noqa: F401
