@@ -11,6 +11,7 @@ from wtforms import (
 from wtforms.validators import URL, Length, Optional
 
 from models import Village
+from models.village import VillageRequirements
 
 from ..common.forms import Form
 
@@ -60,6 +61,9 @@ class VillageForm(Form):
         village.description = self.description.data
         village.url = self.url.data
 
+        if village.requirements is None:
+            village.requirements = VillageRequirements()
+
         village.requirements.num_attendees = self.num_attendees.data
         village.requirements.size_sqm = self.size_sqm.data
         village.requirements.power_requirements = self.power_requirements.data
@@ -86,17 +90,9 @@ class AdminVillageForm(VillageForm):
             self.lon.data = latlon.x
 
     def populate_obj(self, village: Village) -> None:
-        assert self.name.data is not None
-        village.name = self.name.data
-        village.description = self.description.data
-        village.url = self.url.data
+        super().populate_obj(village)
+
         if self.lat.data is not None and self.lon.data is not None:
             village.location = from_shape(Point(self.lon.data, self.lat.data))
         else:
             village.location = None
-
-        village.requirements.num_attendees = self.num_attendees.data
-        village.requirements.size_sqm = self.size_sqm.data
-        village.requirements.power_requirements = self.power_requirements.data
-        village.requirements.noise = self.noise.data
-        village.requirements.structures = self.structures.data
