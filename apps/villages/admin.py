@@ -4,6 +4,7 @@ NOTE: make sure all admin views are tagged with the @village_admin_required deco
 """
 
 from flask import abort, flash, redirect, render_template, url_for
+from sqlalchemy import exists, select
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from wtforms.widgets import TextArea
@@ -52,16 +53,21 @@ def admin_village(village_id):
     form = AdminVillageForm()
 
     if form.validate_on_submit():
-        for venue in village.venues:
-            if venue.name == village.name:
-                # Rename a village venue if it exists and has the old name.
-                venue.name = form.name.data
+        if db.session.execute(
+            select(exists().where(Village.name == form.name.data, Village.id != village.id))
+        ).scalar_one():
+            flash("Another village with that name already exists!", "error")
+        else:
+            for venue in village.venues:
+                if venue.name == village.name:
+                    # Rename a village venue if it exists and has the old name.
+                    venue.name = form.name.data
 
-        form.populate_obj(village)
-        db.session.add(village)
-        db.session.commit()
+            form.populate_obj(village)
+            db.session.add(village)
+            db.session.commit()
 
-        flash("The village has been updated")
+            flash("The village has been updated")
         return redirect(url_for(".admin_village", village_id=village.id))
 
     form.populate(village)

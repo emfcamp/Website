@@ -6,7 +6,7 @@ from sqlalchemy import exists, select
 from main import db
 from models import event_year
 from models.cfp import Venue
-from models.village import Village, VillageMember, VillageRequirements
+from models.village import Village, VillageMember
 
 from . import load_village, villages
 from .forms import VillageForm
@@ -14,34 +14,32 @@ from .forms import VillageForm
 
 @villages.route("/register", methods=["GET", "POST"])
 @login_required
-def register():
+def register() -> ResponseValue:
     if current_user.village and current_user.village_membership.admin:
         return redirect(url_for(".edit", year=event_year(), village_id=current_user.village.id))
 
     form = VillageForm()
     if form.validate_on_submit():
         if Village.get_by_name(form.name.data):
-            flash("A village already exists with that name, please choose another")
-            return redirect(url_for(".register"))
+            # TODO: should probably be a validator, although then you do have to give it
+            # a db handle and somehow pass in the current name. WTForms-alchemy has a
+            # ModelForm which solves this...
+            form.name.errors = ["A village already exists with that name, please choose another"]
+        else:
+            village = Village()
+            form.populate_obj(village)
 
-        village = Village()
-        form.populate_obj(village)
+            membership = VillageMember(village=village, user=current_user, admin=True)
 
-        membership = VillageMember(village=village, user=current_user, admin=True)
+            venue = Venue(village=village, name=village.name)
 
-        venue = Venue(village=village, name=village.name)
+            db.session.add(village)
+            db.session.add(membership)
+            db.session.add(venue)
+            db.session.commit()
 
-        requirements = VillageRequirements(village=village)
-        form.populate_obj(requirements)
-
-        db.session.add(village)
-        db.session.add(membership)
-        db.session.add(requirements)
-        db.session.add(venue)
-        db.session.commit()
-
-        flash("Your village registration has been received, thanks! You can edit it below.")
-        return redirect(url_for(".edit", year=event_year(), village_id=village.id))
+            flash("Your village registration has been received, thanks! You can edit it below.")
+            return redirect(url_for(".edit", year=event_year(), village_id=village.id))
 
     return render_template("villages/register.html", form=form)
 
@@ -71,27 +69,26 @@ def edit(year: int, village_id: int) -> ResponseValue:
     village = load_village(year, village_id, require_admin=True)
 
     form = VillageForm()
+    if request.method == "GET":
+        form.populate(village)
+
     if form.validate_on_submit():
+        # Check to see if changed name clashes with another village
         if db.session.execute(
             select(exists().where(Village.name == form.name.data, Village.id != village.id))
         ).scalar_one():
-            # FIXME: this should be a WTForms validation
-            # ALTHOUGH: it's annoying to implement in a wtforms validator since you need a
-            # way of telling if the name has changed ;)
-            flash("A village already exists with that name, please choose another")
-            return redirect(url_for(".register"))
+            # TODO: see register()
+            form.name.errors = ["A village already exists with that name, please choose another"]
+        else:
+            # All good, update DB
+            for venue in village.venues:
+                if venue.name == village.name:
+                    # Rename a village venue if it exists and has the old name.
+                    venue.name = form.name.data
 
-        for venue in village.venues:
-            if venue.name == village.name:
-                # Rename a village venue if it exists and has the old name.
-                venue.name = form.name.data
-
-        form.populate_obj(village)
-        db.session.commit()
-        flash("Your village registration has been updated.")
-        return redirect(url_for(".edit", year=year, village_id=village_id))
-
-    if request.method != "POST":
-        form.populate(village)
+            form.populate_obj(village)
+            db.session.commit()
+            flash("Your village registration has been updated.")
+            return redirect(url_for(".edit", year=year, village_id=village_id))
 
     return render_template("villages/edit.html", form=form, village=village)

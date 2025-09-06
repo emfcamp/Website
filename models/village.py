@@ -34,9 +34,13 @@ class Village(BaseModel):
     url: Mapped[str | None]
     location: Mapped[WKBElement | None] = mapped_column(Geometry("POINT", srid=4326, spatial_index=False))
 
-    village_memberships: Mapped[list[VillageMember]] = relationship(back_populates="village")
-    requirements: Mapped[VillageRequirements] = relationship(back_populates="village")
-    venues: Mapped[list[Venue]] = relationship(back_populates="village")
+    village_memberships: Mapped[list[VillageMember]] = relationship(
+        back_populates="village", cascade="all, delete-orphan"
+    )
+    requirements: Mapped[VillageRequirements] = relationship(
+        back_populates="village", cascade="all, delete-orphan"
+    )
+    venues: Mapped[list[Venue]] = relationship(back_populates="village", cascade="all, delete-orphan")
     members = association_proxy("village_memberships", "user")
 
     @classmethod
