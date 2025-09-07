@@ -1209,7 +1209,7 @@ class Venue(BaseModel):
         unnest = db.func.unnest(cls.default_for_types).table_valued()
         return {
             type: venue_names
-            for venue_names, type in db.engine.execute(
+            for venue_names, type in db.session.execute(
                 db.select(db.func.array_agg(cls.name), unnest.column)
                 .join(unnest, db.true())
                 .group_by(unnest.column)
