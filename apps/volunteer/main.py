@@ -21,7 +21,7 @@ from models.volunteer import (
 from ..common import feature_enabled, feature_flag
 from . import v_admin_required, volunteer
 from .init_data import load_initial_roles, load_initial_venues
-from .shift_list import shift_list
+from .shift_list import get_shift_list
 
 
 @volunteer.route("/")
@@ -71,6 +71,8 @@ def init_shifts():
             role.role_notes = r.get("role_notes", None)
             role.over_18_only = r.get("over_18_only", False)
             role.requires_training = r.get("requires_training", False)
+
+    shift_list = get_shift_list()
 
     for shift_role in shift_list:
         role = Role.get_by_name(shift_role)
