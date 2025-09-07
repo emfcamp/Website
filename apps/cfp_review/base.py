@@ -167,7 +167,7 @@ def filter_proposal_request() -> tuple[list[Proposal], bool]:
         .options(joinedload(Proposal.tags))
         .options(undefer(Proposal.favourite_count))
     )
-    proposals = list(db.session.execute(proposal_query).scalars().all())
+    proposals = list(db.session.execute(proposal_query).unique().scalars().all())
     proposals.sort(**sort_dict)
     return proposals, filtered
 
