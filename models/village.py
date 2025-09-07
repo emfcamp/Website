@@ -132,8 +132,7 @@ class VillageMember(BaseModel):
     # We only allow one village per user. TODO: make this the primary key
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), unique=True)
     village_id: Mapped[int] = mapped_column(ForeignKey("village.id"))
-    # TODO: probably shouldn't be nullable
-    admin: Mapped[bool | None] = mapped_column(default=False)
+    admin: Mapped[bool] = mapped_column(default=False)
 
     village: Mapped[list[Village]] = relationship(back_populates="village_memberships")
     user: Mapped[User] = relationship(back_populates="village_membership")

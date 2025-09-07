@@ -13,8 +13,7 @@ __all__ = ["VolunteerVenue"]
 class VolunteerVenue(BaseModel):
     __tablename__ = "volunteer_venue"
     id: Mapped[int] = mapped_column(primary_key=True)
-    # TODO: shouldn't be nullable
-    name: Mapped[str | None] = mapped_column(unique=True, index=True)
+    name: Mapped[str] = mapped_column(unique=True, index=True)
     mapref: Mapped[str | None]
 
     shifts: Mapped[list["Shift"]] = relationship(back_populates="venue")

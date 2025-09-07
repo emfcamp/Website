@@ -95,9 +95,8 @@ class Shift(BaseModel):
     role_id: Mapped[int] = mapped_column(ForeignKey("volunteer_role.id"))
     venue_id: Mapped[int] = mapped_column(ForeignKey("volunteer_venue.id"))
     proposal_id: Mapped[int | None] = mapped_column(ForeignKey("proposal.id"))
-    # TODO: should start and end be not nullable?
-    start: Mapped[datetime | None] = mapped_column()
-    end: Mapped[datetime | None] = mapped_column()
+    start: Mapped[datetime] = mapped_column()
+    end: Mapped[datetime] = mapped_column()
     min_needed: Mapped[int] = mapped_column(default=0)
     max_needed: Mapped[int] = mapped_column(default=0)
 

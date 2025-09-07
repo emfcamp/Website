@@ -25,8 +25,7 @@ class VolunteerNotifyRecipient(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     volunteer_id: Mapped[int] = mapped_column(ForeignKey("volunteer.id"))
     job_id: Mapped[int] = mapped_column(ForeignKey("volunteer_notify_job.id"))
-    # TODO: shouldn't be nullable
-    sent: Mapped[bool | None] = mapped_column(default=False)
+    sent: Mapped[bool] = mapped_column(default=False)
 
     volunteer = relationship("Volunteer")
     job = relationship("VolunteerNotifyJob")

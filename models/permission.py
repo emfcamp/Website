@@ -26,8 +26,7 @@ UserPermission = Table(
 class Permission(BaseModel):
     __tablename__ = "permission"
     id: Mapped[int] = mapped_column(primary_key=True)
-    # TODO: pretty sure this shouldn't be nullable
-    name: Mapped[str | None] = mapped_column(unique=True, index=True)
+    name: Mapped[str] = mapped_column(unique=True, index=True)
 
     # TODO: should be `users`
     user: Mapped[list["User"]] = relationship(back_populates="permissions", secondary=UserPermission)

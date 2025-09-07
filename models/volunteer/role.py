@@ -135,8 +135,7 @@ class RolePermission(BaseModel):
     __tablename__ = "volunteer_role_permission"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    # TODO: shouldn't be nullable
-    name: Mapped[str | None] = mapped_column(unique=True, index=True)
+    name: Mapped[str] = mapped_column(unique=True, index=True)
 
 
 class RoleAdmin(BaseModel):

@@ -38,8 +38,7 @@ class EmailJobRecipient(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     job_id: Mapped[int] = mapped_column(ForeignKey("email_job.id"))
-    # TODO: probably shouldn't be nullable
-    sent: Mapped[bool | None] = mapped_column(default=False)
+    sent: Mapped[bool] = mapped_column(default=False)
 
     user: Mapped[User] = relationship()
     job: Mapped[EmailJob] = relationship()
