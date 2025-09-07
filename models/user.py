@@ -221,7 +221,7 @@ class User(BaseModel, UserMixin):
     shipping: Mapped[UserShipping | None] = relationship(back_populates="user", cascade="all, delete-orphan")
     payments: Mapped[list[Payment]] = relationship(lazy="dynamic", back_populates="user", cascade="all")
     permissions: Mapped[list[Permission]] = relationship(
-        back_populates="user",
+        back_populates="users",
         cascade="all",
         secondary=UserPermission,  # type: ignore[has-type]  # mypy can't see that this is a Table for some reason
         lazy="joined",

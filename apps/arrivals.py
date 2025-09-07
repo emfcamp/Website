@@ -56,7 +56,7 @@ def arrivals_required(f, *args, **kwargs):
     else:
         views = (
             ArrivalsView.query.join(ArrivalsView.required_permission)
-            .join(Permission.user)
+            .join(Permission.users)
             .where(User.id == current_user.id)
             .all()
         )
