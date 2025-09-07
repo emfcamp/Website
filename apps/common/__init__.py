@@ -217,8 +217,6 @@ def create_current_user(email: str, name: str):
     # Login & make sure everything's set correctly
     login_user(user)
     assert current_user.id == user.id
-    # FIXME: why do we do this?
-    current_user.id = user.id
     return user
 
 
