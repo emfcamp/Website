@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, assert_never
 import datetype
 from dateutil.parser import parse
 from flask import current_app as app
-from sqlalchemy import inspect, true
+from sqlalchemy import inspect
 from sqlalchemy.engine.row import Row
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.base import NO_VALUE
@@ -24,11 +24,6 @@ if TYPE_CHECKING:
     from main import BaseModel
 else:
     BaseModel = db.Model
-
-""" Type alias for ISO currency (GBP or EUR currently). """
-
-# Ideally needs to be unified with the Currency class in app/common/__init__.py, but this is
-# non-trivial.
 
 
 class Currency(enum.StrEnum):
@@ -61,10 +56,6 @@ def event_year():
 
 def event_end():
     return config_date("EVENT_END")
-
-
-def exists(query):
-    return db.session.query(true()).filter(query.exists()).scalar()
 
 
 def to_dict(obj):
