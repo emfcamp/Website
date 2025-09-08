@@ -17,6 +17,12 @@ def test_wise_account_retrieval(app):
     accounts = list(wise_retrieve_accounts(profile_id=123456789))
     assert len(accounts) == 1  # FIXME
 
+    primary_account = accounts[0]
+    assert primary_account.currency == "GBP"
+    assert primary_account.institution == "TransferWise"
+    assert primary_account.sort_code.startswith("231")
+    assert primary_account.acct_id.startswith("1000")
+
 
 @pytest.mark.parametrize(
     "payee, bankref",
