@@ -1,4 +1,5 @@
 import logging
+from dataclasses import dataclass
 from datetime import timedelta
 
 from flask import abort, request
@@ -213,6 +214,17 @@ def _retrieve_detail(details, requested_type):
         if detail.type == requested_type:
             return detail.body
     raise AttributeError(f"Failed to find requested {requested_type} attribute in account details")
+
+
+@dataclass
+class RecipientDetails:
+    account_holder: str
+    bank_name: str
+    bank_address: str
+    sort_code: str
+    account_number: str
+    swift: str
+    iban: str
 
 
 def _aggregate_account_recipient_details(account):
