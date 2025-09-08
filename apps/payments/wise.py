@@ -215,6 +215,32 @@ def _retrieve_detail(details, requested_type):
     raise AttributeError(f"Failed to find requested {requested_type} attribute in account details")
 
 
+def _aggregate_account_recipient_details(account):
+    account_holder = bank_name = bank_address = sort_code = account_number = swift = iban = None
+    for receive_options in account.receiveOptions:
+        details = receive_options.details
+
+        account_holder = _retrieve_detail(details, "ACCOUNT_HOLDER")
+        bank_info = _retrieve_detail(details, "BANK_NAME_AND_ADDRESS")
+
+        if receive_options.type == "LOCAL":
+            sort_code = _retrieve_detail(details, "BANK_CODE").replace("-", "")
+            account_number = _retrieve_detail(details, "ACCOUNT_NUMBER")
+
+        elif receive_options.type == "INTERNATIONAL":
+            swift = _retrieve_detail(details, "SWIFT_CODE")
+            iban = _retrieve_detail(details, "IBAN")
+
+    if not bank_info:
+        raise ValueError("Bank info field is empty")
+
+    bank_name, _, bank_address = bank_info.partition("\n")
+    if not bank_name or not bank_address:
+        raise ValueError("Could not extract bank name and address from bank info")
+
+    return account_holder, bank_name, bank_address, sort_code, account_number, swift, iban
+
+
 def wise_retrieve_accounts(profile_id):
     from main import wise
 
@@ -222,23 +248,10 @@ def wise_retrieve_accounts(profile_id):
         account_holder = bank_name = bank_address = sort_code = account_number = swift = iban = None
 
         if account.currency.code == "GBP":
-            for receive_options in account.receiveOptions:
-                details = receive_options.details
-                account_holder = _retrieve_detail(details, "ACCOUNT_HOLDER")
-                bank_info = _retrieve_detail(details, "BANK_NAME_AND_ADDRESS")
-
-                if receive_options.type == "LOCAL":
-                    sort_code = _retrieve_detail(details, "BANK_CODE").replace("-", "")
-                    account_number = _retrieve_detail(details, "ACCOUNT_NUMBER")
-
-                elif receive_options.type == "INTERNATIONAL":
-                    swift = _retrieve_detail(details, "SWIFT_CODE")
-                    iban = _retrieve_detail(details, "IBAN")
-
-            if not bank_info:
+            try:
+                account_holder, bank_name, bank_address, sort_code, account_number, swift, iban = _aggregate_account_recipient_details(account)
+            except ValueError:
                 continue
-
-            bank_name, _, bank_address = bank_info.partition("\n")
 
         if not bank_name or not bank_address:
             continue
