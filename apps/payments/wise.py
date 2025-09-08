@@ -210,6 +210,7 @@ def wise_business_profile():
 
 def _retrieve_detail(details, requested_type):
     """Helper method to retrieve content from attribute-value details recordsets"""
+    # TODO: eliminate this loop, by iterating over the keys/attributes from the details object
     for detail in details:
         if detail.type == requested_type:
             return detail.body
@@ -249,6 +250,7 @@ def _aggregate_account_recipient_details(account):
     if not bank_name or not bank_address:
         raise ValueError("Could not extract bank name and address from bank info")
 
+    # TODO: return a RecipientDetails instance here instead
     return account_holder, bank_name, bank_address, sort_code, account_number, swift, iban
 
 
@@ -260,6 +262,7 @@ def wise_retrieve_accounts(profile_id):
 
         if account.currency.code == "GBP":
             try:
+                # TODO: retrieve a RecipientDetails instance here instead
                 account_holder, bank_name, bank_address, sort_code, account_number, swift, iban = (
                     _aggregate_account_recipient_details(account)
                 )
