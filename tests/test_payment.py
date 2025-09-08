@@ -1,6 +1,21 @@
 import pytest
 
+from apps.payments.wise import wise_retrieve_accounts
 from models.payment import BankTransaction
+
+
+@pytest.fixture(scope="module")
+def vcr_config():
+    return {
+        # Replace the Authorization request header with "DUMMY" in cassettes
+        "filter_headers": [("authorization", "DUMMY")],
+    }
+
+
+@pytest.mark.vcr()
+def test_wise_account_retrieval(app):
+    accounts = list(wise_retrieve_accounts(profile_id=123456789))
+    assert len(accounts) == 1  # FIXME
 
 
 @pytest.mark.parametrize(

@@ -6,7 +6,7 @@ from flask import current_app as app
 from pywisetransfer.exceptions import InvalidWebhookSignature
 from pywisetransfer.webhooks import validate_request
 
-from main import db, wise
+from main import db
 from models import naive_utcnow
 from models.payment import BankAccount, BankTransaction
 
@@ -115,6 +115,7 @@ def wise_balance_credit(event_type, event):
 
 
 def sync_wise_statement(profile_id, wise_balance_id, currency):
+    from main import wise
     # Retrieve an account transaction statement for the past week
     interval_end = naive_utcnow()
     interval_start = interval_end - timedelta(days=7)
@@ -184,6 +185,7 @@ def sync_wise_statement(profile_id, wise_balance_id, currency):
 
 
 def wise_business_profile():
+    from main import wise
     if app.config.get("TRANSFERWISE_PROFILE_ID"):
         id = int(app.config["TRANSFERWISE_PROFILE_ID"])
         accounts = list(wise.account_details.list(profile_id=id))
@@ -212,6 +214,7 @@ def _retrieve_detail(details, requested_type):
 
 
 def wise_retrieve_accounts(profile_id):
+    from main import wise
     for account in wise.account_details.list(profile_id=profile_id):
         account_holder = bank_name = bank_address = sort_code = account_number = swift = iban = None
 
@@ -258,6 +261,7 @@ def wise_retrieve_accounts(profile_id):
 
 
 def wise_validate():
+    from main import wise
     """Validate that Wise is configured and operational"""
     result = []
 
