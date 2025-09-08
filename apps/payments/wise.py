@@ -219,8 +219,7 @@ def _retrieve_detail(details, requested_type):
 @dataclass
 class RecipientDetails:
     account_holder: str
-    bank_name: str
-    bank_address: str
+    bank_name_and_address: str
     sort_code: str
     account_number: str
     swift: str
