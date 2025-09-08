@@ -260,7 +260,9 @@ def wise_retrieve_accounts(profile_id):
 
         if account.currency.code == "GBP":
             try:
-                account_holder, bank_name, bank_address, sort_code, account_number, swift, iban = _aggregate_account_recipient_details(account)
+                account_holder, bank_name, bank_address, sort_code, account_number, swift, iban = (
+                    _aggregate_account_recipient_details(account)
+                )
             except ValueError:
                 continue
 
