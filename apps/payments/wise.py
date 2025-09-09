@@ -217,6 +217,14 @@ class RecipientDetails:
     swift: str | None = None
     iban: str | None = None
 
+    @property
+    def parsed_account_number(self):
+        return self.account_number.replace(" ", "")[-8:]
+
+    @property
+    def parsed_sort_code(self):
+        return self.sort_code.replace("-", "")
+
 
 def _translate_recipient_details(receive_options):
     """Helper method to translate Wise receive options into a local RecipientDetails instance"""
@@ -278,8 +286,8 @@ def wise_retrieve_accounts(profile_id):
             wise_balance_id = 0
 
         yield BankAccount(
-            sort_code=bank_details.sort_code,
-            acct_id=bank_details.account_number,
+            sort_code=bank_details.parsed_sort_code,
+            acct_id=bank_details.parsed_account_number,
             currency=account.currency.code,
             active=False,
             payee_name=bank_details.account_holder,
