@@ -235,18 +235,18 @@ def _translate_recipient_details(receive_options):
     })
 
 
-def _aggregate_account_recipient_details(account):
+def _combine_account_recipient_details(account):
     existing_details = None
     for receive_options in account.receiveOptions:
         recipient_details = _translate_recipient_details(receive_options)
 
         if existing_details:
             # coalesce translated account info into the existing bank details
-            existing_details.sort_code = existing_details.sort_code or recipient_details.sort_code
-            existing_details.account_number = existing_details.account_number or recipient_details.account_number
-            existing_details.swift = existing_details.swift or recipient_details.swift
-            existing_details.iban = existing_details.iban or recipient_details.iban
-
+            for field in ("sort_code", "account_number", "swift", "iban"):
+                existing_value = getattr(existing_details, field)
+                updated_value = getattr(recipient_details, field)
+                combined_value = existing_value if existing_value is not None else updated_value
+                setattr(existing_details, field, combined_value)
         else:
             existing_details = recipient_details
 
@@ -258,7 +258,7 @@ def wise_retrieve_accounts(profile_id):
 
     for account in wise.account_details.list(profile_id=profile_id):
         if account.currency.code == "GBP":
-            bank_details = _aggregate_account_recipient_details(account)
+            bank_details = _combine_account_recipient_details(account)
 
         if not bank_details.name_and_address:
             # TODO: add an error or warning about this condition
