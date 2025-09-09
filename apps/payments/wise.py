@@ -212,10 +212,10 @@ def wise_business_profile():
 class RecipientDetails:
     account_holder: str
     name_and_address: str
-    sort_code: str
-    account_number: str
-    swift: str
-    iban: str
+    sort_code: str | None = None
+    account_number: str | None = None
+    swift: str | None = None
+    iban: str | None = None
 
 
 def _translate_recipient_details(receive_options):
