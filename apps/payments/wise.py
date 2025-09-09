@@ -236,11 +236,13 @@ def _translate_recipient_details(receive_options):
         "SWIFT_CODE": "swift",
         "IBAN": "iban",
     }
-    return RecipientDetails(**{
-        field_mappings.get(detail.type): detail.body
-        for detail in receive_options.details
-        if detail.type in field_mappings
-    })
+    return RecipientDetails(
+        **{
+            field_mappings.get(detail.type): detail.body
+            for detail in receive_options.details
+            if detail.type in field_mappings
+        }
+    )
 
 
 def _combine_account_recipient_details(account):
