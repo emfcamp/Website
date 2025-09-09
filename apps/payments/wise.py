@@ -245,7 +245,7 @@ def _translate_recipient_details(receive_options):
     )
 
 
-def _combine_account_recipient_details(account):
+def _merge_recipient_details(account):
     existing_details = None
     for receive_options in account.receiveOptions:
         recipient_details = _translate_recipient_details(receive_options)
@@ -271,7 +271,7 @@ def wise_retrieve_accounts(profile_id):
             # TODO: support other host currencies
             continue
 
-        bank_details = _combine_account_recipient_details(account)
+        bank_details = _merge_recipient_details(account)
         if not bank_details.name_and_address:
             # TODO: add an error or warning about this condition
             continue
