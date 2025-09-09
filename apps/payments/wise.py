@@ -211,7 +211,7 @@ def wise_business_profile():
 @dataclass
 class RecipientDetails:
     account_holder: str
-    bank_name_and_address: str
+    name_and_address: str
     sort_code: str
     account_number: str
     swift: str
@@ -230,7 +230,7 @@ def _translate_recipient_details(receive_options):
     }
     return RecipientDetails(**{
         field_mappings.get(detail.type): detail.body
-        for detail in details
+        for detail in receive_options.details
         if detail.type in field_mappings
     })
 
