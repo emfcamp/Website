@@ -218,6 +218,26 @@ class RecipientDetails:
     iban: str | None = None
 
     @property
+    def bank_info(self):
+        if not self.name_and_address:
+            raise ValueError("Bank name/address information not found")
+        return self.name_and_address
+
+    @property
+    def name(self):
+        bank_name, _, _ = self.bank_info.partition("\n")
+        if not bank_name:
+            raise ValueError("Bank name is empty")
+        return bank_name
+
+    @property
+    def address(self):
+        _, _, bank_address = self.bank_info.partition("\n")
+        if not bank_address:
+            raise ValueError("Bank address is empty")
+        return bank_address
+
+    @property
     def parsed_account_number(self):
         return self.account_number.replace(" ", "")[-8:]
 
@@ -272,15 +292,6 @@ def wise_retrieve_accounts(profile_id):
             continue
 
         bank_details = _merge_recipient_details(account)
-        if not bank_details.name_and_address:
-            # TODO: add an error or warning about this condition
-            continue
-
-        bank_name, _, bank_address = bank_details.name_and_address.partition("\n")
-        if not bank_name or not bank_address:
-            # TODO: add an error or warning about this condition
-            continue
-
         wise_balance_id = account.id
 
         # Workaround: the Wise Sandbox API returns a null/empty account ID; populate a value
@@ -293,8 +304,8 @@ def wise_retrieve_accounts(profile_id):
             currency=account.currency.code,
             active=False,
             payee_name=bank_details.account_holder,
-            institution=bank_name,
-            address=bank_address,
+            institution=bank_details.name,
+            address=bank_details.address,
             swift=bank_details.swift,
             iban=bank_details.iban,
             wise_balance_id=wise_balance_id,
