@@ -257,9 +257,11 @@ def wise_retrieve_accounts(profile_id):
     from main import wise
 
     for account in wise.account_details.list(profile_id=profile_id):
-        if account.currency.code == "GBP":
-            bank_details = _combine_account_recipient_details(account)
+        if account.currency.code != "GBP":
+            # TODO: support other host currencies
+            continue
 
+        bank_details = _combine_account_recipient_details(account)
         if not bank_details.name_and_address:
             # TODO: add an error or warning about this condition
             continue
