@@ -219,22 +219,19 @@ class RecipientDetails:
 
     @property
     def bank_info(self):
-        if not self.name_and_address:
-            raise ValueError("Bank name/address information not found")
+        assert self.name_and_address, "Bank name/address information not found"
         return self.name_and_address
 
     @property
     def name(self):
         bank_name, _, _ = self.bank_info.partition("\n")
-        if not bank_name:
-            raise ValueError("Bank name is empty")
+        assert bank_name, "Bank name is empty"
         return bank_name
 
     @property
     def address(self):
         _, _, bank_address = self.bank_info.partition("\n")
-        if not bank_address:
-            raise ValueError("Bank address is empty")
+        assert bank_address, "Bank address is empty"
         return bank_address
 
     @property
