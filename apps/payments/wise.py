@@ -257,8 +257,6 @@ def wise_retrieve_accounts(profile_id):
     from main import wise
 
     for account in wise.account_details.list(profile_id=profile_id):
-        account_holder = bank_name = bank_address = sort_code = account_number = swift = iban = None
-
         if account.currency.code == "GBP":
             bank_details = _aggregate_account_recipient_details(account)
 
@@ -278,15 +276,15 @@ def wise_retrieve_accounts(profile_id):
             wise_balance_id = 0
 
         yield BankAccount(
-            sort_code=sort_code,
-            acct_id=account_number,
+            sort_code=bank_details.sort_code,
+            acct_id=bank_details.account_number,
             currency=account.currency.code,
             active=False,
-            payee_name=account_holder,
+            payee_name=bank_details.account_holder,
             institution=bank_name,
             address=bank_address,
-            swift=swift,
-            iban=iban,
+            swift=bank_details.swift,
+            iban=bank_details.iban,
             wise_balance_id=wise_balance_id,
         )
 
