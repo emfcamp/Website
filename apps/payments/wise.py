@@ -289,11 +289,10 @@ def wise_retrieve_accounts(profile_id):
             continue
 
         bank_details = _merge_recipient_details(account)
-        wise_balance_id = account.id
 
         # Workaround: the Wise Sandbox API returns a null/empty account ID; populate a value
         if account.id is None and app.config.get("TRANSFERWISE_ENVIRONMENT") == "sandbox":
-            wise_balance_id = 0
+            account.id = 0
 
         yield BankAccount(
             sort_code=bank_details.parsed_sort_code,
@@ -305,7 +304,7 @@ def wise_retrieve_accounts(profile_id):
             address=bank_details.address,
             swift=bank_details.swift,
             iban=bank_details.iban,
-            wise_balance_id=wise_balance_id,
+            wise_balance_id=account.id,
         )
 
 
