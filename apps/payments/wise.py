@@ -7,7 +7,7 @@ from flask import current_app as app
 from pywisetransfer.exceptions import InvalidWebhookSignature
 from pywisetransfer.webhooks import validate_request
 
-from main import db
+from main import db, wise
 from models import naive_utcnow
 from models.payment import BankAccount, BankTransaction
 
@@ -116,8 +116,6 @@ def wise_balance_credit(event_type, event):
 
 
 def sync_wise_statement(profile_id, wise_balance_id, currency):
-    from main import wise
-
     # Retrieve an account transaction statement for the past week
     interval_end = naive_utcnow()
     interval_start = interval_end - timedelta(days=7)
@@ -187,8 +185,6 @@ def sync_wise_statement(profile_id, wise_balance_id, currency):
 
 
 def wise_business_profile():
-    from main import wise
-
     if app.config.get("TRANSFERWISE_PROFILE_ID"):
         id = int(app.config["TRANSFERWISE_PROFILE_ID"])
         accounts = list(wise.account_details.list(profile_id=id))
@@ -209,7 +205,7 @@ def wise_business_profile():
 
 
 @dataclass
-class RecipientDetails:
+class WiseRecipient:
     account_holder: str
     name_and_address: str
     sort_code: str | None = None
@@ -244,7 +240,7 @@ class RecipientDetails:
 
 
 def _translate_recipient_details(receive_options):
-    """Helper method to translate Wise receive options into a local RecipientDetails instance"""
+    """Helper method to translate Wise receive options into a WiseRecipient instance"""
     field_mappings = {
         "ACCOUNT_HOLDER": "account_holder",
         "BANK_NAME_AND_ADDRESS": "name_and_address",
@@ -253,7 +249,7 @@ def _translate_recipient_details(receive_options):
         "SWIFT_CODE": "swift",
         "IBAN": "iban",
     }
-    return RecipientDetails(
+    return WiseRecipient(
         **{
             field_mappings.get(detail.type): detail.body
             for detail in receive_options.details
@@ -309,8 +305,6 @@ def wise_retrieve_accounts(profile_id):
 
 
 def wise_validate():
-    from main import wise
-
     """Validate that Wise is configured and operational"""
     result = []
 
