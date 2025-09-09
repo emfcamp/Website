@@ -208,15 +208,6 @@ def wise_business_profile():
     return id
 
 
-def _retrieve_detail(details, requested_type):
-    """Helper method to retrieve content from attribute-value details recordsets"""
-    # TODO: eliminate this loop, by iterating over the keys/attributes from the details object
-    for detail in details:
-        if detail.type == requested_type:
-            return detail.body
-    raise AttributeError(f"Failed to find requested {requested_type} attribute in account details")
-
-
 @dataclass
 class RecipientDetails:
     account_holder: str
@@ -227,31 +218,39 @@ class RecipientDetails:
     iban: str
 
 
+def _translate_recipient_details(receive_options):
+    """Helper method to translate Wise receive options into a local RecipientDetails instance"""
+    field_mappings = {
+        "ACCOUNT_HOLDER": "account_holder",
+        "BANK_NAME_AND_ADDRESS": "name_and_address",
+        "BANK_CODE": "sort_code",
+        "ACCOUNT_NUMBER": "account_number",
+        "SWIFT_CODE": "swift",
+        "IBAN": "iban",
+    }
+    return RecipientDetails(**{
+        field_mappings.get(detail.type): detail.body
+        for detail in details
+        if detail.type in field_mappings
+    })
+
+
 def _aggregate_account_recipient_details(account):
-    account_holder = bank_name = bank_address = sort_code = account_number = swift = iban = None
+    existing_details = None
     for receive_options in account.receiveOptions:
-        details = receive_options.details
+        recipient_details = _translate_recipient_details(receive_options)
 
-        account_holder = _retrieve_detail(details, "ACCOUNT_HOLDER")
-        bank_info = _retrieve_detail(details, "BANK_NAME_AND_ADDRESS")
+        if existing_details:
+            # coalesce translated account info into the existing bank details
+            existing_details.sort_code = existing_details.sort_code or recipient_details.sort_code
+            existing_details.account_number = existing_details.account_number or recipient_details.account_number
+            existing_details.swift = existing_details.swift or recipient_details.swift
+            existing_details.iban = existing_details.iban or recipient_details.iban
 
-        if receive_options.type == "LOCAL":
-            sort_code = _retrieve_detail(details, "BANK_CODE").replace("-", "")
-            account_number = _retrieve_detail(details, "ACCOUNT_NUMBER")
+        else:
+            existing_details = recipient_details
 
-        elif receive_options.type == "INTERNATIONAL":
-            swift = _retrieve_detail(details, "SWIFT_CODE")
-            iban = _retrieve_detail(details, "IBAN")
-
-    if not bank_info:
-        raise ValueError("Bank info field is empty")
-
-    bank_name, _, bank_address = bank_info.partition("\n")
-    if not bank_name or not bank_address:
-        raise ValueError("Could not extract bank name and address from bank info")
-
-    # TODO: return a RecipientDetails instance here instead
-    return account_holder, bank_name, bank_address, sort_code, account_number, swift, iban
+    return existing_details
 
 
 def wise_retrieve_accounts(profile_id):
@@ -261,15 +260,15 @@ def wise_retrieve_accounts(profile_id):
         account_holder = bank_name = bank_address = sort_code = account_number = swift = iban = None
 
         if account.currency.code == "GBP":
-            try:
-                # TODO: retrieve a RecipientDetails instance here instead
-                account_holder, bank_name, bank_address, sort_code, account_number, swift, iban = (
-                    _aggregate_account_recipient_details(account)
-                )
-            except ValueError:
-                continue
+            bank_details = _aggregate_account_recipient_details(account)
 
+        if not bank_details.name_and_address:
+            # TODO: add an error or warning about this condition
+            continue
+
+        bank_name, _, bank_address = bank_details.name_and_address.partition("\n")
         if not bank_name or not bank_address:
+            # TODO: add an error or warning about this condition
             continue
 
         wise_balance_id = account.id
