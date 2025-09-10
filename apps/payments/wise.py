@@ -239,8 +239,8 @@ class WiseRecipient:
         return self.sort_code.replace("-", "")
 
 
-def _translate_recipient_details(receive_options):
-    """Helper method to translate Wise receive options into a WiseRecipient instance"""
+def _recipient_details_adapter(receive_options):
+    """Helper method to adapt Wise receive options response data into a WiseRecipient instance"""
     field_mappings = {
         "ACCOUNT_HOLDER": "account_holder",
         "BANK_NAME_AND_ADDRESS": "name_and_address",
@@ -261,7 +261,7 @@ def _translate_recipient_details(receive_options):
 def _merge_recipient_details(account):
     existing_details = None
     for receive_options in account.receiveOptions:
-        recipient_details = _translate_recipient_details(receive_options)
+        recipient_details = _recipient_details_adapter(receive_options)
 
         if existing_details:
             # coalesce translated account info into the existing bank details
