@@ -15,7 +15,9 @@ def vcr_config():
 @pytest.mark.vcr()
 def test_wise_account_retrieval(app):
     accounts = list(wise_retrieve_accounts(profile_id=123456789))
-    assert len(accounts) == 1  # FIXME
+
+    # we merge Wise's local and international details for our GBP account into a single record
+    assert len(accounts) == 1
 
     primary_account = accounts[0]
     assert primary_account.currency == "GBP"
