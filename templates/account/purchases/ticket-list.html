@@ -12,6 +12,7 @@
   <thead>
     <tr>
       <th>Type</th>
+      <th>Price</th>
       <th>Status</th>
       <th class="table-actions"></th>
     </tr>
@@ -25,6 +26,7 @@
 {%- if t.payment and t.payment.expired %} expired {%- endif -%}
 ">
 <td>{{ t.price_tier.parent.display_name }}</td>
+<td>{{ t.price.value | price(t.price.currency) }}</td>
 <td>
     {%- if t.is_paid_for %}
     Paid
