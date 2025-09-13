@@ -1,5 +1,6 @@
 import time
-from urllib.parse import urljoin, urlparse
+from typing import overload
+from urllib.parse import urljoin, urlparse, urlunparse
 
 from flask import (
     Blueprint,
@@ -59,17 +60,27 @@ def users_variables():
     }
 
 
-def is_safe_url(target):
+def make_safe_url(target: str) -> str | None:
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
-    return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc
+    if test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc:
+        return urlunparse(test_url)
+    return None
+
+
+@overload
+def get_next_url(default: str) -> str: ...
+
+
+@overload
+def get_next_url(default: None) -> str | None: ...
 
 
 def get_next_url(default=None):
     next_url = request.args.get("next")
     if next_url:
-        if is_safe_url(next_url):
-            return next_url
+        if safe_url := make_safe_url(next_url):
+            return safe_url
         app.logger.error(f"Dropping unsafe next URL {repr(next_url)}")
     if default is None:
         default = url_for(".account")
