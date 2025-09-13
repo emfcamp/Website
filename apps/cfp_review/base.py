@@ -26,6 +26,7 @@ from sqlalchemy import func, exists, select
 from sqlalchemy.orm import joinedload, undefer
 from sqlalchemy_continuum.utils import version_class
 
+from apps.users import get_next_url
 from main import db, external_url, get_or_404
 from .estimation import get_cfp_estimate
 from .majority_judgement import calculate_max_normalised_score
@@ -1288,7 +1289,7 @@ def proposals_summary():
 def confidentiality_warning():
     if request.method == "POST" and request.form.get("agree"):
         session["cfp_confidentiality"] = True
-        return redirect(request.args.get("next", url_for(".proposals")))
+        return redirect(get_next_url(default=url_for(".proposals")))
 
     return render_template("cfp_review/confidentiality_warning.html")
 
