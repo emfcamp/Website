@@ -26,7 +26,7 @@ from sqlalchemy import func, exists, select
 from sqlalchemy.orm import joinedload, undefer
 from sqlalchemy_continuum.utils import version_class
 
-from apps.users import get_next_url
+from apps.common import get_next_url
 from main import db, external_url, get_or_404
 from .estimation import get_cfp_estimate
 from .majority_judgement import calculate_max_normalised_score

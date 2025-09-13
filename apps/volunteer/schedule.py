@@ -15,9 +15,8 @@ from models.volunteer.shift import Shift, ShiftEntry
 from models.volunteer.venue import VolunteerVenue
 from models.volunteer.volunteer import Volunteer
 
-from ..common import feature_flag
+from ..common import feature_flag, get_next_url
 from ..schedule import event_tz
-from ..users import get_next_url
 from . import v_admin_required, v_user_required, volunteer
 
 

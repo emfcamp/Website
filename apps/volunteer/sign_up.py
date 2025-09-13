@@ -14,7 +14,7 @@ from markupsafe import Markup
 from wtforms import BooleanField, StringField, SubmitField
 from wtforms.validators import DataRequired, Email, ValidationError
 
-from apps.users import get_next_url
+from apps.common import get_next_url
 from main import db
 from models.user import User
 from models.volunteer import Volunteer as VolunteerUser
