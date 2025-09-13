@@ -199,7 +199,7 @@ class User(BaseModel, UserMixin):
     __versioned__ = {"exclude": ["favourites"]}
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str | None] = mapped_column(unique=True, index=True)
+    email: Mapped[str] = mapped_column(unique=True, index=True)
     name: Mapped[str] = mapped_column(index=True)
     company: Mapped[str | None]
     will_have_ticket: Mapped[bool] = mapped_column(default=False)  # for CfP filtering
