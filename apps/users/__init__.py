@@ -1,6 +1,4 @@
 import time
-from typing import overload
-from urllib.parse import urljoin, urlparse, urlunparse
 
 from flask import (
     Blueprint,
@@ -23,6 +21,7 @@ from sqlalchemy import or_
 from wtforms import BooleanField, StringField, SubmitField
 from wtforms.validators import DataRequired, ValidationError
 
+from apps.common import get_next_url
 from main import db, get_or_404
 from models.basket import Basket
 from models.cfp import CFPMessage, Proposal
@@ -58,33 +57,6 @@ def users_variables():
         "unread_count": unread_count,
         "view_name": request.url_rule.endpoint.replace("users.", "."),
     }
-
-
-def make_safe_url(target: str) -> str | None:
-    ref_url = urlparse(request.host_url)
-    test_url = urlparse(urljoin(request.host_url, target))
-    if test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc:
-        return urlunparse(test_url)
-    return None
-
-
-@overload
-def get_next_url(default: str) -> str: ...
-
-
-@overload
-def get_next_url(default: None) -> str | None: ...
-
-
-def get_next_url(default=None):
-    next_url = request.args.get("next")
-    if next_url:
-        if safe_url := make_safe_url(next_url):
-            return safe_url
-        app.logger.error(f"Dropping unsafe next URL {repr(next_url)}")
-    if default is None:
-        default = url_for(".account")
-    return default
 
 
 class LoginForm(Form):
