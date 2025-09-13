@@ -142,6 +142,7 @@ disallow_incomplete_defs = true
 warn_redundant_casts = true
 warn_return_any = true
 strict_equality = true
+no_implicit_reexport = true
 
 [[tool.mypy.overrides]]
 module = [
@@ -162,6 +163,7 @@ ignore_missing_imports = true
 # TODO: Remove once CFP rework is in
 [[tool.mypy.overrides]]
 module = [
+    "apps.cfp.*",
     "apps.cfp_review.*",
     "models.cfp",
 ]

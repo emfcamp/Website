@@ -9,6 +9,7 @@ from flask_mailman import EmailMessage
 from wtforms import HiddenField, SubmitField
 from wtforms.validators import AnyOf, DataRequired
 
+from apps.payments.common import get_user_payment_or_abort, lock_user_payment_or_abort
 from main import db
 from models import Currency, naive_utcnow
 from models.payment import BankPayment, BankTransaction
@@ -17,7 +18,7 @@ from ..common import feature_enabled, get_user_currency
 from ..common.email import from_email
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
-from . import get_user_payment_or_abort, lock_user_payment_or_abort, payments
+from . import payments
 
 logger = logging.getLogger(__name__)
 

@@ -23,6 +23,8 @@ from main import db
 # of DeclarativeBase) as mypy can't handle using the sqlalchemy-flask generated db.Model
 if TYPE_CHECKING:
     from main import BaseModel
+
+    __all__ = ["BaseModel"]
 else:
     BaseModel = db.Model
 

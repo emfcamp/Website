@@ -5,13 +5,6 @@ from faker import Faker
 from sqlalchemy import select
 
 from apps.cfp.scheduler import Scheduler
-from apps.common.forms import (
-    AGE_CHOICES,
-    DISABILITY_CHOICES,
-    ETHNICITY_CHOICES,
-    GENDER_CHOICES,
-    SEXUALITY_CHOICES,
-)
 from main import db
 from models import Currency
 from models.basket import Basket
@@ -26,7 +19,14 @@ from models.cfp import (
     WorkshopProposal,
     YouthWorkshopProposal,
 )
-from models.diversity import UserDiversity
+from models.diversity import (
+    AGE_CHOICES,
+    DISABILITY_CHOICES,
+    ETHNICITY_CHOICES,
+    GENDER_CHOICES,
+    SEXUALITY_CHOICES,
+    UserDiversity,
+)
 from models.event_tickets import EventTicket, get_max_rank_for_user
 from models.payment import BankPayment, StripePayment
 from models.product import PriceTier

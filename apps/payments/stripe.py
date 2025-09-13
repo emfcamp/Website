@@ -30,6 +30,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from wtforms import SubmitField
 
+from apps.payments.common import get_user_payment_or_abort, lock_user_payment_or_abort
 from main import db, get_stripe_client
 from models.payment import StripePayment
 
@@ -37,7 +38,7 @@ from ..common import feature_enabled
 from ..common.email import from_email
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
-from . import get_user_payment_or_abort, lock_user_payment_or_abort, payments, ticket_admin_email
+from . import payments, ticket_admin_email
 
 logger = logging.getLogger(__name__)
 
