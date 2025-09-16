@@ -143,6 +143,7 @@ warn_redundant_casts = true
 warn_return_any = true
 strict_equality = true
 no_implicit_reexport = true
+warn_unreachable = true
 
 [[tool.mypy.overrides]]
 module = [

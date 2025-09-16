@@ -37,7 +37,7 @@ class Village(BaseModel):
     village_memberships: Mapped[list[VillageMember]] = relationship(
         back_populates="village", cascade="all, delete-orphan"
     )
-    requirements: Mapped[VillageRequirements] = relationship(
+    requirements: Mapped[VillageRequirements | None] = relationship(
         back_populates="village", cascade="all, delete-orphan"
     )
     venues: Mapped[list[Venue]] = relationship(back_populates="village", cascade="all, delete-orphan")
