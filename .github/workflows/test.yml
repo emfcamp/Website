@@ -41,3 +41,5 @@ jobs:
         run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml build --parallel
       - name: Test
         run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml run --quiet-pull -e GITHUB_ACTIONS=true -T app uv run make pytest
+      - name: Adding report
+        run: cat cov.md >> $GITHUB_STEP_SUMMARY

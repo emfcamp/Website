@@ -3,6 +3,7 @@ from collections import defaultdict
 import pendulum
 from flask import Response, abort, flash, redirect, render_template, request, session, url_for
 from flask import current_app as app
+from flask.typing import ResponseValue
 from flask_login import current_user
 from icalendar import Calendar, Event
 from sqlalchemy.orm import joinedload
@@ -35,7 +36,7 @@ def _get_roles_with_user_data(user):
     return res
 
 
-def redirect_next_or_schedule(message: str | None = None):
+def redirect_next_or_schedule(message: str | None = None) -> ResponseValue:
     """
     Set the flash if `message` is set, then redirect either to the URL in the
     `next` form field, or if that doesn't exist to the schedule page.

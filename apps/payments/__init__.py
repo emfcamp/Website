@@ -3,7 +3,6 @@ from flask import current_app as app
 from flask_mailman import EmailMessage
 
 from ..common.email import from_email
-from .common import get_user_payment_or_abort, lock_user_payment_or_abort  # noqa: F401
 
 payments = Blueprint("payments", __name__)
 

@@ -11,7 +11,7 @@ import yaml
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from datetype import DateTime
-from flask import Flask, abort, g, render_template, request, url_for
+from flask import Config, Flask, abort, g, render_template, request, url_for
 from flask_caching import Cache
 from flask_cors import CORS
 from flask_debugtoolbar import DebugToolbarExtension
@@ -86,6 +86,9 @@ def get_or_404[M: BaseModel](db: SQLAlchemy, model: type[M], id: int) -> M:
 # type datetype.DateTime[None]".
 NaiveDT = DateTime[None]
 
+
+type JSONValue = dict[str, "JSONValue"] | list["JSONValue"] | str | int | float | bool | None
+
 # We can't use `type_annotation_map` directly in the BaseModel due to flask-sqlalchemy
 # https://github.com/pallets-eco/flask-sqlalchemy/issues/1361
 db = SQLAlchemy(model_class=BaseModel)
@@ -114,7 +117,7 @@ toolbar = DebugToolbarExtension()
 wise = None
 
 
-def get_stripe_client(config) -> stripe.StripeClient:
+def get_stripe_client(config: Config) -> stripe.StripeClient:
     return stripe.StripeClient(
         api_key=config["STRIPE_SECRET_KEY"],
         stripe_version="2023-10-16",
@@ -133,7 +136,7 @@ def check_cache_configuration():
         logger.warning("Flask-Caching backend does not appear to be working. Performance may be affected.")
 
 
-def derive_secret_key(app: Flask):
+def derive_secret_key(app: Flask) -> None:
     """The database is cleared between events, but the secret key may not be reset, which raises the
     risk of reuse of generated tokens (including ticket barcodes) from previous years.
 

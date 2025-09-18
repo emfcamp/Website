@@ -1,4 +1,7 @@
 from collections import defaultdict
+from collections.abc import Sequence
+from datetime import datetime
+from typing import NotRequired, TypedDict
 
 import pendulum  # preferred over datetime
 from flask_login import current_user
@@ -12,42 +15,81 @@ from models.cfp import Proposal, Venue, WorkshopProposal, YouthWorkshopProposal
 from . import event_tz
 
 
-def _get_proposal_dict(proposal: Proposal, favourites_ids):
+class VideoProposalDict(TypedDict):
+    ccc: NotRequired[str]
+    youtube: NotRequired[str]
+    preview_image: NotRequired[str]
+    recording_lost: NotRequired[bool]
+
+
+class ProposalDict(TypedDict):
+    id: int
+    slug: str
+    start_date: datetime
+    end_date: datetime | None
+    venue: str
+    latlon: str
+    map_link: str | None
+    title: str
+    speaker: str
+    pronouns: str | None
+    user_id: int
+    description: str
+    type: str
+    video_privacy: str | None
+    is_fave: bool
+    is_family_friendly: bool | None
+    is_from_cfp: bool
+    content_note: str | None
+    source: str
+    link: str
+
+    # workshop stuff
+    cost: NotRequired[str]
+    equipment: NotRequired[str]
+    age_range: NotRequired[str]
+    attendees: NotRequired[str | None]
+    requires_ticket: NotRequired[bool | None]
+
+    video: NotRequired[VideoProposalDict]
+
+
+def _get_proposal_dict(proposal: Proposal, favourites_ids: Sequence[int]) -> ProposalDict:
     assert proposal.scheduled_venue is not None
-    res = {
-        "id": proposal.id,
-        "slug": proposal.slug,
-        "start_date": event_tz.localize(proposal.start_date),
-        "end_date": event_tz.localize(proposal.end_date) if proposal.end_date else None,
-        "venue": proposal.scheduled_venue.name,
-        "latlon": proposal.latlon,
-        "map_link": proposal.map_link,
-        "title": proposal.display_title,
-        "speaker": proposal.published_names or proposal.user.name,
-        "pronouns": proposal.published_pronouns,
-        "user_id": proposal.user.id,
-        "description": proposal.published_description or proposal.description,
-        "type": proposal.type,
-        "video_privacy": proposal.video_privacy,
-        "is_fave": proposal.id in favourites_ids,
-        "is_family_friendly": proposal.family_friendly,
-        "is_from_cfp": not proposal.user_scheduled,
-        "content_note": proposal.content_note,
-        "source": "database",
-        "link": external_url(
+    res = ProposalDict(
+        id=proposal.id,
+        slug=proposal.slug,
+        start_date=event_tz.localize(proposal.start_date),
+        end_date=event_tz.localize(proposal.end_date) if proposal.end_date else None,
+        venue=proposal.scheduled_venue.name,
+        latlon=proposal.latlon,
+        map_link=proposal.map_link,
+        title=proposal.display_title,
+        speaker=proposal.published_names or proposal.user.name,
+        pronouns=proposal.published_pronouns,
+        user_id=proposal.user.id,
+        description=proposal.published_description or proposal.description,
+        type=proposal.type,
+        video_privacy=proposal.video_privacy,
+        is_fave=proposal.id in favourites_ids,
+        is_family_friendly=proposal.family_friendly,
+        is_from_cfp=not proposal.user_scheduled,
+        content_note=proposal.content_note,
+        source="database",
+        link=external_url(
             ".item",
             year=event_year(),
             proposal_id=proposal.id,
             slug=proposal.slug,
         ),
-    }
+    )
     if isinstance(proposal, WorkshopProposal | YouthWorkshopProposal):
         res["cost"] = proposal.display_cost
         res["equipment"] = proposal.display_participant_equipment
         res["age_range"] = proposal.display_age_range
         res["attendees"] = proposal.attendees
         res["requires_ticket"] = proposal.requires_ticket
-    video_res: dict[str, str | bool] = {}
+    video_res = VideoProposalDict()
     if proposal.c3voc_url:
         video_res["ccc"] = proposal.c3voc_url
     if proposal.youtube_url:

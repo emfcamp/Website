@@ -4,7 +4,7 @@ import socket
 from flask import current_app as app
 
 
-def irc_send(channel: str, message: str):
+def irc_send(channel: str, message: str) -> None:
     message = f"{channel} {message}"
     irc_host = os.environ.get("IRCCAT", "")
     if not irc_host:

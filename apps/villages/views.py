@@ -20,6 +20,8 @@ def register() -> ResponseValue:
 
     form = VillageForm()
     if form.validate_on_submit():
+        # Checked by form so should never fail
+        assert form.name.data is not None
         if Village.get_by_name(form.name.data):
             # TODO: should probably be a validator, although then you do have to give it
             # a db handle and somehow pass in the current name. WTForms-alchemy has a
@@ -45,16 +47,16 @@ def register() -> ResponseValue:
 
 
 @villages.route("/")
-def villages_redirect():
+def villages_redirect() -> ResponseValue:
     return redirect(url_for(".main", year=event_year()))
 
 
 @villages.route("/<int:year>")
-def main(year):
+def main(year: int) -> ResponseValue:
     if year != event_year():
         abort(404)
 
-    villages = list(Village.query.all())
+    villages = list(db.session.execute(select(Village)).scalars().all())
     any_village_located = any(v.location is not None for v in villages)
     return render_template(
         "villages/villages.html",

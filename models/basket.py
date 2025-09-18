@@ -1,12 +1,14 @@
 from collections.abc import MutableMapping
 from decimal import Decimal
 from itertools import groupby
+from typing import Self
 
 from flask import current_app as app
 from flask import session
 from sqlalchemy.orm import joinedload
 
 from main import db
+from models.user import User
 
 from . import Currency
 from .exc import CapacityException
@@ -28,7 +30,7 @@ class Line:
         self.purchases = purchases
 
 
-class Basket(MutableMapping):
+class Basket(MutableMapping[PriceTier, int]):
     """
     Helper class for basket-related operations. Tied to a user, and maps PriceTiers to counts.
 
@@ -44,7 +46,7 @@ class Basket(MutableMapping):
     ids should be trustworthy (e.g. stored in flask.session)
     """
 
-    def __init__(self, user, currency: Currency, voucher=None):
+    def __init__(self, user: User, currency: Currency, voucher: str | None = None) -> None:
         self.user = user
         # Due to the Price, reserved Purchases have an implicit currency,
         # but this shouldn't be relied on until they're attached to a Payment.
@@ -54,12 +56,12 @@ class Basket(MutableMapping):
         self.voucher = voucher
 
     @classmethod
-    def from_session(self, user, currency: Currency):
+    def from_session(cls, user: User, currency: Currency) -> Self:
         purchases = session.get("basket_purchase_ids", [])
         surplus_purchases = session.get("basket_surplus_purchase_ids", [])
         voucher = session.get("ticket_voucher", None)
 
-        basket = Basket(user, currency, voucher)
+        basket = cls(user, currency, voucher)
         basket.load_purchases_from_ids(purchases, surplus_purchases)
         return basket
 
@@ -72,7 +74,7 @@ class Basket(MutableMapping):
         session["basket_purchase_ids"] = [p.id for p in self.purchases]
         session["basket_surplus_purchase_ids"] = [p.id for p in self.surplus_purchases]
 
-    def _get_line(self, tier: PriceTier):
+    def _get_line(self, tier: PriceTier) -> Line:
         for line in self._lines:
             if line.tier == tier:
                 return line
@@ -82,7 +84,7 @@ class Basket(MutableMapping):
     def __getitem__(self, key: PriceTier) -> int:
         return self._get_line(key).count
 
-    def __setitem__(self, key: PriceTier, value: int):
+    def __setitem__(self, key: PriceTier, value: int) -> None:
         if key.get_price(self.currency) is None:
             raise KeyError(f"Cannot add {key} to basket - no price")
 
@@ -93,7 +95,7 @@ class Basket(MutableMapping):
         except KeyError:
             self._lines.append(Line(key, value))
 
-    def __delitem__(self, key: PriceTier):
+    def __delitem__(self, key: PriceTier) -> None:
         line = self._get_line(key)
         self._lines.remove(line)
 
@@ -116,7 +118,7 @@ class Basket(MutableMapping):
     def surplus_purchases(self) -> list[Purchase]:
         return [p for line in self._lines for p in line.purchases[line.count :]]
 
-    def set_currency(self, currency: Currency):
+    def set_currency(self, currency: Currency) -> None:
         # We do this half to save loading the wrong prices on the next page,
         # and half so there's a record of how often currency changes happen.
         # When Basket is stored in the DB, we'll just update it there.

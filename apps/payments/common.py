@@ -8,7 +8,10 @@ from models.payment import Payment
 
 
 def get_user_payment_or_abort(
-    payment_id: int, provider=None, valid_states: list[str] | None = None, allow_admin=False
+    payment_id: int,
+    provider: str | None = None,
+    valid_states: list[str] | None = None,
+    allow_admin: bool = False,
 ) -> Payment:
     try:
         payment = db.session.execute(select(Payment).where(Payment.id == payment_id)).scalar_one_or_none()
@@ -35,7 +38,12 @@ def get_user_payment_or_abort(
     return payment
 
 
-def lock_user_payment_or_abort(payment_id, provider=None, valid_states=None, allow_admin=False) -> Payment:
+def lock_user_payment_or_abort(
+    payment_id: int,
+    provider: str | None = None,
+    valid_states: list[str] | None = None,
+    allow_admin: bool = False,
+) -> Payment:
     # This does an unlocked check on state, which is handy if it's invalid
     payment = get_user_payment_or_abort(payment_id, provider, valid_states, allow_admin)
 

@@ -58,7 +58,7 @@ ProposalTag = Table(
 
 
 class Tag(BaseModel):
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
     __tablename__ = "tag"
 
     id: Mapped[int] = mapped_column(primary_key=True)

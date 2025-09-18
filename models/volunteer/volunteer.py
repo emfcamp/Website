@@ -38,7 +38,7 @@ VolunteerRoleTraining = Table(
 
 class Volunteer(BaseModel, UserMixin):
     __tablename__ = "volunteer"
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     nickname: Mapped[str | None]

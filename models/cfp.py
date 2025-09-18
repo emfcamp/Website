@@ -1082,7 +1082,7 @@ class CFPMessage(BaseModel):
 
 
 class CFPVote(BaseModel):
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
     __tablename__ = "cfp_vote"
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))

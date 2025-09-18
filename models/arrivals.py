@@ -18,7 +18,7 @@ class ArrivalsView(BaseModel):
     """An analog to a ProductView, except for checking in items rather than selling them."""
 
     __tablename__ = "arrivals_view"
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(index=True)

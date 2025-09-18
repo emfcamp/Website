@@ -1,11 +1,17 @@
+from collections.abc import Sequence
+from typing import Literal
+
 from flask import flash, redirect, render_template, url_for
+from sqlalchemy import select
 from wtforms import SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired
 from wtforms.widgets import TextArea
 
+from main import db
 from models import event_year
 from models.cfp import Proposal
 from models.payment import Payment
+from models.purchase import Purchase
 from models.user import User
 from models.village import VillageMember
 
@@ -37,24 +43,24 @@ class EmailComposeForm(Form):
     send = SubmitField("Send Email")
 
 
-def get_users(dest: str) -> list[User]:
-    query = User.query
+def get_users(dest: Literal["ticket", "cfp", "purchasers", "villages"]) -> Sequence[User]:
+    query = select(User)
     if dest == "ticket":
         query = (
             query.join(User.owned_purchases)
-            .filter_by(type="admission_ticket", is_paid_for=True)
+            .where(Purchase.type == "admission_ticket", Purchase.is_paid_for == True)
             .group_by(User.id)
         )
     elif dest == "purchasers":
-        query = query.join(User.payments).filter(Payment.state == "paid")
+        query = query.join(User.payments).where(Payment.state == "paid")
     elif dest == "cfp":
-        query = query.join(User.proposals).filter(Proposal.is_accepted)
+        query = query.join(User.proposals).where(Proposal.is_accepted)
     elif dest == "villages":
-        query = query.join(User.village_membership).filter(VillageMember.admin)
+        query = query.join(User.village_membership).where(VillageMember.admin == True)
     else:
         raise ValueError(f"Invalid email destination set: {dest}")
 
-    return query.distinct().all()
+    return db.session.execute(query.distinct()).scalars().all()
 
 
 def get_email_reason(dest: str) -> str:

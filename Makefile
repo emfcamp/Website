@@ -11,7 +11,7 @@ endif
 test: check-syntax pytest
 
 pytest:
-	SETTINGS_FILE=$(TEST_SETTINGS) pytest --random-order --cov=apps --cov=models ./tests/ ./models/
+	SETTINGS_FILE=$(TEST_SETTINGS) pytest --random-order --cov-report markdown:cov.md --cov=apps --cov=models ./tests/ ./models/
 	SETTINGS_FILE=$(TEST_SETTINGS) flask db upgrade
 	SETTINGS_FILE=$(TEST_SETTINGS) flask db check
 

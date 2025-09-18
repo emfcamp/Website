@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 class SiteState(BaseModel):
     __tablename__ = "site_state"
     __export_data__ = False
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
     name: Mapped[str] = mapped_column(primary_key=True)
     state: Mapped[str]
 

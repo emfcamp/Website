@@ -12,6 +12,7 @@ from flask import (
     render_template,
     url_for,
 )
+from flask.typing import ResponseValue
 
 from apps.common import render_markdown
 
@@ -19,17 +20,17 @@ from . import base
 
 
 @base.route("/about/branding")
-def branding():
+def branding() -> ResponseValue:
     return render_template("about/branding.html")
 
 
 @base.route("/about/<page_name>")
-def page(page_name: str):
+def page(page_name: str) -> ResponseValue:
     return render_markdown(f"about/{page_name}", page_name=page_name)
 
 
 @base.route("/about/diversity/<int:year>")
-def yearly_diversity_stats(year: int):
+def yearly_diversity_stats(year: int) -> ResponseValue:
     if year in (2018, 2022):
         with open(f"exports/{year}/public/UserDiversity.json") as raw_data:
             data = json.load(raw_data)
@@ -45,20 +46,20 @@ def yearly_diversity_stats(year: int):
 # About and Contact have actual logic in them, so remain as HTML rather than
 # markdown
 @base.route("/about")
-def about():
+def about() -> ResponseValue:
     return render_template("about/index.html")
 
 
 @base.route("/company")
-def company():
+def company() -> ResponseValue:
     return render_markdown("about/company")
 
 
 @base.route("/about/contact")
-def contact():
+def contact() -> ResponseValue:
     return render_template("about/contact.html")
 
 
 @base.route("/about/covid")
-def covid():
+def covid() -> ResponseValue:
     return redirect(url_for(".page", page_name="health"), code=301)

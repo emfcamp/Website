@@ -26,10 +26,7 @@ class VenueDefinition:
 
     @property
     def location(self) -> str:
-        if self.latlon:
-            return f"POINT({self.latlon[1]} {self.latlon[0]})"
-        else:
-            return None
+        return f"POINT({self.latlon[1]} {self.latlon[0]})"
 
     def as_venue(self) -> Venue:
         return Venue(

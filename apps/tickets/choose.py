@@ -12,6 +12,7 @@ from flask import (
 from flask import (
     current_app as app,
 )
+from flask.typing import ResponseValue
 from flask_login import current_user
 from flask_mailman import EmailMessage
 from sqlalchemy import select
@@ -151,7 +152,9 @@ def products_for_view(product_view: ProductView) -> Sequence[Product]:
     )
 
 
-def handle_ticket_selection(form, view: ProductView, flow: str, basket: Basket):
+def handle_ticket_selection(
+    form: TicketAmountsForm, view: ProductView, flow: str, basket: Basket
+) -> ResponseValue:
     """
     For consistency and to avoid surprises, we try to ensure a few things here:
     - if the user successfully submits a form with no errors, their basket is updated
@@ -168,7 +171,7 @@ def handle_ticket_selection(form, view: ProductView, flow: str, basket: Basket):
     We currently don't deal with multiple price tiers being available around the same time.
     Reserved tickets from a previous tier should be cancelled before activating a new one.
     """
-    if form.currency_code.data != get_user_currency():
+    if form.currency_code.data is not None and form.currency_code.data != get_user_currency():
         set_user_currency(form.currency_code.data)
         # Commit so we don't lose the currency change if an error occurs
         db.session.commit()
@@ -229,7 +232,7 @@ def handle_ticket_selection(form, view: ProductView, flow: str, basket: Basket):
     return handle_free_tickets(flow, view, basket)
 
 
-def handle_free_tickets(flow: str, view: ProductView, basket: Basket):
+def handle_free_tickets(flow: str, view: ProductView, basket: Basket) -> ResponseValue:
     """The user is trying to "buy" only free tickets.
 
     This is effectively a payment stage, handled differently
@@ -284,7 +287,7 @@ def handle_free_tickets(flow: str, view: ProductView, basket: Basket):
 
 @tickets.route("/tickets/clear")
 @tickets.route("/tickets/<flow>/clear")
-def tickets_clear(flow: str | None = None):
+def tickets_clear(flow: str | None = None) -> ResponseValue:
     app.logger.info("Clearing basket")
     basket = Basket.from_session(current_user, get_user_currency())
     if not any(basket.values()):
@@ -309,7 +312,7 @@ def tickets_voucher_clear():
 
 @tickets.route("/tickets/voucher/")
 @tickets.route("/tickets/voucher/<voucher_code>")
-def tickets_voucher(voucher_code: str | None = None):
+def tickets_voucher(voucher_code: str | None = None) -> ResponseValue:
     """
     A user reaches this endpoint if they're sent a voucher code by email.
     Set up the voucher details in the session and redirect them to choose their tickets.

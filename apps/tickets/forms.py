@@ -72,7 +72,7 @@ class TicketAmountsForm(Form):
 
             f.amount.data = basket.get(tier, 0)
 
-    def ensure_capacity(form, basket: Basket, voucher: Voucher | None):
+    def ensure_capacity(form, basket: Basket, voucher: Voucher | None) -> bool:
         """
         This function updates the products on the form based on the current capacity
         so it will fail to validate if the requested ticket capacity is now unavailable.

@@ -25,7 +25,7 @@ __all__ = [
 
 class Village(BaseModel):
     __tablename__ = "village"
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
@@ -37,18 +37,18 @@ class Village(BaseModel):
     village_memberships: Mapped[list[VillageMember]] = relationship(
         back_populates="village", cascade="all, delete-orphan"
     )
-    requirements: Mapped[VillageRequirements] = relationship(
+    requirements: Mapped[VillageRequirements | None] = relationship(
         back_populates="village", cascade="all, delete-orphan"
     )
     venues: Mapped[list[Venue]] = relationship(back_populates="village", cascade="all, delete-orphan")
     members = association_proxy("village_memberships", "user")
 
     @classmethod
-    def get_by_name(cls, name) -> Village | None:
+    def get_by_name(cls, name: str) -> Village | None:
         return db.session.execute(select(cls).where(cls.name == name)).scalar_one_or_none()
 
     @classmethod
-    def get_by_id(cls, id) -> Village | None:
+    def get_by_id(cls, id: int) -> Village | None:
         return db.session.execute(select(cls).where(cls.id == id)).scalar_one_or_none()
 
     def admins(self) -> list[User]:

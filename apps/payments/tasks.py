@@ -181,3 +181,15 @@ def expire_pending_payments(yes):
             app.logger.info(f"Would expire payment {payment}")
 
     db.session.commit()
+
+
+@payments.cli.command("mark_transfer_paid")
+@click.argument("payment_id", type=int)
+def mark_paid(payment_id: int) -> None:
+    """Mark a Bank transfer payment as paid. Useful for testing."""
+    p = db.session.get(BankPayment, payment_id)
+    if p is None:
+        app.logger.error("Payment id %d not found!", payment_id)
+        return
+    p.paid()
+    db.session.commit()

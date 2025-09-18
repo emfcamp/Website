@@ -20,7 +20,7 @@ class ManualRefundRequired(RefundException):
 
 
 def create_stripe_refund(
-    payment: StripePayment, amount: Decimal, metadata: dict | None = None
+    payment: StripePayment, amount: Decimal, metadata: dict[str, str] | None = None
 ) -> StripeRefund | None:
     """Initiate a stripe refund, and return the StripeRefund object."""
     if metadata is None:
@@ -112,7 +112,7 @@ def handle_refund_request(request: RefundRequest) -> None:
 
     refund = None
     if refund_amount > 0:
-        refund = create_stripe_refund(payment, refund_amount, metadata={"refund_request": request.id})
+        refund = create_stripe_refund(payment, refund_amount, metadata={"refund_request": str(request.id)})
 
     with db.session.no_autoflush:
         for purchase in payment.purchases:
