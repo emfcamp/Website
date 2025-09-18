@@ -71,7 +71,7 @@ from . import (
     copy_request_args,
 )
 from ..common.email import from_email
-from ..common.forms import guess_age, guess_gender, guess_ethnicity  # type: ignore[attr-defined]
+from models.diversity import guess_age, guess_gender, guess_ethnicity
 
 
 @cfp_review.route("/")
