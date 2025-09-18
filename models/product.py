@@ -563,7 +563,7 @@ class Voucher(BaseModel):
     is_used = column_property((purchases_remaining == 0) | (tickets_remaining == 0))
 
     @classmethod
-    def get_by_code(cls, code: str) -> Voucher | None:
+    def get_by_code(cls, code: str | None) -> Voucher | None:
         if not code:
             return None
         return db.session.execute(select(Voucher).where(Voucher.code == code)).scalar_one_or_none()

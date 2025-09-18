@@ -193,7 +193,7 @@ def handle_ticket_selection(
         return redirect(url_for("tickets.main", flow=flow))
 
     # Ensure this purchase is valid for this voucher.
-    voucher = Voucher.get_by_code(basket.voucher) if basket.voucher is not None else None
+    voucher = Voucher.get_by_code(basket.voucher)
     if voucher and not voucher.check_capacity(basket):
         basket.save_to_session()
         if voucher.is_used:
