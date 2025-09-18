@@ -1,6 +1,6 @@
 import json
 import os
-from collections.abc import Generator
+from collections.abc import Iterable
 from typing import Any, cast
 
 import click
@@ -15,7 +15,7 @@ from models import event_year, naive_utcnow
 from . import base
 
 
-def get_export_data(table_filter: str | None = None) -> Generator[tuple[str, Any]]:
+def get_export_data(table_filter: str | None = None) -> Iterable[tuple[str, Any]]:
     """Export data to archive using the `get_export_data` method in the model class."""
     # As we go, we check against the list of all tables, in case we forget about some
     # new object type (e.g. association table).
