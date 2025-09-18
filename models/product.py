@@ -702,7 +702,7 @@ class ProductView(BaseModel):
     def get_by_name(cls, name: str) -> ProductView | None:
         return db.session.execute(select(ProductView).where(ProductView.name == name)).scalar_one_or_none()
 
-    def is_accessible_at(self, user: User, voucher: str | None = None) -> bool:
+    def is_accessible(self, user: User, voucher: str | None = None) -> bool:
         "Whether this ProductView is accessible to a user."
         if user.is_authenticated and user.has_permission("admin"):
             # Admins always have access
@@ -728,9 +728,6 @@ class ProductView(BaseModel):
             return voucher_obj.is_accessible(voucher)
 
         return True
-
-    def is_accessible(self, user, voucher=None):
-        return self.is_accessible_at(user, voucher=voucher)
 
     def __repr__(self):
         return f"<ProductView: {self.name}>"
