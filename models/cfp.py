@@ -335,18 +335,18 @@ class InvalidVenueException(Exception):
     pass
 
 
-FavouriteProposal = Table(
-    "favourite_proposal",
-    BaseModel.metadata,
-    Column("user_id", Integer, ForeignKey("user.id"), primary_key=True),
-    Column(
-        "proposal_id",
-        Integer,
-        ForeignKey("proposal.id"),
-        primary_key=True,
-        index=True,
-    ),
-)
+# FavouriteProposal = Table(
+#     "favourite_proposal",
+#     BaseModel.metadata,
+#     Column("user_id", Integer, ForeignKey("user.id"), primary_key=True),
+#     Column(
+#         "proposal_id",
+#         Integer,
+#         ForeignKey("proposal.id"),
+#         primary_key=True,
+#         index=True,
+#     ),
+# )
 
 
 ProposalAllowedVenues = Table(
@@ -399,10 +399,10 @@ class Proposal(BaseModel):
     # References to this table
     messages: Mapped[list[CFPMessage]] = relationship(back_populates="proposal")
     votes: Mapped[list[CFPVote]] = relationship(back_populates="proposal")
-    favourites: Mapped[list[User]] = relationship(
-        secondary=FavouriteProposal,
-        back_populates="favourites",
-    )
+    # favourites: Mapped[list[User]] = relationship(
+    #     secondary=FavouriteProposal,
+    #     back_populates="favourites",
+    # )
     user: Mapped[User] = relationship(back_populates="proposals", foreign_keys=[user_id])
     anonymiser: Mapped[User | None] = relationship(
         back_populates="anonymised_proposals", foreign_keys=[anonymiser_id]
@@ -410,12 +410,12 @@ class Proposal(BaseModel):
     shifts: Mapped[list["Shift"]] = relationship(back_populates="proposal")
 
     # Convenience for individual objects. Use an outerjoin and groupby for more than a few records
-    favourite_count = column_property(
-        select(func.count(FavouriteProposal.c.proposal_id))
-        .where(FavouriteProposal.c.proposal_id == id)
-        .scalar_subquery(),
-        deferred=True,
-    )
+    # favourite_count = column_property(
+    #     select(func.count(FavouriteProposal.c.proposal_id))
+    #     .where(FavouriteProposal.c.proposal_id == id)
+    #     .scalar_subquery(),
+    #     deferred=True,
+    # )
 
     # Fields for finalised info
     published_names: Mapped[str | None]
@@ -1264,7 +1264,7 @@ __all__ = [
     "make_periods_contiguous",
     "CfpStateException",
     "InvalidVenueException",
-    "FavouriteProposal",
+    # "FavouriteProposal",
     "Proposal",
     "PerformanceProposal",
     "TalkProposal",

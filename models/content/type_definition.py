@@ -10,10 +10,15 @@ The field definition requires that a default be set so that we can change type
 with relative safety.
 """
 
+from typing import TYPE_CHECKING
+
 from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 
 from .. import BaseModel
+
+if TYPE_CHECKING:
+    from .proposal import Proposal
 
 
 class ContentTypeDefinition(BaseModel):
@@ -45,6 +50,7 @@ class ContentTypeFieldDefinition(BaseModel):
 
     # Relationships
     type: Mapped[ContentTypeDefinition] = relationship(back_populates="fields")
+    proposals: Mapped[Proposal] = relationship(back_populates="type")
 
     def __init__(
         self,
