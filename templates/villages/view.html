@@ -1,0 +1,21 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block title %}Village: {{village.name}}{% endblock %}
+{% block body %}
+{% if village.url %}
+<h2><a href="{{ village.url }}" rel="nofollow" target="_blank">{{village.name}}</a></h2>
+{% else %}
+<h2>{{village.name}}</h2>
+{% endif %}
+
+{% if village.description %}
+<p>{{village.description}}</p>
+{% endif %}
+
+{# TODO: embed a map somehow? #}
+{% if village.map_link %}
+<a href="{{ village.map_link }}">📍&nbsp;Map</a>
+{% endif %}
+
+{# TODO: Can we show what's on at the village venues here? #}
+{% endblock %}

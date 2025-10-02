@@ -65,6 +65,13 @@ def main(year: int) -> ResponseValue:
     )
 
 
+@villages.route("/<int:year>/<int:village_id>")
+def view(year: int, village_id: int) -> ResponseValue:
+    village = load_village(year, village_id)
+
+    return render_template("villages/view.html", village=village)
+
+
 @villages.route("/<int:year>/<int:village_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit(year: int, village_id: int) -> ResponseValue:
