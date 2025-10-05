@@ -30,9 +30,9 @@ def create_product_groups():
     top_level_groups = [
         # name, capacity, expires, redeemable
         ("admissions", None, 2500, True),
-        ("parking", None, None, False),
-        ("campervan", None, None, False),
-        ("merchandise", None, None, True),
+        ("parking", None, 2500, False),
+        ("campervan", None, 2500, False),
+        ("merchandise", None, 2500, True),
     ]
     for name, expires, capacity, redeemable in top_level_groups:
         if ProductGroup.get_by_name(name):

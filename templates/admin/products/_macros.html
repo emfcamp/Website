@@ -4,15 +4,6 @@
     {% endif %}
 {% endmacro %}
 
-{% macro remaining(item) -%}
-    {%- set rem = item.get_total_remaining_capacity() %}
-    {%- if rem < 999999 %}{# Infinity check #}
-        {{ rem }}
-    {%- else %}
-        ∞
-    {%- endif %}
-{%- endmacro %}
-
 {% macro coalesce(val, def='') -%}
     {%- if val %}
         {{val}}

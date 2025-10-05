@@ -60,14 +60,6 @@ def random_string(length):
     return "".join(random.choice(string.ascii_lowercase + string.digits) for _ in range(length))
 
 
-def test_has_capacity(tent):
-    # With no parent this is a trivial test
-    assert tent.has_capacity()
-
-    with pytest.raises(ValueError):
-        tent.has_capacity(-1)
-
-
 def test_capacity_remaining(tent, db):
     assert tent.capacity_max == tent.get_total_remaining_capacity()
 

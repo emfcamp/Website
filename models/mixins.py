@@ -1,4 +1,3 @@
-import sys
 from abc import abstractmethod
 from datetime import datetime
 
@@ -69,39 +68,15 @@ class CapacityMixin:
             delta = sum(history.added) - sum(history.deleted)
             target.capacity_used = target.__class__.capacity_used + delta
 
-    def has_capacity(self, count=1):
-        """
-        Determine whether this object, and all its ancestors, have
-        available capacity.
-
-        The count parameter (default: 1) determines whether there is capacity
-        for count instances.
-        """
-        if count < 1:
-            raise ValueError("Count cannot be less than 1.")
-
-        return count <= self.get_total_remaining_capacity()
-
-    def remaining_capacity(self) -> int:
-        """
-        Return remaining capacity or inf if
-        capacity_max is not set (i.e. None).
-        """
-        if self.capacity_max is None:
-            return sys.maxsize
-        return self.capacity_max - self.capacity_used
-
     def get_total_remaining_capacity(self) -> int:
         """
         Get the capacity remaining to this object, and all its ancestors.
-
-        Returns inf if no objects have a capacity_max set.
         """
-        remaining = [self.remaining_capacity()]
-        if self.parent:
-            remaining.append(self.parent.get_total_remaining_capacity())
+        if self.capacity_max is None:
+            assert self.parent is not None
+            return self.parent.get_total_remaining_capacity()
 
-        return min(remaining)
+        return self.capacity_max - self.capacity_used
 
     def has_expired(self):
         """
@@ -121,7 +96,7 @@ class CapacityMixin:
         This design (cascading up instead of carving out allocations)
         is liable to contention if there's a rush on reservations.
         """
-        if not self.has_capacity(count):
+        if count > self.get_total_remaining_capacity():
             raise CapacityException("Out of capacity.")
 
         if self.has_expired():

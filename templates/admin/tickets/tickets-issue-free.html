@@ -1,4 +1,3 @@
-{% from "admin/products/_macros.html" import remaining %}
 {% from "_formhelpers.html" import render_field %}
 {% extends "admin/base.html" %}
 {% block title %}Issue Free Tickets{% endblock %}
@@ -40,7 +39,7 @@
         <td>{{ f._tier.parent.name }}</td>
         <td>{{ f._tier.parent.display_name }}</td>
         <td>{{ f._tier.capacity_used }}</td>
-        <td>{{ remaining(f._tier) }}</td>
+        <td>{{ f._tier.get_total_remaining_capacity() }}</td>
         <td>
             {{ f.hidden_tag() }}
             <div class="controls">{{ f.amount(class_="amount") | safe }}

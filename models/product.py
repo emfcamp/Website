@@ -161,6 +161,9 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
             ProductGroup capacity.
         """
 
+        if capacity_max is None and not self.parent:
+            raise ValueError("Top-level product groups must have a capacity")
+
         if self.capacity_used is not None and capacity_max is not None and capacity_max < self.capacity_used:
             raise ValueError("capacity_max cannot be lower than capacity_used")
 

@@ -1,4 +1,4 @@
-{% from "admin/products/_macros.html" import remaining, coalesce, format_expiry %}
+{% from "admin/products/_macros.html" import coalesce, format_expiry %}
 {% extends "admin/base.html" %}
 {% set nav_active = 'products' %}
 {% block title %}Product Overview{% endblock %}
@@ -24,7 +24,7 @@
     <td></td>
     <td>{{coalesce(group.capacity_used, '0')}}</td>
     <td>{{coalesce(group.capacity_max)}}</td>
-    <td>{{remaining(group)}}</td>
+    <td>{{group.get_total_remaining_capacity()}}</td>
     <td>{{format_expiry(group)}}</td>
     <td>{{state(group)}}</td>
 </tr>
@@ -38,7 +38,7 @@
             <td></td>
             <td>{{coalesce(product.capacity_used, '0')}}</td>
             <td>{{coalesce(product.capacity_max)}}</td>
-            <td>{{remaining(product)}}</td>
+            <td>{{product.get_total_remaining_capacity()}}</td>
             <td>{{format_expiry(product)}}</td>
             <td>{{state(product)}}</td>
         </tr>
@@ -53,7 +53,7 @@
                     </a></td>
                 <td>{{coalesce(price_tier.capacity_used, '0')}}</td>
                 <td>{{coalesce(price_tier.capacity_max)}}</td>
-                <td>{{remaining(price_tier)}}</td>
+                <td>{{price_tier.get_total_remaining_capacity()}}</td>
                 <td>{{format_expiry(price_tier)}}</td>
                 <td>{{state(price_tier)}}</td>
             </tr>
