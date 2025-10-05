@@ -34,6 +34,7 @@ from yaml import safe_load as parse_yaml
 from main import JSONValue, db, external_url
 from models import Currency, User, event_end, event_start, naive_utcnow
 from models.basket import Basket
+from models.capacity import UnlimitedType
 from models.feature_flag import get_db_flags
 from models.product import Price
 from models.purchase import Ticket
@@ -106,6 +107,10 @@ def load_utility_functions(app_obj):
         sign, digit, exp = normalized.as_tuple()
         pct = normalized if exp <= 0 else normalized.quantize(1)
         return f"{pct}%"
+
+    @app_obj.template_test("unlimited")
+    def test_unlimited(obj):
+        return isinstance(obj, UnlimitedType)
 
     @app_obj.context_processor
     def utility_processor():

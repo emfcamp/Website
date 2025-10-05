@@ -25,6 +25,7 @@ from main import NaiveDT, db
 from models.user import User
 
 from . import BaseModel, Currency, naive_utcnow
+from .capacity import UnlimitedType
 from .mixins import CapacityMixin, InheritedAttributesMixin
 from .purchase import AdmissionTicket, Purchase, Ticket
 
@@ -469,7 +470,11 @@ class PriceTier(BaseModel, CapacityMixin):
         if self.has_expired():
             return 0
 
-        return min(self.personal_limit, self.get_total_remaining_capacity())
+        remaining = self.get_total_remaining_capacity()
+        if isinstance(remaining, UnlimitedType):
+            return self.personal_limit
+
+        return min(self.personal_limit, remaining)
 
     def __repr__(self):
         return f"<PriceTier {self.name}>"
