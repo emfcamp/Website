@@ -193,6 +193,7 @@ from .admin_message import *  # noqa: F403
 from .arrivals import *  # noqa: F403
 from .basket import *  # noqa: F403
 from .cfp import *  # noqa: F403
+from .content.proposal import *  # noqa: F403
 from .diversity import *  # noqa: F403
 from .email import *  # noqa: F403
 from .event_tickets import *  # noqa: F403

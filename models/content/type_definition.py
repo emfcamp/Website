@@ -18,7 +18,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from .. import BaseModel
 
 if TYPE_CHECKING:
-    from .proposal import Proposal
+    from .proposal import NewProposal
 
 
 class ContentTypeDefinition(BaseModel):
@@ -30,6 +30,7 @@ class ContentTypeDefinition(BaseModel):
     name: Mapped[str] = mapped_column(unique=True, index=True)
 
     fields: Mapped[list["ContentTypeFieldDefinition"]] = relationship(back_populates="type")
+    proposals: Mapped["NewProposal"] = relationship(back_populates="type")
 
     def __init__(self, name: str):
         self.name = name.lower()
@@ -49,8 +50,7 @@ class ContentTypeFieldDefinition(BaseModel):
     default_value: Mapped[str]
 
     # Relationships
-    type: Mapped[ContentTypeDefinition] = relationship(back_populates="fields")
-    proposals: Mapped[Proposal] = relationship(back_populates="type")
+    type: Mapped["ContentTypeDefinition"] = relationship(back_populates="fields")
 
     def __init__(
         self,

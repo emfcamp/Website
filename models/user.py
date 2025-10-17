@@ -27,9 +27,9 @@ from .volunteer.shift import ShiftEntry
 
 if typing.TYPE_CHECKING:
     from .admin_message import AdminMessage
-    from .cfp import CFPMessage, CFPVote
+    from .cfp import CFPMessage, CFPVote, Proposal
     from .cfp_tag import Tag
-    from .content import Proposal
+    from .content import NewProposal
     from .diversity import UserDiversity
     from .event_tickets import EventTicket
     from .payment import Payment
@@ -195,12 +195,17 @@ CFPReviewerTags = Table(
 )
 
 
-# UserProposal = Table(
-#     "content_user_proposal",
-#     BaseModel.metadata,
-#     Column("user_id", Integer, ForeignKey("user.id"), primary_key=True),
-#     Column("proposal_id", Integer, ForeignKey("content_proposal.id"), primary_key=True),
-# )
+UserProposal = Table(
+    "content_user_proposal",
+    BaseModel.metadata,
+    Column("user_id", Integer, ForeignKey("user.id"), primary_key=True),
+    Column(
+        "content_proposal_id",
+        Integer,
+        ForeignKey("content_proposal.id"),
+        primary_key=True,
+    ),
+)
 
 
 class User(BaseModel, UserMixin):
@@ -237,20 +242,26 @@ class User(BaseModel, UserMixin):
     )
     votes: Mapped[list[CFPVote]] = relationship(back_populates="user", lazy="dynamic")
 
-    # proposals: Mapped[list["Proposal"]] = relationship(
-    #     primaryjoin=(UserProposal.c.user_id == id),
-    #     secondary=UserProposal,
-    #     back_populates="users",
-    # )
-    # anonymised_proposals: Mapped[list[Proposal]] = relationship(
-    #     primaryjoin="Proposal.anonymiser_id == User.id",
-    #     back_populates="anonymiser",
-    #     lazy="dynamic",
-    #     cascade="all, delete-orphan",
-    # )
-    # favourites: Mapped[list[Proposal]] = relationship(
-    #     back_populates="favourites", secondary="favourite_proposal"
-    # )
+    proposals_new: Mapped[list[NewProposal]] = relationship(
+        secondary=UserProposal,
+        back_populates="users_new",
+    )
+
+    proposals: Mapped[list[Proposal]] = relationship(
+        primaryjoin="Proposal.user_id == User.id",
+        back_populates="user",
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+    )
+    anonymised_proposals: Mapped[list[Proposal]] = relationship(
+        primaryjoin="Proposal.anonymiser_id == User.id",
+        back_populates="anonymiser",
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+    )
+    favourites: Mapped[list[Proposal]] = relationship(
+        back_populates="favourites", secondary="favourite_proposal"
+    )
 
     messages_from: Mapped[list[CFPMessage]] = relationship(
         primaryjoin="CFPMessage.from_user_id == User.id",

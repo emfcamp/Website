@@ -5,14 +5,19 @@ proposal for a talk or workshop is accepted, a corresponding ScheduleItem
 is created.
 """
 
-from sqlalchemy import ForeignKey, UniqueConstraint, Table, Column, Integer
+import typing
+
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .. import BaseModel, User, UserProposal
+from .. import BaseModel
 from .type_definition import ContentTypeDefinition
 
+if typing.TYPE_CHECKING:
+    from .. import User
 
-class Proposal(BaseModel):
+
+class NewProposal(BaseModel):
     __versioned__: dict = {}
     __tablename__ = "content_proposal"
 
@@ -22,7 +27,7 @@ class Proposal(BaseModel):
 
     # Relationships
     type: Mapped[ContentTypeDefinition] = relationship(back_populates="proposals")
-    # users: Mapped[list[User]] = relationship(
-    #     primaryjoin=(UserProposal.c.proposal_id == id),
-    #     back_populates="proposals", secondary=UserProposal
-    # )
+    users_new: Mapped[list["User"]] = relationship(
+        back_populates="proposals_new",
+        secondary="content_user_proposal",
+    )
