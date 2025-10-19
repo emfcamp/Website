@@ -69,6 +69,7 @@ export default defineConfig({
             "volunteer_schedule.js": './js/volunteer-schedule.js',
             "event_tickets.js": './js/event-tickets.js',
             "arrivals.js": './js/arrivals.js',
+            "sandboxed-iframe.js": './js/sandboxed-iframe.js',
 
             "admin.scss": './css/admin.scss',
             "arrivals.scss": './css/arrivals.scss',
