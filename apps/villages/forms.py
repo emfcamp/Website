@@ -19,6 +19,7 @@ from ..common.forms import Form
 class VillageForm(Form):
     name = StringField("Village Name", [Length(2, 25)])
     description = TextAreaField("Description", [Optional()])
+    long_description = TextAreaField("Long Description", [Optional()])
     url = StringField("URL", [URL(), Optional()])
 
     num_attendees = IntegerField("Number of People", [Optional()])
@@ -46,6 +47,7 @@ class VillageForm(Form):
     def populate(self, village: Village) -> None:
         self.name.data = village.name
         self.description.data = village.description
+        self.long_description.data = village.long_description
         self.url.data = village.url
 
         requirements = village.requirements
@@ -60,6 +62,7 @@ class VillageForm(Form):
         assert self.name.data is not None
         village.name = self.name.data
         village.description = self.description.data
+        village.long_description = self.long_description.data
         village.url = self.url.data
 
         if village.requirements is None:
