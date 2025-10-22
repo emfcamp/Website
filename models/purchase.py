@@ -132,7 +132,7 @@ class Purchase(BaseModel):
     def is_transferable(self):
         return self.product.get_attribute("is_transferable") and not self.redeemed
 
-    def is_refundable(self, ignore_event_refund_state=False) -> bool:
+    def is_refundable(self, ignore_event_refund_state: bool = False) -> bool:
         return (
             (self.is_paid_for is True)
             and not self.is_transferred
@@ -150,7 +150,7 @@ class Purchase(BaseModel):
             raise PurchaseStateException("Ticket cannot be issued for a purchase which hasn't been paid for")
         return issued
 
-    def set_user(self, user: User):
+    def set_user(self, user: User) -> None:
         if self.state != "reserved" or self.owner_id is not None or self.purchaser_id is not None:
             raise PurchaseStateException("Can only set state on purchases that are unclaimed & reserved.")
 
@@ -203,7 +203,7 @@ class Purchase(BaseModel):
         self.state = "paid"
         self.refund = None
 
-    def change_currency(self, currency: Currency):
+    def change_currency(self, currency: Currency) -> None:
         new_price = self.price_tier.get_price(currency)
         if new_price is None:
             raise ValueError(f"No price for currency {currency.value}")

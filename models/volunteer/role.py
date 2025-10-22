@@ -131,7 +131,7 @@ class Role(BaseModel):
 
 
 class RolePermission(BaseModel):
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
     __tablename__ = "volunteer_role_permission"
 
     id: Mapped[int] = mapped_column(primary_key=True)

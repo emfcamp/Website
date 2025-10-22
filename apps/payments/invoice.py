@@ -21,6 +21,7 @@ from sqlalchemy import select
 from sqlalchemy.sql.functions import func
 from wtforms import SubmitField, TextAreaField
 
+from apps.payments.common import get_user_payment_or_abort
 from main import db, external_url
 from models.product import PriceTier, Product
 from models.purchase import Purchase
@@ -28,7 +29,7 @@ from models.purchase import Purchase
 from ..common.epc import format_inline_epc_qr
 from ..common.forms import Form
 from ..common.receipt import render_pdf
-from . import get_user_payment_or_abort, payments
+from . import payments
 
 logger = logging.getLogger(__name__)
 

@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import pendulum
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask import current_app as app
+from flask.typing import ResponseValue
 from flask_login import current_user
 from sqlalchemy import select
 from wtforms import (
@@ -583,7 +584,7 @@ def workshop_steward_main():
 
 @schedule.route("/schedule/workshop-steward/<int:venue_id>")
 @v_user_required
-def workshop_steward_venue(venue_id: int):
+def workshop_steward_venue(venue_id: int) -> ResponseValue:
     venue = get_or_404(db, Venue, venue_id)
     workshops = (
         db.session.execute(

@@ -19,7 +19,7 @@ INITIAL_TOPICS = {
 
 class AdminMessage(BaseModel):
     __tablename__ = "admin_message"
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     message: Mapped[str]

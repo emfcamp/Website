@@ -6,7 +6,7 @@ from decimal import Decimal
 from os import path
 from pathlib import Path
 from textwrap import wrap
-from typing import overload
+from typing import Any, cast, overload
 from urllib.parse import urljoin, urlparse, urlunparse
 
 import pendulum
@@ -31,9 +31,10 @@ from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import Response
 from yaml import safe_load as parse_yaml
 
-from main import db, external_url
+from main import JSONValue, db, external_url
 from models import Currency, User, event_end, event_start, naive_utcnow
 from models.basket import Basket
+from models.capacity import UnlimitedType
 from models.feature_flag import get_db_flags
 from models.product import Price
 from models.purchase import Ticket
@@ -72,7 +73,9 @@ def load_utility_functions(app_obj):
         return "-".join(wrap(sort_code, 2))
 
     @app_obj.template_filter("price")
-    def format_price(_price, _currency=None, after=False) -> str:
+    def format_price(
+        _price: Price | int | float | Decimal, _currency: Currency | str | None = None, after: bool = False
+    ) -> str:
         match _price, _currency:
             case Price(), None:
                 amount = f"{_price.value:.2f}"
@@ -104,6 +107,10 @@ def load_utility_functions(app_obj):
         sign, digit, exp = normalized.as_tuple()
         pct = normalized if exp <= 0 else normalized.quantize(1)
         return f"{pct}%"
+
+    @app_obj.template_test("unlimited")
+    def test_unlimited(obj):
+        return isinstance(obj, UnlimitedType)
 
     @app_obj.context_processor
     def utility_processor():
@@ -189,7 +196,7 @@ def load_utility_functions(app_obj):
         return {"mailing_list": mailing_list}
 
     @app_obj.template_filter("ticket_state_label")
-    def ticket_state_label(ticket: Ticket):
+    def ticket_state_label(ticket: Ticket) -> Markup:
         # see docs/ticket_states.md
 
         match ticket.state:
@@ -211,7 +218,7 @@ def load_utility_functions(app_obj):
         return Markup(f'<span class="label label-{cls}">{ticket.state}</span>')
 
 
-def create_current_user(email: str, name: str):
+def create_current_user(email: str, name: str) -> User:
     user = User(email, name)
 
     db.session.add(user)
@@ -224,7 +231,7 @@ def create_current_user(email: str, name: str):
     return user
 
 
-def get_user_currency(default=Currency.GBP) -> Currency:
+def get_user_currency(default: Currency = Currency.GBP) -> Currency:
     """Fetch the user's currency from the session.
 
     If it's missing or invalid, returns `default`
@@ -313,17 +320,22 @@ def json_response(f, *args, **kwargs):
         return jsonify(response), 200
 
 
-def feature_enabled(feature) -> bool:
+def feature_enabled(feature: str) -> bool:
     """
     If a feature flag is defined in the database return that,
     otherwise fall back to the config setting.
     """
-    db_flags = get_db_flags()
+    # the cache decorator doesn't pass through types, so we have to cast here
+    db_flags = cast(dict[str, bool], get_db_flags())
 
     if feature in db_flags:
         return db_flags[feature]
 
-    return app.config.get(feature, False)
+    from_conf = app.config.get(feature, False)
+    if isinstance(from_conf, bool):
+        return from_conf
+    logger.warning("Feature '%s' read from config was not a boolean! using bool()")
+    return bool(from_conf)
 
 
 def archive_file(year, *path, raise_404=True):
@@ -341,14 +353,14 @@ def archive_file(year, *path, raise_404=True):
     return file_path
 
 
-def load_archive_file(year: int, *path, raise_404=True):
+def load_archive_file(year: int, *path: str, raise_404: bool = True) -> JSONValue:
     """Load the contents of a JSON file from the archive, and optionally
     abort with a 404 if it doesn't exist.
     """
     json_path = archive_file(year, *path, raise_404=raise_404)
     if json_path is None:
         return None
-    return json.load(open(json_path))
+    return cast(JSONValue, json.load(open(json_path)))
 
 
 def page_template(metadata, template):
@@ -360,7 +372,8 @@ def page_template(metadata, template):
     return "static_page.html"
 
 
-def render_markdown(source, template="about/template.html", **view_variables):
+def render_markdown(source: str, template: str = "about/template.html", **view_variables: Any) -> str:
+    assert app.template_folder is not None
     template_root = Path(path.join(app.root_path, app.template_folder)).resolve()
     source_file = template_root.joinpath(f"{source}.md").resolve()
 

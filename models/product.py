@@ -5,6 +5,7 @@ import random
 import re
 import string
 from collections import defaultdict
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import timedelta
 from decimal import Decimal
@@ -13,7 +14,6 @@ from typing import TYPE_CHECKING, cast
 from sqlalchemy import ForeignKey, Numeric, UniqueConstraint, func, inspect, select
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import (
-    InstanceState,
     Mapped,
     column_property,
     mapped_column,
@@ -22,8 +22,10 @@ from sqlalchemy.orm import (
 )
 
 from main import NaiveDT, db
+from models.user import User
 
 from . import BaseModel, Currency, naive_utcnow
+from .capacity import UnlimitedType
 from .mixins import CapacityMixin, InheritedAttributesMixin
 from .purchase import AdmissionTicket, Purchase, Ticket
 
@@ -79,7 +81,7 @@ def random_voucher():
     )
 
 
-def one_or_none(result):
+def one_or_none[T](result: Sequence[T]) -> T | None:
     if len(result) == 1:
         return result[0]
     if len(result) == 0:
@@ -329,7 +331,7 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
 
         return dict(states)
 
-    def get_cheapest_price(self, currency=Currency.GBP) -> Price | None:
+    def get_cheapest_price(self, currency: Currency = Currency.GBP) -> Price | None:
         price = (
             db.session.execute(
                 select(PriceTier)
@@ -450,7 +452,7 @@ class PriceTier(BaseModel, CapacityMixin):
         return self.purchase_count == 0 and not self.active
 
     def get_price(self, currency: Currency) -> Price | None:
-        instance_state = cast(InstanceState, inspect(self))
+        instance_state = inspect(self)
         if "prices" in instance_state.unloaded:
             return self.get_price_unloaded(currency)
         return self.get_price_loaded(currency)
@@ -468,7 +470,11 @@ class PriceTier(BaseModel, CapacityMixin):
         if self.has_expired():
             return 0
 
-        return min(self.personal_limit, self.get_total_remaining_capacity())
+        remaining = self.get_total_remaining_capacity()
+        if isinstance(remaining, UnlimitedType):
+            return self.personal_limit
+
+        return min(self.personal_limit, remaining)
 
     def __repr__(self):
         return f"<PriceTier {self.name}>"
@@ -562,16 +568,16 @@ class Voucher(BaseModel):
     is_used = column_property((purchases_remaining == 0) | (tickets_remaining == 0))
 
     @classmethod
-    def get_by_code(cls, code: str) -> Voucher | None:
+    def get_by_code(cls, code: str | None) -> Voucher | None:
         if not code:
             return None
         return db.session.execute(select(Voucher).where(Voucher.code == code)).scalar_one_or_none()
 
     def __init__(
         self,
-        view,
+        view: ProductView,
         code: str | None = None,
-        expiry=None,
+        expiry: NaiveDT | None = None,
         email: str | None = None,
         purchases_remaining: int = 1,
         tickets_remaining: int = 2,
@@ -597,7 +603,7 @@ class Voucher(BaseModel):
         # interacts badly with the fact that we fake the date in tests.
         return self.expiry is not None and (self.expiry + VOUCHER_GRACE_PERIOD) < naive_utcnow()
 
-    def check_capacity(self, basket: Basket):
+    def check_capacity(self, basket: Basket) -> bool:
         """Check if there is enough capacity in this voucher to buy
         the tickets in the provided basket.
         """
@@ -610,7 +616,7 @@ class Voucher(BaseModel):
             return False
         return True
 
-    def consume_capacity(self, payment: Payment):
+    def consume_capacity(self, payment: Payment) -> None:
         """Decrease the voucher's capacity based on tickets in a payment."""
         if self.purchases_remaining < 1:
             raise VoucherUsedError(f"Attempting to use voucher with no remaining purchases: {self}")
@@ -628,7 +634,7 @@ class Voucher(BaseModel):
         self.purchases_remaining = Voucher.purchases_remaining - 1
         self.tickets_remaining = Voucher.tickets_remaining - adult_tickets
 
-    def return_capacity(self, payment: Payment):
+    def return_capacity(self, payment: Payment) -> None:
         """Return capacity to this voucher based on tickets in a payment."""
         adult_tickets = len(
             [purchase for purchase in payment.purchases if purchase.product.is_adult_ticket()]
@@ -642,7 +648,7 @@ class Voucher(BaseModel):
             return f"<Voucher: {self.code}, view: {self.product_view_id}, expiry: {self.expiry}>"
         return f"<Voucher: {self.code}, view: {self.product_view_id}>"
 
-    def is_accessible(self, voucher):
+    def is_accessible(self, voucher: str) -> bool:
         # voucher expired
         if self.is_expired:
             return False
@@ -701,7 +707,7 @@ class ProductView(BaseModel):
     def get_by_name(cls, name: str) -> ProductView | None:
         return db.session.execute(select(ProductView).where(ProductView.name == name)).scalar_one_or_none()
 
-    def is_accessible_at(self, user, dt, voucher=None) -> bool:
+    def is_accessible(self, user: User, voucher: str | None = None) -> bool:
         "Whether this ProductView is accessible to a user."
         if user.is_authenticated and user.has_permission("admin"):
             # Admins always have access
@@ -727,9 +733,6 @@ class ProductView(BaseModel):
             return voucher_obj.is_accessible(voucher)
 
         return True
-
-    def is_accessible(self, user, voucher=None):
-        return self.is_accessible_at(user, naive_utcnow(), voucher=voucher)
 
     def __repr__(self):
         return f"<ProductView: {self.name}>"

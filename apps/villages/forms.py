@@ -49,11 +49,12 @@ class VillageForm(Form):
         self.url.data = village.url
 
         requirements = village.requirements
-        self.num_attendees.data = requirements.num_attendees
-        self.size_sqm.data = requirements.size_sqm
-        self.power_requirements.data = requirements.power_requirements
-        self.noise.data = requirements.noise
-        self.structures.data = requirements.structures
+        if requirements is not None:
+            self.num_attendees.data = requirements.num_attendees
+            self.size_sqm.data = requirements.size_sqm
+            self.power_requirements.data = requirements.power_requirements
+            self.noise.data = requirements.noise
+            self.structures.data = requirements.structures
 
     def populate_obj(self, village: Village) -> None:
         assert self.name.data is not None

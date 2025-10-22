@@ -23,12 +23,14 @@ from flask import (
 from flask import (
     current_app as app,
 )
+from flask.typing import ResponseValue
 from flask_login import current_user, login_required
 from flask_mailman import EmailMessage
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from wtforms import SubmitField
 
+from apps.payments.common import get_user_payment_or_abort, lock_user_payment_or_abort
 from main import db, get_stripe_client
 from models.payment import StripePayment
 
@@ -36,7 +38,7 @@ from ..common import feature_enabled
 from ..common.email import from_email
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
-from . import get_user_payment_or_abort, lock_user_payment_or_abort, payments, ticket_admin_email
+from . import payments, ticket_admin_email
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +62,7 @@ def webhook(type=None):
     return inner
 
 
-def stripe_start(payment: StripePayment):
+def stripe_start(payment: StripePayment) -> ResponseValue:
     """This is called by the ticket flow to initialise the payment and
     redirect to the capture page. We don't need to do anything here."""
     logger.info("Starting Stripe payment %s", payment.id)
@@ -220,7 +222,7 @@ def stripe_update_payment(
     stripe_client: stripe.StripeClient,
     payment: StripePayment,
     intent: stripe.PaymentIntent | None = None,
-):
+) -> None:
     """Update a Stripe payment.
     If a PaymentIntent object is not passed in, this will fetch the payment details from
     the Stripe API.
@@ -275,7 +277,7 @@ def stripe_update_payment(
     raise StripeUpdateUnexpected("Charge object is not paid, refunded or failed")
 
 
-def stripe_payment_paid(payment: StripePayment):
+def stripe_payment_paid(payment: StripePayment) -> None:
     if payment.state == "paid":
         logger.info("Payment is already paid, ignoring")
         return
@@ -309,7 +311,7 @@ def stripe_payment_paid(payment: StripePayment):
     db.session.commit()
 
 
-def stripe_payment_refunded(payment: StripePayment):
+def stripe_payment_refunded(payment: StripePayment) -> None:
     if payment.state in ("refunded", "refunding"):
         logger.info(f"Payment {payment.id} is {payment.state}, ignoring refund webhook")
         return
@@ -331,7 +333,7 @@ def stripe_payment_refunded(payment: StripePayment):
     )
 
 
-def stripe_payment_part_refunded(payment: StripePayment, charge):
+def stripe_payment_part_refunded(payment: StripePayment) -> None:
     # Payments can be marked as "refunded" if the user has requested a full refund with
     # donation. This is a part-refund on Stripe's end.
     if payment.state in ("partrefunded", "refunded", "refunding"):
@@ -345,7 +347,7 @@ def stripe_payment_part_refunded(payment: StripePayment, charge):
     )
 
 
-def stripe_payment_failed(payment):
+def stripe_payment_failed(payment: StripePayment) -> None:
     # Stripe payments almost always fail during capture, but can be failed while charging.
     # Test with 4000 0000 0000 0341
     if payment.state == "partrefunded":
@@ -419,7 +421,7 @@ def stripe_charge_refunded(_type, charge):
         # Full refund
         stripe_payment_refunded(payment)
     else:
-        stripe_payment_part_refunded(payment, charge)
+        stripe_payment_part_refunded(payment)
 
     return ("", 200)
 

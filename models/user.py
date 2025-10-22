@@ -46,7 +46,7 @@ CHECKIN_CODE_LEN = 16
 checkin_code_re = rf"[0-9a-zA-Z_-]{{{CHECKIN_CODE_LEN}}}"
 
 
-def _generate_hmac(prefix, key, msg):
+def _generate_hmac(prefix: bytes | str, key: bytes | str, msg: bytes | str) -> bytes:
     """
     Generate a keyed HMAC for a unique purpose. You don't want to call this directly.
 
@@ -199,7 +199,7 @@ class User(BaseModel, UserMixin):
     __versioned__ = {"exclude": ["favourites"]}
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str | None] = mapped_column(unique=True, index=True)
+    email: Mapped[str] = mapped_column(unique=True, index=True)
     name: Mapped[str] = mapped_column(index=True)
     company: Mapped[str | None]
     will_have_ticket: Mapped[bool] = mapped_column(default=False)  # for CfP filtering
@@ -347,7 +347,7 @@ class User(BaseModel, UserMixin):
     def bar_training_token(self):
         return generate_bar_training_token(app.config["SECRET_KEY"], self.id)
 
-    def has_permission(self, name, cascade=True) -> bool:
+    def has_permission(self, name: str, cascade: bool = True) -> bool:
         if cascade:
             if name != "admin" and self.has_permission("admin"):
                 return True
@@ -358,7 +358,7 @@ class User(BaseModel, UserMixin):
                 return True
         return False
 
-    def grant_permission(self, name: str):
+    def grant_permission(self, name: str) -> None:
         try:
             perm = db.session.execute(select(Permission).where(Permission.name == name)).scalar_one()
         except NoResultFound:
@@ -366,7 +366,7 @@ class User(BaseModel, UserMixin):
             db.session.add(perm)
         self.permissions.append(perm)
 
-    def revoke_permission(self, name: str):
+    def revoke_permission(self, name: str) -> None:
         for user_perm in self.permissions:
             if user_perm.name == name:
                 self.permissions.remove(user_perm)
@@ -383,45 +383,46 @@ class User(BaseModel, UserMixin):
         return f"<User {self.email}>"
 
     @classmethod
-    def get_by_email(cls, email) -> User | None:
-        return User.query.filter(func.lower(User.email) == func.lower(email)).one_or_none()
+    def get_by_email(cls, email: str) -> User | None:
+        return (
+            db.session.execute(select(User).where(func.lower(User.email) == func.lower(email)))
+            .unique()
+            .scalar_one_or_none()
+        )
 
     @classmethod
     def does_user_exist(cls, email):
         return bool(User.get_by_email(email))
 
     @classmethod
-    def get_by_code(cls, key, code) -> User | None:
+    def get_by_code(cls, key: str, code: str) -> User | None:
         uid = verify_login_code(key, time.time(), code)
         if uid is None:
             return None
-
-        return User.query.filter_by(id=uid).one()
+        return db.session.get_one(User, uid)
 
     @classmethod
-    def get_by_checkin_code(cls, key, code) -> User | None:
+    def get_by_checkin_code(cls, key: str, code: str) -> User | None:
         uid = verify_checkin_code(key, code)
         if uid is None:
             return None
-
-        return User.query.filter_by(id=uid).one()
+        return db.session.get_one(User, uid)
 
     @classmethod
-    def get_by_api_token(cls, key, code) -> User | None:
+    def get_by_api_token(cls, key: str, code: str) -> User | None:
         uid = verify_api_token(key, code)
         if uid is None:
             # FIXME: raise an exception instead of returning None
             return None
-
-        return User.query.filter_by(id=uid).one()
+        return db.session.get_one(User, uid)
 
     @classmethod
-    def get_by_bar_training_token(cls, code) -> User:
+    def get_by_bar_training_token(cls, code: str) -> User:
         uid = verify_bar_training_token(app.config["SECRET_KEY"], code)
         if uid is None:
             raise ValueError("Invalid token")
 
-        return User.query.filter_by(id=uid).one()
+        return db.session.get_one(User, uid)
 
     @property
     def is_cfp_accepted(self):

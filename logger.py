@@ -27,7 +27,7 @@ class AnsiColors(Enum):
 # modified from http://plumberjack.blogspot.co.uk/2010/12/colorizing-logging-output-in-terminals.html
 
 
-class ColorizingStreamHandler(logging.StreamHandler):
+class ColorizingStreamHandler(logging.StreamHandler):  # type: ignore[type-arg]  # mypy insists this is generic
     DEFAULT_COLORS: typing.ClassVar = {
         "DEBUG": "BLUE",
         "WARNING": "YELLOW",

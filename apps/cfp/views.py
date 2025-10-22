@@ -584,7 +584,7 @@ class FinaliseForm(Form):
             ("mon am", "Monday am"),
         ],
     )
-    _available_slots: tuple = tuple()
+    _available_slots: list[str]
 
     def get_availability_json(self):
         res = []

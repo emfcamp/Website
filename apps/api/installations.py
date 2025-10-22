@@ -1,3 +1,5 @@
+from typing import Any, TypedDict
+
 from flask import url_for
 from flask_restful import Resource
 from geoalchemy2.shape import to_shape
@@ -8,7 +10,15 @@ from models.cfp import InstallationProposal
 from . import api
 
 
-def render_installation(installation: InstallationProposal):
+class InstallationResponse(TypedDict):
+    id: int
+    name: str
+    url: str
+    description: str | None
+    location: dict[str, Any] | None
+
+
+def render_installation(installation: InstallationProposal) -> InstallationResponse:
     return {
         "id": installation.id,
         "name": installation.display_title,

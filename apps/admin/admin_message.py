@@ -7,8 +7,8 @@ from wtforms.widgets import TextArea
 from main import db
 from models.admin_message import AdminMessage
 
+from ..common.forms import Form
 from . import admin
-from .forms import Form
 
 
 class AdminMessageForm(Form):

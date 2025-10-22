@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import TypedDict
 
 from sqlalchemy import and_
 
@@ -7,7 +8,18 @@ from models.volunteer.shift import Shift
 from . import volunteer
 
 
-def serialize_shift(shift: Shift):
+class ShiftResponse(TypedDict):
+    id: int
+    role: str
+    venue: str | None
+    min_needed: int
+    max_needed: int
+    current: int
+    start: datetime | None
+    end: datetime | None
+
+
+def serialize_shift(shift: Shift) -> ShiftResponse:
     return {
         "id": shift.id,
         "role": shift.role.name,

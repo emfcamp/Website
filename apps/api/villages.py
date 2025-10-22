@@ -1,3 +1,5 @@
+from typing import Any, TypedDict
+
 from flask import abort, request
 from flask_login import current_user
 from flask_restful import Resource
@@ -12,13 +14,21 @@ from models.village import Village, VillageMember
 from . import api
 
 
-def render_village(village: Village):
+class VillageResponse(TypedDict):
+    id: int
+    name: str
+    url: str | None
+    description: str | None
+    location: dict[str, Any] | None
+
+
+def render_village(village: Village) -> VillageResponse:
     return {
         "id": village.id,
         "name": village.name,
         "url": village.url,
         "description": village.description,
-        "location": (to_shape(village.location).__geo_interface__ if village.location else None),
+        "location": to_shape(village.location).__geo_interface__ if village.location else None,
     }
 
 

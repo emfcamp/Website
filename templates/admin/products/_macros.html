@@ -6,7 +6,7 @@
 
 {% macro remaining(item) -%}
     {%- set rem = item.get_total_remaining_capacity() %}
-    {%- if rem < 999999 %}{# Infinity check #}
+    {%- if rem is not unlimited %}
         {{ rem }}
     {%- else %}
         ∞

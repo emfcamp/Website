@@ -5,13 +5,6 @@ from faker import Faker
 from sqlalchemy import select
 
 from apps.cfp.scheduler import Scheduler
-from apps.common.forms import (
-    AGE_CHOICES,
-    DISABILITY_CHOICES,
-    ETHNICITY_CHOICES,
-    GENDER_CHOICES,
-    SEXUALITY_CHOICES,
-)
 from main import db
 from models import Currency
 from models.basket import Basket
@@ -21,11 +14,19 @@ from models.cfp import (
     InstallationProposal,
     LightningTalkProposal,
     PerformanceProposal,
+    Proposal,
     TalkProposal,
     WorkshopProposal,
     YouthWorkshopProposal,
 )
-from models.diversity import UserDiversity
+from models.diversity import (
+    AGE_CHOICES,
+    DISABILITY_CHOICES,
+    ETHNICITY_CHOICES,
+    GENDER_CHOICES,
+    SEXUALITY_CHOICES,
+    UserDiversity,
+)
 from models.event_tickets import EventTicket, get_max_rank_for_user
 from models.payment import BankPayment, StripePayment
 from models.product import PriceTier
@@ -232,7 +233,7 @@ class FakeDataGenerator:
         user.grant_permission("volunteer:user")
         db.session.add(vol)
 
-    def create_fake_tickets(self, user) -> None:
+    def create_fake_tickets(self, user: User) -> None:
         currency = Currency.EUR if random.random() < 0.2 else Currency.GBP
 
         # In this case we're going to use the same payment method if we make multiple payments.
@@ -274,9 +275,9 @@ class FakeDataGenerator:
 
         db.session.commit()
 
-    def create_fake_lottery_tickets(self, users_list: list[User], proposal):
+    def create_fake_lottery_tickets(self, users_list: list[User], proposal: Proposal) -> None:
         n_lottery_tickets = random.randint(0, len(users_list))
-        max_ticket_count = 2 if proposal is WorkshopProposal else 5
+        max_ticket_count = 2 if isinstance(proposal, WorkshopProposal) else 5
 
         for user in random.sample(users_list, k=n_lottery_tickets):
             rank = get_max_rank_for_user(user, proposal.type)

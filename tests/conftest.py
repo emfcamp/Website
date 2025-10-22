@@ -6,12 +6,13 @@ import os.path
 import shutil
 
 import pytest
+from flask_mailman import Mail
 from freezegun import freeze_time
 from sqlalchemy import text
 
 from apps.base.dev.tasks import create_bank_accounts
 from apps.tickets.tasks import create_product_groups
-from main import Mail, create_app
+from main import create_app
 from main import db as db_obj
 from models.site_state import SiteState
 from models.user import User

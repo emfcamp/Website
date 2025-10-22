@@ -3,11 +3,13 @@ from datetime import timedelta
 
 from flask import current_app as app
 from flask import flash, redirect, render_template, url_for
+from flask.typing import ResponseValue
 from flask_login import current_user, login_required
 from flask_mailman import EmailMessage
 from wtforms import HiddenField, SubmitField
 from wtforms.validators import AnyOf, DataRequired
 
+from apps.payments.common import get_user_payment_or_abort, lock_user_payment_or_abort
 from main import db
 from models import Currency, naive_utcnow
 from models.payment import BankPayment, BankTransaction
@@ -16,12 +18,12 @@ from ..common import feature_enabled, get_user_currency
 from ..common.email import from_email
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
-from . import get_user_payment_or_abort, lock_user_payment_or_abort, payments
+from . import payments
 
 logger = logging.getLogger(__name__)
 
 
-def transfer_start(payment: BankPayment):
+def transfer_start(payment: BankPayment) -> ResponseValue:
     if not feature_enabled("BANK_TRANSFER"):
         return redirect(url_for("tickets.pay"))
 
@@ -147,7 +149,7 @@ def transfer_cancel(payment_id):
     return render_template("payments/transfer-cancel.html", payment=payment, form=form)
 
 
-def reconcile_txns(txns: list[BankTransaction], doit: bool = False):
+def reconcile_txns(txns: list[BankTransaction], doit: bool = False) -> None:
     paid = 0
     failed = 0
 
@@ -221,7 +223,7 @@ def reconcile_txns(txns: list[BankTransaction], doit: bool = False):
     app.logger.info("Reconciliation complete: %s paid, %s failed", paid, failed)
 
 
-def send_confirmation(payment: BankPayment):
+def send_confirmation(payment: BankPayment) -> None:
     msg = EmailMessage(
         "Electromagnetic Field ticket purchase update",
         from_email=from_email("TICKETS_EMAIL"),

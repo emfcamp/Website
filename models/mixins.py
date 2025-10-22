@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from datetime import datetime
 
 from sqlalchemy import JSON, FetchedValue, and_, event, func
@@ -5,6 +6,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Mapped, column_property, mapped_column
 from sqlalchemy.orm.attributes import get_history
 
+from .capacity import Unlimited, UnlimitedType
 from .exc import CapacityException
 
 
@@ -23,6 +25,10 @@ class CapacityMixin:
     capacity_used: Mapped[int] = mapped_column(default=0, server_onupdate=FetchedValue())
 
     expires: Mapped[datetime | None]
+
+    @property
+    @abstractmethod
+    def parent(self) -> "CapacityMixin | None": ...
 
     @declared_attr
     def __expired(cls):
@@ -76,26 +82,26 @@ class CapacityMixin:
 
         return count <= self.get_total_remaining_capacity()
 
-    def remaining_capacity(self):
+    def remaining_capacity(self) -> int | UnlimitedType:
         """
-        Return remaining capacity or inf if
+        Return remaining capacity or Unlimited if
         capacity_max is not set (i.e. None).
         """
         if self.capacity_max is None:
-            return float("inf")
+            return Unlimited
         return self.capacity_max - self.capacity_used
 
-    def get_total_remaining_capacity(self):
+    def get_total_remaining_capacity(self) -> int | UnlimitedType:
         """
         Get the capacity remaining to this object, and all its ancestors.
 
-        Returns inf if no objects have a capacity_max set.
+        Returns Unlimited if no objects have a capacity_max set.
         """
-        remaining = [self.remaining_capacity()]
+        remaining = self.remaining_capacity()
         if self.parent:
-            remaining.append(self.parent.get_total_remaining_capacity())
+            return min(remaining, self.parent.get_total_remaining_capacity())
 
-        return min(remaining)
+        return remaining
 
     def has_expired(self):
         """
