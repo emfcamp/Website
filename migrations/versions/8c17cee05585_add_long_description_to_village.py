@@ -1,14 +1,14 @@
 """Add long_description to village
 
-Revision ID: 6646de329427
-Revises: 5062a9a72efc
-Create Date: 2025-10-02 20:34:55.746599
+Revision ID: 8c17cee05585
+Revises: 53220373bfde
+Create Date: 2025-10-25 09:40:24.997019
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '6646de329427'
-down_revision = '5062a9a72efc'
+revision = '8c17cee05585'
+down_revision = '53220373bfde'
 
 from alembic import op
 import sqlalchemy as sa
