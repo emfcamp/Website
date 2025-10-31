@@ -13,7 +13,7 @@ from models.village import Village
 villages = Blueprint("villages", __name__)
 
 
-def load_village(year, village_id, require_admin=False):
+def load_village(year: int, village_id: int, require_admin: bool = False) -> Village:
     """Helper to return village or 404"""
     if year != event_year():
         abort(404)
