@@ -77,11 +77,13 @@ def view(year: int, village_id: int) -> ResponseValue:
     return render_template(
         "villages/view.html",
         village=village,
-        village_long_description_html=render_markdown(village.long_description),
+        village_long_description_html=(
+            render_markdown(village.long_description) if village.long_description else None
+        ),
     )
 
 
-def render_markdown(markdown_text):
+def render_markdown(markdown_text: str) -> Markup:
     """Render untrusted markdown
 
     This doesn't have access to any templating unlike email markdown
@@ -99,15 +101,18 @@ def render_markdown(markdown_text):
 @villages.route("/<int:year>/<int:village_id>/view2")
 def view2(year: int, village_id: int) -> ResponseValue:
     village = load_village(year, village_id)
+    rendered_long_description = (
+        render_markdown2(village.long_description) if village.long_description else None
+    )
 
     return render_template(
         "villages/view2.html",
         village=village,
-        village_long_description_html=render_markdown2(village.long_description),
+        village_long_description_html=rendered_long_description,
     )
 
 
-def render_markdown2(markdown_text):
+def render_markdown2(markdown_text: str) -> Markup:
     """Render untrusted markdown
 
     This doesn't have access to any templating unlike email markdown
@@ -149,7 +154,7 @@ def edit(year: int, village_id: int) -> ResponseValue:
         else:
             # All good, update DB
             for venue in village.venues:
-                if venue.name == village.name:
+                if venue.name == village.name and form.name.data is not None:
                     # Rename a village venue if it exists and has the old name.
                     venue.name = form.name.data
 
