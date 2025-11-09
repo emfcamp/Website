@@ -152,7 +152,29 @@ def derive_secret_key(app: Flask) -> None:
     app.config["SECRET_KEY"] = kdf.derive(bytes(app.config["SECRET_KEY"], "utf-8"))
 
 
+def _flask_admin_monkey():
+    import flask_admin
+
+    assert flask_admin.__version__ == "1.6.1", (
+        "Please remove the monkey patches from main.py; they were necessary for WTForms 3.x support"
+    )
+    from flask_admin.contrib.sqla.validators import Unique
+
+    Unique.field_flags = {"unique": True}
+    from flask_admin.contrib.sqla.fields import QuerySelectField
+
+    old_iter_choices = QuerySelectField.iter_choices
+
+    def _new_iter_choices(self):
+        for val, label, selected in old_iter_choices(self):
+            yield val, label, selected, {}
+
+    QuerySelectField.iter_choices = _new_iter_choices
+
+
 def create_app(dev_server=False, config_override=None):
+    _flask_admin_monkey()
+
     app = Flask(__name__, static_folder="dist/static")
     app.config.from_envvar("SETTINGS_FILE")
     if config_override:
