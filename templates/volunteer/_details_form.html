@@ -1,0 +1,13 @@
+{% from "_formhelpers.html" import render_field, render_checkbox %}
+
+{% macro volunteer_details_form(form, show_save_button) %}
+    {{ render_field(form.nickname, horizontal=9) }}
+    {{ render_field(form.volunteer_email, horizontal=9) }}
+    {{ render_checkbox(form.over_18, horizontal=9) }}
+    {{ render_field(form.volunteer_phone, horizontal=9) }}
+    {% call render_field(form.allergies, horizontal=9) %}{% endcall %}
+    {% call render_field(form.dietary_restrictions, horizontal=9) %}{% endcall %}
+    {% if show_save_button %}
+    {{ form.save(class_="btn btn-primary debounce pull-right") }}
+    {% endif %}
+{% endmacro %}
