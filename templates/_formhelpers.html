@@ -166,3 +166,37 @@
     </dd>
 {% endmacro %}
 
+
+{% macro render_checkbox(field, horizontal=False) %}
+{% if caller %}
+    {% set help_text = caller() %}
+{% endif %}
+
+{% if horizontal == True %}
+    {% set horizontal = 10 %}
+{% endif %}
+
+{% if horizontal != False %}
+    {% set labelw = 12 - horizontal %}
+    {% set fieldw = horizontal %}
+{% endif %}
+
+{% if help_text or field.errors %}
+    {# If we have help text, add an aria-describedby attribute to the field. #}
+    {% do kwargs.update({'aria-describedby': "help-block-" + field.name}) %}
+{% endif %}
+
+<div class="form-group {%- if field.errors %} has-error {%- endif %}">
+    <label for="{{ field.name }}" class="{% if horizontal -%} col-sm-{{fieldw}} col-sm-offset-{{labelw}} {% endif -%} checkbox">
+        {{ field(class_='big-checkbox', **kwargs)|safe }}
+        {{ field.label.text }}
+    </label>
+    {% if field.errors %}
+        {% for error in field.errors %}
+        <p class="help-block" id="help-block-{{field.name}}">{{ error }}</p>
+            {% endfor %}
+    {% elif help_text %}
+        <p class="help-block" id="help-block-{{field.name}}">{{ help_text }}</p>
+    {% endif -%}</div>
+{% endmacro %}
+

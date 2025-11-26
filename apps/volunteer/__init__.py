@@ -37,6 +37,7 @@ def volunteer_variables():
 from . import (
     api,  # noqa: F401
     bar_training,  # noqa: F401
+    buildup,  # noqa: F401
     choose_roles,  # noqa: F401
     main,  # noqa: F401
     schedule,  # noqa: F401
