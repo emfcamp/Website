@@ -91,7 +91,9 @@ def render_markdown(markdown_text: str) -> Markup:
     """
     extensions = ["markdown.extensions.nl2br", "markdown.extensions.smarty", "tables"]
     contentHtml = nh3.clean(
-        markdown.markdown(markdown_text, extensions=extensions), tags=(nh3.ALLOWED_TAGS - {"img"})
+        markdown.markdown(markdown_text, extensions=extensions),
+        tags=(nh3.ALLOWED_TAGS - {"img"}),
+        link_rel="noopener nofollow",  # default includes noreferrer but not nofollow
     )
     innerHtml = render_template("sandboxed-iframe.html", body=Markup(contentHtml))
     iFrameHtml = f'<iframe sandbox="allow-scripts" class="embedded-content" srcdoc="{html.escape(innerHtml, True)}" onload="javascript:window.listenForFrameResizedMessages(this);"></iframe>'
@@ -120,7 +122,9 @@ def render_markdown2(markdown_text: str) -> Markup:
     """
     extensions = ["markdown.extensions.nl2br", "markdown.extensions.smarty", "tables"]
     contentHtml = nh3.clean(
-        markdown.markdown(markdown_text, extensions=extensions), tags=(nh3.ALLOWED_TAGS - {"img"})
+        markdown.markdown(markdown_text, extensions=extensions),
+        tags=(nh3.ALLOWED_TAGS - {"img"}),
+        link_rel="noopener nofollow",  # default includes noreferrer but not nofollow
     )
     innerHtml = f"""
     <link rel="stylesheet" href="/static/css/main.css">
