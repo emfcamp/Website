@@ -284,6 +284,8 @@ def create_app(dev_server=False, config_override=None):
             "'unsafe-hashes'",
             "'sha256-2rvfFrggTCtyF5WOiTri1gDS8Boibj4Njn0e+VCBmDI='",  # return false;
             "'sha256-gC0PN/M+TSxp9oNdolzpqpAA+ZRrv9qe1EnAbUuDmk8='",  # return modelActions.execute('notify');
+            "'sha256-GtgSCbDPm83G2B75TQfbv5TR/nqHF4WnrnN+njVmQFU='",  # javascript:window.listenForFrameResizedMessages(this);
+            "'sha256-dW+ze6eYWjNQB4tjHLKsdbtI4AqFRK/FpdEu/ZCxmLc='",  # javascript:window.sendFrameResizedMessage()
         ]
 
         if app.config.get("DEBUG_TB_ENABLED"):
