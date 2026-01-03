@@ -23,11 +23,7 @@ If you have a ticket, you can <a href="{{url_for('users.login', next=url_for('.r
   <tbody>
   {% for village in villages %}
     <tr>
-      {% if village.url %}
-        <td><a href="{{ village.url }}" rel="nofollow" target="_blank">{{village.name}}</a></td>
-      {% else %}
-        <td>{{village.name}}</td>
-      {% endif %}
+      <td><a href="{{ url_for('villages.view', year=event_year, village_id=village.id) }}">{{village.name}}</a></td>
       <td style="overflow-wrap: anywhere">{{village.description}}</td>
       {% if any_village_located %}
       <td style="width: 1px; white-space: nowrap;">
