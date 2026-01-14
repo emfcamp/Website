@@ -1,4 +1,5 @@
 import logging
+from dataclasses import dataclass
 from datetime import timedelta
 
 from flask import abort, request
@@ -203,52 +204,102 @@ def wise_business_profile():
     return id
 
 
+@dataclass
+class WiseRecipient:
+    account_holder: str
+    name_and_address: str
+    sort_code: str | None = None
+    account_number: str | None = None
+    swift: str | None = None
+    iban: str | None = None
+
+    @property
+    def bank_info(self):
+        assert self.name_and_address, "Bank name/address information not found"
+        return self.name_and_address
+
+    @property
+    def name(self):
+        bank_name, _, _ = self.bank_info.partition("\n")
+        assert bank_name, "Bank name is empty"
+        return bank_name
+
+    @property
+    def address(self):
+        _, _, bank_address = self.bank_info.partition("\n")
+        assert bank_address, "Bank address is empty"
+        return bank_address
+
+    @property
+    def parsed_account_number(self):
+        return self.account_number.replace(" ", "")[-8:]
+
+    @property
+    def parsed_sort_code(self):
+        return self.sort_code.replace("-", "")
+
+
+def _recipient_details_adapter(receive_options):
+    """Helper method to adapt Wise receive options response data into a WiseRecipient instance"""
+    field_mappings = {
+        "ACCOUNT_HOLDER": "account_holder",
+        "BANK_NAME_AND_ADDRESS": "name_and_address",
+        "BANK_CODE": "sort_code",
+        "ACCOUNT_NUMBER": "account_number",
+        "SWIFT_CODE": "swift",
+        "IBAN": "iban",
+    }
+    return WiseRecipient(
+        **{
+            field_mappings.get(detail.type): detail.body
+            for detail in receive_options.details
+            if detail.type in field_mappings
+        }
+    )
+
+
+def _merge_recipient_details(account):
+    existing_details = None
+    for receive_options in account.receiveOptions:
+        recipient_details = _recipient_details_adapter(receive_options)
+
+        if existing_details:
+            # coalesce translated account info into the existing bank details
+            for field in ("sort_code", "account_number", "swift", "iban"):
+                existing_value = getattr(existing_details, field)
+                updated_value = getattr(recipient_details, field)
+                combined_value = existing_value if existing_value is not None else updated_value
+                setattr(existing_details, field, combined_value)
+        else:
+            existing_details = recipient_details
+
+    return existing_details
+
+
 def wise_retrieve_accounts(profile_id):
-    # Wise creates the concept of a multi-currency account by calling normal
-    # bank accounts "balances". As far as we're concerned, "balances" are bank
-    # accounts, as that's what people will be sending money to.
-    for account in wise.balances.list(profile_id=profile_id):
-        try:
-            if not account.bankDetails:
-                continue
-            if not account.bankDetails.bankAddress:
-                continue
-        except AttributeError:
+    from main import wise
+
+    for account in wise.account_details.list(profile_id=profile_id):
+        if account.currency.code != "GBP":
+            # TODO: support other host currencies
             continue
 
-        address = ", ".join(
-            [
-                account.bankDetails.bankAddress.addressFirstLine,
-                account.bankDetails.bankAddress.city + " " + (account.bankDetails.bankAddress.postCode or ""),
-                account.bankDetails.bankAddress.country,
-            ]
-        )
+        bank_details = _merge_recipient_details(account)
 
-        sort_code = account_number = None
-
-        if account.bankDetails.currency == "GBP":
-            # bankCode is the SWIFT code for non-GBP accounts.
-            sort_code = account.bankDetails.bankCode.replace("-", "")
-
-            if len(account.bankDetails.accountNumber) == 8:
-                account_number = account.bankDetails.accountNumber
-            else:
-                # Wise bug:
-                # accountNumber is sometimes erroneously the IBAN for GBP accounts.
-                # Extract the account number from the IBAN.
-                account_number = account.bankDetails.accountNumber.replace(" ", "")[-8:]
+        # Workaround: the Wise Sandbox API returns a null/empty account ID; populate a value
+        if account.id is None and app.config.get("TRANSFERWISE_ENVIRONMENT") == "sandbox":
+            account.id = 0
 
         yield BankAccount(
-            sort_code=sort_code,
-            acct_id=account_number,
-            currency=account.bankDetails.currency,
+            sort_code=bank_details.parsed_sort_code,
+            acct_id=bank_details.parsed_account_number,
+            currency=account.currency.code,
             active=False,
-            payee_name=account.bankDetails.get("accountHolderName"),
-            institution=account.bankDetails.bankName,
-            address=address,
-            swift=account.bankDetails.get("swift"),
-            iban=account.bankDetails.get("iban"),
-            # Webhooks only include the borderlessAccountId
+            payee_name=bank_details.account_holder,
+            institution=bank_details.name,
+            address=bank_details.address,
+            swift=bank_details.swift,
+            iban=bank_details.iban,
             wise_balance_id=account.id,
         )
 

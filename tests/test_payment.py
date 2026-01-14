@@ -1,6 +1,29 @@
 import pytest
 
+from apps.payments.wise import wise_retrieve_accounts
 from models.payment import BankTransaction
+
+
+@pytest.fixture(scope="module")
+def vcr_config():
+    return {
+        # Replace the Authorization request header with "DUMMY" in cassettes
+        "filter_headers": [("authorization", "DUMMY")],
+    }
+
+
+@pytest.mark.vcr()
+def test_wise_account_retrieval(app):
+    accounts = list(wise_retrieve_accounts(profile_id=123456789))
+
+    # we merge Wise's local and international details for our GBP account into a single record
+    assert len(accounts) == 1
+
+    primary_account = accounts[0]
+    assert primary_account.currency == "GBP"
+    assert primary_account.institution == "TransferWise"
+    assert primary_account.sort_code.startswith("231")
+    assert primary_account.acct_id.startswith("1000")
 
 
 @pytest.mark.parametrize(
