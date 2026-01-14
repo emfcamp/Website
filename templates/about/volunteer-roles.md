@@ -5,6 +5,8 @@ show_nav: false
 
 It takes a wide variety of skills to make EMF happen, it's not all network cabling and designing badges. Ahead of the event, a lot of what needs doing is sending emails and project management. If you've got some spare time and would like to help please do [get in touch](mailto:volunteer@emfcamp.org).
 
+**Note** This page hasn't been updated for the 2026 event.
+
 In general we're looking for people ahead of the event who are comfortable with some of the following skills:
 
 * Project management
