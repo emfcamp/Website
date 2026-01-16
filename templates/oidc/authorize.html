@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Authorize{% endblock %}
+{% block body %}
+<h2>Log in with your EMF account</h2>
+
+<form method="post" class="form-horizontal">
+    <div class="panel panel-default">
+    <div class="panel-body">
+        <p>
+          <strong>{{ grant.client.client_name }}</strong> wants to authenticate you using your EMF account.
+        </p>
+        <p>
+            <strong>{{ grant.client.client_name }}</strong>
+            {% if grant.client.official %}
+                is an official EMF orga-run service.
+            {% else %}
+                is a third party service. EMF is not responsible for the service or what it does with your data!
+            {% endif %}
+        </p>
+        <p>
+            The app will be given <strong>read-only</strong> access to:
+            <ul>
+            {% for name, detail in scopes.items() %}
+                <li>✅ {{ detail }}</li>
+            {% endfor %}
+            </ul>
+        </p>
+        {% if scopents %}
+            <p>
+                The app will <strong>not</strong> have access to:
+                <ul>
+                {% for name, detail in scopents.items() %}
+                    <li>⛔️ {{ detail }}</li>
+                {% endfor %}
+                </ul>
+            </p>
+        {% endif %}
+    </div>
+    <div class="panel-footer">
+        <p>
+            Authorizing will redirect you to <code>{{ grant.request.payload.redirect_uri }}</code>
+        </p>
+        <div class="form-actions btn-group">
+            <button type="submit" name="authorize" class="btn btn-success debounce">Authorize</button>
+            <button type="submit" class="btn btn-danger debounce">Deny</button>
+        </div>
+    </div>
+</div>
+</form>
+{% endblock %}
