@@ -95,7 +95,11 @@ def app_factory(cache):
         db_obj.session.commit()
 
         db_obj.session.close()
-        db_obj.drop_all()
+
+        # Allow keeping test data for debugging via test app
+        # Set KEEP_TEST_DB=1 to preserve data after tests
+        if not os.environ.get("KEEP_TEST_DB"):
+            db_obj.drop_all()
     freezer.stop()
 
 
@@ -137,3 +141,77 @@ def outbox(app):
     mail = Mail(app)
     mail.get_connection()
     yield mail.outbox
+
+
+# ============================================================================
+# CfP E2E Test Fixtures
+# ============================================================================
+
+
+@pytest.fixture
+def cli_runner(app):
+    """Flask CLI test runner for testing ./flask commands"""
+    yield app.test_cli_runner()
+
+
+@pytest.fixture(scope="module")
+def cfp_admin_user(db):
+    """User with cfp_admin permission (cfp_admin@test.invalid)"""
+    email = "cfp_admin@test.invalid"
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        user = User(email, "Test CFP Admin")
+        user.grant_permission("cfp_admin")
+        db.session.add(user)
+        db.session.commit()
+    return user
+
+
+@pytest.fixture(scope="module")
+def cfp_anonymiser_user(db):
+    """User with cfp_anonymiser permission"""
+    email = "anonymiser@test.invalid"
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        user = User(email, "Test Anonymiser")
+        user.grant_permission("cfp_anonymiser")
+        db.session.add(user)
+        db.session.commit()
+    return user
+
+
+@pytest.fixture(scope="module")
+def cfp_reviewers(db):
+    """10 reviewers with cfp_reviewer permission (reviewer0-9@test.invalid)"""
+    reviewers = []
+    for i in range(10):
+        email = f"reviewer{i}@test.invalid"
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            user = User(email, f"Reviewer {i}")
+            user.grant_permission("cfp_reviewer")
+            db.session.add(user)
+        reviewers.append(user)
+    db.session.commit()
+    return reviewers
+
+
+@pytest.fixture(scope="module")
+def e2e_speakers(db):
+    """Create unique speaker users for each proposal to avoid double-booking conflicts"""
+    speakers = []
+    for i in range(60):
+        email = f"speaker{i}@test.invalid"
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            user = User(email, f"Speaker {i}")
+            db.session.add(user)
+        speakers.append(user)
+    db.session.commit()
+    return speakers
+
+
+def login_user_to_client(client, user):
+    """Log in user via BYPASS_LOGIN URL: /login/email@test.invalid"""
+    response = client.get(f"/login/{user.email}", follow_redirects=True)
+    return response
