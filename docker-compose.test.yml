@@ -24,3 +24,4 @@ services:
       COLORIZE_LOGS: always
       PYTHONUNBUFFERED: 1
       IRCCAT: fakeirccat:12345
+    entrypoint: ["./docker/test_entrypoint.sh"]

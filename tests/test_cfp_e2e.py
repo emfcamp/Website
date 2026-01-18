@@ -15,17 +15,13 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from main import db
 from models import event_start, event_year
 from models.cfp import (
-    CFP_STATES,
-    EVENT_SPACING,
     PROPOSAL_TIMESLOTS,
     CfpStateException,
     InstallationProposal,
     LightningTalkProposal,
     PerformanceProposal,
-    Proposal,
     TalkProposal,
     Venue,
     WorkshopProposal,
@@ -131,9 +127,7 @@ def verify_within_allowed_times(proposal):
 
 def assert_valid_schedule(proposals):
     """Assert schedule is valid regardless of exact times."""
-    scheduled_proposals = [
-        p for p in proposals if p.scheduled_time and p.scheduled_duration
-    ]
+    scheduled_proposals = [p for p in proposals if p.scheduled_time and p.scheduled_duration]
 
     # Check no venue overlaps
     overlaps = verify_no_venue_overlaps(scheduled_proposals)
@@ -141,9 +135,7 @@ def assert_valid_schedule(proposals):
 
     # Check each proposal is within allowed times
     for p in scheduled_proposals:
-        assert verify_within_allowed_times(p), (
-            f"Proposal {p.id} ({p.title}) scheduled outside allowed times"
-        )
+        assert verify_within_allowed_times(p), f"Proposal {p.id} ({p.title}) scheduled outside allowed times"
 
 
 # ============================================================================
@@ -239,7 +231,7 @@ def proposal_factory(db):
 def venues(app, db):
     """Create all EMF venues using CLI command."""
     runner = app.test_cli_runner()
-    result = runner.invoke(args=["cfp", "create_venues"])
+    runner.invoke(args=["cfp", "create_venues"])
     # Command may return non-zero if venues exist, that's OK
     db.session.commit()
     return Venue.query.all()
@@ -297,9 +289,7 @@ class TestCfPSubmission:
         response = client.post("/cfp/workshop", data=form_data, follow_redirects=True)
         assert response.status_code == 200
 
-        proposal = WorkshopProposal.query.filter_by(
-            title="E2E Test Workshop Submission"
-        ).first()
+        proposal = WorkshopProposal.query.filter_by(title="E2E Test Workshop Submission").first()
         assert proposal is not None
         assert proposal.state == "new"
         assert proposal.attendees == "15"
@@ -320,9 +310,7 @@ class TestCfPSubmission:
         response = client.post("/cfp/youthworkshop", data=form_data, follow_redirects=True)
         assert response.status_code == 200
 
-        proposal = YouthWorkshopProposal.query.filter_by(
-            title="E2E Test Youth Workshop"
-        ).first()
+        proposal = YouthWorkshopProposal.query.filter_by(title="E2E Test Youth Workshop").first()
         assert proposal is not None
         assert proposal.valid_dbs is True
 
@@ -339,9 +327,7 @@ class TestCfPSubmission:
         response = client.post("/cfp/performance", data=form_data, follow_redirects=True)
         assert response.status_code == 200
 
-        proposal = PerformanceProposal.query.filter_by(
-            title="E2E Test Performance"
-        ).first()
+        proposal = PerformanceProposal.query.filter_by(title="E2E Test Performance").first()
         assert proposal is not None
 
     def test_submit_installation_proposal(self, app, client, db):
@@ -358,9 +344,7 @@ class TestCfPSubmission:
         response = client.post("/cfp/installation", data=form_data, follow_redirects=True)
         assert response.status_code == 200
 
-        proposal = InstallationProposal.query.filter_by(
-            title="E2E Test Installation"
-        ).first()
+        proposal = InstallationProposal.query.filter_by(title="E2E Test Installation").first()
         assert proposal is not None
         assert proposal.size == "large"
 
@@ -380,9 +364,7 @@ class TestCfPSubmission:
         response = client.post("/cfp/lightning", data=form_data, follow_redirects=True)
         assert response.status_code == 200
 
-        proposal = LightningTalkProposal.query.filter_by(
-            title="E2E Test Lightning Talk"
-        ).first()
+        proposal = LightningTalkProposal.query.filter_by(title="E2E Test Lightning Talk").first()
         assert proposal is not None
         assert proposal.session == "fri"
 
@@ -402,9 +384,7 @@ class TestCfPSubmission:
             "length": "10-25 mins",
             "notice_required": "1 month",
         }
-        response = client.post(
-            f"/cfp/proposals/{proposal.id}/edit", data=form_data, follow_redirects=True
-        )
+        response = client.post(f"/cfp/proposals/{proposal.id}/edit", data=form_data, follow_redirects=True)
         assert response.status_code == 200
 
         # Verify update
@@ -421,7 +401,7 @@ class TestCfPSubmission:
         response = client.post(
             f"/cfp/proposals/{proposal.id}/withdraw",
             data={"confirm_withdrawal": "Confirm proposal withdrawal", "message": "Testing withdrawal"},
-            follow_redirects=True
+            follow_redirects=True,
         )
         assert response.status_code == 200
 
@@ -621,7 +601,7 @@ class TestCfPScheduling:
     def test_create_venues_command(self, app, db):
         """Test flask cfp create_venues command creates venues."""
         runner = app.test_cli_runner()
-        result = runner.invoke(args=["cfp", "create_venues"])
+        runner.invoke(args=["cfp", "create_venues"])
         # Should succeed or venues already exist
         venues = Venue.query.all()
         assert len(venues) > 0, "No venues were created"
@@ -644,7 +624,7 @@ class TestCfPScheduling:
         runner.invoke(args=["cfp", "set_rough_durations"])
 
         # Run scheduler dry-run
-        result = runner.invoke(args=["cfp", "schedule", "--type", "talk"])
+        runner.invoke(args=["cfp", "schedule", "--type", "talk"])
         # Dry run should not persist
         # (exact behavior depends on scheduler implementation)
 
@@ -678,9 +658,7 @@ class TestCfPScheduling:
         runner.invoke(args=["cfp", "schedule", "-p", "--type", "talk"])
 
         # Apply potential schedule
-        result = runner.invoke(
-            args=["cfp", "apply_potential_schedule", "--no-email", "--type", "talk"]
-        )
+        result = runner.invoke(args=["cfp", "apply_potential_schedule", "--no-email", "--type", "talk"])
         assert result.exit_code == 0
 
         # Verify scheduled_time is now set
@@ -696,13 +674,11 @@ class TestCfPScheduling:
     def test_schedule_validity(self, app, db, scheduling_proposals, venues):
         """Test scheduled proposals don't have venue overlaps."""
         all_proposals = []
-        for ptype, plist in scheduling_proposals.items():
+        for _ptype, plist in scheduling_proposals.items():
             all_proposals.extend(plist)
 
         # Get only scheduled proposals
-        scheduled = [
-            p for p in all_proposals if p.scheduled_time and p.scheduled_duration
-        ]
+        scheduled = [p for p in all_proposals if p.scheduled_time and p.scheduled_duration]
 
         if scheduled:
             overlaps = verify_no_venue_overlaps(scheduled)
@@ -712,9 +688,7 @@ class TestCfPScheduling:
         """Test proposals are scheduled within available_times."""
         for talk in scheduling_proposals["talk"]:
             if talk.scheduled_time and talk.scheduled_duration:
-                assert verify_within_allowed_times(talk), (
-                    f"Talk {talk.id} scheduled outside allowed times"
-                )
+                assert verify_within_allowed_times(talk), f"Talk {talk.id} scheduled outside allowed times"
 
 
 # ============================================================================
@@ -844,9 +818,7 @@ class TestCfPFavouriting:
         # Should redirect to login
         assert response.status_code in (302, 401)
 
-    def test_scheduled_proposal_appears_in_schedule_json(
-        self, app, client, db, scheduled_proposal
-    ):
+    def test_scheduled_proposal_appears_in_schedule_json(self, app, client, db, scheduled_proposal):
         """Test that properly scheduled proposals appear in the public schedule JSON."""
         year = event_year()
         response = client.get(f"/schedule/{year}.json")
@@ -1049,9 +1021,7 @@ class TestCfPClashFinder:
 
         return {"overlapping": [p1, p2], "non_overlapping": p3, "users": fave_users}
 
-    def test_clashfinder_finds_popular_clashes(
-        self, app, client, db, cfp_admin_user, clashfinder_proposals
-    ):
+    def test_clashfinder_finds_popular_clashes(self, app, client, db, cfp_admin_user, clashfinder_proposals):
         """Test ClashFinder finds proposals favourited by same users that overlap."""
         # Verify login works
         login_response = login_user_to_client(client, cfp_admin_user)
@@ -1067,9 +1037,7 @@ class TestCfPClashFinder:
         # The response should contain the overlapping proposals
         p1, p2 = clashfinder_proposals["overlapping"]
         # Check that at least one of the proposal titles appears
-        assert (
-            p1.title.encode() in response.data or p2.title.encode() in response.data
-        )
+        assert p1.title.encode() in response.data or p2.title.encode() in response.data
 
     def test_clashfinder_empty_when_no_overlaps(
         self, app, client, db, cfp_admin_user, proposal_factory, venues
