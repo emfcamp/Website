@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 from collections import defaultdict
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from flask_login import UserMixin
-from sqlalchemy import Column, ForeignKey, Integer, Table
+from sqlalchemy import ARRAY, Column, ForeignKey, Integer, String, Table
+from sqlalchemy.ext.mutable import Mutable, MutableSet
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .. import BaseModel
@@ -17,6 +20,8 @@ __all__ = [
     "VolunteerRoleInterest",
     "VolunteerRoleTraining",
 ]
+
+_T = TypeVar("_T")
 
 # This effectively records the roles that a volunteer is interested in
 VolunteerRoleInterest = Table(
@@ -36,6 +41,16 @@ VolunteerRoleTraining = Table(
 )
 
 
+class MutableSetAsList(MutableSet[_T]):
+    @classmethod
+    def coerce(cls, index: str, value: Any) -> MutableSetAsList[_T] | None:
+        if not isinstance(value, cls):
+            if isinstance(value, set | list):
+                return cls(value)
+            return Mutable.coerce(index, value)
+        return value
+
+
 class Volunteer(BaseModel, UserMixin):
     __tablename__ = "volunteer"
     __versioned__: dict[str, str] = {}
@@ -46,18 +61,22 @@ class Volunteer(BaseModel, UserMixin):
     volunteer_phone: Mapped[str | None]
     volunteer_email: Mapped[str | None]
     over_18: Mapped[bool] = mapped_column(default=False)
+    allergies: Mapped[set[str]] = mapped_column(MutableSetAsList.as_mutable(ARRAY(String)))
+    allergies_other: Mapped[str] = mapped_column(default="")
+    dietary_restrictions: Mapped[set[str]] = mapped_column(MutableSetAsList.as_mutable(ARRAY(String)))
+    dietary_restrictions_other: Mapped[str] = mapped_column(default="")
     allow_comms_during_event: Mapped[bool] = mapped_column(default=False)
 
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
-    user: Mapped["User"] = relationship(back_populates="volunteer")
+    user: Mapped[User] = relationship(back_populates="volunteer")
 
-    interested_roles: Mapped[list["Role"]] = relationship(
+    interested_roles: Mapped[list[Role]] = relationship(
         back_populates="interested_volunteers",
         secondary=VolunteerRoleInterest,
         lazy="dynamic",
     )
-    trained_roles: Mapped[list["Role"]] = relationship(
+    trained_roles: Mapped[list[Role]] = relationship(
         back_populates="trained_volunteers",
         secondary=VolunteerRoleTraining,
         lazy="dynamic",

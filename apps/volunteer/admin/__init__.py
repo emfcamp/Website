@@ -13,6 +13,7 @@ volunteer_admin.endpoint_prefix = "volunteer_admin"
 
 
 from . import (
+    buildup,  # noqa: F401
     role,  # noqa: F401
     shift,  # noqa: F401
     venue,  # noqa: F401
