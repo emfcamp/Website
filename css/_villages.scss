@@ -1,0 +1,82 @@
+/* Villages */
+@use "./_variables.scss" as *;
+
+.village-table {
+  display: grid;
+  padding: 0;
+
+  .village-table-title a {
+    color: inherit;
+  }
+
+  /* Display as cards */
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+
+    .village-table-header {
+      display: none;
+    }
+    .village-table-village {
+      background-color: $highlight-background;
+      color: $highlight-background-text;
+      border-radius: 3px;
+      padding: 10px 15px 10px 15px;
+      margin-bottom: 10px;
+    }
+
+    .village-table-title {
+      color: $highlight-background-text;
+      margin-top: 0;
+    }
+    .village-table-description {
+      margin: 0;
+    }
+  }
+
+  /* Display as table */
+  @media (min-width: 600px) {
+    grid-template-columns: [title-start] auto [title-end desc-start] auto [desc-end links-start] max-content [links-end];
+
+    background-color: $highlight-background;
+    color: $highlight-background-text;
+    border-radius: 3px;
+
+    .village-table-village, .village-table-header {
+      display: contents;
+    }
+    .village-table-header h4 {
+      font-weight: bold;
+    }
+
+    .village-table-title, .village-table-description, .village-table-links {
+      margin: 0;
+      padding: 10px 15px 5px 15px;
+    }
+    .village-table-village .village-table-title {
+      font-size: inherit;
+      font-family: inherit;
+    }
+    .village-table-village::before {
+      display: block;
+      content: '';
+      height: 0;
+      border-top: 1px solid #aaa;
+      grid-column: title-start / links-end;
+    }
+    .village-table-title {
+      grid-column: title-start / title-end;
+      color: $highlight-background-text;
+    }
+    .village-table-description {
+      grid-column: desc-start / desc-end;
+      color: $highlight-background-text;
+    }
+    .village-table-links {
+      grid-column: links-start / links-end;
+    }
+
+    &:not(.village-table-located) {
+      grid-template-columns: [title-start] auto [title-end desc-start] auto [desc-end links-start] 0 [links-end];
+    }
+  }
+}
