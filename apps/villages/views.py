@@ -46,7 +46,7 @@ def register() -> ResponseValue:
             db.session.commit()
 
             flash("Your village registration has been received, thanks! You can edit it below.")
-            return redirect(url_for(".edit", year=event_year(), village_id=village.id))
+            return redirect(url_for(".view", year=event_year(), village_id=village.id))
 
     return render_template("villages/register.html", form=form)
 
@@ -73,10 +73,16 @@ def main(year: int) -> ResponseValue:
 @villages.route("/<int:year>/<int:village_id>")
 def view(year: int, village_id: int) -> ResponseValue:
     village = load_village(year, village_id)
+    show_edit = (
+        current_user.village
+        and current_user.village.id == village_id
+        and current_user.village_membership.admin
+    )
 
     return render_template(
         "villages/view.html",
         village=village,
+        show_edit=show_edit,
         village_long_description_html=(
             render_markdown(village.long_description) if village.long_description else None
         ),
@@ -165,6 +171,6 @@ def edit(year: int, village_id: int) -> ResponseValue:
             form.populate_obj(village)
             db.session.commit()
             flash("Your village registration has been updated.")
-            return redirect(url_for(".edit", year=year, village_id=village_id))
+            return redirect(url_for(".view", year=year, village_id=village_id))
 
     return render_template("villages/edit.html", form=form, village=village)
