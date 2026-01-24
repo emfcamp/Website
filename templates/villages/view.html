@@ -3,9 +3,19 @@
 {% block foot %}<script src="{{static_url_for('static', filename="js/sandboxed-iframe.js")}}"></script>{% endblock%}
 {% block body %}
 {% if village.url %}
-<h2><a href="{{ village.url }}" rel="nofollow" target="_blank">{{village.name}}</a></h2>
+<h2>
+    <a href="{{ village.url }}" rel="nofollow" target="_blank">{{village.name}}</a>
+    {% if show_edit %}
+    (<a href="{{url_for('villages.edit', year=event_year, village_id=village.id)}}">edit</a>)
+    {% endif %}
+</h2>
 {% else %}
-<h2>{{village.name}}</h2>
+<h2>
+    {{village.name}}
+    {% if show_edit %}
+    (<a href="{{url_for('villages.edit', year=event_year, village_id=village.id)}}">edit</a>)
+    {% endif %}
+</h2>
 {% endif %}
 
 {% if village.description %}
