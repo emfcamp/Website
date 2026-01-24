@@ -134,7 +134,7 @@ def render_markdown2(markdown_text: str) -> Markup:
     )
     innerHtml = f"""
     <link rel="stylesheet" href="/static/css/main.css">
-    <div id="emf-container" >
+    <div id="emf-container" style="min-height: 100%;">
         <div class="emf-row">
             <div class="emf-col" role="main">
                 {Markup(contentHtml)}

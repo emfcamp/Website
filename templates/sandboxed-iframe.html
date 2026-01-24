@@ -11,7 +11,7 @@
     </head>
 <body itemscope itemtype="http://schema.org/WebPage" {% block body_class %}{% endblock %} onload="javascript:window.sendFrameResizedMessage()" style="overflow: hidden;">
 {% block document %}
-  <div id="emf-container">
+  <div id="emf-container" style="min-height: 100%;">
     <div class="emf-row">
         <div class="emf-col {{ main_class }}" role="main" {% if self.content_scope() -%}
               itemscope itemtype="{% block content_scope %}{% endblock %}"
