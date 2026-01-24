@@ -9,8 +9,10 @@
       {{ render_field(form.url, horizontal=9, placeholder="") }}
       {{ render_field(form.description, horizontal=9,
             placeholder="A short description of your village. Who are you, what cool things will you be doing?") }}
-      {{ render_field(form.long_description, horizontal=9,
-            placeholder="A longer description of your village using Markdown. Project details etc.") }}
+      {% call render_field(form.long_description, horizontal=9,
+            placeholder="A longer description of your village using Markdown. Project details etc.") %}
+        <a href="https://www.markdown-cheatsheet.com">Standard Markdown</a> supported <em>apart from</em> images.
+      {% endcall %}
     </fieldset>
     <fieldset>
       <legend>Requirements</legend>
