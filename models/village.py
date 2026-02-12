@@ -31,6 +31,7 @@ class Village(BaseModel):
 
     name: Mapped[str] = mapped_column(unique=True)
     description: Mapped[str | None]
+    long_description: Mapped[str | None]
     url: Mapped[str | None]
     location: Mapped[WKBElement | None] = mapped_column(Geometry("POINT", srid=4326, spatial_index=False))
 
@@ -98,6 +99,7 @@ class Village(BaseModel):
                     v.id: {
                         "name": v.name,
                         "description": v.description,
+                        "long_description": v.long_description,
                         "url": v.url,
                         "location": v.latlon,
                     }

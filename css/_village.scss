@@ -1,0 +1,16 @@
+.village-form {
+    textarea#description {
+        height: 100px;
+    }
+
+    textarea#long_description {
+        height: 200px;
+    }
+}
+
+.embedded-content {
+    width: 100%;
+    height: 450px; // default height, recalculated by javascript.
+    border: none;
+    overflow: hidden;
+}

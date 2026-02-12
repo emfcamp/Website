@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Village: {{village.name}}{% endblock %}
+{% block foot %}<script src="{{static_url_for('static', filename="js/sandboxed-iframe.js")}}"></script>{% endblock%}
+{% block body %}
+{% if village.url %}
+<h2>
+    <a href="{{ village.url }}" rel="nofollow" target="_blank">{{village.name}}</a>
+    {% if show_edit %}
+    (<a href="{{url_for('villages.edit', year=event_year, village_id=village.id)}}">edit</a>)
+    {% endif %}
+</h2>
+{% else %}
+<h2>
+    {{village.name}}
+    {% if show_edit %}
+    (<a href="{{url_for('villages.edit', year=event_year, village_id=village.id)}}">edit</a>)
+    {% endif %}
+</h2>
+{% endif %}
+
+{% if village.description %}
+<p>{{village.description}}</p>
+{% endif %}
+
+{% if village_long_description_html %}
+<p>{{village_long_description_html}}</p>
+{% endif %}
+
+{# TODO: embed a map somehow? #}
+{% if village.map_link %}
+<a href="{{ village.map_link }}">📍&nbsp;Map</a>
+{% endif %}
+
+{# TODO: Can we show what's on at the village venues here? #}
+{% endblock %}

@@ -1,0 +1,27 @@
+{# The source of an iFrame used to sandbox user-controlled HTML #}
+{# Once loaded, this emits an event with it's content's size which the parent page can listen for to adapt the iFrame's height #}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        {% block css -%}
+        <link rel="stylesheet" href="{{ static_url_for('static', filename="css/main.css") }}">
+        {% endblock -%}
+        {% block head -%}{% endblock -%}
+    </head>
+<body itemscope itemtype="http://schema.org/WebPage" {% block body_class %}{% endblock %} onload="javascript:window.sendFrameResizedMessage()" style="overflow: hidden;">
+{% block document %}
+  <div id="emf-container" style="min-height: 100%;">
+    <div class="emf-row">
+        <div class="emf-col {{ main_class }}" role="main" {% if self.content_scope() -%}
+              itemscope itemtype="{% block content_scope %}{% endblock %}"
+          {%- endif %}>
+            {% block body -%} {{ body }} {% endblock -%}
+        </div>
+    </div>
+  </div>
+{% endblock %}
+<script src="{{static_url_for('static', filename="js/sandboxed-iframe.js")}}"></script>
+{% block foot -%}{% endblock -%}
+</body>
+</html>

@@ -1,6 +1,11 @@
+import html
+
+import markdown
+import nh3
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseValue
 from flask_login import current_user, login_required
+from markupsafe import Markup
 from sqlalchemy import exists, select
 
 from main import db
@@ -41,7 +46,7 @@ def register() -> ResponseValue:
             db.session.commit()
 
             flash("Your village registration has been received, thanks! You can edit it below.")
-            return redirect(url_for(".edit", year=event_year(), village_id=village.id))
+            return redirect(url_for(".view", year=event_year(), village_id=village.id))
 
     return render_template("villages/register.html", form=form)
 
@@ -65,6 +70,81 @@ def main(year: int) -> ResponseValue:
     )
 
 
+@villages.route("/<int:year>/<int:village_id>")
+def view(year: int, village_id: int) -> ResponseValue:
+    village = load_village(year, village_id)
+    show_edit = (
+        current_user.village
+        and current_user.village.id == village_id
+        and current_user.village_membership.admin
+    )
+
+    return render_template(
+        "villages/view.html",
+        village=village,
+        show_edit=show_edit,
+        village_long_description_html=(
+            render_markdown(village.long_description) if village.long_description else None
+        ),
+    )
+
+
+def render_markdown(markdown_text: str) -> Markup:
+    """Render untrusted markdown
+
+    This doesn't have access to any templating unlike email markdown
+    which is from a trusted user so is pre-processed with jinja.
+    """
+    extensions = ["markdown.extensions.nl2br", "markdown.extensions.smarty", "tables"]
+    contentHtml = nh3.clean(
+        markdown.markdown(markdown_text, extensions=extensions),
+        tags=(nh3.ALLOWED_TAGS - {"img"}),
+        link_rel="noopener nofollow",  # default includes noreferrer but not nofollow
+    )
+    innerHtml = render_template("sandboxed-iframe.html", body=Markup(contentHtml))
+    iFrameHtml = f'<iframe sandbox="allow-scripts" class="embedded-content" srcdoc="{html.escape(innerHtml, True)}" onload="javascript:window.listenForFrameResizedMessages(this);"></iframe>'
+    return Markup(iFrameHtml)
+
+
+@villages.route("/<int:year>/<int:village_id>/view2")
+def view2(year: int, village_id: int) -> ResponseValue:
+    village = load_village(year, village_id)
+    rendered_long_description = (
+        render_markdown2(village.long_description) if village.long_description else None
+    )
+
+    return render_template(
+        "villages/view2.html",
+        village=village,
+        village_long_description_html=rendered_long_description,
+    )
+
+
+def render_markdown2(markdown_text: str) -> Markup:
+    """Render untrusted markdown
+
+    This doesn't have access to any templating unlike email markdown
+    which is from a trusted user so is pre-processed with jinja.
+    """
+    extensions = ["markdown.extensions.nl2br", "markdown.extensions.smarty", "tables"]
+    contentHtml = nh3.clean(
+        markdown.markdown(markdown_text, extensions=extensions),
+        tags=(nh3.ALLOWED_TAGS - {"img"}),
+        link_rel="noopener nofollow",  # default includes noreferrer but not nofollow
+    )
+    innerHtml = f"""
+    <link rel="stylesheet" href="/static/css/main.css">
+    <div id="emf-container" style="min-height: 100%;">
+        <div class="emf-row">
+            <div class="emf-col" role="main">
+                {Markup(contentHtml)}
+            </div>
+        </div>
+    </div>"""
+    iFrameHtml = f'<iframe sandbox class="embedded-content" srcdoc="{html.escape(innerHtml, True)}"></iframe>'
+    return Markup(iFrameHtml)
+
+
 @villages.route("/<int:year>/<int:village_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit(year: int, village_id: int) -> ResponseValue:
@@ -84,13 +164,13 @@ def edit(year: int, village_id: int) -> ResponseValue:
         else:
             # All good, update DB
             for venue in village.venues:
-                if venue.name == village.name:
+                if venue.name == village.name and form.name.data is not None:
                     # Rename a village venue if it exists and has the old name.
                     venue.name = form.name.data
 
             form.populate_obj(village)
             db.session.commit()
             flash("Your village registration has been updated.")
-            return redirect(url_for(".edit", year=year, village_id=village_id))
+            return redirect(url_for(".view", year=year, village_id=village_id))
 
     return render_template("villages/edit.html", form=form, village=village)

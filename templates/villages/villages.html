@@ -5,8 +5,12 @@
 <h2>Villages</h2>
 <p>For more information on villages, see the <a href="{{ url_for('base.page', page_name='villages') }}">villages page</a>.
 {% if current_user.is_authenticated %}
-  If you want to create a village, you can
-      <a href="{{url_for('.register')}}">register it here</a>.
+  {% if current_user.village %}
+    You're a member of the <strong><a href="{{url_for('villages.view', year=event_year, village_id=current_user.village.id)}}">{{current_user.village.name}}</a></strong> village.
+  {% else %}
+    If you want to create a village, you can
+    <a href="{{url_for('.register')}}">register it here</a>.
+  {% endif %}
 {% else %}
 If you have a ticket, you can <a href="{{url_for('users.login', next=url_for('.register'))}}">log in to register a village</a>.
 {% endif %}
@@ -23,11 +27,7 @@ If you have a ticket, you can <a href="{{url_for('users.login', next=url_for('.r
   <tbody>
   {% for village in villages %}
     <tr>
-      {% if village.url %}
-        <td><a href="{{ village.url }}" rel="nofollow" target="_blank">{{village.name}}</a></td>
-      {% else %}
-        <td>{{village.name}}</td>
-      {% endif %}
+      <td><a href="{{ url_for('villages.view', year=event_year, village_id=village.id) }}">{{village.name}}</a></td>
       <td style="overflow-wrap: anywhere">{{village.description}}</td>
       {% if any_village_located %}
       <td style="width: 1px; white-space: nowrap;">

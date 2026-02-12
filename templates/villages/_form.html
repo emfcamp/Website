@@ -1,5 +1,5 @@
 <div class="well">
-  <form method="post" class="form-horizontal" role="form">
+  <form method="post" class="form-horizontal village-form" role="form">
     {{ form.hidden_tag() }}
     <fieldset>
       <legend>Basic Details</legend>
@@ -8,7 +8,11 @@
       {{ render_field(form.name, horizontal=9, placeholder="My Village") }}
       {{ render_field(form.url, horizontal=9, placeholder="") }}
       {{ render_field(form.description, horizontal=9,
-            placeholder="A description of your village. Who are you, what cool things will you be doing?") }}
+            placeholder="A short description of your village. Who are you, what cool things will you be doing?") }}
+      {% call render_field(form.long_description, horizontal=9,
+            placeholder="A longer description of your village using Markdown. Project details etc.") %}
+        <a href="https://www.markdown-cheatsheet.com">Standard Markdown</a> supported <em>apart from</em> images.
+      {% endcall %}
     </fieldset>
     <fieldset>
       <legend>Requirements</legend>
