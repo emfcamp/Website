@@ -135,3 +135,5 @@ node_modules
 !static/fonts
 !static/deliveries.pdf
 
+cov.md
+mypy-report/
