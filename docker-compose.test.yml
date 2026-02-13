@@ -1,0 +1,27 @@
+# Docker Compose override for running test app alongside dev app
+# Usage: docker compose -f docker-compose.yml -f docker-compose.test.yml up test-app
+#
+# This runs an app instance pointing to the test database (emf_site_test)
+# on port 2343, allowing you to browse test data after running E2E tests.
+
+services:
+  test-app:
+    build:
+      context: "./"
+    init: true
+    networks:
+      - emfweb
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+      - ./var/vat_invoices:/vat_invoices
+    ports:
+      - "2343:2342"
+    environment:
+      SETTINGS_FILE: ./config/test.cfg
+      FLASK_APP: dev_server.py
+      COLORIZE_LOGS: always
+      PYTHONUNBUFFERED: 1
+      IRCCAT: fakeirccat:12345
+    entrypoint: ["./docker/test_entrypoint.sh"]
