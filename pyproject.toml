@@ -8,6 +8,7 @@ requires-python = ">=3.13,<3.14"
 
 dependencies = [
     "alembic~=1.1",
+    "alembic-autogenerate-enums>=0.1.2",
     "cryptography>=44.0.3",
     "css-inline<0.18",
     "datetype",
@@ -90,7 +91,6 @@ dev = [
     "types-flask-migrate~=4.1.0.20250809",
     "types-icalendar>=6.3.1.20250822",
     "types-wtforms>=3.2.1.20250809",
-    "alembic-autogenerate-enums>=0.1.2",
 ]
 
 
