@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Village: {{village.name}}{% endblock %}
-{% block foot %}<script src="{{static_url_for('static', filename="js/sandboxed-iframe.js")}}"></script>{% endblock%}
+{% block foot %}<script src="{{static_url_for('static', filename="js/sandboxed-iframe-parent.js")}}"></script>{% endblock%}
 {% block body %}
 {% if village.url %}
 <h2>
