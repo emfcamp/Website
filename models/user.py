@@ -34,7 +34,7 @@ if typing.TYPE_CHECKING:
     from .payment import Payment
     from .purchase import AdmissionTicket, Purchase, PurchaseTransfer, Ticket
     from .village import VillageMember
-    from .volunteer import RoleAdmin, Volunteer
+    from .volunteer import BuildupVolunteer, RoleAdmin, Volunteer
 
 __all__ = [
     "AnonymousUser",
@@ -292,6 +292,7 @@ class User(BaseModel, UserMixin):
 
     admin_messages: Mapped[list[AdminMessage]] = relationship("AdminMessage", back_populates="creator")
 
+    buildup_volunteer: Mapped[BuildupVolunteer | None] = relationship(back_populates="user")
     volunteer: Mapped[Volunteer | None] = relationship(back_populates="user")
     volunteer_admin_roles: Mapped[list[RoleAdmin]] = relationship(back_populates="user")
     shift_entries: Mapped[list[ShiftEntry]] = relationship(back_populates="user")
