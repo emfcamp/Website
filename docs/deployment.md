@@ -12,8 +12,7 @@ This is done after each event, following a clear of the database:
     docker compose -f ./docker-compose.environment.yml exec app uv run flask db upgrade
     docker compose -f ./docker-compose.environment.yml exec app uv run flask create_perms
     docker compose -f ./docker-compose.environment.yml exec app uv run flask cfp create_venues
-    docker compose -f ./docker-compose.environment.yml exec app uv run flask tickets create
-
+    docker compose -f ./docker-compose.environment.yml exec app uv run flask cfp create_tags
 
 # Deployments
 
