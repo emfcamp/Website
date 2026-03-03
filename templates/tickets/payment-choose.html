@@ -63,10 +63,11 @@
 
     {% endif %}
 
-    <h3>Choose a payment method</h3>
+    <h3>Payment</h3>
 
-    <div class="row row-equal">
+    <div class="row">
 
+        {#
         <div class="col-sm-6">
             <div class="panel panel-default panel--payment">
                 {% if feature_enabled('BANK_TRANSFER') %}
@@ -93,8 +94,9 @@
                 {% endif %}
             </div>
         </div>
+        #}
 
-        <div class="col-sm-6">
+        <div class="col-sm-12">
             <div class="panel panel-default panel--payment">
                 {% if feature_enabled('STRIPE') %}
                 <div class="panel-heading"><h3 class="panel-title">Card</h3></div>
