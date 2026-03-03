@@ -47,8 +47,10 @@ def info_page(page_name: str) -> ResponseValue:
 
 
 @volunteer.route("/info")
-@feature_flag("VOLUNTEERS_SIGNUP")
 def info():
+    if not feature_enabled("VOLUNTEERS_SIGNUP"):
+        # Rather than 404ing, point at the misc 'volunteering' page instead.
+        return redirect(url_for("base.page", page_name="volunteering"))
     return render_markdown("volunteer/info/index", page_name="index")
 
 
