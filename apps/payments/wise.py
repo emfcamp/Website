@@ -185,6 +185,8 @@ def sync_wise_statement(profile_id, wise_balance_id, currency):
 
 
 def wise_business_profile():
+    from main import wise
+
     if app.config.get("TRANSFERWISE_PROFILE_ID"):
         id = int(app.config["TRANSFERWISE_PROFILE_ID"])
         accounts = list(wise.account_details.list(profile_id=id))
