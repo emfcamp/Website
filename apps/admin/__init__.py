@@ -252,11 +252,11 @@ def payment_config_verify():
             db.session.add(account)
 
         if db.session.new:
-            db.session.commit()
             flash("New Wise bank accounts have been imported", "info")
         else:
             flash("No new Wise bank accounts have been imported", "warning")
 
+        db.session.commit()
         return redirect(url_for(".payment_config_verify"), 303)
 
     return render_template(
