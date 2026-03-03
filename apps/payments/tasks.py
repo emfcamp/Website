@@ -63,11 +63,11 @@ def bulk_refund(yes, number, provider):
         app.logger.info(f"{count} refunds would be processed. Pass the -y option to refund these for real.")
 
 
-@payments.cli.command("transferwise_refund")
+@payments.cli.command("wise_refund")
 @click.option("-n", "--number", type=int, help="number of refunds to export")
 @click.option("-a", "--amount", type=int, help="value of refunds to export")
 @click.argument("currency", type=click.Choice(["GBP", "EUR"]))
-def transferwise_refund(number, amount, currency):
+def wise_refund(number, amount, currency):
     """Emit a CSV file for refunding with Transferwise"""
     query = (
         RefundRequest.query.join(Payment)
@@ -138,10 +138,10 @@ def transferwise_refund(number, amount, currency):
     app.logger.info(f"Refunds produced for currency {currency} up to id {max_id}")
 
 
-@payments.cli.command("transferwise_refund_complete")
+@payments.cli.command("wise_refund_complete")
 @click.argument("currency", type=click.Choice(["GBP", "EUR"]))
 @click.argument("max_id", type=int)
-def transferwise_refund_complete(max_id, currency):
+def wise_refund_complete(max_id, currency):
     """Mark Transferwise bulk refunds as completed"""
     query = (
         RefundRequest.query.join(Payment)
