@@ -4,11 +4,28 @@ from apps.payments.wise import wise_business_profile, wise_retrieve_accounts
 from models.payment import BankTransaction
 
 
+def vcr_response_scrubber(response):
+    """Removes excessively-uniquely-identifying response headers"""
+    SCRUB_HEADERS = {"set-cookie", "server", "alt-svc"}
+    for header_name in tuple(response["headers"].keys()):
+        header_name_lower, scrub = header_name.lower(), False
+        if "cf" in header_name_lower.split("-"):
+            scrub = True
+        if header_name_lower.startswith("x-"):
+            scrub = True
+        if header_name_lower in SCRUB_HEADERS:
+            scrub = True
+        if scrub:
+            del response["headers"][header_name]
+    return response
+
+
 @pytest.fixture(scope="module")
 def vcr_config():
     return {
         # Replace the Authorization request header with "DUMMY" in cassettes
         "filter_headers": [("authorization", "DUMMY")],
+        "before_record_response": vcr_response_scrubber,
     }
 
 
