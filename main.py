@@ -294,7 +294,9 @@ def create_app(dev_server=False, config_override=None):
             csp["script-src"].append(f"'nonce-{g.csp_nonce}'")
 
         value = "; ".join(k + " " + " ".join(v) for k, v in csp.items())
-        response.headers["Content-Security-Policy"] = value
+
+        if app.config.get("DEBUG"):
+            response.headers["Content-Security-Policy"] = value
 
         return response
 
