@@ -156,12 +156,6 @@ def sponsor():
 def badge():
     return redirect("https://tildagon.badge.emfcamp.org/")
 
-
-@base.route("/code-of-conduct")
-def code_of_conduct():
-    return render_template("code-of-conduct.html")
-
-
 @base.route("/googlec108e6ab4f75019d.html")
 def google_verification_russ():
     return "google-site-verification: googlec108e6ab4f75019d.html"
@@ -220,3 +214,4 @@ from . import tasks_banking  # noqa
 from . import tasks_export  # noqa
 from . import tasks_videos  # noqa
 from . import dev  # noqa
+from . import code_of_conduct
