@@ -26,7 +26,7 @@ def test_wise_account_retrieval(app):
             assert account.institution == "TransferWise"
             assert account.sort_code.startswith("231")
             assert account.acct_id.startswith("1000")
-    
+
     assert found
 
 
