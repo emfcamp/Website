@@ -7,13 +7,54 @@ interactions:
       Accept-Encoding:
       - gzip, deflate, br
       Authorization:
-      - DUMMY
+      - Bearer DUMMY
       Connection:
       - keep-alive
       User-Agent:
       - python-requests/2.32.5
     method: GET
-    uri: https://api.sandbox.transferwise.tech/v1/profiles/123456789/account-details
+    uri: https://api.sandbox.transferwise.tech/v1/profiles
+  response:
+    body:
+      string: '[{"id":29751847,"type":"personal","details":{"firstName":"Franco","lastName":"Burke","dateOfBirth":"1991-03-02","phoneNumber":"+5546938430539","avatar":null,"occupation":null,"occupations":null,"primaryAddress":51676017,"firstNameInKana":null,"lastNameInKana":null,"localizedInformation":[]}},{"id":29751848,"type":"business","details":{"name":"Raymond
+        and Sons 5443","registrationNumber":"19517120","acn":null,"abn":null,"arbn":null,"companyType":"LIMITED","companyRole":"OWNER","descriptionOfBusiness":"DESIGN","primaryAddress":51676018,"webpage":"https://raymondandsons5443.com","businessCategory":"CONSULTING_IT_BUSINESS_SERVICES","businessSubCategory":"DESIGN","localizedInformation":[]}}]'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 02 Mar 2026 23:59:24 GMT
+      Transfer-Encoding:
+      - chunked
+      cache-control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      content-encoding:
+      - gzip
+      expires:
+      - '0'
+      pragma:
+      - no-cache
+      vary:
+      - origin,access-control-request-method,access-control-request-headers,accept-encoding
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate, br
+      Authorization:
+      - Bearer DUMMY
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://api.sandbox.transferwise.tech/v1/profiles/29751848/account-details
   response:
     body:
       string: "[{\"id\":null,\"currency\":{\"code\":\"EUR\",\"name\":\"Euro\"},\"balanceId\":-1,\"title\":\"Your
@@ -39,7 +80,7 @@ interactions:
         to keep your money protected</li></ul><p>Your Wise account, and the money
         in it, are managed and protected by Wise in your region.</p><p><a href=\\\"https://wise.com/help/articles/2949821/how-wise-keeps-your-money-safe?origin=topic-5U80whCL1cmJnbIVNGsm3h\\\"
         rel=\\\"noopener\\\" target=\\\"_blank\\\">Learn more</a></p>\",\"cta\":null}}],\"details\":[{\"type\":\"ACCOUNT_HOLDER\",\"title\":\"Account
-        holder\",\"body\":\"Willis and Daughters 4056\",\"description\":null,\"hidden\":false},{\"type\":\"SWIFT_CODE\",\"title\":\"BIC\",\"body\":\"TRWIBxxxxxx\",\"description\":{\"title\":\"What\u2019s
+        holder\",\"body\":\"Raymond and Sons 5443\",\"description\":null,\"hidden\":false},{\"type\":\"SWIFT_CODE\",\"title\":\"BIC\",\"body\":\"TRWIBxxxxxx\",\"description\":{\"title\":\"What\u2019s
         BIC?\",\"body\":\"<p>A BIC code identifies banks and financial institutions
         globally. It says who and where they are \u2014 a sort of international bank
         code or ID.</p>\",\"cta\":null},\"hidden\":false},{\"type\":\"IBAN\",\"title\":\"IBAN\",\"body\":\"BE29
@@ -67,7 +108,7 @@ interactions:
         to keep your money protected</li></ul><p>Your Wise account, and the money
         in it, are managed and protected by Wise in your region.</p><p><a href=\\\"https://wise.com/help/articles/2949821/how-wise-keeps-your-money-safe?origin=topic-5U80whCL1cmJnbIVNGsm3h\\\"
         rel=\\\"noopener\\\" target=\\\"_blank\\\">Learn more</a></p>\",\"cta\":null}}],\"details\":[{\"type\":\"ACCOUNT_HOLDER\",\"title\":\"Account
-        holder\",\"body\":\"Willis and Daughters 4056\",\"description\":null,\"hidden\":false},{\"type\":\"SWIFT_CODE\",\"title\":\"Swift/BIC\",\"body\":\"TRWIBxxxxxx\",\"description\":{\"title\":\"What\u2019s
+        holder\",\"body\":\"Raymond and Sons 5443\",\"description\":null,\"hidden\":false},{\"type\":\"SWIFT_CODE\",\"title\":\"Swift/BIC\",\"body\":\"TRWIBxxxxxx\",\"description\":{\"title\":\"What\u2019s
         Swift/BIC?\",\"body\":\"<p>A Swift/BIC code identifies banks and financial
         institutions globally. It says who and where they are \u2014 a sort of international
         bank code or ID.</p>\",\"cta\":null},\"hidden\":false},{\"type\":\"IBAN\",\"title\":\"IBAN\",\"body\":\"BE29
@@ -104,7 +145,7 @@ interactions:
         less than 2 hours.</li><li><strong>Bacs</strong> \u2013 2\u20133 working days.</li><li><strong>CHAPS</strong>
         \u2013 1 working day.</li></ul><p>If you\u2019re waiting for longer than this,
         we can help. Just get in touch with a copy of the payment confirmation.</p>\",\"cta\":null}}],\"details\":[{\"type\":\"ACCOUNT_HOLDER\",\"title\":\"Account
-        holder\",\"body\":\"Willis and Daughters 4056\",\"description\":null,\"hidden\":false},{\"type\":\"BANK_CODE\",\"title\":\"Sort
+        holder\",\"body\":\"Raymond and Sons 5443\",\"description\":null,\"hidden\":false},{\"type\":\"BANK_CODE\",\"title\":\"Sort
         code\",\"body\":\"23-1x-xx\",\"description\":null,\"hidden\":false},{\"type\":\"ACCOUNT_NUMBER\",\"title\":\"Account
         number\",\"body\":\"1000xxxx\",\"description\":null,\"hidden\":false},{\"type\":\"IBAN\",\"title\":\"IBAN\",\"body\":\"GB77
         TRWI 2314 7010 0000 00\",\"description\":null,\"hidden\":false},{\"type\":\"BANK_NAME_AND_ADDRESS\",\"title\":\"Bank
@@ -133,7 +174,7 @@ interactions:
         the amount that you receive can be less than was sent. </p><p>It\u2019s best
         to ask your sender to check with their bank if there are any fees before they
         make the payment.</p>\",\"cta\":null}}],\"details\":[{\"type\":\"ACCOUNT_HOLDER\",\"title\":\"Account
-        holder\",\"body\":\"Willis and Daughters 4056\",\"description\":null,\"hidden\":false},{\"type\":\"SWIFT_CODE\",\"title\":\"Swift/BIC\",\"body\":\"TRWIGB2L\",\"description\":{\"title\":\"What\u2019s
+        holder\",\"body\":\"Raymond and Sons 5443\",\"description\":null,\"hidden\":false},{\"type\":\"SWIFT_CODE\",\"title\":\"Swift/BIC\",\"body\":\"TRWIGB2L\",\"description\":{\"title\":\"What\u2019s
         Swift/BIC?\",\"body\":\"<p>A Swift/BIC code identifies banks and financial
         institutions globally. It says who and where they are \u2014 a sort of international
         bank code or ID.</p>\",\"cta\":null},\"hidden\":false},{\"type\":\"IBAN\",\"title\":\"IBAN\",\"body\":\"GB77
@@ -152,7 +193,7 @@ interactions:
         number (ACH or ABA), account number and Swift/BIC\",\"status\":\"AVAILABLE\",\"deprecated\":false,\"migrated\":false,\"receiveOptions\":[{\"type\":\"LOCAL\",\"title\":\"Local\",\"description\":{\"title\":\"Your
         USD account details\",\"body\":\"Receive from a bank in the USreceive-option.usd.description.body.links\",\"cta\":null},\"summaries\":[{\"type\":\"TIME\",\"title\":\"Payments
         take up to 3 working days to arrive\",\"description\":null}],\"details\":[{\"type\":\"ACCOUNT_HOLDER\",\"title\":\"Account
-        holder\",\"body\":\"Willis and Daughters 4056\",\"description\":null,\"hidden\":false},{\"type\":\"ROUTING_NUMBER\",\"title\":\"Wire
+        holder\",\"body\":\"Raymond and Sons 5443\",\"description\":null,\"hidden\":false},{\"type\":\"ROUTING_NUMBER\",\"title\":\"Wire
         routing number\",\"body\":\"026073008\",\"description\":null,\"hidden\":false},{\"type\":\"ACCOUNT_NUMBER\",\"title\":\"Account
         number\",\"body\":\"8xx00xxxxx\",\"description\":null,\"hidden\":false},{\"type\":\"ACCOUNT_TYPE\",\"title\":\"Account
         type\",\"body\":\"Checking\",\"description\":null,\"hidden\":false},{\"type\":\"BANK_NAME_AND_ADDRESS\",\"title\":\"Bank
@@ -167,7 +208,7 @@ interactions:
         \xB7 Swift\",\"description\":{\"title\":\"Your USD account details\",\"body\":\"Receive
         from a bank outside the USreceive-option.usd.description.body.links\",\"cta\":null},\"summaries\":[{\"type\":\"TIME\",\"title\":\"Payments
         take up to 5 working days to arrive\",\"description\":null}],\"details\":[{\"type\":\"ACCOUNT_HOLDER\",\"title\":\"Account
-        holder\",\"body\":\"Willis and Daughters 4056\",\"description\":null,\"hidden\":false},{\"type\":\"ROUTING_NUMBER\",\"title\":\"Routing
+        holder\",\"body\":\"Raymond and Sons 5443\",\"description\":null,\"hidden\":false},{\"type\":\"ROUTING_NUMBER\",\"title\":\"Routing
         number\",\"body\":\"026073008\",\"description\":{\"title\":\"Did they ask
         for a routing number?\",\"body\":\"<p>A routing number is not required to
         add or receive USD from bank accounts outside the US. But if they specifically
@@ -208,7 +249,7 @@ interactions:
         transfers (BECS)</strong> \u2013 1 working day.</li></ul><p>If you\u2019re
         waiting for longer than this, we can help. Just get in touch with a copy of
         the payment confirmation.\",\"cta\":null}}],\"details\":[{\"type\":\"ACCOUNT_HOLDER\",\"title\":\"Account
-        holder\",\"body\":\"Willis and Daughters 4056\",\"description\":null,\"hidden\":false},{\"type\":\"BANK_CODE\",\"title\":\"BSB
+        holder\",\"body\":\"Raymond and Sons 5443\",\"description\":null,\"hidden\":false},{\"type\":\"BANK_CODE\",\"title\":\"BSB
         code\",\"body\":\"774xxx\",\"description\":null,\"hidden\":false},{\"type\":\"ACCOUNT_NUMBER\",\"title\":\"Account
         number\",\"body\":\"6129xxxxx\",\"description\":null,\"hidden\":false}],\"alert\":null,\"shareText\":null},{\"type\":\"INTERNATIONAL\",\"title\":\"Global
         \xB7 Swift\",\"description\":{\"title\":\"Your AUD account details\",\"body\":\"Sorry,
@@ -227,7 +268,7 @@ interactions:
         try to set up any Direct Debits with your NZD account details. The payment
         will be rejected and the merchant may charge you a fee.</p>\",\"cta\":null}},{\"type\":\"TIME\",\"title\":\"Payments
         take up to 2 working days to arrive\",\"description\":null}],\"details\":[{\"type\":\"ACCOUNT_HOLDER\",\"title\":\"Account
-        holder\",\"body\":\"Willis and Daughters 4056\",\"description\":null,\"hidden\":false},{\"type\":\"ACCOUNT_NUMBER\",\"title\":\"Account
+        holder\",\"body\":\"Raymond and Sons 5443\",\"description\":null,\"hidden\":false},{\"type\":\"ACCOUNT_NUMBER\",\"title\":\"Account
         number\",\"body\":\"02-1290-0xxxxxx-xxx\",\"description\":null,\"hidden\":false}],\"alert\":null,\"shareText\":null},{\"type\":\"INTERNATIONAL\",\"title\":\"Global
         \xB7 Swift\",\"description\":{\"title\":\"Your NZD account details\",\"body\":\"Sorry,
         you can\u2019t get account details to receive international NZD payments yet.\",\"cta\":null},\"summaries\":[],\"details\":[],\"alert\":null,\"shareText\":null}],\"bankFeatures\":[{\"key\":\"LOCAL_RECEIVE\",\"title\":\"Receive
@@ -252,7 +293,7 @@ interactions:
         it will be returned to the originating bank with $25 CAD deducted to cover
         return processing fees.</p>\",\"cta\":null}},{\"type\":\"TIME\",\"title\":\"Payments
         take up to 2 working days to arrive\",\"description\":null}],\"details\":[{\"type\":\"ACCOUNT_HOLDER\",\"title\":\"Account
-        holder\",\"body\":\"Willis and Daughters 4056\",\"description\":null,\"hidden\":false},{\"type\":\"ROUTING_NUMBER\",\"title\":\"Institution
+        holder\",\"body\":\"Raymond and Sons 5443\",\"description\":null,\"hidden\":false},{\"type\":\"ROUTING_NUMBER\",\"title\":\"Institution
         number\",\"body\":\"6xx\",\"description\":null,\"hidden\":false},{\"type\":\"ACCOUNT_NUMBER\",\"title\":\"Account
         number\",\"body\":\"200110xxxxxx\",\"description\":null,\"hidden\":false},{\"type\":\"BANK_NAME_AND_ADDRESS\",\"title\":\"Bank
         name and address\",\"body\":\"Peoples Trust\\n595 Burrard Street\\nVancouver
@@ -276,7 +317,7 @@ interactions:
         HUF account details\",\"body\":\"Receive from a bank in Hungary<a href=\\\"https://wise.com/help/articles/2978073/how-do-i-use-my-huf-bank-details\\\"
         rel=\\\"noopener\\\" target=\\\"_blank\\\">See how to use HUF account details</a>\",\"cta\":null},\"summaries\":[{\"type\":\"TIME\",\"title\":\"Payments
         take up to 1 working day to arrive\",\"description\":null}],\"details\":[{\"type\":\"ACCOUNT_HOLDER\",\"title\":\"Account
-        holder\",\"body\":\"Willis and Daughters 4056\",\"description\":null,\"hidden\":false},{\"type\":\"ACCOUNT_NUMBER\",\"title\":\"Account
+        holder\",\"body\":\"Raymond and Sons 5443\",\"description\":null,\"hidden\":false},{\"type\":\"ACCOUNT_NUMBER\",\"title\":\"Account
         number\",\"body\":\"12600016-0000xxxx-xxxxxxxx\",\"description\":{\"title\":\"Did
         they ask for an IBAN?\",\"body\":\"<p>For most payments in Hungary, you can
         use your account number. But if your sender specifically asked for an IBAN,
@@ -303,7 +344,7 @@ interactions:
         the amount that you receive can be less than was sent.</p><p>It\u2019s best
         to ask your sender to check with their bank if there are any fees before they
         make the payment.</p>\",\"cta\":null}}],\"details\":[{\"type\":\"ACCOUNT_HOLDER\",\"title\":\"Account
-        holder\",\"body\":\"Willis and Daughters 4056\",\"description\":null,\"hidden\":false},{\"type\":\"SWIFT_CODE\",\"title\":\"Swift/BIC\",\"body\":\"TRWIBxxxxxx\",\"description\":{\"title\":\"What\u2019s
+        holder\",\"body\":\"Raymond and Sons 5443\",\"description\":null,\"hidden\":false},{\"type\":\"SWIFT_CODE\",\"title\":\"Swift/BIC\",\"body\":\"TRWIBxxxxxx\",\"description\":{\"title\":\"What\u2019s
         Swift/BIC?\",\"body\":\"<p>A Swift/BIC code identifies banks and financial
         institutions globally. It says who and where they are \u2014 a sort of international
         bank code or ID.</p>\",\"cta\":{\"label\":\"Swift/BIC\",\"content\":\"TRWIBxxxxxx\"}},\"hidden\":false},{\"type\":\"IBAN\",\"title\":\"IBAN\",\"body\":\"HU68
@@ -330,7 +371,7 @@ interactions:
         MYR account details\",\"body\":\"Receive from a bank in Malaysia<a href=\\\"https://wise.com/help/articles/2lDYkmGHRiyfl1T8XKuahU/how-do-i-use-my-myr-account-details\\\"
         rel=\\\"noopener\\\" target=\\\"_blank\\\">See how to use MYR account details</a>\",\"cta\":null},\"summaries\":[{\"type\":\"TIME\",\"title\":\"Payments
         take up to 1 working day to arrive\",\"description\":null}],\"details\":[{\"type\":\"ACCOUNT_HOLDER\",\"title\":\"Account
-        holder\",\"body\":\"Willis and Daughters 4056\",\"description\":null,\"hidden\":false},{\"type\":\"PARTNER_BANK_NAME\",\"title\":\"Partner
+        holder\",\"body\":\"Raymond and Sons 5443\",\"description\":null,\"hidden\":false},{\"type\":\"PARTNER_BANK_NAME\",\"title\":\"Partner
         bank name\",\"body\":\"JPMorgan Chase Bank Berhad\",\"description\":null,\"hidden\":false},{\"type\":\"ACCOUNT_NUMBER\",\"title\":\"Account
         number\",\"body\":\"3120000xxxxxxxx\",\"description\":null,\"hidden\":false}],\"alert\":null,\"shareText\":null},{\"type\":\"INTERNATIONAL\",\"title\":\"Global
         \xB7 Swift\",\"description\":{\"title\":\"Your MYR account details\",\"body\":\"Sorry,
@@ -344,7 +385,7 @@ interactions:
         RON account details\",\"body\":\"Receive from a bank in Romania<a href=\\\"https://wise.com/help/17/borderless-account/2978062/how-do-i-use-my-ron-bank-details\\\"
         rel=\\\"noopener\\\" target=\\\"_blank\\\">See how to use RON account details</a>\",\"cta\":null},\"summaries\":[{\"type\":\"TIME\",\"title\":\"Payments
         take up to 1 working day to arrive\",\"description\":null}],\"details\":[{\"type\":\"ACCOUNT_HOLDER\",\"title\":\"Account
-        holder\",\"body\":\"Willis and Daughters 4056\",\"description\":null,\"hidden\":false},{\"type\":\"SWIFT_CODE\",\"title\":\"Bank
+        holder\",\"body\":\"Raymond and Sons 5443\",\"description\":null,\"hidden\":false},{\"type\":\"SWIFT_CODE\",\"title\":\"Bank
         code\",\"body\":\"BRELRxxxxxx\",\"description\":null,\"hidden\":false},{\"type\":\"ACCOUNT_NUMBER\",\"title\":\"Account
         number\",\"body\":\"RO83 BREL 0005 xxxx xxxx xxxx\",\"description\":null,\"hidden\":false},{\"type\":\"BANK_NAME_AND_ADDRESS\",\"title\":\"Bank
         name and address\",\"body\":\"Libra Internet Bank\\nCalea Vitan Nr. 6-6A\\nBucuresti\\n031296\\nRomania\",\"description\":{\"title\":\"Did
@@ -377,7 +418,7 @@ interactions:
         or Stripe, use your GIRO/MEPS account details instead.</p><h5>Useful to know</h5><p>You
         can only receive SGD from people or business that have a SGD bank account
         in Singapore.</p>\",\"cta\":null},\"hidden\":false},{\"type\":\"ACCOUNT_HOLDER\",\"title\":\"Account
-        holder\",\"body\":\"Willis and Daughters 4056\",\"description\":null,\"hidden\":false},{\"type\":\"BANK_NAME\",\"title\":\"Bank
+        holder\",\"body\":\"Raymond and Sons 5443\",\"description\":null,\"hidden\":false},{\"type\":\"BANK_NAME\",\"title\":\"Bank
         name\",\"body\":\"DBS Bank Ltd\",\"description\":null,\"hidden\":false},{\"type\":\"BANK_CODE\",\"title\":\"Bank
         code\",\"body\":\"71xx\",\"description\":null,\"hidden\":false},{\"type\":\"ACCOUNT_NUMBER\",\"title\":\"Account
         number\",\"body\":\"885-074-xxx-xxx\",\"description\":null,\"hidden\":false},{\"type\":\"ADDRESS\",\"title\":\"Wise\u2019s
@@ -395,7 +436,7 @@ interactions:
         TRY account details\",\"body\":\"Receive from a bank in Turkey<a href=\\\"https://wise.com/help/articles/2978080/how-do-i-use-my-try-bank-details\\\"
         rel=\\\"noopener\\\" target=\\\"_blank\\\">See how to use TRY account details</a>\",\"cta\":null},\"summaries\":[{\"type\":\"TIME\",\"title\":\"Payments
         take up to 1 working day to arrive\",\"description\":null}],\"details\":[{\"type\":\"ACCOUNT_HOLDER\",\"title\":\"Account
-        holder\",\"body\":\"Willis and Daughters 4056\",\"description\":null,\"hidden\":false},{\"type\":\"IBAN\",\"title\":\"IBAN\",\"body\":\"TR29
+        holder\",\"body\":\"Raymond and Sons 5443\",\"description\":null,\"hidden\":false},{\"type\":\"IBAN\",\"title\":\"IBAN\",\"body\":\"TR29
         0010 3000 0xxx xxxx xxxx xx\",\"description\":null,\"hidden\":false}],\"alert\":null,\"shareText\":null},{\"type\":\"INTERNATIONAL\",\"title\":\"Global
         \xB7 Swift\",\"description\":{\"title\":\"Your TRY account details\",\"body\":\"Sorry,
         you can\u2019t get account details to receive international TRY payments yet.\",\"cta\":null},\"summaries\":[],\"details\":[],\"alert\":null,\"shareText\":null}],\"bankFeatures\":[{\"key\":\"LOCAL_RECEIVE\",\"title\":\"Receive
@@ -409,7 +450,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Mon, 08 Sep 2025 22:19:49 GMT
+      - Mon, 02 Mar 2026 23:59:24 GMT
       Transfer-Encoding:
       - chunked
       cache-control:
