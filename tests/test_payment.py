@@ -24,7 +24,7 @@ def vcr_response_scrubber(response):
 def vcr_config():
     return {
         # Replace the Authorization request header with "DUMMY" in cassettes
-        "filter_headers": [("authorization", "DUMMY")],
+        "filter_headers": [("Authorization", "DUMMY")],
         "before_record_response": vcr_response_scrubber,
     }
 

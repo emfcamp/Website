@@ -7,7 +7,7 @@ interactions:
       Accept-Encoding:
       - gzip, deflate, br
       Authorization:
-      - Bearer DUMMY
+      - DUMMY
       Connection:
       - keep-alive
       User-Agent:
@@ -48,7 +48,7 @@ interactions:
       Accept-Encoding:
       - gzip, deflate, br
       Authorization:
-      - Bearer DUMMY
+      - DUMMY
       Connection:
       - keep-alive
       User-Agent:
