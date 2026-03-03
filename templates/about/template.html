@@ -8,9 +8,8 @@
   <a href="{{url_for('base.page', page_name=target_page)}}">{{title}}</a>
 </li>
 {%- endmacro %}
-{% extends "base.html" %}
+{% extends "markdown.html" %}
 {% set main_class = "about" %}
-{% block title %}{{title}}{% endblock %}
 {% block secondary_nav %}
 <ul role="navigation list" aria-label="About">
   {{view("About EMF", "base.about")}}
