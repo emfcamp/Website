@@ -280,8 +280,7 @@ def wise_retrieve_accounts(profile_id):
     from main import wise
 
     for account in wise.account_details.list(profile_id=profile_id):
-        if account.currency.code != "GBP":
-            # TODO: support other host currencies
+        if account.currency.code not in ["GBP", "EUR"]:
             continue
 
         bank_details = _merge_recipient_details(account)
