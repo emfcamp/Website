@@ -20,21 +20,25 @@ def test_wise_account_retrieval(app):
     # we merge Wise's local and international details for our GBP account into a single record
     assert len(accounts) == 2
 
-    account = accounts[1]
-    assert account.currency == "GBP"
-    assert account.institution == "TransferWise"
-    assert account.sort_code.startswith("231")
-    assert account.acct_id.startswith("1000")
-    assert account.iban.startswith("GB77 TRWI")
-    assert account.swift.startswith("TRWI")
+    found = set()
+    for account in accounts:
+        if account.currency == "GBP":
+            found.add(account.currency)
+            assert account.institution == "TransferWise"
+            assert account.sort_code.startswith("231")
+            assert account.acct_id.startswith("1000")
+            assert account.iban.startswith("GB77 TRWI")
+            assert account.swift.startswith("TRWI")
 
-    account = accounts[0]
-    assert account.currency == "EUR"
-    assert account.institution == "TransferWise Europe SA"
-    assert account.sort_code is None
-    assert account.acct_id is None
-    assert account.iban.startswith("BE29 9670")
-    assert account.swift.startswith("TRWI")
+        if account.currency == "EUR":
+            found.add(account.currency)
+            assert account.institution == "TransferWise Europe SA"
+            assert account.sort_code is None
+            assert account.acct_id is None
+            assert account.iban.startswith("BE29 9670")
+            assert account.swift.startswith("TRWI")
+
+    assert found == {"GBP", "EUR"}
 
 
 @pytest.mark.parametrize(
