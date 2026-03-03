@@ -232,10 +232,14 @@ class WiseRecipient:
 
     @property
     def parsed_account_number(self):
+        if self.account_number is None:
+            return None
         return self.account_number.replace(" ", "")[-8:]
 
     @property
     def parsed_sort_code(self):
+        if self.sort_code is None:
+            return None
         return self.sort_code.replace("-", "")
 
 
