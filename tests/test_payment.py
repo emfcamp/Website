@@ -1,6 +1,6 @@
 import pytest
 
-from apps.payments.wise import wise_retrieve_accounts
+from apps.payments.wise import wise_business_profile, wise_retrieve_accounts
 from models.payment import BankTransaction
 
 
@@ -14,7 +14,8 @@ def vcr_config():
 
 @pytest.mark.vcr()
 def test_wise_account_retrieval(app):
-    accounts = list(wise_retrieve_accounts(profile_id=123456789))
+    profile_id = wise_business_profile()
+    accounts = list(wise_retrieve_accounts(profile_id=profile_id))
 
     # we merge Wise's local and international details for our GBP account into a single record
     assert len(accounts) == 2
