@@ -88,7 +88,7 @@ def stripe_capture(payment_id):
 
     if payment.intent_id is None:
         # Create the payment intent with Stripe. This intent will persist across retries.
-        intent = stripe_client.payment_intents.create(
+        intent = stripe_client.v1.payment_intents.create(
             params={
                 "amount": payment.amount_int,
                 "currency": payment.currency.upper(),
@@ -100,7 +100,7 @@ def stripe_capture(payment_id):
         db.session.commit()
     else:
         # Reuse a previously-created payment intent
-        intent = stripe_client.payment_intents.retrieve(payment.intent_id)
+        intent = stripe_client.v1.payment_intents.retrieve(payment.intent_id)
         if intent.status == "succeeded":
             logger.warning("Intent already succeeded, not capturing again")
             payment.state = "charging"
@@ -231,7 +231,7 @@ def stripe_update_payment(
         raise ValueError("Payment intent_id is None")
     intent_is_fresh = False
     if intent is None:
-        intent = stripe_client.payment_intents.retrieve(
+        intent = stripe_client.v1.payment_intents.retrieve(
             payment.intent_id, params=dict(expand=["latest_charge"])
         )
         intent_is_fresh = True
@@ -244,7 +244,7 @@ def stripe_update_payment(
         # The payment intent object has been expanded already
         charge = intent.latest_charge
     else:
-        charge = stripe_client.charges.retrieve(intent.latest_charge)
+        charge = stripe_client.v1.charges.retrieve(intent.latest_charge)
 
     if payment.charge_id is not None and payment.charge_id != charge.id:
         # The payment's failed and been retried, and this might be a
@@ -253,7 +253,7 @@ def stripe_update_payment(
         if intent_is_fresh:
             fresh_intent = intent
         else:
-            fresh_intent = stripe_client.payment_intents.retrieve(
+            fresh_intent = stripe_client.v1.payment_intents.retrieve(
                 payment.intent_id, params=dict(expand=["latest_charge"])
             )
 

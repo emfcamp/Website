@@ -139,7 +139,7 @@ class TicketPaymentForm(Form):
     basket_total = HiddenField("basket total")
 
     banktransfer = SubmitField("Pay by Bank Transfer")
-    stripe = SubmitField("Pay by card")
+    stripe = SubmitField("Pay")
 
     def validate_email(form, field):
         if current_user.is_anonymous and User.does_user_exist(field.data):
