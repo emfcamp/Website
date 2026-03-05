@@ -1,6 +1,6 @@
-"""Payment handler for Stripe credit card payments.
+"""Payment handler for Stripe payments.
 
-This takes credit card payments using Stripe's
+This takes payments using Stripe's
 [Payment Intents](https://stripe.com/docs/payments/payment-intents) API.
 """
 
