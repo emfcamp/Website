@@ -39,7 +39,7 @@
 <script nonce="{{csp_nonce}}">
   const PUBLIC_KEY = {{ config['STRIPE_PUBLIC_KEY']|tojson }};
   const client_secret = {{ client_secret|tojson }};
-  const capture_url = {{ external_url('payments.stripe_capture', payment_id=payment.id)|tojson }};
+  const capture_url = {{ external_url('payments.stripe_waiting', payment_id=payment.id)|tojson }};
   const appearance = {
     theme: 'stripe',
     variables: {

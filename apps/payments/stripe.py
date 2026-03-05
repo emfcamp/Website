@@ -103,8 +103,7 @@ def stripe_capture(payment_id):
         intent = stripe_client.v1.payment_intents.retrieve(payment.intent_id)
         if intent.status == "succeeded":
             logger.warning("Intent already succeeded, not capturing again")
-            payment.state = "charging"
-            db.session.commit()
+            stripe_update_payment(stripe_client, payment, intent)
             return redirect(url_for(".stripe_waiting", payment_id=payment_id))
 
         if intent.payment_method:
@@ -122,20 +121,6 @@ def stripe_capture(payment_id):
         payment=payment,
         client_secret=intent.client_secret,
     )
-
-
-@payments.route("/pay/stripe/<int:payment_id>/capture", methods=["POST"])
-@login_required
-def stripe_capture_post(payment_id):
-    """The user is sent here after the payment has succeeded in the browser.
-    We set the payment state to charging, but we're expecting a webhook to
-    set it to "paid" almost immediately.
-    """
-    payment = lock_user_payment_or_abort(payment_id, "stripe")
-    if payment.state == "new":
-        payment.state = "charging"
-        db.session.commit()
-    return redirect(url_for(".stripe_waiting", payment_id=payment_id))
 
 
 class StripeCancelForm(Form):
@@ -165,7 +150,12 @@ def stripe_cancel(payment_id):
 @payments.route("/pay/stripe/<int:payment_id>/waiting")
 @login_required
 def stripe_waiting(payment_id):
-    payment = get_user_payment_or_abort(payment_id, "stripe", valid_states=["charging", "paid"])
+    payment = lock_user_payment_or_abort(payment_id, "stripe", valid_states=["new", "paid"])
+
+    if payment.state != "paid":
+        stripe_client = get_stripe_client(app.config)
+        stripe_update_payment(stripe_client, payment)
+
     return render_template(
         "payments/stripe-waiting.html",
         payment=payment,
