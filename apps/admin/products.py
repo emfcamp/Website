@@ -637,6 +637,7 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 purchases_remaining=form.num_purchases.data,
                 tickets_remaining=form.num_tickets.data,
             )
+            db.session.add(voucher)
 
             voucher_url = external_url("tickets.tickets_voucher", voucher_code=voucher.code)
 
@@ -663,7 +664,6 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 html_message=html,
             )
 
-            db.session.add(voucher)
             db.session.commit()
             sent_total += sent_count
             added += 1
