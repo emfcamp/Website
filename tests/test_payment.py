@@ -29,6 +29,7 @@ def vcr_config():
     }
 
 
+@pytest.mark.skip(reason="Wise payments and dependencies are currently inactive")
 @pytest.mark.vcr()
 def test_wise_account_retrieval(app):
     profile_id = wise_business_profile()

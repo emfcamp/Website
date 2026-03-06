@@ -36,12 +36,13 @@ from models.site_state import VALID_STATES, SiteState, get_states, refresh_state
 from ..common import feature_enabled, require_permission
 from ..common.forms import Form
 from ..payments.stripe import stripe_validate
-from ..payments.wise import (
-    wise_business_profile,
-    wise_retrieve_accounts,
-    wise_validate,
-)
 from .products import product_views, products
+
+# from ..payments.wise import (
+#     wise_business_profile,
+#     wise_retrieve_accounts,
+#     wise_validate,
+# )
 
 admin = Blueprint("admin", __name__)
 
@@ -235,13 +236,13 @@ def payment_config_verify():
     form = BankAccountRefreshForm()
 
     if form.validate_on_submit():
-        profile_id = wise_business_profile()
+        profile_id = None  # wise_business_profile()
 
         if not profile_id:
             flash("Cannot identify Wise profile", "warning")
             return redirect(url_for(".payment_config_verify"), 303)
 
-        accounts = wise_retrieve_accounts(profile_id)
+        accounts = []  # wise_retrieve_accounts(profile_id)
         for account in accounts:
             existing_account = BankAccount.query.filter_by(
                 wise_balance_id=account.wise_balance_id,
@@ -260,7 +261,7 @@ def payment_config_verify():
         return redirect(url_for(".payment_config_verify"), 303)
 
     if feature_enabled("BANK_TRANSFER"):
-        wise_state = wise_validate()
+        wise_state = None  # wise_validate()
     else:
         wise_state = None
 

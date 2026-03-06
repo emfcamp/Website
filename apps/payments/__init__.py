@@ -27,5 +27,5 @@ from . import (
     main,  # noqa: F401
     stripe,  # noqa: F401
     tasks,  # noqa: F401
-    wise,  # noqa: F401
+    ## wise,  # noqa: F401, RUF100
 )
