@@ -346,7 +346,7 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
         )
         return price
 
-    def is_adult_ticket(self) -> bool:
+    def is_adult_ticket(self, voucher: bool = False) -> bool:
         """Whether this is an "adult" ticket.
 
         This is used for two purposes:
@@ -359,9 +359,13 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
         Day tickets should be able to buy badges/merchandise.
         """
         # FIXME: Make this less awful, we need a less brittle way of detecting this
-        return self.parent.type == "admissions" and (
-            self.name.startswith("full") or self.name.startswith("u18") or self.name.startswith("day")
-        )
+
+        adult_codes = ["full", "day"]
+        if not voucher:
+            # U18 tickets are not adult tickets for the purposes of voucher capacity
+            adult_codes.append("u18")
+
+        return self.parent.type == "admissions" and any(self.name.startswith(code) for code in adult_codes)
 
     @property
     def checkin_display_name(self):
@@ -610,7 +614,9 @@ class Voucher(BaseModel):
         if self.purchases_remaining < 1:
             return False
 
-        adult_tickets = sum(line.count for line in basket._lines if line.tier.parent.is_adult_ticket())
+        adult_tickets = sum(
+            line.count for line in basket._lines if line.tier.parent.is_adult_ticket(voucher=True)
+        )
 
         if self.tickets_remaining < adult_tickets:
             return False
