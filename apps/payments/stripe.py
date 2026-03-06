@@ -264,7 +264,6 @@ def stripe_update_payment(
 
 def stripe_payment_paid(payment: StripePayment) -> None:
     if payment.state == "paid":
-        logger.info("Payment is already paid, ignoring")
         return
 
     if payment.state == "partrefunded":
