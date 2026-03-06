@@ -408,7 +408,7 @@ def product_view_new():
         db.session.add(view)
         db.session.commit()
         flash("ProductView created")
-        return redirect(url_for("admin.products.product_view", view_id=view.id))
+        return redirect(url_for("admin.product_views.product_view", view_id=view.id))
 
     return render_template("admin/products/view-new.html", form=form)
 
@@ -577,7 +577,7 @@ def product_view_edit_voucher(view_id, voucher_code):
         flash("Voucher updated")
         return redirect(
             url_for(
-                "admin.products.product_view_voucher_detail",
+                "admin.product_views.product_view_voucher_detail",
                 view_id=view_id,
                 voucher_code=voucher_code,
             )
