@@ -602,6 +602,7 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 voucher_url="http://VOUCHER_URL_PLACEHOLDER",
                 expiry=form.expires.data,
                 reason=form.reason.data,
+                num_tickets=form.num_tickets.data
             )
 
         return render_template(
@@ -621,6 +622,9 @@ def product_view_bulk_add_vouchers_by_email(view_id):
 
     with mail.get_connection() as conn:
         for email in emails:
+            if email == '':
+                continue
+
             if Voucher.query.filter_by(email=email).first():
                 existing += 1
                 continue
@@ -645,6 +649,7 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 voucher_url=voucher_url,
                 expiry=form.expires.data,
                 reason=form.reason.data,
+                num_tickets=form.num_tickets.data
             )
 
             app.logger.info("Emailing %s volunteer voucher: %s", email, voucher.code)
