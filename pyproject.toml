@@ -47,7 +47,7 @@ dependencies = [
     "python-slugify>=8.0.4",
     "python-stdnum<2.2",
     "pytz",
-    "pywisetransfer>=0.3.1,<0.4",
+    ## "pywisetransfer>=0.3.1,<0.4",
     "pyyaml",
     "requests~=2.29",
     "segno>=1.0.0,<2",
@@ -76,7 +76,7 @@ dev = [
     "pytest-random-order",
     "pytest-vcr>=1.0.2,<2",
     "pytest",
-    "pyzbar>=0.1.8,<0.2",
+    ## "pyzbar>=0.1.8,<0.2",
     # Ruff version should also be updated in .pre-commit-config.yaml
     "ruff==0.12.10",
     "types-decorator>=5.1.4,<6",
