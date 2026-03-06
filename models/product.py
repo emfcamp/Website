@@ -643,7 +643,7 @@ class Voucher(BaseModel):
     def return_capacity(self, payment: Payment) -> None:
         """Return capacity to this voucher based on tickets in a payment."""
         adult_tickets = len(
-            [purchase for purchase in payment.purchases if purchase.product.is_adult_ticket()]
+            [purchase for purchase in payment.purchases if purchase.product.is_adult_ticket(voucher=True)]
         )
         log.info("Returning 1 purchase and %s tickets to %s", adult_tickets, self)
         self.purchases_remaining = Voucher.purchases_remaining + 1
