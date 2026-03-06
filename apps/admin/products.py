@@ -638,6 +638,10 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 tickets_remaining=form.num_tickets.data,
             )
             db.session.add(voucher)
+            # Commit here to avoid a race condition where two requests try to send the same
+            # list of vouchers. This does run the risk of vouchers being added without an email
+            # being sent, but this is preferable to sending two vouchers to the same person.
+            db.session.commit()
 
             voucher_url = external_url("tickets.tickets_voucher", voucher_code=voucher.code)
 
@@ -664,7 +668,6 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 html_message=html,
             )
 
-            db.session.commit()
             sent_total += sent_count
             added += 1
 

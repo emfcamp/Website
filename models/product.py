@@ -569,6 +569,8 @@ class Voucher(BaseModel):
     payment: Mapped[list[Payment]] = relationship(back_populates="voucher")
     view: Mapped[ProductView | None] = relationship(back_populates="vouchers")
 
+    __table_args__ = (UniqueConstraint("email", "product_view_id", name="uniq_voucher_email_product_view"),)
+
     is_used = column_property((purchases_remaining == 0) | (tickets_remaining == 0))
 
     @classmethod
