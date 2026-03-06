@@ -628,7 +628,7 @@ class Voucher(BaseModel):
             raise VoucherUsedError(f"Attempting to use voucher with no remaining purchases: {self}")
 
         adult_tickets = len(
-            [purchase for purchase in payment.purchases if purchase.product.is_adult_ticket()]
+            [purchase for purchase in payment.purchases if purchase.product.is_adult_ticket(voucher=True)]
         )
 
         if self.tickets_remaining < adult_tickets:
