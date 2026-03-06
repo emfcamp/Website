@@ -625,7 +625,7 @@ def product_view_bulk_add_vouchers_by_email(view_id):
             if email == "":
                 continue
 
-            if Voucher.query.filter_by(email=email).first():
+            if Voucher.query.filter_by(email=email, product_view_id=view.id).first():
                 existing += 1
                 continue
 
