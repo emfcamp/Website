@@ -4,8 +4,6 @@ from datetime import timedelta
 
 from flask import abort, request
 from flask import current_app as app
-from pywisetransfer.exceptions import InvalidWebhookSignature
-from pywisetransfer.webhooks import validate_request
 
 from main import db, wise
 from models import naive_utcnow
@@ -13,6 +11,9 @@ from models.payment import BankAccount, BankTransaction
 
 from . import payments
 from .banktransfer import reconcile_txns
+
+# from pywisetransfer.exceptions import InvalidWebhookSignature
+# from pywisetransfer.webhooks import validate_request
 
 logger = logging.getLogger(__name__)
 
@@ -36,15 +37,15 @@ def wise_webhook():
         request.headers,
     )
 
-    environment = app.config["TRANSFERWISE_ENVIRONMENT"]
-    try:
-        validate_request(request=request, environment=environment)
-    except InvalidWebhookSignature as e:
-        logger.exception(e)
-        abort(400)
-    except Exception as e:
-        logger.info(e)
-        abort(400)
+    # environment = app.config["TRANSFERWISE_ENVIRONMENT"]
+    # try:
+    #     validate_request(request=request, environment=environment)
+    # except InvalidWebhookSignature as e:
+    #     logger.exception(e)
+    #     abort(400)
+    # except Exception as e:
+    #     logger.info(e)
+    #     abort(400)
 
     schema_version = request.json.get("schema_version")
     if schema_version != "2.0.0":
