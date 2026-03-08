@@ -54,16 +54,91 @@
     flex: 1 1 auto;
 }
 
-#sponsorship-levels > .panel > .panel-body {
-    min-width: 12em;
-}
-
 #sponsorship-levels ul {
     padding-left: 15px;
+    font-size: 12px;
 }
 
 img.img-sponsor {
    max-height: 150px; 
    width: 100%;
    object-fit: contain;
+}
+
+.sponsors .image-with-caption {
+    position: relative;
+    padding-bottom: 24px;
+
+    figcaption {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        font-size: 12px;
+        font-style: italic;
+    }
+}
+
+.sponsors .img-hero {
+    width: 100%;
+    height: 150px;
+    object-position: center bottom;
+    object-fit: cover;
+    margin-top: 24px;
+
+    @media(min-width: 550px) {
+        height: 200px;
+    }
+    @media(min-width: 768px) {
+        height: 300px;
+    }
+}
+
+.sponsors section {
+    margin-top: 30px;
+    @media(min-width: 768px) {
+        display: flex;
+    }
+}
+
+.sponsors .split-section {
+    .content {
+        @media(min-width: 768px) {
+            flex-basis: 66%;
+            align-self: center;
+            padding-right: 15px;
+        }
+    }
+    .image-container {
+        @media(min-width: 768px) {
+            position: relative;
+            align-items: center;
+            flex-basis: 33%;
+            display: flex;
+        }
+        img {
+            max-width: 100%;
+            width: 100%;
+        }
+    }
+
+    &--flipped {
+        .content {
+            @media(min-width: 768px) {
+                padding-left: 15px;
+                order: 2;
+            }
+        }
+    }
+}
+
+
+.sponsors .intro {
+    display: block;
+
+    @media(min-width: 768px) {
+        display: grid;
+        padding: 0 30px;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-gap: 12px;
+    }
 }
