@@ -70,8 +70,8 @@ def stripe_start(payment: StripePayment) -> ResponseValue:
 @login_required
 def stripe_capture(payment_id):
     """This endpoint displays the card payment form, including the Stripe payment element.
-    Card details are validated and submitted to Stripe by XHR, and if it succeeds
-    a POST is sent back, which is received by the next endpoint.
+    Card details are validated and submitted to Stripe by XHR, and the user is then sent by
+    Stripe to the `stripe_waiting` endpoint.
     """
     payment = lock_user_payment_or_abort(payment_id, "stripe", valid_states=["new"])
 
@@ -150,6 +150,12 @@ def stripe_waiting(payment_id):
     if payment.state != "paid":
         stripe_client = get_stripe_client(app.config)
         stripe_update_payment(stripe_client, payment)
+
+    if payment.state == "new":
+        # Async payment failure. Redirect back to capture page.
+        # This flow can be tested by choosing "pay by bank" and closing the popup
+        flash("Your payment has not been completed - please try again.")
+        return redirect(url_for(".stripe_capture", payment_id=payment_id))
 
     return render_template(
         "payments/stripe-waiting.html",
@@ -332,8 +338,10 @@ def stripe_payment_part_refunded(payment: StripePayment) -> None:
 
 
 def stripe_payment_failed(payment: StripePayment) -> None:
-    # Stripe payments almost always fail during capture, but can be failed while charging.
-    # Test with 4000 0000 0000 0341
+    # Stripe payments almost always fail during capture, which will result in an immediate
+    # error on the capture page. In some cases the Stripe element fails (this can be
+    # reproduced by choosing "pay by bank" and closing the popup), and we leave the payment
+    # state as "new" so it can be retried.
     if payment.state == "partrefunded":
         logger.error("Payment is already partially refunded, so cannot be failed")
         raise StripeUpdateConflict()
