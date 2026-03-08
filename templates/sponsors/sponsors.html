@@ -5,65 +5,45 @@
 
 <div class="well">
   We're still accepting sponsors for this year's event.
-  <a href="{{url_for('.sponsor')}}"
-    >Learn more about sponsoring Electromagnetic Field</a
-  >.
+  <a href="{{url_for('.sponsor')}}">Learn more about sponsoring Electromagnetic Field</a>.
 </div>
 
 {% macro sponsor(url, image, alt, dark=False) %}
 <div class="sponsor{% if dark %} sponsor-dark{% endif %}">
-  <a class="clearfix" href="{{ url }}" title="{{alt}}">
-    <img
-      class="img-responsive col-xs-12 img-sponsor"
-      alt="{{alt}}"
-      src="{{ url_for('static', filename='images/sponsors/' + image) }}"
-    />
+  <a href="{{ url }}" title="{{alt}}" target="_blank" rel="noopener">
+    <img class="img-responsive col-xs-12 img-sponsor" alt="{{alt}}"
+      src="{{ url_for('static', filename='images/sponsors/' + image) }}" />
   </a>
 </div>
 {% endmacro %}
 
-<div
-  class="col-xs-6 col-sm-5 col-sm-offset-1"
->
+<div class="clearfix col-xs-12">
+  <h3>Platinum</h3>
+  <div class="sponsors-list sponsors-list--platinum">
+    {{ sponsor("https://www.nationwide.co.uk/", "nationwide.svg", "Nationwide") }}
+  </div>
+
   <h3>Gold</h3>
-  {{ sponsor("https://www.and.digital/", "ANDDigital.svg", "AND Digital") }}
-  {{ sponsor("https://www.mathworks.com/", "mathworks.png", "MathWorks") }}
+  <div class="sponsors-list sponsors-list--gold">
+    {{ sponsor("https://foundryzero.co.uk/", "foundry-zero.svg", "Foundry Zero") }}
+  </div>
 
   <h3>Silver</h3>
-  {{ sponsor("https://www.onega.net/", "onega.jpg", "Onega") }}
-  {{ sponsor("https://www.msd-animal-health.com/research-and-development/technology-labs/", "msd-animal-health.png", "MSD Animal Health Technology Labs") }}
-  {{ sponsor("https://www.mythic-beasts.com/", "mythicbeasts.svg", "Mythic Beasts") }}
-  {{ sponsor("https://www.nationwide.co.uk/", "nationwide.svg", "Nationwide") }}
-  {{ sponsor("https://www.pcbway.com/", "pcbway.png", "PCBWay") }}
-  {{ sponsor("https://utaw.tech/about/", "UTAW.svg", "United Tech and Allied Workers") }}
+  <div class="sponsors-list sponsors-list--silver">
+    {{ sponsor("https://cside.com/", "cside.png", "cside") }}
+    {{ sponsor("https://grafana.com/", "grafana.svg", "Grafana Labs") }}
+    {{ sponsor("https://www.mythic-beasts.com/", "mythicbeasts.svg", "Mythic Beasts") }}
+    {{ sponsor("https://www.onega.net/", "onega.jpg", "Onega") }}
+    {{ sponsor("https://utaw.tech/about/", "UTAW.svg", "United Tech and Allied Workers") }}
+  </div>
 
   <h3>Bronze</h3>
-  {{ sponsor("https://www.codethink.co.uk/", "codethink.svg", "Codethink") }}
-  {{ sponsor("https://feng-ltd.com/", "FEng.svg", "Fieldhouse Engineering") }}
-  {{ sponsor("https://www.infobip.com/developers", "infobip.png", "Infobip") }}
-  {{ sponsor("https://octopus.energy/", "octopus-stacked.png", "Octopus Energy") }}
-  {{ sponsor("https://www.softwire.com/", "softwire-blue.svg", "Softwire") }}
-
-  <h3>Copper</h3>
-  {{ sponsor("https://connectedthings.store/", "connectedthings.svg", "Connected Things") }}
-  {{ sponsor("https://hookdeck.com/", "hookdeck-logo-color.svg", "Hookdeck") }}
-  {{ sponsor("https://canonical.com", "Canonical_logo_2023.svg", "Canonical") }}
-
+  <div class="sponsors-list sponsors-list--bronze">
+    {{ sponsor("https://codemyriad.io/", "codemyriad.svg", "Codemyriad", True) }}
+    {{ sponsor("https://feng-ltd.com/", "FEng.svg", "Fieldhouse Engineering") }}
+  </div>
 </div>
-<div
-  class="col-xs-6 col-sm-5"
->
-  <h3>Badge</h3>
-  {{ sponsor("https://www.bosch-sensortec.com/", "bosch.png", "Bosch") }}
-  {{ sponsor("https://www.espressif.com/", "espressif-logo.svg", "Espressif") }}
-  {{ sponsor("https://www.ti.com/", "texasinstruments.svg", "Texas Instruments") }}
 
-  <h3>Arcade</h3>
-  {{ sponsor("https://lightburnsoftware.com/", "lightburn.svg", "Lightburn") }}
-  {{ sponsor("https://pimoroni.com/", "pimoroni.svg", "Pimoroni") }}
-  {{ sponsor("https://smokeandmirrors.store/", "smokeandmirrors.svg", "Smoke & Mirrors") }}
-
-</div>
 <div class="clearfix col-xs-12">
   <h3>Special Thanks</h3>
   <p>

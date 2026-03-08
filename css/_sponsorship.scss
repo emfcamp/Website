@@ -3,18 +3,43 @@
 }
 
 .sponsors .sponsor {
-    padding-top: 10px;
-    padding-bottom: 10px;
-}
-
-.sponsor img {
     padding: 15px;
-    background-color: #f3f3f3;
+    background-color: #fff;
     border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.sponsor-dark img {
+.sponsors .sponsor-dark {
     background-color: #222;
+}
+
+.sponsors .sponsors-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 15px;
+    
+    @media(min-width: 550px) {
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-gap: 15px;
+        justify-content: center;
+        align-items: stretch;
+        
+        &--platinum {
+            grid-template-columns: 1fr;
+            margin-left: 20%;
+            margin-right: 20%;
+
+            img.img-sponsor {
+                height: 150px;
+            }
+        }
+        &--gold {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
 }
 
 #sponsorship-levels {
@@ -38,6 +63,7 @@
 }
 
 img.img-sponsor {
-   max-height: 250px; 
-   width: auto;
+   max-height: 150px; 
+   width: 100%;
+   object-fit: contain;
 }
