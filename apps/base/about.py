@@ -19,6 +19,11 @@ from apps.common import render_markdown
 from . import base
 
 
+@base.route("/supporting-emf")
+def supporting_emf() -> ResponseValue:
+    return render_markdown("supporting-emf", template="static_page.html")
+
+
 @base.route("/about/branding")
 def branding() -> ResponseValue:
     return render_template("about/branding.html")

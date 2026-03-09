@@ -1,27 +1,28 @@
 @use "./_variables.scss" as *;
 
-.about {
-  .support-catalogue {
-    --panel-grid-min-size: 300px;
-    grid-template-rows: 1fr 1fr;
-  }
+.support-catalogue {
+  --panel-grid-min-size: 300px;
+  grid-template-rows: 1fr 1fr;
+  max-width: 750px;
+  margin-left: auto;
+  margin-right: auto;
 
-  .support-catalogue .panel {
+  .panel {
     display: flex;
     flex-direction: column;
     height: 100%;
   }
 
-  .support-catalogue .panel-body {
+  .panel-body {
     flex-grow: 1;
   }
 
-  .support-catalogue .panel-footer {
+  .panel-footer {
     background-color: $highlight-background;
     border-top: 1px solid rgba(0, 0, 0, 0.12);
   }
 
-  .support-catalogue .panel-footer a {
+  .panel-footer a {
     font-weight: 700;
     text-decoration: none;
 
