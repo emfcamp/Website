@@ -4,8 +4,11 @@
 <h2>Sponsors</h2>
 
 <div class="well">
-  We're still accepting sponsors for this year's event.
-  <a href="{{url_for('.sponsor')}}">Learn more about sponsoring Electromagnetic Field</a>.
+  <p>
+    EMF is a non-profit event, and would not exist without help from our wonderful sponsors.
+  </p>
+    We're still accepting sponsors for this year's event.
+    <a href="{{url_for('.sponsor')}}">Learn more about sponsoring Electromagnetic Field</a>.
 </div>
 
 {% macro sponsor(url, image, alt, dark=False) %}
@@ -18,11 +21,6 @@
 {% endmacro %}
 
 <div class="clearfix col-xs-12">
-  <h3>Platinum</h3>
-  <div class="sponsors-list sponsors-list--platinum">
-    {{ sponsor("https://www.nationwide.co.uk/", "nationwide.svg", "Nationwide") }}
-  </div>
-
   <h3>Gold</h3>
   <div class="sponsors-list sponsors-list--gold">
     {{ sponsor("https://foundryzero.co.uk/", "foundry-zero.svg", "Foundry Zero") }}
