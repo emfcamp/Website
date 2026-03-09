@@ -1,8 +1,78 @@
 title: Supporting EMF
 ---
 # Supporting EMF
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+<p class="emphasis">
+EMF is a non-profit event, run entirely by volunteers. There are many ways you can help make it happen
+</p>
 
-Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula.
+<div class="panel-grid support-catalogue">
+
+<div class="panel panel-primary support-option--tickets">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{octicon('gift-24')}} Supporter Tickets</h3>
+  </div>
+  <div class="panel-body">
+    <p>
+      Supporter tickets cost a little more than a standard admission, and every extra penny goes directly towards making EMF more awesome.
+    </p>
+    <div class="support-tiers">
+      <div class="support-tier">
+        <span>Supporter</span>
+        <span class="support-tier-price">&pound;150</span>
+      </div>
+      <div class="support-tier">
+        <span>Gold Supporter</span>
+        <span class="support-tier-price">&pound;200</span>
+      </div>
+    </div>
+  </div>
+  <div class="panel-footer">
+    <a href="/tickets">Buy a supporter ticket &rarr;</a>
+  </div>
+</div>
+
+<div class="panel panel-primary support-option--volunteer">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{octicon('people-24')}} Volunteer</h3>
+  </div>
+  <div class="panel-body">
+    <p>
+      EMF is organised and run by unpaid volunteers. Whether you can spare an hour or a whole day, there are roles during setup, the event itself, and teardown.
+      Volunteers get a free hot meal for every shift worked.
+    </p>
+  </div>
+  <div class="panel-footer">
+    <a href="/about/volunteering">Find out about volunteering &rarr;</a>
+  </div>
+</div>
+
+<div class="panel panel-primary support-option--sponsor">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{octicon('briefcase-24')}} Corporate Sponsorship</h3>
+  </div>
+  <div class="panel-body">
+    <p>
+      Does your employer value the maker, technology, and creative communities? Corporate sponsors help fund childcare, live transcription, art installations, and more. Packages start from £1,000.
+    </p>
+  </div>
+  <div class="panel-footer">
+    <a href="/sponsor">View sponsorship packages &rarr;</a>
+  </div>
+</div>
+
+<div class="panel panel-primary support-option--art">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{octicon('rocket-24')}} Support Arts @ EMF</h3>
+  </div>
+  <div class="panel-body">
+    <p>
+      your name will be displayed on a mysterious object at EMF 2026&hellip;
+    </p>
+  </div>
+  <div class="panel-footer">
+    <em>Details coming soon.</em>
+  </div>
+</div>
+
+</div>
