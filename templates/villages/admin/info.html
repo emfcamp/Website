@@ -5,9 +5,26 @@
 <h3>Village Info: {{village.name}}</h3>
 <b>Village administrators:</b>
 <ul>
+    {% set show_remove = village.admins()|count > 1 %}
     {% for user in village.admins() %}
-        <li><a href="{{ url_for('admin.user', user_id=user.id) }}">{{ user.name }}</a> ({{ user.email }})</li>
+        <li>
+            {% if show_remove %}
+            <form method="POST" action="{{ url_for('villages.admin_village_admins', village_id=village.id) }}">
+                <a href="{{ url_for('admin.user', user_id=user.id) }}">{{ user.name }}</a> ({{ user.email }})
+                <input type="hidden" name="user_id" value="{{ user.id }}" />
+                <input type="submit" name="remove" value="Remove" class="btn btn-sm btn-danger"/>
+            </form>
+            {% else %}
+                <a href="{{ url_for('admin.user', user_id=user.id) }}">{{ user.name }}</a> ({{ user.email }})
+            {% endif %}
+        </li>
     {% endfor %}
+    <li>
+        <form method="POST" action="{{ url_for('villages.admin_village_admins', village_id=village.id) }}">
+            <input name="user_email" value="" placeholder="email address" />
+            <input type="submit" name="add" value="Add" class="btn btn-sm btn-success"/>
+        </form>
+    </li>
 </ul>
 
 <form method="POST">
