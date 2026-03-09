@@ -3,6 +3,7 @@
 .support-catalogue {
   --panel-grid-min-size: 300px;
   grid-template-rows: 1fr 1fr;
+  gap: 15px;
   max-width: 750px;
   margin-left: auto;
   margin-right: auto;
