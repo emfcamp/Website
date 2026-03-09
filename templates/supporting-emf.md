@@ -3,7 +3,7 @@ title: Supporting EMF
 # Supporting EMF
 
 <p class="emphasis">
-EMF is a non-profit event, run entirely by volunteers. There are many ways you can help make it happen
+EMF is a non-profit event, run entirely by volunteers. There are many ways you can help make it happen!
 </p>
 
 <div class="panel-grid support-catalogue">
