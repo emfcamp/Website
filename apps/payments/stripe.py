@@ -471,6 +471,16 @@ def stripe_validate():
         for webhook in webhooks:
             if webhook["status"] != "enabled":
                 result.append((False, f"Webhook {webhook['url']} is {webhook['status']}"))
+
+            not_found = 0
+            for event in webhook_handlers:
+                if event not in webhook.enabled_events:
+                    if event in {None, 'ping'}:
+                        continue
+                    not_found += 1
+                    result.append((False, f"Webhook endpoint {webhook['url']} is not configured to deliver the {event} event"))
+            if not_found == 0:
+                result.append((True, f"Webhook endpoint {webhook['url']} is configured to deliver all required events"))
     else:
         result.append((False, "No webhooks configured"))
 
