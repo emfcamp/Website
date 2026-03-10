@@ -2,7 +2,6 @@ This is the www.emfcamp.org web site, built with Flask & Postgres by the
 EMF web team.
 
 [![Deploy Status](https://github.com/emfcamp/Website/workflows/Deploy/badge.svg)](https://github.com/emfcamp/Website/actions?query=workflow%3ADeploy)
-[![Coverage Status](https://coveralls.io/repos/github/emfcamp/Website/badge.svg?branch=main)](https://coveralls.io/github/emfcamp/Website?branch=main)
 
 ## Get Involved
 
@@ -14,8 +13,7 @@ Join with IRCCloud: <a href="https://www.irccloud.com/invite?channel=%23emfcamp-
 
 The only supported way to develop is to use [Docker](https://docker.com/) with Docker Compose (on Linux you'll need to install [Docker Compose](https://docs.docker.com/compose/install/) separately) version 1.24.0 or newer.
 
-[Lazydocker](https://github.com/jesseduffield/lazydocker) is highly recommended
-to monitor the containers.
+We also recommend you have `uv` [installed on your development machine](https://docs.astral.sh/uv/getting-started/installation/), as it's sometimes useful to use this command outside Docker.
 
 To start all containers (and rebuild any which may have changed):
 
@@ -78,8 +76,7 @@ pre-commit hook using [pre-commit](https://pre-commit.com/). To set this up on
 the host where you'll be using git:
 
 ```
-pip3 install pre-commit
-pre-commit install
+uvx pre-commit install
 ```
 
 ### Adding accounts
@@ -88,10 +85,6 @@ Once you've created an account on the website, you can use `./flask make_admin` 
 Or, you can create an account and simultaneously make it an admin by using `./flask make_admin -e email@domain.tld`
 
 E-mail sending is disabled in development (but is printed out on the console). You can also log in directly by setting `BYPASS_LOGIN=True` in `config/development.cfg` and then using a URL of the form e.g. `/login/admin@test.invalid`.
-
-### Testing payments
-
-The easiest way to test the payments flow (marginally less easy if you don't have a Stripe account) is to use Stripe test keys and pay by card with Stripe's test cards. To test incoming webhooks you can use a service like ngrok or tailscale funnel to expose your local dev instance to the web (temporarily!).
 
 ### Database Migrations
 
