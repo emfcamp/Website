@@ -87,7 +87,6 @@ def stripe_capture(payment_id):
             params={
                 "amount": payment.amount_int,
                 "currency": payment.currency.upper(),
-                "statement_descriptor_suffix": payment.description,
                 "metadata": {"user_id": current_user.id, "payment_id": payment.id},
             },
         )
