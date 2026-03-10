@@ -5,6 +5,8 @@ This takes payments using Stripe's
 """
 
 import logging
+from collections.abc import Callable
+from typing import Any
 
 import stripe
 from flask import (
@@ -46,7 +48,7 @@ class StripeUpdateConflict(Exception):
     pass
 
 
-webhook_handlers = {}
+webhook_handlers: dict[str | None, Callable[[str, Any], ResponseValue]] = {}
 
 
 def webhook(type=None):
@@ -68,12 +70,13 @@ def stripe_start(payment: StripePayment) -> ResponseValue:
 
 @payments.route("/pay/stripe/<int:payment_id>/capture")
 @login_required
-def stripe_capture(payment_id):
+def stripe_capture(payment_id: int) -> ResponseValue:
     """This endpoint displays the card payment form, including the Stripe payment element.
     Card details are validated and submitted to Stripe by XHR, and the user is then sent by
     Stripe to the `stripe_waiting` endpoint.
     """
     payment = lock_user_payment_or_abort(payment_id, "stripe", valid_states=["new"])
+    assert isinstance(payment, StripePayment)
 
     if not feature_enabled("STRIPE"):
         logger.warning("Unable to capture payment as Stripe is disabled")
@@ -87,7 +90,7 @@ def stripe_capture(payment_id):
             params={
                 "amount": payment.amount_int,
                 "currency": payment.currency.upper(),
-                "metadata": {"user_id": current_user.id, "payment_id": payment.id},
+                "metadata": {"user_id": str(current_user.id), "payment_id": str(payment.id)},
             },
         )
         payment.intent_id = intent.id
@@ -123,8 +126,9 @@ class StripeCancelForm(Form):
 
 @payments.route("/pay/stripe/<int:payment_id>/cancel", methods=["GET", "POST"])
 @login_required
-def stripe_cancel(payment_id):
+def stripe_cancel(payment_id: int) -> ResponseValue:
     payment = lock_user_payment_or_abort(payment_id, "stripe", valid_states=["new", "captured", "failed"])
+    assert isinstance(payment, StripePayment)
 
     form = StripeCancelForm()
     if form.validate_on_submit():
@@ -143,8 +147,9 @@ def stripe_cancel(payment_id):
 
 @payments.route("/pay/stripe/<int:payment_id>/waiting")
 @login_required
-def stripe_waiting(payment_id):
+def stripe_waiting(payment_id: int) -> ResponseValue:
     payment = lock_user_payment_or_abort(payment_id, "stripe", valid_states=["new", "paid"])
+    assert isinstance(payment, StripePayment)
 
     if payment.state != "paid":
         stripe_client = get_stripe_client(app.config)
@@ -164,13 +169,19 @@ def stripe_waiting(payment_id):
 
 
 @payments.route("/stripe-webhook", methods=["POST"])
-def stripe_webhook():
+def stripe_webhook() -> ResponseValue:
     stripe_client = get_stripe_client(app.config)
+
+    webhook_key = app.config.get("STRIPE_WEBHOOK_KEY")
+    if webhook_key is None:
+        logger.error("Stripe webhook received but no STRIPE_WEBHOOK_KEY set.")
+        abort(500)
+
     try:
         event = stripe_client.construct_event(
             request.data,
             request.headers["STRIPE_SIGNATURE"],
-            app.config.get("STRIPE_WEBHOOK_KEY"),
+            webhook_key,
         )
     except ValueError:
         logger.exception("Error decoding Stripe webhook")
@@ -190,6 +201,8 @@ def stripe_webhook():
         except KeyError:
             handler = webhook_handlers[None]
 
+        # Stripe's library seems to suggest that event.data.object here is dict[str, Any],
+        # but it's actually a dict-derived object I think, so I've left the type here as Any.
         return handler(event.type, event.data.object)
     except Exception:
         logger.exception("Unhandled exception during Stripe webhook")
@@ -198,14 +211,14 @@ def stripe_webhook():
 
 
 @webhook()
-def stripe_default(_type, _obj):
+def stripe_default(_type: str, _obj: Any) -> ResponseValue:
     """Default webhook handler"""
-    return ("", 200)
+    return ""
 
 
 @webhook("ping")
-def stripe_ping(_type, _obj):
-    return ("", 200)
+def stripe_ping(_type: str, _obj: Any) -> ResponseValue:
+    return ""
 
 
 def stripe_update_payment(
@@ -222,7 +235,7 @@ def stripe_update_payment(
     intent_is_fresh = False
     if intent is None:
         intent = stripe_client.v1.payment_intents.retrieve(
-            payment.intent_id, params=dict(expand=["latest_charge"])
+            payment.intent_id, params={"expand": ["latest_charge"]}
         )
         intent_is_fresh = True
 
@@ -244,7 +257,7 @@ def stripe_update_payment(
             fresh_intent = intent
         else:
             fresh_intent = stripe_client.v1.payment_intents.retrieve(
-                payment.intent_id, params=dict(expand=["latest_charge"])
+                payment.intent_id, params={"expand": ["latest_charge"]}
             )
 
         if fresh_intent.latest_charge == charge.id:
@@ -377,7 +390,7 @@ def lock_payment_or_abort_by_charge(charge_id: str) -> StripePayment:
 @webhook("payment_intent.created")
 @webhook("payment_intent.payment_failed")
 @webhook("payment_intent.succeeded")
-def stripe_payment_intent_updated(hook_type, intent):
+def stripe_payment_intent_updated(hook_type: str, intent: Any) -> ResponseValue:
     payment = lock_payment_or_abort_by_intent(intent.id)
 
     logger.info(
@@ -395,11 +408,11 @@ def stripe_payment_intent_updated(hook_type, intent):
     except StripeUpdateUnexpected:
         abort(501)
 
-    return ("", 200)
+    return ""
 
 
 @webhook("charge.refunded")
-def stripe_charge_refunded(_type, charge):
+def stripe_charge_refunded(_type: str, charge: Any) -> ResponseValue:
     payment = lock_payment_or_abort_by_charge(charge.id)
 
     logger.info(
@@ -414,7 +427,7 @@ def stripe_charge_refunded(_type, charge):
     else:
         stripe_payment_part_refunded(payment)
 
-    return ("", 200)
+    return ""
 
 
 def stripe_validate():
@@ -446,7 +459,7 @@ def stripe_validate():
 
     stripe_client = get_stripe_client(app.config)
     try:
-        webhooks = stripe_client.webhook_endpoints.list()
+        webhooks = stripe_client.v1.webhook_endpoints.list()
         result.append((True, "Connection to Stripe API succeeded"))
     except stripe.AuthenticationError as e:
         result.append((False, f"Connecting to Stripe failed: {e}"))
