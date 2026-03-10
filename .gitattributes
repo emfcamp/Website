@@ -1,0 +1,4 @@
+*.py diff=python
+*.css diff=css
+*.html diff=html
+*.md diff=markdown
