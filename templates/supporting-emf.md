@@ -63,11 +63,14 @@ EMF is a non-profit event, run entirely by volunteers. There are many ways you c
 
 <div class="panel panel-primary support-option--art">
   <div class="panel-heading">
-    <h3 class="panel-title">{{octicon('rocket-24')}} Support Arts @ EMF</h3>
+    <h3 class="panel-title">{{octicon('rocket-24')}} Art & Installations Fund</h3>
   </div>
   <div class="panel-body">
     <p>
-      your name will be displayed on a mysterious object at EMF 2026&hellip;
+      EMF's Art & Installations Fund is used to provide grants and support to help members of the EMF community make awesome things for the festival. We also work with all kinds of artists to bring their work to EMF.
+    </p>
+    <p>
+      Donors will be included in a special Wall of Fame installation at EMF 2026 &#128588;
     </p>
   </div>
   <div class="panel-footer">
