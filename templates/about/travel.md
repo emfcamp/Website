@@ -24,7 +24,7 @@ Timetables and further information can be found on the [shuttle bus page](https:
 ## By Car
 If you plan to drive, you will need to [buy a parking ticket or live-in vehicle ticket](/tickets/other). Motorcycles do not require a parking ticket. 
 
-Plan your travel to the south gate on the A438 - postcode **HR8 1RQ** should get you there. The entrance to the site is located at [52.0322, -2.3837](geo:52.03222,-2.3837), grid reference SO 73774 37158.
+Plan your travel to the south gate on the A438 - postcode **HR8 1RQ** should get you there. The entrance to the site is located at [52.0322, -2.3837](https://geohack.toolforge.org/geohack.php?pagename=Electromagnetic_Field_(festival)&params=52.03222_N_2.3837_W_region:GB), grid reference SO 73774 37158.
 
 Once you're near the site, you'll see yellow temporary road signs for EMF - follow these and ignore your sat nav if it tells you differently.
 
