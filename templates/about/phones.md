@@ -4,9 +4,15 @@ title: Phones
 
 The Phone Team (aka POC) provides a comprehensive phone service at EMF.
 
+## Registering a number
+
+Closer to the event start date, we will publish instructions here about registering a personal extension number you can use during the event.
+
+{# 2024 
+
 ## Getting Started
 
-You can pick a 4-digit extension number to use, and call anyone on site via it. Create your number in the  [Electromagnetic Phonebook](https://phones.emfcamp.org)
+You can pick a 4-digit extension number to use, and call anyone on site via it. Create your number in the [Electromagnetic Phonebook](https://phones.emfcamp.org)
 
 Firstly you will need to register an account with a username, email & password. We send an email validation message from [poc@emfcamp.org](mailto:poc@emfcamp.org) so make sure you’ve clicked that before you can login.
 
@@ -46,6 +52,7 @@ Next to each number is 3 buttons.
 
 The **Fallback Number** is a number that will be called if the main number doesn’t answer the call within 30sec or is unavailable. 
 
+#}
 
 ## Types of Service
 
