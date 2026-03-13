@@ -5,7 +5,6 @@ import time
 from pathlib import Path
 
 import email_validator
-import pywisetransfer
 import stripe
 import yaml
 from cryptography.hazmat.primitives import hashes
@@ -29,6 +28,8 @@ from sqlalchemy_continuum.plugins import FlaskPlugin
 from werkzeug.exceptions import HTTPException
 
 from loggingmanager import create_logging_manager, set_user_id
+
+# import pywisetransfer
 
 # If we have logging handlers set up here, don't touch them.
 # This is especially problematic during testing as we don't
@@ -224,12 +225,12 @@ def create_app(dev_server=False, config_override=None):
 
     login_manager.anonymous_user = load_anonymous_user
 
-    global wise
-    wise = pywisetransfer.Client(
-        api_key=app.config["TRANSFERWISE_API_TOKEN"],
-        environment=app.config["TRANSFERWISE_ENVIRONMENT"],
-        private_key_file=app.config.get("TRANSFERWISE_PRIVATE_KEY_FILE"),
-    )
+    # global wise
+    # wise = pywisetransfer.Client(
+    #     api_key=app.config["TRANSFERWISE_API_TOKEN"],
+    #     environment=app.config["TRANSFERWISE_ENVIRONMENT"],
+    #     private_key_file=app.config.get("TRANSFERWISE_PRIVATE_KEY_FILE"),
+    # )
 
     @app.before_request
     def load_per_request_state():
