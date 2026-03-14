@@ -10,7 +10,7 @@ from models import event_end, event_start, event_year
 from models.cfp import HUMAN_CFP_TYPES, Venue
 
 from . import event_tz
-from .data import ProposalDict, _get_proposal_dict
+from .data import _get_proposal_dict
 
 LICENCE = "CC BY-SA 4.0"
 VERSION = "1.0-public"
@@ -25,7 +25,7 @@ class FrabExporter:
     def __init__(self, schedule):
         self._schedule = schedule
 
-    def format_duration(self, start_time: datetime, end_time: datetime) -> timedelta:
+    def format_duration(self, start_time: datetime, end_time: datetime) -> str:
         # str(timedelta) creates e.g. hrs:min:sec...
         duration = (end_time - start_time).total_seconds() / 60
         hours = int(duration // 60)
@@ -36,7 +36,7 @@ class FrabExporter:
         hours = int(hours % 24)
         return f"{days:d}:{hours:02d}:{minutes:02d}"
 
-    def get_day_start_end(dt: datetime, start_time=time(4, 0)):
+    def get_day_start_end(self, dt: datetime, start_time: time = time(4, 0)) -> tuple[datetime, datetime]:
         # A day changeover of 4am allows us to have late events.
         # All in local time because that's what people deal in.
         start_date = dt.date()
@@ -229,7 +229,7 @@ class FrabXmlExporter(FrabExporter):
     def add_room(self, day, name):
         return etree.SubElement(day, "room", name=name)
 
-    def add_event(self, room, event: ProposalDict):
+    def add_event(self, room, event):
         event_node = etree.SubElement(
             room, "event", id=str(event["id"]), guid=str(uuid5(NAMESPACE_URL, event["link"]))
         )
