@@ -25,7 +25,7 @@ from .data import (
     get_upcoming,
 )
 from .historic import feed_historic
-from .schedule_xml import export_frab
+from .frab_exporter import FrabXmlExporter
 
 
 def _format_event_description(flat_sid: ScheduleItemDict) -> str:
@@ -99,7 +99,8 @@ def schedule_frab(year: int) -> ResponseReturnValue:
     filter = ScheduleFilter()
     flat_sids = [flat_sid for si in schedule_items for flat_sid in get_schedule_item_dicts_flat(filter, si)]
 
-    frab = export_frab(flat_sids)
+    exporter = FrabXmlExporter(flat_sids)
+    frab = exporter.run()
 
     return Response(frab, mimetype="application/xml")
 
