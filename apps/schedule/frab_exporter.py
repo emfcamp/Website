@@ -1,17 +1,25 @@
 from datetime import datetime, time, timedelta
 from functools import cached_property
 from uuid import NAMESPACE_URL, uuid5
+from hashlib import md5
 
 from lxml import etree
 
 from main import external_url
 from models import event_end, event_start, event_year
+from models.cfp import Venue, HUMAN_CFP_TYPES
 
 from . import event_tz
 from .data import _get_proposal_dict, ProposalDict
 
 
 LICENCE = "CC BY-SA 4.0"
+VERSION = "1.0-public"
+
+TRACK_COLOURS = {
+    slug: f"#{md5(human_readable.encode("utf-8")).hexdigest()[:6]}"
+    for slug, human_readable in HUMAN_CFP_TYPES.items()
+}
 
 
 class FrabExporter:
@@ -72,7 +80,6 @@ class FrabExporter:
                 day["rooms"][venue_key] = {
                     "id": event.scheduled_venue.id,
                     "name": event.scheduled_venue.name,
-                    "description": event.scheduled_venue.location,
                     "talks": [],
                 }
 
@@ -87,8 +94,96 @@ class FrabExporter:
 
 
 class FrabJsonExporter(FrabExporter):
+    def __init__(self, schedule, url):
+        super().__init__(schedule)
+        self.url = url
+
     def run(self):
-        raise NotImplementedError
+        return {
+            "$schema": "https://c3voc.de/schedule/schema.json",
+            "schedule": {
+                "url": self.url,
+                "version": VERSION,
+                "base_url": external_url("base.main"),
+                "conference": {
+                    "acronym": f"emf{event_year()}",
+                    "title": f"Electromagnetic Field {event_year()}",
+                    "start": event_start().strftime("%Y-%m-%d"),
+                    "end": event_end().strftime("%Y-%m-%d"),
+                    "daysCount": 3,
+                    "timeslot_duration": "00:10",
+                    "time_zone_name": event_tz.zone,
+                    "rooms": [
+                        {
+                            "name": room.name,
+                            "capacity": room.capacity,
+                        }
+                        for room in Venue.query.order_by(Venue.name).all()
+                    ],
+                    "tracks": [
+                        {
+                            "name": human_readable,
+                            "slug": slug,
+                            "color": TRACK_COLOURS[slug],
+                        }
+                        for slug, human_readable in sorted(HUMAN_CFP_TYPES.items())
+                    ],
+                    "days": [
+                        {
+                            "index": day["index"],
+                            "date": day["start"].strftime("%Y-%m-%d"),
+                            "day_start": day["start"].isoformat(),
+                            "day_end": day["end"].isoformat(),
+                            "rooms": {
+                                room["name"]: [
+                                    {
+                                        "guid": str(uuid5(NAMESPACE_URL, event["link"])),
+                                        "id": event["id"],
+                                        "date": event["start_date"].isoformat(),
+                                        "start": event["start_date"].strftime("%H:%M"),
+                                        "duration": self.format_duration(event["start_date"], event["end_date"]),
+                                        "room": room["name"],
+                                        "slug": "emf{}-{}-{}".format(event_year(), event["id"], event["slug"]),
+                                        "url": event["link"],
+                                        "title": event["title"],
+                                        "subtitle": "",
+                                        "track": HUMAN_CFP_TYPES[event["type"]],
+                                        "type": event["type"],
+                                        "language": "en",
+                                        "abstract": "",
+                                        "description": event["description"],
+                                        "recording_license": LICENCE,
+                                        "do_not_record": bool(event.get("video_privacy") != "public"),
+                                        "persons": [
+                                            {
+                                                "name": event["speaker"],
+                                            }
+                                        ],
+                                        "links": [
+                                            {
+                                                "title": "ccc",
+                                                "url": event["video"]["ccc"],
+                                                "type": "related",
+                                            }
+                                        ] if "ccc" in event.get("video") else
+                                        [
+                                            {
+                                                "title": "youtube",
+                                                "url": event["video"]["youtube"],
+                                                "type": "related",
+                                            }
+                                        ] if "youtube" in event.get("video") else [],
+                                    }
+                                    for event in room["talks"]
+                                ]
+                                for room in day["rooms"]
+                            },
+                        }
+                        for day in self.schedule
+                    ],
+                },
+            },
+        }
 
 
 class FrabXmlExporter(FrabExporter):
@@ -100,7 +195,7 @@ class FrabXmlExporter(FrabExporter):
     def make_root(self):
         root = etree.Element("schedule")
 
-        self._add_sub_with_text(root, "version", "1.0-public")
+        self._add_sub_with_text(root, "version", VERSION)
 
         conference = etree.SubElement(root, "conference")
 
@@ -129,9 +224,7 @@ class FrabXmlExporter(FrabExporter):
         return etree.SubElement(day, "room", name=name)
 
     def add_event(self, room, event: ProposalDict):
-        url = external_url("schedule.item", year=event_year(), proposal_id=event["id"], slug=event["slug"])
-
-        event_node = etree.SubElement(room, "event", id=str(event["id"]), guid=str(uuid5(NAMESPACE_URL, url)))
+        event_node = etree.SubElement(room, "event", id=str(event["id"]), guid=str(uuid5(NAMESPACE_URL, event["link"])))
 
         self._add_sub_with_text(event_node, "room", room.attrib["name"])
         self._add_sub_with_text(event_node, "title", event["title"])
@@ -139,7 +232,7 @@ class FrabXmlExporter(FrabExporter):
         event_type = event.get("type", "talk")
         self._add_sub_with_text(event_node, "type", event_type)
         # infobeamer frab scheduler can color by "track"
-        self._add_sub_with_text(event_node, "track", event_type)
+        self._add_sub_with_text(event_node, "track", HUMAN_CFP_TYPES[event_type])
 
         self._add_sub_with_text(event_node, "date", event["start_date"].isoformat())
         self._add_sub_with_text(event_node, "url", url)
@@ -188,7 +281,7 @@ class FrabXmlExporter(FrabExporter):
             room_node = self.add_day(root, day["index"], day["start"], day["end"])
 
             for venue in day["rooms"]:
-                venue_node = self.add_room(room_node, venue_key)
+                venue_node = self.add_room(room_node, venue["name"])
 
                 for event in venue["talks"]:
                     self.add_event(venue_node, event)

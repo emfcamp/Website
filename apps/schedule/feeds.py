@@ -1,12 +1,12 @@
 import json
 
-from flask import Response, abort, request, redirect
+from flask import Response, abort, request, redirect, jsonify
 from flask import current_app as app
 from flask_cors import cross_origin
 from flask_login import current_user
 from icalendar import Calendar, Event
 
-from main import db, get_or_404
+from main import db, get_or_404, external_url
 from models import event_year
 from models.cfp import Proposal
 from models.user import User
@@ -20,7 +20,7 @@ from .data import (
     _get_upcoming,
 )
 from .historic import feed_historic
-from .frab_exporter import FrabXmlExporter
+from .frab_exporter import FrabXmlExporter, FrabJsonExporter
 
 
 def _format_event_description(event):
@@ -90,6 +90,31 @@ def schedule_frab_xml(year):
     frab = exporter.run()
 
     return Response(frab, mimetype="application/xml")
+
+
+@schedule.route("/schedule/<int:year>.frab.json")
+def schedule_frab_json(year):
+    if year != event_year():
+        return feed_historic(year, "frab_json")
+
+    if not feature_enabled("SCHEDULE"):
+        abort(404)
+
+    schedule = (
+        Proposal.query.filter(
+            Proposal.is_accepted,
+            Proposal.scheduled_time.isnot(None),
+            Proposal.scheduled_venue_id.isnot(None),
+            Proposal.scheduled_duration.isnot(None),
+        )
+        .order_by(Proposal.scheduled_time)
+        .all()
+    )
+
+    exporter = FrabJsonExporter(schedule, external_url("schedule.schedule_frab_json", year=year))
+    frab = exporter.run()
+
+    return Response(json.dumps(frab, indent=4), mimetype="application/json")
 
 
 @schedule.route("/schedule/<int:year>.ical")
