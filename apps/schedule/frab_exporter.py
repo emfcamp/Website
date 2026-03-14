@@ -153,8 +153,8 @@ class FrabJsonExporter(FrabExporter):
                                         "track": HUMAN_CFP_TYPES[event["type"]],
                                         "type": event["type"],
                                         "language": "en",
-                                        "abstract": "",
-                                        "description": event["description"],
+                                        "abstract": event["description"],
+                                        "description": "",
                                         "recording_license": LICENCE,
                                         "do_not_record": bool(event.get("video_privacy") != "public"),
                                         "persons": [
@@ -251,8 +251,8 @@ class FrabXmlExporter(FrabExporter):
         duration = self.format_duration(event["start_date"], event["end_date"])
         self._add_sub_with_text(event_node, "duration", duration)
 
-        self._add_sub_with_text(event_node, "abstract", "")
-        self._add_sub_with_text(event_node, "description", event["description"])
+        self._add_sub_with_text(event_node, "abstract", event["description"])
+        self._add_sub_with_text(event_node, "description", "")
 
         self._add_sub_with_text(
             event_node,
