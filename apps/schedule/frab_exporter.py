@@ -1,9 +1,11 @@
 from collections.abc import Sequence
+from dataclasses import dataclass, field
 from datetime import datetime, time, timedelta
 from functools import cached_property
 from hashlib import md5
 from uuid import NAMESPACE_URL, uuid5
 
+from flask import request
 from lxml import etree
 from lxml.etree import _Element as Element
 
@@ -24,9 +26,30 @@ TRACK_COLOURS = {
 }
 
 
+@dataclass
+class FrabExporterFilter:
+    official_venues_only: bool = False
+    village_id: int | None = None
+    venue_ids: Sequence[int] = field(default_factory=list)
+
+    @classmethod
+    def from_request(cls):
+        official_venues_only = request.args.get("official_venues_only") in {"true", "yes", "1"}
+        venue_ids_raw = request.args.get("venue_ids", "").split(",")
+        venue_ids = [int(id.strip()) for id in venue_ids_raw if id.strip()]
+        village_id_raw = request.args.get("village_id")
+        village_id = int(village_id_raw) if village_id_raw else None
+        return FrabExporterFilter(
+            official_venues_only=official_venues_only,
+            village_id=village_id,
+            venue_ids=venue_ids,
+        )
+
+
 class FrabExporter:
-    def __init__(self, schedule_items: Sequence[ScheduleItem]):
+    def __init__(self, filter: FrabExporterFilter, schedule_items: Sequence[ScheduleItem]):
         self.schedule_items = schedule_items
+        self.filter = filter
 
     def format_duration(self, start_time: datetime, end_time: datetime) -> str:
         duration = (end_time - start_time).total_seconds() / 60
@@ -76,6 +99,15 @@ class FrabExporter:
                 # Safe assertion due to check that state == "scheduled"
                 assert occurrence.scheduled_venue is not None
 
+                if self.filter.official_venues_only and occurrence.scheduled_venue.allows_attendee_content:
+                    continue
+
+                if self.filter.village_id and occurrence.scheduled_venue.village_id != self.filter.village_id:
+                    continue
+
+                if self.filter.venue_ids and occurrence.scheduled_venue.id not in self.filter.venue_ids:
+                    continue
+
                 od = _get_occurrence_dict(filter, occurrence)
                 # TODO: maybe we should type these differently
                 flat_sid = sid.copy()
@@ -113,9 +145,26 @@ class FrabExporter:
 
 
 class FrabJsonExporter(FrabExporter):
-    def __init__(self, schedule_items: Sequence[ScheduleItem], url: str):
-        super().__init__(schedule_items)
+    def __init__(self, filter: FrabExporterFilter, schedule_items: Sequence[ScheduleItem], url: str):
+        super().__init__(filter, schedule_items)
         self.url = url
+
+    @cached_property
+    def venues(self):
+        venues = Venue.query.order_by(Venue.name).all()
+        result = []
+        for venue in venues:
+            if self.filter.official_venues_only and venue.allows_attendee_content:
+                continue
+
+            if self.filter.village_id and venue.village_id != self.filter.village_id:
+                continue
+
+            if self.filter.venue_ids and venue.id not in self.filter.venue_ids:
+                continue
+
+            result.append(venue)
+        return result
 
     def run(self):
         return {
@@ -134,10 +183,10 @@ class FrabJsonExporter(FrabExporter):
                     "time_zone_name": event_tz.zone,
                     "rooms": [
                         {
-                            "name": room.name,
-                            "capacity": room.capacity,
+                            "name": venue.name,
+                            "capacity": venue.capacity,
                         }
-                        for room in Venue.query.order_by(Venue.name).all()
+                        for venue in self.venues
                     ],
                     "tracks": [
                         {

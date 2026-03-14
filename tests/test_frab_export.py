@@ -5,7 +5,7 @@ from lxml import etree
 
 from apps.schedule import event_tz
 from apps.schedule.data import OccurrenceDict, ScheduleItemDict
-from apps.schedule.frab_exporter import FrabExporter, FrabXmlExporter
+from apps.schedule.frab_exporter import FrabExporter, FrabExporterFilter, FrabXmlExporter
 
 
 def _local_datetime(*args):
@@ -28,7 +28,7 @@ def test_empty_frab_schema_fails(frab_schema):
 
 
 def test_min_version_is_valid(frab_schema, request_context):
-    exporter = FrabXmlExporter([])
+    exporter = FrabXmlExporter(FrabExporterFilter(), [])
     root = exporter.make_root()
     exporter.add_day(
         root,
@@ -41,7 +41,7 @@ def test_min_version_is_valid(frab_schema, request_context):
 
 
 def test_simple_room(frab_schema, request_context):
-    exporter = FrabXmlExporter([])
+    exporter = FrabXmlExporter(FrabExporterFilter(), [])
     root = exporter.make_root()
     day = exporter.add_day(
         root,
@@ -55,7 +55,7 @@ def test_simple_room(frab_schema, request_context):
 
 
 def test_simple_event(frab_schema, request_context):
-    exporter = FrabXmlExporter([])
+    exporter = FrabXmlExporter(FrabExporterFilter(), [])
     root = exporter.make_root()
     day = exporter.add_day(
         root,
@@ -196,7 +196,7 @@ def test_simple_event(frab_schema, request_context):
 
 
 def test_get_duration():
-    exporter = FrabExporter([])
+    exporter = FrabExporter(FrabExporterFilter(), [])
     start = datetime(2016, 8, 15, 11, 0)
     stop = datetime(2016, 8, 15, 11, 30)
     assert exporter.format_duration(start, stop) == "0:30"

@@ -1,6 +1,6 @@
 import json
 
-from flask import Response, abort, redirect, request
+from flask import Response, abort, redirect, request, url_for
 from flask import current_app as app
 from flask.typing import ResponseReturnValue
 from flask_cors import cross_origin
@@ -24,7 +24,7 @@ from .data import (
     get_schedule_items,
     get_upcoming,
 )
-from .frab_exporter import FrabJsonExporter, FrabXmlExporter
+from .frab_exporter import FrabExporterFilter, FrabJsonExporter, FrabXmlExporter
 from .historic import feed_historic
 
 
@@ -103,7 +103,9 @@ def schedule_frab_xml(year):
         ).unique()
     )
 
-    exporter = FrabXmlExporter(schedule_items)
+    filter = FrabExporterFilter.from_request()
+
+    exporter = FrabXmlExporter(filter, schedule_items)
     frab = exporter.run()
 
     return Response(frab, mimetype="application/xml")
@@ -131,7 +133,9 @@ def schedule_frab_json(year):
         ).unique()
     )
 
-    exporter = FrabJsonExporter(schedule_items, external_url("schedule.schedule_frab_json", year=year))
+    filter = FrabExporterFilter.from_request()
+
+    exporter = FrabJsonExporter(filter, schedule_items, external_url("schedule.schedule_frab_json", year=year))
     frab = exporter.run()
 
     return Response(json.dumps(frab, indent=4), mimetype="application/json")
