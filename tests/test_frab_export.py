@@ -199,8 +199,8 @@ def test_get_duration():
     exporter = FrabExporter([])
     start = datetime(2016, 8, 15, 11, 0)
     stop = datetime(2016, 8, 15, 11, 30)
-    assert exporter.get_duration(start, stop) == "0:30"
+    assert exporter.format_duration(start, stop) == "0:30"
     stop = datetime(2016, 8, 15, 11, 5)
-    assert exporter.get_duration(start, stop) == "0:05"
+    assert exporter.format_duration(start, stop) == "0:05"
     stop = datetime(2016, 8, 15, 12, 0)
-    assert exporter.get_duration(start, stop) == "1:00"
+    assert exporter.format_duration(start, stop) == "1:00"
