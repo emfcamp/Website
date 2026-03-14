@@ -1,6 +1,6 @@
 import json
 
-from flask import Response, abort, request
+from flask import Response, abort, request, redirect
 from flask import current_app as app
 from flask.typing import ResponseReturnValue
 from flask_cors import cross_origin
@@ -73,6 +73,14 @@ def schedule_json(year: int) -> ResponseReturnValue:
 
 @schedule.route("/schedule/<int:year>.frab")
 def schedule_frab(year: int) -> ResponseReturnValue:
+    if year != event_year():
+        return feed_historic(year, "frab")
+
+    return redirect("schedule.schedule_frab_xml", year=year)
+
+
+@schedule.route("/schedule/<int:year>.frab.xml")
+def schedule_frab_xml(year):
     if year != event_year():
         return feed_historic(year, "frab")
 
