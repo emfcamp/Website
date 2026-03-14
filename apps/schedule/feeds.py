@@ -1,6 +1,6 @@
 import json
 
-from flask import Response, abort, request, redirect, jsonify
+from flask import Response, abort, redirect, request
 from flask import current_app as app
 from flask.typing import ResponseReturnValue
 from flask_cors import cross_origin
@@ -8,7 +8,7 @@ from flask_login import current_user
 from icalendar import Calendar, Event
 from sqlalchemy import select
 
-from main import db, get_or_404, external_url
+from main import db, external_url, get_or_404
 from models import event_year
 from models.cfp import Occurrence, ScheduleItem
 from models.user import User
@@ -24,8 +24,8 @@ from .data import (
     get_schedule_items,
     get_upcoming,
 )
+from .frab_exporter import FrabJsonExporter, FrabXmlExporter
 from .historic import feed_historic
-from .frab_exporter import FrabXmlExporter, FrabJsonExporter
 
 
 def _format_event_description(flat_sid: ScheduleItemDict) -> str:

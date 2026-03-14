@@ -1,26 +1,25 @@
 from collections.abc import Sequence
 from datetime import datetime, time, timedelta
 from functools import cached_property
-from uuid import NAMESPACE_URL, uuid5
 from hashlib import md5
+from uuid import NAMESPACE_URL, uuid5
 
 from lxml import etree
 from lxml.etree import _Element as Element
 
 from main import external_url
 from models import event_end, event_start, event_year
-from models.cfp import ScheduleItem, Venue, SCHEDULE_ITEM_INFOS
+from models.cfp import SCHEDULE_ITEM_INFOS, ScheduleItem, Venue
 
 from . import event_tz
-from .data import _get_occurrence_dict, _get_schedule_item_dict, ScheduleItemDict, ScheduleFilter
-
+from .data import ScheduleFilter, ScheduleItemDict, _get_occurrence_dict, _get_schedule_item_dict
 
 # Default licence for recordings
 LICENCE = "CC BY-SA 4.0"
 VERSION = "1.0-public"
 
 TRACK_COLOURS = {
-    type_info.type: f"#{md5(type_info.human_type.encode("utf-8")).hexdigest()[:6]}"
+    type_info.type: f"#{md5(type_info.human_type.encode('utf-8')).hexdigest()[:6]}"
     for type_info in SCHEDULE_ITEM_INFOS.values()
 }
 
@@ -95,7 +94,7 @@ class FrabExporter:
                     }
                     index += 1
 
-                day = days_dict[day_key]
+                day = data[day_key]
                 if venue_key not in day["rooms"]:
                     day["rooms"][venue_key] = {
                         "id": occurrence.scheduled_venue.id,
@@ -108,7 +107,7 @@ class FrabExporter:
         for day in data.values():
             day["rooms"] = sorted(
                 day["rooms"].values(),
-                key=lambda room: r["id"],
+                key=lambda room: room["id"],
             )
         return data.values()
 
@@ -166,7 +165,9 @@ class FrabJsonExporter(FrabExporter):
                                             flat_sid["occurrences"][0]["end_date"],
                                         ),
                                         "room": room["name"],
-                                        "slug": "emf{}-{}-{}".format(event_year(), flat_sid["id"], flat_sid["slug"]),
+                                        "slug": "emf{}-{}-{}".format(
+                                            event_year(), flat_sid["id"], flat_sid["slug"]
+                                        ),
                                         "url": flat_sid["link"],
                                         "title": flat_sid["title"],
                                         "subtitle": "",
@@ -190,14 +191,17 @@ class FrabJsonExporter(FrabExporter):
                                                 "url": flat_sid["occurrences"][0]["ccc_url"],
                                                 "type": "related",
                                             }
-                                        ] if "ccc_url" in flat_sid else
-                                        [
+                                        ]
+                                        if "ccc_url" in flat_sid
+                                        else [
                                             {
                                                 "title": "youtube",
                                                 "url": flat_sid["occurrences"][0]["youtube_url"],
                                                 "type": "related",
                                             }
-                                        ] if "youtube" in flat_sid else [],
+                                        ]
+                                        if "youtube" in flat_sid
+                                        else [],
                                     }
                                     for flat_sid in room["talks"]
                                 ]
