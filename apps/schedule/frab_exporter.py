@@ -2,13 +2,14 @@ from collections.abc import Sequence
 from datetime import datetime, time, timedelta
 from functools import cached_property
 from uuid import NAMESPACE_URL, uuid5
+from hashlib import md5
 
 from lxml import etree
 from lxml.etree import _Element as Element
 
 from main import external_url
 from models import event_end, event_start, event_year
-from models.cfp import ScheduleItem
+from models.cfp import ScheduleItem, Venue, SCHEDULE_ITEM_INFOS
 
 from . import event_tz
 from .data import _get_occurrence_dict, _get_schedule_item_dict, ScheduleItemDict, ScheduleFilter
@@ -16,6 +17,12 @@ from .data import _get_occurrence_dict, _get_schedule_item_dict, ScheduleItemDic
 
 # Default licence for recordings
 LICENCE = "CC BY-SA 4.0"
+VERSION = "1.0-public"
+
+TRACK_COLOURS = {
+    type_info.type: f"#{md5(type_info.human_type.encode("utf-8")).hexdigest()[:6]}"
+    for type_info in SCHEDULE_ITEM_INFOS.values()
+}
 
 
 class FrabExporter:
@@ -93,7 +100,6 @@ class FrabExporter:
                     day["rooms"][venue_key] = {
                         "id": occurrence.scheduled_venue.id,
                         "name": occurrence.scheduled_venue.name,
-                        "description": occurrence.scheduled_venue.location,
                         "talks": [],
                     }
 
@@ -108,8 +114,101 @@ class FrabExporter:
 
 
 class FrabJsonExporter(FrabExporter):
+    def __init__(self, schedule_items: Sequence[ScheduleItem], url: str):
+        super().__init__(schedule_items)
+        self.url = url
+
     def run(self):
-        raise NotImplementedError
+        return {
+            "$schema": "https://c3voc.de/schedule/schema.json",
+            "schedule": {
+                "url": self.url,
+                "version": VERSION,
+                "base_url": external_url("base.main"),
+                "conference": {
+                    "acronym": f"emf{event_year()}",
+                    "title": f"Electromagnetic Field {event_year()}",
+                    "start": event_start().strftime("%Y-%m-%d"),
+                    "end": event_end().strftime("%Y-%m-%d"),
+                    "daysCount": 3,
+                    "timeslot_duration": "00:10",
+                    "time_zone_name": event_tz.zone,
+                    "rooms": [
+                        {
+                            "name": room.name,
+                            "capacity": room.capacity,
+                        }
+                        for room in Venue.query.order_by(Venue.name).all()
+                    ],
+                    "tracks": [
+                        {
+                            "name": type_info.human_type,
+                            "slug": type_info.type,
+                            "color": TRACK_COLOURS[type_info.type],
+                        }
+                        for type_info in SCHEDULE_ITEM_INFOS.values()
+                    ],
+                    "days": [
+                        {
+                            "index": day["index"],
+                            "date": day["start"].strftime("%Y-%m-%d"),
+                            "day_start": day["start"].isoformat(),
+                            "day_end": day["end"].isoformat(),
+                            "rooms": {
+                                room["name"]: [
+                                    {
+                                        "guid": str(uuid5(NAMESPACE_URL, flat_sid["link"])),
+                                        "id": flat_sid["id"],
+                                        "date": flat_sid["occurrences"][0]["start_date"].isoformat(),
+                                        "start": flat_sid["occurrences"][0]["start_date"].strftime("%H:%M"),
+                                        "duration": self.format_duration(
+                                            flat_sid["occurrences"][0]["start_date"],
+                                            flat_sid["occurrences"][0]["end_date"],
+                                        ),
+                                        "room": room["name"],
+                                        "slug": "emf{}-{}-{}".format(event_year(), flat_sid["id"], flat_sid["slug"]),
+                                        "url": flat_sid["link"],
+                                        "title": flat_sid["title"],
+                                        "subtitle": "",
+                                        "track": SCHEDULE_ITEM_INFOS[flat_sid["type"]].human_type,
+                                        "type": flat_sid["type"],
+                                        "language": "en",
+                                        "abstract": "",
+                                        "description": flat_sid["description"],
+                                        "recording_license": LICENCE,
+                                        "do_not_record": bool(
+                                            flat_sid["occurrences"][0]["video_privacy"] != "public"
+                                        ),
+                                        "persons": [
+                                            {
+                                                "name": flat_sid["names"],
+                                            }
+                                        ],
+                                        "links": [
+                                            {
+                                                "title": "ccc",
+                                                "url": flat_sid["occurrences"][0]["ccc_url"],
+                                                "type": "related",
+                                            }
+                                        ] if "ccc_url" in flat_sid else
+                                        [
+                                            {
+                                                "title": "youtube",
+                                                "url": flat_sid["occurrences"][0]["youtube_url"],
+                                                "type": "related",
+                                            }
+                                        ] if "youtube" in flat_sid else [],
+                                    }
+                                    for flat_sid in room["talks"]
+                                ]
+                                for room in day["rooms"]
+                            },
+                        }
+                        for day in self.schedule
+                    ],
+                },
+            },
+        }
 
 
 class FrabXmlExporter(FrabExporter):
@@ -121,7 +220,7 @@ class FrabXmlExporter(FrabExporter):
     def make_root(self) -> Element:
         root = etree.Element("schedule")
 
-        self._add_sub_with_text(root, "version", "1.0-public")
+        self._add_sub_with_text(root, "version", VERSION)
 
         conference = etree.SubElement(root, "conference")
 
@@ -161,7 +260,7 @@ class FrabXmlExporter(FrabExporter):
 
         self._add_sub_with_text(event, "type", flat_sid["type"])
         # infobeamer frab scheduler can color by "track"
-        self._add_sub_with_text(event, "track", flat_sid["type"])
+        self._add_sub_with_text(event, "track", SCHEDULE_ITEM_INFOS[flat_sid["type"]].human_type)
 
         self._add_sub_with_text(event, "date", flat_sid["occurrences"][0]["start_date"].isoformat())
 
@@ -225,9 +324,9 @@ class FrabXmlExporter(FrabExporter):
             day = self.add_day(root, schedule_day["index"], schedule_day["start"], schedule_day["end"])
 
             for schedule_venue in schedule_day["rooms"]:
-                room = self.add_room(day, venue_key)
+                room = self.add_room(day, schedule_venue["name"])
 
                 for schedule_event in schedule_venue["talks"]:
-                    self.add_event(room, venue_key, schedule_event)
+                    self.add_event(room, schedule_venue["name"], schedule_event)
 
         return etree.tostring(root)
