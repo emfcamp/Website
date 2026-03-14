@@ -1,26 +1,27 @@
 from collections.abc import Sequence
 from datetime import datetime, time, timedelta
-from functools import cache
-from typing import Any
+from functools import cached_property
 from uuid import NAMESPACE_URL, uuid5
 
 from lxml import etree
 from lxml.etree import _Element as Element
 
-from apps.schedule.data import ScheduleItemDict
 from main import external_url
 from models import event_end, event_start, event_year
+from models.cfp import ScheduleItem
 
 from . import event_tz
+from .data import _get_occurrence_dict, _get_schedule_item_dict, ScheduleItemDict, ScheduleFilter
+
+
+# Default licence for recordings
+LICENCE = "CC BY-SA 4.0"
 
 
 class FrabExporter:
-    flat_sids: Sequence[ScheduleItemDict]
+    def __init__(self, schedule_items: Sequence[ScheduleItem]):
+        self.schedule_items = schedule_items
 
-    def __init__(self, flat_sids: Sequence[ScheduleItemDict]):
-        self.flat_sids = flat_sids
-
-    @cache
     def format_duration(self, start_time: datetime, end_time: datetime) -> str:
         duration = (end_time - start_time).total_seconds() / 60
         hours = int(duration // 60)
@@ -31,7 +32,6 @@ class FrabExporter:
         hours = int(hours % 24)
         return f"{days:d}:{hours:02d}:{minutes:02d}"
 
-    @cache
     def get_day_start_end(self, dt: datetime, start_time: time = time(4, 0)) -> tuple[datetime, datetime]:
         # A day changeover of 4am allows us to have late events.
         # All in local time because that's what people deal in.
@@ -48,6 +48,63 @@ class FrabExporter:
         end_dt = event_tz.localize(end_dt)
 
         return start_dt, end_dt
+
+    @cached_property
+    def schedule(self):
+        # This is basically a reimplementation of get_schedule_item_dicts_flat
+        # TODO: it might be better to use the ScheduleItem/Occurrences directly
+        if not self.schedule_items:
+            return []
+
+        # Empty filter
+        filter = ScheduleFilter()
+
+        data = {}
+        index = 0
+        for schedule_item in self.schedule_items:
+            sid = _get_schedule_item_dict(filter, schedule_item)
+            for occurrence in schedule_item.occurrences:
+                if occurrence.state != "scheduled":
+                    continue
+
+                # Safe assertion due to check that state == "scheduled"
+                assert occurrence.scheduled_venue is not None
+
+                od = _get_occurrence_dict(filter, occurrence)
+                # TODO: maybe we should type these differently
+                flat_sid = sid.copy()
+                flat_sid["occurrences"] = [od]
+
+                day_start, day_end = self.get_day_start_end(od["start_date"])
+                day_key = day_start.strftime("%Y-%m-%d")
+                venue_key = occurrence.scheduled_venue.name
+
+                if day_key not in data:
+                    data[day_key] = {
+                        "index": index,
+                        "start": day_start,
+                        "end": day_end,
+                        "rooms": {},
+                    }
+                    index += 1
+
+                day = days_dict[day_key]
+                if venue_key not in day["rooms"]:
+                    day["rooms"][venue_key] = {
+                        "id": occurrence.scheduled_venue.id,
+                        "name": occurrence.scheduled_venue.name,
+                        "description": occurrence.scheduled_venue.location,
+                        "talks": [],
+                    }
+
+                day["rooms"][venue_key]["talks"].append(flat_sid)
+
+        for day in data.values():
+            day["rooms"] = sorted(
+                day["rooms"].values(),
+                key=lambda room: r["id"],
+            )
+        return data.values()
 
 
 class FrabJsonExporter(FrabExporter):
@@ -74,6 +131,8 @@ class FrabXmlExporter(FrabExporter):
         self._add_sub_with_text(conference, "end", event_end().strftime("%Y-%m-%d"))
         self._add_sub_with_text(conference, "days", "3")
         self._add_sub_with_text(conference, "timeslot_duration", "00:10")
+        self._add_sub_with_text(conference, "time_zone_name", event_tz.zone)
+        self._add_sub_with_text(conference, "url", external_url("base.main"))
 
         return root
 
@@ -114,13 +173,13 @@ class FrabXmlExporter(FrabExporter):
 
         self._add_sub_with_text(event, "start", flat_sid["occurrences"][0]["start_date"].strftime("%H:%M"))
 
-        duration = self.get_duration(
+        duration = self.format_duration(
             flat_sid["occurrences"][0]["start_date"], flat_sid["occurrences"][0]["end_date"]
         )
         self._add_sub_with_text(event, "duration", duration)
 
-        self._add_sub_with_text(event, "abstract", flat_sid["description"])
-        self._add_sub_with_text(event, "description", "")
+        self._add_sub_with_text(event, "abstract", "")
+        self._add_sub_with_text(event, "description", flat_sid["description"])
 
         slug = "emf{}-{}-{}-{}".format(
             event_year(), flat_sid["id"], flat_sid["slug"], flat_sid["occurrences"][0]["occurrence_num"]
@@ -145,39 +204,30 @@ class FrabXmlExporter(FrabExporter):
     def add_recording(self, event: Element, flat_sid: ScheduleItemDict) -> Element:
         recording = etree.SubElement(event, "recording")
 
-        self._add_sub_with_text(recording, "license", "CC BY-SA 4.0")
-        self._add_sub_with_text(
-            recording,
-            "optout",
-            "false" if flat_sid["occurrences"][0]["video_privacy"] == "public" else "true",
-        )
-        if "ccc_url" in flat_sid["occurrences"][0]:
-            self._add_sub_with_text(recording, "url", flat_sid["occurrences"][0]["ccc_url"])
-        elif "youtube_url" in flat_sid["occurrences"][0]:
-            self._add_sub_with_text(recording, "url", flat_sid["occurrences"][0]["youtube_url"])
+        od = flat_sid["occurrences"][0]
+        if od["video_privacy"] == "public":
+            self._add_sub_with_text(recording, "license", LICENCE)
+            self._add_sub_with_text(recording, "optout", "false")
+            if "ccc_url" in od:
+                self._add_sub_with_text(recording, "url", od["ccc_url"])
+            elif "youtube_url" in flat_sid["occurrences"][0]:
+                self._add_sub_with_text(recording, "url", od["youtube_url"])
+
+        else:
+            self._add_sub_with_text(recording, "optout", "true")
 
         return recording
 
     def run(self) -> bytes:
         root: Element = self.make_root()
-        days_dict: dict[str, dict[str, Any]] = {}
-        index: int = 0
 
-        for flat_sid in self.flat_sids:
-            day_start, day_end = self.get_day_start_end(flat_sid["occurrences"][0]["start_date"])
-            day_key = day_start.strftime("%Y-%m-%d")
-            venue_key = flat_sid["occurrences"][0]["venue"]
+        for schedule_day in self.schedule:
+            day = self.add_day(root, schedule_day["index"], schedule_day["start"], schedule_day["end"])
 
-            if day_key not in days_dict:
-                index += 1
-                node = self.add_day(root, index, day_start, day_end)
-                days_dict[day_key] = {"node": node, "rooms": {}}
+            for schedule_venue in schedule_day["rooms"]:
+                room = self.add_room(day, venue_key)
 
-            day = days_dict[day_key]
-
-            if venue_key not in day["rooms"]:
-                day["rooms"][venue_key] = self.add_room(day["node"], venue_key)
-
-            self.add_event(day["rooms"][venue_key], venue_key, flat_sid)
+                for schedule_event in schedule_venue["talks"]:
+                    self.add_event(room, venue_key, schedule_event)
 
         return etree.tostring(root)

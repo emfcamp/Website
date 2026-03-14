@@ -95,11 +95,7 @@ def schedule_frab(year: int) -> ResponseReturnValue:
         ).unique()
     )
 
-    # Empty filter
-    filter = ScheduleFilter()
-    flat_sids = [flat_sid for si in schedule_items for flat_sid in get_schedule_item_dicts_flat(filter, si)]
-
-    exporter = FrabXmlExporter(flat_sids)
+    exporter = FrabXmlExporter(schedule_items)
     frab = exporter.run()
 
     return Response(frab, mimetype="application/xml")
