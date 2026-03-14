@@ -20,7 +20,7 @@ from .data import (
     _get_upcoming,
 )
 from .historic import feed_historic
-from .schedule_xml import export_frab
+from .frab_exporter import FrabXmlExporter
 
 
 def _format_event_description(event):
@@ -78,9 +78,8 @@ def schedule_frab(year):
         .all()
     )
 
-    schedule = [_get_proposal_dict(p, []) for p in schedule]
-
-    frab = export_frab(schedule)
+    exporter = FrabXmlExporter([_get_proposal_dict(p, []) for p in schedule])
+    frab = exporter.run()
 
     return Response(frab, mimetype="application/xml")
 
