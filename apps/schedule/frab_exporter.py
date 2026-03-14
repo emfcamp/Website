@@ -174,8 +174,8 @@ class FrabJsonExporter(FrabExporter):
                                         "track": SCHEDULE_ITEM_INFOS[flat_sid["type"]].human_type,
                                         "type": flat_sid["type"],
                                         "language": "en",
-                                        "abstract": "",
-                                        "description": flat_sid["description"],
+                                        "abstract": flat_sid["description"],
+                                        "description": "",
                                         "recording_license": LICENCE,
                                         "do_not_record": bool(
                                             flat_sid["occurrences"][0]["video_privacy"] != "public"
@@ -281,8 +281,8 @@ class FrabXmlExporter(FrabExporter):
         )
         self._add_sub_with_text(event, "duration", duration)
 
-        self._add_sub_with_text(event, "abstract", "")
-        self._add_sub_with_text(event, "description", flat_sid["description"])
+        self._add_sub_with_text(event, "abstract", flat_sid["description"])
+        self._add_sub_with_text(event, "description", "")
 
         slug = "emf{}-{}-{}-{}".format(
             event_year(), flat_sid["id"], flat_sid["slug"], flat_sid["occurrences"][0]["occurrence_num"]
