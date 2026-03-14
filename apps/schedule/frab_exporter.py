@@ -306,10 +306,10 @@ class FrabXmlExporter(FrabExporter):
 
     def add_recording(self, event: Element, flat_sid: ScheduleItemDict) -> Element:
         recording = etree.SubElement(event, "recording")
+        self._add_sub_with_text(recording, "license", LICENCE)
 
         od = flat_sid["occurrences"][0]
         if od["video_privacy"] == "public":
-            self._add_sub_with_text(recording, "license", LICENCE)
             self._add_sub_with_text(recording, "optout", "false")
             if "ccc_url" in od:
                 self._add_sub_with_text(recording, "url", od["ccc_url"])
