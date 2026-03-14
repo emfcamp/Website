@@ -271,10 +271,10 @@ class FrabXmlExporter(FrabExporter):
 
     def add_recording(self, event_node, event):
         recording_node = etree.SubElement(event_node, "recording")
+        self._add_sub_with_text(recording_node, "license", LICENCE)
 
         if event.get("video_privacy") == "public":
             video = event.get("video", {})
-            self._add_sub_with_text(recording_node, "license", LICENCE)
             self._add_sub_with_text(recording_node, "optout", "false")
             if "ccc" in video:
                 self._add_sub_with_text(recording_node, "url", video["ccc"])
