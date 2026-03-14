@@ -1,23 +1,22 @@
 from datetime import datetime, time, timedelta
 from functools import cached_property
-from uuid import NAMESPACE_URL, uuid5
 from hashlib import md5
+from uuid import NAMESPACE_URL, uuid5
 
 from lxml import etree
 
 from main import external_url
 from models import event_end, event_start, event_year
-from models.cfp import Venue, HUMAN_CFP_TYPES
+from models.cfp import HUMAN_CFP_TYPES, Venue
 
 from . import event_tz
-from .data import _get_proposal_dict, ProposalDict
-
+from .data import ProposalDict, _get_proposal_dict
 
 LICENCE = "CC BY-SA 4.0"
 VERSION = "1.0-public"
 
 TRACK_COLOURS = {
-    slug: f"#{md5(human_readable.encode("utf-8")).hexdigest()[:6]}"
+    slug: f"#{md5(human_readable.encode('utf-8')).hexdigest()[:6]}"
     for slug, human_readable in HUMAN_CFP_TYPES.items()
 }
 
@@ -61,7 +60,7 @@ class FrabExporter:
         data = {}
         index = 0
         for event in self._schedule:
-            event_dict = _get_proposal_dict(event)
+            event_dict = _get_proposal_dict(event, [])
             day_start, day_end = self.get_day_start_end(event_dict["start_date"])
             day_key = day_start.strftime("%Y-%m-%d")
             venue_key = event.scheduled_venue.name
@@ -75,7 +74,7 @@ class FrabExporter:
                 }
                 index += 1
 
-            day = days_dict[day_key]
+            day = data[day_key]
             if venue_key not in day["rooms"]:
                 day["rooms"][venue_key] = {
                     "id": event.scheduled_venue.id,
@@ -88,7 +87,7 @@ class FrabExporter:
         for day in data.values():
             day["rooms"] = sorted(
                 day["rooms"].values(),
-                key=lambda room: r["id"],
+                key=lambda room: room["id"],
             )
         return data.values()
 
@@ -141,9 +140,13 @@ class FrabJsonExporter(FrabExporter):
                                         "id": event["id"],
                                         "date": event["start_date"].isoformat(),
                                         "start": event["start_date"].strftime("%H:%M"),
-                                        "duration": self.format_duration(event["start_date"], event["end_date"]),
+                                        "duration": self.format_duration(
+                                            event["start_date"], event["end_date"]
+                                        ),
                                         "room": room["name"],
-                                        "slug": "emf{}-{}-{}".format(event_year(), event["id"], event["slug"]),
+                                        "slug": "emf{}-{}-{}".format(
+                                            event_year(), event["id"], event["slug"]
+                                        ),
                                         "url": event["link"],
                                         "title": event["title"],
                                         "subtitle": "",
@@ -165,14 +168,17 @@ class FrabJsonExporter(FrabExporter):
                                                 "url": event["video"]["ccc"],
                                                 "type": "related",
                                             }
-                                        ] if "ccc" in event.get("video") else
-                                        [
+                                        ]
+                                        if "ccc" in event.get("video")
+                                        else [
                                             {
                                                 "title": "youtube",
                                                 "url": event["video"]["youtube"],
                                                 "type": "related",
                                             }
-                                        ] if "youtube" in event.get("video") else [],
+                                        ]
+                                        if "youtube" in event.get("video")
+                                        else [],
                                     }
                                     for event in room["talks"]
                                 ]
@@ -224,7 +230,9 @@ class FrabXmlExporter(FrabExporter):
         return etree.SubElement(day, "room", name=name)
 
     def add_event(self, room, event: ProposalDict):
-        event_node = etree.SubElement(room, "event", id=str(event["id"]), guid=str(uuid5(NAMESPACE_URL, event["link"])))
+        event_node = etree.SubElement(
+            room, "event", id=str(event["id"]), guid=str(uuid5(NAMESPACE_URL, event["link"]))
+        )
 
         self._add_sub_with_text(event_node, "room", room.attrib["name"])
         self._add_sub_with_text(event_node, "title", event["title"])
@@ -235,7 +243,7 @@ class FrabXmlExporter(FrabExporter):
         self._add_sub_with_text(event_node, "track", HUMAN_CFP_TYPES[event_type])
 
         self._add_sub_with_text(event_node, "date", event["start_date"].isoformat())
-        self._add_sub_with_text(event_node, "url", url)
+        self._add_sub_with_text(event_node, "url", event["link"])
 
         # Start time
         self._add_sub_with_text(event_node, "start", event["start_date"].strftime("%H:%M"))

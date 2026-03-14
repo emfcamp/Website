@@ -4,7 +4,7 @@ import pytest
 from lxml import etree
 
 from apps.schedule import event_tz
-from apps.schedule.frab_exporter import FrabXmlExporter, FrabExporter
+from apps.schedule.frab_exporter import FrabExporter, FrabXmlExporter
 
 
 def _local_datetime(*args):
@@ -81,7 +81,7 @@ def test_simple_event(frab_schema, request_context):
 
 
 # TODO rework this. FrabExporter now wants a QuerySet instead of a dict
-#def test_export_frab(frab_schema, request_context):
+# def test_export_frab(frab_schema, request_context):
 #    events = [
 #        {
 #            "id": 1,
@@ -136,7 +136,7 @@ def test_simple_event(frab_schema, request_context):
 
 
 def test_get_duration():
-    exporter = Frabxporter([])
+    exporter = FrabExporter([])
     start = datetime(2016, 8, 15, 11, 0)
     stop = datetime(2016, 8, 15, 11, 30)
     assert exporter.get_duration(start, stop) == "0:30"

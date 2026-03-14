@@ -1,26 +1,21 @@
 import json
 
-from flask import Response, abort, request, redirect, jsonify
+from flask import Response, abort, redirect, request
 from flask import current_app as app
 from flask_cors import cross_origin
 from flask_login import current_user
 from icalendar import Calendar, Event
 
-from main import db, get_or_404, external_url
+from main import db, external_url, get_or_404
 from models import event_year
 from models.cfp import Proposal
 from models.user import User
 
 from ..common import feature_enabled, feature_flag, json_response
 from . import schedule
-from .data import (
-    _convert_time_to_str,
-    _get_proposal_dict,
-    _get_scheduled_proposals,
-    _get_upcoming,
-)
+from .data import _convert_time_to_str, _get_proposal_dict, _get_scheduled_proposals, _get_upcoming
+from .frab_exporter import FrabJsonExporter, FrabXmlExporter
 from .historic import feed_historic
-from .frab_exporter import FrabXmlExporter, FrabJsonExporter
 
 
 def _format_event_description(event):
