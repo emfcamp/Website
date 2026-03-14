@@ -59,7 +59,7 @@ def schedule_frab(year):
     if year != event_year():
         return feed_historic(year, "frab")
 
-    return redirect("schedule.schedule_frab_xml", year=year)
+    return redirect(url_for("schedule.schedule_frab_xml", year=year))
 
 
 @schedule.route("/schedule/<int:year>.frab.xml")
