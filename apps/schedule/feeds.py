@@ -78,7 +78,7 @@ def schedule_frab(year):
         .all()
     )
 
-    exporter = FrabXmlExporter([_get_proposal_dict(p, []) for p in schedule])
+    exporter = FrabXmlExporter(schedule)
     frab = exporter.run()
 
     return Response(frab, mimetype="application/xml")

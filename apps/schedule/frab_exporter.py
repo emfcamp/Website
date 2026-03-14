@@ -1,5 +1,5 @@
 from datetime import datetime, time, timedelta
-from functools import cache
+from functools import cached_property
 from uuid import NAMESPACE_URL, uuid5
 
 from lxml import etree
@@ -8,13 +8,16 @@ from main import external_url
 from models import event_end, event_start, event_year
 
 from . import event_tz
+from .data import _get_proposal_dict, ProposalDict
+
+
+LICENCE = "CC BY-SA 4.0"
 
 
 class FrabExporter:
     def __init__(self, schedule):
-        self.schedule = schedule
+        self._schedule = schedule
 
-    @cache
     def format_duration(self, start_time: datetime, end_time: datetime) -> timedelta:
         # str(timedelta) creates e.g. hrs:min:sec...
         duration = (end_time - start_time).total_seconds() / 60
@@ -26,8 +29,7 @@ class FrabExporter:
         hours = int(hours % 24)
         return f"{days:d}:{hours:02d}:{minutes:02d}"
 
-    @cache
-    def get_day_start_end(dt, start_time=time(4, 0)):
+    def get_day_start_end(dt: datetime, start_time=time(4, 0)):
         # A day changeover of 4am allows us to have late events.
         # All in local time because that's what people deal in.
         start_date = dt.date()
@@ -43,6 +45,45 @@ class FrabExporter:
         end_dt = event_tz.localize(end_dt)
 
         return start_dt, end_dt
+
+    @cached_property
+    def schedule(self):
+        if not self._schedule:
+            return []
+        data = {}
+        index = 0
+        for event in self._schedule:
+            event_dict = _get_proposal_dict(event)
+            day_start, day_end = self.get_day_start_end(event_dict["start_date"])
+            day_key = day_start.strftime("%Y-%m-%d")
+            venue_key = event.scheduled_venue.name
+
+            if day_key not in data:
+                data[day_key] = {
+                    "index": index,
+                    "start": day_start,
+                    "end": day_end,
+                    "rooms": {},
+                }
+                index += 1
+
+            day = days_dict[day_key]
+            if venue_key not in day["rooms"]:
+                day["rooms"][venue_key] = {
+                    "id": event.scheduled_venue.id,
+                    "name": event.scheduled_venue.name,
+                    "description": event.scheduled_venue.location,
+                    "talks": [],
+                }
+
+            day["rooms"][venue_key]["talks"].append(event_dict)
+
+        for day in data.values():
+            day["rooms"] = sorted(
+                day["rooms"].values(),
+                key=lambda room: r["id"],
+            )
+        return data.values()
 
 
 class FrabJsonExporter(FrabExporter):
@@ -69,6 +110,8 @@ class FrabXmlExporter(FrabExporter):
         self._add_sub_with_text(conference, "end", event_end().strftime("%Y-%m-%d"))
         self._add_sub_with_text(conference, "days", "3")
         self._add_sub_with_text(conference, "timeslot_duration", "00:10")
+        self._add_sub_with_text(conference, "time_zone_name", event_tz.zone)
+        self._add_sub_with_text(conference, "url", external_url("base.main"))
 
         return root
 
@@ -85,7 +128,7 @@ class FrabXmlExporter(FrabExporter):
     def add_room(self, day, name):
         return etree.SubElement(day, "room", name=name)
 
-    def add_event(self, room, event):
+    def add_event(self, room, event: ProposalDict):
         url = external_url("schedule.item", year=event_year(), proposal_id=event["id"], slug=event["slug"])
 
         event_node = etree.SubElement(room, "event", id=str(event["id"]), guid=str(uuid5(NAMESPACE_URL, url)))
@@ -104,11 +147,11 @@ class FrabXmlExporter(FrabExporter):
         # Start time
         self._add_sub_with_text(event_node, "start", event["start_date"].strftime("%H:%M"))
 
-        duration = self.get_duration(event["start_date"], event["end_date"])
+        duration = self.format_duration(event["start_date"], event["end_date"])
         self._add_sub_with_text(event_node, "duration", duration)
 
-        self._add_sub_with_text(event_node, "abstract", event["description"])
-        self._add_sub_with_text(event_node, "description", "")
+        self._add_sub_with_text(event_node, "abstract", "")
+        self._add_sub_with_text(event_node, "description", event["description"])
 
         self._add_sub_with_text(
             event_node,
@@ -123,43 +166,31 @@ class FrabXmlExporter(FrabExporter):
 
     def add_persons(self, event_node, event):
         persons_node = etree.SubElement(event_node, "persons")
-
         self._add_sub_with_text(persons_node, "person", event["speaker"], id=str(event["user_id"]))
 
     def add_recording(self, event_node, event):
-        video = event.get("video", {})
-
         recording_node = etree.SubElement(event_node, "recording")
 
-        self._add_sub_with_text(recording_node, "license", "CC BY-SA 4.0")
-        self._add_sub_with_text(
-            recording_node, "optout", "false" if event.get("video_privacy") == "public" else "true"
-        )
-        if "ccc" in video:
-            self._add_sub_with_text(recording_node, "url", video["ccc"])
-        elif "youtube" in video:
-            self._add_sub_with_text(recording_node, "url", video["youtube"])
+        if event.get("video_privacy") == "public":
+            video = event.get("video", {})
+            self._add_sub_with_text(recording_node, "license", LICENCE)
+            self._add_sub_with_text(recording_node, "optout", "false")
+            if "ccc" in video:
+                self._add_sub_with_text(recording_node, "url", video["ccc"])
+            elif "youtube" in video:
+                self._add_sub_with_text(recording_node, "url", video["youtube"])
+        else:
+            self._add_sub_with_text(recording_node, "optout", "true")
 
     def run(self):
         root = self.make_root()
-        days_dict = {}
-        index = 0
+        for day in self.schedule:
+            room_node = self.add_day(root, day["index"], day["start"], day["end"])
 
-        for event in self.schedule:
-            day_start, day_end = self.get_day_start_end(event["start_date"])
-            day_key = day_start.strftime("%Y-%m-%d")
-            venue_key = event["venue"]
+            for venue in day["rooms"]:
+                venue_node = self.add_room(room_node, venue_key)
 
-            if day_key not in days_dict:
-                index += 1
-                node = self.add_day(root, index, day_start, day_end)
-                days_dict[day_key] = {"node": node, "rooms": {}}
-
-            day = days_dict[day_key]
-
-            if venue_key not in day["rooms"]:
-                day["rooms"][venue_key] = self.add_room(day["node"], venue_key)
-
-            self.add_event(day["rooms"][venue_key], event)
+                for event in venue["talks"]:
+                    self.add_event(venue_node, event)
 
         return etree.tostring(root)
