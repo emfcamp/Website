@@ -1,6 +1,6 @@
 import json
 
-from flask import Response, abort, redirect, request
+from flask import Response, abort, redirect, request, url_for
 from flask import current_app as app
 from flask_cors import cross_origin
 from flask_login import current_user
@@ -81,7 +81,13 @@ def schedule_frab_xml(year):
         .all()
     )
 
-    exporter = FrabXmlExporter(schedule)
+    scheduled_content_only = request.args.get("scheduled_content_only") in ("true", "yes")
+    village_id = request.args.get("village_id")
+    venue_ids = request.args.get("venue_ids", "").split(",")
+
+    exporter = FrabXmlExporter(
+        schedule, scheduled_content_only=scheduled_content_only, village_id=village_id, venue_ids=venue_ids
+    )
     frab = exporter.run()
 
     return Response(frab, mimetype="application/xml")
@@ -106,7 +112,17 @@ def schedule_frab_json(year):
         .all()
     )
 
-    exporter = FrabJsonExporter(schedule, external_url("schedule.schedule_frab_json", year=year))
+    scheduled_content_only = request.args.get("scheduled_content_only") in ("true", "yes")
+    village_id = request.args.get("village_id")
+    venue_ids = request.args.get("venue_ids", "").split(",")
+
+    exporter = FrabJsonExporter(
+        schedule,
+        url=external_url("schedule.schedule_frab_json", year=year),
+        scheduled_content_only=scheduled_content_only,
+        village_id=village_id,
+        venue_ids=venue_ids,
+    )
     frab = exporter.run()
 
     return Response(json.dumps(frab, indent=4), mimetype="application/json")

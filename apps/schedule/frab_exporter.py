@@ -22,8 +22,14 @@ TRACK_COLOURS = {
 
 
 class FrabExporter:
-    def __init__(self, schedule):
+    def __init__(self, schedule, scheduled_content_only=False, village_id=None, venue_ids=None):
         self._schedule = schedule
+        self._scheduled_content_only = scheduled_content_only
+        self._village_id = village_id
+        if venue_ids:
+            self._venue_ids = [int(id.strip()) for id in venue_ids if id.strip()]
+        else:
+            self._venue_ids = []
 
     def format_duration(self, start_time: datetime, end_time: datetime) -> str:
         # str(timedelta) creates e.g. hrs:min:sec...
@@ -65,6 +71,15 @@ class FrabExporter:
             day_key = day_start.strftime("%Y-%m-%d")
             venue_key = event.scheduled_venue.name
 
+            if self._scheduled_content_only and not event.scheduled_venue.scheduled_content_only:
+                continue
+
+            if self._village_id and event.scheduled_venue.village_id != self._village_id:
+                continue
+
+            if self._venue_ids and event.scheduled_venue.id not in self._venue_ids:
+                continue
+
             if day_key not in data:
                 data[day_key] = {
                     "index": index,
@@ -93,9 +108,31 @@ class FrabExporter:
 
 
 class FrabJsonExporter(FrabExporter):
-    def __init__(self, schedule, url):
-        super().__init__(schedule)
+    def __init__(self, schedule, url=None, scheduled_content_only=False, village_id=None, venue_ids=None):
+        super().__init__(
+            schedule,
+            scheduled_content_only=scheduled_content_only,
+            village_id=village_id,
+            venue_ids=venue_ids,
+        )
         self.url = url
+
+    @cached_property
+    def rooms(self):
+        rooms = Venue.query.order_by(Venue.name).all()
+        result = []
+        for room in rooms:
+            if self._scheduled_content_only and not room.scheduled_content_only:
+                continue
+
+            if self._village_id and room.village_id != self._village_id:
+                continue
+
+            if self._venue_ids and room.id not in self._venue_ids:
+                continue
+
+            result.append(room)
+        return result
 
     def run(self):
         return {
@@ -117,7 +154,7 @@ class FrabJsonExporter(FrabExporter):
                             "name": room.name,
                             "capacity": room.capacity,
                         }
-                        for room in Venue.query.order_by(Venue.name).all()
+                        for room in self.rooms
                     ],
                     "tracks": [
                         {
