@@ -185,6 +185,8 @@ class FrabJsonExporter(FrabExporter):
                         {
                             "name": venue.name,
                             "capacity": venue.capacity,
+                            # TODO do we have an URL for listing the schedule in a specific room?
+                            "guid": str(uuid5(NAMESPACE_URL, venue.name)),
                         }
                         for venue in self.venues
                     ],
