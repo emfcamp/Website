@@ -21,9 +21,16 @@ LICENCE = "CC BY-SA 4.0"
 VERSION = "1.0-public"
 
 TRACK_COLOURS = {
-    type_info.type: f"#{md5(type_info.human_type.encode('utf-8')).hexdigest()[:6]}"
-    for type_info in SCHEDULE_ITEM_INFOS.values()
+    "talk": "#FB0558",
+    "performance": "#2EADD9",
+    "workshop": "#F9E200",
+    "youthworkshop": "#FF8101",
+    "lightning": "#FC0220",
 }
+
+for type_info in SCHEDULE_ITEM_INFOS.values():
+    if type_info.type not in TRACK_COLOURS:
+        TRACK_COLOURS[type_info.type] = f"#{md5(type_info.human_type.encode('utf-8')).hexdigest()[:6]}"
 
 
 @dataclass
