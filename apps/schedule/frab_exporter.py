@@ -16,9 +16,16 @@ LICENCE = "CC BY-SA 4.0"
 VERSION = "1.0-public"
 
 TRACK_COLOURS = {
-    slug: f"#{md5(human_readable.encode('utf-8')).hexdigest()[:6]}"
-    for slug, human_readable in HUMAN_CFP_TYPES.items()
+    "talk": "#FB0558",
+    "performance": "#2EADD9",
+    "workshop": "#F9E200",
+    "youthworkshop": "#FF8101",
+    "lightning": "#FC0220",
 }
+
+for slug, human_readable in HUMAN_CFP_TYPES.items():
+    if slug not in TRACK_COLOURS:
+        TRACK_COLOURS[slug] = f"#{md5(human_readable.encode('utf-8')).hexdigest()[:6]}"
 
 
 class FrabExporter:
