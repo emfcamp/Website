@@ -135,7 +135,9 @@ def schedule_frab_json(year):
 
     filter = FrabExporterFilter.from_request()
 
-    exporter = FrabJsonExporter(filter, schedule_items, external_url("schedule.schedule_frab_json", year=year))
+    exporter = FrabJsonExporter(
+        filter, schedule_items, external_url("schedule.schedule_frab_json", year=year)
+    )
     frab = exporter.run()
 
     return Response(json.dumps(frab, indent=4), mimetype="application/json")

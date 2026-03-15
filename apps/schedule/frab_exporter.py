@@ -296,6 +296,15 @@ class FrabXmlExporter(FrabExporter):
         self._add_sub_with_text(conference, "time_zone_name", event_tz.zone)
         self._add_sub_with_text(conference, "url", external_url("base.main"))
 
+        for type_info in SCHEDULE_ITEM_INFOS.values():
+            etree.SubElement(
+                conference,
+                "track",
+                name=type_info.human_type,
+                slug=type_info.type,
+                color=TRACK_COLOURS[type_info.type],
+            )
+
         return root
 
     def add_day(self, root: Element, index: int, start: datetime, end: datetime) -> Element:
