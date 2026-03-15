@@ -261,6 +261,9 @@ class FrabXmlExporter(FrabExporter):
         self._add_sub_with_text(conference, "time_zone_name", event_tz.zone)
         self._add_sub_with_text(conference, "url", external_url("base.main"))
 
+        for slug, human_readable in sorted(HUMAN_CFP_TYPES.items()):
+            etree.SubElement(conference, "track", name=human_readable, slug=slug, color=TRACK_COLOURS[slug])
+
         return root
 
     def add_day(self, root, index, start, end):
