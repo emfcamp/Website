@@ -131,6 +131,7 @@ class FrabExporter:
                     day["rooms"][venue_key] = {
                         "id": occurrence.scheduled_venue.id,
                         "name": occurrence.scheduled_venue.name,
+                        "priority": occurrence.scheduled_venue.priority,
                         "talks": [],
                     }
 
@@ -139,7 +140,7 @@ class FrabExporter:
         for day in data.values():
             day["rooms"] = sorted(
                 day["rooms"].values(),
-                key=lambda room: room["id"],
+                key=lambda room: -room["priority"] if room["priority"] else room["name"],
             )
         return data.values()
 
@@ -151,7 +152,7 @@ class FrabJsonExporter(FrabExporter):
 
     @cached_property
     def venues(self):
-        venues = Venue.query.order_by(Venue.name).all()
+        venues = Venue.query.order_by(-Venue.priority, Venue.name).all()
         result = []
         for venue in venues:
             if self.filter.official_venues_only and venue.allows_attendee_content:
