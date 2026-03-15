@@ -25,7 +25,7 @@ class FrabExporter:
     def __init__(self, schedule, scheduled_content_only=False, village_id=None, venue_ids=None):
         self._schedule = schedule
         self._scheduled_content_only = scheduled_content_only
-        self._village_id = village_id
+        self._village_id = int(village_id) if village_id else None
         if venue_ids:
             self._venue_ids = [int(id.strip()) for id in venue_ids if id.strip()]
         else:
