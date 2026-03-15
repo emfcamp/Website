@@ -1,26 +1,21 @@
 import json
 
-from flask import Response, abort, request
+from flask import Response, abort, redirect, request, url_for
 from flask import current_app as app
 from flask_cors import cross_origin
 from flask_login import current_user
 from icalendar import Calendar, Event
 
-from main import db, get_or_404
+from main import db, external_url, get_or_404
 from models import event_year
 from models.cfp import Proposal
 from models.user import User
 
 from ..common import feature_enabled, feature_flag, json_response
 from . import schedule
-from .data import (
-    _convert_time_to_str,
-    _get_proposal_dict,
-    _get_scheduled_proposals,
-    _get_upcoming,
-)
+from .data import _convert_time_to_str, _get_proposal_dict, _get_scheduled_proposals, _get_upcoming
+from .frab_exporter import FrabJsonExporter, FrabXmlExporter
 from .historic import feed_historic
-from .schedule_xml import export_frab
 
 
 def _format_event_description(event):
@@ -64,6 +59,14 @@ def schedule_frab(year):
     if year != event_year():
         return feed_historic(year, "frab")
 
+    return redirect(url_for("schedule.schedule_frab_xml", year=year))
+
+
+@schedule.route("/schedule/<int:year>.frab.xml")
+def schedule_frab_xml(year):
+    if year != event_year():
+        return feed_historic(year, "frab")
+
     if not feature_enabled("SCHEDULE"):
         abort(404)
 
@@ -78,11 +81,51 @@ def schedule_frab(year):
         .all()
     )
 
-    schedule = [_get_proposal_dict(p, []) for p in schedule]
+    scheduled_content_only = request.args.get("scheduled_content_only") in ("true", "yes")
+    village_id = request.args.get("village_id")
+    venue_ids = request.args.get("venue_ids", "").split(",")
 
-    frab = export_frab(schedule)
+    exporter = FrabXmlExporter(
+        schedule, scheduled_content_only=scheduled_content_only, village_id=village_id, venue_ids=venue_ids
+    )
+    frab = exporter.run()
 
     return Response(frab, mimetype="application/xml")
+
+
+@schedule.route("/schedule/<int:year>.frab.json")
+def schedule_frab_json(year):
+    if year != event_year():
+        return feed_historic(year, "frab_json")
+
+    if not feature_enabled("SCHEDULE"):
+        abort(404)
+
+    schedule = (
+        Proposal.query.filter(
+            Proposal.is_accepted,
+            Proposal.scheduled_time.isnot(None),
+            Proposal.scheduled_venue_id.isnot(None),
+            Proposal.scheduled_duration.isnot(None),
+        )
+        .order_by(Proposal.scheduled_time)
+        .all()
+    )
+
+    scheduled_content_only = request.args.get("scheduled_content_only") in ("true", "yes")
+    village_id = request.args.get("village_id")
+    venue_ids = request.args.get("venue_ids", "").split(",")
+
+    exporter = FrabJsonExporter(
+        schedule,
+        url=external_url("schedule.schedule_frab_json", year=year),
+        scheduled_content_only=scheduled_content_only,
+        village_id=village_id,
+        venue_ids=venue_ids,
+    )
+    frab = exporter.run()
+
+    return Response(json.dumps(frab, indent=4), mimetype="application/json")
 
 
 @schedule.route("/schedule/<int:year>.ical")

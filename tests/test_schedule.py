@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from apps.schedule import schedule_xml
+from apps.schedule import frab_exporter
 
 
 @pytest.mark.parametrize(
@@ -17,7 +17,8 @@ from apps.schedule import schedule_xml
     ],
 )
 def test_get_duration(start_time, end_time, expected):
+    exporter = frab_exporter.FrabExporter([])
     fmt = "%Y-%m-%d %H:%M:%S"
     start_time = datetime.strptime(start_time, fmt)
     end_time = datetime.strptime(end_time, fmt)
-    assert schedule_xml.get_duration(start_time, end_time) == expected
+    assert exporter.format_duration(start_time, end_time) == expected
