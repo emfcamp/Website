@@ -202,6 +202,8 @@ class BulkVoucherEmailForm(Form):
 
 You can now buy your Electromagnetic Field ticket through [this link]({{voucher_url}}).
 
+This voucher allows you to buy {{num_tickets}} adult tickets, and as many child tickets as you need.
+
 You are guaranteed these tickets until {{expiry}}, so please make sure you use your voucher before then.
 
 Love,

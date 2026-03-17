@@ -33,7 +33,7 @@ from models.purchase import Purchase
 from models.scheduled_task import ScheduledTaskResult, tasks
 from models.site_state import VALID_STATES, SiteState, get_states, refresh_states
 
-from ..common import require_permission
+from ..common import feature_enabled, require_permission
 from ..common.forms import Form
 from ..payments.stripe import stripe_validate
 from ..payments.wise import (
@@ -259,10 +259,15 @@ def payment_config_verify():
         db.session.commit()
         return redirect(url_for(".payment_config_verify"), 303)
 
+    if feature_enabled("BANK_TRANSFER"):
+        wise_state = wise_validate()
+    else:
+        wise_state = None
+
     return render_template(
         "admin/payment-config-verify.html",
         stripe=stripe_validate(),
-        transferwise=wise_validate(),
+        transferwise=wise_state,
         bank_accounts=BankAccount.query.order_by(
             BankAccount.active.desc(), BankAccount.currency.desc()
         ).all(),

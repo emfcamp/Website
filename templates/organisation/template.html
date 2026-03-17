@@ -1,0 +1,24 @@
+{% macro view(title, view_name) -%}
+<li class="{{ 'active' if request.endpoint == view_name }}">
+  <a href="{{url_for(view_name)}}">{{title}}</a>
+</li>
+{%- endmacro %}
+{% macro page(title, target_page) -%}
+<li class="{{ 'active' if request.endpoint == 'base.org_page' and page_name==target_page }}">
+  <a href="{{url_for('base.org_page', page_name=target_page)}}">{{title}}</a>
+</li>
+{%- endmacro %}
+{% extends "base.html" %}
+{% set main_class = "about" %}
+{% block title %}{{title}}{% endblock %}
+{% block secondary_nav %}
+<ul role="navigation list" aria-label="Organisation">
+  {{view("About the organisation", "base.organisation")}}
+  {{page("Diversity", "diversity")}}
+  {{view("Finances", "base.finances")}}
+  {{view("Company info", "base.company")}}
+</ul>
+{% endblock %}
+{% block body %}
+{{content}}
+{% endblock %}

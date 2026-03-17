@@ -1,37 +1,36 @@
 {% macro view(title, view_name) -%}
-  <li class="{{ 'active' if request.endpoint == view_name }}">
-    <a href="{{url_for(view_name)}}">{{title}}</a>
-  </li>
+<li class="{{ 'active' if request.endpoint == view_name }}">
+  <a href="{{url_for(view_name)}}">{{title}}</a>
+</li>
 {%- endmacro %}
 {% macro page(title, target_page) -%}
-  <li class="{{ 'active' if request.endpoint == 'base.page' and page_name==target_page }}">
-    <a href="{{url_for('base.page', page_name=target_page)}}">{{title}}</a>
-  </li>
+<li class="{{ 'active' if request.endpoint == 'base.page' and page_name==target_page }}">
+  <a href="{{url_for('base.page', page_name=target_page)}}">{{title}}</a>
+</li>
 {%- endmacro %}
 {% extends "markdown.html" %}
 {% set main_class = "about" %}
 {% block secondary_nav %}
-  <ul role="navigation list" aria-label="About">
-    {{view("About EMF", "base.about")}}
-    {{page("Travel", "travel")}}
-    {{page("Arrival Times", "arrival-times")}}
-    {{page("What to Bring", "what-to-bring")}}
-    {{page("Villages", "villages")}}
-    {{page("Health", "health")}}
-    {{page("Accessibility", "accessibility")}}
-    {{page("Diversity", "diversity")}}
-    {{page("Childcare", "childcare")}}
-    {{page("Food & Drink", "food")}}
-    {{page("Power", "power")}}
-    {{page("Internet", "internet")}}
-    {{page("Phones", "phones")}}
-    {{page("Deliveries", "deliveries")}}
-    {{page("Swap Shop", "swap-shop")}}
-    {{page("Volunteering", "volunteering")}}
-    {{view("Branding", "base.branding")}}
-    {{view("Contact", "base.contact")}}
-  </ul>
+<ul role="navigation list" aria-label="About">
+  {{view("About EMF", "base.about")}}
+  {{page("Travel", "travel")}}
+  {{page("Arrival Times", "arrival-times")}}
+  {{page("What to Bring", "what-to-bring")}}
+  {{page("Villages", "villages")}}
+  {{page("Health", "health")}}
+  {{page("Accessibility", "accessibility")}}
+  {{page("Childcare", "childcare")}}
+  {{page("Food & Drink", "food")}}
+  {{page("Power", "power")}}
+  {{page("Internet", "internet")}}
+  {{page("Phones", "phones")}}
+  {{page("Deliveries", "deliveries")}}
+  {{page("Swap Shop", "swap-shop")}}
+  {{page("Volunteering", "volunteering")}}
+  {{view("Branding", "base.branding")}}
+  {{view("Contact", "base.contact")}}
+</ul>
 {% endblock %}
 {% block body %}
-  {{content}}
+{{content}}
 {% endblock %}
