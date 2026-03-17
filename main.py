@@ -121,7 +121,7 @@ wise = None
 def get_stripe_client(config: Config) -> stripe.StripeClient:
     return stripe.StripeClient(
         api_key=config["STRIPE_SECRET_KEY"],
-        stripe_version="2023-10-16",
+        stripe_version="2026-02-25.clover",
     )
 
 

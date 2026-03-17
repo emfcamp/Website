@@ -408,7 +408,7 @@ def product_view_new():
         db.session.add(view)
         db.session.commit()
         flash("ProductView created")
-        return redirect(url_for("admin.products.product_view", view_id=view.id))
+        return redirect(url_for("admin.product_views.product_view", view_id=view.id))
 
     return render_template("admin/products/view-new.html", form=form)
 
@@ -577,7 +577,7 @@ def product_view_edit_voucher(view_id, voucher_code):
         flash("Voucher updated")
         return redirect(
             url_for(
-                "admin.products.product_view_voucher_detail",
+                "admin.product_views.product_view_voucher_detail",
                 view_id=view_id,
                 voucher_code=voucher_code,
             )
@@ -625,7 +625,7 @@ def product_view_bulk_add_vouchers_by_email(view_id):
             if email == "":
                 continue
 
-            if Voucher.query.filter_by(email=email).first():
+            if Voucher.query.filter_by(email=email, product_view_id=view.id).first():
                 existing += 1
                 continue
 
@@ -637,6 +637,11 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 purchases_remaining=form.num_purchases.data,
                 tickets_remaining=form.num_tickets.data,
             )
+            db.session.add(voucher)
+            # Commit here to avoid a race condition where two requests try to send the same
+            # list of vouchers. This does run the risk of vouchers being added without an email
+            # being sent, but this is preferable to sending two vouchers to the same person.
+            db.session.commit()
 
             voucher_url = external_url("tickets.tickets_voucher", voucher_code=voucher.code)
 
@@ -663,8 +668,6 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 html_message=html,
             )
 
-            db.session.add(voucher)
-            db.session.commit()
             sent_total += sent_count
             added += 1
 

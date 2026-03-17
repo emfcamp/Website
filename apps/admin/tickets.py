@@ -44,14 +44,14 @@ def tickets():
 
 @admin.route("/tickets/unpaid")
 def tickets_unpaid():
-    tickets = (
+    query = (
         Purchase.query.filter_by(is_paid_for=False)
         .filter(~Purchase.owner_id.is_(None))
+        .filter(Purchase.state.in_(["reserved", "admin-reserved", "payment-pending"]))
         .order_by(Purchase.id)
-        .all()
     )
 
-    return render_template("admin/tickets/tickets.html", tickets=tickets)
+    return render_template("admin/tickets/tickets.html", tickets=query.all())
 
 
 @admin.route("/tickets/issue", methods=["GET", "POST"])

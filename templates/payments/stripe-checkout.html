@@ -26,11 +26,14 @@
 </noscript>
 
 <form class="form well" role="form" id="stripe-form">
-  <div id="stripe-payment"></div>
+  <div id="stripe-payment" class="hidden"></div>
+  <div id="stripe-loading">
+    Loading payment form, please wait...
+  </div>
   <div class="form-group" id="stripe-group">
     <span id="stripe-error" class="help-block"></span>
   </div>
-  <button class="btn btn-lg btn-success" id="stripe-pay" disabled="true">Make Payment</button>
+  <button class="btn btn-lg btn-success hidden" id="stripe-pay" disabled="true">Make Payment</button>
 </form>
 
 </div>
@@ -68,6 +71,15 @@
         set_error(null);
       }
     });
+
+    paymentElement.on('ready', () => {
+      const loadingContainer = document.querySelector('#stripe-loading');
+      const paymentContainer = document.querySelector('#stripe-payment');
+      loadingContainer.classList.add('hidden');
+      paymentContainer.classList.remove('hidden');
+      pay_button.classList.remove('hidden');
+    });
+
     paymentElement.mount('#stripe-payment');
 
     pay_button.addEventListener('click', stripe_submit);
