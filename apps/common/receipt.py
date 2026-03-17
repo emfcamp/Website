@@ -1,17 +1,17 @@
-import io
 import asyncio
+import io
+from typing import IO, Any
 
+import segno
 from flask import render_template
 from markupsafe import Markup
 from playwright.async_api import async_playwright
-import segno
 
 from apps.common import feature_enabled
 from main import external_url
 from models import event_year
-from models.product import Product, ProductGroup, PriceTier
+from models.product import PriceTier, Product, ProductGroup
 from models.purchase import Purchase, PurchaseTransfer
-
 
 RECEIPT_TYPES = ["admissions", "parking", "campervan", "merchandise", "hire"]
 
@@ -19,7 +19,9 @@ RECEIPT_TYPES = ["admissions", "parking", "campervan", "merchandise", "hire"]
 def render_receipt(user, png=False, pdf=False):
     purchases = (
         user.owned_purchases.filter_by(is_paid_for=True)
-        .join(PriceTier, Product, ProductGroup)
+        .join(PriceTier)
+        .join(Product)
+        .join(ProductGroup)
         .with_entities(Purchase)
         .order_by(Purchase.id)
     )
@@ -86,34 +88,17 @@ def render_pdf(url, html):
     return pdffile
 
 
-def make_qrfile(data, **kwargs):
+def make_qrfile(data: str, kind: str = "svg", **kwargs: dict[str, Any]) -> IO[bytes]:
     qrfile = io.BytesIO()
     qr = segno.make_qr(data)
-    qr.save(qrfile, **kwargs)
+    qr.save(qrfile, kind=kind, **kwargs)
     qrfile.seek(0)
     return qrfile
 
 
-def qrfile_to_svg(qrfile):
-    return Markup(qrfile.getvalue().decode("utf-8"))
-
-
-def format_inline_qr(data):
-    qrfile = make_qrfile(
-        data,
-        kind="svg",
-        svgclass=None,
-        omitsize=True,
-        xmldecl=False,
-        svgns=False,
-        nl=False,
-    )
-    return qrfile_to_svg(qrfile)
-
-
-def make_qr_png(url):
-    return make_qrfile(url, kind="png", scale=3)
-
+def format_inline_qr(data: str) -> Markup:
+    qr = segno.make(data)
+    return Markup(qr.svg_inline(svgclass=None, omitsize=True))
 
 
 def attach_tickets(msg, user):
@@ -122,7 +107,7 @@ def attach_tickets(msg, user):
     url = external_url("tickets.receipt", user_id=user.id)
     pdf = render_pdf(url, page)
 
-    msg.attach("EMF{}.pdf".format(event_year()), pdf.read(), "application/pdf")
+    msg.attach(f"EMF{event_year()}.pdf", pdf.read(), "application/pdf")
 
 
 def set_tickets_emailed(user):
@@ -131,7 +116,9 @@ def set_tickets_emailed(user):
 
     purchases = (
         user.owned_purchases.filter_by(is_paid_for=True)
-        .join(PriceTier, Product, ProductGroup)
+        .join(PriceTier)
+        .join(Product)
+        .join(ProductGroup)
         .filter(ProductGroup.type.in_(RECEIPT_TYPES))
         .with_entities(Purchase)
         .group_by(Purchase)

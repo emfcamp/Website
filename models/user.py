@@ -1,33 +1,52 @@
 from __future__ import annotations
+
 import base64
-import hmac
 import hashlib
+import hmac
 import random
 import string
-from datetime import datetime, timedelta
-import time
 import struct
-import re
-from collections import defaultdict
-from typing import Optional
+import time
+import typing
+from datetime import datetime, timedelta
 
-from sqlalchemy import func, Index, text, Table
+from flask import current_app as app
+from flask import session
+from flask_login import AnonymousUserMixin, UserMixin
+from sqlalchemy import Column, ForeignKey, Index, Integer, Table, func, select, text
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm.exc import NoResultFound
-from flask import current_app as app, session
-from flask_login import UserMixin, AnonymousUserMixin
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from main import db
 from loggingmanager import set_user_id
-from . import bucketise, BaseModel
-from .permission import UserPermission, Permission
+from main import db
+
+from . import BaseModel
+from .permission import Permission, UserPermission
 from .volunteer.shift import ShiftEntry
 
+if typing.TYPE_CHECKING:
+    from .admin_message import AdminMessage
+    from .cfp import CFPMessage, CFPVote
+    from .cfp_tag import Tag
+    from .diversity import UserDiversity
+    from .event_tickets import EventTicket
+    from .payment import Payment
+    from .purchase import AdmissionTicket, Purchase, PurchaseTransfer, Ticket
+    from .village import VillageMember
+    from .volunteer import RoleAdmin, Volunteer
+
+__all__ = [
+    "AnonymousUser",
+    "User",
+    "UserShipping",
+]
+
 CHECKIN_CODE_LEN = 16
-checkin_code_re = r"[0-9a-zA-Z_-]{%s}" % CHECKIN_CODE_LEN
+checkin_code_re = rf"[0-9a-zA-Z_-]{{{CHECKIN_CODE_LEN}}}"
 
 
-def _generate_hmac(prefix, key, msg):
+def _generate_hmac(prefix: bytes | str, key: bytes | str, msg: bytes | str) -> bytes:
     """
     Generate a keyed HMAC for a unique purpose. You don't want to call this directly.
 
@@ -50,13 +69,13 @@ def _generate_hmac(prefix, key, msg):
 def generate_timed_hmac(prefix, key, timestamp, uid):
     """Typical time-limited HMAC used for logins, etc"""
     timestamp = int(timestamp)  # to truncate floating point, not coerce strings
-    msg = "{}-{}".format(timestamp, uid)
+    msg = f"{timestamp}-{uid}"
     return _generate_hmac(prefix, key, msg).decode("ascii")
 
 
 def generate_unlimited_hmac(prefix, key, uid):
     """Intended for user tokens, long-lived but low-importance"""
-    msg = "{}".format(uid)
+    msg = f"{uid}"
     return _generate_hmac(prefix, key, msg).decode("ascii")
 
 
@@ -70,13 +89,10 @@ def verify_timed_hmac(prefix, key, current_timestamp, code, valid_hours):
 
     expected_code = generate_timed_hmac(prefix, key, timestamp, uid)
     if hmac.compare_digest(expected_code, code):
-        age = datetime.fromtimestamp(current_timestamp) - datetime.fromtimestamp(
-            timestamp
-        )
+        age = datetime.fromtimestamp(current_timestamp) - datetime.fromtimestamp(timestamp)
         if age > timedelta(hours=valid_hours):
             return None
-        else:
-            return uid
+        return uid
 
     return None
 
@@ -134,10 +150,6 @@ def generate_login_code(key, timestamp, uid):
     return generate_timed_hmac("login-", key, timestamp, uid)
 
 
-def generate_sso_code(key, timestamp, uid):
-    return generate_timed_hmac("sso-", key, timestamp, uid)
-
-
 def generate_signup_code(key, timestamp, uid):
     return generate_timed_hmac("signup-", key, timestamp, uid)
 
@@ -158,10 +170,6 @@ def verify_login_code(key, current_timestamp, code):
     return verify_timed_hmac("login-", key, current_timestamp, code, valid_hours=6)
 
 
-def verify_sso_code(key, current_timestamp, code):
-    return verify_timed_hmac("sso-", key, current_timestamp, code, valid_hours=6)
-
-
 def verify_signup_code(key, current_timestamp, code):
     return verify_timed_hmac("signup-", key, current_timestamp, code, valid_hours=6)
 
@@ -178,119 +186,115 @@ def verify_checkin_code(key, uid):
     return verify_unlimited_short_hmac("checkin-", key, uid)
 
 
-CFPReviewerTags: Table = db.Table(
+CFPReviewerTags = Table(
     "cfp_reviewer_tags",
     BaseModel.metadata,
-    db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
-    db.Column("tag_id", db.Integer, db.ForeignKey("tag.id"), primary_key=True),
+    Column("user_id", Integer, ForeignKey("user.id"), primary_key=True),
+    Column("tag_id", Integer, ForeignKey("tag.id"), primary_key=True),
 )
 
 
 class User(BaseModel, UserMixin):
     __tablename__ = "user"
-    __versioned__ = {"exclude": ["favourites", "calendar_favourites"]}
+    __versioned__ = {"exclude": ["favourites"]}
 
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String, unique=True, index=True)
-    name = db.Column(db.String, nullable=False, index=True)
-    company = db.Column(db.String)
-    will_have_ticket = db.Column(
-        db.Boolean, nullable=False, default=False
-    )  # for CfP filtering
-    checkin_note = db.Column(db.String, nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(unique=True, index=True)
+    name: Mapped[str] = mapped_column(index=True)
+    company: Mapped[str | None]
+    will_have_ticket: Mapped[bool] = mapped_column(default=False)  # for CfP filtering
+    checkin_note: Mapped[str | None]
     # Whether the user has opted in to receive promo emails after this event:
-    promo_opt_in = db.Column(db.Boolean, nullable=False, default=False)
+    promo_opt_in: Mapped[bool] = mapped_column(default=False)
 
-    cfp_invite_reason = db.Column(db.String, nullable=True)
+    cfp_invite_reason: Mapped[str | None]
 
-    cfp_reviewer_tags = db.relationship(
-        "Tag",
-        backref="reviewers",
+    cfp_reviewer_tags: Mapped[list[Tag]] = relationship(
+        back_populates="reviewers",
         cascade="all",
         secondary=CFPReviewerTags,
     )
 
-    diversity = db.relationship(
-        "UserDiversity", uselist=False, backref="user", cascade="all, delete-orphan"
+    diversity: Mapped[UserDiversity | None] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
     )
-    shipping = db.relationship(
-        "UserShipping", uselist=False, backref="user", cascade="all, delete-orphan"
-    )
-    payments = db.relationship("Payment", lazy="dynamic", backref="user", cascade="all")
-    permissions = db.relationship(
-        "Permission",
-        backref="user",
+    shipping: Mapped[UserShipping | None] = relationship(back_populates="user", cascade="all, delete-orphan")
+    payments: Mapped[list[Payment]] = relationship(lazy="dynamic", back_populates="user", cascade="all")
+    permissions: Mapped[list[Permission]] = relationship(
+        back_populates="users",
         cascade="all",
-        secondary=UserPermission,
+        secondary=UserPermission,  # type: ignore[has-type]  # mypy can't see that this is a Table for some reason
         lazy="joined",
     )
-    votes = db.relationship("CFPVote", backref="user", lazy="dynamic")
+    votes: Mapped[list[CFPVote]] = relationship(back_populates="user", lazy="dynamic")
 
-    proposals = db.relationship(
-        "Proposal",
+    proposals: Mapped[list[Proposal]] = relationship(
         primaryjoin="Proposal.user_id == User.id",
-        backref="user",
+        back_populates="user",
         lazy="dynamic",
         cascade="all, delete-orphan",
     )
-    anonymised_proposals = db.relationship(
-        "Proposal",
+    anonymised_proposals: Mapped[list[Proposal]] = relationship(
         primaryjoin="Proposal.anonymiser_id == User.id",
-        backref="anonymiser",
+        back_populates="anonymiser",
         lazy="dynamic",
         cascade="all, delete-orphan",
     )
+    favourites: Mapped[list[Proposal]] = relationship(
+        back_populates="favourites", secondary="favourite_proposal"
+    )
 
-    messages_from = db.relationship(
-        "CFPMessage",
+    messages_from: Mapped[list[CFPMessage]] = relationship(
         primaryjoin="CFPMessage.from_user_id == User.id",
-        backref="from_user",
+        back_populates="from_user",
         lazy="dynamic",
     )
 
-    event_tickets = db.relationship("EventTicket", backref="user", lazy="dynamic")
+    event_tickets: Mapped[list[EventTicket]] = relationship(back_populates="user", lazy="dynamic")
 
-    purchases = db.relationship(
-        "Purchase", lazy="dynamic", primaryjoin="Purchase.purchaser_id == User.id"
+    purchases: Mapped[list[Purchase]] = relationship(
+        lazy="dynamic", primaryjoin="Purchase.purchaser_id == User.id"
     )
 
-    owned_purchases = db.relationship(
-        "Purchase", lazy="dynamic", primaryjoin="Purchase.owner_id == User.id"
+    owned_purchases: Mapped[list[Purchase]] = relationship(
+        lazy="dynamic", primaryjoin="Purchase.owner_id == User.id"
     )
 
-    owned_tickets = db.relationship(
-        "Ticket", lazy="select", primaryjoin="Ticket.owner_id == User.id", viewonly=True
+    owned_tickets: Mapped[list[Ticket]] = relationship(
+        lazy="select", primaryjoin="Ticket.owner_id == User.id", viewonly=True
     )
 
-    owned_admission_tickets = db.relationship(
-        "AdmissionTicket",
+    owned_admission_tickets: Mapped[list[AdmissionTicket]] = relationship(
         lazy="select",
         primaryjoin="AdmissionTicket.owner_id == User.id",
         viewonly=True,
     )
 
-    transfers_to = db.relationship(
-        "PurchaseTransfer",
-        backref="to_user",
+    transfers_to: Mapped[list[PurchaseTransfer]] = relationship(
+        back_populates="to_user",
         lazy="dynamic",
         primaryjoin="PurchaseTransfer.to_user_id == User.id",
         cascade="all, delete-orphan",
     )
-    transfers_from = db.relationship(
-        "PurchaseTransfer",
-        backref="from_user",
+    transfers_from: Mapped[list[PurchaseTransfer]] = relationship(
+        back_populates="from_user",
         lazy="dynamic",
         primaryjoin="PurchaseTransfer.from_user_id == User.id",
         cascade="all, delete-orphan",
     )
 
-    village_membership = db.relationship(
-        "VillageMember",
+    village_membership: Mapped[VillageMember] = relationship(
         cascade="all, delete-orphan",
         back_populates="user",
         uselist=False,
     )
     village = association_proxy("village_membership", "village")
+
+    admin_messages: Mapped[list[AdminMessage]] = relationship("AdminMessage", back_populates="creator")
+
+    volunteer: Mapped[Volunteer | None] = relationship(back_populates="user")
+    volunteer_admin_roles: Mapped[list[RoleAdmin]] = relationship(back_populates="user")
+    shift_entries: Mapped[list[ShiftEntry]] = relationship(back_populates="user")
 
     def __init__(self, email: str, name: str):
         self.email = email
@@ -306,9 +310,9 @@ class User(BaseModel, UserMixin):
                 "volunteer_emails": [u.email for u in User.query.join(ShiftEntry)],
                 "speaker_emails": [
                     u.email
-                    for u in User.query.join(
-                        Proposal, Proposal.user_id == User.id
-                    ).filter(Proposal.is_accepted)
+                    for u in User.query.join(Proposal, Proposal.user_id == User.id).filter(
+                        Proposal.is_accepted
+                    )
                 ],
             },
         }
@@ -326,12 +330,7 @@ class User(BaseModel, UserMixin):
     def get_owned_tickets(self, paid=None, type=None):
         "Get tickets owned by a user, filtered by type and payment state."
         for ticket in self.owned_tickets:
-            if (
-                paid is True
-                and not ticket.is_paid_for
-                or paid is False
-                and ticket.is_paid_for
-            ):
+            if (paid is True and not ticket.is_paid_for) or (paid is False and ticket.is_paid_for):
                 continue
             if type is not None and ticket.type != type:
                 continue
@@ -339,9 +338,6 @@ class User(BaseModel, UserMixin):
 
     def login_code(self, key):
         return generate_login_code(key, int(time.time()), self.id)
-
-    def sso_code(self, key):
-        return generate_sso_code(key, int(time.time()), self.id)
 
     @property
     def checkin_code(self):
@@ -351,103 +347,94 @@ class User(BaseModel, UserMixin):
     def bar_training_token(self):
         return generate_bar_training_token(app.config["SECRET_KEY"], self.id)
 
-    def has_permission(self, name, cascade=True) -> bool:
+    def has_permission(self, name: str, cascade: bool = True) -> bool:
         if cascade:
             if name != "admin" and self.has_permission("admin"):
                 return True
-            if (
-                name.startswith("cfp_")
-                and name != "cfp_admin"
-                and self.has_permission("cfp_admin")
-            ):
+            if name.startswith("cfp_") and name != "cfp_admin" and self.has_permission("cfp_admin"):
                 return True
         for permission in self.permissions:
             if permission.name == name:
                 return True
         return False
 
-    def grant_permission(self, name: str):
+    def grant_permission(self, name: str) -> None:
         try:
-            perm = Permission.query.filter_by(name=name).one()
+            perm = db.session.execute(select(Permission).where(Permission.name == name)).scalar_one()
         except NoResultFound:
             perm = Permission(name)
             db.session.add(perm)
         self.permissions.append(perm)
 
-    def revoke_permission(self, name: str):
+    def revoke_permission(self, name: str) -> None:
         for user_perm in self.permissions:
             if user_perm.name == name:
                 self.permissions.remove(user_perm)
 
     def has_ticket_for_event(self, proposal_id: int) -> bool:
-        return any(
-            [
-                t
-                for t in self.event_tickets
-                if t.proposal_id == proposal_id and t.state == "ticket"
-            ]
-        )
+        return any([t for t in self.event_tickets if t.proposal_id == proposal_id and t.state == "ticket"])
 
     def has_lottery_ticket_for_event(self, proposal_id: int) -> bool:
         return any(
-            [
-                t
-                for t in self.event_tickets
-                if t.proposal_id == proposal_id and t.state == "entered-lottery"
-            ]
+            [t for t in self.event_tickets if t.proposal_id == proposal_id and t.state == "entered-lottery"]
         )
 
     def __repr__(self):
-        return "<User %s>" % self.email
+        return f"<User {self.email}>"
 
     @classmethod
-    def get_by_email(cls, email) -> Optional[User]:
-        return User.query.filter(
-            func.lower(User.email) == func.lower(email)
-        ).one_or_none()
+    def get_by_email(cls, email: str) -> User | None:
+        return (
+            db.session.execute(select(User).where(func.lower(User.email) == func.lower(email)))
+            .unique()
+            .scalar_one_or_none()
+        )
 
     @classmethod
     def does_user_exist(cls, email):
         return bool(User.get_by_email(email))
 
     @classmethod
-    def get_by_code(cls, key, code) -> Optional[User]:
+    def get_by_code(cls, key: str, code: str) -> User | None:
         uid = verify_login_code(key, time.time(), code)
         if uid is None:
             return None
-
-        return User.query.filter_by(id=uid).one()
+        return db.session.get_one(User, uid)
 
     @classmethod
-    def get_by_checkin_code(cls, key, code) -> Optional[User]:
+    def get_by_checkin_code(cls, key: str, code: str) -> User | None:
         uid = verify_checkin_code(key, code)
         if uid is None:
             return None
-
-        return User.query.filter_by(id=uid).one()
+        return db.session.get_one(User, uid)
 
     @classmethod
-    def get_by_api_token(cls, key, code) -> Optional[User]:
+    def get_by_api_token(cls, key: str, code: str) -> User | None:
         uid = verify_api_token(key, code)
         if uid is None:
             # FIXME: raise an exception instead of returning None
             return None
-
-        return User.query.filter_by(id=uid).one()
+        return db.session.get_one(User, uid)
 
     @classmethod
-    def get_by_bar_training_token(cls, code) -> User:
+    def get_by_bar_training_token(cls, code: str) -> User:
         uid = verify_bar_training_token(app.config["SECRET_KEY"], code)
         if uid is None:
             raise ValueError("Invalid token")
 
-        return User.query.filter_by(id=uid).one()
+        return db.session.get_one(User, uid)
 
     @property
     def is_cfp_accepted(self):
         for proposal in self.proposals:
             if proposal.is_accepted:
                 return True
+        return False
+
+    @property
+    def has_proposals(self):
+        for _ in self.proposals:
+            return True
         return False
 
 
@@ -457,95 +444,20 @@ Index(
     text("to_tsvector('simple', replace(email, '@', ' '))"),
     postgresql_using="gin",
 )
-Index(
-    "ix_user_name_tsearch", text("to_tsvector('simple', name)"), postgresql_using="gin"
-)
-
-
-class UserDiversity(BaseModel):
-    __tablename__ = "diversity"
-    user_id = db.Column(
-        db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True
-    )
-    age = db.Column(db.String)
-    gender = db.Column(db.String)
-    ethnicity = db.Column(db.String)
-
-    @classmethod
-    def get_export_data(cls):
-        valid_ages = []
-        ages = defaultdict(int)
-        sexes = defaultdict(int)
-        ethnicities = defaultdict(int)
-
-        for row in cls.query:
-            matches = re.findall(r"\b[0-9]{1,3}\b", row.age)
-            if matches:
-                valid_ages += map(int, matches)
-            elif not row.age:
-                ages[""] += 1
-            else:
-                ages["other"] += 1
-
-            # Someone might put "more X than Y" or "both X",
-            # but this mostly works. 'other' includes the error rate.
-            matches_m = re.findall(r"\b(male|man|m)\b", row.gender, re.I)
-            matches_f = re.findall(r"\b(female|woman|f)\b", row.gender, re.I)
-            if matches_m or matches_f:
-                sexes["male"] += len(matches_m)
-                sexes["female"] += len(matches_f)
-            elif not row.gender:
-                sexes[""] += 1
-            else:
-                sexes["other"] += 1
-
-            # This is largely junk, because people put jokes or expressions of surprise, which can
-            # only reasonably be categorised as "other". Next time, we should use an autocomplete,
-            # explain why we're collecting this information, and separate "other" from "unknown".
-            matches_white = re.findall(
-                r"\b(white|caucasian|wasp)\b", row.ethnicity, re.I
-            )
-            # People really like putting their heritage, which gives another data point or two.
-            matches_anglo = re.findall(
-                r"\b(british|english|irish|scottish|welsh|american|australian|canadian|zealand|nz)\b",
-                row.ethnicity,
-                re.I,
-            )
-            if matches_white or matches_anglo:
-                if matches_white and matches_anglo:
-                    ethnicities["both"] += 1
-                elif matches_white:
-                    ethnicities["white"] += 1
-                elif matches_anglo:
-                    ethnicities["anglosphere"] += 1
-            elif not row.ethnicity:
-                ethnicities[""] += 1
-            else:
-                ethnicities["other"] += 1
-
-        ages.update(bucketise(valid_ages, [0, 15, 25, 35, 45, 55, 65]))
-
-        data = {
-            "private": {
-                "diversity": {"age": ages, "sex": sexes, "ethnicity": ethnicities}
-            },
-            "tables": ["diversity"],
-        }
-
-        return data
+Index("ix_user_name_tsearch", text("to_tsvector('simple', name)"), postgresql_using="gin")
 
 
 class UserShipping(BaseModel):
     __tablename__ = "shipping"
-    user_id = db.Column(
-        db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True
-    )
-    name = db.Column(db.String)
-    address_1 = db.Column(db.String)
-    address_2 = db.Column(db.String)
-    town = db.Column(db.String)
-    postcode = db.Column(db.String)
-    country = db.Column(db.String)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
+    name: Mapped[str | None]
+    address_1: Mapped[str | None]
+    address_2: Mapped[str | None]
+    town: Mapped[str | None]
+    postcode: Mapped[str | None]
+    country: Mapped[str | None]
+
+    user: Mapped[User] = relationship(back_populates="shipping")
 
 
 class AnonymousUser(AnonymousUserMixin):
@@ -568,9 +480,7 @@ def load_anonymous_user():
     if "anon_id" in session:
         au = AnonymousUser(session["anon_id"])
     else:
-        aid = "".join(
-            random.choice(string.ascii_lowercase + string.digits) for _ in range(8)
-        )
+        aid = "".join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))
         session["anon_id"] = aid
         au = AnonymousUser(aid)
 
@@ -578,4 +488,4 @@ def load_anonymous_user():
     return au
 
 
-from .cfp import Proposal  # noqa
+from .cfp import Proposal

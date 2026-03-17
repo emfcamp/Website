@@ -1,0 +1,1012 @@
+{
+    "villages": {
+        "1": {
+            "description": "The Maths Village is run by a group of mathematicians and maths communicators from all over the UK - including researchers, authors, presenters, YouTubers and hobbyists. This year the Maths Village will be one of EMF's Workshop Villages, hosting workshops from the main programme alongside their own content. Last EMF, we had a selection of hands-on maths puzzles, free maths magazines, interactive gadgets and games, dome-building workshops, face painting and a MathsJam evening. If you're a big maths fan already, or want to get into it (or back into it) you're welcome to join us to do some maths, and see what exciting stuff we've come up with this time.",
+            "location": [
+                52.04081962164122,
+                -2.3776591363047714
+            ],
+            "name": "Maths Village",
+            "url": "https://wiki.emfcamp.org/2024/wiki/Maths_Village"
+        },
+        "2": {
+            "description": "Not actually a test, we're real people. From South Oxfordshire and more. A combination of Harwell Hackers and Makers and our friends.",
+            "location": [
+                52.040270609942695,
+                -2.3791078159732137
+            ],
+            "name": "Test Village [Plz Ignore]",
+            "url": "https://harwellmakers.com"
+        },
+        "3": {
+            "description": "Fans and volunteers of the Wintergatan band unite!",
+            "location": [
+                52.04304121579813,
+                -2.374014583511979
+            ],
+            "name": "Wintergatan Village",
+            "url": "https://discord.gg/wintergatan"
+        },
+        "4": {
+            "description": "The description you have requested is not available. Please refresh and try again.",
+            "location": [
+                52.04296262488538,
+                -2.3767747487233066
+            ],
+            "name": "ERR_NAME_NOT_RESOLVED",
+            "url": ""
+        },
+        "5": {
+            "description": "We are bringing a Valve Index and gaming rig. Welcoming anyone to come by, try VR or join the village with their gaming kit. Several multiplayer games are on offer and if we get enough people to join, maybe a mini LAN party?\r\n\r\nCheck the link to view the wiki for full details and add your name if you want to join us.",
+            "location": [
+                52.0397647815214,
+                -2.379185860306677
+            ],
+            "name": "VR + PC Gaming Village",
+            "url": "https://wiki.emfcamp.org/2024/wiki/VR_%2B_PC_Gaming"
+        },
+        "6": {
+            "description": "We're Leeds Hackspace! A workshop and craft space for people who like making things, are curious about how stuff works, or would like to learn new skills, based in lovely Leeds.",
+            "location": [
+                52.04229753352189,
+                -2.3765152500726003
+            ],
+            "name": "Leeds Hackspace",
+            "url": "https://leedshackspace.org.uk/"
+        },
+        "7": {
+            "description": "Members and friends of Cheltenham Hackspace! Pop in and have a chat. All are welcome!\r\nUnless you're from East Essex hackspace.",
+            "location": [
+                52.042986735200486,
+                -2.3751966844093033
+            ],
+            "name": "Cheltenham Hackspace",
+            "url": "https://www.cheltenhamhackspace.org/"
+        },
+        "8": {
+            "description": "This year will see the return of the ever popular lockpicking village! Come and learn to pick locks and/or show off your skills. There will be members of The Open Organisation Of Lockpickers (TOOOL) to show you how and answer questions.",
+            "location": [
+                52.04101310437471,
+                -2.3777535651122435
+            ],
+            "name": "Lockpicking Village",
+            "url": "https://toool.uk/"
+        },
+        "9": {
+            "description": "Glauca and Co",
+            "location": [
+                52.04319182852811,
+                -2.375036814206311
+            ],
+            "name": "Shark Corner",
+            "url": "https://glauca.digital/"
+        },
+        "10": {
+            "description": "A demoparty at emf.",
+            "location": [
+                52.04333517398396,
+                -2.3760873864113137
+            ],
+            "name": "Field-FX ",
+            "url": null
+        },
+        "11": {
+            "description": "The increasingly misnamed London Aerospace. All things drone and model flight-related. We're a friendly bunch, so feel free to swing by and say hello, or simply stare at our mesmerising RGB village sign.",
+            "location": [
+                52.04340493814871,
+                -2.3750603981718825
+            ],
+            "name": "London Aerospace",
+            "url": null
+        },
+        "12": {
+            "description": "We are a hackerspace based in Edinburgh, bringing our members, friends, and their hacks. All welcome!\r\n\r\n[30 tents]",
+            "location": [
+                52.04262440407331,
+                -2.374704191148311
+            ],
+            "name": "Edinburgh Hacklab",
+            "url": "https://edinburghhacklab.com/"
+        },
+        "13": {
+            "description": "Folks from Bristol Hackspace",
+            "location": [
+                52.040806951773675,
+                -2.377433973535233
+            ],
+            "name": "Bristol Hackspace",
+            "url": null
+        },
+        "14": {
+            "description": "The ECS Village is for all of the lovely people from the University of Southampton!",
+            "location": [
+                52.040954255381706,
+                -2.375365354718383
+            ],
+            "name": "ECS",
+            "url": null
+        },
+        "15": {
+            "description": "Pooh, Eeyore, Rabbit and more welcome you to the RGB tents for hot drinks, honey, talk and trying new things. Drop by, create or collaborate on an idea, experiment with a cricut, screen printing, laser cutter, and other gadgets. Pop your project in the gallery and/or take a photo.\r\nThe on-site psychologist is in/out (like cats in boxes. Check the grey gazebo to find out). Much like the inhabitants of 100 acre wood, the rest of us might be hiding.\r\nLightBurn hosted by Smoke & Mirrors are also here with a large format (A1) Laser Cutter providing on-site laser cutting support, materials and introductions to laser cutting. \r\nLaura Mathews Art is here and will start puppet walkabouts from this village. ",
+            "location": [
+                52.04131698073036,
+                -2.3760390325738854
+            ],
+            "name": "100 Acre Wood (of Geeks)",
+            "url": "https://wiki.emfcamp.org/2024/wiki/100_Acre_Wood_(of_Geeks)"
+        },
+        "16": {
+            "description": "Too small to be a village. \r\n\r\nMaking, fixing, cooking, and enough lights to be visible from space (probably)",
+            "location": [
+                52.04055554652402,
+                -2.37651215807432
+            ],
+            "name": "Hacking Hamlet",
+            "url": "https://wiki.emfcamp.org/2024/wiki/Hacking_Hamlet"
+        },
+        "17": {
+            "description": "Amateur Radio demonstrations and talks.\r\nMembers representing AMSAT-UK (Amateur Satellites), BATC (British Amateur Television Club), UKuG (UK Microwave Group).\r\n",
+            "location": [
+                52.04107841847622,
+                -2.3758400490326608
+            ],
+            "name": "AMSAT-UK / BATC / UKuG",
+            "url": "https://wiki.batc.org.uk/EMFcamp_2024"
+        },
+        "18": {
+            "description": "Formally Regirock \u00dcN \u00dcN \u00dcN\r\n",
+            "location": [
+                52.04063570169194,
+                -2.376768198110426
+            ],
+            "name": "Gibraltar? Hardly new 'er",
+            "url": ""
+        },
+        "19": {
+            "description": "South London Makerspace is a social community workshop in the heart of South London, this is a place for all our members to camp together.",
+            "location": [
+                52.04167722723014,
+                -2.3756209783238376
+            ],
+            "name": "South London Makerspace",
+            "url": "https://discourse.southlondonmakerspace.org/t/emf-camp-2024/31775/44"
+        },
+        "20": {
+            "description": "We are building an interactive DJ set that anybody can join in with and control. We are a few friends that mostly all met online. We're flying in from different parts of the world and we will be bringing DJ decks + speakers + other goodies. All welcome",
+            "location": [
+                52.04308428947252,
+                -2.376446275418772
+            ],
+            "name": "data_rave",
+            "url": "https://www.datarave.live/"
+        },
+        "21": {
+            "description": "",
+            "location": null,
+            "name": "[Delete me,]",
+            "url": ""
+        },
+        "22": {
+            "description": "Members of Manchester Hackspace \ud83d\udc1d",
+            "location": [
+                52.04214430198516,
+                -2.376411179742888
+            ],
+            "name": "Manchester Hackspace",
+            "url": "https://www.hacman.org.uk/"
+        },
+        "23": {
+            "description": "Friends and fans of the Shonkbot, or any sort of low-rent robotics really",
+            "location": [
+                52.040718072652595,
+                -2.3774427939381724
+            ],
+            "name": "Shonkbot",
+            "url": "https://wiki.emfcamp.org/2024/wiki/Shonkbot"
+        },
+        "24": {
+            "description": "DON'T PANIC",
+            "location": [
+                52.04073050867626,
+                -2.376487166433492
+            ],
+            "name": "Heart of Gold",
+            "url": null
+        },
+        "25": {
+            "description": "Freeside is a loose conglomerate of hackers from around the globe. Cyberpunks, Stirner enthusiasts, beer drinkers, hedgehog admirers, and victims of the programming language Go.\r\n\r\nWe are a part of Milliways.",
+            "location": null,
+            "name": "Freeside",
+            "url": null
+        },
+        "26": {
+            "description": "Milton Keynes Makerspace & Friends\r\nLikely including the tea tent, and anything else we get around to!",
+            "location": [
+                52.040916708047945,
+                -2.3764443084518234
+            ],
+            "name": "Milton Keynes Makerspace",
+            "url": "https://mkmakerspace.co.uk/"
+        },
+        "27": {
+            "description": "Domes and dome enthusiasts",
+            "location": [
+                52.04314665404212,
+                -2.375503083032271
+            ],
+            "name": "Hacks \"R\" Us and Friends",
+            "url": "https://hacksrus.org"
+        },
+        "28": {
+            "description": "Consular Chaos, Deep Fried Buckfast, big dinks and big wiggles",
+            "location": [
+                52.04329962667447,
+                -2.3756295932040246
+            ],
+            "name": "Scottish Consulate",
+            "url": "https://consulate.scot"
+        },
+        "29": {
+            "description": "This is the village where Maker Space (of Newcastle and Gateshead) members and friends will be gathering. Our only real policy is \"Flat caps optional, being nice mandatory\". That and the global not being on fire thing. This year we are big on LEDs, flags, more LEDs, yet more LEDs, and digital radio. There will also be tea. Lots of tea. We are big on tea.",
+            "location": [
+                52.042825065455645,
+                -2.374928913659488
+            ],
+            "name": "The Northern Quarter",
+            "url": "https://wiki.emfcamp.org/2024/wiki/The_Northern_Quarter"
+        },
+        "30": {
+            "description": "Newbury & District Hackspace, We promote and encourage technical, scientific, creative and artistic skills through collaboration and education in Newbury and the surrounding areas",
+            "location": [
+                52.04023178869383,
+                -2.3789633698998216
+            ],
+            "name": "NADHack",
+            "url": null
+        },
+        "31": {
+            "description": "Less serious than the name might suggest\r\n\r\nTalk to Kristian for more details",
+            "location": [
+                52.04046052584599,
+                -2.3759355655842285
+            ],
+            "name": "SeriousCamp",
+            "url": null
+        },
+        "32": {
+            "description": "For those who were Guild of Makers members and friends. Please message Lucy (Twitter / Bluesky, Via web site / linkedin etc DrLucyRogers ) if you'd like to reserve a spot. It won't be near the ducks.\r\n\r\n",
+            "location": [
+                52.042763152727105,
+                -2.37383627346253
+            ],
+            "name": "GoM / Lucy",
+            "url": ""
+        },
+        "33": {
+            "description": "Nottinghack is a Nottingham based group for hackers, makers and crafty creative people! Nottinghack are helping run Workshop 1 and will be hosting several workshops there by our members, including a morning pop up cafe 8:30 - 9:30AM for pastries, tea and coffee (bring a flask!) and we will have a selection of snacks available for purchase in our tent next to Workshop 1",
+            "location": [
+                52.04269926644852,
+                -2.375176614972645
+            ],
+            "name": "Nottingham Hackspace",
+            "url": "https://wiki.emfcamp.org/2024/wiki/Nottinghack"
+        },
+        "34": {
+            "description": "People from Essex.  Not recognisable from antics as demonstrated on TOWIE.  Feel free to pop by and say hello or come camp with us.\r\n\r\nWe are currently planning a pre-setup LAN party for people to drop in, with some old LAN party games.",
+            "location": [
+                52.0433937508094,
+                -2.374480798759123
+            ],
+            "name": "East Essex Hackspace CIO",
+            "url": "https://wiki.emfcamp.org/2024/wiki/EEH_Village"
+        },
+        "35": {
+            "description": "Amateur Radio, Telephones, Communications, Retro Computers, etc. Made up of the EMF Hams (G1EMF), MastCar ARC (G1CAR), CuTEL, and friends. In previous years we were the \"Amateur Radio Village\"\r\n\r\nN.B We're not affiliated with the EMF organisers, and we can't help with your WiFi",
+            "location": [
+                52.043194936313455,
+                -2.3741230967545732
+            ],
+            "name": "ECHQ",
+            "url": "https://echq.org.uk/"
+        },
+        "36": {
+            "description": "A village that aims to show the power of Nix to the world. We want to create an open and welcoming space for people who want to learn and build together. We are all Nix enthusiasts with other interests ranging from radio to game development to AI. We might do small workshops and presentations at the village. ",
+            "location": [
+                52.04237515493185,
+                -2.376797009997148
+            ],
+            "name": "NixCamp",
+            "url": ""
+        },
+        "37": {
+            "description": "We are just a bunch of people that got connected by crazy and various circumstances\r\n\r\nJust a bunch of geeks sharing a story about moose (or possibly meese) who connected by crazy and various circumstances, in a spontaneous and still very dynamic way.\r\n\r\nCome and visit, we can tell you about all the mosses.\r\n\r\n",
+            "location": [
+                52.040781640081946,
+                -2.3759659825420556
+            ],
+            "name": "Moose",
+            "url": "https://trouble.is/moose/"
+        },
+        "38": {
+            "description": "We are bunch of hackers from all around the world who are into food, drinks and bio, experimenting wildly and enjoying each others presence. ",
+            "location": [
+                52.04093661671263,
+                -2.3771408563709144
+            ],
+            "name": "Food Hacking Base",
+            "url": "https://foodhackingbase.org/wiki/Fhb_emf2024"
+        },
+        "39": {
+            "description": "A village for EMF's Furry community. If you're a furry, or interested in the furry fandom, come and say hi. Many of our number are particularly interested in electronics and radio. We're also a very LGBTQ group.\r\n\r\nWe are a workshop village this year and will be running events where we brew and drink home-brewed beer. We will have a fursuit changing area, social and cooking areas, and pagers available to borrow",
+            "location": [
+                52.04189257877408,
+                -2.3753431582415203
+            ],
+            "name": "Furry High Commission",
+            "url": null
+        },
+        "40": {
+            "description": "A large group of friends (around 40) from across the UK.\r\nWe will be running a small programme of kids techy workshops in the village.",
+            "location": [
+                52.04082619133035,
+                -2.376720684625184
+            ],
+            "name": "Unnamed Village",
+            "url": ""
+        },
+        "41": {
+            "description": "Group of friends with some drop in workshops: \r\nThreadz: tablet weaving\r\nWebz: Xeon PHI nodes to play with",
+            "location": [
+                52.04046045976952,
+                -2.37836518805679
+            ],
+            "name": "Threadz 'n' Webz",
+            "url": "https://wiki.emfcamp.org/2024/wiki/Treadz_%27n%27_Webz"
+        },
+        "42": {
+            "description": "\ud83e\udd16 Model Village \ud83e\uddbe is for anyone interested in AI, machine learning, data science, deep learning, open data, GenAI, and everything in between.\r\n\r\nWe're a new village for 2024, all are welcome to join us to camp and chat about:\r\n\r\n\ud83e\udd16\ud83e\udde0\ud83d\udcca AI, machine learning, DL, statistics, whatever you call it.\r\n\ud83d\udcca\ud83d\udcc8\u2696\ufe0f Data science, open data, data storytelling, algo bias, AI ethics.\r\n\ud83d\udc0d\ud83e\udd80\u2728 Python, R, Mojo, Rust, or whatever you dig to dig into data.\r\n\ud83c\udfb5\ud83c\udfbb\ud83c\udfb7 Bring instruments! We'd love to have some live music jams in the evenings.\r\n\r\nWhether you go deep or just dipping your toes into the world of AI, you're welcome to join us. Let's hang out, share insights, and enjoy some tunes together under the stars. \ud83d\ude80\ud83c\udfb8\ud83c\udf0c",
+            "location": [
+                52.042834285908754,
+                -2.374750093757825
+            ],
+            "name": "Model Village",
+            "url": null
+        },
+        "43": {
+            "description": "Milliways is a group of information security specialists at hacker camps. \r\n\r\nWe bring large infrastructure which we plan and built ourselves. The intercontinental logistics include self constructed installations.",
+            "location": [
+                52.042649415042206,
+                -2.376248865077031
+            ],
+            "name": "Milliways",
+            "url": "https://milliways.info"
+        },
+        "44": {
+            "description": "Hi, we're Leigh Hackspace.  A collection of makers and artists from Leigh, Greater Manchester.  This will be our first EMF camp as a Hackspace, so we're looking forward to meeting people.",
+            "location": [
+                52.041972894671176,
+                -2.375782834449666
+            ],
+            "name": "Leigh Hackspace",
+            "url": "https://www.leighhack.org/"
+        },
+        "45": {
+            "description": "Just York Hackspace and associated folks camping in a field in Herefordshire.",
+            "location": [
+                52.04095894825673,
+                -2.376182505945252
+            ],
+            "name": "York Hackspace",
+            "url": "https://york.hackspace.org.uk"
+        },
+        "46": {
+            "description": "Being soft is a revolutionary act. A tapestry of transfeminine-leaning internet communities. Formerly known as the Cuddly Catgirl Collective and femcamp.\r\n",
+            "location": [
+                52.04117928504235,
+                -2.3762590724617496
+            ],
+            "name": "&nbsp;",
+            "url": ""
+        },
+        "47": {
+            "description": "Group of buddies from the lowlands; the Netherlands and Flanders, with a broad variety of interests. sysadmin, HAM radio, experimental music making and (retro) gaming.",
+            "location": [
+                52.042540525032024,
+                -2.3740161456001942
+            ],
+            "name": "lowland village",
+            "url": ""
+        },
+        "48": {
+            "description": "Ongoing film project\r\n\r\nStarted some years ago, will finish one day.  Honestly,",
+            "location": [
+                52.04345121555488,
+                -2.3748068774919773
+            ],
+            "name": "The Reckless Engineers",
+            "url": ""
+        },
+        "49": {
+            "description": "We are a team of friends combining our talents of our members to create interesting and beautiful things~\r\n\r\nCome by for a chat & coffee! ",
+            "location": [
+                52.041598834612415,
+                -2.375661318850007
+            ],
+            "name": "tilde.industries",
+            "url": ""
+        },
+        "50": {
+            "description": "A group of enthusiastic people from the Netherlands; looking for ways to immaterialise happiness. ",
+            "location": [
+                52.0429312213042,
+                -2.3738637660840425
+            ],
+            "name": "Making Happiness",
+            "url": "https://wiki.emfcamp.org/2024/wiki/Making_Happiness"
+        },
+        "51": {
+            "description": "A village of Makespace members from Cambridge. Makespace is a community workshop in the heart of Cambridge. Each year we host hundreds of events, training sessions, talks, and subject specific meet-ups, all with a collaborative spirit. Come and see some of our cool members\u2019 projects or join in a 3d printing demo.\r\n",
+            "location": [
+                52.04119635094233,
+                -2.3751539378120867
+            ],
+            "name": "Cambridge Makespace",
+            "url": ""
+        },
+        "52": {
+            "description": "To be confirmed.\r\n\r\nUkrainian people. Probably Ukrainian shirts, books, food.\r\n\r\nNo permanent stall planned at the moment.",
+            "location": null,
+            "name": "Ukrainian Village",
+            "url": ""
+        },
+        "53": {
+            "description": "Loose collective of people with some connection to / interest in Ireland, who travel to hacker/maker events and pool resources to create shared spaces while there.\r\n\r\nYou don't need to be from Ireland. You don't need to be living in Ireland. Mostly you just need to be able to get on with us for a week/end.",
+            "location": [
+                52.043013939044926,
+                -2.375910658177162
+            ],
+            "name": "Irish Embassy",
+            "url": "https://wiki.emfcamp.org/2024/wiki/Irish_Embassy"
+        },
+        "54": {
+            "description": "A village for people who like playing with string \ud83e\udea1 \ud83e\uddf6 - knitting, crochet, weaving, sewing conductive wearables, embroidery, handspinning, and any other fibre crafts! There will be a central comfy place to sit in the marquee, free materials for sharing, maybe a couple spare table looms/hooks/knitting needles to use, and a kettle on for tea and coffee. Open to anyone interested. Family-friendly. Hoping to get enough people to organise some drop-in workshops. ",
+            "location": [
+                52.04032632020346,
+                -2.378844010641359
+            ],
+            "name": "Tekhn\u0113-cal Village ",
+            "url": "https://wiki.emfcamp.org/2024/wiki/Tekhn%C4%93-cal_Village"
+        },
+        "55": {
+            "description": "A group of friends, most of whom are involved with the Puzzle Hunt, but some aren't. We're also mostly software engineers and mostly based in London. The village name is a tribute to everyone's favourite 1990s virtual assistant.",
+            "location": [
+                52.041156310446695,
+                -2.3769340738746507
+            ],
+            "name": "Camp Clippy",
+            "url": "https://eclectic-ideas.github.io/clippy/"
+        },
+        "56": {
+            "description": "Friends and Family of Dogsbody Technology to camp together however everyone is welcome! This is our fifth EMF and more staff join us each year. A quiet group of techies but friendly and \"mostly harmless\" :-)",
+            "location": [
+                52.041421805407964,
+                -2.3756977847586143
+            ],
+            "name": "Dogsbody HQ",
+            "url": ""
+        },
+        "57": {
+            "description": "ERROR at line 1:\r\nORA-00942: table or view does not exist",
+            "location": [
+                52.03964116392268,
+                -2.379011838689081
+            ],
+            "name": "Inclusive Bytes CIC",
+            "url": ""
+        },
+        "58": {
+            "description": "High altitude \ud83c\udf88 and \ud83d\ude80",
+            "location": [
+                52.041023637748765,
+                -2.3755366879835265
+            ],
+            "name": "Habville",
+            "url": null
+        },
+        "59": {
+            "description": "Village of Dutch hackerspaces and friends",
+            "location": [
+                52.040989240745716,
+                -2.3768781026436443
+            ],
+            "name": "Hackerspaces NL (HSNL)",
+            "url": "https://hackerspaces.nl"
+        },
+        "60": {
+            "description": "We are a slightly disparate group covering different genres of nerds. Some of us will be making LED constructs (that may be pink and long legged in nature); one of us running a workshop; others liaising with the Hackspace Foundation folk; and at least one playing with ham radios. All of us are here for General Malarky and a hearty camping breakfast. ",
+            "location": [
+                52.040435822204415,
+                -2.37820400505845
+            ],
+            "name": "Flamingo Frontier",
+            "url": ""
+        },
+        "61": {
+            "description": "Dolphin Emulator developers and friends.",
+            "location": [
+                52.04204978704857,
+                -2.3756767689816627
+            ],
+            "name": "Dolphin Emulator Village",
+            "url": "https://dolphin-emu.org/"
+        },
+        "62": {
+            "description": "Home of Birminghams Makerspace fizzPOP. We will be teaching lock picking, making random stuff and exhibiting various projects/installations.",
+            "location": [
+                52.04096403833711,
+                -2.377339971229162
+            ],
+            "name": "fizzPOP Makerspace",
+            "url": ""
+        },
+        "63": {
+            "description": "Sound Artists: Experienced field recordists, noisemakers, AI enthusiasts, instrument makers, electronics wizards, sculptors... \r\n\r\n",
+            "location": [
+                52.04291134380671,
+                -2.373582950999719
+            ],
+            "name": "Sounds Like Art",
+            "url": ""
+        },
+        "64": {
+            "description": "The Hardware Hacking Area is a place available for all participants of EMF Camp -- all day and all night.  There are soldering tools and other tools for creating and fixing, as well as for the many workshops scheduled throughout EMF.  The location is: Workshop 6 tent",
+            "location": [
+                52.04127607329244,
+                -2.3757017565431795
+            ],
+            "name": "Hardware Hacking Area",
+            "url": ""
+        },
+        "65": {
+            "description": "\ud83d\udc85",
+            "location": [
+                52.04261516220967,
+                -2.374914468487191
+            ],
+            "name": "IfDA School of Technology",
+            "url": "https://advancing.digital/"
+        },
+        "66": {
+            "description": "Nothing special but we might draw bats",
+            "location": [
+                52.04136338883569,
+                -2.375236307957607
+            ],
+            "name": "Gothic Valley",
+            "url": ""
+        },
+        "67": {
+            "description": "Wand Making for Muggles. - We are running green wood workshop for any one to come along and have a go at making a wand from green wood. You will learn how to use a shave horse and a draw knife to shape your wand. And there will be some tools for you to carve patterns in to the wand. \r\n\r\nWe will also provide a range of finishing products to help you perfect the finish and install the magical powers needed. This is the perfect session for you to create a wand as a cosplay accessory. we can accommodate any age, but for youngsters please drag an adult along, as we do work with sharp tools. \r\n\r\nNo dark arts spells allowed within the workshop tent. ",
+            "location": [
+                52.041079274788444,
+                -2.377530204125634
+            ],
+            "name": "Treeodesic! Wand Making",
+            "url": ""
+        },
+        "68": {
+            "description": "In the care of Hackerly Parish Council.",
+            "location": [
+                52.042067617714366,
+                -2.3754638427135717
+            ],
+            "name": "Bodgeham-on-Wye",
+            "url": "https://wiki.emfcamp.org/2024/wiki/Bodgeham-on-Wye"
+        },
+        "69": {
+            "description": "Tkkrlab is a community hackerspace in Enschede, Netherlands.",
+            "location": null,
+            "name": "TkkrLab",
+            "url": "https://tkkrlab.nl/"
+        },
+        "70": {
+            "description": "A small group formed when two loosely connected communities accidentally realised they'd both have attendees at EMF. Not really anything to do with Koalas, and not everyone is a programmer either. Naming things is hard!",
+            "location": [
+                52.04130478436585,
+                -2.375135062894145
+            ],
+            "name": "Koala Programming",
+            "url": ""
+        },
+        "71": {
+            "description": "Enthusiastic City Dwellers",
+            "location": [
+                52.04033731289772,
+                -2.3756541229953427
+            ],
+            "name": "Intense City",
+            "url": ""
+        },
+        "72": {
+            "description": "We're TWASK (FKA: AIA), a bunch of friends from the London area. You'll find us camping somewhere in proximity to the Scottish Consulate and Milliways - usually we fly a Pride Kubernetes flag. As with previous years, we can only apologise in advance.\r\n\r\nThings you might find in our village:\r\n\r\n- An eclectic mix of radios, including some LORA\r\n- Weird old, maybe working, analogue cameras\r\n- DJing\r\n- Twinks\r\n- Beverages\r\n- ?????",
+            "location": [
+                52.0433550113905,
+                -2.3751871302921472
+            ],
+            "name": "TWASK",
+            "url": null
+        },
+        "73": {
+            "description": "Odin is a large musical Tesla coil that will be generating up to 3m of sparks flavoured with industrial drum'n'bass. Also featuring smaller coils and Wimshurst machines from Derek at Extreme Electronics. Anyone with an interest in high voltage or power electronics welcome. Odin accepts audio input from electronic music equipment so I would like to hear from other musicians or DJs who might be interested in plugging in.\r\n",
+            "location": [
+                52.043332883036754,
+                -2.377304059026841
+            ],
+            "name": "Odin's Tesla Fest",
+            "url": "https://wiki.emfcamp.org/2024/wiki/Odin%27s_Tesla_Fest"
+        },
+        "74": {
+            "description": "Miscellaneous family and friends.",
+            "location": [
+                52.040358092995604,
+                -2.3761404357233573
+            ],
+            "name": "Motley Crew",
+            "url": ""
+        },
+        "75": {
+            "description": "",
+            "location": [
+                52.04126133464359,
+                -2.376732597359876
+            ],
+            "name": "Teesside Hackspace",
+            "url": null
+        },
+        "76": {
+            "description": "A bunch of folks from Swansea Hackspace. We will be bringing lots of phones, radios and possibly a fax machine. Interests in electronics, radio, sewing, crafts, programming and making in general!",
+            "location": [
+                52.04055234801058,
+                -2.3760351439859733
+            ],
+            "name": "Swansea Hackspace",
+            "url": "Https://Swansea.hackspace.org.uk"
+        },
+        "77": {
+            "description": "Meet the Makers James Bruton & his Giant Tentacle Rob Robot, Matt Denton and his giant scale Lego inspired 3D prints and R2-D2 builder\u00a0Lee\u00a0Towersey!",
+            "location": [
+                52.04015575970692,
+                -2.378013184724807
+            ],
+            "name": "Content Creators Village",
+            "url": ""
+        },
+        "78": {
+            "description": "[15~ people] An erratic collection of makers, burners, goths and hippies from Cambridge here to have a good time and bring chaos and/or prog to EMF.",
+            "location": [
+                52.04170327000736,
+                -2.375185588798985
+            ],
+            "name": "Poorly Located Prog",
+            "url": "https://wiki.emfcamp.org/2024/wiki/Poorly_Located_Prog"
+        },
+        "79": {
+            "description": "Electromagnetic Field Arcade\r\n\r\nThis is not a camping village, but for scheduling game developer demos and Q&A times. ",
+            "location": null,
+            "name": "Arcade",
+            "url": null
+        },
+        "80": {
+            "description": "Join us for a drop-in workshop on Tool and Knife sharpening! \r\n\r\nWe'll be running every day from 10-4 (with a few breaks in between) to teach manual tool sharpening using traditional whetstones.\r\n\r\nDue to the handling of sharp objects, this workshop is 18+, or 12+ if supervised by a responsible adult.",
+            "location": [
+                52.04289427320194,
+                -2.376318069325464
+            ],
+            "name": "Knife & Tool Sharpening",
+            "url": ""
+        },
+        "81": {
+            "description": "A Group of 8 - 15 friends from around the Reading Area wanting to set up a village together. ",
+            "location": [
+                52.04139121161512,
+                -2.375514194187218
+            ],
+            "name": "League of Dibs",
+            "url": ""
+        },
+        "82": {
+            "description": "Loud music at times, Chilling at others. Map Space claim",
+            "location": [
+                52.041440983088734,
+                -2.3751444977418146
+            ],
+            "name": "Spaced Out",
+            "url": null
+        },
+        "83": {
+            "description": "A group of people from Bristol camping together with a loosely planned collection of our nonsense. You may have played Mario Kart with us in 2012, or listened to Simon Singh narrate us totally failing to light a barbecue in 2016.",
+            "location": [
+                52.04172526889039,
+                -2.3755547214478554
+            ],
+            "name": "2016's worst village",
+            "url": ""
+        },
+        "84": {
+            "description": "Hitchin Hackspace - North Herts Makers.\r\n\r\nThe little hackspace that likes to build big things. Come along, say hello, and see what outlandishly outsized creation we've brought this time.",
+            "location": [
+                52.04071628691702,
+                -2.3759898592300033
+            ],
+            "name": "Hitchin Hackspace",
+            "url": null
+        },
+        "85": {
+            "description": "termisoc alumni & friends. Potentially a crumpet stand for your crumpting needs ",
+            "location": [
+                52.04191994920191,
+                -2.3756070808464074
+            ],
+            "name": "TermiCamp",
+            "url": ""
+        },
+        "86": {
+            "description": "A group of friends from Scotland who demand a Shrubbery.  There will be a rabbit with big pointy teeth.",
+            "location": [
+                52.04092726674972,
+                -2.3758228884386483
+            ],
+            "name": "Shrubbery \ud83e\udeb4",
+            "url": "https://wiki.emfcamp.org/2024/wiki/Shrubbery"
+        },
+        "87": {
+            "description": "A most splendid gathering of most splendid people.\r\nWith a dinosaur flag.",
+            "location": [
+                52.04021101861747,
+                -2.3771180428348657
+            ],
+            "name": "Village of Doom",
+            "url": null
+        },
+        "88": {
+            "description": "Just a group of people trying to set up camp allowing for some space for others arriving later.\r\n",
+            "location": [
+                52.04122171762435,
+                -2.3764922856109365
+            ],
+            "name": "this.camp()",
+            "url": ""
+        },
+        "89": {
+            "description": "Not a real software company, but a bunch of mainly former Royal Holloway students from the Surrey area camping together. Feel free to come hang out! We have some funky old tech, DJ decks, and pilk in abundance. ",
+            "location": [
+                52.04296756421817,
+                -2.3746124700391817
+            ],
+            "name": "Pilksoft Interactive",
+            "url": "https://pilk.uk/"
+        },
+        "90": {
+            "description": "a bunch of people from brighton. and some who are not.",
+            "location": [
+                52.040572749829295,
+                -2.3755442230634287
+            ],
+            "name": "Brighton Consulate",
+            "url": "https://wiki.emfcamp.org/2024/wiki/Brighton_Consulate"
+        },
+        "91": {
+            "description": "Hacky Racers is a DIY electric racing series, now recognised by Motorsports UK, that aims to get people involved in a motorsport who may not otherwise have a chance. To level the playing field we have a \u00a3500 budget limit so people can't just pay to win, and the racers themselves have to be small too and typically can be transported in a hatchback.\r\n\r\nCome visit our track and watch one of our racers, we'll be near the bar!",
+            "location": [
+                52.04182261363587,
+                -2.3781586012054845
+            ],
+            "name": "Hacky Racers",
+            "url": "https://www.hackyracers.co.uk"
+        },
+        "92": {
+            "description": "Just a collection of mates camping in glowing hats.\r\n~ 16 people",
+            "location": [
+                52.042533766463805,
+                -2.374346780510706
+            ],
+            "name": "Hat Village",
+            "url": ""
+        },
+        "93": {
+            "description": "A collection of families made up of (mostly young) passionate pokemon players. Drop in for a cuppa/coffee, for a quick game or card swap. We will also be running a sticker swap (sticker for a sticker OR donate MSF for stickers). Other families with young pokemon players are welcome to join.",
+            "location": [
+                52.04021131883516,
+                -2.376045072793488
+            ],
+            "name": "Aeos Island",
+            "url": null
+        },
+        "94": {
+            "description": "A village for people without a village, if you're coming on your own and would like to meet a few people who are in the same situation add yourself to the linked wiki page, and camp somewhere in the vicinity of the village's spot on the map.",
+            "location": [
+                52.042729855538056,
+                -2.3742128956681086
+            ],
+            "name": "Unaffiliated",
+            "url": null
+        },
+        "95": {
+            "description": "Group of people working on public crypto projects, RFID, hardware hacking, and with a pony theme.  We won't need any structures, and it will basically be our tents with some small tables we will be using. \r\n\r\nPerhaps around Camping H?",
+            "location": [
+                52.041282494187016,
+                -2.375138125841687
+            ],
+            "name": "Crypto Ponies",
+            "url": null
+        },
+        "96": {
+            "description": "We have a really good camping table. If you see it, take a picture to show your loved ones.\r\n\r\nA small group (4) of friends from the northern territories, for most of us this is our first EMF",
+            "location": [
+                52.04305314872545,
+                -2.3737689054782436
+            ],
+            "name": "Camper's Union",
+            "url": ""
+        },
+        "97": {
+            "description": "Welcome to Kernowfornia! Featuring clear blue waters and miles of expansive beaches. We'll be bringing the very best of the Cornish Tech Industry to a field in the middle of Hertfordshire.\r\n\r\nHome to a world famous pop culture quiz night every night and providers of minature Cornish flags for all...",
+            "location": [
+                52.04229077318445,
+                -2.376323031733534
+            ],
+            "name": "Kernowfornia",
+            "url": null
+        },
+        "98": {
+            "description": "It's a massive flag. And this year, its more massive. But, is it just a flag, or is it faultlessly aligned? ",
+            "location": [
+                52.04256744247479,
+                -2.3759889073602665
+            ],
+            "name": "Electronic Mega-Flag",
+            "url": ""
+        },
+        "99": {
+            "description": "DOME",
+            "location": [
+                52.042798120231,
+                -2.376611415379614
+            ],
+            "name": "Chilling with my Domies",
+            "url": null
+        },
+        "100": {
+            "description": "We'll be running blacksmithing classes from 2pm to 8pm on Thursday, 8am to 8pm Friday and Saturday and 8am until 4pm on Sunday. \r\n\r\nWe'll also be running coppersmithing classes and and a handful of blacksmithing/coppersmithing combo masterclasses where you'll make an amazing forged steel and copper ladle.",
+            "location": [
+                52.04198924207739,
+                -2.378228338591697
+            ],
+            "name": "Blacksmiths Village",
+            "url": "https://www.urbancraftsfoundation.co.uk/"
+        },
+        "101": {
+            "description": "This isn't a village, it's a workshop. Starts by my tent (with the purple/gold/black conlang flag), next to the cluster of 4 trees south of the lounge, and walks all around camp from there.\r\n\r\nSign up required, at https://s.ai/emf/ws. Probably once a day, Thursday through Sunday, in the evening. Exact times depend on sign-ups and my own needs; you'll get an email from me or Alex telling you when to come. Assistants needed, please sign up. Observers welcome to tag along.",
+            "location": [
+                52.04117059858581,
+                -2.3770322182784014
+            ],
+            "name": "Sense Without Sight w/s",
+            "url": "https://s.ai/emf#workshop"
+        },
+        "102": {
+            "description": "What if music, but faster?\r\nThere are also t-shirts for sale - check our page on the wiki!",
+            "location": [
+                52.0434379512173,
+                -2.3758136794351685
+            ],
+            "name": "The Nightcore Collective",
+            "url": "https://wiki.emfcamp.org/2024/wiki/The_Nightcore_Collective"
+        },
+        "103": {
+            "description": "Country bumpkins with a love of bicycles, maths, anime, computer science & cake.",
+            "location": null,
+            "name": "Here be Badgers",
+            "url": ""
+        },
+        "104": {
+            "description": "A CTF team forged by the memes, for the memes, 0rganizers turns cyber security into cyber mystery.\r\n\r\nWe consist of the university teams from ETH Zurich and EPFL, people in the UK, Germany and other places. Say hi!",
+            "location": [
+                52.041678270844585,
+                -2.3752934842120226
+            ],
+            "name": "0rganizers",
+            "url": "https://org.anize.rs"
+        },
+        "105": {
+            "description": "We will be running FREE Laser Tag sessions for 1 Hour at 11am/ 2pm  Saturday and 2pm Sunday next to the Null Sector.\r\nNo booking required. We can do 10 people per game. Each game is about 6 minutes. Just turn up and we'll do our best to fit you in.\r\nSuitable for ages 7+\r\n",
+            "location": [
+                52.04356915492792,
+                -2.3769251882568767
+            ],
+            "name": "Null Sector Laser Tag",
+            "url": ""
+        },
+        "106": {
+            "description": "People who are not quite as cool as those from Brighton.",
+            "location": [
+                52.04060654706035,
+                -2.3754169950172184
+            ],
+            "name": "Hove, actually",
+            "url": "https://wiki.emfcamp.org/2024/wiki/Hove,_actually"
+        },
+        "107": {
+            "description": "A magical musical instrument that is made from a tree stump. We invite people from musical and non musical backgrounds to gather round and play collaboratively.\r\n\r\nThe more you explore the stump, the more it has to offer, feel it, whack it, speak to it and see what you receive.\r\n\r\nIt creates inspiration, creativity and silliness like no other instrument. Coming from the roots to create magical sounds.\r\n\r\nIt has sound effects and amplification to create an atmospheric mode. The stump works well as the soul compound instrument in a jam or can be used to integrate other instruments.\r\n\r\nBe careful when you visit, you might loose an hour or two!\r\n\r\nCheck out the instagram:\r\nhttps://www.instagram.com/synestreesia_wood_stories/\r\nhttps://www.instagram.com/jazzcousins/",
+            "location": [
+                52.043070974217386,
+                -2.3768256223424373
+            ],
+            "name": "Stumpadelic Sound",
+            "url": "https://www.instagram.com/synestreesia/"
+        },
+        "108": {
+            "description": "We are a relatively small hackspace of about 40 members total and a penchant for working with metal and general over-engineering. Not sure exactly what we\u2019ll be doing at EMF, beyond basic hacking, but it will likely involve video games in some way.",
+            "location": null,
+            "name": "Cardiff Hackspace",
+            "url": null
+        },
+        "109": {
+            "description": "Surrey and Hampshire MakerSpace - a makerpace located on the borders of Surrey and Hampshire near Farnham/Guildford/Farnborough. ",
+            "location": [
+                52.04051063058134,
+                -2.3754477785338395
+            ],
+            "name": "SHM",
+            "url": null
+        },
+        "110": {
+            "description": "EOF Hackspace comes to EMF. All Oxfordshire and nearby attendees are welcome to pitch by.\r\nVery simple setup, so more like a hamlet than a village.",
+            "location": [
+                52.04059559086818,
+                -2.375838287199798
+            ],
+            "name": "EOF Hackspace (Oxford)",
+            "url": null
+        },
+        "111": {
+            "description": "The Ship is an extraordinary space that enables creativity, collaboration and innovation, allowing teams to go deeper, faster, with more creativity, and without any limits.\r\n\r\nThis is more than an innovation retreat centre themed as a sailing ship inside a Welsh Chapel. It's hyper-dimensional innovation vehicle for changing this world.\r\n\r\nSailors, equipped with everything they need onboard, are free to sail anywhere they choose. Corporations seeking profit brought us to the brink, now let's see where radical innovation pirates can take us.",
+            "location": [
+                52.042984453345866,
+                -2.375513900357589
+            ],
+            "name": "Astralship",
+            "url": null
+        },
+        "112": {
+            "description": "A small craft & maker studio from south west London.",
+            "location": [
+                52.043225799037,
+                -2.3735908844342077
+            ],
+            "name": "Forge & Craft",
+            "url": null
+        },
+        "113": {
+            "description": "Great Camp Hexpansion Quest",
+            "location": [
+                52.04125633597309,
+                -2.375553356964076
+            ],
+            "name": "GCHQ.NET",
+            "url": ""
+        },
+        "114": {
+            "description": "We have a van, and a lot of LEDs, and a surprising about of rotary telephones.",
+            "location": null,
+            "name": "Hack The Vannit",
+            "url": "https://roygbivw.hecknswell.com/"
+        },
+        "115": {
+            "description": "The EMF Camp Badge Team",
+            "location": null,
+            "name": "Badge Tent",
+            "url": ""
+        }
+    }
+}

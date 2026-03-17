@@ -1,20 +1,23 @@
 {% extends "base.html" %}
 {% block title %}Credit Card Payment{% endblock %}
+{% block head %}
+<script src="https://js.stripe.com/clover/stripe.js"></script>
+{% endblock %}
 {% block body %}
 
-<div class="col-md-10">
+<div class="col-md-12">
 
-<h2>Card Payment Details</h2>
+<h2>Payment Details</h2>
 
 <div class="well" id="payment-info">
-  Please enter your card details below to complete your order for 
+  Please enter your payment details below to complete your order for 
   <strong>{{ payment.amount | price(payment.currency) }}</strong>.<br>
-  <small>Your card details are processed securely by Stripe and are not handled or stored by EMF.</small>
+  <small>Your payment details are processed securely by Stripe and are not handled or stored by EMF.</small>
 </div>
 
 <noscript>
     <div class="alert alert-info">
-        <p>You must have Javascript enabled to use our card payment provider Stripe.
+        <p>You must have Javascript enabled to use our payment provider Stripe.
             Please enable Javascript and click below to reload the page.</p>
             <a class="btn btn-primary"
                 href="{{ url_for('payments.stripe_capture', payment_id=payment.id) }}">
@@ -23,94 +26,99 @@
 </noscript>
 
 <form class="form well" role="form" id="stripe-form">
-  <div class="form-group">
-    <label class="control-label" for="cardholder-name">Cardholder Name</label>
-    <input class="form-control" id="cardholder-name" value="{{ current_user.name }}">
+  <div id="stripe-payment" class="hidden"></div>
+  <div id="stripe-loading">
+    Loading payment form, please wait...
   </div>
   <div class="form-group" id="stripe-group">
-    <label class="control-label" for="stripe-card">Card Details</label>
-    <div class="controls">
-      <div class="form-control" id="stripe-card"></div>
-    </div>
     <span id="stripe-error" class="help-block"></span>
   </div>
-  <button class="btn btn-default" id="stripe-pay" disabled="true">Make Payment</button>
-</form>
-
-<form method="post" action="{{ url_for('payments.stripe_capture', payment_id=payment.id) }}" id="stripe_capture" class="hidden">
+  <button class="btn btn-lg btn-success hidden" id="stripe-pay" disabled="true">Make Payment</button>
 </form>
 
 </div>
 {% endblock %}
 {% block foot -%}
-<script src="https://js.stripe.com/v3/"></script>
 <script nonce="{{csp_nonce}}">
-  var PUBLIC_KEY = {{ config['STRIPE_PUBLIC_KEY']|tojson }};
-  var client_secret = {{ client_secret|tojson }};
-  var email = {{ current_user.email|tojson }};
-  var METHOD = 'card';
-
-  var stripe = Stripe(PUBLIC_KEY);
-  var elements = stripe.elements();
-
-  var pay_button = $('#stripe-pay');
-
-  function set_error(error) {
-    if (error) {
-      $('#stripe-error').text(error);
-      $('#stripe-group').addClass('has-error');
-      pay_button.prop('disabled', true);
-    } else {
-      $('#stripe-error').text("");
-      $('#stripe-group').removeClass('has-error');
+  const PUBLIC_KEY = {{ config['STRIPE_PUBLIC_KEY']|tojson }};
+  const client_secret = {{ client_secret|tojson }};
+  const capture_url = {{ external_url('payments.stripe_waiting', payment_id=payment.id)|tojson }};
+  const appearance = {
+    theme: 'stripe',
+    variables: {
+      fontFamily: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+      colorBackground: '#efece0',
+      colorPrimary: '#213018',
+      colorText: '#1e1e1e'
     }
-  }
+  };
 
-  function stripe_validate(event) {
-    if (event.error) {
-      set_error(event.error.message);
-    } else {
-      set_error('');
-    }
+  const stripe = Stripe(PUBLIC_KEY);
+  const elements = stripe.elements({clientSecret: client_secret, appearance});
 
-    if (event.complete) {
-      pay_button.prop('disabled', false);
-    } else {
-      pay_button.prop('disabled', true);
-    }
-  }
+  const pay_button = document.querySelector('#stripe-pay');
 
-  function stripe_submit(event) {
-    event.preventDefault();
-    pay_button.prop('disabled', true);
-    stripe.confirmCardPayment(
-      client_secret,
-      {
-        payment_method: {
-          card: cardElement,
-          billing_details: {
-            name: $('#cardholder-name').val(),
-            email: email,
-          }
-        }
-      }
-    ).then(function(result) {
-      if (result.error) {
-        set_error(result.error.message);
-      } else {
-        $('#stripe_capture').submit();
+  async function init() {
+    let paymentElement = elements.create('payment', {
+      layout: "accordion",
+      defaultValues: {
+        email: {{ current_user.email|tojson }}
       }
     });
+
+    paymentElement.on('change', function(event) {
+      if (event.complete) {
+        set_error(null);
+      }
+    });
+
+    paymentElement.on('ready', () => {
+      const loadingContainer = document.querySelector('#stripe-loading');
+      const paymentContainer = document.querySelector('#stripe-payment');
+      loadingContainer.classList.add('hidden');
+      paymentContainer.classList.remove('hidden');
+      pay_button.classList.remove('hidden');
+    });
+
+    paymentElement.mount('#stripe-payment');
+
+    pay_button.addEventListener('click', stripe_submit);
+    document.querySelector('#stripe-form').addEventListener('submit', stripe_submit);
   }
 
-  if (METHOD == 'card') {
-    var cardElement = elements.create('card');
-
-    cardElement.on('change', stripe_validate);
-    cardElement.mount('#stripe-card');
-
-    pay_button.on('click', stripe_submit);
-    $('#stripe-form').on('submit', stripe_submit);
+  function set_error(error) {
+    const errorContainer = document.querySelector('#stripe-error');
+    const errorGroup = document.querySelector('#stripe-group');
+    let text = '';
+    if (error) {
+      text = error;
+      pay_button.setAttribute('disabled', true);
+      errorGroup.classList.add('has-error');
+    } else {
+      pay_button.removeAttribute('disabled')
+      errorGroup.classList.remove('has-error');
+    }
+    errorContainer.innerText = error;
   }
+
+  async function stripe_submit(event) {
+    event.preventDefault();
+    pay_button.setAttribute('disabled', true);
+
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: capture_url
+      },
+    });
+
+    if (error.type === "card_error" || error.type === "validation_error") {
+      set_error(error.message);
+    } else {
+      set_error("An unexpected error occurred.")
+    }
+  }
+
+  init();
 </script>
 {% endblock -%}

@@ -1,21 +1,20 @@
-from . import admin
-
 import re
 
-from Levenshtein import ratio, jaro
-from flask import render_template, redirect, flash, url_for, current_app as app
+from flask import current_app as app
+from flask import flash, redirect, render_template, url_for
 from flask_login import current_user
 from flask_mailman import EmailMessage
-
+from Levenshtein import jaro, ratio
 from wtforms import SubmitField
 
-from main import db
+from main import db, get_or_404
 from models.payment import BankPayment, BankTransaction
 
 from ..common import feature_enabled
 from ..common.email import from_email
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
+from . import admin
 
 
 @admin.route("/transactions")
@@ -32,7 +31,7 @@ class TransactionSuppressForm(Form):
 
 @admin.route("/transaction/<int:txn_id>/suppress", methods=["GET", "POST"])
 def transaction_suppress(txn_id):
-    txn = BankTransaction.query.get_or_404(txn_id)
+    txn = get_or_404(db, BankTransaction, txn_id)
 
     form = TransactionSuppressForm()
     if form.validate_on_submit():
@@ -41,7 +40,7 @@ def transaction_suppress(txn_id):
             app.logger.info("Transaction %s suppressed", txn.id)
 
             db.session.commit()
-            flash("Transaction %s suppressed" % txn.id)
+            flash(f"Transaction {txn.id} suppressed")
             return redirect(url_for("admin.transactions"))
 
     return render_template("admin/accounts/txn-suppress.html", txn=txn, form=form)
@@ -86,7 +85,7 @@ def score_reconciliation(txn, payment):
 
 @admin.route("/transaction/<int:txn_id>/reconcile")
 def transaction_suggest_payments(txn_id):
-    txn = BankTransaction.query.get_or_404(txn_id)
+    txn = get_or_404(db, BankTransaction, txn_id)
 
     payments = (
         BankPayment.query.filter_by(state="inprogress")
@@ -98,21 +97,17 @@ def transaction_suggest_payments(txn_id):
     payments = list(reversed(payments[-20:]))
 
     app.logger.info("Suggesting %s payments for txn %s", len(payments), txn.id)
-    return render_template(
-        "admin/accounts/txn-suggest-payments.html", txn=txn, payments=payments
-    )
+    return render_template("admin/accounts/txn-suggest-payments.html", txn=txn, payments=payments)
 
 
 class ManualReconcilePaymentForm(Form):
     reconcile = SubmitField("Reconcile")
 
 
-@admin.route(
-    "/transaction/<int:txn_id>/reconcile/<int:payment_id>", methods=["GET", "POST"]
-)
+@admin.route("/transaction/<int:txn_id>/reconcile/<int:payment_id>", methods=["GET", "POST"])
 def transaction_reconcile(txn_id, payment_id):
-    txn = BankTransaction.query.get_or_404(txn_id)
-    payment = BankPayment.query.get_or_404(payment_id)
+    txn = get_or_404(db, BankTransaction, txn_id)
+    payment = get_or_404(db, BankPayment, payment_id)
 
     form = ManualReconcilePaymentForm()
     if form.validate_on_submit():
@@ -127,14 +122,14 @@ def transaction_reconcile(txn_id, payment_id):
 
             if txn.payment:
                 app.logger.error("Transaction already reconciled")
-                flash("Transaction %s already reconciled" % txn.id)
+                flash(f"Transaction {txn.id} already reconciled")
                 return redirect(url_for("admin.transactions"))
 
             payment.lock()
 
             if payment.state == "paid":
                 app.logger.error("Payment has already been paid")
-                flash("Payment %s already paid" % payment.id)
+                flash(f"Payment {payment.id} already paid")
                 return redirect(url_for("admin.transactions"))
 
             txn.payment = payment
@@ -160,9 +155,7 @@ def transaction_reconcile(txn_id, payment_id):
 
             msg.send()
 
-            flash("Payment ID %s marked as paid" % payment.id)
+            flash(f"Payment ID {payment.id} marked as paid")
             return redirect(url_for("admin.transactions"))
 
-    return render_template(
-        "admin/accounts/txn-reconcile.html", txn=txn, payment=payment, form=form
-    )
+    return render_template("admin/accounts/txn-reconcile.html", txn=txn, payment=payment, form=form)

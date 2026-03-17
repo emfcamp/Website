@@ -1,27 +1,24 @@
-# coding=utf-8
-import pendulum
-from icalendar import Calendar, Event
-from datetime import datetime
-from flask import render_template, request, redirect, url_for, flash, abort, session, Response
-from flask import current_app as app
 from collections import defaultdict
+
+import pendulum
+from flask import Response, abort, flash, redirect, render_template, request, session, url_for
+from flask import current_app as app
+from flask.typing import ResponseValue
 from flask_login import current_user
+from icalendar import Calendar, Event
 from sqlalchemy.orm import joinedload
 
-from main import db
-from models import event_year
+from main import db, get_or_404
+from models import config_date, event_year, naive_utcnow
 from models.user import User, generate_api_token
-
 from models.volunteer.role import Role
-from models.volunteer.venue import VolunteerVenue
 from models.volunteer.shift import Shift, ShiftEntry
+from models.volunteer.venue import VolunteerVenue
 from models.volunteer.volunteer import Volunteer
-from models import config_date
 
+from ..common import feature_flag, get_next_url
 from ..schedule import event_tz
-from ..users import get_next_url
-from ..common import feature_flag
-from . import volunteer, v_user_required, v_admin_required
+from . import v_admin_required, v_user_required, volunteer
 
 
 def _get_roles_with_user_data(user):
@@ -39,7 +36,7 @@ def _get_roles_with_user_data(user):
     return res
 
 
-def redirect_next_or_schedule(message: str | None = None):
+def redirect_next_or_schedule(message: str | None = None) -> ResponseValue:
     """
     Set the flash if `message` is set, then redirect either to the URL in the
     `next` form field, or if that doesn't exist to the schedule page.
@@ -56,9 +53,9 @@ def redirect_next_or_schedule(message: str | None = None):
 @feature_flag("VOLUNTEERS_SCHEDULE")
 @v_user_required
 def schedule():
-    if datetime.utcnow() < config_date("EVENT_START"):
+    if naive_utcnow() < config_date("EVENT_START"):
         default_day = "wed"
-    elif datetime.utcnow() > config_date("EVENT_END"):
+    elif naive_utcnow() > config_date("EVENT_END"):
         default_day = "mon"
     else:
         default_day = pendulum.now().strftime("%a").lower()
@@ -109,7 +106,7 @@ def schedule_ical():
     if not user:
         abort(404)
 
-    title = "EMF {} Volunteer Shifts for {}".format(event_year(), user.name)
+    title = f"EMF {event_year()} Volunteer Shifts for {user.name}"
 
     cal = Calendar()
     cal.add("summary", title)
@@ -117,18 +114,16 @@ def schedule_ical():
     cal.add("X-WR-CALDESC", title)
     cal.add("version", "2.0")
 
-    shifts = (Shift.query
-            .select_from(ShiftEntry)
-            .join(Shift.entries.and_(ShiftEntry.user == user))
-            .options(
-                joinedload(Shift.venue),
-                joinedload(Shift.role)
-            )).all()
+    shifts = (
+        Shift.query.select_from(ShiftEntry)
+        .join(Shift.entries.and_(ShiftEntry.user == user))
+        .options(joinedload(Shift.venue), joinedload(Shift.role))
+    ).all()
 
     for shift in shifts:
         cal_event = Event()
-        cal_event.add("uid", "%s-%s" % (event_year(), shift.id))
-        cal_event.add("summary", "%s at %s" % (shift.role.name, shift.venue.name))
+        cal_event.add("uid", f"{event_year()}-{shift.id}")
+        cal_event.add("summary", f"{shift.role.name} at {shift.venue.name}")
         cal_event.add("location", shift.venue.name)
         cal_event.add("dtstart", event_tz.localize(shift.start))
         cal_event.add("dtend", event_tz.localize(shift.end))
@@ -141,7 +136,7 @@ def schedule_ical():
 @feature_flag("VOLUNTEERS_SCHEDULE")
 @v_admin_required
 def shift(shift_id):
-    shift = Shift.query.get_or_404(shift_id)
+    shift = get_or_404(db, Shift, shift_id)
     all_volunteers = Volunteer.query.order_by(Volunteer.nickname).all()
 
     return render_template("volunteer/shift.html", shift=shift, all_volunteers=all_volunteers)
@@ -151,7 +146,7 @@ def shift(shift_id):
 @feature_flag("VOLUNTEERS_SCHEDULE")
 @v_user_required
 def shift_sign_up(shift_id):
-    shift = Shift.query.get_or_404(shift_id)
+    shift = get_or_404(db, Shift, shift_id)
     if current_user.has_permission("volunteer:admin") and "user_id" in request.form:
         user = User.query.get(request.form["user_id"])
     else:
@@ -179,7 +174,7 @@ def shift_sign_up(shift_id):
                 f"This shift clashes with your {clash_role} shift at {clash_time}, you have not been signed up."
             )
 
-    shift.entries.append(ShiftEntry(user=user, shift=shift))
+    db.session.add(ShiftEntry(user=user, shift=shift))
     db.session.commit()
 
     return redirect_next_or_schedule(f"Signed up {shift.role.name} shift")
@@ -189,7 +184,7 @@ def shift_sign_up(shift_id):
 @feature_flag("VOLUNTEERS_SCHEDULE")
 @v_user_required
 def shift_cancel(shift_id):
-    shift = Shift.query.get_or_404(shift_id)
+    shift = get_or_404(db, Shift, shift_id)
 
     user = current_user
     shift_entry = ShiftEntry.query.filter_by(user_id=user.id, shift_id=shift.id).first()
@@ -204,6 +199,6 @@ def shift_cancel(shift_id):
 @feature_flag("VOLUNTEERS_SCHEDULE")
 @v_admin_required
 def shift_contact(shift_id):
-    shift = Shift.query.get_or_404(shift_id)
+    shift = get_or_404(db, Shift, shift_id)
     session["recipients"] = [u.volunteer.id for u in shift.volunteers]
     return redirect(url_for("volunteer_admin_notify.main"))

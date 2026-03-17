@@ -1,27 +1,29 @@
-# encoding=utf-8
 from datetime import timedelta
-from flask import redirect, url_for, current_app as app, abort
+
+from flask import abort, redirect, url_for
+from flask import current_app as app
+from flask.typing import ResponseValue
 from flask_login import current_user
 from geoalchemy2.shape import to_shape
 from pendulum import parse
 
-from models.cfp import WorkshopProposal
-
-from . import volunteer, v_admin_required
-from ..common import feature_enabled, feature_flag
 from apps.common import render_markdown
-
 from main import db
+from models.cfp import WorkshopProposal
 from models.volunteer import (
-    Volunteer,
-    VolunteerVenue,
     Role,
     RoleAdmin,
     Shift,
     ShiftEntry,
+    Volunteer,
+    VolunteerVenue,
 )
-from .init_data import load_initial_venues, load_initial_roles
-from .shift_list import shift_list
+
+from ..common import feature_enabled, feature_flag
+from . import v_admin_required, volunteer
+from .init_data import load_initial_roles, load_initial_venues
+from .shift_list import get_shift_list
+
 
 @volunteer.route("/")
 def main():
@@ -38,19 +40,21 @@ def main():
     return redirect(url_for(".choose_role"))
 
 
-
 @volunteer.route("/info/<page_name>")
 @feature_flag("VOLUNTEERS_SIGNUP")
-def info_page(page_name: str):
+def info_page(page_name: str) -> ResponseValue:
     return render_markdown(f"volunteer/info/{page_name}", page_name=page_name)
 
 
 @volunteer.route("/info")
-@feature_flag("VOLUNTEERS_SIGNUP")
 def info():
-    return render_markdown(f"volunteer/info/index", page_name="index")
+    if not feature_enabled("VOLUNTEERS_SIGNUP"):
+        # Rather than 404ing, point at the misc 'volunteering' page instead.
+        return redirect(url_for("base.page", page_name="volunteering"))
+    return render_markdown("volunteer/info/index", page_name="index")
 
-@volunteer.route("/init_shifts")
+
+@volunteer.route("/init-shifts")
 @v_admin_required
 def init_shifts():
     for v in load_initial_venues():
@@ -71,6 +75,8 @@ def init_shifts():
             role.over_18_only = r.get("over_18_only", False)
             role.requires_training = r.get("requires_training", False)
 
+    shift_list = get_shift_list()
+
     for shift_role in shift_list:
         role = Role.get_by_name(shift_role)
         if role is None:
@@ -78,7 +84,7 @@ def init_shifts():
             continue
 
         if role.shifts:
-            app.logger.info("Skipping making shifts for role: %s" % role.name)
+            app.logger.info(f"Skipping making shifts for role: {role.name}")
             continue
 
         for shift_venue in shift_list[shift_role]:
@@ -105,7 +111,7 @@ def init_shifts():
     return redirect(url_for(".main"))
 
 
-@volunteer.route("/init_workshop_shifts")
+@volunteer.route("/init-workshop-shifts")
 @v_admin_required
 def init_workshop_shifts():
     time_before_start = timedelta(minutes=30)
@@ -154,15 +160,14 @@ def init_workshop_shifts():
             shift.end = proposal.scheduled_time + time_after_start
             shift.min_needed = 1
             shift.max_needed = 1
-            db.session.add(shift)
 
+            db.session.add(shift)
             db.session.commit()
 
-    db.session.commit()
     return redirect(url_for(".schedule"))
 
 
-@volunteer.route("/clear_data")
+@volunteer.route("/clear-data")
 @v_admin_required
 def clear_data():
     if not app.config.get("DEBUG"):

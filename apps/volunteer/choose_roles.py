@@ -1,33 +1,37 @@
-from flask import (
-    render_template,
-    redirect,
-    url_for,
-    flash,
-    request,
-    abort,
-    current_app as app,
-)
-from flask_login import current_user
-from decorator import decorator
-
-from wtforms import SubmitField, BooleanField, FormField, FieldList
-from wtforms.validators import InputRequired
-
 from datetime import datetime, timedelta
 
-from main import db
+from decorator import decorator
+from flask import (
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask import (
+    current_app as app,
+)
+from flask.typing import ResponseValue
+from flask_login import current_user
+from sqlalchemy import select
+from wtforms import BooleanField, FieldList, FormField, SubmitField
+from wtforms.validators import InputRequired
+
+from main import db, get_or_404
 from models.volunteer.role import Role
-from models.volunteer.volunteer import Volunteer as VolunteerUser
 from models.volunteer.shift import (
     Shift,
     ShiftEntry,
+    ShiftEntryState,
     ShiftEntryStateException,
 )
+from models.volunteer.volunteer import Volunteer as VolunteerUser
 
-from . import volunteer, v_user_required
 from ..common import feature_enabled, feature_flag
-from ..common.forms import Form
 from ..common.fields import HiddenIntegerField
+from ..common.forms import Form
+from . import v_user_required, volunteer
 
 
 class RoleSelectForm(Form):
@@ -89,12 +93,11 @@ def choose_role():
         if feature_enabled("VOLUNTEERS_SCHEDULE"):
             flash("Your role list has been updated", "info")
             return redirect(url_for(".schedule"))
-        else:
-            flash(
-                "Thanks for volunteering! You'll be able to sign up for specific shifts soon.",
-                "info",
-            )
-            return redirect(url_for(".choose_role"))
+        flash(
+            "Thanks for volunteering! You'll be able to sign up for specific shifts soon.",
+            "info",
+        )
+        return redirect(url_for(".choose_role"))
 
     current_roles = current_volunteer.interested_roles.all()
     if current_roles:
@@ -111,13 +114,15 @@ def choose_role():
     return render_template("volunteer/choose_role.html", form=form)
 
 
-@volunteer.route("/role_admin", methods=["GET"])
+@volunteer.route("/role-admin", methods=["GET"])
 @v_user_required
 def role_admin_index():
     roles = []
-    if (current_user.has_permission("admin") or
-        current_user.has_permission("volunteer:manager") or
-        current_user.has_permission("volunteer:admin")):
+    if (
+        current_user.has_permission("admin")
+        or current_user.has_permission("volunteer:manager")
+        or current_user.has_permission("volunteer:admin")
+    ):
         roles = Role.query.order_by("name").all()
     else:
         roles = [admin.role for admin in current_user.volunteer_admin_roles]
@@ -133,7 +138,7 @@ def role_admin_index():
 @feature_flag("VOLUNTEERS_SIGNUP")
 @v_user_required
 def role(role_id):
-    role = Role.query.get_or_404(role_id)
+    role = get_or_404(db, Role, role_id)
     current_volunteer = VolunteerUser.get_for_user(current_user)
     current_role_ids = [r.id for r in current_volunteer.interested_roles]
 
@@ -163,10 +168,9 @@ def role(role_id):
 def role_admin_required(f, *args, **kwargs):
     """Check that current user has permissions to be RoleAdmin for role.id that is first entry in args"""
     if current_user.is_authenticated:
-        if int(args[0]) in [
-            ra.role_id for ra in current_user.volunteer_admin_roles
-        ] or (current_user.has_permission("volunteer:admin") or
-              current_user.has_permission("volunteer:manager")):
+        if int(args[0]) in [ra.role_id for ra in current_user.volunteer_admin_roles] or (
+            current_user.has_permission("volunteer:admin") or current_user.has_permission("volunteer:manager")
+        ):
             return f(*args, **kwargs)
         abort(404)
     return app.login_manager.unauthorized()
@@ -183,7 +187,7 @@ def role_admin(role_id):
 
     limit = int(request.args.get("limit", "5"))
     offset = int(request.args.get("offset", "0"))
-    role = Role.query.get_or_404(role_id)
+    role = get_or_404(db, Role, role_id)
     cutoff = now - timedelta(minutes=30)
     shifts = (
         Shift.query.filter_by(role=role)
@@ -195,7 +199,7 @@ def role_admin(role_id):
     )
 
     active_shift_entries = (
-        ShiftEntry.query.filter(ShiftEntry.state == "arrived")
+        ShiftEntry.query.filter(ShiftEntry.state == ShiftEntryState.ARRIVED)
         .join(ShiftEntry.shift)
         .filter(Shift.role_id == role.id)
         .all()
@@ -203,7 +207,9 @@ def role_admin(role_id):
     pending_shift_entries = (
         ShiftEntry.query.join(ShiftEntry.shift)
         .filter(
-            Shift.start <= now - timedelta(minutes=15), Shift.role == role, ShiftEntry.state == "signed_up"
+            Shift.start <= now - timedelta(minutes=15),
+            Shift.role == role,
+            ShiftEntry.state == ShiftEntryState.SIGNED_UP,
         )
         .all()
     )
@@ -220,28 +226,35 @@ def role_admin(role_id):
     )
 
 
-@volunteer.route("role/<int:role_id>/set_state/<int:shift_id>/<int:user_id>", methods=["POST"])
+@volunteer.route("role/<int:role_id>/set-state/<int:shift_id>/<int:user_id>", methods=["POST"])
 @role_admin_required
-def set_state(role_id: int, shift_id: int, user_id: int):
+def set_state(role_id: int, shift_id: int, user_id: int) -> ResponseValue:
     state = request.form["state"]
 
-    try:
-        se = ShiftEntry.query.filter(
-            ShiftEntry.shift_id == shift_id, ShiftEntry.user_id == user_id
-        ).first_or_404()
-        if se.state != state:
+    se = (
+        db.session.execute(
+            select(ShiftEntry).where(ShiftEntry.shift_id == shift_id, ShiftEntry.user_id == user_id)
+        )
+        .scalars()
+        .first()
+    )
+    if se is None:
+        abort(404)
+    if se.state != state:
+        try:
             se.set_state(state)
-        db.session.commit()
-    except ShiftEntryStateException:
-        flash(f"{state} is not a valid state for this shift.")
+        except ShiftEntryStateException:
+            flash(f"{state} is not a valid state for this shift.")
+        else:
+            db.session.commit()
 
     return redirect(url_for(".role_admin", role_id=role_id))
 
 
 @volunteer.route("role/<int:role_id>/<int:shift_id>", methods=["POST"])
 @role_admin_required
-def update_shift(role_id: int, shift_id: int):
-    shift = Shift.query.get_or_404(shift_id)
+def update_shift(role_id: int, shift_id: int) -> ResponseValue:
+    shift = get_or_404(db, Shift, shift_id)
     shift.min_needed = int(request.form["min_needed"])
     shift.max_needed = int(request.form["max_needed"])
     db.session.add(shift)
@@ -254,7 +267,7 @@ def update_shift(role_id: int, shift_id: int):
 @volunteer.route("role/<int:role_id>/volunteers")
 @role_admin_required
 def role_volunteers(role_id):
-    role = Role.query.get_or_404(role_id)
+    role = get_or_404(db, Role, role_id)
     interested = VolunteerUser.query.join(VolunteerUser.interested_roles).filter(Role.id == role_id).all()
     entries = ShiftEntry.query.join(ShiftEntry.shift).filter(Shift.role_id == role_id).all()
     signed_up = list(set([se.user.volunteer for se in entries]))

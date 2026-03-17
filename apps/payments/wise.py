@@ -1,14 +1,18 @@
 import logging
+from dataclasses import dataclass
+from datetime import timedelta
 
-from datetime import datetime, timedelta
-from flask import abort, current_app as app, request
+from flask import abort, request
+from flask import current_app as app
 from pywisetransfer.exceptions import InvalidWebhookSignature
 from pywisetransfer.webhooks import validate_request
 
+from main import db, wise
+from models import naive_utcnow
 from models.payment import BankAccount, BankTransaction
+
 from . import payments
 from .banktransfer import reconcile_txns
-from main import db, wise
 
 logger = logging.getLogger(__name__)
 
@@ -71,14 +75,14 @@ def wise_balance_credit(event_type, event):
         # logger.info("Webhook data: %s", request.data)
         abort(400)
 
-    borderless_account_id = event.get("data", {}).get("resource", {}).get("id")
-    if borderless_account_id is None:
-        logger.exception("Missing borderless_account_id in Wise webhook")
+    wise_balance_id = event.get("data", {}).get("resource", {}).get("id")
+    if wise_balance_id is None:
+        logger.exception("Missing balance-account id in Wise webhook")
         # logger.info("Webhook data: %s", request.data)
         abort(400)
 
-    if borderless_account_id == 0:
-        # A credit event with an account ID of 0 is sent when webhook connections are configured.
+    if wise_balance_id == 0:
+        # A credit event with a balance account ID of 0 is sent when webhook connections are configured.
         return ("", 204)
 
     currency = event.get("data", {}).get("currency")
@@ -88,13 +92,13 @@ def wise_balance_credit(event_type, event):
         abort(400)
 
     logger.info(
-        "Checking Wise details for borderless_account_id %s and currency %s",
-        borderless_account_id,
+        "Checking Wise details for wise_balance_id %s and currency %s",
+        wise_balance_id,
         currency,
     )
     # Find the Wise bank account in the application database
     bank_account = BankAccount.query.filter_by(
-        borderless_account_id=borderless_account_id,
+        wise_balance_id=wise_balance_id,
         currency=currency,
         active=True,
     ).first()
@@ -103,7 +107,7 @@ def wise_balance_credit(event_type, event):
         return ("", 204)
 
     try:
-        sync_wise_statement(profile_id, borderless_account_id, currency)
+        sync_wise_statement(profile_id, wise_balance_id, currency)
     except Exception:
         logger.exception("Error fetching statement")
         return ("", 500)
@@ -111,13 +115,13 @@ def wise_balance_credit(event_type, event):
     return ("", 204)
 
 
-def sync_wise_statement(profile_id, borderless_account_id, currency):
+def sync_wise_statement(profile_id, wise_balance_id, currency):
     # Retrieve an account transaction statement for the past week
-    interval_end = datetime.utcnow()
+    interval_end = naive_utcnow()
     interval_start = interval_end - timedelta(days=7)
-    statement = wise.borderless_accounts.statement(
+    statement = wise.balance_statements.statement(
         profile_id,
-        borderless_account_id,
+        wise_balance_id,
         currency,
         interval_start.isoformat() + "Z",
         interval_end.isoformat() + "Z",
@@ -128,14 +132,14 @@ def sync_wise_statement(profile_id, borderless_account_id, currency):
     bank_account = (
         BankAccount.query.with_for_update()
         .filter_by(
-            borderless_account_id=borderless_account_id,
+            wise_balance_id=wise_balance_id,
             currency=currency,
         )
         .one()
     )
     if not bank_account.active:
         logger.info(
-            f"BankAccount for borderless account {borderless_account_id} and {currency} is not active, not syncing"
+            f"BankAccount for Wise balance account {wise_balance_id} and {currency} is not active, not syncing"
         )
         db.session.commit()
         return
@@ -181,10 +185,12 @@ def sync_wise_statement(profile_id, borderless_account_id, currency):
 
 
 def wise_business_profile():
+    from main import wise
+
     if app.config.get("TRANSFERWISE_PROFILE_ID"):
         id = int(app.config["TRANSFERWISE_PROFILE_ID"])
-        borderless_accounts = list(wise.borderless_accounts.list(profile_id=id))
-        if len(borderless_accounts) == 0:
+        accounts = list(wise.account_details.list(profile_id=id))
+        if len(accounts) == 0:
             raise Exception("Provided TRANSFERWISE_PROFILE_ID has no accoutns")
     else:
         # Wise bug:
@@ -200,65 +206,107 @@ def wise_business_profile():
     return id
 
 
-def _collect_bank_accounts(borderless_account):
-    # Wise creates the concept of a multi-currency account by calling normal
-    # bank accounts "balances", and collecting them into a "borderless account",
-    # one balance per currency. As far as we're concerned, "balances" are bank
-    # accounts, as that's what people will be sending money to.
-    for account in borderless_account.balances:
-        try:
-            if not account.bankDetails:
-                continue
-            if not account.bankDetails.bankAddress:
-                continue
-        except AttributeError:
-            continue
+@dataclass
+class WiseRecipient:
+    account_holder: str
+    name_and_address: str
+    sort_code: str | None = None
+    account_number: str | None = None
+    swift: str | None = None
+    iban: str | None = None
 
-        address = ", ".join(
-            [
-                account.bankDetails.bankAddress.addressFirstLine,
-                account.bankDetails.bankAddress.city
-                + " "
-                + (account.bankDetails.bankAddress.postCode or ""),
-                account.bankDetails.bankAddress.country,
-            ]
-        )
+    @property
+    def bank_info(self):
+        assert self.name_and_address, "Bank name/address information not found"
+        return self.name_and_address
 
-        sort_code = account_number = None
+    @property
+    def name(self):
+        bank_name, _, _ = self.bank_info.partition("\n")
+        assert bank_name, "Bank name is empty"
+        return bank_name
 
-        if account.bankDetails.currency == "GBP":
-            # bankCode is the SWIFT code for non-GBP accounts.
-            sort_code = account.bankDetails.bankCode.replace("-", "")
+    @property
+    def address(self):
+        _, _, bank_address = self.bank_info.partition("\n")
+        assert bank_address, "Bank address is empty"
+        return bank_address
 
-            if len(account.bankDetails.accountNumber) == 8:
-                account_number = account.bankDetails.accountNumber
-            else:
-                # Wise bug:
-                # accountNumber is sometimes erroneously the IBAN for GBP accounts.
-                # Extract the account number from the IBAN.
-                account_number = account.bankDetails.accountNumber.replace(" ", "")[-8:]
+    @property
+    def parsed_account_number(self):
+        if self.account_number is None:
+            return None
+        return self.account_number.replace(" ", "")[-8:]
 
-        yield BankAccount(
-            sort_code=sort_code,
-            acct_id=account_number,
-            currency=account.bankDetails.currency,
-            active=False,
-            payee_name=account.bankDetails.get("accountHolderName"),
-            institution=account.bankDetails.bankName,
-            address=address,
-            swift=account.bankDetails.get("swift"),
-            iban=account.bankDetails.get("iban"),
-            # Webhooks only include the borderlessAccountId
-            borderless_account_id=borderless_account.id,
-        )
+    @property
+    def parsed_sort_code(self):
+        if self.sort_code is None:
+            return None
+        return self.sort_code.replace("-", "")
+
+
+def _recipient_details_adapter(receive_options):
+    """Helper method to adapt Wise receive options response data into a WiseRecipient instance"""
+    field_mappings = {
+        "ACCOUNT_HOLDER": "account_holder",
+        "BANK_NAME_AND_ADDRESS": "name_and_address",
+        "BANK_CODE": "sort_code",
+        "ACCOUNT_NUMBER": "account_number",
+        "SWIFT_CODE": "swift",
+        "IBAN": "iban",
+    }
+    return WiseRecipient(
+        **{
+            field_mappings.get(detail.type): detail.body
+            for detail in receive_options.details
+            if detail.type in field_mappings
+        }
+    )
+
+
+def _merge_recipient_details(account):
+    existing_details = None
+    for receive_options in account.receiveOptions:
+        recipient_details = _recipient_details_adapter(receive_options)
+
+        if existing_details:
+            # coalesce translated account info into the existing bank details
+            for field in ("sort_code", "account_number", "swift", "iban"):
+                existing_value = getattr(existing_details, field)
+                updated_value = getattr(recipient_details, field)
+                combined_value = existing_value if existing_value is not None else updated_value
+                setattr(existing_details, field, combined_value)
+        else:
+            existing_details = recipient_details
+
+    return existing_details
 
 
 def wise_retrieve_accounts(profile_id):
-    borderless_accounts = wise.borderless_accounts.list(profile_id=profile_id)
+    from main import wise
 
-    for borderless_account in borderless_accounts:
-        for bank_account in _collect_bank_accounts(borderless_account):
-            yield bank_account
+    for account in wise.account_details.list(profile_id=profile_id):
+        if account.currency.code not in ["GBP", "EUR"]:
+            continue
+
+        bank_details = _merge_recipient_details(account)
+
+        # Workaround: the Wise Sandbox API returns a null/empty account ID; populate a value
+        if account.id is None and app.config.get("TRANSFERWISE_ENVIRONMENT") == "sandbox":
+            account.id = 0
+
+        yield BankAccount(
+            sort_code=bank_details.parsed_sort_code,
+            acct_id=bank_details.parsed_account_number,
+            currency=account.currency.code,
+            active=False,
+            payee_name=bank_details.account_holder,
+            institution=bank_details.name,
+            address=bank_details.address,
+            swift=bank_details.swift,
+            iban=bank_details.iban,
+            wise_balance_id=account.id,
+        )
 
 
 def wise_validate():

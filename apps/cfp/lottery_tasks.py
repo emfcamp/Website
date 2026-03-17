@@ -67,13 +67,12 @@ def run_lottery(ticketed_proposals, dry_run=False):
     if not signup:
         raise Exception("'signup_state' not found.")
 
-    initial_state = signup.state # only used for dry-run mode
+    initial_state = signup.state  # only used for dry-run mode
 
     # This is the only state for running the lottery
     signup.state = "run-lottery"
     db.session.flush()
     refresh_states()
-
 
     max_rank = db.session.query(func.max(EventTicket.rank)).scalar() + 1
     proposal_capacities = {p.id: p.get_lottery_capacity() for p in ticketed_proposals}
@@ -103,13 +102,14 @@ def run_lottery(ticketed_proposals, dry_run=False):
 
             proposal_capacities[proposal.id] = tickets_remaining
 
-    app.logger.info(
-        f"Issued {len(winning_tickets)} winning tickets over {lottery_round} rounds"
-    )
-
+    app.logger.info(f"Issued {len(winning_tickets)} winning tickets over {lottery_round} rounds")
 
     format_string = "{: >80s} {: >15} {: >15} {: >15}  {: >10}  {: >10}"
-    app.logger.info(format_string.format("title", "total tickets", "lottery-tickets", "entered-lottery", "ticket", "cancelled"))
+    app.logger.info(
+        format_string.format(
+            "title", "total tickets", "lottery-tickets", "entered-lottery", "ticket", "cancelled"
+        )
+    )
     for prop in ticketed_proposals:
         counts = {
             "entered-lottery": 0,
@@ -120,7 +120,16 @@ def run_lottery(ticketed_proposals, dry_run=False):
         for ticket in prop.tickets:
             counts[ticket.state] += 1
 
-        app.logger.info(format_string.format(prop.title, prop.total_tickets, (prop.total_tickets-prop.non_lottery_tickets), counts["entered-lottery"], counts["ticket"], counts["cancelled"]))
+        app.logger.info(
+            format_string.format(
+                prop.title,
+                prop.total_tickets,
+                (prop.total_tickets - prop.non_lottery_tickets),
+                counts["entered-lottery"],
+                counts["ticket"],
+                counts["cancelled"],
+            )
+        )
 
     if dry_run:
         app.logger.info("Undoing lottery")
@@ -160,7 +169,6 @@ def run_lottery(ticketed_proposals, dry_run=False):
         if dry_run:
             continue
         msg.send()
-
 
     if dry_run:
         app.logger.info(f"Would have sent {sent_emails} emails for {len(winning_tickets)} winners")

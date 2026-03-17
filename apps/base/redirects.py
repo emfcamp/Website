@@ -1,4 +1,5 @@
-""" Redirects for old pages or common URLs. """
+"""Redirects for old pages or common URLs."""
+
 from flask import redirect, url_for
 
 from . import base
@@ -18,17 +19,13 @@ def contact_redirect():
 
 @base.route("/wave")
 def wave():
-    return redirect(
-        "https://web.archive.org/web/20130627201413/https://www.emfcamp.org/wave"
-    )
+    return redirect("https://web.archive.org/web/20130627201413/https://www.emfcamp.org/wave")
 
 
 @base.route("/wave-talks")
 @base.route("/wave/talks")
 def wave_talks():
-    return redirect(
-        "https://web.archive.org/web/20130627201413/https://www.emfcamp.org/wave/talks"
-    )
+    return redirect("https://web.archive.org/web/20130627201413/https://www.emfcamp.org/wave/talks")
 
 
 @base.route("/sine")
@@ -36,3 +33,9 @@ def wave_talks():
 @base.route("/wave/SiNE")
 def sine():
     return redirect("https://wiki-archive.emfcamp.org/2014/wiki/SiNE")
+
+
+@base.route("/now-and-next.json")
+@base.route("/upcoming.json")
+def old_now_next_feed():
+    return redirect(url_for("schedule.now_and_next_json"), code=301)

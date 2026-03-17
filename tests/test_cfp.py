@@ -1,17 +1,15 @@
-from hypothesis import given, assume, settings
+from hypothesis import assume, given, settings
 from hypothesis.strategies import text
 
-from models.cfp import TalkProposal
 from apps.cfp_review.base import send_email_for_proposal
+from models.cfp import TalkProposal
 
 
 def test_cfp(db, app, user, outbox):
     # Run hypothesis over an inner function to avoid warnings about re-use of
     # `outbox` (which we are manually clearing in this test)
     @given(title=text(), description=text(), requirements=text())
-    @settings(
-        deadline=None
-    )  # Variable execution time errors observed in Travis and locally for russ
+    @settings(deadline=None)  # Variable execution time errors observed in Travis and locally for russ
     def test_cfp_inner(title, description, requirements):
         for c in ["\0", "\r", "\n"]:
             assume(c not in title)

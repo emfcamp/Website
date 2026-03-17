@@ -1,13 +1,16 @@
-from main import db
-from sqlalchemy import event
-from sqlalchemy.orm import column_property
-from sqlalchemy.orm.attributes import get_history
+from abc import abstractmethod
+from datetime import datetime
+
+from sqlalchemy import JSON, FetchedValue, and_, event, func
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy import and_, func, FetchedValue
+from sqlalchemy.orm import Mapped, column_property, mapped_column
+from sqlalchemy.orm.attributes import get_history
+
+from .capacity import Unlimited, UnlimitedType
 from .exc import CapacityException
 
 
-class CapacityMixin(object):
+class CapacityMixin:
     """Defines a database object which has an optional maximum capacity and an optional parent
     (which must also inherit CapacityMixin). Objects also have an expiry date.
 
@@ -18,12 +21,14 @@ class CapacityMixin(object):
     """
 
     # A max capacity of None implies no max (or use parent's if set)
-    capacity_max = db.Column(db.Integer, default=None)
-    capacity_used = db.Column(
-        db.Integer, default=0, nullable=False, server_onupdate=FetchedValue()
-    )
+    capacity_max: Mapped[int | None] = mapped_column(default=None)
+    capacity_used: Mapped[int] = mapped_column(default=0, server_onupdate=FetchedValue())
 
-    expires = db.Column(db.DateTime)
+    expires: Mapped[datetime | None]
+
+    @property
+    @abstractmethod
+    def parent(self) -> "CapacityMixin | None": ...
 
     @declared_attr
     def __expired(cls):
@@ -77,26 +82,26 @@ class CapacityMixin(object):
 
         return count <= self.get_total_remaining_capacity()
 
-    def remaining_capacity(self):
+    def remaining_capacity(self) -> int | UnlimitedType:
         """
-        Return remaining capacity or inf if
+        Return remaining capacity or Unlimited if
         capacity_max is not set (i.e. None).
         """
         if self.capacity_max is None:
-            return float("inf")
+            return Unlimited
         return self.capacity_max - self.capacity_used
 
-    def get_total_remaining_capacity(self):
+    def get_total_remaining_capacity(self) -> int | UnlimitedType:
         """
         Get the capacity remaining to this object, and all its ancestors.
 
-        Returns inf if no objects have a capacity_max set.
+        Returns Unlimited if no objects have a capacity_max set.
         """
-        remaining = [self.remaining_capacity()]
+        remaining = self.remaining_capacity()
         if self.parent:
-            remaining.append(self.parent.get_total_remaining_capacity())
+            return min(remaining, self.parent.get_total_remaining_capacity())
 
-        return min(remaining)
+        return remaining
 
     def has_expired(self):
         """
@@ -135,14 +140,14 @@ class CapacityMixin(object):
         self.capacity_used -= count
 
 
-class InheritedAttributesMixin(object):
+class InheritedAttributesMixin:
     """Create a JSON column to store arbitrary attributes. When fetching attributes, cascade up to the parent (which
     must also inherit this mixin).
 
     Objects which inherit this mixin must have a "parent" relationship.
     """
 
-    attributes = db.Column(db.JSON, default={})
+    attributes = mapped_column(JSON, default={})
 
     def get_attribute(self, name, default=None):
         if name in self.attributes:

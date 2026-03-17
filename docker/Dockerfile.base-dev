@@ -7,6 +7,6 @@
 FROM ghcr.io/emfcamp/website-base:latest
 
 WORKDIR /app
-COPY pyproject.toml poetry.lock /app/
+COPY pyproject.toml uv.lock /app/
 
-RUN poetry install
+RUN uv sync

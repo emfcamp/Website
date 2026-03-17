@@ -1,22 +1,28 @@
 from collections.abc import MutableMapping
 from decimal import Decimal
 from itertools import groupby
-from typing import Optional
+from typing import Self
 
-from flask import current_app as app, session
+from flask import current_app as app
+from flask import session
 from sqlalchemy.orm import joinedload
 
 from main import db
+from models.user import User
+
 from . import Currency
 from .exc import CapacityException
-from .product import PriceTier, Voucher, PRODUCT_GROUP_TYPES_DICT
+from .product import PRODUCT_GROUP_TYPES_DICT, PriceTier, Voucher
 from .purchase import Purchase
+
+__all__ = [
+    "Basket",
+    "Line",
+]
 
 
 class Line:
-    def __init__(
-        self, tier: PriceTier, count: int, purchases: Optional[list[Purchase]] = None
-    ):
+    def __init__(self, tier: PriceTier, count: int, purchases: list[Purchase] | None = None):
         self.tier = tier
         self.count = count
         if purchases is None:
@@ -24,7 +30,7 @@ class Line:
         self.purchases = purchases
 
 
-class Basket(MutableMapping):
+class Basket(MutableMapping[PriceTier, int]):
     """
     Helper class for basket-related operations. Tied to a user, and maps PriceTiers to counts.
 
@@ -40,7 +46,7 @@ class Basket(MutableMapping):
     ids should be trustworthy (e.g. stored in flask.session)
     """
 
-    def __init__(self, user, currency: Currency, voucher=None):
+    def __init__(self, user: User, currency: Currency, voucher: str | None = None) -> None:
         self.user = user
         # Due to the Price, reserved Purchases have an implicit currency,
         # but this shouldn't be relied on until they're attached to a Payment.
@@ -50,12 +56,12 @@ class Basket(MutableMapping):
         self.voucher = voucher
 
     @classmethod
-    def from_session(self, user, currency: Currency):
+    def from_session(cls, user: User, currency: Currency) -> Self:
         purchases = session.get("basket_purchase_ids", [])
         surplus_purchases = session.get("basket_surplus_purchase_ids", [])
         voucher = session.get("ticket_voucher", None)
 
-        basket = Basket(user, currency, voucher)
+        basket = cls(user, currency, voucher)
         basket.load_purchases_from_ids(purchases, surplus_purchases)
         return basket
 
@@ -68,19 +74,19 @@ class Basket(MutableMapping):
         session["basket_purchase_ids"] = [p.id for p in self.purchases]
         session["basket_surplus_purchase_ids"] = [p.id for p in self.surplus_purchases]
 
-    def _get_line(self, tier: PriceTier):
+    def _get_line(self, tier: PriceTier) -> Line:
         for line in self._lines:
             if line.tier == tier:
                 return line
 
-        raise KeyError("Tier {} not found in basket".format(tier))
+        raise KeyError(f"Tier {tier} not found in basket")
 
     def __getitem__(self, key: PriceTier) -> int:
         return self._get_line(key).count
 
-    def __setitem__(self, key: PriceTier, value: int):
+    def __setitem__(self, key: PriceTier, value: int) -> None:
         if key.get_price(self.currency) is None:
-            raise KeyError("Cannot add {} to basket - no price".format(key))
+            raise KeyError(f"Cannot add {key} to basket - no price")
 
         try:
             line = self._get_line(key)
@@ -89,7 +95,7 @@ class Basket(MutableMapping):
         except KeyError:
             self._lines.append(Line(key, value))
 
-    def __delitem__(self, key: PriceTier):
+    def __delitem__(self, key: PriceTier) -> None:
         line = self._get_line(key)
         self._lines.remove(line)
 
@@ -101,7 +107,7 @@ class Basket(MutableMapping):
         return len(self._lines)
 
     def __str__(self):
-        lines = ["{} {}".format(line.count, line.tier) for line in self._lines]
+        lines = [f"{line.count} {line.tier}" for line in self._lines]
         return "<Basket {} ({} {})>".format(",".join(lines), self.total, self.currency)
 
     @property
@@ -112,7 +118,7 @@ class Basket(MutableMapping):
     def surplus_purchases(self) -> list[Purchase]:
         return [p for line in self._lines for p in line.purchases[line.count :]]
 
-    def set_currency(self, currency: Currency):
+    def set_currency(self, currency: Currency) -> None:
         # We do this half to save loading the wrong prices on the next page,
         # and half so there's a record of how often currency changes happen.
         # When Basket is stored in the DB, we'll just update it there.
@@ -128,9 +134,7 @@ class Basket(MutableMapping):
             if price is None:
                 # This is enforced when adding items but it's possible to get here in
                 # rare cases if the currency changes to one which has no price.
-                raise Exception(
-                    f"No price for tier {line.tier} in currency {self.currency}"
-                )
+                raise Exception(f"No price for tier {line.tier} in currency {self.currency}")
             total += price.value * line.count
 
         return total
@@ -145,19 +149,13 @@ class Basket(MutableMapping):
 
             if chosen_ids is not None:
                 purchases = [p for p in tier_purchases if p.id in chosen_ids]
-                surplus_purchases = [
-                    p for p in tier_purchases if p.id not in chosen_ids
-                ]
+                surplus_purchases = [p for p in tier_purchases if p.id not in chosen_ids]
             else:
                 purchases = tier_purchases
                 surplus_purchases = []
 
-            app.logger.debug(
-                "Basket line: %s %s %s", tier, purchases, surplus_purchases
-            )
-            self._lines.append(
-                Line(tier, len(purchases), purchases + surplus_purchases)
-            )
+            app.logger.debug("Basket line: %s %s %s", tier, purchases, surplus_purchases)
+            self._lines.append(Line(tier, len(purchases), purchases + surplus_purchases))
 
     def load_purchases_from_ids(self, chosen_ids, surplus_ids):
         chosen_ids = set(chosen_ids)
@@ -196,26 +194,16 @@ class Basket(MutableMapping):
                 if issue_count > 0:
                     # user_limit takes into account existing purchases
                     if issue_count > line.tier.user_limit():
-                        raise CapacityException(
-                            "Insufficient capacity for tier %s." % line.tier
-                        )
+                        raise CapacityException(f"Insufficient capacity for tier {line.tier}.")
 
                     line.tier.issue_instances(issue_count)
 
                     product = line.tier.parent
-                    product_group_type = PRODUCT_GROUP_TYPES_DICT.get(
-                        product.parent.type
-                    )
-                    purchase_cls = (
-                        product_group_type.purchase_cls
-                        if product_group_type
-                        else Purchase
-                    )
+                    product_group_type = PRODUCT_GROUP_TYPES_DICT.get(product.parent.type)
+                    purchase_cls = product_group_type.purchase_cls if product_group_type else Purchase
 
                     price = line.tier.get_price(self.currency)
-                    purchases = [
-                        purchase_cls(price=price, user=user) for _ in range(issue_count)
-                    ]
+                    purchases = [purchase_cls(price=price, user=user) for _ in range(issue_count)]
                     line.purchases += purchases
                     purchases_to_flush += purchases
 
@@ -224,6 +212,7 @@ class Basket(MutableMapping):
 
         # Insert the purchases right away, as column_property and
         # polymorphic columns are reloaded from the DB after insert
+        db.session.add_all(purchases_to_flush)
         db.session.flush(purchases_to_flush)
 
     def ensure_purchase_capacity(self):
@@ -263,9 +252,7 @@ class Basket(MutableMapping):
 
     def check_out_free(self):
         if self.total != 0:
-            raise Exception(
-                "Cannot check out free basket with total of {}".format(self.total)
-            )
+            raise Exception(f"Cannot check out free basket with total of {self.total}")
 
         if self.user is None:
             raise Exception("Cannot check out basket with no user")
@@ -295,15 +282,14 @@ class Basket(MutableMapping):
 
             if purchase.state not in ["reserved", "admin-reserved"]:
                 raise Exception(
-                    "Purchase {} state is {}, not reserved or admin-reserved".format(
-                        purchase.id, purchase.state
-                    )
+                    f"Purchase {purchase.id} state is {purchase.state}, not reserved or admin-reserved"
                 )
 
             if purchase.payment_id is not None:
-                raise Exception("Purchase {} has a payment already".format(purchase.id))
+                raise Exception(f"Purchase {purchase.id} has a payment already")
 
         payment = payment_cls(self.currency, self.total, self.voucher)
+        db.session.add(payment)
 
         # This is where you'd add the premium if it existed
 
@@ -330,7 +316,6 @@ class Basket(MutableMapping):
                 raise Exception(f"Voucher with code {self.voucher} not found")
 
             voucher_obj.consume_capacity(payment)
-            db.session.add(voucher_obj)
 
         return payment
 

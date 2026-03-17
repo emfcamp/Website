@@ -49,3 +49,5 @@ loggers:
     level: INFO
   CSSUTILS:
     level: ERROR
+  flask_caching:
+    level: WARN

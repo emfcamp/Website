@@ -1,14 +1,34 @@
-from main import db
-from . import BaseModel
-import sqlalchemy
+from typing import TYPE_CHECKING
+
+from sqlalchemy import Column, ForeignKey, Integer, Table
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 import models
+
+from . import BaseModel
+
+if TYPE_CHECKING:
+    from .user import User
+
+__all__ = [
+    "Permission",
+    "UserPermission",
+]
+
+UserPermission = Table(
+    "user_permission",
+    BaseModel.metadata,
+    Column("user_id", Integer, ForeignKey("user.id"), primary_key=True),
+    Column("permission_id", Integer, ForeignKey("permission.id"), primary_key=True),
+)
 
 
 class Permission(BaseModel):
     __tablename__ = "permission"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True, index=True)
+
+    users: Mapped[list["User"]] = relationship(back_populates="permissions", secondary=UserPermission)
 
     def __init__(self, name: str):
         self.name = name
@@ -16,7 +36,8 @@ class Permission(BaseModel):
     @classmethod
     def get_export_data(cls):
         users = (
-            cls.query.join(UserPermission, models.User)
+            cls.query.join(UserPermission)
+            .join(models.User)
             .with_entities(models.User.id, models.User.email, Permission.name)
             .order_by(models.User.id, Permission.id)
         )
@@ -27,13 +48,3 @@ class Permission(BaseModel):
         }
 
         return data
-
-
-UserPermission: sqlalchemy.Table = db.Table(
-    "user_permission",
-    BaseModel.metadata,
-    db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
-    db.Column(
-        "permission_id", db.Integer, db.ForeignKey("permission.id"), primary_key=True
-    ),
-)

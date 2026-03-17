@@ -16,23 +16,27 @@ bar_shifts = {
                 "min": 1,
                 "max": 3,
                 "changeover": 10,
-            }
-        ] + [
+            },
+        ]
+        + [
             {
                 "first": edt(d[0], "11:00:00"),
                 "final": edt(d[1], "01:00:00"),
                 "min": 1,
                 "max": 3,
                 "changeover": 10,
-            } for d in [("fri", "sat"), ("sat", "sun"), ("sun", "mon")]
-        ] + [
+            }
+            for d in [("fri", "sat"), ("sat", "sun"), ("sun", "mon")]
+        ]
+        + [
             {
                 "first": edt(d[0], "12:00:00"),
                 "final": edt(d[1], "00:00:00"),
                 "min": 1,
                 "max": 3,
                 "changeover": 10,
-            } for d in [("fri", "sat"), ("sat", "sun"), ("sun", "mon")]
+            }
+            for d in [("fri", "sat"), ("sat", "sun"), ("sun", "mon")]
         ]
     },
     "Cybar": {
@@ -60,5 +64,4 @@ bar_shifts = {
             },
         ]
     },
-
- }
+}

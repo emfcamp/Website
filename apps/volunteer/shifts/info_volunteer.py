@@ -8,8 +8,10 @@ info_vol_shifts = {
                 "final": edt(d, "20:00:00"),
                 "min": 1,
                 "max": 3,
-            } for d in ["thurs", "fri", "sat", "sun"]
-        ] + [
+            }
+            for d in ["thurs", "fri", "sat", "sun"]
+        ]
+        + [
             {
                 "first": edt("mon", "10:00:00"),
                 "final": edt("mon", "12:00:00"),
@@ -25,8 +27,10 @@ info_vol_shifts = {
                 "final": edt(d, "21:00:00"),
                 "min": 1,
                 "max": 1,
-            }for d in ["thurs", "fri", "sat", "sun"]
-        ] + [ 
+            }
+            for d in ["thurs", "fri", "sat", "sun"]
+        ]
+        + [
             {
                 "first": edt("mon", "10:00:00"),
                 "final": edt("mon", "12:00:00"),
@@ -42,8 +46,10 @@ info_vol_shifts = {
                 "final": edt(d, "21:00:00"),
                 "min": 1,
                 "max": 1,
-            }for d in ["thurs", "fri", "sat", "sun"]
-        ] + [ 
+            }
+            for d in ["thurs", "fri", "sat", "sun"]
+        ]
+        + [
             {
                 "first": edt("mon", "10:00:00"),
                 "final": edt("mon", "12:00:00"),
@@ -59,8 +65,10 @@ info_vol_shifts = {
                 "final": edt(d, "20:00:00"),
                 "min": 1,
                 "max": 2,
-            } for d in ["thurs", "fri", "sat", "sun"]
-        ] + [
+            }
+            for d in ["thurs", "fri", "sat", "sun"]
+        ]
+        + [
             {
                 "first": edt("mon", "10:00:00"),
                 "final": edt("mon", "12:00:00"),
@@ -68,5 +76,5 @@ info_vol_shifts = {
                 "max": 2,
             },
         ]
-    }, 
+    },
 }

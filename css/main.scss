@@ -11,8 +11,9 @@
 @use "./_buttons.scss";
 @use "./_video.scss";
 @use "./_panel_grid.scss";
+@use "./_forms.scss";
 
-@use "./_about.scss";
+@use "./_support.scss";
 @use "./_attendee_content.scss";
 @use "./_cfp.scss";
 @use "./_lineup.scss";
@@ -28,8 +29,8 @@
   font-weight: 400;
   font-display: swap;
   src: local(""),
-    url("../fonts/raleway-v22-latin-ext_latin-regular.woff2") format("woff2"),
-    url("../fonts/raleway-v22-latin-ext_latin-regular.woff") format("woff");
+    url("../static/fonts/raleway-v22-latin-ext_latin-regular.woff2") format("woff2"),
+    url("../static/fonts/raleway-v22-latin-ext_latin-regular.woff") format("woff");
 }
 
 @font-face {
@@ -38,6 +39,6 @@
   font-weight: 700;
   font-display: swap;
   src: local(""),
-    url("../fonts/raleway-v22-latin-ext_latin-700.woff2") format("woff2"),
-    url("../fonts/raleway-v22-latin-ext_latin-700.woff") format("woff");
+    url("../static/fonts/raleway-v22-latin-ext_latin-700.woff2") format("woff2"),
+    url("../static/fonts/raleway-v22-latin-ext_latin-700.woff") format("woff");
 }

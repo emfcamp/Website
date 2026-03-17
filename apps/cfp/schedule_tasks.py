@@ -1,4 +1,4 @@
-""" CLI commands for scheduling """
+"""CLI commands for scheduling"""
 
 import click
 from dataclasses import dataclass
@@ -26,10 +26,7 @@ class VenueDefinition:
 
     @property
     def location(self) -> str:
-        if self.latlon:
-            return f"POINT({self.latlon[1]} {self.latlon[0]})"
-        else:
-            return None
+        return f"POINT({self.latlon[1]} {self.latlon[0]})"
 
     def as_venue(self) -> Venue:
         return Venue(
@@ -150,22 +147,23 @@ _EMF_VENUES = [
 @cfp.cli.command("create_venues")
 def create_venues():
     """Create venues defined in code"""
+    created = updated = 0
     for venue_definition in _EMF_VENUES:
         name = venue_definition.name
         venue = Venue.query.filter_by(name=name).all()
 
         if len(venue) == 1 and venue[0].location is None:
             venue[0].location = venue_definition.location
-            app.logger.info(f"Updating venue {name} with new latlon")
+            updated += 1
             continue
         elif venue:
-            app.logger.info(f"Venue {name} already exists")
             continue
 
         db.session.add(venue_definition.as_venue())
-        app.logger.info(f"Adding venue {name}")
+        created += 1
 
     db.session.commit()
+    app.logger.info(f"Created {created} and updated {updated} venues.")
 
 
 @cfp.cli.command("create_village_venues")
@@ -177,25 +175,17 @@ def create_village_venues():
                 app.logger.info(f"Not updating EMF venue {venue.name}")
 
             elif venue.name != village.name:
-                app.logger.info(
-                    f"Updating village venue name from {venue.name} to {village.name}"
-                )
+                app.logger.info(f"Updating village venue name from {venue.name} to {village.name}")
                 venue.name = village.name
                 db.session.commit()
 
             continue
 
-        if Venue.query.filter(
-            func.lower(Venue.name) == func.trim(func.lower(village.name))
-        ).count():
-            app.logger.warning(
-                f"Not creating village venue with colliding name {village.name}"
-            )
+        if Venue.query.filter(func.lower(Venue.name) == func.trim(func.lower(village.name))).count():
+            app.logger.warning(f"Not creating village venue with colliding name {village.name}")
             continue
 
-        venue = Venue(
-            name=village.name, village_id=village.id, scheduled_content_only=False
-        )
+        venue = Venue(name=village.name, village_id=village.id, scheduled_content_only=False)
         db.session.add(venue)
         db.session.commit()
 
@@ -208,22 +198,14 @@ def set_rough_durations():
 
 
 @cfp.cli.command("schedule")
-@click.option(
-    "-p", "--persist", is_flag=True, help="Persist changes rather than doing a dry run"
-)
-@click.option(
-    "--ignore_potential", is_flag=True, help="Ignore potential slots when scheduling"
-)
-@click.option(
-    "--type", help="Only run the scheduler for the specified type of content."
-)
+@click.option("-p", "--persist", is_flag=True, help="Persist changes rather than doing a dry run")
+@click.option("--ignore_potential", is_flag=True, help="Ignore potential slots when scheduling")
+@click.option("--type", help="Only run the scheduler for the specified type of content.")
 def run_schedule(persist, ignore_potential, type):
     """Run the schedule constraint solver. This can take a while."""
     scheduler = Scheduler()
     if ignore_potential:
-        app.logger.info(
-            f"Ignoring current potential slots, items without a scheduled slot will move!"
-        )
+        app.logger.info(f"Ignoring current potential slots, items without a scheduled slot will move!")
 
     if type:
         app.logger.info(f"Only scheduling {type} proposals.")
@@ -235,9 +217,7 @@ def run_schedule(persist, ignore_potential, type):
 
 
 @cfp.cli.command("apply_potential_schedule")
-@click.option(
-    "--email/--no-email", default=True, help="Send update emails to proposers"
-)
+@click.option("--email/--no-email", default=True, help="Send update emails to proposers")
 @click.option(
     "--type",
     help="Which type of proposal to apply for ('all' selects all proposals)",
@@ -280,9 +260,7 @@ def apply_potential_schedule(email, type):
             proposal.potential_time = None
 
         if previously_unscheduled:
-            app.logger.info(
-                'Scheduling proposal "%s" by %s', proposal.title, user.email
-            )
+            app.logger.info('Scheduling proposal "%s" by %s', proposal.title, user.email)
             if email:
                 send_email_for_proposal(
                     proposal,
@@ -292,8 +270,6 @@ def apply_potential_schedule(email, type):
         else:
             app.logger.info('Moving proposal "%s" by %s', proposal.title, user.email)
             if email:
-                send_email_for_proposal(
-                    proposal, reason="moved", from_address=from_email("SPEAKERS_EMAIL")
-                )
+                send_email_for_proposal(proposal, reason="moved", from_address=from_email("SPEAKERS_EMAIL"))
 
         db.session.commit()

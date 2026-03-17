@@ -1,54 +1,56 @@
 import re
+
 from flask import (
-    render_template,
-    redirect,
-    flash,
-    request,
+    Blueprint,
     abort,
+    flash,
+    redirect,
+    render_template,
+    request,
     url_for,
+)
+from flask import (
     current_app as app,
 )
 from flask_login import current_user
-
-from sqlalchemy.sql.functions import func
 from sqlalchemy import not_
+from sqlalchemy.sql.functions import func
 
-from main import db, mail, external_url
-from models.user import User
+from main import db, external_url, get_or_404, mail
 from models.product import (
     VOUCHER_GRACE_PERIOD,
-    ProductGroup,
     Price,
     PriceTier,
     Product,
+    ProductGroup,
     ProductView,
     ProductViewProduct,
-    random_voucher,
     Voucher,
+    random_voucher,
 )
 from models.purchase import Purchase
+from models.user import User
 
 from ..common.email import (
     format_trusted_html_email,
     format_trusted_plaintext_email,
     from_email,
 )
-from . import admin
 from .forms import (
+    AddProductViewProductForm,
+    BulkVoucherEmailForm,
+    CopyProductGroupForm,
+    EditPriceTierForm,
     EditProductForm,
+    EditProductGroupForm,
+    EditProductViewForm,
+    EditVoucherForm,
+    ModifyPriceTierForm,
+    NewPriceTierForm,
     NewProductForm,
     NewProductGroupForm,
-    EditProductGroupForm,
-    CopyProductGroupForm,
-    NewPriceTierForm,
-    EditPriceTierForm,
-    ModifyPriceTierForm,
     NewProductViewForm,
-    EditProductViewForm,
-    AddProductViewProductForm,
     NewVoucherForm,
-    EditVoucherForm,
-    BulkVoucherEmailForm,
 )
 
 
@@ -63,19 +65,20 @@ def get_user_purchases(query):
     )
 
 
-@admin.route("/products")
-def products():
-    root_groups = (
-        ProductGroup.query.filter_by(parent_id=None).order_by(ProductGroup.id).all()
-    )
+products = Blueprint("products", __name__)
+
+
+@products.route("/")
+def products_main():
+    root_groups = ProductGroup.query.filter_by(parent_id=None).order_by(ProductGroup.id).all()
     return render_template("admin/products/overview.html", root_groups=root_groups)
 
 
-@admin.route("/products/<int:product_id>/edit", methods=["GET", "POST"])
+@products.route("/<int:product_id>/edit", methods=["GET", "POST"])
 def edit_product(product_id):
     form = EditProductForm()
 
-    product = Product.query.get_or_404(product_id)
+    product = get_or_404(db, Product, product_id)
     if form.validate_on_submit():
         app.logger.info("%s editing product %s", current_user.name, product_id)
         form.update_product(product)
@@ -83,24 +86,22 @@ def edit_product(product_id):
         return redirect(url_for(".product_details", product_id=product_id))
 
     form.init_with_product(product)
-    return render_template(
-        "admin/products/edit-product.html", product=product, form=form
-    )
+    return render_template("admin/products/edit-product.html", product=product, form=form)
 
 
-@admin.route(
-    "/products/group/<int:parent_id>/new",
+@products.route(
+    "/group/<int:parent_id>/new",
     defaults={"copy_id": None},
     methods=["GET", "POST"],
 )
-@admin.route(
-    "/products/<int:copy_id>/clone",
+@products.route(
+    "/<int:copy_id>/clone",
     defaults={"parent_id": None},
     methods=["GET", "POST"],
 )
 def new_product(copy_id, parent_id):
     if parent_id:
-        parent = ProductGroup.query.get_or_404(parent_id)
+        parent = get_or_404(db, ProductGroup, parent_id)
     else:
         parent = Product.query.get(copy_id).parent
 
@@ -124,17 +125,13 @@ def new_product(copy_id, parent_id):
     if copy_id:
         form.init_with_product(Product.query.get(copy_id))
 
-    return render_template(
-        "admin/products/new-product.html", parent=parent, product_id=copy_id, form=form
-    )
+    return render_template("admin/products/new-product.html", parent=parent, product_id=copy_id, form=form)
 
 
-@admin.route("/products/<int:product_id>")
+@products.route("/<int:product_id>")
 def product_details(product_id):
-    product = Product.query.get_or_404(product_id)
-    user_purchases = get_user_purchases(
-        PriceTier.query.filter_by(product_id=product_id)
-    )
+    product = get_or_404(db, Product, product_id)
+    user_purchases = get_user_purchases(PriceTier.query.filter_by(product_id=product_id))
 
     return render_template(
         "admin/products/product-details.html",
@@ -143,10 +140,10 @@ def product_details(product_id):
     )
 
 
-@admin.route("/products/<int:product_id>/new-tier", methods=["GET", "POST"])
+@products.route("/<int:product_id>/new-tier", methods=["GET", "POST"])
 def new_price_tier(product_id):
     form = NewPriceTierForm()
-    product = Product.query.get_or_404(product_id)
+    product = get_or_404(db, Product, product_id)
 
     if form.validate_on_submit():
         pt = PriceTier(
@@ -162,17 +159,16 @@ def new_price_tier(product_id):
         # Only activate this price tier if it's the first one added.
         pt.active = len(product.price_tiers) == 0
         product.price_tiers.append(pt)
+        db.session.add(pt)
         db.session.commit()
         return redirect(url_for(".price_tier_details", tier_id=pt.id))
 
-    return render_template(
-        "admin/products/price-tier-new.html", product=product, form=form
-    )
+    return render_template("admin/products/price-tier-new.html", product=product, form=form)
 
 
-@admin.route("/products/price-tiers/<int:tier_id>")
+@products.route("/price-tiers/<int:tier_id>")
 def price_tier_details(tier_id):
-    tier = PriceTier.query.get_or_404(tier_id)
+    tier = get_or_404(db, PriceTier, tier_id)
     form = ModifyPriceTierForm()
     user_purchases = get_user_purchases(PriceTier.query.filter_by(id=tier.id))
     return render_template(
@@ -183,10 +179,10 @@ def price_tier_details(tier_id):
     )
 
 
-@admin.route("/products/price-tiers/<int:tier_id>", methods=["POST"])
+@products.route("/price-tiers/<int:tier_id>", methods=["POST"])
 def price_tier_modify(tier_id):
     form = ModifyPriceTierForm()
-    tier = PriceTier.query.get_or_404(tier_id)
+    tier = get_or_404(db, PriceTier, tier_id)
 
     if form.validate_on_submit():
         if form.delete.data and tier.unused:
@@ -213,9 +209,9 @@ def price_tier_modify(tier_id):
     return abort(401)
 
 
-@admin.route("/products/price-tiers/<int:tier_id>/edit", methods=["GET", "POST"])
+@products.route("/price-tiers/<int:tier_id>/edit", methods=["GET", "POST"])
 def price_tier_edit(tier_id):
-    tier = PriceTier.query.get_or_404(tier_id)
+    tier = get_or_404(db, PriceTier, tier_id)
     form = EditPriceTierForm(obj=tier)
 
     if form.validate_on_submit():
@@ -245,17 +241,15 @@ def price_tier_edit(tier_id):
     return render_template("admin/products/price-tier-edit.html", tier=tier, form=form)
 
 
-@admin.route("/products/group/<int:group_id>")
+@products.route("/group/<int:group_id>")
 def product_group_details(group_id):
-    group = ProductGroup.query.get_or_404(group_id)
+    group = get_or_404(db, ProductGroup, group_id)
 
     def get_all_child_groups(group):
         return [group] + [g for c in group.children for g in get_all_child_groups(c)]
 
     group_ids = [g.id for g in get_all_child_groups(group)]
-    price_tiers = ProductGroup.query.filter(ProductGroup.id.in_(group_ids)).join(
-        Product, PriceTier
-    )
+    price_tiers = ProductGroup.query.filter(ProductGroup.id.in_(group_ids)).join(Product).join(PriceTier)
     user_purchases = get_user_purchases(price_tiers)
     return render_template(
         "admin/products/product-group-details.html",
@@ -264,10 +258,10 @@ def product_group_details(group_id):
     )
 
 
-@admin.route("/products/group/new", methods=["GET", "POST"])
+@products.route("/group/new", methods=["GET", "POST"])
 def product_group_new():
     if request.args.get("parent"):
-        parent = ProductGroup.query.get_or_404(request.args.get("parent"))
+        parent = get_or_404(db, ProductGroup, request.args.get("parent"))
     else:
         parent = None
 
@@ -286,34 +280,30 @@ def product_group_new():
         db.session.add(pg)
         db.session.commit()
         flash("ProductGroup created")
-        return redirect(url_for(".product_group_details", group_id=pg.id))
+        return redirect(url_for("admin.products.product_group_details", group_id=pg.id))
 
-    return render_template(
-        "admin/products/product-group-edit.html", method="new", parent=parent, form=form
-    )
+    return render_template("admin/products/product-group-edit.html", method="new", parent=parent, form=form)
 
 
-@admin.route("/products/group/<int:group_id>/edit", methods=["GET", "POST"])
+@products.route("/group/<int:group_id>/edit", methods=["GET", "POST"])
 def product_group_edit(group_id):
-    group = ProductGroup.query.get_or_404(group_id)
+    group = get_or_404(db, ProductGroup, group_id)
     form = EditProductGroupForm()
     if form.validate_on_submit():
         group = form.update_pg(group)
         db.session.add(group)
         db.session.commit()
         flash("ProductGroup updated")
-        return redirect(url_for(".product_group_details", group_id=group.id))
+        return redirect(url_for("admin.products.product_group_details", group_id=group.id))
 
     form.init_with_pg(group)
 
-    return render_template(
-        "admin/products/product-group-edit.html", method="edit", group=group, form=form
-    )
+    return render_template("admin/products/product-group-edit.html", method="edit", group=group, form=form)
 
 
-@admin.route("/products/group/<int:group_id>/copy", methods=["GET", "POST"])
+@products.route("/group/<int:group_id>/copy", methods=["GET", "POST"])
 def product_group_copy(group_id):
-    group = ProductGroup.query.get_or_404(group_id)
+    group = get_or_404(db, ProductGroup, group_id)
     form = CopyProductGroupForm()
 
     if group.children:
@@ -367,29 +357,32 @@ def product_group_copy(group_id):
         db.session.add(new_group)
         db.session.commit()
         flash("ProductGroup copied")
-        return redirect(url_for(".product_group_details", group_id=new_group.id))
+        return redirect(url_for("admin.products.product_group_details", group_id=new_group.id))
 
-    return render_template(
-        "admin/products/product-group-copy.html", group=group, form=form
-    )
+    return render_template("admin/products/product-group-copy.html", group=group, form=form)
 
 
-@admin.route("/tees")
+@products.route("/tees")
 def tees():
     purchases = (
         ProductGroup.query.filter_by(type="tees")
-        .join(Product, Purchase, Purchase.owner)
+        .join(Product)
+        .join(Purchase)
+        .join(Purchase.owner)
         .group_by(User.id, Product.id)
         .with_entities(User, Product, func.count(Purchase.id))
-        .filter(Purchase.is_paid_for == True)  # noqa: E712
+        .filter(Purchase.is_paid_for == True)
         .order_by(User.name, Product.name)
     )
 
     return render_template("admin/products/tee-purchases.html", purchases=purchases)
 
 
-@admin.route("/product_views")
-def product_views():
+product_views = Blueprint("product_views", __name__)
+
+
+@product_views.route("/")
+def product_views_main():
     view_counts = (
         ProductView.query.outerjoin(ProductView.product_view_products)
         .with_entities(ProductView, func.count(ProductViewProduct.view_id))
@@ -400,7 +393,7 @@ def product_views():
     return render_template("admin/products/views.html", view_counts=view_counts)
 
 
-@admin.route("/product_views/new", methods=["GET", "POST"])
+@product_views.route("/new", methods=["GET", "POST"])
 def product_view_new():
     form = NewProductViewForm()
 
@@ -415,14 +408,14 @@ def product_view_new():
         db.session.add(view)
         db.session.commit()
         flash("ProductView created")
-        return redirect(url_for(".product_view", view_id=view.id))
+        return redirect(url_for("admin.product_views.product_view", view_id=view.id))
 
     return render_template("admin/products/view-new.html", form=form)
 
 
-@admin.route("/product_views/<int:view_id>", methods=["GET", "POST"])
+@product_views.route("/<int:view_id>", methods=["GET", "POST"])
 def product_view(view_id):
-    view = ProductView.query.get_or_404(view_id)
+    view = get_or_404(db, ProductView, view_id)
 
     form = EditProductViewForm(obj=view)
     if request.method != "POST":
@@ -458,37 +451,28 @@ def product_view(view_id):
         db.session.commit()
 
     active_vouchers = Voucher.query.filter_by(view=view).filter(
-        not_(
-            Voucher.expiry.isnot(None)
-            & (Voucher.expiry + VOUCHER_GRACE_PERIOD < func.now())
-        )
+        not_(Voucher.expiry.isnot(None) & (Voucher.expiry + VOUCHER_GRACE_PERIOD < func.now()))
         & not_(Voucher.is_used)
     )
     stats = {
         "active": active_vouchers.count(),
-        "total_tickets": active_vouchers.with_entities(
-            func.sum(Voucher.tickets_remaining)
-        ).scalar(),
+        "total_tickets": active_vouchers.with_entities(func.sum(Voucher.tickets_remaining)).scalar(),
     }
 
-    return render_template(
-        "admin/products/view-edit.html", view=view, form=form, voucher_stats=stats
-    )
+    return render_template("admin/products/view-edit.html", view=view, form=form, voucher_stats=stats)
 
 
-@admin.route("/product_views/<int:view_id>/add", methods=["GET", "POST"])
-@admin.route("/product_views/<int:view_id>/add/<int:group_id>", methods=["GET", "POST"])
-@admin.route(
-    "/product_views/<int:view_id>/add/<int:group_id>/<int:product_id>",
+@product_views.route("/<int:view_id>/add", methods=["GET", "POST"])
+@product_views.route("/<int:view_id>/add/<int:group_id>", methods=["GET", "POST"])
+@product_views.route(
+    "/<int:view_id>/add/<int:group_id>/<int:product_id>",
     methods=["GET", "POST"],
 )
 def product_view_add(view_id, group_id=None, product_id=None):
-    view = ProductView.query.get_or_404(view_id)
+    view = get_or_404(db, ProductView, view_id)
     form = AddProductViewProductForm()
 
-    root_groups = (
-        ProductGroup.query.filter_by(parent_id=None).order_by(ProductGroup.id).all()
-    )
+    root_groups = ProductGroup.query.filter_by(parent_id=None).order_by(ProductGroup.id).all()
 
     if product_id is not None:
         product = Product.query.get(product_id)
@@ -505,11 +489,11 @@ def product_view_add(view_id, group_id=None, product_id=None):
     if form.validate_on_submit():
         if form.add_all_products.data:
             for product in group.products:
-                ProductViewProduct(view, product)
+                db.session.add(ProductViewProduct(view, product))
             db.session.commit()
 
         elif form.add_product.data:
-            ProductViewProduct(view, product)
+            db.session.add(ProductViewProduct(view, product))
             db.session.commit()
 
         return redirect(url_for(".product_view", view_id=view.id))
@@ -524,9 +508,9 @@ def product_view_add(view_id, group_id=None, product_id=None):
     )
 
 
-@admin.route("/product_views/<int:view_id>/voucher")
+@product_views.route("/<int:view_id>/voucher")
 def product_view_voucher_list(view_id):
-    view = ProductView.query.get_or_404(view_id)
+    view = get_or_404(db, ProductView, view_id)
     vouchers = Voucher.query.filter_by(view=view)
 
     if not request.args.get("used"):
@@ -534,31 +518,24 @@ def product_view_voucher_list(view_id):
 
     if not request.args.get("expired"):
         vouchers = vouchers.filter(
-            not_(
-                Voucher.expiry.isnot(None)
-                & (Voucher.expiry + VOUCHER_GRACE_PERIOD < func.now())
-            )
+            not_(Voucher.expiry.isnot(None) & (Voucher.expiry + VOUCHER_GRACE_PERIOD < func.now()))
         )
 
-    return render_template(
-        "admin/products/view-vouchers.html", view=view, vouchers=vouchers
-    )
+    return render_template("admin/products/view-vouchers.html", view=view, vouchers=vouchers)
 
 
-@admin.route("/product_views/<int:view_id>/voucher/<string:voucher_code>")
+@product_views.route("/<int:view_id>/voucher/<string:voucher_code>")
 def product_view_voucher_detail(view_id, voucher_code):
-    view = ProductView.query.get_or_404(view_id)
+    view = get_or_404(db, ProductView, view_id)
     voucher = Voucher.get_by_code(voucher_code)
     if voucher is None:
         abort(404)
-    return render_template(
-        "admin/products/view-voucher.html", view=view, voucher=voucher
-    )
+    return render_template("admin/products/view-voucher.html", view=view, voucher=voucher)
 
 
-@admin.route("/product_views/<int:view_id>/voucher/add", methods=["GET", "POST"])
+@product_views.route("/<int:view_id>/voucher/add", methods=["GET", "POST"])
 def product_view_add_voucher(view_id):
-    view = ProductView.query.get_or_404(view_id)
+    view = get_or_404(db, ProductView, view_id)
     form = NewVoucherForm()
 
     if form.validate_on_submit():
@@ -569,11 +546,12 @@ def product_view_add_voucher(view_id):
             purchases_remaining=form.num_purchases.data,
             tickets_remaining=form.num_tickets.data,
         )
+        db.session.add(voucher)
         db.session.commit()
         flash("Voucher successfully created")
         return redirect(
             url_for(
-                ".product_view_voucher_detail",
+                "admin.product_views.product_view_voucher_detail",
                 view_id=view_id,
                 voucher_code=voucher.code,
             )
@@ -582,12 +560,12 @@ def product_view_add_voucher(view_id):
     return render_template("admin/products/view-add-voucher.html", view=view, form=form)
 
 
-@admin.route(
-    "/product_views/<int:view_id>/voucher/<string:voucher_code>/edit",
+@product_views.route(
+    "/<int:view_id>/voucher/<string:voucher_code>/edit",
     methods=["GET", "POST"],
 )
 def product_view_edit_voucher(view_id, voucher_code):
-    view = ProductView.query.get_or_404(view_id)
+    view = get_or_404(db, ProductView, view_id)
     voucher = Voucher.get_by_code(voucher_code)
     if voucher is None:
         abort(404)
@@ -599,7 +577,7 @@ def product_view_edit_voucher(view_id, voucher_code):
         flash("Voucher updated")
         return redirect(
             url_for(
-                ".product_view_voucher_detail",
+                "admin.product_views.product_view_voucher_detail",
                 view_id=view_id,
                 voucher_code=voucher_code,
             )
@@ -607,14 +585,12 @@ def product_view_edit_voucher(view_id, voucher_code):
 
     form.init_with_voucher(voucher)
 
-    return render_template(
-        "admin/products/view-edit-voucher.html", view=view, voucher=voucher, form=form
-    )
+    return render_template("admin/products/view-edit-voucher.html", view=view, voucher=voucher, form=form)
 
 
-@admin.route("/product_views/<int:view_id>/voucher/bulk_add", methods=["GET", "POST"])
+@product_views.route("/<int:view_id>/voucher/bulk-add", methods=["GET", "POST"])
 def product_view_bulk_add_vouchers_by_email(view_id):
-    view = ProductView.query.get_or_404(view_id)
+    view = get_or_404(db, ProductView, view_id)
     form = BulkVoucherEmailForm()
 
     if not form.validate_on_submit() or form.preview.data:
@@ -626,6 +602,7 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 voucher_url="http://VOUCHER_URL_PLACEHOLDER",
                 expiry=form.expires.data,
                 reason=form.reason.data,
+                num_tickets=form.num_tickets.data,
             )
 
         return render_template(
@@ -639,15 +616,16 @@ def product_view_bulk_add_vouchers_by_email(view_id):
 
     if len(emails) >= 250:
         flash("More than 250 emails provided. Please submit <250 at a time.")
-        return redirect(
-            url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id)
-        )
+        return redirect(url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id))
 
     added = existing = sent_total = 0
 
     with mail.get_connection() as conn:
         for email in emails:
-            if Voucher.query.filter_by(email=email).first():
+            if email == "":
+                continue
+
+            if Voucher.query.filter_by(email=email, product_view_id=view.id).first():
                 existing += 1
                 continue
 
@@ -659,10 +637,13 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 purchases_remaining=form.num_purchases.data,
                 tickets_remaining=form.num_tickets.data,
             )
+            db.session.add(voucher)
+            # Commit here to avoid a race condition where two requests try to send the same
+            # list of vouchers. This does run the risk of vouchers being added without an email
+            # being sent, but this is preferable to sending two vouchers to the same person.
+            db.session.commit()
 
-            voucher_url = external_url(
-                "tickets.tickets_voucher", voucher_code=voucher.code
-            )
+            voucher_url = external_url("tickets.tickets_voucher", voucher_code=voucher.code)
 
             plaintext = format_trusted_plaintext_email(
                 form.text.data, voucher_url=voucher_url, expiry=form.expires.data
@@ -673,6 +654,7 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 voucher_url=voucher_url,
                 expiry=form.expires.data,
                 reason=form.reason.data,
+                num_tickets=form.num_tickets.data,
             )
 
             app.logger.info("Emailing %s volunteer voucher: %s", email, voucher.code)
@@ -685,14 +667,10 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 connection=conn,
                 html_message=html,
             )
-            db.session.commit()
+
             sent_total += sent_count
             added += 1
 
-    flash(
-        f"{added} vouchers added, {sent_total} emails sent, {existing} duplicates skipped."
-    )
+    flash(f"{added} vouchers added, {sent_total} emails sent, {existing} duplicates skipped.")
 
-    return redirect(
-        url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id)
-    )
+    return redirect(url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id))

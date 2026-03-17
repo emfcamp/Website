@@ -14,10 +14,10 @@
 <div>
   <h3>Quick Links</h3>
   <div class="btn-group">
-  {% if SITE_STATE == 'before-sales' %}
+  {% if SITE_STATE in ('before-sales', 'sales') %}
     <a class="btn btn-default" href="{{url_for(".payment_config_verify")}}">Verify Payment Config</a>
   {% endif %}
-    <a class="btn btn-default" href="{{url_for(".products")}}">Product Overview</a>
+    <a class="btn btn-default" href="{{url_for(".products.products_main")}}">Product Overview</a>
     <a class="btn btn-default" href="{{url_for(".email")}}">Email Users</a>
   </div>
 </div>

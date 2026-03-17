@@ -7,7 +7,7 @@
 FROM ghcr.io/emfcamp/website:latest AS website
 FROM nginx:1.17-alpine
 
-COPY --from=website /app/static /usr/share/nginx/emf-static/static
+COPY --from=website /app/dist /usr/share/nginx/emf-static
 COPY convert_webp.sh /usr/local/bin/convert_webp.sh
 
 # Create a webp version of all images, served automatically by nginx.

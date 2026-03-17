@@ -1,0 +1,567 @@
+{
+    "favourites": {
+        "counts": {
+            "0": 0,
+            "1-9": 0,
+            "10-19": 0,
+            "20-29": 0,
+            "30-39": 0,
+            "40-49": 0,
+            "50-99": 0,
+            "100-199": 0,
+            "200+": 0
+        }
+    },
+    "proposals": {
+        "accepted": [
+            {
+                "published_title": "Light up paper houses and pop-up cards - let's build a glowing village!",
+                "published_description": "Come and explore paper circuits - we\u2019ll use  conductive tape, LED lights and coin cell batteries, plus drawing, colouring & stickers, and some paper folding tricks. And we\u2019ll make a village of 3D houses, pop-up cards, and maybe flowers and other origami models, all lighting up with coloured LEDs!\r\n\r\nYou can take them away with you, or we can set up a gallery space in the children\u2019s area to glow into the night \ud83c\udf03\ud83c\udf86",
+                "names": "Adam Cohen-Rose",
+                "pronouns": "He/him",
+                "may_record": false,
+                "video_privacy": "public",
+                "scheduled_time": "2024-05-31 14:00:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "bit:birds: build & code micro:bit pipecleaner birds as part of the EMF flock",
+                "published_description": "We want to build a flock of beautiful, unique, singing, communicating birds.\r\n\r\nYour bird will come and join the flock. We'll show you how to write your first micro:bit program, how to play with different ways to make cool sounds, and then how to make your bird a social beast, responding to wireless signals from the flock.\r\n\r\nWe want you to come and teach your bird how to squeak, squawk, sqauck, quack or even beatbox.\r\n\r\nYou will need to bring a laptop\r\nWe'll provide the micro:bits, batteries, cables and craft materials.\r\n\r\nIf you have your own micro:bit (V2), bring it along so you can keep your bird at the end of the festival. if you have servo motors, bring them along and you can make a bird that flaps.\r\n\r\nYou can code in MicroPython or MakeCode (which is like Scratch)\r\n\r\nAt the end of the activity we will find a nice tree to hang the birds up somewhere people can come and see, hear and admire them.\r\n",
+                "names": "Jonny Austin",
+                "pronouns": "He/Him",
+                "may_record": false,
+                "video_privacy": "public",
+                "scheduled_time": "2024-05-31 15:30:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "EMF Rocks!",
+                "published_description": "Come create something beautiful, funny, thoughtful - your choice! Rock painting is a wonderful craft that people use to show inspirational quotes, draw realistic animals, or release your creativity. Come relax for a little while and paint a rock. Your rock will have a base coat to help the colours pop when using acrylic pens to create your masterpiece.\r\n\r\nYou don't even need to have an idea of how to paint it - there will be lots of inspiration to help you choose.\r\n\r\nIf worried about getting messy - please bring something to cover your child's clothes.\r\n\r\nThis is on a first come first served basis",
+                "names": "Olivia Wilson",
+                "pronouns": "She/her",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-05-31 11:00:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "[CANCELLED] Up up and away! - Let's launch a weather balloon!",
+                "published_description": "CANCELLED - Unsuitable wind conditions have unfortunately meant this balloon launch isn\u2019t able to take place.\r\n\r\n\r\nWe're going to launch a very large balloon up to the edge of space*.\r\nAfter a brief introduction to high altitude ballooning from Dave in the village (plus a safety briefing), we'll walk out to an open area of field, fill a very large balloon with helium, check the flight computers and let go! The balloon will then drift up to 25km+, eventually bursting and falling back down to earth.\r\nAll the while, we'll be able to track it live on the map, while even hopefully receive some images from the edge of space*.\r\n\r\n\r\nThanks to Dave from the AMSAT-UK / BATC / UKuG village for making this activity possible.\r\n\r\n(* And yes, we know balloons don't actually go to the edge of space, but it's still going to be a lot higher than even commercial planes fly!)\r\n\r\n\r\nThis workshop is (initially) taking place in The Unnamed Village. We're in the middle of camping area G - https://map.emfcamp.org/#18.41/52.040788/-2.376733",
+                "names": "Dave Akerman / Andrew Mulholland",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-02 11:10:00",
+                "scheduled_duration": 65,
+                "venue": "Unnamed Village",
+                "venue_village_id": 40
+            },
+            {
+                "published_title": "Introduction to EMF Badge coding for kids [ TIME CHANGED ]",
+                "published_description": "In this special badge coding session for under 18s, you will learn to create your very own simple Tildagon (EMF 2024 badge) app.\r\n\r\nSome prior basic Python experience is recommended.\r\n\r\n\r\nNote - Please try and update your badge 20-30 mins before the workshop to make sure you have the most up to date code.\r\n\r\n\r\nThis workshop is taking place in The Unnamed Village. We're in the middle of camping area G - https://map.emfcamp.org/#18.41/52.040788/-2.376733",
+                "names": "Andrew Mulholland",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-02 10:45:00",
+                "scheduled_duration": 60,
+                "venue": "Unnamed Village",
+                "venue_village_id": 40
+            },
+            {
+                "published_title": "Botato Wars",
+                "published_description": "Participants make app-controlled fighting robots made from potatoes and other veggies and then they fight (and have a race if there's room). They use the PCB and motors from my Smartibot kit with some additional 3D printed bits so everything spikes into the vegetables. \r\nThere's a video about the time I ran it at the Apple Store here: https://www.youtube.com/watch?v=EXbMMBYNRKg\r\n",
+                "names": "Ross Atkin",
+                "pronouns": "He / Him",
+                "may_record": false,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-31 17:00:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Build a Minecraft games controller!",
+                "published_description": "Using a Micro:Bit, learn to code a Bluetooth based games controller for Minecraft.\r\nAfter building a basic controller, it's time to upgrade it with superpowers!\r\n\r\nAll coding will be done using MakeCode blocks, so no prior experience needing of coding.\r\n\r\n\r\nThis workshop is taking place in The Unnamed Village. We're in the middle of camping area G - https://map.emfcamp.org/#18.41/52.040788/-2.376733",
+                "names": "Abbie Welch",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-01 11:15:00",
+                "scheduled_duration": 60,
+                "venue": "Unnamed Village",
+                "venue_village_id": 40
+            },
+            {
+                "published_title": "Hex Allen and the Clanksmiths Read-Aloud",
+                "published_description": "Join the author in a short read-aloud from the STEM fantasy quest, Hex Allen and the Clanksmiths and learn how Hex uses her engineering skills to outsmart monsters using everything from LEDs to electromagnets to water balloon launchers.\r\n\r\nBook summary:\r\nHex Allen can't do magic - a huge problem when everything from lights to locks is powered by simple spells that everyone (save a few unfortunate \"Undevelopeds\") can do. After years of feeling useless, Hex seizes the chance to change her future by journeying to the Wishing Wyrm, a legendary dragon that will grant a single wish once a century. Unfortunately, Hex isn't the only one after the wish, and every rival wish hunter has magic on their side. Every rival except the Clanksmiths, Cam and Fuse. Like Hex, they can't do magic, but they've learned to build clank, creations made using the mysterious, forgotten arts of science and engineering.\r\n\r\nAfter a fairy fiasco throws Hex and the Clanksmiths together, they agree to cooperate - for the time being. With the Clanksmiths' know-how and Hex's creativity, they outsmart monsters with everything from LEDs to electromagnets to water balloon launchers. But as they race to the Wishing Wyrm, Hex must decide between her friendship with the Clanksmiths and the wish that would give her a normal, magical life.",
+                "names": "Jasmine Florentine",
+                "pronouns": "she/her",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 11:00:00",
+                "scheduled_duration": 60,
+                "venue": "Family Lounge",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Writing stories in code (repeat)",
+                "published_description": "During this session we will be learning how to create an interactive story. We will do this with the use of inklewriter which is a narrative scripting program in the browser. This is a tool for making branching dialogue and can connect to game engines, but we will be working with it in the browser. By the end of this session you will have made an epic tale that friends and family alike can play and enjoy. All the while learning how video game story telling is created.\r\n\r\nThis session is a repeat of the session run in the Youth Workshop tent on Friday afternoon.\r\n\r\n\r\nThis workshop is taking place in The Unnamed Village. We're in the middle of camping area G - https://map.emfcamp.org/#18.41/52.040788/-2.376733",
+                "names": "Claire Mulholland",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-01 16:30:00",
+                "scheduled_duration": 60,
+                "venue": "Unnamed Village",
+                "venue_village_id": 40
+            },
+            {
+                "published_title": "Design & Build Your Own Rocket Workshop part 2",
+                "published_description": "Meet at the Mini Mobile Makerspace to finish off your spacecraft and then come with us to the launch site where we will launch your air rockets to the skies!\r\n\r\nNote - This is part 2 of the workshop. Part 1 (on Friday) involves designing your rocket parts to be 3D printed and lasercut. If you missed this, we should have a limited number of spare parts available, but these will be first come first serve.\r\n\r\n\r\nThis workshop is taking place in The Unnamed Village. We're in the middle of camping area G - https://map.emfcamp.org/#18.41/52.040788/-2.376733",
+                "names": "Richard Maynard",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-02 12:00:00",
+                "scheduled_duration": 90,
+                "venue": "Unnamed Village",
+                "venue_village_id": 40
+            },
+            {
+                "published_title": "How computers sense the world? (using Micro:Bit)",
+                "published_description": "Ever wondered how your phone knows when you turn it upside down or when you're moving around counting your every step? Well in this workshop we'll take a peak into the world of sensors and how they work and what they are used for. \r\n\r\nWe'll use the BBC Microbit which is a tiny computer along with Python/Makecode to store what it sees, then using code we'll create graphs that can allow us to understand what the Microbit is seeing.\r\n\r\nIn this workshop you'll learn:\r\n- What sensors the BBC Microbit has\r\n- How to store/log data coming off of the Microbit's sensors\r\n- How to create graphs and other ways of seeing the information \r\n\r\n\r\nThis workshop is taking place in The Unnamed Village. We're in the middle of camping area G - https://map.emfcamp.org/#18.41/52.040788/-2.376733",
+                "names": "Vincent Lee",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-31 11:30:00",
+                "scheduled_duration": 45,
+                "venue": "Unnamed Village",
+                "venue_village_id": 40
+            },
+            {
+                "published_title": "Origami Boomerang Folding",
+                "published_description": "Learn to fold and throw a paper origami boomerang - that really comes back when you throw it! Paper will be provided.",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-01 16:30:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Botato Wars",
+                "published_description": "Participants make app-controlled fighting robots made from potatoes and other veggies and then they fight (and have a race if there's room). They use the PCB and motors from my Smartibot kit with some additional 3D printed bits so everything spikes into the vegetables. \r\nThere's a video about the time I ran it at the Apple Store here: https://www.youtube.com/watch?v=EXbMMBYNRKg",
+                "names": "Ross Atkin",
+                "pronouns": "He / Him",
+                "may_record": false,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-01 15:00:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Minecraft Social 7-12yrs - Education Edition",
+                "published_description": "Come along, meet other kids interested in minecraft.\r\n\r\nWe have 8 laptops to setup.\r\n\r\nTimes/location subject to change, so please check the map and schedule.\r\n\r\nIf it's super popular we'll put up a couple more.",
+                "names": "Minecraft Social 7-12yrs - Education Edition",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-30 15:00:00",
+                "scheduled_duration": 60,
+                "venue": "East Essex Hackspace CIO",
+                "venue_village_id": 34
+            },
+            {
+                "published_title": "Minecraft Social 7-12yrs - Education Edition",
+                "published_description": "Come along, meet other kids interested in minecraft.\r\n\r\nWe have 8 laptops to setup.\r\n\r\nTimes/location subject to change, so please check the map and schedule.\r\n\r\nIf it's super popular we'll put up a couple more.\r\n\r\nIf you've been before, you will be expected to give way to newbies.",
+                "names": "Minecraft Social 7-12yrs - Education Edition",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-31 10:00:00",
+                "scheduled_duration": 60,
+                "venue": "East Essex Hackspace CIO",
+                "venue_village_id": 34
+            },
+            {
+                "published_title": "Mario Kart Tournament ",
+                "published_description": "Are you ready to race? Come and join the EMF Mario Kart Tournament! Zoom around the track with your favourite characters, compete against other kids, and have a blast. \r\nThe winner gets the ultimate prize: bragging rights!\r\n\r\nDrop in, but limited tournament spaces available.",
+                "names": "Bethanie Fentiman ",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 13:30:00",
+                "scheduled_duration": 90,
+                "venue": "Family Lounge",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Introduction to tea pets",
+                "published_description": "Come along and learn about tea pets! What are they? How long have they been in the world? Why would you have one? Then make your own tea pet from air-drying clay to keep and take home. All participants are invited to share some tea with a pet I prepared earlier at the end of the session. Suitable for tea drinkers and non-tea drinkers of all ages.",
+                "names": "Hannah Hulbert",
+                "pronouns": "She/her",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 11:00:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Build and fly a rocket!",
+                "published_description": "Build and fly a solid-fuelled model rocket from scratch!\r\n\r\nWe'll provide paper templates and all required materials, you cut and tape the rocket together and then decorate it to taste. Once they're all built we'll take the rockets out to the model flying area and launch them from our launch pad.\r\n\r\nAssembling the rocket is straightforward and as they're all made from white card and paper there are plenty of options for decoration or modification. We'll have some helpers on hand to provide guidance.\r\n\r\nSuitable for young children with supervision. The build involves mostly using scissors and tape, one step involves hot glue which requires adult supervision. Feel free to contact us beforehand if you want to check suitability: emf@adamgreig.com.\r\n\r\nThere is a limit of one rocket per child.",
+                "names": "Adam Greig",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 11:00:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Making Lightup Wearables - An Intro to E-textiles!",
+                "published_description": "In this session we will follow along step by step to make light-up bracelets and badges for kids using some simple sew-on electronics and conductive thread! \r\n\r\nEach attendee should leave with a light-up bracelet or safety badge which they have put together themselves and then decorated.\r\nDuring the workshop we will also talk about the basics of both sewing and electronic circuits, explaining how to complete a running stitch and how a current flows through a simple circuit to turn on the LED light.\r\n\r\nNote: we will be using sewing needles and scissors, so parent or guardian supervision is important!\r\n",
+                "names": "Dervla O'Brien",
+                "pronouns": "she/her",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 13:00:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Paper Rockets for all",
+                "published_description": "Not got enough of Rockets on the schedule or didn't get a slot?\r\n\r\nCome join us for the much more exciting world of paper rockets.\r\n\r\nTIMES MAY BE FLUID.  PLEASE CHECK THIS BEFORE HEADING OVER TO US - AND CHECK THE LOCATION AS WELL\r\n\r\nFree and combustion free (Donations to the hackspace never turned away!)\r\n\r\nNO COST, NO LIMIT ON NUMBERS.  We will run until the end of the hour but if there's people left over we'll arrange another time to run.\r\n\r\nPop along, meet the crew, fire some rockets.  wcgw.",
+                "names": "Tim",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-31 11:00:00",
+                "scheduled_duration": 60,
+                "venue": "East Essex Hackspace CIO",
+                "venue_village_id": 34
+            },
+            {
+                "published_title": "Painting with light - Build and paint with your own \"Glowie\"",
+                "published_description": "In this evening activity, we will get hands on drawing with light!\r\n\r\nFirst, we will build our very own \"glowie\" torch (coincell + LED + tape) to keep, explore the brightness of different colours of LEDs and each attendee will get to pick which colour they want to use for the second stage.\r\n\r\nIn the second stage of the activity, we will head outside into the dark (or twilight) and take some long exposure light painting photographs. Common things drawn in the past include initials, basic shapes or just simple lines.",
+                "names": "Andrew Mulholland",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 20:40:00",
+                "scheduled_duration": 45,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Lego Technic ElectroEngineers",
+                "published_description": "For Kids, AFOL's (adult fan of lego), I would like to bring a few tubs of cleaned, loose lego technic (cogs, gears, axels, wheels etc) and create a continous chain of connected creations. I've made examples of logic gates AND OR NOT that I can explain computer science, Archimedes screw, pistons, scissor lifts, engines, gears/ratios, motors/generators, water turbines, conveyor belts and whatever else people can imagine. I love to see them add to it each day and have this long connected machine using all the above and explain where each item is used in every day situations. I'd like this to grow into a live installation, people could label their part like a exhibition of their skill. If possible, it would be great to try make parts of it a marble run. I have lots of wheels, they can have a contest on the last day of who can make their car travel the furthest down a ramp, or balloon/elastic band powered. \r\n\r\nI want them to have fun building and seeing things connected, but I'd like to show examples where what they've built takes place. Maybe I could squeeze a bit of my science knowledge of what's going on in too.\r\n\r\nI'll keep tweaking this but I wanted to get this idea through to you and I'm happy for suggestions, tweaks. But I'd love to run this and build this continuous connected machine.\r\n\r\nI hope you like it. I'd love to run it.",
+                "names": "Christopher Watson ",
+                "pronouns": "Mr",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 09:30:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Light Up Flowers Workshop ",
+                "published_description": "We will be making simple flowers for this workshop. \r\nYou will be provided with all the materials you need to make these, as well as an instruction card. Someone will be on hand to support and answer any questions you have.\r\nMaterials will include a battery and LED light, as well as paper and other recycled materials.",
+                "names": "Hannah Tucker McLellan",
+                "pronouns": "She/they",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 14:00:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Finger Knitting for Kids - intro drop-in session",
+                "published_description": "Learn the elements of knitting through Finger Knitting, a kid-friendly technique that uses your fingers instead of knitting needles. Make a bracelet, bookmark, or headband to take home or give to a friend! \r\nOnce you get the basic technique, you can finish a small project in 10-15 minutes in this free drop-in session.  Open to all ages - recommended for 5+. All children to be accompanied by an adult.",
+                "names": "Emily Robertson",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-05-30 14:30:00",
+                "scheduled_duration": 60,
+                "venue": "Tekhn\u0113-cal Village",
+                "venue_village_id": 54
+            },
+            {
+                "published_title": "Lego skyscraper scramble",
+                "published_description": "How high a lego skyscraper can you build with 1kg of lego? What is the perfect balance between sturdiness and height? Do you prioritise strong foundations or elegant spires? Can you build a tower that is taller than you? In this workshop, you will collaborate in small teams of 2-3 children and their adults, to reach for the sky with your lego creations. We will provide each team with a 1kg box of mixed lego bricks and unusual lego pieces. You will discover new ways of using lego to achieve unheard-of heights. Enter your skyscrapers into the the height test, the beauty competition, the \u2018original\u2019 competition, and for the very confident builders, the earthquake test! ",
+                "names": "Arlo Gillespie & Flora Cornish",
+                "pronouns": "Arlo Gillespie (he/him) & Flora Cornish (she/her)",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 12:30:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "MadLab soldering workshop",
+                "published_description": "Soldering workshop in which attendees build kits such as lie detectors, musical bagpipes, steady-hand games and burglar alarms.We provide all the equipment and help needed for beginners to learn how to solder and build their own gadget to take home.\r\n\r\nWe primarily run workshops for children so the above kits are aimed at them but we also have more complicated kits more suitable for adults. I've put in a proposal for an adult workshop as well.",
+                "names": "James Hutchby",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 16:00:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Introduction to lasercutting for kids - Drop in",
+                "published_description": "Come join our drop in introduction to lasercutting for kids. You will learn to use ShaperTrace, TinkerCad or Inkscape to prepare a file for our laser cutter, which will then be cut out with a laser from wood or acrylic right before your very eyes!\r\n\r\nSome idea of the type of things you could design and make include:\r\n- A name badge \r\n- Some earrings\r\n- Souvenir EMF cufflinks\r\n\r\nNOTE - You can arrive anytime within this workshop block as it's a drop in.\r\n\r\n\r\nThis workshop is taking place in The Unnamed Village. We're in the middle of camping area G - https://map.emfcamp.org/#18.41/52.040788/-2.376733",
+                "names": "Paul Koshal",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-06-01 12:30:00",
+                "scheduled_duration": 120,
+                "venue": "Unnamed Village",
+                "venue_village_id": 40
+            },
+            {
+                "published_title": "Build and fly a rocket!",
+                "published_description": "Build and fly a solid-fuelled model rocket from scratch!\r\n\r\nWe'll provide paper templates and all required materials, you cut and tape the rocket together and then decorate it to taste. Once they're all built we'll take the rockets out to the model flying area and launch them from our launch pad.\r\n\r\nAssembling the rocket is straightforward and as they're all made from white card and paper there are plenty of options for decoration or modification. We'll have some helpers on hand to provide guidance.\r\n\r\nSuitable for young children with supervision. The build involves mostly using scissors and tape, one step involves hot glue which requires adult supervision. Feel free to contact us beforehand if you want to check suitability: emf@adamgreig.com.\r\n\r\nThere is a limit of one rocket per child.",
+                "names": "Adam Greig",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-05-31 18:30:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "300 Addressable LED Strings with Microbits & Python",
+                "published_description": "Children can learn to control addressable RGB LED using the Neopixel library and Python on the BBC Microbit. Starting small with a 10 LED attached to a Microbit and then upgrade once the code is working to strings of 300. \r\nJoin us for an exciting 60 minute workshop where your child will delve into the world of coding using the innovative BBC Microbit and Neopixels. This hands-on session is tailored to match the Key Stage 3 & 4 computing curriculum, making it a valuable addition to your child\u2019s education while keeping it fun and engaging. \r\nIn the workshop children will create a simple device that changes the lights, teaching them essential programming concepts such as variables, loops, conditionals, and functions. The workshop is more than just a coding lesson; it\u2019s an introduction to how technology integrates into various aspects of our industries, from manufacturing to creative arts. \r\nThis session is a fantastic way for your child to see the real-world impact of technology and to spark their interest in innovation and tech careers.",
+                "names": "Robert Wiltshire & Garry Hunt",
+                "pronouns": "He/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-01 17:50:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Rocket Science and Brain Surgery",
+                "published_description": "Thought becoming Rocket Scientist or a Brain Surgeon was difficult? Get ready for an hour of pure excitement where we'll do both!\r\n\r\n\ud83d\ude80 Rocket Launch: Get ready to be a rocket scientist as we design and build stomp rockets! Then with a burst of compressed air, watch your creation shoot towards the stars from our launchpad.\r\n\r\n\ud83e\udde0 Brain Surgery: Step into the shoes of a brain surgeon (no medical degree required) as we perform keyhole surgery on artificial brains. We'll create our own electric circuits that'll buzz if any \"mistakes\" are made\u2014just like the classic Operation game.\r\n\r\nAll materials will be provided, just bring enthusiasm! \ud83d\ude80\ud83e\udde0",
+                "names": "Tom Howe",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-06-02 09:30:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Design & Build Your Own Rocket Workshop part 1",
+                "published_description": "Use our Mini Mobile Makerspace to build your own air rocket. Get an introduction to TinkerCad, so you can design and 3D print a nose cone, laser cut some fins and decorate it ready for launch in session 2.\r\n\r\nNOTE - This is part 1, you're going to need to come back on Sunday at midday for part 2 where we will build and launch the rockets with your lasercut and 3D printed rocket parts.\r\n\r\n\r\nThis workshop is taking place in The Unnamed Village. We're in the middle of camping area G - https://map.emfcamp.org/#18.41/52.040788/-2.376733",
+                "names": "Richard Maynard",
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": "2024-05-31 15:15:00",
+                "scheduled_duration": 90,
+                "venue": "Unnamed Village",
+                "venue_village_id": 40
+            },
+            {
+                "published_title": "Writing stories in code",
+                "published_description": "During this session we will be learning how to create an interactive story. We will do this with the use of inklewriter which is a narrative scripting program in the browser. This is a tool for making branching dialogue and can connect to game engines, but we will be working with it in the browser. By the end of this session you will have made an epic tale that friends and family alike can play and enjoy. All the while learning how video game story telling is created.",
+                "names": "Claire Mulholland",
+                "pronouns": "She/Her",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": "2024-05-31 12:30:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop",
+                "venue_village_id": null
+            }
+        ],
+        "counts": {
+            "needs_help": {
+                "false": 44,
+                "true": 10
+            },
+            "needs_money": {
+                "false": 54
+            },
+            "needs_laptop": {
+                "false": 43,
+                "null": 11
+            },
+            "one_day": {
+                "false": 54
+            },
+            "notice_required": {
+                "1 month": 39,
+                "1 week": 1,
+                "> 1 month": 3,
+                "null": 11
+            },
+            "may_record": {
+                "false": 43,
+                "null": 11
+            },
+            "video_privacy": {
+                "none": 37,
+                "public": 2,
+                "null": 15
+            },
+            "state": {
+                "accepted": 2,
+                "finalised": 30,
+                "rejected": 16,
+                "withdrawn": 6
+            },
+            "created_week": {
+                "2024-01-29": 2,
+                "2024-02-05": 3,
+                "2024-02-12": 6,
+                "2024-02-26": 2,
+                "2024-03-11": 1,
+                "2024-03-18": 3,
+                "2024-03-25": 7,
+                "2024-04-01": 2,
+                "2024-04-08": 4,
+                "2024-04-15": 2,
+                "2024-04-22": 8,
+                "2024-04-29": 1,
+                "2024-05-13": 3,
+                "2024-05-20": 2,
+                "2024-05-27": 8
+            }
+        },
+        "edits": {
+            "published_title": {
+                "avg": "1.89",
+                "max": 5
+            },
+            "published_description": {
+                "avg": "2.15",
+                "max": 5
+            },
+            "length": {
+                "avg": "1.04",
+                "max": 2
+            },
+            "equipment_required": {
+                "avg": "1.38",
+                "max": 4
+            },
+            "funding_required": {
+                "avg": "1.35",
+                "max": 4
+            },
+            "additional_info": {
+                "avg": "1.27",
+                "max": 3
+            },
+            "notice_required": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "needs_help": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "needs_money": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "one_day": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "has_rejected_email": {
+                "avg": "1.29",
+                "max": 2
+            },
+            "published_names": {
+                "avg": "1.76",
+                "max": 4
+            },
+            "published_pronouns": {
+                "avg": "1.73",
+                "max": 4
+            },
+            "arrival_period": {
+                "avg": "1.75",
+                "max": 3
+            },
+            "departure_period": {
+                "avg": "1.75",
+                "max": 3
+            },
+            "eventphone_number": {
+                "avg": "1.42",
+                "max": 2
+            },
+            "telephone_number": {
+                "avg": "1.69",
+                "max": 3
+            },
+            "may_record": {
+                "avg": "1.76",
+                "max": 2
+            },
+            "video_privacy": {
+                "avg": "1.07",
+                "max": 2
+            },
+            "needs_laptop": {
+                "avg": "1.78",
+                "max": 2
+            },
+            "available_times": {
+                "avg": "1.82",
+                "max": 4
+            },
+            "attendees": {
+                "avg": "1.09",
+                "max": 2
+            },
+            "cost": {
+                "avg": "1.05",
+                "max": 2
+            },
+            "size": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "installation_funding": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "age_range": {
+                "avg": "1.25",
+                "max": 4
+            },
+            "participant_equipment": {
+                "avg": "1.02",
+                "max": 2
+            }
+        }
+    }
+}

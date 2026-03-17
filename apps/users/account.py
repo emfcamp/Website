@@ -1,15 +1,15 @@
-from flask import render_template, redirect, request, flash, url_for, current_app as app
-from flask_login import login_required, current_user
-from wtforms import StringField, SubmitField, BooleanField
+from flask import current_app as app
+from flask import flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
+from wtforms import BooleanField, StringField, SubmitField
 from wtforms.validators import DataRequired
 
 from main import db
-from models.purchase import Purchase
 from models.payment import Payment
+from models.purchase import Purchase
 from models.site_state import get_site_state
 
 from ..common.forms import DiversityForm
-
 from . import users
 
 
@@ -87,11 +87,7 @@ def purchases():
     tickets = purchases.filter_by(is_ticket=True).all()
     other_items = purchases.filter_by(is_ticket=False).all()
 
-    payments = (
-        current_user.payments.filter(Payment.state != "cancelled")
-        .order_by(Payment.state)
-        .all()
-    )
+    payments = current_user.payments.filter(Payment.state != "cancelled").order_by(Payment.state).all()
 
     if not tickets and not payments:
         return redirect(url_for("tickets.main"))

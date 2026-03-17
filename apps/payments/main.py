@@ -1,23 +1,25 @@
 import requests
 from flask import (
-    render_template,
-    redirect,
     current_app as app,
+)
+from flask import (
     flash,
+    redirect,
+    render_template,
     request,
     url_for,
 )
 from flask_login import login_required
-from wtforms import StringField, SubmitField, FieldList, FormField
+from wtforms import FieldList, FormField, IntegerRangeField, StringField, SubmitField
 from wtforms.validators import ValidationError
-from wtforms.fields.html5 import IntegerRangeField
 
-from . import payments
-from .common import get_user_payment_or_abort
-from ..common.forms import Form, RefundPurchaseForm, update_refund_purchase_form_details
 from main import db
 from models import RefundRequest
 from models.site_state import get_refund_state
+
+from ..common.forms import Form, RefundPurchaseForm, update_refund_purchase_form_details
+from . import payments
+from .common import get_user_payment_or_abort
 
 
 @payments.route("/pay/terms")
@@ -27,10 +29,7 @@ def terms():
 
 def required_for(currency=None, providers=None):
     def validate(form, field):
-        if (
-            form.donation_amount.data
-            and form._total_amount == form.donation_amount.data
-        ):
+        if form.donation_amount.data and form._total_amount == form.donation_amount.data:
             return
         if providers is not None and form._provider not in providers:
             return
@@ -44,22 +43,12 @@ def required_for(currency=None, providers=None):
 
 class RefundRequestForm(Form):
     # We only support UK and international (Euros)
-    sort_code = StringField(
-        "Sort code", [required_for(currency="GBP", providers=["banktransfer"])]
-    )
-    account = StringField(
-        "Account number", [required_for(currency="GBP", providers=["banktransfer"])]
-    )
-    iban = StringField(
-        "IBAN", [required_for(currency="EUR", providers=["banktransfer"])]
-    )
-    swiftbic = StringField(
-        "SWIFT BIC", [required_for(currency="EUR", providers=["banktransfer"])]
-    )
+    sort_code = StringField("Sort code", [required_for(currency="GBP", providers=["banktransfer"])])
+    account = StringField("Account number", [required_for(currency="GBP", providers=["banktransfer"])])
+    iban = StringField("IBAN", [required_for(currency="EUR", providers=["banktransfer"])])
+    swiftbic = StringField("SWIFT BIC", [required_for(currency="EUR", providers=["banktransfer"])])
     donation_amount = IntegerRangeField("Donation amount")
-    payee_name = StringField(
-        "Name of account holder", [required_for(providers=["banktransfer"])]
-    )
+    payee_name = StringField("Name of account holder", [required_for(providers=["banktransfer"])])
 
     purchases = FieldList(FormField(RefundPurchaseForm))
 
@@ -87,9 +76,7 @@ def validate_bank_details(form, currency):
         if not wise_validate("sort-code", sortCode=form.sort_code.data):
             return False
 
-        if not wise_validate(
-            "sort-code-account-number", accountNumber=form.account.data
-        ):
+        if not wise_validate("sort-code-account-number", accountNumber=form.account.data):
             return False
 
     elif currency == "EUR":
@@ -110,13 +97,9 @@ def payment_refund_request(payment_id, currency=None):
         )
         return redirect(url_for("users.purchases"))
 
-    payment = get_user_payment_or_abort(
-        payment_id, valid_states=["paid", "partrefunded"]
-    )
+    payment = get_user_payment_or_abort(payment_id, valid_states=["paid", "partrefunded"])
 
-    if not payment.is_refundable() or not any(
-        [t.is_refundable() for t in payment.purchases]
-    ):
+    if not payment.is_refundable() or not any([t.is_refundable() for t in payment.purchases]):
         flash(
             """Payment cannot be refunded. It is either in an unpaid state or
             has no associated tickets; if you have transferred tickets to
@@ -147,7 +130,6 @@ def payment_refund_request(payment_id, currency=None):
             and payment.amount != form.donation_amount.data
             and not validate_bank_details(form, currency)
         ):
-
             if payment.currency == "GBP":
                 bank_type = "UK"
             else:
@@ -181,9 +163,7 @@ def payment_refund_request(payment_id, currency=None):
             payment.state = "refund-requested"
             db.session.commit()
 
-            flash(
-                "Your refund request has been submitted. We will email you when it's processed."
-            )
+            flash("Your refund request has been submitted. We will email you when it's processed.")
             return redirect(url_for("users.purchases"))
 
     for f in form.purchases:

@@ -6,6 +6,9 @@
 @use "./_variables.scss" as *;
 
 #emf-container {
+  background-color: $main-background;
+  overflow: hidden;
+
   @media (min-width: $main-content-width + 14) {
     width: $main-content-width;
     margin-left: auto;
@@ -20,13 +23,12 @@
     margin: 0 0 0 0;
     padding: 0 0 0 0;
   }
-  background-color: $main-background;
-  overflow:hidden;
 }
 
 .emf-row {
   display: flex;
   flex-flow: row;
+
   @media(max-width: $main-content-width) {
     flex-flow: column;
   }

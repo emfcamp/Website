@@ -1,0 +1,1253 @@
+{
+    "favourites": {
+        "counts": {
+            "0": 0,
+            "1-9": 0,
+            "10-19": 0,
+            "20-29": 0,
+            "30-39": 0,
+            "40-49": 0,
+            "50-99": 0,
+            "100-199": 0,
+            "200+": 0
+        }
+    },
+    "proposals": {
+        "accepted": [
+            {
+                "published_title": "Deep-Fried Buckfast with Irn Bru Sauce",
+                "published_description": "Slide the bleeding edge of Scottish culture into yer gaping maw.",
+                "names": "Nick",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "QuickTake Me to the 90s Photo Booth",
+                "published_description": "Step back to 1995, borrow one of the first consumer digital cameras, and capture up to 16 images at EMF. You may even take your best shots back to the future! With the help of our \u201cexpert\u201d technicians (when available) receive a tiny physical print or electronic delivery over the Internet.",
+                "names": "Martin Burch",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "public",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Zombie Shooting Range",
+                "published_description": "Straight from Pi Wars, the Zombies are on the outlook for brains, defend yourself from the zombies with the Nerf gun and hit the big red button to reset the zombies. ",
+                "names": "Brian Corteil",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "public",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Cybow",
+                "published_description": "Created for EMF Camp in 2022, Cybow fuses traditional archery with modern arcade-style video gaming in a widely accessible and safe environment. Immersed in a rich visual and audio setting, players aged 12+ shoot foam-tipped arrows at digitally projected targets.\r\n\r\nAccurate infrared laser detection technology provides instant feedback, generating moving targets that return fire, enhancing the experience into one that perfectly combines physical challenges with the excitement of the virtual.",
+                "names": "Paul Hayes",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": null,
+                "pronouns": null,
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "EMF Camp Scavenger Hunt",
+                "published_description": "Welcome to the EMF Scavenger Hunt. \"Wow, hunting? At EMF camp?\" Don't worry! A Scavenger hunt is the fun, silly kind of hunting that everyone can enjoy.\r\n\r\nWe have a list of things you'll need to find, make, do, hack or vaguely attempt and the more you achieve, the more points you'll score. Can you make a toast with toast? Can you Juggle? Can you compose a conversation entirely out of song titles? Then this is the hunt for you.\r\n\r\nAll you need to take part is a smart phone and some imagination. We've crafted a carefully curated list that will be fun for participants at all ages and abilities. With a hunt list well over 100 items, you'll have plenty of options to get that high score and maybe some prizes!\r\n\r\nhttps://hunt.silverphish.io",
+                "names": "silverphish (James Boland) & Kohbah_d (Sye Watts)",
+                "pronouns": "He/Him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Tesla coil village",
+                "published_description": "Bringing \"Odin\" my large musical Tesla coil \r\nhttps://connerlabs.org/tag/odin/ \r\nhttps://www.youtube.com/watch?v=libmdA0keXU\r\nfor a series of performances throughout the weekend. Lots of noise and up to 10ft of arcs.\r\nOdin accepts input from synths and random audio sources so looking to hook up with electronic musicians for some experimentation.\r\n",
+                "names": "Steve Conner",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": null,
+                "video_privacy": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": null,
+                "pronouns": null,
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Mind Chimes",
+                "published_description": "Mind Chimes is a network of simple computers that work together to compose a piece of music, inspired by wind chimes, the composition is energised and perturbed by people moving between them, the weather, and (hopefully) events across the EMF site. \r\n\r\nThe composition algorithm is derived (loosely) from digital circuit synthesis and simulation, each node behaves as a logic gate, taking input from two other nodes, and driving values to two more.\r\nEach node has a chime that it strikes when it changes state, and a display of what it's \"thinking\" and how it is related to the other nodes.\r\n\r\n",
+                "names": "Sort of Solved",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "RGB Squash",
+                "published_description": "What on earth is RGB Squash??? Well, its Squash, but the ball, walls, lines, even rules, don\u2019t exist!  Everything is RGB LEDs in a virtual squash court.  Using low power RADAR detection and many RGB lights and sound effects, RGB Squash is entertaining, exiting, and fun for all ages and abilities.  Hit the RGB ball with a swing of your arm (actual bat optional) to either work with your friends or family to beat the longest rally, or compete against an opponent, to score points and win the game.\r\n The game may even evolve throughout the weekend so keep coming back and see if you can work out what changed.",
+                "names": "Team Robotmad",
+                "pronouns": "they/them",
+                "may_record": false,
+                "video_privacy": "public",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Appybird arcade game",
+                "published_description": "Appybird is a joyful little bird that just wants to go flying. Unfortunately, annoying and inexplicable green pillars keep getting in the way. Can you help him avoid them?\r\n\r\nAppybird (not available in any app store) is a new breakthrough in 3D gaming, eclipsing the latest offerings from the tech giants.\r\n",
+                "names": "Iain Sharp",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Shadowplay",
+                "published_description": "Become an AI-facilitated shadow puppeteer with this interactive audio-visual installation. By casting analogue shadows with light you can playfully reveal digital shadows within today's AI-enabled image diffusion technologies. Shadowplay is fun but thought provoking, immersive but grounding, dark but light. ",
+                "names": "Joseph Lindley, Roger Whitham, Jesse Benjamin",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "ZAPP - Bar Top Game",
+                "published_description": "ZAPP is a 'Whack-a-Mole' style reaction game inspired by the electronic games of the 70's & 80's, with an RGB twist.  Built using an Arduino, some 74 series logic and a classic 555 all housed in a repurposed cable drum.  \r\n\r\nAlong with the main unit comes an offboard scoring system, powered by a Raspberry Pi. This allows anyone to view the timestamped scores through a browser and access an API data feed.\r\n\r\nThere is also a desktop advertising marquee displaying the ZAPP name in LEDs which acts as a housing for the power supply / battery and the Raspberry Pi.",
+                "names": "ADA, AJB & JAB",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Spin Cycle",
+                "published_description": "A pedal propelled & driven mobile washing machine.",
+                "names": "The Mechanical Menagerie",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "ams",
+                "published_description": "Sam Underwood's acoustic modular system is part modular synth, part noise orchestrion, and part human. Controlled over CV/Gate this four-case modular rig is entirely acoustic and physical in its output.\r\n\r\nBuilt in collaboration with tech wizard Jarkman, this one-of-a-kind musical instrument system will be ready to delight, or at least bemuse.",
+                "names": "Sam Underwood",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Matt Gray\u2019s Free Play Gameboys",
+                "published_description": "A variety of Game Boys: Original, Color, Advance and SP; a variety of games, and even a couple of Game Boy Cameras for you to play with!",
+                "names": "Matt Gray",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Karaobot - dynamically generated parody karaoke",
+                "published_description": "Do you ever find that you get bored singing the same old songs at karaoke evenings, and you\u2019d rather sing an EMF-themed parody? Then Karaobot has you covered! \r\n\r\nKaraobot is an automatic parody generator, which will dynamically create a parody of any song you select, to give you a unique singing experience every time. It\u2019s based on a hacked version of Karafun software, so comes with all the songs available through the platform (~50,000). \r\n\r\nEnjoy such classic songs as Street Turpentine (by Neil Diamond), Mr Horsehide (by the Killers), and Barracuda (by Jeff Buckley) \r\n\r\nWhere some parody songs may take liberties with the scansion and rhyme scheme of the original, Karaobot has been explicitly programmed to always match the stress and rhyme structure of the original - so you should find that if you know the original song, singing the new words should come fairly naturally! (Disclaimer: while the new lyrics will scan and rhyme, there are no promises made about the coherence of the lyrics)\r\n\r\nIn addition, custom words and phrases can be pre-loaded into the system, which will show up within the generated lyrics; these will be crowd-sourced EMF in-jokes from festival attendees to be used in the karaoke.\r\n",
+                "names": "Ben Below",
+                "pronouns": "he/him/they/them",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Murmuration",
+                "published_description": "From dusk lie down and let yourself be mesmerised by the rolling curls and whorls of our upside-down fire.\r\n\r\nhttps://www.instagram.com/hotmesscamp",
+                "names": "James Darling",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "small games, big pixels",
+                "published_description": "Apskeppet is a game development studio, founded by game industry veteran Johan Peitz, located in Gothenburg, Sweden.\r\n\r\nOn this solar-powered arcade machine you can play a selection of Apskeppet's PICO-8 games. The cabinet was made by Leigh Hackspace.",
+                "names": "Apskeppet",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "EMFFAX",
+                "published_description": "Raspberry Pi powered CEEFAX screens.",
+                "names": "Matthew Scroggs",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Cyber Coin Pusher",
+                "published_description": "A small coin pusher / coin dozer from the fair, but upgraded with tech. It plays music, spits out CYBER coins. Part of the fun is that you can 'hack' and cheat to win as long as you don't destroy the machine and keep it fun for others.\r\n",
+                "names": "Elger Jonker",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Come and play with the Crawlybots",
+                "published_description": "We have a troupe of cute, expressive little robots that we take out to various events, where we encourage people of all ages to take control control of the robots, ...or alternatively, we sneak up on people unsuspectedly and do robotty things.\r\n\r\nCrawlybots were born from talks with Bristol based, robot friends during Covid times, regarding active suspension systems <yawn>.  Many many experimentations later, lead to a Crawly prototype, which 5 mins after turning on, we realised it was not only adept and surmounting any number of challenging terrains... it was also a fantastic dancer!\r\n\r\nFunding helped us build a troupe of 4 Crawlybots that we have taken to many public engagement events, and allowed hundreds of kids to take control of the Crawlybots via remote control and FPV drone goggles. The bots bring joy wherever they go, across all ages, even among hard hearted roboticists. \r\n\r\nWe pride ourselves on having all our robot 'guts' on show, so we can talk about all the great things like Teensys, coding, lipo batteries, BMS's's, esp32s, 3D printing, education, learning through play, sustainability, CNC, laser cutting and all sorts of interesting stuff.\r\n\r\nFun fact! Crawlybot beta # 2 attended EMF 2022 and won the Hacky Races inaugural small robot class!\r\n\r\nhttps://crawlybots.uk/\r\nhttps://mechanismo.com/robots/\r\nhttps://www.instagram.com/mechanismobot/\r\nhttps://twitter.com/mechanismobot\r\n",
+                "names": "Mechanismo",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Giant Tentacle Robot",
+                "published_description": "A giant Tentacle Robot on an Omni-Directional base.",
+                "names": "James Bruton",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "LED Cube",
+                "published_description": "A large cube full of LEDs.\r\nChange the animations or play games like Snake and Asteroids at ledcube.co.uk\r\n\r\n",
+                "names": "Matt Taylor",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Two Tin Cans",
+                "published_description": "Two Tin Cans is the world's smallest printmaking studio (probably!) inside a telephone box. Make a print using laser cut printing blocks and a tiny printing press. Get plans to make your own miniature 3D printed printing press too! Come along and have a chat about how the box uses solar panels to create a great experience!",
+                "names": "Suzie Devey",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Hacky Racers",
+                "published_description": "Hacky Racers is a small electric vehicle racing series where show is valued as much as speed.\r\nWe're expecting 15-20 teams, with 5minute races running every 1-2hours  during the afternoon / evening, on a track with barriers, on grass. Each vehicle has a theme, so is visually much more interesting than just a go kart, such as fire engines, mec-car-no, or recognizable scale car bodies.\r\nWe'll bring pit tents, timing equipment, racers, safety stuff\r\nwhat we'd like from EMF:\r\n* lots of space! (I think last time we had an area of ~50x75m, we'd like a\r\n little bit more if possible)\r\n* 200 haybales (or plastic equivalent) for the track brriers\r\n* 32A mains supply (average draw during the day ~1kw)\r\n* festoon lights to light the track at night. these can be laid on the\r\n barriers\r\n\r\nreference vides from previous years: https://www.youtube.com/watch?v=_zHBOwpwFnY\r\nhttps://www.youtube.com/watch?v=W07ma3zEbCE&t=85s",
+                "names": "Mark Mellors",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "AutoCrat the automatic buracrat",
+                "published_description": "Ever wanted a to wite a formal complaint but too lazy to write one yourself? Well I have a machine for you! Presenting the AutoCrat - your automatic burcrat. Simply press go and sit and relax as it does all the hard work for you. Now at EMF. \r\n\r\nbuild info http://alexmakes.net/projects/autocrat.html",
+                "names": "Alex Bennett ",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": null,
+                "pronouns": null,
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Space Pirate Trainer VR Arena Game",
+                "published_description": "Co-located 2-player Virtual Reality PvP shooter in a 10x10m space! The game is Space Pirate Trainer DX arena mode. I will be providing 2 Oculus Quests. Basically laser tag in VR!\r\n\r\nHeadsets will be sanitised between each use but are used at people\u2019s own risk! Suitable for ages 10+.",
+                "names": "Matt W",
+                "pronouns": "He/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Climax",
+                "published_description": "A machine made by the legendary Tim Hunkin in 1986:\r\n\r\n\"I think I found a flexitone in a music shop, liked it and thought I might be able to do something with it. I'd also been getting old photocopiers and taking them to bits and my favourite parts were the electromagnetic clutches. So Climax is a combination of the two components I liked. But it's a long time since I made it so don't remember any other details.\"",
+                "names": "Tim Hunkin",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Spellbinding green vectors: interactive Tektronix 4006-1 vector storage tube terminal from 1975",
+                "published_description": "It's an adorably retro Tektronix 4006-1 computer terminal attached to a RC2014 kit computer, continually drawing intricate vector graphics in fine green lines on its unique storage CRT display. The drawing process is mesmerising to watch: a brilliant green dot precisely sears lines into the screen at about 5x the speed of a person drawing quickly. Half the fun is guessing what's being drawn as the image slowly forms. When it's done, there's a pause and then the double-flash of the screen blanking itself before a new drawing begins. Overall, it's an intriguing mix of analog and digital.\r\n\r\nVisitors can press a key to interrupt free-running mode and select one of the graphics from an on-screen menu, or they can just sit back and watch as the computer cycles through them automatically.\r\n\r\nThe 4006-1 makes use of a forgotten display technology: the direct-view storage tube. This unique cathode-ray tube retains anything drawn to it, like a glowing Etch-a-Sketch: there's no flicker, no refresh, and (because vectors) not even any pixels. When computers were slow and memory was expensive, a vector storage tube was a practical way to achieve high-resolution graphics, particularly for line drawings, CAD diagrams, schematics, graphs, maps, and similar imagery. Tektronix (most known for oscilloscopes) made storage-tube based computers and terminals from the early 1970s until the late 1980s, when more familiar technologies finally gained an unbeatable edge.",
+                "names": "Tom Stepleton",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Solar/Battery Sound Systems & Lighting: Immersive Experience or Demo and Educate",
+                "published_description": "DIY boomboxes that are solar and lithium battery powered and perhaps some lights for splash of colour.  For a show and educate stand.\r\nor \r\nImmersive 4.1 sound system also solar and lithium battery powered with bubbles and lights to create a immersive sound bath experience. Ether relaxing music or full on dancing, raving music!\r\n\r\nCross the threshold and be in a immersive unique bubble bath of sound or come and geek out at smaller mini systems. Maybe even early prototypes of wireless subwoofers...\r\n\r\nTo get a better idea, a picture is worth a thousands words:\r\nTech behind the scenes posts: https://www.instagram.com/oxidisingagentavtech/\r\n\r\nFuture post-event media published here and stories during EMF: https://www.instagram.com/oxidisingagentav/\r\n\r\nPlease follow instagrams for updates! \r\n\r\nHere is a taste of early small 4.1 setup from a few years ago: \r\nhttps://www.youtube.com/shorts/kWh3xJMWnZk \r\nhttps://www.youtube.com/watch?v=7J-nX1NKyq0\r\n\r\nMini 4.1 first test https://www.youtube.com/watch?v=Jf21LiI5LlE\r\nPosh boombox tease https://www.youtube.com/watch?v=qh5WgVRMqIM\r\n",
+                "names": "Alexander Ross",
+                "pronouns": "He/They",
+                "may_record": false,
+                "video_privacy": "public",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Communcations Failures",
+                "published_description": "I'd like to attach a few artifacts from failed ventures to the lighting poles. Ideally out of reach of the average human. They've all featured on Hackaday / Youtube / etc so should be a recognisable curiosity for attendees. \r\n\r\n* Hutchison Rabbit Clock\r\n* Ionica Microwave Telephone Dish (Disconnected)\r\n* BSB \"Squarial\" TV Dish (Disconnected)\r\n* Dolphin Telecom Handset\r\n\r\nNone require power or additional connectivity. \r\nThey'll be modified for easily mounting on a 48.3mm pole\r\nI'm not fussed on the location, just somewhere with some foot fall is fine.\r\n\r\nI'm happy to mount them myself one way or another, or I'll be on site from Tuesday the 28th so I could hand them over to a team with a MEWP / Ladder / Whatever.\r\n\r\nThanks!",
+                "names": "Matthew Harrold",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Satellite tracking station",
+                "published_description": "The station consists of 2 parts:\r\n- small junction box with IP66 antenna and solar panel attached\r\n- rotator with directional antenna and raspberry pi (if weather permits)\r\nI also have instructions printed on A4 on how to connect to wi-fi and access the station Web interface. Through this web interface it is possible to check current's satellite status and data received from satellites.\r\nLast time I brought rotator with directional antenna and got a lot of questions about the station.\r\n\r\nhttps://x.com/dernasherbrezon/status/1532667610751455234?s=20",
+                "names": "dernasherbrezon",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Robot Slide Whistle Orchestra",
+                "published_description": "For centuries, organs have needed to use hundreds, sometimes thousands of pipes to reach all the notes. Inefficient!\r\n\r\nFirst appearing at EMF2022, the Robot Slide Whistle Orchestra dispenses with such dreadful inefficiency, at only the tiny cost of being mostly out of tune. In this radical organ design, just four pipes are used, with tiny robot arms sliding the whistles to somewhere in the vicinity of the right note. The MIDI input enables both real-time playing, and playback of arranged music.\r\n\r\nWith this pioneering prototype, I have no doubt that in years to come all organs will be constructed this way.",
+                "names": "Tim Jacobs",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Puppet Walkabout",
+                "published_description": "A variety of walkabout puppet acts, creating little micro-narratives. I have a Phoenix, a Dragon, a Sparrow and a Velociraptor! \r\n\r\nIf you hold your arm out, one of them might just land on you!\r\n\r\nThey are created using a blend of contemporary and traditional making techniques, including laser cutting, 3D printing, wood carving and leather work. I spend a huge amount of time studying the anatomy of the creatures I make, in order to create truly realistic movement. ",
+                "names": "Laura Mathews",
+                "pronouns": "She/Her",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Open Wave Field Synthesis",
+                "published_description": "Wave Field Synthesis is a unique approach to spatial audio that aims to recreate realistic 3D sound scenes by using large-scale loudspeaker arrays to reproduce the pressure fronts of spatially-distributed sound sources, creating something akin to an acoustic hologram.\r\n\r\nPresented for the first time at EMF Camp 2024, OpenWFS (Open Wave Field Synthesis) is a modular wave field synthesis system with completely open-source hardware schematics and software stack, allowing anybody to create their own DIY WFS array.\r\n\r\nShowcasing this system is an immersive 256-speaker installation in Null Sector, with specially-composed sound works that are designed for spatial playback. These works explore the concept of \"exploded sound\", in which audio fragments are exploded into thousands of harmonics that are frozen, dilated and animated around the virtual space, giving a sense of being able to walk around inside the structure of a sound.",
+                "names": "Max Hunter (he/him) & Daniel Jones (he/him)",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Monumental GameBoy",
+                "published_description": "Hitchin Hackspace have a group project for EMF Camp:\r\nA large reproduction of a classic GameBoy, measuring aprox. 2.4m Wide x 2m High x 0.8m Thick (the original GameBoy was 90mm x 148mm x 32mm this is a scale factor of 26). The game boy will be chopped in half and mounted at an angle. This will be controlled by a raspberry pi to drive an LED Matrix to create a screen with the same resolution as the original GameBoy. Can be made to run Doom if required.",
+                "names": "Hitchin Hackspace",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "roygbiVW",
+                "published_description": "1972 VW campervan covered in addressable LEDs to create an interactive display.\r\n",
+                "names": "Leo Currie",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Tune on A Stick",
+                "published_description": "A rotating machine that plays music depending on the locations of people near it.\r\nIf you have a few people and some cunning, you can control the tune.\r\nA Jarkman/Russ production.",
+                "names": "Jarkman",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "LEDs on a spherical tiling",
+                "published_description": "A big spherical tiling with lots of LEDs. Created with a laser cutter, python, inkscape and a bit of maths.",
+                "names": "Erik Bosman",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Open Emfer",
+                "published_description": "Everything these days is open this and open that. What if one EMF attendee was a walking dataset that in realtime collected as many datapoints as they can cram with a limited number of devices? I give you Open Emfer, one person will record everything they can about them at EMF in realtime, wanna know how much they've spent or how many trips they've had to the toilet or even where they are right now? it's all there in its unabashed glory. You can see a live dashboard using the QR code on their back or visit emf.harvinderatwal.com/ Their complete dataset will also be made available after the event.",
+                "names": "Harvinder Atwal",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Infinite potato",
+                "published_description": "The infinite potato will hopefully be wandering about somewhere on site. Its desire is to be carried around over the days and track the places it visits about the festival and its route. It doesnt mean or represent anything unless you want it to, by itself it just exists.\r\nThe shell is fibreglass and polyester with a series of addressable infinity mirrors set within.\r\n\r\nnote: in all honesty it may not have the above ability by the time the fest rolls around, we'll see.",
+                "names": "lucas payton",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Invisible heatmirror",
+                "published_description": "A weird experience as an unseen, unseeable camera watches you and projects you onto the screen. ",
+                "names": "Nigel K Tolley",
+                "pronouns": "Mr",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "ASCII Photobooth",
+                "published_description": "Take a picture to remember EMF camp '24 at the ASCII art photo booth.\r\n\r\nThe booth is free to use and accessible to all ages (although shorter people may need a little boost and taller folks may need to duck a bit to get in frame!)\r\n\r\nPlease feel free to add a sticker to the outside of the booth to mark your visit.\r\n\r\nPowered by a Raspberry Pi 3 the photo booth takes pictures and converts them (you can learn more about this at the ASCII Art workshop) into ASCII art before printing them on receipt paper. Where possible the booth is constructed using reclaimed or reused materials (try and spot the IKEA hack!)\r\n\r\n",
+                "names": "Hugh Evans",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Open hardware/3D printed lasertag",
+                "published_description": "Multiple, free (as in beer) lasertag games for up to 10 players at 1030 daily using a home made open hardware/3D printed system.  Suitable for attendees aged 7+. \r\n\r\nWe will be running multiple games throughout the hour so just turn up and we will do our best to get everyone a game!\r\n\r\nPlanning to operate near the trees near the family lounge .",
+                "names": "Anthony Goacher",
+                "pronouns": "He/him",
+                "may_record": false,
+                "video_privacy": "public",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Fluroclock v2",
+                "published_description": "Fluroclock is a 4 digit clock, made using fluorescent tubes. At just under a meter, they're quite a bit bigger than your average 7-segment display!\r\nFluorescent tubes are going out of fashion. Originally designed as an energy efficient alternative to the halogen and incandescent bulb, they are now being replaced in favour of LEDs. Fluorescents aren't as efficient, have a 'warm up' time and generally contain not-so-nice substances like mercury; so it's easy to see why they are falling out of favour.\r\nHowever, we grew up in the era of the fluorescent tube: the 'plink plonk' as someone flicks the switch in a large room and the tubes flicker into life is something we don't want to forget. So we decided to build a giant 7-segment display out of fluorescent tubes.\r\nYou've actually seen Fluroclock v1 at EMF22, this year it's coming back better and more reliable, being controlled by a Programmable Logic Controller and Modbus",
+                "names": "Tom O'Connor",
+                "pronouns": "they/them",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Big Precision Clock",
+                "published_description": "I have built a lot of precision clocks. They are synchronised to GPS and display the time as an ISO8601 (or RFC3339) timestamp on red 7-segment displays. The display shows to the nearest millisecond, which isn't visible to the human eye but is readable with a high-speed camera.\r\n\r\nThe normal clock is about 50cm wide, the large clock is about 1 metre wide, and the extra large clock is 2.3m wide. All of them fold in half if needed (the display still works in the folded configuration).\r\n\r\nThese could go anywhere so long as it's dry, maybe in the lounge area, just needs mains power. The display brightness is adjustable and automatically dims so it shouldn't be too annoying.\r\n\r\nThey could be just placed on a table, or some shelves or something.\r\n\r\nThere is a countdown mode supported, so instead of showing the time they could count down to the end of the event, that might be a bit depressing though!",
+                "names": "Tim Jacobs",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Great Camp Hexpansion Quest - (GCHQ.NET)",
+                "published_description": "An interactive challenge for participants to find and \u201ccollect\u201d hexpansions hidden all over the site. \r\n\r\nTo play, open the app on your badge and connect the hexpansion this will validate your presence at the location and submit it to a leaderboard server. The leaderboard will be available online at gchq.net and also displayed in real-time at the main scoreboard.\r\n\r\nPlaying the game will let you explore the EMFCamp site, visit villages and installations and also have some friendly competition with your friends. Some locations will be more difficult to find, or might require a player to have done an activity to locate.\r\n",
+                "names": "GCHQ.NET team",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "sunDome_001",
+                "published_description": "sunDome_001\r\n\r\nDays fly by. Time seems to move too fast. Moments are what we have.\r\n\r\nsunDome_001 is a space to let time go. Come in. Sit down. Or better yet, lie down. Experience the wheeling of a day in just 10 minutes. With sunrises and sunsets, disappointment and laughter. The day is what you make of it with the people you share the space with.\r\n\r\nNote: The installation will run at darker times, from dusk into the wee hours. \r\n\r\nMade with\r\n# Artnet\r\n# Bittwist\r\n# Broomsticks\r\n# ESP32\r\n# Raspberry Pi\r\n# TouchDesigner\r\n# WLED\r\n# Wireshark\r\n\r\nMade by\r\nBranden Faulls\r\ninstagram: @branden_faulls_studio\r\nweb: portfolio.branden.faulls.com",
+                "names": "Branden Faulls",
+                "pronouns": "He/Him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Supercomputer",
+                "published_description": "Originally commissioned by property developers in Cambridge, Supercomputer operated in the city between 2014 and 2018 before relocating to Trinity Buoy Wharf, London E14, until 2020. Since then it has been deconstructed and in storage. EMF 2024 has freed its constituent parts which await reconstruction / reconfiguration. \r\n\r\nBorn out of the collision of pinball and pachinko with theories of computing and artificial life, Supercomputer is a composing machine in which the flow of ball bearings, carrying information through labyrinthine circuits of mechanical computational units, calculates minimal melodic phrases.\r\n\r\nAs a work of art, Supercomputer relates as much to Jean Tinguely's sculptural machines and Sol LeWitt's instruction-based drawings and structures, as to Cambridge's seminal position in the history of computing, in particular the work of Alan Turing and John Conway.\r\n\r\nThe process implicit in Supercomputer, a one dimensional cellular automata, is a simplification of Conway's Game of Life; a self-organising system in which each output (result) is fed back to become the next input. Supercomputer's form is a direct consequence of this computation. The process, understood as an abstract set of instructions, dictates the physical, mechanical and visual aspects of the sculpture. Form follows function.\r\n\r\nAlthough nothing is random in Supercomputer's computation - for each of its 8192 possible settings the sculpture's computational process is distinct and deterministic - indeterminacy is introduced through bugs, resulting in unique compositions in which micro-minimal melodies ate accompanied by sounds of the work in process, the complex sonic patterns of Supercomputer's calculations.\r\n\r\nFor more information and documentation visit supercomputer.org.uk",
+                "names": "Jem Finer",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "World'O'Techno",
+                "published_description": "Plays location-dependent techno. A different tune for every square foot of the planet. Please take it for walks. Abandon it when you are bored.\r\nIf it's broken or flat, please let me know (richard@jarkman.co.uk) or haul it back to Shonkbot Village where we can care for it.\r\nA Jarkman/Julia production.",
+                "names": "Jarkman",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Interacting with Mothers' Q(g)uilt",
+                "published_description": "Come and interact with our digital augmented quilt. \r\nOur project explores mums\u2019 experiences of baby feeding decisions. The interactive project is inspired by the Welsh quilting tradition, bringing communities together through crafting, whilst digital touch points stitched into the quilt allow mothers stories to be heard. \r\nIf you want you can give us some feedback about the way it make you feel through a survey. ",
+                "names": "Sophia Komninou",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "(The) Retro Reliquary - An Interactive Nostalgia Nook of Tech from Past Times",
+                "published_description": "Remember when we tuned CRT TVs in to play on a console, or so you could watch a video tape? What about the VideoDisc player, using a stylus to transmit video as well as audio? Do you recall when toys such as Teddy Ruxpin or the original Furby were popular? Do you show your kids an audio cassette and they just look at you blankly? Played the original Pong on a Grandstand in black and white? \r\n\r\nThe Retro Reliquary is an interactive installation of consumer technology spanning the late 70\u2019s to early 00\u2019s; get hands on with the earliest days of home gaming such as the Binatone, via Spectrum and into the 8-bit era and beyond as far as the XBox and PlayStation 2, all on CRT TVs as originally intended. For those who weren\u2019t so much into gaming, we have a collection of tech toys and audio visual equipment from when going down to a rental store to choose a movie to watch was the highlight of a weekend, or you would sit hovering over the record button to capture that song from the radio to play on your tape walkman.\r\n\r\nSome items are from a personal collection but the majority have been saved from landfill or donated and refurbished so that you can enjoy them once more. The aim is to pass on this history to future generations while also giving an opportunity for the older among us to spark a memory and reminisce about days of tech gone by.",
+                "names": "Terah Karma",
+                "pronouns": "They / Them",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "The Button",
+                "published_description": "Keep the timer alive! You and your fellow camp-goers are working together to press \"The Button\" to prevent the countdown timer reaching 00:00, even over night!\r\n\r\nWe'll give any pressers a pin-on badge at our handy dandy button dispenser unit, with bigger saviours (pressers with the timer being closer to 00:00) given more prestigious rewards!\r\n\r\nWill you keep your wits about you to claim the coveted level 6 badge?\r\n\r\nYou can't camp on the button, there are two units, someone else might press at any time!",
+                "names": "Andrew Barrett-Sprot",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "EMF Puzzlehunt 2024: The Wizard of OS",
+                "published_description": "A murder most foul has been committed in the once serene land of OS. Can you defragment the clues, debug the chaos left in the murderer's path, and solve the mystery?\r\n\r\nAn unknown culprit has left a trail of destruction across numerous programs, at the end of which we found the most distressing scene of all: Clippy, the beloved Office Assistant, lifeless and bent out of shape.\r\n\r\nCan you pick through the evidence, investigate what happened, and follow the clues to figure out: Who killed Clippy?\r\n\r\n----\r\n\r\n\"The Wizard of OS\" is a puzzlehunt \u2013 part escape room, part treasure hunt \u2013 which you can play at your leisure, and is the spiritual successor to our previous puzzlehunts at EMF (Dreamcatcher in 2018, Octonet in 2022.) The game is best enjoyed in teams of 2 - 4, and will likely take 2 - 3 hours in total to complete.\r\n\r\nPuzzles will be located across the camp, including a mini-escape room, each of which will weave into the story as you try to uncover the truth\u2026",
+                "names": "Dreamcat Puzzlehunt Team",
+                "pronouns": "They / them",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Flipdot & Friend",
+                "published_description": "An Infosystems Vacuum Florescent Display (VFD) from a German tram and a Hannover Displays 84x7px Flipdot. \r\n\r\nBoth have an API and can receive arbitrary strings for your amusement. Neither support Pixelflut (to avoid magic smoke).\r\n",
+                "names": "crablab",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Pylons of the World / The Nth Estate",
+                "published_description": "Pylons of the World: sit back, relax, and enjoy a generative 3D journey showcasing electrical pylons from around the world. \r\n\r\nThe Nth Estate: get a glimpse inside the mind of Erno Goldfinger with a series of procedurally generated council estates. \r\n\r\nIf you like what you see, be sure to check out The Jean-Paul Software Screen Explosion on Steam (https://store.steampowered.com/app/1631280/The_JeanPaul_Software_Screen_Explosion/) and experience them live in your home.\r\n\r\n",
+                "names": "Ed Boucher",
+                "pronouns": "He / Him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Longplayer",
+                "published_description": "Longplayer is a one thousand year long musical composition. It began playing at midnight on the 31st of December 1999, and will continue to play without repetition until the last moment of 2999, at which point it will complete its cycle and begin again. Conceived and composed by Jem Finer, it was originally produced as an Artangel commission, and is now in the care of the Longplayer Trust.\r\n\r\nYou can listen to Longplayer at EMF on any of the phones around site (or on your own DECT phone) by dialing 5664 (LONG).",
+                "names": "Jem Finer",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Analogue is nicer",
+                "published_description": "A working analogue clock face is drawn on an Oscilloscope screen as a Lissajous figure (vector scanned, not raster scanned). An old CRT oscilloscope shows a clear, easily readable clock face. For comparison a modern sampling digital storage oscilloscope shows the same clock face as a pixelated mess. This hardware similar to \u2018ScopeClock\u2019 at \r\nhttp://www.dutchtronix.com/ScopeClock.htm\r\n. ",
+                "names": "Peter Miller",
+                "pronouns": "He/Him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Lasers everywhere ",
+                "published_description": "Northern Lights guaranteed every night!",
+                "names": "Robert Faulkner",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Retro Communications Hardware",
+                "published_description": "Hello, I'd like to display some Retro Computing / Communications stuff in the ECHQ village. The list is slightly fluid depending on whats working but it'll look something like:\r\n\r\nBBC Micro Computer - Viewdata (https://en.wikipedia.org/wiki/Viewdata) and Bulletin Board systems\r\nTandata Viewdata Terminal - Viewdata systems\r\nBush Internet TV Box - Dial Up internet\r\nTelephones - An assortment of telephones\r\n\r\nThis would take up a standard sized Table but I could probably fill two if you wanted to pad it out a bit.\r\n\r\nIt will be hands on installation and someone is working on making an EMF specific Viewdata service to show the schedule etc.\r\n\r\nThanks\r\n",
+                "names": "Matthew Harrold",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Sea Angels ",
+                "published_description": "\"Sea Angels\" celebrates the enduring spirit and essential function of lighthouses around the globe. These beacons of light serve not only as navigational aids but also as symbols of safety, hope, and resilience in the face of nature\u2019s vastness and unpredictability. Inspired by a lifelong fascination with lighthouses and their role as guardians of the seas, this installation aims to bridge the gap between art, technology, and historical significance.\r\n\r\nThe installation uses 3D printing of the world map with topographical details. Three strips of LED lights represent each lighthouse. The LEDs are individually controlled using Arduino uno boards to replicate the light characteristics of the lighthouses, with a special focus on those with the highest range, symbolizing their far-reaching influence. ",
+                "names": "Shan Sun",
+                "pronouns": "she/her",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Hexatower",
+                "published_description": "It's a tower made of hexagons!\r\nA tower made of 300 ish individually lit hexes showing some chill patterns.",
+                "names": "Toby",
+                "pronouns": "He/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Surveillance Dreams",
+                "published_description": "\"Surveillance Dreams\" is a thought-provoking art installation that transforms a vintage Phillips TX television set into a whimsical yet unsettling commentary on modern surveillance. Painted with a bold pink side panel and adorned with a striking black star and anarchy symbol, this TV was originally created for TV Turnoff Week to emphasize the message that \"You are the product\" in the eyes of anarchists. Over the years, it evolved, growing legs and eyes, symbolizing the intrusive nature of media and technology. The flexible gooseneck lights protruding from the top resemble probing eyes, while dinosaur legs give it a surreal, extinct creature-like appearance. Originally showcased at The Art House, this piece invites viewers to reflect on how media consumption affects personal privacy and autonomy.",
+                "names": "Bik (Paul K Bickmore)",
+                "pronouns": "He/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "JerryCanvas - an interactive video wall made of Jerry Cans!",
+                "published_description": "A lovely team of lovely people have created a grid of translucent Jerry cans, illuminated by addressable RGB LED tape.\r\n21x10 \u201cpixel\u201d display, where visitors can send text or animated GIFs to the wall throughout the weekend - plus a few other tricks ;)\r\n\r\nInspired by a combination of burning man\u2019s \u201cbitcube\u201d and 2001s \u201cBlinkenlights\u201d",
+                "names": "Daniel JW Ellis",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "MastCar",
+                "published_description": "I am MastCar - https://mastcar.uk/\r\n\r\nMastCar is an ex-BBC Outside Broadcast vehicle - a Peugeot 406 - with a 10m telescopic mast built in. I am currently being used to support antennas and ancillary equipment for the Amateur Radio attachment to the ECHQ village. \r\n\r\nThere will be a number of Amateur Radio 'services' in operation, everything from across-the-world communications on the HF bands, to a local on site repeater for licensed amateurs, to a pager network to help you relive the 1980s. Digital modes, voice, data, pictures, maybe even some TV broadcast will be available to feast your eyes upon.\r\n\r\nWhy not come along and have a go on the airwaves, and see what traditional BBC vehicle engineering was like?",
+                "names": "MastCar @ EMF Communications HeadQuarters",
+                "pronouns": "classified",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Signal Interference",
+                "published_description": "\"Signal Interference\" is a dynamic installation repurposing a discarded satellite dish found at the side of the road into a striking commentary on the pervasive influence, and changing nature, of technology. Mounted with a laser that creates mesmerizing patterns on the dish's surface, this piece explores the intersection of outdated and modern technology. Additional embellishments from found discarded tech components add layers of complexity and intrigue. Much like \"Surveillance Dreams,\" this installation delves into themes of media influence and technological intrusion. The juxtaposition of a defunct satellite dish with cutting-edge laser technology symbolizes the ever-evolving yet relentless nature of surveillance and communication. Initially exhibited at The Art House, \"Signal Interference\" challenges viewers to consider the implications of our digital footprint in an increasingly connected world.",
+                "names": "Bik (Paul K Bickmore)",
+                "pronouns": "He/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Blowing Nowhere - a Persistence of Vision display on a Wind Turbine",
+                "published_description": "Make a silly face and my Nan would say: \u201cIf the wind changes you\u2019ll stay like that\u201d. \r\n\r\nAbove Null Sector, come see a wind turbine made from bicycle bits, milking parlour pipes, and a ceiling fan found in a skip. \r\n\r\nYou can\u2019t miss it, especially at night, when a picture is painted in the sky! How? A very dizzy computer blinks LED strips on the spinning blades just right. Thanks to the Persistence of Vision effect your eyes briefly remember the blinks and you see a complete picture.\r\n\r\nWith remote control you can change the pattern it draws, add a message for everyone to see or upload a photo of your face\u2026 So that when the wind changes, it stays like that!\r\n\r\nBlowing Nowhere was built for the dusty desert of Spain\u2019s Nowhere festival in 2010 and 2011. Now it's out of hibernation and spruced up for EMF 2024!\r\n",
+                "names": "Steve Ogborne and Aran Dasan",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Fieldhouse Challenge: Strongest Bridge Competition!",
+                "published_description": "You have 10 minutes to assemble the strongest bridge from a very regulated amount of Lego! \r\n\r\nWe will then be testing the bridges to destruction and the maximum weight supported will be put onto the leaderboard.\r\n\r\nThere will be prizes for 1st, 2nd and 3rd place.\r\n\r\nLookout for the 'Fieldhouse Engineering' banner!",
+                "names": "Damien Fieldhouse",
+                "pronouns": "He/ Him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "_PhotoSYNTH_4D",
+                "published_description": "_PhotoSYNTH_4D #interFACE is a Holographic, face-controlled, smile activated musical instrument! The project is being designed with accessible music charity Drake Music, alongside disabled artists, with the intention of making the most inclusive musical instrument and the simplest to learn and play for instant musical superpowers! ",
+                "names": "designerzen",
+                "pronouns": "they",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Whiteboard Techno",
+                "published_description": "It's a whiteboard that plays techno, in classic sequencer style, for passers-by to tinker with.\r\n\r\nIt operates via 5-pin MIDI and some separate MIDI boxes, so feel free to try other MIDI hardware with it if you have any. But please put it back to the state you found it in when you are done.\r\n\r\nIt also has CV & gate output, so you can also plug your modular bits into it if you like..\r\n\r\nCode is here if you want to make another one: https://github.com/jarkman/WhiteboardTechno/tree/main",
+                "names": "Richard Sewell",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Autonomy and duck-poop-soup",
+                "published_description": "An autonomous underwater R&D robot\r\n",
+                "names": "Tom Rooney",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Speczilla",
+                "published_description": "A giant fully operational 4m x 2.5m foam replica of a\r\nrubber-key Sinclair ZX Spectrum, that you can play games on by jumping on the keys. Writeup of the first version, from 2018: https://gasman.zxdemo.org/speczilla/",
+                "names": "Matthew Westcott",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Oinkst\u00fcrzende Neubacon",
+                "published_description": "Feel free to explore the buttons on both sides of this musical pig and he will be only too happy to make some sounds for you. Also be sure to check out his upcoming DJ set! Oinkst\u00fcrzende will be playing some fabulous acid house tracks with assistance from his human friend.\r\n\r\nwww.nervoussquirrel.com",
+                "names": "Dave Cranmer",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "7-Segment Servo Clock",
+                "published_description": "A 7-segment servo clock, made last year using 3D printed segments mounted on servos.  It was inspired by seeing several similar projects which looked like they were only really viewable from one angle.  The solution was to add an enclosure and make the segments cylindrical so the they are more clearly defined.\r\n\r\nI initially made one digit as the intention was only to prove the concept but after completing it, I inevitably felt that I had to make another three digits to build a clock.\r\n\r\nThe clock is normally running full-time at Maker Space in Gateshead where it's currently set to announce \"Pub O'Clock\" at 8PM on a Wednesday by displaying \"Pub\" instead of the time.\r\n\r\n",
+                "names": "Iain Yarnall",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "trebuchet",
+                "published_description": "A trebuchet built to a 12th century design which is a working display and stunt piece. It has been successfully used on reactant shows. \r\n\r\nbuild and pictures http://alexmakes.net/projects/trebuchets-and-stunt-castle.html",
+                "names": "alex bennett",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "A 1950s Telephone Exchange",
+                "published_description": "A working Strowger electromagnetic telephone exchange from 1957.\r\n\r\nEquipped for up to 50 phones, this piece of telecommunications history was built by AT&E of Liverpool in 1957 to a design that was already 20 years old by that point!\r\n\r\nIt's self contained, and originally provided internal telephone services to the Midland Electricity Board.  There is no operator, all calls are routed automatically via good old fashioned dial phones, yet there are no semiconductors or even valves in the equipment, it all works by electromagnets!\r\n\r\nIt moves, it makes noises, it has phones connected to it that you can play with and examples of the components used that you can handle and explore to see how they work.\r\n\r\nIf things go to plan, it will be linked to the wider EMF telephone networks so you can use it to make calls across the site!\r\n",
+                "names": "lpbkdotnet",
+                "pronouns": "He/Him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Inside the Iconic Teletype ASR33 Printer ",
+                "published_description": "Come and see a restored Teletype ASR 33 printer and what it was like in the early days of computing, around 1963.\r\nThere will be 8 hole paper tape with the opportunity to create and take home your efforts.\r\nOperation of the machine with the covers off to hear and see it working.\r\nHandle parts from a stripped down machine to really see how it operates including the early use of ASCII and how the mechanics converts this to a print head position.\r\n\r\nSee the restoration and some unrestored parts, gummed up and covered in \"stuff\".\r\n",
+                "names": "Malcolm Clark",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Interactive site map",
+                "published_description": "Explore a high detail 3D printed map of our site, scaled at 1:426. Engage with the installation by adding your tent to the map, using either the provided white clay for custom sculptures or the variety of pre-printed standard tent shapes and sizes.\r\n\r\nScan the QR codes or go to benoxley.com/emfmap to control interactive data layers projected over the map, providing real-time updates. This map is based on a high-resolution 2018 LiDAR scan with a 25cm accuracy, combined with a 1m LiDAR DSM from the Environment Agency.\r\n\r\nThe technology behind this installation includes three.js, react-three-fiber, @emfcamp/map, WebRTC. \r\n\r\nWe extend our gratitude to James Harrison (talkunafraid.co.uk) for the LiDAR data and to Russ and other contributors to the map layers and emf map software.",
+                "names": "Ben Oxley",
+                "pronouns": "He/Him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Organic Networks",
+                "published_description": "I made a willow evergreen tree and a willow deciduous tree. I created knotted roots in textiles for the trees. In leather I made a fungus. I wanted it to fit in with the theme of the camp. I liked researching it and doing the work in sessions. I think the environment is important, keeping people safe from pollution, to help people, help animals, and keep the planet going. It\u2019s an important planet, and we need it to stay alive to keep all the people healthy.",
+                "names": "Isabella Jayne Aplin",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "David Lynch Numbers Station Phone - The Return",
+                "published_description": "You see a small table with a zig-zag tablecloth, a lamp with a red shade, and a red telephone, the old-fashioned type with a dial. Sat incongruously under a tree, or by the pond, or wherever. You approach for a better look and as you get near it starts to ring. You answer and hear a voice saying a sequence of numbers. It is American film-maker and creator of Twin Peaks, David Lynch.\r\n\r\nWhat can it mean? Does it lead to something? Are the owls all that they seem?",
+                "names": "Barney Livingston",
+                "pronouns": "he/they",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "How big can you make a Wimshurst machine? A demo with sparks!",
+                "published_description": "A demonstration of probably the largest Wimshurst machine that you have ever seen.\r\n\r\nWimshurst machines are a popular Victorian electro-static generator capable of generating tens of thousands of volts - possibly hundreds of thousands of volts...\r\n\r\n... but for higher voltage, you need more size.  We set out to build the largest one that we could on a reasonable budget. We think our 1.3m machine is likely the biggest in the UK, unless you know better?\r\n",
+                "names": "Andy Whyte",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Interactive Musical Roots",
+                "published_description": "A magical musical instrument that is made from a tree stump. We invite people from musical and non musical backgrounds to gather round and play collaboratively.\r\n\r\nThe more you explore the stump, the more it has to offer, feel it, whack it, speak to it and see what you receive.\r\n\r\nIt creates inspiration, creativity and silliness like no other instrument. Coming from the roots to create magical sounds.\r\n\r\nIt has sound effects and amplification to create an atmospheric mode. The stump works well as the soul compound instrument in a jam or can be used to integrate other instruments.\r\n\r\nBe careful when you visit, you might loose an hour or two!\r\n\r\nCheck out the instagram:\r\nhttps://www.instagram.com/synestreesia_wood_stories/\r\nhttps://www.instagram.com/jazzcousins/",
+                "names": "Jasper Cousins, Grace Fairhead",
+                "pronouns": "He/him, She/her",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Flipdot clock",
+                "published_description": "I have two flipdot displays that can be programmed to do pretty much anything you would like. One is from the side of a bus, the other from the front of a bus. 84x8px and 96x16px resolution. They work best showing text rather than complex graphics. \r\nThey can be used to display whatever you would like - if you would like to use them over the weekend in some way.\r\nThey are controlled via an ESP32 controller board - https://github.com/willfurnell/esp32-flipdot-controller\r\nOne is primarily used as a clock at home, but can be re-programmed.\r\nOne (the smaller) will be easy enough to bring, two I would need to rent a van.",
+                "names": "Will Furnell",
+                "pronouns": "they/them",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "The Scent Organ",
+                "published_description": "\u201cThe Scent Organ was playing a delightfully refreshing Herbal Capriccio - rippling arpeggios of thyme and lavender, of rosemary, basil, myrtle, tarragon; a series of daring modulations through the spice keys into ambergris; and a slow return through sandalwood, camphor, cedar, and new mown hay... back to the simple aromatics with which the piece began. The final blast of thyme died away; there was a round of applause.\u201d\r\n\r\n\u2013 from Brave New World (Aldous Huxley 1932)\r\n\r\nStep up to a device that is half-plant, half-machine. It pulsates with light. Vines intertwined around its body. This is The Scent Organ, and you are invited to play it. You can choose different species of plants, combine them any way you wish, and then play back their aromas. Will you make something beautiful? Evocative? Or whimsical?\r\n\r\nCuriosity piqued, you look at myriad glass vessels containing eight solutions of plant essential oils, carrying each plant\u2019s unique fragrance. Select up to three fragrances at a time, using a tactile, playful interface built around glass jars. Pull the lever to release your mixture of ultrasonically-atomised essential oils, and smell your creation. An invigorating scent of peppermint, crisp and refreshing. A small adjustment adds the soothing aroma of lavender, evoking calm and tranquillity. Yet another jar shifted mixes in a dissonant but energising scent of black pepper.\r\n\r\nUsing The Scent Organ, we invite you to explore scent as a means to play with plants, evoke hidden memories, and even create scents that have never been smelled before\u2026",
+                "names": "Aran Dasan & Drew Batchelor",
+                "pronouns": "He/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "MastoDot Matrix Printer",
+                "published_description": "Dot matrix printer hooked up to mastodon. \r\nPrints anything with #emfcamp etc on it or anything @mentioned to it. \r\nIn theory. As I write this description I haven't finished making it :D ",
+                "names": "Matt Gray",
+                "pronouns": "he/him",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            },
+            {
+                "published_title": "Robot Wars robot display",
+                "published_description": "A small \"antweight\" (150g) display arena for attendees to come up and try. \r\n\r\nAlong with several display robots - some from the TV series Robot Wars itself. \r\n\r\nIf power is available, can also bring a computer screen with clips from events around the UK to show off. ",
+                "names": "Gareth Anstee",
+                "pronouns": "",
+                "may_record": false,
+                "video_privacy": "none",
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null,
+                "venue_village_id": null
+            }
+        ],
+        "counts": {
+            "needs_help": {
+                "false": 81,
+                "true": 25
+            },
+            "needs_money": {
+                "false": 106
+            },
+            "needs_laptop": {
+                "false": 106
+            },
+            "one_day": {
+                "false": 106
+            },
+            "notice_required": {
+                "1 month": 90,
+                "> 1 month": 12,
+                "> 3 months": 4
+            },
+            "may_record": {
+                "false": 102,
+                "null": 4
+            },
+            "video_privacy": {
+                "none": 93,
+                "public": 5,
+                "null": 8
+            },
+            "state": {
+                "accepted": 3,
+                "finalised": 86,
+                "rejected": 7,
+                "withdrawn": 10
+            },
+            "created_week": {
+                "2024-01-29": 7,
+                "2024-02-05": 8,
+                "2024-02-12": 9,
+                "2024-02-19": 10,
+                "2024-02-26": 2,
+                "2024-03-04": 2,
+                "2024-03-11": 7,
+                "2024-03-18": 1,
+                "2024-03-25": 3,
+                "2024-04-01": 5,
+                "2024-04-08": 6,
+                "2024-04-15": 7,
+                "2024-04-22": 5,
+                "2024-04-29": 6,
+                "2024-05-06": 2,
+                "2024-05-13": 13,
+                "2024-05-20": 10,
+                "2024-05-27": 2,
+                "2024-06-03": 1
+            }
+        },
+        "edits": {
+            "published_title": {
+                "avg": "2.01",
+                "max": 4
+            },
+            "published_description": {
+                "avg": "2.18",
+                "max": 4
+            },
+            "length": {
+                "avg": "1.96",
+                "max": 2
+            },
+            "equipment_required": {
+                "avg": "1.91",
+                "max": 5
+            },
+            "funding_required": {
+                "avg": "1.33",
+                "max": 4
+            },
+            "additional_info": {
+                "avg": "1.76",
+                "max": 4
+            },
+            "notice_required": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "needs_help": {
+                "avg": "1.01",
+                "max": 2
+            },
+            "needs_money": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "one_day": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "has_rejected_email": {
+                "avg": "1.03",
+                "max": 2
+            },
+            "published_names": {
+                "avg": "2.05",
+                "max": 4
+            },
+            "published_pronouns": {
+                "avg": "1.94",
+                "max": 4
+            },
+            "arrival_period": {
+                "avg": "2.03",
+                "max": 4
+            },
+            "departure_period": {
+                "avg": "1.99",
+                "max": 4
+            },
+            "eventphone_number": {
+                "avg": "1.93",
+                "max": 3
+            },
+            "telephone_number": {
+                "avg": "2.04",
+                "max": 4
+            },
+            "may_record": {
+                "avg": "1.94",
+                "max": 2
+            },
+            "video_privacy": {
+                "avg": "1.05",
+                "max": 2
+            },
+            "needs_laptop": {
+                "avg": "1.96",
+                "max": 2
+            },
+            "available_times": {
+                "avg": "1.90",
+                "max": 2
+            },
+            "attendees": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "cost": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "size": {
+                "avg": "1.06",
+                "max": 3
+            },
+            "installation_funding": {
+                "avg": "1.03",
+                "max": 2
+            },
+            "age_range": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "participant_equipment": {
+                "avg": "1.00",
+                "max": 1
+            }
+        }
+    }
+}

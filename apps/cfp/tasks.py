@@ -123,9 +123,7 @@ def email_reserve():
     )
 
     for proposal in proposals:
-        send_email_for_proposal(
-            proposal, reason="reserve-list", from_address=from_email("SPEAKERS_EMAIL")
-        )
+        send_email_for_proposal(proposal, reason="reserve-list", from_address=from_email("SPEAKERS_EMAIL"))
 
 
 @cfp.cli.command(
@@ -141,15 +139,13 @@ def create_tags(tags_to_create):
     tags_created = 0
     for tag in tags_to_create:
         if Tag.query.filter_by(tag=tag).all():
-            app.logger.info(f"'{tag}' already exists, skipping.")
             continue
 
         db.session.add(Tag(tag))
         tags_created += 1
-        app.logger.info(f"'{tag}' added to session.")
 
     db.session.commit()
-    app.logger.info(f"Successfully created {tags_created} new tags.")
+    app.logger.info(f"Created {tags_created}/{len(tags_to_create)} tags.")
 
 
 @cfp.cli.command(
@@ -168,9 +164,7 @@ def delete_tags(tags_to_delete):
 
         if tag.proposals:
             tagged_proposals = [p.id for p in tag.proposals]
-            app.logger.info(
-                f"'{tag_name}' will be removed from the proposals with ids: {tagged_proposals}"
-            )
+            app.logger.info(f"'{tag_name}' will be removed from the proposals with ids: {tagged_proposals}")
 
         db.session.delete(tag)
         tags_deleted += 1

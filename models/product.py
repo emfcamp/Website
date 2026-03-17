@@ -1,28 +1,53 @@
 from __future__ import annotations
-from dataclasses import dataclass
-from decimal import Decimal
-from collections import defaultdict
-from datetime import datetime, timedelta
+
 import logging
-import re
 import random
+import re
 import string
-from typing import Optional, TYPE_CHECKING
+from collections import defaultdict
+from collections.abc import Sequence
+from dataclasses import dataclass
+from datetime import timedelta
+from decimal import Decimal
+from typing import TYPE_CHECKING, cast
 
-from sqlalchemy import func, UniqueConstraint, inspect
-from sqlalchemy.orm import validates, column_property
+from sqlalchemy import ForeignKey, Numeric, UniqueConstraint, func, inspect, select
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import (
+    Mapped,
+    column_property,
+    mapped_column,
+    relationship,
+    validates,
+)
 
-from main import db
+from main import NaiveDT, db
+from models.user import User
+
+from . import BaseModel, Currency, naive_utcnow
+from .capacity import UnlimitedType
 from .mixins import CapacityMixin, InheritedAttributesMixin
-from . import BaseModel
-from .purchase import Purchase, AdmissionTicket, Ticket
-from .payment import Currency
+from .purchase import AdmissionTicket, Purchase, Ticket
 
 if TYPE_CHECKING:
     # Imports used only in type hints, can't be imported normally due to circular references.
+    from .arrivals import ArrivalsViewProduct
     from .basket import Basket
     from .payment import Payment
+
+__all__ = [
+    "MultipleLoadedResultsFound",
+    "Price",
+    "PriceTier",
+    "Product",
+    "ProductGroup",
+    "ProductGroupException",
+    "ProductGroupType",
+    "ProductView",
+    "ProductViewProduct",
+    "Voucher",
+    "VoucherUsedError",
+]
 
 log = logging.getLogger(__name__)
 
@@ -50,16 +75,13 @@ VOUCHER_GRACE_PERIOD = timedelta(hours=36)
 def random_voucher():
     return "".join(
         random.choices(
-            list(
-                set(string.ascii_lowercase) - {"a", "e", "i", "o", "u"}
-                | set(string.digits)
-            ),
+            list(set(string.ascii_lowercase) - {"a", "e", "i", "o", "u"} | set(string.digits)),
             k=RANDOM_VOUCHER_LENGTH,
         )
     )
 
 
-def one_or_none(result):
+def one_or_none[T](result: Sequence[T]) -> T | None:
     if len(result) == 1:
         return result[0]
     if len(result) == 0:
@@ -93,20 +115,19 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
 
     __tablename__ = "product_group"
 
-    id = db.Column(db.Integer, primary_key=True)
-    parent_id = db.Column(db.Integer, db.ForeignKey("product_group.id"))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    parent_id: Mapped[int | None] = mapped_column(ForeignKey("product_group.id"))
     # Whether this is a ticket or hire item.
-    type = db.Column(db.String, nullable=False)
-    name = db.Column(db.String, unique=True, nullable=False)
+    type: Mapped[str]
+    name: Mapped[str] = mapped_column(unique=True)
 
-    products = db.relationship(
-        "Product", backref="parent", cascade="all", order_by="Product.id"
+    products: Mapped[list[Product]] = relationship(
+        back_populates="parent", cascade="all", order_by="Product.id"
     )
-    children = db.relationship(
-        "ProductGroup",
-        backref=db.backref("parent", remote_side=[id]),
+    parent: Mapped[ProductGroup | None] = relationship(back_populates="children", remote_side=[id])
+    children: Mapped[list[ProductGroup]] = relationship(
         cascade="all",
-        order_by="ProductGroup.id",
+        order_by=id,
     )
 
     def __init__(self, type=None, parent=None, parent_id=None, **kwargs):
@@ -124,8 +145,10 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
         super().__init__(type=type, parent=parent, parent_id=parent_id, **kwargs)
 
     @classmethod
-    def get_by_name(cls, group_name) -> Optional[ProductGroup]:
-        return ProductGroup.query.filter_by(name=group_name).one_or_none()
+    def get_by_name(cls, group_name: str) -> ProductGroup | None:
+        return db.session.execute(
+            select(ProductGroup).where(ProductGroup.name == group_name)
+        ).scalar_one_or_none()
 
     @validates("capacity_max")
     def validate_capacity_max(self, _, capacity_max):
@@ -139,11 +162,7 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
             ProductGroup capacity.
         """
 
-        if (
-            self.capacity_used is not None
-            and capacity_max is not None
-            and capacity_max < self.capacity_used
-        ):
+        if self.capacity_used is not None and capacity_max is not None and capacity_max < self.capacity_used:
             raise ValueError("capacity_max cannot be lower than capacity_used")
 
         with db.session.no_autoflush:
@@ -158,9 +177,7 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
 
         if capacity_max is None:
             if any(sibling.capacity_max for sibling in siblings):
-                raise ValueError(
-                    "capacity_max must be provided if siblings have capacity_max set."
-                )
+                raise ValueError("capacity_max must be provided if siblings have capacity_max set.")
         else:
             if any(sibling.capacity_max is None for sibling in siblings):
                 raise ValueError(
@@ -171,14 +188,13 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
             sibling_capacity = sum(sibling.capacity_max for sibling in siblings)
             if sibling_capacity + capacity_max > self.parent.capacity_max:
                 raise ValueError(
-                    "New capacity_max (%s) + sum of sibling capacities (%s) exceeds "
-                    "parent ProductGroup capacity (%s)."
-                    % (capacity_max, sibling_capacity, self.parent.capacity_max)
+                    f"New capacity_max ({capacity_max}) + sum of sibling capacities ({sibling_capacity}) exceeds "
+                    f"parent ProductGroup capacity ({self.parent.capacity_max})."
                 )
         return capacity_max
 
     @property
-    def unallocated_capacity(self) -> Optional[int]:
+    def unallocated_capacity(self) -> int | None:
         """If this is an allocation-level ProductGroup (i.e. it has a capacity_max
         set, and all childen also do), return the total unallocated capacity.
 
@@ -192,7 +208,9 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
         ):
             return None
 
-        return self.capacity_max - sum(child.capacity_max for child in self.children)
+        # We check that all children have a non-None capacity_max above - but mypy isn't
+        # able to infer this, hence the cast
+        return self.capacity_max - sum(cast(int, child.capacity_max) for child in self.children)
 
     @property
     def purchase_count_by_state(self):
@@ -255,7 +273,7 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
         return {"private": data}
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self.name)
+        return f"<{self.__class__.__name__}: {self.name}>"
 
     def __str__(self):
         return self.name
@@ -264,55 +282,71 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
 class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
     """A product (ticket or other item) which is for sale."""
 
-    id = db.Column(db.Integer, primary_key=True)
-    group_id = db.Column(db.Integer, db.ForeignKey(ProductGroup.id), nullable=False)
-    name = db.Column(db.String, nullable=False)
-    display_name = db.Column(db.String)
-    description = db.Column(db.String)
-    price_tiers = db.relationship(
-        "PriceTier", backref="parent", cascade="all", order_by="PriceTier.id"
+    __tablename__ = "product"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    group_id: Mapped[int] = mapped_column(ForeignKey(ProductGroup.id))
+    name: Mapped[str]
+    display_name: Mapped[str | None]
+    description: Mapped[str | None]
+
+    price_tiers: Mapped[list[PriceTier]] = relationship(
+        back_populates="parent", cascade="all", order_by="PriceTier.id"
     )
-    product_view_products = db.relationship(
-        "ProductViewProduct", backref="product", cascade="all, delete-orphan"
+    product_view_products: Mapped[list[ProductViewProduct]] = relationship(
+        back_populates="product", cascade="all, delete-orphan"
     )
-    arrivals_view_products = db.relationship(
-        "ArrivalsViewProduct", backref="product", cascade="all, delete-orphan"
+    arrivals_view_products: Mapped[list[ArrivalsViewProduct]] = relationship(
+        back_populates="product", cascade="all, delete-orphan"
     )
+    purchases: Mapped[list[Purchase]] = relationship(back_populates="product")
+    parent: Mapped[ProductGroup] = relationship(back_populates="products")
 
     __table_args__ = (UniqueConstraint("name", "group_id"),)
     __export_data__ = False  # Exported by ProductGroup
 
     @classmethod
-    def get_by_name(cls, group_name, product_name) -> Optional[Product]:
-        group = ProductGroup.query.filter_by(name=group_name)
-        product = (
-            group.join(Product).filter_by(name=product_name).with_entities(Product)
-        )
-        return product.one_or_none()
+    def get_by_name(cls, group_name: str, product_name: str) -> Product | None:
+        return db.session.execute(
+            select(ProductGroup)
+            .where(ProductGroup.name == group_name)
+            .join(Product)
+            .where(Product.name == product_name)
+            .with_only_columns(Product)
+        ).scalar_one_or_none()
 
     @property
-    def purchase_count_by_state(self):
+    def purchase_count_by_state(self) -> dict[str, int]:
         states = (
-            Purchase.query.join(PriceTier, Product)
-            .filter(Product.id == self.id)
-            .with_entities(Purchase.state, func.count(Purchase.id))
-            .group_by(Purchase.state)
+            db.session.execute(
+                select(Purchase.state, func.count(Purchase.id))
+                .join(PriceTier)
+                .join(Product)
+                .where(Product.id == self.id)
+                .group_by(Purchase.state)
+            )
+            .tuples()
+            .all()
         )
 
         return dict(states)
 
-    def get_cheapest_price(self, currency="GBP") -> "Price":
+    def get_cheapest_price(self, currency: Currency = Currency.GBP) -> Price | None:
         price = (
-            PriceTier.query.filter_by(product_id=self.id)
-            .join(Price)
-            .filter_by(currency=currency)
-            .with_entities(Price)
-            .order_by(Price.price_int)
+            db.session.execute(
+                select(PriceTier)
+                .where(PriceTier.product_id == self.id)
+                .join(Price)
+                .where(Price.currency == currency)
+                .with_only_columns(Price)
+                .order_by(Price.price_int)
+            )
+            .scalars()
             .first()
         )
         return price
 
-    def is_adult_ticket(self) -> bool:
+    def is_adult_ticket(self, voucher: bool = False) -> bool:
         """Whether this is an "adult" ticket.
 
         This is used for two purposes:
@@ -325,11 +359,13 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
         Day tickets should be able to buy badges/merchandise.
         """
         # FIXME: Make this less awful, we need a less brittle way of detecting this
-        return self.parent.type == "admissions" and (
-            self.name.startswith("full")
-            or self.name.startswith("u18")
-            or self.name.startswith("day")
-        )
+
+        adult_codes = ["full", "day"]
+        if not voucher:
+            # U18 tickets are not adult tickets for the purposes of voucher capacity
+            adult_codes.append("u18")
+
+        return self.parent.type == "admissions" and any(self.name.startswith(code) for code in adult_codes)
 
     @property
     def checkin_display_name(self):
@@ -342,7 +378,7 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
         return tier.one_or_none()
 
     def __repr__(self):
-        return "<Product: %s>" % self.name
+        return f"<Product: {self.name}>"
 
     def __str__(self):
         return self.name
@@ -359,66 +395,78 @@ class PriceTier(BaseModel, CapacityMixin):
     For now, only one PriceTier is active (unexpired) per Product at once.
     """
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey(Product.id), nullable=False)
+    __tablename__ = "price_tier"
 
-    personal_limit = db.Column(db.Integer, default=10, nullable=False)
-    active = db.Column(db.Boolean, default=True, nullable=False)
-    vat_rate = db.Column(db.Numeric(4, 3), nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str]
+    product_id: Mapped[int] = mapped_column(ForeignKey(Product.id))
+
+    personal_limit: Mapped[int] = mapped_column(default=10)
+    active: Mapped[bool] = mapped_column(default=True)
+    vat_rate: Mapped[Decimal | None] = mapped_column(Numeric(4, 3))
 
     __table_args__ = (UniqueConstraint("name", "product_id"),)
     __export_data__ = False  # Exported by ProductGroup
 
-    prices = db.relationship(
-        "Price", backref="price_tier", cascade="all", order_by="Price.id"
+    prices: Mapped[list[Price]] = relationship(
+        back_populates="price_tier", cascade="all", order_by="Price.id"
     )
+    purchases: Mapped[list[Purchase]] = relationship(back_populates="price_tier")
+    parent: Mapped[Product] = relationship(back_populates="price_tiers")
 
     def __init__(self, name=None, **kwargs):
         super().__init__(name=name, **kwargs)
 
     @classmethod
-    def get_by_name(cls, group_name, product_name, tier_name) -> Optional[PriceTier]:
-        group = ProductGroup.query.filter_by(name=group_name)
-        product = (
-            group.join(Product).filter_by(name=product_name).with_entities(Product)
-        )
-        tier = (
-            product.join(PriceTier).filter_by(name=tier_name).with_entities(PriceTier)
-        )
-        return tier.one_or_none()
+    def get_by_name(cls, group_name: str, product_name: str, tier_name: str) -> PriceTier | None:
+        return db.session.execute(
+            select(ProductGroup)
+            .where(ProductGroup.name == group_name)
+            .join(Product)
+            .where(Product.name == product_name)
+            .join(PriceTier)
+            .where(PriceTier.name == tier_name)
+            .with_only_columns(PriceTier)
+        ).scalar_one_or_none()
 
     @property
-    def purchase_count_by_state(self):
+    def purchase_count_by_state(self) -> dict[str, int]:
         states = (
-            Purchase.query.join(PriceTier)
-            .filter(PriceTier.id == self.id)
-            .with_entities(Purchase.state, func.count(Purchase.id))
-            .group_by(Purchase.state)
+            db.session.execute(
+                select(Purchase.state, func.count(Purchase.id))
+                .join(PriceTier)
+                .where(PriceTier.id == self.id)
+                .group_by(Purchase.state)
+            )
+            .tuples()
+            .all()
         )
 
         return dict(states)
 
     @property
     def purchase_count(self) -> int:
-        return Purchase.query.join(PriceTier).filter(PriceTier.id == self.id).count()
+        return db.session.execute(
+            select(func.count()).select_from(Purchase).join(PriceTier).where(PriceTier.id == self.id)
+        ).scalar_one()
 
     @property
     def unused(self) -> bool:
         """Whether this tier is unused and can be safely deleted."""
         return self.purchase_count == 0 and not self.active
 
-    def get_price(self, currency: Currency) -> Optional["Price"]:
-        if "prices" in inspect(self).unloaded:
+    def get_price(self, currency: Currency) -> Price | None:
+        instance_state = inspect(self)
+        if "prices" in instance_state.unloaded:
             return self.get_price_unloaded(currency)
-        else:
-            return self.get_price_loaded(currency)
+        return self.get_price_loaded(currency)
 
-    def get_price_unloaded(self, currency: Currency) -> Optional[Price]:
-        price = Price.query.filter_by(price_tier_id=self.id, currency=currency)
-        return price.one_or_none()
+    def get_price_unloaded(self, currency: Currency) -> Price | None:
+        return db.session.execute(
+            select(Price).where(Price.price_tier_id == self.id, Price.currency == currency)
+        ).scalar_one_or_none()
 
-    def get_price_loaded(self, currency: Currency) -> Optional[Price]:
+    def get_price_loaded(self, currency: Currency) -> Price | None:
         prices = [p for p in self.prices if p.currency == currency]
         return one_or_none(prices)
 
@@ -426,10 +474,14 @@ class PriceTier(BaseModel, CapacityMixin):
         if self.has_expired():
             return 0
 
-        return min(self.personal_limit, self.get_total_remaining_capacity())
+        remaining = self.get_total_remaining_capacity()
+        if isinstance(remaining, UnlimitedType):
+            return self.personal_limit
+
+        return min(self.personal_limit, remaining)
 
     def __repr__(self):
-        return "<PriceTier %s>" % self.name
+        return f"<PriceTier {self.name}>"
 
     def __str__(self):
         return self.name
@@ -448,12 +500,13 @@ class Price(BaseModel):
     __tablename__ = "price"
     __export_data__ = False  # Exported by ProductGroup
 
-    id = db.Column(db.Integer, primary_key=True)
-    price_tier_id = db.Column(
-        db.Integer, db.ForeignKey("price_tier.id"), nullable=False
-    )
-    currency: Currency = db.Column(db.String, nullable=False)
-    price_int = db.Column(db.Integer, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    price_tier_id: Mapped[int] = mapped_column(ForeignKey("price_tier.id"))
+    currency: Mapped[Currency]
+    price_int: Mapped[int]
+
+    purchases: Mapped[list[Purchase]] = relationship(back_populates="price")
+    price_tier: Mapped[list[PriceTier]] = relationship(back_populates="prices")
 
     def __init__(self, currency, value=None, **kwargs):
         super().__init__(currency=currency.upper(), **kwargs)
@@ -488,10 +541,10 @@ class Price(BaseModel):
         return self.value_ex_vat * self.price_tier.vat_rate
 
     def __repr__(self):
-        return "<Price for %r: %.2f %s>" % (self.price_tier, self.value, self.currency)
+        return f"<Price for {self.price_tier!r}: {self.value:.2f} {self.currency}>"
 
     def __str__(self):
-        return "%0.2f %s" % (self.value, self.currency)
+        return f"{self.value:0.2f} {self.currency}"
 
 
 class Voucher(BaseModel):
@@ -500,39 +553,42 @@ class Voucher(BaseModel):
     __tablename__ = "voucher"
     __export_data__ = False  # Exported by ProductView
 
-    code = db.Column(db.String, primary_key=True)
-    expiry = db.Column(db.DateTime, nullable=True)
+    code: Mapped[str] = mapped_column(primary_key=True)
+    expiry: Mapped[NaiveDT | None]
 
-    email = db.Column(db.String, nullable=True, index=True)
+    email: Mapped[str | None] = mapped_column(index=True)
 
-    product_view_id = db.Column(db.Integer, db.ForeignKey("product_view.id"))
-
-    payment = db.relationship("Payment", backref="voucher")
+    product_view_id: Mapped[int | None] = mapped_column(ForeignKey("product_view.id"))
 
     # The number of purchases remaining on this voucher
-    purchases_remaining = db.Column(db.Integer, nullable=False, server_default="1")
+    purchases_remaining: Mapped[int] = mapped_column(default=1)
 
     # The number of adult tickets remaining to purchase on this voucher
-    tickets_remaining = db.Column(db.Integer, nullable=False, server_default="2")
+    tickets_remaining: Mapped[int] = mapped_column(default=2)
+
+    payment: Mapped[list[Payment]] = relationship(back_populates="voucher")
+    view: Mapped[ProductView | None] = relationship(back_populates="vouchers")
+
+    __table_args__ = (UniqueConstraint("email", "product_view_id", name="uniq_voucher_email_product_view"),)
 
     is_used = column_property((purchases_remaining == 0) | (tickets_remaining == 0))
 
     @classmethod
-    def get_by_code(cls, code: str) -> Optional["Voucher"]:
+    def get_by_code(cls, code: str | None) -> Voucher | None:
         if not code:
             return None
-        return Voucher.query.filter_by(code=code).one_or_none()
+        return db.session.execute(select(Voucher).where(Voucher.code == code)).scalar_one_or_none()
 
     def __init__(
         self,
-        view,
-        code: Optional[str] = None,
-        expiry=None,
-        email: Optional[str] = None,
+        view: ProductView,
+        code: str | None = None,
+        expiry: NaiveDT | None = None,
+        email: str | None = None,
         purchases_remaining: int = 1,
         tickets_remaining: int = 2,
     ):
-        super(Voucher, self).__init__()
+        super().__init__()
         self.view = view
         self.email = email
         self.purchases_remaining = purchases_remaining
@@ -551,12 +607,9 @@ class Voucher(BaseModel):
     def is_expired(self) -> bool:
         # Note: this should be a column_property but getting the current time in the DB
         # interacts badly with the fact that we fake the date in tests.
-        return (
-            self.expiry is not None
-            and (self.expiry + VOUCHER_GRACE_PERIOD) < datetime.utcnow()
-        )
+        return self.expiry is not None and (self.expiry + VOUCHER_GRACE_PERIOD) < naive_utcnow()
 
-    def check_capacity(self, basket: Basket):
+    def check_capacity(self, basket: Basket) -> bool:
         """Check if there is enough capacity in this voucher to buy
         the tickets in the provided basket.
         """
@@ -564,26 +617,20 @@ class Voucher(BaseModel):
             return False
 
         adult_tickets = sum(
-            line.count for line in basket._lines if line.tier.parent.is_adult_ticket()
+            line.count for line in basket._lines if line.tier.parent.is_adult_ticket(voucher=True)
         )
 
         if self.tickets_remaining < adult_tickets:
             return False
         return True
 
-    def consume_capacity(self, payment: Payment):
+    def consume_capacity(self, payment: Payment) -> None:
         """Decrease the voucher's capacity based on tickets in a payment."""
         if self.purchases_remaining < 1:
-            raise VoucherUsedError(
-                f"Attempting to use voucher with no remaining purchases: {self}"
-            )
+            raise VoucherUsedError(f"Attempting to use voucher with no remaining purchases: {self}")
 
         adult_tickets = len(
-            [
-                purchase
-                for purchase in payment.purchases
-                if purchase.product.is_adult_ticket()
-            ]
+            [purchase for purchase in payment.purchases if purchase.product.is_adult_ticket(voucher=True)]
         )
 
         if self.tickets_remaining < adult_tickets:
@@ -595,14 +642,10 @@ class Voucher(BaseModel):
         self.purchases_remaining = Voucher.purchases_remaining - 1
         self.tickets_remaining = Voucher.tickets_remaining - adult_tickets
 
-    def return_capacity(self, payment: Payment):
+    def return_capacity(self, payment: Payment) -> None:
         """Return capacity to this voucher based on tickets in a payment."""
         adult_tickets = len(
-            [
-                purchase
-                for purchase in payment.purchases
-                if purchase.product.is_adult_ticket()
-            ]
+            [purchase for purchase in payment.purchases if purchase.product.is_adult_ticket(voucher=True)]
         )
         log.info("Returning 1 purchase and %s tickets to %s", adult_tickets, self)
         self.purchases_remaining = Voucher.purchases_remaining + 1
@@ -610,14 +653,10 @@ class Voucher(BaseModel):
 
     def __repr__(self):
         if self.expiry:
-            return "<Voucher: %s, view: %s, expiry: %s>" % (
-                self.code,
-                self.product_view_id,
-                self.expiry,
-            )
-        return "<Voucher: %s, view: %s>" % (self.code, self.product_view_id)
+            return f"<Voucher: {self.code}, view: {self.product_view_id}, expiry: {self.expiry}>"
+        return f"<Voucher: {self.code}, view: {self.product_view_id}>"
 
-    def is_accessible(self, voucher):
+    def is_accessible(self, voucher: str) -> bool:
         # voucher expired
         if self.is_expired:
             return False
@@ -634,29 +673,26 @@ class Voucher(BaseModel):
 class ProductView(BaseModel):
     """A selection of products to be shown together for sale."""
 
-    __table_name__ = "product_view"
+    __tablename__ = "product_view"
 
-    id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String, nullable=False)
-    name = db.Column(db.String, nullable=False, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    type: Mapped[str]
+    name: Mapped[str] = mapped_column(index=True)
 
     # Whether this productview is only accessible to users with an accepted CfP proposal
-    cfp_accepted_only = db.Column(db.Boolean, nullable=False, default=False)
+    cfp_accepted_only: Mapped[bool] = mapped_column(default=False)
 
     # Whether this productview is only accessible with a voucher associated with this productview
-    vouchers_only = db.Column(
-        db.Boolean, nullable=False, default=False, server_default="False"
-    )
+    vouchers_only: Mapped[bool] = mapped_column(default=False)
 
-    product_view_products = db.relationship(
-        "ProductViewProduct",
-        backref="view",
+    product_view_products: Mapped[list[ProductViewProduct]] = relationship(
+        back_populates="view",
         order_by="ProductViewProduct.order",
         cascade="all, delete-orphan",
     )
 
-    vouchers = db.relationship(
-        "Voucher", backref="view", cascade="all, delete-orphan", lazy=True
+    vouchers: Mapped[list[Voucher]] = relationship(
+        back_populates="view", cascade="all, delete-orphan", lazy=True
     )
 
     products = association_proxy("product_view_products", "product")
@@ -676,12 +712,10 @@ class ProductView(BaseModel):
         return {"private": data}
 
     @classmethod
-    def get_by_name(cls, name) -> Optional[ProductView]:
-        if name is None:
-            return None
-        return ProductView.query.filter_by(name=name).one_or_none()
+    def get_by_name(cls, name: str) -> ProductView | None:
+        return db.session.execute(select(ProductView).where(ProductView.name == name)).scalar_one_or_none()
 
-    def is_accessible_at(self, user, dt, voucher=None) -> bool:
+    def is_accessible(self, user: User, voucher: str | None = None) -> bool:
         "Whether this ProductView is accessible to a user."
         if user.is_authenticated and user.has_permission("admin"):
             # Admins always have access
@@ -697,7 +731,9 @@ class ProductView(BaseModel):
             if not voucher:
                 return False
 
-            voucher_obj = Voucher.query.filter_by(view=self, code=voucher).one_or_none()
+            voucher_obj = db.session.execute(
+                select(Voucher).where(Voucher.view == self, Voucher.code == voucher)
+            ).scalar_one_or_none()
 
             if not voucher_obj:
                 return False
@@ -706,24 +742,24 @@ class ProductView(BaseModel):
 
         return True
 
-    def is_accessible(self, user, voucher=None):
-        return self.is_accessible_at(user, datetime.utcnow(), voucher=voucher)
-
     def __repr__(self):
-        return "<ProductView: %s>" % self.name
+        return f"<ProductView: {self.name}>"
 
     def __str__(self):
         return self.name
 
 
 class ProductViewProduct(BaseModel):
-    __table_name__ = "product_view_product"
+    __tablename__ = "product_view_product"
     __export_data__ = False  # Exported by ProductView
 
-    view_id = db.Column(db.Integer, db.ForeignKey(ProductView.id), primary_key=True)
-    product_id = db.Column(db.Integer, db.ForeignKey(Product.id), primary_key=True)
+    view_id: Mapped[int] = mapped_column(ForeignKey(ProductView.id), primary_key=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey(Product.id), primary_key=True)
 
-    order = db.Column(db.Integer, nullable=False, default=0)
+    order: Mapped[int] = mapped_column(default=0)
+
+    view: Mapped[ProductView] = relationship(back_populates="product_view_products")
+    product: Mapped[Product] = relationship(back_populates="product_view_products")
 
     def __init__(self, view, product, order=None):
         self.view = view
@@ -732,6 +768,4 @@ class ProductViewProduct(BaseModel):
             self.order = order
 
     def __repr__(self):
-        return "<ProductViewProduct: view {}, product {}, order {}>".format(
-            self.view_id, self.product_id, self.order
-        )
+        return f"<ProductViewProduct: view {self.view_id}, product {self.product_id}, order {self.order}>"

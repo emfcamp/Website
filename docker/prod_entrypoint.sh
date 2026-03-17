@@ -16,4 +16,4 @@ $PSQL emf_site -c 'CREATE EXTENSION postgis' || true
 
 mkdir -p $PROMETHEUS_MULTIPROC_DIR
 
-exec poetry run gunicorn -k gthread -c gunicorn.py -w 6 -b '0.0.0.0:8000' --preload wsgi:app
+exec uv run gunicorn -k gthread -c gunicorn.py -w 6 -b '0.0.0.0:8000' --preload wsgi:app

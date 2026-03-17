@@ -1,34 +1,36 @@
 """Views for attendees to manage their own content."""
 
-from models.cfp import PYTHON_CFP_TYPES, Proposal, Venue, AGE_RANGE_OPTIONS
-from sqlalchemy import or_
-from flask_login import login_required, current_user
-from flask import (
-    current_app as app,
-    render_template,
-    redirect,
-    url_for,
-    request,
-    flash,
-)
-from wtforms import (
-    StringField,
-    TextAreaField,
-    SelectField,
-    IntegerField,
-    DecimalField,
-    TimeField,
-    BooleanField,
-    SubmitField,
-)
-from wtforms.validators import DataRequired, Optional, NumberRange
 from datetime import date, datetime, timedelta
 
-from main import db
+from flask import (
+    current_app as app,
+)
+from flask import (
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask_login import current_user, login_required
+from sqlalchemy import or_
+from wtforms import (
+    BooleanField,
+    DecimalField,
+    IntegerField,
+    SelectField,
+    StringField,
+    SubmitField,
+    TextAreaField,
+    TimeField,
+)
+from wtforms.validators import DataRequired, NumberRange, Optional
 
-from ..common.forms import Form
+from main import db, get_or_404
+from models.cfp import AGE_RANGE_OPTIONS, PYTHON_CFP_TYPES, Proposal, Venue
+
 from ..common import feature_flag
-
+from ..common.forms import Form
 from . import schedule
 
 
@@ -196,10 +198,10 @@ class DeleteAttendeeContentForm(Form):
 @login_required
 @feature_flag("ATTENDEE_CONTENT")
 def attendee_content_delete(id):
-    proposal = Proposal.query.get_or_404(id)
+    proposal = get_or_404(db, Proposal, id)
     can_delete = proposal.user_id == current_user.id and proposal.user_scheduled
     if not can_delete:
-        app.logger.warn(f"{current_user} cannot delete proposal {proposal}")
+        app.logger.warning(f"{current_user} cannot delete proposal {proposal}")
         flash("You can't delete this content")
         return redirect(url_for("schedule.attendee_content"))
 

@@ -1,9 +1,10 @@
 from flask import current_app as app
 
-from main import mail, db
+from main import db, mail
 from models.email import EmailJobRecipient
-from models.volunteer.notify import VolunteerNotifyRecipient
 from models.scheduled_task import scheduled_task
+from models.volunteer.notify import VolunteerNotifyRecipient
+
 from ..common.email import from_email
 
 
@@ -13,9 +14,7 @@ def send_emails():
     count = 0
 
     with mail.get_connection(app.config.get("BULK_MAIL_BACKEND")) as conn:
-        for rec in EmailJobRecipient.query.filter(
-            EmailJobRecipient.sent == False  # noqa: E712
-        ):
+        for rec in EmailJobRecipient.query.filter(EmailJobRecipient.sent == False):
             count += send_email(conn, rec)
     return count
 
@@ -32,7 +31,6 @@ def send_email(conn, rec):
     )
     if sent_count > 0:
         rec.sent = True
-        db.session.add(rec)
         db.session.commit()
     return sent_count
 
@@ -42,9 +40,7 @@ def send_volunteer_emails():
     """Send queued volunteer notifications"""
     count = 0
     with mail.get_connection() as conn:
-        for rec in VolunteerNotifyRecipient.query.filter(
-            VolunteerNotifyRecipient.sent == False  # noqa: E712
-        ):
+        for rec in VolunteerNotifyRecipient.query.filter(VolunteerNotifyRecipient.sent == False):
             count += send_volunteer_email(conn, rec)
     return count
 
@@ -61,6 +57,5 @@ def send_volunteer_email(conn, rec):
     )
     if sent_count > 0:
         rec.sent = True
-        db.session.add(rec)
         db.session.commit()
     return sent_count

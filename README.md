@@ -2,7 +2,6 @@ This is the www.emfcamp.org web site, built with Flask & Postgres by the
 EMF web team.
 
 [![Deploy Status](https://github.com/emfcamp/Website/workflows/Deploy/badge.svg)](https://github.com/emfcamp/Website/actions?query=workflow%3ADeploy)
-[![Coverage Status](https://coveralls.io/repos/github/emfcamp/Website/badge.svg?branch=main)](https://coveralls.io/github/emfcamp/Website?branch=main)
 
 ## Get Involved
 
@@ -14,21 +13,9 @@ Join with IRCCloud: <a href="https://www.irccloud.com/invite?channel=%23emfcamp-
 
 The only supported way to develop is to use [Docker](https://docker.com/) with Docker Compose (on Linux you'll need to install [Docker Compose](https://docs.docker.com/compose/install/) separately) version 1.24.0 or newer.
 
-[Lazydocker](https://github.com/jesseduffield/lazydocker) is highly recommended
-to monitor the containers.
+We also recommend you have `uv` [installed on your development machine](https://docs.astral.sh/uv/getting-started/installation/), as it's sometimes useful to use this command outside Docker.
 
 To start all containers (and rebuild any which may have changed):
-
-> [!TIP]
-> **Apple Silicon Users**
-> You'll probably want to build your own version of the base images as well, as
-> the ones we build are amd64 only, and so painfully slow on ARM devices. This
-> is unlikely to be resolved until GitHub Actions has ARM runners.
->
-> ```sh
-> docker build -t ghcr.io/emfcamp/website-base -f ./docker/Dockerfile.base .
-> docker build -t ghcr.io/emfcamp/website-base-dev -f ./docker/Dockerfile.base-dev .
-> ```
 
 ```
 docker compose build --parallel
@@ -60,10 +47,10 @@ your VSCode instance to the application container, install relevant extensions,
 and ensure everything is configured to fit with our standards.
 
 The first time you start the dev container you will need to tell VSCode where to
-find the Poetry virtual environment. You can do this by open the command palette
+find the `uv` virtual environment. You can do this by open the command palette
 (Cmd-P on macOS devices) and searching for "Python: Select interpreter", the list
 presented should include `website-${randomHash}-py3.11`, which will be annotated
-as "Poetry". Select that, and then any Python tooling and shells will run within
+as "uv". Select that, and then any Python tooling and shells will run within
 the appropriate virtualenv.
 
 ### Errors starting the dev server
@@ -89,8 +76,7 @@ pre-commit hook using [pre-commit](https://pre-commit.com/). To set this up on
 the host where you'll be using git:
 
 ```
-pip3 install pre-commit
-pre-commit install
+uvx pre-commit install
 ```
 
 ### Adding accounts

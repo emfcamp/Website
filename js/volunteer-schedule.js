@@ -10,7 +10,7 @@ function loadFilters() {
         let interestedRoles = Array.from(document.querySelectorAll('input[data-role-id]')).filter(box => box.getAttribute('data-interested') == "True").map(box => box.getAttribute('data-role-id'));
         savedFilters = JSON.stringify({
             "role_ids": interestedRoles,
-            "show_finished_shifts": false,
+            "show_past": false,
             "signed_up": false,
             "hide_full": false,
             "hide_staffed": false,
@@ -22,7 +22,7 @@ function loadFilters() {
     document.querySelectorAll("input[data-role-id]").forEach(node => {
         node.checked = filters.role_ids.includes(node.getAttribute("data-role-id"))
     })
-    document.getElementById("show_past").checked = filters.show_finished_shifts;
+    document.getElementById("show_past").checked = filters.show_past;
     document.getElementById("show_signed_up_only").checked = filters.signed_up
     document.getElementById("hide_full").checked = filters.hide_full
     document.getElementById("is_understaffed").checked = filters.hide_staffed
@@ -33,7 +33,7 @@ function loadFilters() {
 function getFilters() {
     let filters = {
         "role_ids": Array.from(document.querySelectorAll('input[data-role-id]:checked')).map(node => node.getAttribute('data-role-id')),
-        "show_finished_shifts": document.getElementById("show_past").checked,
+        "show_past": document.getElementById("show_past").checked,
         "signed_up": document.getElementById("show_signed_up_only").checked,
         "hide_full": document.getElementById("hide_full").checked,
         "hide_staffed": document.getElementById("is_understaffed").checked,

@@ -1,5 +1,6 @@
 import pytest
 import sqlalchemy
+
 from main import db
 
 
@@ -13,15 +14,11 @@ class QueryLog:
         self.queries.append(query)
 
     def __enter__(self):
-        sqlalchemy.event.listen(
-            db.engine, "before_cursor_execute", self._query_callback
-        )
+        sqlalchemy.event.listen(db.engine, "before_cursor_execute", self._query_callback)
         return self
 
     def __exit__(self, *args):
-        sqlalchemy.event.remove(
-            db.engine, "before_cursor_execute", self._query_callback
-        )
+        sqlalchemy.event.remove(db.engine, "before_cursor_execute", self._query_callback)
 
     def __repr__(self):
         return "<SQLAlchemy Query Logger>"

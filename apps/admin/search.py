@@ -1,7 +1,9 @@
-from flask import request, redirect, url_for, render_template
-from models.user import User
-from models.payment import StripePayment, BankPayment
+from flask import redirect, render_template, request, url_for
 from sqlalchemy import func
+
+from models.payment import BankPayment, StripePayment
+from models.user import User
+
 from . import admin
 
 
@@ -34,9 +36,7 @@ def search():
     # how small our dataset is, but I spent ages trying to work out how to get Alembic to add
     # those indexes. So humour me.
     results = User.query.filter(
-        func.to_tsvector("simple", User.name).match(
-            to_query(q), postgresql_regconfig="simple"
-        )
+        func.to_tsvector("simple", User.name).match(to_query(q), postgresql_regconfig="simple")
         | (
             func.to_tsvector("simple", func.replace(User.email, "@", " ")).match(
                 email_query, postgresql_regconfig="simple"

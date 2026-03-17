@@ -1,6 +1,9 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import timedelta
+from main import db
+
+from sqlalchemy import select
 from models.cfp import (
     PROPOSAL_TIMESLOTS,
     Proposal,
@@ -30,13 +33,11 @@ def get_available_proposal_minutes():
     minutes = defaultdict(int)
     venue_names_by_type = Venue.emf_venue_names_by_type()
     for type, slots in PROPOSAL_TIMESLOTS.items():
-        periods = make_periods_contiguous(
-            [timeslot_to_period(ts, type=type) for ts in slots]
-        )
+        periods = make_periods_contiguous([timeslot_to_period(ts, type=type) for ts in slots])
         for period in periods:
-            minutes[type] += int(
-                (period.end - period.start).total_seconds() / 60
-            ) * len(venue_names_by_type[type])
+            minutes[type] += int((period.end - period.start).total_seconds() / 60) * len(
+                venue_names_by_type[type]
+            )
     return minutes
 
 
@@ -47,9 +48,7 @@ def get_cfp_estimate(proposal_type: str) -> CFPEstimate:
 
     changeover_time = SLOT_LENGTH * EVENT_SPACING[proposal_type]
 
-    accepted_proposals = (
-        Proposal.query_accepted().filter(Proposal.type == proposal_type).all()
-    )
+    accepted_proposals = Proposal.query_accepted().filter(Proposal.type == proposal_type).all()
 
     allocated_time = timedelta()
     unknown_lengths: int = 0
@@ -69,9 +68,11 @@ def get_cfp_estimate(proposal_type: str) -> CFPEstimate:
 
     num_days = len(get_days_map().items())
 
-    available_venues = Venue.query.filter(
-        Venue.default_for_types.any(proposal_type)
-    ).all()
+    available_venues = list(
+        db.session.execute(select(Venue).where(Venue.default_for_types.any_() == proposal_type))
+        .scalars()
+        .all()
+    )
 
     # Correct for changeover period not being needed at the end of the day
     # This can go negative if there aren't many proposals accepted yet, so clamp to 0

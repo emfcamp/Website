@@ -1,35 +1,36 @@
 import time
-from urllib.parse import urlparse, urljoin
 
 from flask import (
-    render_template,
-    redirect,
-    request,
-    flash,
-    url_for,
-    abort,
     Blueprint,
-    current_app as app,
-    session,
+    abort,
+    flash,
+    redirect,
+    render_template,
     render_template_string,
+    request,
+    session,
+    url_for,
 )
-from markupsafe import Markup
-from flask_login import login_user, login_required, logout_user, current_user
+from flask import (
+    current_app as app,
+)
+from flask_login import current_user, login_required, login_user, logout_user
 from flask_mailman import EmailMessage
+from markupsafe import Markup
 from sqlalchemy import or_
-from wtforms import StringField, SubmitField, BooleanField
+from wtforms import BooleanField, StringField, SubmitField
 from wtforms.validators import DataRequired, ValidationError
 
-from main import db
-from models.user import User, verify_signup_code
-from models.cfp import Proposal, CFPMessage
+from apps.common import get_next_url
+from main import db, get_or_404
 from models.basket import Basket
+from models.cfp import CFPMessage, Proposal
+from models.user import User, verify_signup_code
 
-from ..common import set_user_currency, feature_flag
+from ..common import feature_flag, set_user_currency
 from ..common.email import from_email
-from ..common.forms import Form
 from ..common.fields import EmailField
-
+from ..common.forms import Form
 
 users = Blueprint("users", __name__)
 
@@ -56,23 +57,6 @@ def users_variables():
         "unread_count": unread_count,
         "view_name": request.url_rule.endpoint.replace("users.", "."),
     }
-
-
-def is_safe_url(target):
-    ref_url = urlparse(request.host_url)
-    test_url = urlparse(urljoin(request.host_url, target))
-    return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc
-
-
-def get_next_url(default=None):
-    next_url = request.args.get("next")
-    if next_url:
-        if is_safe_url(next_url):
-            return next_url
-        app.logger.error(f"Dropping unsafe next URL {repr(next_url)}")
-    if default is None:
-        default = url_for(".account")
-    return default
 
 
 class LoginForm(Form):
@@ -113,10 +97,7 @@ def login():
             login_user(user)
             session.permanent = True
             return redirect(get_next_url())
-        else:
-            flash(
-                "Your login link was invalid. Please enter your email address below to receive a new link."
-            )
+        flash("Your login link was invalid. Please enter your email address below to receive a new link.")
 
     form = LoginForm(request.form)
     if form.validate_on_submit():
@@ -168,8 +149,7 @@ class SignupForm(Form):
 
             msg = Markup(
                 render_template_string(
-                    "Account already exists. "
-                    'Please <a href="{{ url }}">click here</a> to log in.',
+                    'Account already exists. Please <a href="{{ url }}">click here</a> to log in.',
                     url=url_for("users.login", email=field.data),
                 )
             )
@@ -181,18 +161,14 @@ def signup():
     if not request.args.get("code"):
         abort(404)
 
-    uid = verify_signup_code(
-        app.config["SECRET_KEY"], time.time(), request.args.get("code")
-    )
+    uid = verify_signup_code(app.config["SECRET_KEY"], time.time(), request.args.get("code"))
     if uid is None:
-        flash(
-            "Your signup link was invalid. Please note that they expire after 6 hours."
-        )
+        flash("Your signup link was invalid. Please note that they expire after 6 hours.")
         abort(404)
 
-    user = User.query.get_or_404(uid)
+    user = get_or_404(db, User, uid)
     if not user.has_permission("admin"):
-        app.logger.warn("Signup link resolves to non-admin user %s", user)
+        app.logger.warning("Signup link resolves to non-admin user %s", user)
         abort(404)
 
     form = SignupForm()
@@ -237,25 +213,6 @@ def set_currency():
     set_user_currency(request.form["currency"])
     db.session.commit()
     return redirect(url_for("tickets.main"))
-
-
-@users.route("/sso/<site>")
-def sso(site=None):
-
-    volunteer_sites = [app.config["VOLUNTEER_SITE"]]
-    if "VOLUNTEER_CAMP_SITE" in app.config:
-        volunteer_sites.append(app.config["VOLUNTEER_CAMP_SITE"])
-
-    if site not in volunteer_sites:
-        abort(404)
-
-    if not current_user.is_authenticated:
-        return redirect(url_for(".login", next=url_for(".sso", site=site)))
-
-    key = app.config["VOLUNTEER_SECRET_KEY"]
-    sso_code = current_user.sso_code(key)
-
-    return redirect("https://%s/?p=sso&c=%s" % (site, sso_code))
 
 
 from . import account  # noqa

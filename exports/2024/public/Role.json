@@ -1,0 +1,311 @@
+{
+    "roles": {
+        "Arcade Assistant": {
+            "interested_volunteers": 254,
+            "shift_histogram": {
+                "1": 25,
+                "2": 3,
+                "3": 1
+            },
+            "total_volunteers": 29
+        },
+        "Badge Helper": {
+            "interested_volunteers": 319,
+            "shift_histogram": {
+                "1": 79,
+                "2": 1,
+                "6": 1
+            },
+            "total_volunteers": 81
+        },
+        "Bands: Artist Liaison": {
+            "interested_volunteers": 41,
+            "shift_histogram": {
+                "1": 2,
+                "2": 1
+            },
+            "total_volunteers": 3,
+            "trained_volunteers": 30
+        },
+        "Bands: Lighting Operator": {
+            "interested_volunteers": 31,
+            "shift_histogram": {
+                "1": 6,
+                "2": 1
+            },
+            "total_volunteers": 7,
+            "trained_volunteers": 23
+        },
+        "Bands: Sound Operator": {
+            "interested_volunteers": 23,
+            "shift_histogram": {
+                "1": 4,
+                "3": 1
+            },
+            "total_volunteers": 5,
+            "trained_volunteers": 19
+        },
+        "Bands: Sound Technician": {
+            "interested_volunteers": 118,
+            "shift_histogram": {
+                "1": 8
+            },
+            "total_volunteers": 8
+        },
+        "Bands: Stage Crew": {
+            "interested_volunteers": 149,
+            "shift_histogram": {
+                "1": 6
+            },
+            "total_volunteers": 6
+        },
+        "Bands: Venue Manager": {
+            "interested_volunteers": 28,
+            "shift_histogram": {
+                "1": 2
+            },
+            "total_volunteers": 2,
+            "trained_volunteers": 19
+        },
+        "Bar": {
+            "interested_volunteers": 489,
+            "shift_histogram": {
+                "1": 99,
+                "2": 26,
+                "3": 7,
+                "4": 4,
+                "5": 2
+            },
+            "total_volunteers": 138,
+            "trained_volunteers": 391
+        },
+        "CYBAR": {
+            "interested_volunteers": 367,
+            "shift_histogram": {
+                "1": 36,
+                "2": 6
+            },
+            "total_volunteers": 42,
+            "trained_volunteers": 391
+        },
+        "Cable Plugger": {
+            "interested_volunteers": 290,
+            "shift_histogram": {
+                "1": 32,
+                "2": 2,
+                "6": 1
+            },
+            "total_volunteers": 35
+        },
+        "Car Parking": {
+            "interested_volunteers": 147,
+            "shift_histogram": {
+                "1": 26,
+                "2": 2
+            },
+            "total_volunteers": 28
+        },
+        "Content Team": {
+            "interested_volunteers": 27,
+            "shift_histogram": {
+                "2": 1,
+                "3": 4,
+                "4": 1
+            },
+            "total_volunteers": 6,
+            "trained_volunteers": 6
+        },
+        "Entrance Steward": {
+            "interested_volunteers": 284,
+            "shift_histogram": {
+                "1": 54,
+                "2": 9,
+                "3": 2,
+                "4": 1
+            },
+            "total_volunteers": 66
+        },
+        "Fire installation manager": {
+            "interested_volunteers": 8,
+            "shift_histogram": {
+                "1": 2
+            },
+            "total_volunteers": 2
+        },
+        "Green Room Runner": {
+            "interested_volunteers": 171,
+            "shift_histogram": {
+                "1": 19,
+                "2": 2,
+                "3": 2,
+                "5": 1
+            },
+            "total_volunteers": 24
+        },
+        "Herald": {
+            "interested_volunteers": 225,
+            "shift_histogram": {
+                "1": 24,
+                "2": 4,
+                "3": 2,
+                "4": 1
+            },
+            "total_volunteers": 31
+        },
+        "Info Desk": {
+            "interested_volunteers": 250,
+            "shift_histogram": {
+                "1": 39,
+                "2": 9,
+                "3": 1
+            },
+            "total_volunteers": 49
+        },
+        "Kitchen Assistant": {
+            "interested_volunteers": 393,
+            "shift_histogram": {
+                "1": 123,
+                "2": 30,
+                "3": 7,
+                "4": 3,
+                "5": 3,
+                "6": 1,
+                "8": 1
+            },
+            "total_volunteers": 168
+        },
+        "Logistics Support": {
+            "interested_volunteers": 236,
+            "shift_histogram": {
+                "1": 66,
+                "2": 4,
+                "3": 1
+            },
+            "total_volunteers": 71
+        },
+        "Looking after Two Tin Cans (printing phone box)": {
+            "interested_volunteers": 21,
+            "shift_histogram": {
+                "1": 1
+            },
+            "total_volunteers": 1
+        },
+        "Null Sector Assistant": {
+            "interested_volunteers": 201,
+            "shift_histogram": {
+                "1": 22,
+                "2": 5
+            },
+            "total_volunteers": 27
+        },
+        "Phone Helpdesk Assistant": {
+            "interested_volunteers": 111,
+            "shift_histogram": {
+                "1": 7
+            },
+            "total_volunteers": 7
+        },
+        "Shop Helper": {
+            "interested_volunteers": 264,
+            "shift_histogram": {
+                "1": 21,
+                "2": 3
+            },
+            "total_volunteers": 24
+        },
+        "Talks: Camera Operator": {
+            "interested_volunteers": 143,
+            "shift_histogram": {
+                "1": 39,
+                "2": 11,
+                "3": 5,
+                "4": 1,
+                "5": 1
+            },
+            "total_volunteers": 57
+        },
+        "Talks: Sound/Lighting Operator": {
+            "interested_volunteers": 135,
+            "shift_histogram": {
+                "1": 13,
+                "2": 10,
+                "3": 1,
+                "4": 2
+            },
+            "total_volunteers": 26
+        },
+        "Talks: Venue Manager": {
+            "interested_volunteers": 62,
+            "shift_histogram": {
+                "1": 21,
+                "2": 7,
+                "4": 1
+            },
+            "total_volunteers": 29
+        },
+        "Talks: Vision Mixer": {
+            "interested_volunteers": 126,
+            "shift_histogram": {
+                "1": 27,
+                "2": 5,
+                "3": 1,
+                "4": 1
+            },
+            "total_volunteers": 34
+        },
+        "Vehicle Gate & Escorts": {
+            "interested_volunteers": 107,
+            "shift_histogram": {
+                "1": 39,
+                "2": 6,
+                "3": 2
+            },
+            "total_volunteers": 47
+        },
+        "Video Editor": {
+            "interested_volunteers": 120,
+            "shift_histogram": {
+                "1": 22,
+                "2": 8
+            },
+            "total_volunteers": 30
+        },
+        "Volunteer Manager": {
+            "interested_volunteers": 96,
+            "shift_histogram": {
+                "1": 16,
+                "2": 2,
+                "3": 1
+            },
+            "total_volunteers": 19
+        },
+        "Volunteer Welfare Assistant": {
+            "interested_volunteers": 156,
+            "shift_histogram": {
+                "1": 19,
+                "2": 2,
+                "3": 1
+            },
+            "total_volunteers": 22
+        },
+        "Workshop Steward": {
+            "interested_volunteers": 126,
+            "shift_histogram": {
+                "1": 27,
+                "2": 5,
+                "3": 1,
+                "4": 1
+            },
+            "total_volunteers": 34,
+            "trained_volunteers": 62
+        },
+        "Youth Workshop Helper": {
+            "interested_volunteers": 146,
+            "shift_histogram": {
+                "1": 11,
+                "2": 2
+            },
+            "total_volunteers": 13
+        }
+    }
+}

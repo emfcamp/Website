@@ -117,6 +117,7 @@ static/.webassets-cache/
 
 config/live.cfg*
 config/development.cfg
+logging.override.yaml
 
 .inside-vagrant
 .vagrant
@@ -130,13 +131,9 @@ node_modules
 .idea/
 
 # Compiled static assets
-static/*
 !static/financial-statements
 !static/fonts
 !static/deliveries.pdf
 
-# Hashed files created by flask-static-digest
-static/**/*-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].*
-static/**/*.gz
-static/cache_manifest.json
-
+cov.md
+mypy-report/

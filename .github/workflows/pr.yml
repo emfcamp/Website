@@ -1,9 +1,11 @@
 name: Test
 
-on: [pull_request]
+on: 
+  pull_request:
+  merge_group:
 
-env:
-  COMPOSE_INTERACTIVE_NO_CLI: 1
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
@@ -11,12 +13,5 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Fetch latest docker-compose
-        run: sudo curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-      - name: Build containers
-        run: docker-compose -f ./docker-compose.yml -f ./docker-compose.ci.yml build --parallel
-      - name: Test
-        run: docker-compose -f ./docker-compose.yml -f ./docker-compose.ci.yml run -T app poetry run make test
+    name: Run tests
+    uses: ./.github/workflows/test.yml

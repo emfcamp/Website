@@ -1,23 +1,26 @@
 import json
-from icalendar import Calendar, Event
-from flask import request, abort, current_app as app, Response
+
+from flask import Response, abort, request
+from flask import current_app as app
 from flask_cors import cross_origin
 from flask_login import current_user
+from icalendar import Calendar, Event
 
+from main import db, get_or_404
 from models import event_year
-from models.user import User
 from models.cfp import Proposal
+from models.user import User
 
-from ..common import feature_flag, feature_enabled, json_response
-from .schedule_xml import export_frab
-from .historic import feed_historic
+from ..common import feature_enabled, feature_flag, json_response
+from . import schedule
 from .data import (
-    _get_scheduled_proposals,
-    _get_proposal_dict,
     _convert_time_to_str,
+    _get_proposal_dict,
+    _get_scheduled_proposals,
     _get_upcoming,
 )
-from . import schedule
+from .historic import feed_historic
+from .schedule_xml import export_frab
 
 
 def _format_event_description(event):
@@ -29,14 +32,14 @@ def _format_event_description(event):
 
     footer_block = []
     if event["link"]:
-        footer_block.append(f'Link: {event["link"]}')
+        footer_block.append(f"Link: {event['link']}")
     if event["venue"]:
         venue_str = event["venue"]
         if event["map_link"]:
-            venue_str = f'{venue_str} ({event["map_link"]})'
-        footer_block.append(f'Venue: {venue_str}')
+            venue_str = f"{venue_str} ({event['map_link']})"
+        footer_block.append(f"Venue: {venue_str}")
     if footer_block:
-        description += '\n\n' + '\n'.join(footer_block)
+        description += "\n\n" + "\n".join(footer_block)
 
     return description
 
@@ -47,7 +50,7 @@ def schedule_json(year):
     if year != event_year():
         return feed_historic(year, "json")
 
-    if not feature_enabled('SCHEDULE'):
+    if not feature_enabled("SCHEDULE"):
         abort(404)
 
     schedule = [_convert_time_to_str(p) for p in _get_scheduled_proposals(request.args)]
@@ -61,7 +64,7 @@ def schedule_frab(year):
     if year != event_year():
         return feed_historic(year, "frab")
 
-    if not feature_enabled('SCHEDULE'):
+    if not feature_enabled("SCHEDULE"):
         abort(404)
 
     schedule = (
@@ -88,11 +91,11 @@ def schedule_ical(year):
     if year != event_year():
         return feed_historic(year, "ics")
 
-    if not feature_enabled('SCHEDULE'):
+    if not feature_enabled("SCHEDULE"):
         abort(404)
 
     schedule = _get_scheduled_proposals(request.args)
-    title = "EMF {}".format(event_year())
+    title = f"EMF {event_year()}"
 
     cal = Calendar()
     cal.add("summary", title)
@@ -102,7 +105,7 @@ def schedule_ical(year):
 
     for event in schedule:
         cal_event = Event()
-        cal_event.add("uid", "%s-%s" % (year, event["id"]))
+        cal_event.add("uid", "{}-{}".format(year, event["id"]))
         cal_event.add("summary", event["title"])
         cal_event.add("description", _format_event_description(event))
         cal_event.add("location", event["venue"])
@@ -149,7 +152,7 @@ def favourites_ical():
         abort(404)
 
     schedule = _get_scheduled_proposals(request.args, override_user=user)
-    title = "EMF {} Favourites for {}".format(event_year(), user.name)
+    title = f"EMF {event_year()} Favourites for {user.name}"
 
     cal = Calendar()
     cal.add("summary", title)
@@ -161,7 +164,7 @@ def favourites_ical():
         if not event["is_fave"]:
             continue
         cal_event = Event()
-        cal_event.add("uid", "%s-%s" % (event_year(), event["id"]))
+        cal_event.add("uid", "{}-{}".format(event_year(), event["id"]))
         cal_event.add("summary", event["title"])
         cal_event.add("description", _format_event_description(event))
         cal_event.add("location", event["venue"])
@@ -172,12 +175,9 @@ def favourites_ical():
     return Response(cal.to_ical(), mimetype="text/calendar")
 
 
-@schedule.route("/now-and-next.json")
-@schedule.route("/upcoming.json")
-def upcoming():
-    return Response(
-        json.dumps(_get_upcoming(request.args)), mimetype="application/json"
-    )
+@schedule.route("/schedule/now-and-next.json")
+def now_and_next_json():
+    return Response(json.dumps(_get_upcoming(request.args)), mimetype="application/json")
 
 
 @schedule.route("/schedule/<int:year>/<int:proposal_id>.json")
@@ -187,7 +187,7 @@ def upcoming():
 def item_json(year, proposal_id, slug=None):
     if year != event_year():
         abort(404)
-    proposal = Proposal.query.get_or_404(proposal_id)
+    proposal = get_or_404(db, Proposal, proposal_id)
     if not proposal.is_accepted:
         abort(404)
 

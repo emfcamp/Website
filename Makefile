@@ -6,20 +6,23 @@ ifeq ("$(TEST_SETTINGS)", "")
 	TEST_SETTINGS=./config/test.cfg
 endif
 
-.PHONY: test check-syntax fix-syntax
+.PHONY: test check-syntax fix-syntax pytest
 
-test:
-	ruff check ./main.py ./apps ./models ./tests
-	mypy ./*.py ./apps ./models
-	SETTINGS_FILE=$(TEST_SETTINGS) pytest --random-order --cov=apps --cov=models ./tests/ ./models/
-#ifdef COVERALLS_REPO_TOKEN
-#	coveralls
-#endif
+test: check-syntax pytest
+
+pytest:
+	SETTINGS_FILE=$(TEST_SETTINGS) pytest --random-order --cov-report markdown:cov.md --cov=apps --cov=models ./tests/ ./models/
+	SETTINGS_FILE=$(TEST_SETTINGS) flask db upgrade
+	SETTINGS_FILE=$(TEST_SETTINGS) flask db check
 
 check-syntax:
-	ruff check ./main.py ./apps ./models ./tests
-	mypy ./*.py ./apps ./models
+	uv lock --check
+	ruff format --check ./*.py ./apps ./models ./tests
+	ruff check ./*.py ./apps ./models ./tests
+	mypy ./*.py ./apps ./models --txt-report mypy-report
+
 
 fix-syntax:
-	ruff check --fix ./main.py ./apps ./models ./tests
+	ruff format ./*.py ./apps ./models ./tests
+	ruff check --fix ./*.py ./apps ./models ./tests
 	mypy ./*.py ./apps ./models

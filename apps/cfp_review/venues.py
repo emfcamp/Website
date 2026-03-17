@@ -5,7 +5,9 @@ from flask import (
     flash,
 )
 
+from shapely import Point
 from wtforms import (
+    FloatField,
     StringField,
     SelectField,
     BooleanField,
@@ -14,9 +16,9 @@ from wtforms import (
     IntegerField,
 )
 from wtforms.validators import DataRequired, Optional
-from geoalchemy2.shape import to_shape
+from geoalchemy2.shape import to_shape, from_shape
 
-from main import db
+from main import db, get_or_404
 from models.cfp import Venue, Proposal, HUMAN_CFP_TYPES
 from models.village import Village
 from . import (
@@ -33,11 +35,10 @@ class VenueForm(Form):
     name = StringField("Name", [DataRequired()])
     village_id = SelectField("Village", choices=[], coerce=int)
     scheduled_content_only = BooleanField("Scheduled Content Only")
-    latlon = StringField("Location")
+    lat = FloatField("Latitude")
+    lon = FloatField("Longitude")
     allowed_types = SelectMultipleField("Allowed for", choices=VENUE_TYPE_CHOICES)
-    default_for_types = SelectMultipleField(
-        "Default Venue for", choices=VENUE_TYPE_CHOICES
-    )
+    default_for_types = SelectMultipleField("Default Venue for", choices=VENUE_TYPE_CHOICES)
     capacity = IntegerField("Capacity", validators=[Optional()])
     submit = SubmitField("Save")
     delete = SubmitField("Delete")
@@ -49,19 +50,24 @@ class VenueForm(Form):
             choices.append((v.id, v.name))
         self.village_id.choices = choices
 
-    def populate_from_venue(self, venue):
+    def populate_from_venue(self, venue: Venue):
         if venue.location is None:
-            self.latlon.data = ""
+            self.lat.data = self.lon.data = None
         else:
             latlon = to_shape(venue.location)
-            self.latlon.data = "{}, {}".format(latlon.x, latlon.y)
+            self.lat.data = latlon.y
+            self.lon.data = latlon.x
 
-    def populate_obj(self, venue):
-        super().populate_obj(venue)
+    def populate_obj(self, venue: Venue):
+        venue.scheduled_content_only = self.scheduled_content_only.data
+        assert self.allowed_types.data is not None
+        assert self.default_for_types.data is not None
+        venue.allowed_types = self.allowed_types.data
+        venue.default_for_types = self.default_for_types.data
+        venue.capacity = self.capacity.data
 
-        if self.latlon.data:
-            latlon = self.latlon.data.split(",")
-            location = f"POINT({latlon[0]} {latlon[1]})"
+        if self.lat.data is not None and self.lon.data is not None:
+            location = from_shape(Point(self.lon.data, self.lat.data))
         else:
             location = None
         venue.location = location
@@ -92,7 +98,7 @@ def venues():
 @cfp_review.route("/venues/<int:venue_id>", methods=["GET", "POST"])
 @admin_required
 def edit_venue(venue_id):
-    venue = Venue.query.get_or_404(venue_id)
+    venue = get_or_404(db, Venue, venue_id)
     form = VenueForm(obj=venue)
     if form.validate_on_submit():
         if form.delete.data:

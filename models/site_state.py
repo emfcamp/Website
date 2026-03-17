@@ -1,11 +1,17 @@
 import logging
-from datetime import datetime
 
-from sqlalchemy.orm.exc import MultipleResultsFound
+from sqlalchemy import select
+from sqlalchemy.exc import MultipleResultsFound
+from sqlalchemy.orm import Mapped, mapped_column
 
 from main import cache, db
-from . import config_date, BaseModel
-from .product import Product, ProductGroup, ProductView, ProductViewProduct, PriceTier
+
+from . import BaseModel, config_date, naive_utcnow
+from .product import PriceTier, Product, ProductGroup, ProductView, ProductViewProduct
+
+__all__ = [
+    "SiteState",
+]
 
 log = logging.getLogger(__name__)
 
@@ -13,9 +19,9 @@ log = logging.getLogger(__name__)
 class SiteState(BaseModel):
     __tablename__ = "site_state"
     __export_data__ = False
-    __versioned__: dict = {}
-    name = db.Column(db.String, primary_key=True)
-    state = db.Column(db.String)
+    __versioned__: dict[str, str] = {}
+    name: Mapped[str] = mapped_column(primary_key=True)
+    state: Mapped[str]
 
     def __init__(self, name, state=None):
         self.name = name
@@ -54,23 +60,16 @@ def calc_sales_state(date):
     if site_capacity.get_total_remaining_capacity() < 1:
         # We've hit capacity - no more tickets will be sold
         return "sold-out"
-    elif date > config_date("EVENT_END"):
+    if date > config_date("EVENT_END"):
         return "sales-ended"
 
     # Active price tier for the full ticket product in the main flow.
     view = ProductView.query.filter_by(name="main")
-    product = view.join(ProductViewProduct, Product).filter_by(name="full")
+    product = view.join(ProductViewProduct).join(Product).filter_by(name="full")
     try:
-        tier = (
-            product.join(Product.price_tiers)
-            .filter_by(active=True)
-            .with_entities(PriceTier)
-            .one_or_none()
-        )
+        tier = product.join(Product.price_tiers).filter_by(active=True).with_entities(PriceTier).one_or_none()
     except MultipleResultsFound:
-        log.error(
-            "Multiple active PriceTiers found. Forcing sales state to unavailable."
-        )
+        log.error("Multiple active PriceTiers found. Forcing sales state to unavailable.")
         return "unavailable"
 
     if tier is None or tier.has_expired() or tier.get_total_remaining_capacity() <= 0:
@@ -82,10 +81,9 @@ def calc_sales_state(date):
 
 @cache.cached(timeout=60, key_prefix="get_states")
 def get_states() -> dict[str, str]:
-    states = SiteState.query.all()
-    states = {s.name: s.state for s in states}
+    states = {s.name: s.state for s in db.session.execute(select(SiteState)).scalars().all()}
 
-    date = datetime.utcnow()
+    date = naive_utcnow()
 
     if states.get("site_state") is None:
         states["site_state"] = "before-sales"

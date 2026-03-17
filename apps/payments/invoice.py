@@ -1,30 +1,34 @@
+import logging
+import os.path
+import shutil
 from collections import namedtuple
 from decimal import Decimal
-import logging
-import shutil
-import os.path
 
 from flask import (
     abort,
-    current_app as app,
-    request,
-    render_template,
-    redirect,
     flash,
-    url_for,
+    redirect,
+    render_template,
+    request,
     send_file,
+    url_for,
 )
-from flask_login import login_required, current_user
+from flask import (
+    current_app as app,
+)
+from flask_login import current_user, login_required
+from sqlalchemy import select
 from sqlalchemy.sql.functions import func
-from wtforms import TextAreaField, SubmitField
+from wtforms import SubmitField, TextAreaField
 
-from main import external_url, db
-from ..common.receipt import render_pdf
-from models.product import Product, PriceTier
+from apps.payments.common import get_user_payment_or_abort
+from main import db, external_url
+from models.product import PriceTier, Product
 from models.purchase import Purchase
+
 from ..common.epc import format_inline_epc_qr
 from ..common.forms import Form
-from . import get_user_payment_or_abort
+from ..common.receipt import render_pdf
 from . import payments
 
 logger = logging.getLogger(__name__)
@@ -35,13 +39,16 @@ class InvoiceForm(Form):
     update = SubmitField("Update")
 
 
-InvoiceLine = namedtuple("InvoiceLine", [
-    "price_tier",
-    "quantity",
-    "vat_rate",
-    "vat_amount",
-    "price",
-])
+InvoiceLine = namedtuple(
+    "InvoiceLine",
+    [
+        "price_tier",
+        "quantity",
+        "vat_rate",
+        "vat_amount",
+        "price",
+    ],
+)
 
 
 @payments.route("/payment/<int:payment_id>/receipt", methods=["GET", "POST"])
@@ -73,19 +80,26 @@ def invoice(payment_id, fmt=None):
     if request.args.get("js") == "0":
         flash("Please use your browser's print feature or download the PDF")
 
-    invoice_lines_query = (
-        Purchase.query.filter_by(payment_id=payment_id)
-        .join(PriceTier, Product)
-        .with_entities(PriceTier, func.count(Purchase.price_tier_id))
-        .group_by(PriceTier, Product.name)
-        .order_by(Product.name)
+    price_tier_counts = (
+        db.session.execute(
+            select(Purchase)
+            .filter_by(payment_id=payment_id)
+            .join(PriceTier)
+            .join(Product)
+            .with_only_columns(PriceTier, func.count(Purchase.price_tier_id))
+            .group_by(PriceTier.id, Product.name)
+            .order_by(Product.name)
+        )
+        .tuples()
         .all()
     )
 
     invoice_lines = []
     prices = []
-    for pt, count in invoice_lines_query:
+    for pt, count in price_tier_counts:
         price = pt.get_price(payment.currency)
+        if price is None:
+            raise ValueError(f"No pricetier '{pt}' price found for currency {payment.currency}")
         prices.append(
             {
                 "sum_ex_vat": price.value_ex_vat * count,
@@ -151,7 +165,7 @@ def invoice(payment_id, fmt=None):
     if mode == "invoice":
         invoice_dir = "/vat_invoices"
         if not os.path.exists(invoice_dir):
-            logger.warn(
+            logger.warning(
                 "Not exporting VAT invoice as directory (%s) does not exist",
                 invoice_dir,
             )

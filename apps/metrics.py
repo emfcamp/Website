@@ -1,21 +1,20 @@
-from flask import Response, Blueprint
+from flask import Blueprint, Response
 from prometheus_client import (
-    PlatformCollector,
-    CollectorRegistry,
-    generate_latest,
     CONTENT_TYPE_LATEST,
+    CollectorRegistry,
+    PlatformCollector,
+    generate_latest,
 )
-from prometheus_client.core import GaugeMetricFamily, Histogram, Counter
+from prometheus_client.core import Counter, GaugeMetricFamily, Histogram
 from prometheus_client.multiprocess import MultiProcessCollector
-from sqlalchemy import cast, String, case, func
-from datetime import datetime
+from sqlalchemy import String, case, cast, func
 
-from models import count_groups
+from models import count_groups, naive_utcnow
+from models.cfp import Proposal
 from models.email import EmailJobRecipient
 from models.payment import Payment
-from models.product import Product, ProductView, Voucher, VOUCHER_GRACE_PERIOD
-from models.purchase import Purchase, AdmissionTicket
-from models.cfp import Proposal
+from models.product import VOUCHER_GRACE_PERIOD, Product, ProductView, Voucher
+from models.purchase import AdmissionTicket, Purchase
 from models.volunteer.role import Role
 from models.volunteer.shift import Shift, ShiftEntry
 from models.volunteer.volunteer import Volunteer
@@ -42,6 +41,9 @@ class ExternalMetrics:
         emf_purchases = GaugeMetricFamily(
             "emf_purchases", "Tickets purchased", labels=["product", "state", "type"]
         )
+        emf_checked_in_purchases = GaugeMetricFamily(
+            "emf_checked_in_purchases", "Purchases by checkin state", labels=["product", "type", "checked_in"]
+        )
         emf_payments = GaugeMetricFamily("emf_payments", "Payments received", labels=["provider", "state"])
         emf_attendees = GaugeMetricFamily("emf_attendees", "Attendees", labels=["checked_in"])
         emf_proposals = GaugeMetricFamily("emf_proposals", "CfP Submissions", labels=["type", "state"])
@@ -59,6 +61,13 @@ class ExternalMetrics:
             Product.name,
             Purchase.state,
             Purchase.type,
+        )
+        gauge_groups(
+            emf_checked_in_purchases,
+            Purchase.query.join(Product),
+            Product.name,
+            Purchase.type,
+            cast(Purchase.redeemed, String),
         )
         gauge_groups(emf_payments, Payment.query, Payment.provider, Payment.state)
         gauge_groups(
@@ -78,12 +87,12 @@ class ExternalMetrics:
             Voucher.query.join(ProductView),
             ProductView.name,
             case(
-                (Voucher.is_used == True, "used"),  # noqa: E712
+                (Voucher.is_used == True, "used"),
                 (
                     (Voucher.expiry != None)  # noqa: E711
-                    & (Voucher.expiry < datetime.utcnow() - VOUCHER_GRACE_PERIOD),
+                    & (Voucher.expiry < naive_utcnow() - VOUCHER_GRACE_PERIOD),
                     "expired",
-                ),  # noqa: E712
+                ),
                 else_="active",
             ),
         )
@@ -133,6 +142,7 @@ class ExternalMetrics:
 
         return [
             emf_purchases,
+            emf_checked_in_purchases,
             emf_payments,
             emf_attendees,
             emf_proposals,

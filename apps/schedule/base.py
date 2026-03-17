@@ -1,13 +1,14 @@
 import html
 import random
-import pendulum
-from datetime import datetime, timedelta
 from collections import defaultdict
+from datetime import datetime, timedelta
 
-from flask import render_template, redirect, url_for, flash, request, abort
-from flask_login import current_user
+import pendulum
+from flask import abort, flash, redirect, render_template, request, url_for
 from flask import current_app as app
-
+from flask.typing import ResponseValue
+from flask_login import current_user
+from sqlalchemy import select
 from wtforms import (
     FieldList,
     FormField,
@@ -17,25 +18,22 @@ from wtforms import (
     SubmitField,
 )
 
-from main import db
+from main import db, get_or_404
 from models import event_year
-from models.cfp import Proposal, Venue, HUMAN_CFP_TYPES, WorkshopProposal
-from models.ical import CalendarSource, CalendarEvent
-from models.user import generate_api_token
 from models.admin_message import AdminMessage
+from models.cfp import HUMAN_CFP_TYPES, Proposal, Venue, WorkshopProposal
 from models.event_tickets import EventTicket
 from models.site_state import get_signup_state
+from models.user import generate_api_token
 
-from ..common import feature_flag, feature_enabled
-from ..common.forms import Form
-from ..common.fields import HiddenIntegerField
-from ..volunteer import v_user_required
 from ..cfp_review import admin_required as cfp_admin_required
-
-from . import schedule, event_tz
-from .historic import talks_historic, item_historic, historic_talk_data
+from ..common import feature_enabled, feature_flag
+from ..common.fields import HiddenIntegerField
+from ..common.forms import Form
+from ..volunteer import v_user_required
+from . import event_tz, schedule
 from .data import _get_upcoming
-
+from .historic import historic_talk_data, item_historic, talks_historic
 
 # This controls both which types show on lineup and favourites, and in which order they are presented.
 LINEUP_TYPE_ORDER = ["talk", "workshop", "youthworkshop", "performance"]
@@ -55,14 +53,12 @@ def main_year(year):
         if feature_enabled("SCHEDULE"):
             # Schedule is ready, show it
             return schedule_current()
-        elif feature_enabled("LINE_UP"):
+        if feature_enabled("LINE_UP"):
             # Show the lineup (list of talks without times/venues)
             return line_up()
-        else:
-            # No schedule should be shown yet.
-            return render_template("schedule/no-schedule.html")
-    else:
-        return talks_historic(year)
+        # No schedule should be shown yet.
+        return render_template("schedule/no-schedule.html")
+    return talks_historic(year)
 
 
 def schedule_current():
@@ -76,13 +72,6 @@ def schedule_current():
         debug=app.config.get("DEBUG"),
         year=event_year(),
     )
-
-
-def _group_proposals_by_human_type(proposals: list[Proposal]) -> dict[str, list[Proposal]]:
-    grouped = defaultdict(list)
-    for proposal in proposals:
-        grouped[proposal.human_type].append(proposal)
-    return grouped
 
 
 # FIXME this should probably work for other years
@@ -100,47 +89,30 @@ def line_up():
     # (Because we don't want a bias in starring)
     random.Random(current_user.get_id()).shuffle(proposals)
 
-    externals = CalendarSource.get_enabled_events()
-
     return render_template(
         "schedule/line-up.html",
-        proposals=_group_proposals_by_human_type(proposals),
-        externals=externals,
-        human_types=LINEUP_ORDER_HUMAN,
+        proposals=proposals,
     )
 
 
-@schedule.route("/schedule/add_favourite", methods=["POST"])
+@schedule.route("/schedule/add-favourite", methods=["POST"])
 def add_favourite():
     if not current_user.is_authenticated:
         abort(401)
 
     event_id = int(request.form["fave"])
     event_type = request.form["event_type"]
-    if event_type == "proposal":
-        proposal = Proposal.query.get_or_404(event_id)
-        if proposal in current_user.favourites:
-            current_user.favourites.remove(proposal)
-        else:
-            current_user.favourites.append(proposal)
+    if event_type != "proposal":
+        abort(400)
 
-        db.session.commit()
-        return redirect(
-            url_for(".main_year", year=event_year())
-            + "#proposal-{}".format(proposal.id)
-        )
-
+    proposal = get_or_404(db, Proposal, event_id)
+    if proposal in current_user.favourites:
+        current_user.favourites.remove(proposal)
     else:
-        event = CalendarEvent.query.get_or_404(event_id)
-        if event in current_user.calendar_favourites:
-            current_user.calendar_favourites.remove(event)
-        else:
-            current_user.calendar_favourites.append(event)
+        current_user.favourites.append(proposal)
 
-        db.session.commit()
-        return redirect(
-            url_for(".main_year", year=event_year()) + "#event-{}".format(event.id)
-        )
+    db.session.commit()
+    return redirect(url_for(".main_year", year=event_year()) + f"#proposal-{proposal.id}")
 
 
 @schedule.route("/favourites", methods=["GET", "POST"])
@@ -149,53 +121,40 @@ def favourites():
     if (request.method == "POST") and current_user.is_authenticated:
         event_id = int(request.form["fave"])
         event_type = request.form["event_type"]
-        if event_type == "proposal":
-            proposal = Proposal.query.get_or_404(event_id)
-            if proposal in current_user.favourites:
-                current_user.favourites.remove(proposal)
-            else:
-                current_user.favourites.append(proposal)
+        if event_type != "proposal":
+            abort(400)
 
-            db.session.commit()
-            return redirect(url_for(".favourites") + "#proposal-{}".format(proposal.id))
-
+        proposal = get_or_404(db, Proposal, event_id)
+        if proposal in current_user.favourites:
+            current_user.favourites.remove(proposal)
         else:
-            event = CalendarEvent.query.get_or_404(event_id)
-            if event in current_user.calendar_favourites:
-                current_user.calendar_favourites.remove(event)
-            else:
-                current_user.calendar_favourites.append(event)
+            current_user.favourites.append(proposal)
 
-            db.session.commit()
-            return redirect(url_for(".favourites") + "#event-{}".format(event.id))
+        db.session.commit()
+        return redirect(url_for(".favourites") + f"#proposal-{proposal.id}")
 
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for(".favourites")))
 
     proposals = [p for p in current_user.favourites if not p.hide_from_schedule]
-    externals = current_user.calendar_favourites
 
     token = generate_api_token(app.config["SECRET_KEY"], current_user.id)
 
     return render_template(
         "schedule/favourites.html",
-        proposals=_group_proposals_by_human_type(proposals),
-        externals=externals,
+        proposals=proposals,
         token=token,
-        human_types=LINEUP_ORDER_HUMAN
+        human_types=LINEUP_ORDER_HUMAN,
     )
 
 
 @schedule.route("/schedule/<int:year>/<int:proposal_id>", methods=["GET", "POST"])
-@schedule.route(
-    "/schedule/<int:year>/<int:proposal_id>-<slug>", methods=["GET", "POST"]
-)
+@schedule.route("/schedule/<int:year>/<int:proposal_id>-<slug>", methods=["GET", "POST"])
 def item(year, proposal_id, slug=None):
     """Display a detail page for a schedule item"""
     if year == event_year():
         return item_current(year, proposal_id, slug)
-    else:
-        return item_historic(year, proposal_id, slug)
+    return item_historic(year, proposal_id, slug)
 
 
 class ItemForm(Form):
@@ -208,7 +167,7 @@ class ItemForm(Form):
 
 def item_current(year, proposal_id, slug=None):
     """Display a detail page for a talk from the current event"""
-    proposal = Proposal.query.get_or_404(proposal_id)
+    proposal = get_or_404(db, Proposal, proposal_id)
     if not proposal.is_accepted or proposal.hide_from_schedule:
         abort(404)
 
@@ -252,7 +211,7 @@ def item_current(year, proposal_id, slug=None):
                     ticket.reenter_lottery()
                     msg = f'Re-entered lottery for "{proposal.display_title}" tickets'
                 else:
-                    msg = f"Updated ticket count"
+                    msg = "Updated ticket count"
                 ticket.ticket_count = form.ticket_count.data
 
             elif form.get_ticket.data:
@@ -263,12 +222,10 @@ def item_current(year, proposal_id, slug=None):
                 else:
                     # it's already in 'ticket' state so just re-issue codes
                     ticket.issue_codes()
-                    msg = f"Updated ticket count"
+                    msg = "Updated ticket count"
 
         elif form.get_ticket.data or form.enter_lottery.data:
-            ticket = EventTicket.create_ticket(
-                current_user, proposal, form.ticket_count.data
-            )
+            ticket = EventTicket.create_ticket(current_user, proposal, form.ticket_count.data)
 
             if ticket.state == "entered-lottery":
                 msg = f'Entered lottery for "{proposal.display_title}"'
@@ -280,7 +237,6 @@ def item_current(year, proposal_id, slug=None):
         flash(msg)
         return redirect(url_for(".event_tickets"))
 
-
     if proposal.type in ["workshop", "youthworkshop"]:
         if ticket:
             form.ticket_count.data = ticket.ticket_count
@@ -290,9 +246,7 @@ def item_current(year, proposal_id, slug=None):
             form.ticket_count.data = form.ticket_count.choices[0][0]
 
     if slug != proposal.slug:
-        return redirect(
-            url_for(".item", year=year, proposal_id=proposal.id, slug=proposal.slug)
-        )
+        return redirect(url_for(".item", year=year, proposal_id=proposal.id, slug=proposal.slug))
 
     venue_name = None
     if proposal.scheduled_venue:
@@ -348,9 +302,7 @@ def event_tickets():
         ticket._form = form.tickets[-1]
         tickets_dict[ticket.state][ticket.proposal.type].append(ticket)
 
-    return render_template(
-        "schedule/event_tickets.html", tickets=tickets_dict, form=form
-    )
+    return render_template("schedule/event_tickets.html", tickets=tickets_dict, form=form)
 
 
 @schedule.route("/api/schedule/tickets/<int:ticket_id>/cancel", methods=["POST"])
@@ -358,7 +310,7 @@ def cancel_event_ticket(ticket_id):
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for("schedule.event_tickets")))
 
-    ticket = EventTicket.query.get_or_404(ticket_id)
+    ticket = get_or_404(db, EventTicket, ticket_id)
 
     if ticket.user != current_user:
         abort(401)
@@ -396,8 +348,6 @@ def time_machine():
     now_time = now.time()
     now_weekday = now.weekday()
 
-    days = [4, 5, 6]  # Friday  # Saturday  # Sunday
-
     years = [2012, 2014, 2016, 2018, 2022]
 
     # Year -> Stage -> Talks
@@ -412,10 +362,7 @@ def time_machine():
                 break
 
         filtered_talks = [
-            t
-            for t in talks
-            if t["end_date"].weekday() == now_weekday
-            and t["end_date"].time() >= now_time
+            t for t in talks if t["end_date"].weekday() == now_weekday and t["end_date"].time() >= now_time
         ]
 
         for talk in sorted(filtered_talks, key=lambda v: v["start_date"]):
@@ -444,12 +391,12 @@ def herald_main():
 class HeraldCommsForm(Form):
     talk_id = HiddenIntegerField()
     video_privacy = SelectField(
-      "Recording",
-      choices=[
-        ("public", "Stream and record"),
-        ("review", "Do not stream, and do not publish until reviewed"),
-        ("none", "Do not stream or record"),
-      ],
+        "Recording",
+        choices=[
+            ("public", "Stream and record"),
+            ("review", "Do not stream, and do not publish until reviewed"),
+            ("none", "Do not stream or record"),
+        ],
     )
     update = SubmitField("Update info")
 
@@ -473,9 +420,7 @@ def herald_venue(venue_name):
             end = datetime.now() + timedelta(days=1)
         else:
             end = proposal.scheduled_time + timedelta(minutes=proposal.scheduled_duration)
-        return AdminMessage(
-            f"[{venue_name}] -- {message}", current_user, end=end, topic="heralds"
-        )
+        return AdminMessage(f"[{venue_name}] -- {message}", current_user, end=end, topic="heralds")
 
     proposals = (
         Proposal.query.join(Venue, Venue.id == Proposal.scheduled_venue_id)
@@ -548,6 +493,7 @@ class GreenroomArrivedForm(Form):
     speakers = SelectField("Speaker name")
     arrived = SubmitField("Arrived")
 
+
 class GreenroomMessageForm(Form):
     message = StringField("Message")
     send_message = SubmitField("Send message")
@@ -559,9 +505,7 @@ def greenroom():
     def greenroom_message(message):
         app.logger.info(f"Creating new message '{message}'")
         end = datetime.now() + timedelta(hours=1)
-        return AdminMessage(
-            f"[greenroom] -- {message}", current_user, end=end, topic="heralds"
-        )
+        return AdminMessage(f"[greenroom] -- {message}", current_user, end=end, topic="heralds")
 
     show = request.args.get("show", default=10, type=int)
     arrived_form = GreenroomArrivedForm()
@@ -579,9 +523,7 @@ def greenroom():
         .limit(show)
         .all()
     )
-    arrived_form.speakers.choices = [
-        (prop.published_names or prop.user.name) for prop in upcoming
-    ]
+    arrived_form.speakers.choices = [(prop.published_names or prop.user.name) for prop in upcoming]
 
     if arrived_form.arrived.data:
         if arrived_form.validate_on_submit():
@@ -599,7 +541,7 @@ def greenroom():
             db.session.add(msg)
             db.session.commit()
 
-            flash(f"Message sent")
+            flash("Message sent")
             return redirect(url_for(".greenroom"))
 
     messages = AdminMessage.get_all_for_topic("heralds")
@@ -614,7 +556,7 @@ def greenroom():
 
 
 class CheckInEventTicketCodeForm(Form):
-    code = HiddenField("code") # Will be hidden
+    code = HiddenField("code")  # Will be hidden
     use_code = SubmitField("Check-in Code")
 
 
@@ -630,34 +572,36 @@ class WorkshopCheckingForm(Form):
 
 @schedule.route("/schedule/workshop-steward")
 def workshop_steward_main():
-    workshop_venues = Venue.query.filter(
-            Venue.allowed_types.any('workshop')
-        ).all()
+    workshop_venues = Venue.query.filter(Venue.allowed_types.any("workshop")).all()
 
-    youthworkshop_venues = Venue.query.filter(
-            Venue.allowed_types.any('youthworkshop')
-        ).all()
-    return render_template("schedule/workshop-steward/main.html", workshop_venues=workshop_venues, youthworkshop_venues=youthworkshop_venues)
+    youthworkshop_venues = Venue.query.filter(Venue.allowed_types.any("youthworkshop")).all()
+    return render_template(
+        "schedule/workshop-steward/main.html",
+        workshop_venues=workshop_venues,
+        youthworkshop_venues=youthworkshop_venues,
+    )
 
 
 @schedule.route("/schedule/workshop-steward/<int:venue_id>")
 @v_user_required
-def workshop_steward_venue(venue_id: int):
-    venue = Venue.query.get_or_404(venue_id)
+def workshop_steward_venue(venue_id: int) -> ResponseValue:
+    venue = get_or_404(db, Venue, venue_id)
     workshops = (
-        WorkshopProposal.query
-        .filter_by(scheduled_venue_id=venue_id)
-        .filter(
-            WorkshopProposal.type.in_(venue.allowed_types),
-            WorkshopProposal.is_accepted,
-            WorkshopProposal.scheduled_time > (
-                pendulum.now(event_tz.zone).naive() - timedelta(hours=1)),
-            WorkshopProposal.scheduled_duration.isnot(None),
-            WorkshopProposal.hide_from_schedule.isnot(True),
-            WorkshopProposal.user_scheduled.isnot(True),
-            WorkshopProposal.requires_ticket.is_(True),
+        db.session.execute(
+            select(WorkshopProposal)
+            .where(
+                WorkshopProposal.scheduled_venue_id == venue_id,
+                WorkshopProposal.type.in_(venue.allowed_types),
+                WorkshopProposal.is_accepted,
+                WorkshopProposal.scheduled_time > (pendulum.now(event_tz.zone).naive() - timedelta(hours=1)),
+                WorkshopProposal.scheduled_duration.isnot(None),
+                WorkshopProposal.hide_from_schedule.isnot(True),
+                WorkshopProposal.user_scheduled.isnot(True),
+                WorkshopProposal.requires_ticket.is_(True),
+            )
+            .order_by(WorkshopProposal.scheduled_time)
         )
-        .order_by(WorkshopProposal.scheduled_time)
+        .scalars()
         .all()
     )
     return render_template("schedule/workshop-steward/venue.html", venue=venue, all_workshops=workshops)
@@ -666,7 +610,7 @@ def workshop_steward_venue(venue_id: int):
 @schedule.route("/schedule/workshop-steward/workshop/<int:workshop_id>", methods=["GET", "POST"])
 @v_user_required
 def workshop_steward(workshop_id):
-    workshop = WorkshopProposal.query.get_or_404(workshop_id)
+    workshop = get_or_404(db, WorkshopProposal, workshop_id)
     user_role_strs = [r.name for r in current_user.volunteer.interested_roles.all()]
 
     # Require that the user has the appropriate role & only show the attendee list the hour before
@@ -677,7 +621,9 @@ def workshop_steward(workshop_id):
         abort(401)
 
     show_list_after = event_tz.localize(workshop.scheduled_time - pendulum.duration(minutes=60))
-    show_list_before = event_tz.localize(workshop.scheduled_time + pendulum.duration(minutes=(workshop.scheduled_duration+60)))
+    show_list_before = event_tz.localize(
+        workshop.scheduled_time + pendulum.duration(minutes=(workshop.scheduled_duration + 60))
+    )
 
     if app.config.get("DEBUG") and request.args.get("time_locked", False):
         time_locked = False
@@ -686,7 +632,7 @@ def workshop_steward(workshop_id):
         time_locked = False
 
     else:
-        flash(f"The attendee list will be visible after { show_list_after }")
+        flash(f"The attendee list will be visible after {show_list_after}")
         time_locked = True
 
     # Now actually do the form
@@ -715,7 +661,6 @@ def workshop_steward(workshop_id):
         form.event_tickets.append_entry()
         form.event_tickets[-1]._ticket = event_ticket
         form.event_tickets[-1].event_ticket_id.data = event_ticket.id
-
 
         for code in event_ticket.ticket_codes.split(","):
             form.event_tickets[-1].codes.append_entry()

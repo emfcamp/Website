@@ -1,41 +1,49 @@
 import os
-from typing import Optional
 
+import requests
 from flask import (
-    render_template,
-    redirect,
-    request,
-    flash,
     Blueprint,
-    url_for,
-    send_from_directory,
     abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    url_for,
+)
+from flask import (
     current_app as app,
 )
 from flask_login import current_user
-import requests
+from sqlalchemy import select
 
-from main import cache
-from models.product import Price, Product, ProductView, ProductViewProduct, PriceTier
+from main import cache, db
+from models import Currency
+from models.product import Price, PriceTier, Product, ProductView, ProductViewProduct
 from models.site_state import get_site_state
-
 
 base = Blueprint("base", __name__, cli_group=None)
 
 
 @cache.cached(timeout=60, key_prefix="get_full_price")
-def get_full_price() -> Optional[Price]:
+def get_full_price() -> Price | None:
     full = (
-        ProductView.query.filter_by(name="main")
-        .join(ProductViewProduct, Product, PriceTier)
-        .filter_by(active=True)
-        .order_by(ProductViewProduct.order)
-        .with_entities(PriceTier)
+        db.session.execute(
+            select(ProductView)
+            .where(ProductView.name == "main")
+            .join(ProductViewProduct)
+            .join(Product)
+            .join(PriceTier)
+            .filter_by(active=True)
+            .order_by(ProductViewProduct.order)
+            .with_only_columns(PriceTier)
+        )
+        .scalars()
         .first()
     )
 
     if full is not None:
-        return full.get_price("GBP")
+        return full.get_price(Currency.GBP)
 
     return None
 
@@ -54,7 +62,7 @@ def main():
     ):
         return redirect(url_for("users.account"))
 
-    return render_template("home/%s.html" % state, full_price=get_full_price())
+    return render_template(f"home/{state}.html", full_price=get_full_price())
 
 
 @base.route("/", methods=["POST"])
@@ -70,7 +78,7 @@ def main_post():
         return redirect(url_for(".main"))
 
     if honeypot_field != "":
-        app.logger.warn(
+        app.logger.warning(
             "Mailing list honeypot field failed for %s (IP %s)",
             email,
             request.remote_addr,
@@ -84,7 +92,7 @@ def main_post():
     )
 
     if response.status_code != 200:
-        app.logger.warn(
+        app.logger.warning(
             "Unable to subscribe to mailing list (HTTP %s): %s",
             response.status_code,
             response.text,
@@ -188,13 +196,18 @@ def subscribe():
 def emp():
     return render_template("emp.html")
 
+
 @base.route("/deliveries")
 def deliveries():
     return redirect("/static/deliveries.pdf")
 
+
 @base.route("/orga-links")
 def orga_links():
-    return redirect("https://docs.google.com/document/d/1AAkzW2J1keCYZj1vDaEWcmVNLIbUTHoqh1zCaZUgNHk/edit?usp=sharing")
+    return redirect(
+        "https://docs.google.com/document/d/1AAkzW2J1keCYZj1vDaEWcmVNLIbUTHoqh1zCaZUgNHk/edit?usp=sharing"
+    )
+
 
 from . import redirects  # noqa
 from . import about  # noqa

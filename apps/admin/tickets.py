@@ -1,38 +1,37 @@
-from . import admin
-
 from flask import (
-    render_template,
-    redirect,
-    flash,
-    url_for,
     current_app as app,
+)
+from flask import (
+    flash,
+    redirect,
+    render_template,
     send_file,
+    url_for,
 )
 from flask_mailman import EmailMessage
 
-from main import db, external_url
+from main import db, external_url, get_or_404
 from models.exc import CapacityException
+from models.product import Price, PriceTier, Product, ProductGroup
+from models.purchase import Purchase, PurchaseTransfer, Ticket
 from models.user import User
-from models.product import ProductGroup, Product, PriceTier, Price
-from models.purchase import Purchase, Ticket, PurchaseTransfer
-
-from .forms import (
-    IssueTicketsInitialForm,
-    IssueTicketsForm,
-    IssueFreeTicketsNewUserForm,
-    ReserveTicketsForm,
-    ReserveTicketsNewUserForm,
-    CancelTicketForm,
-    ConvertTicketForm,
-    TransferTicketInitialForm,
-    TransferTicketForm,
-    TransferTicketNewUserForm,
-)
 
 from ..common import feature_enabled
 from ..common.email import from_email
-from ..common.receipt import attach_tickets, set_tickets_emailed
-from ..common.receipt import render_receipt, render_pdf
+from ..common.receipt import attach_tickets, render_pdf, render_receipt, set_tickets_emailed
+from . import admin
+from .forms import (
+    CancelTicketForm,
+    ConvertTicketForm,
+    IssueFreeTicketsNewUserForm,
+    IssueTicketsForm,
+    IssueTicketsInitialForm,
+    ReserveTicketsForm,
+    ReserveTicketsNewUserForm,
+    TransferTicketForm,
+    TransferTicketInitialForm,
+    TransferTicketNewUserForm,
+)
 
 
 @admin.route("/tickets")
@@ -45,14 +44,14 @@ def tickets():
 
 @admin.route("/tickets/unpaid")
 def tickets_unpaid():
-    tickets = (
+    query = (
         Purchase.query.filter_by(is_paid_for=False)
         .filter(~Purchase.owner_id.is_(None))
+        .filter(Purchase.state.in_(["reserved", "admin-reserved", "payment-pending"]))
         .order_by(Purchase.id)
-        .all()
     )
 
-    return render_template("admin/tickets/tickets.html", tickets=tickets)
+    return render_template("admin/tickets/tickets.html", tickets=query.all())
 
 
 @admin.route("/tickets/issue", methods=["GET", "POST"])
@@ -61,7 +60,7 @@ def tickets_issue():
     if form.validate_on_submit():
         if form.issue_free.data:
             return redirect(url_for(".tickets_issue_free", email=form.email.data))
-        elif form.reserve.data:
+        if form.reserve.data:
             return redirect(url_for(".tickets_reserve", email=form.email.data))
     return render_template("admin/tickets/tickets-issue.html", form=form)
 
@@ -88,12 +87,10 @@ def tickets_issue_free(email):
 
     if form.validate_on_submit():
         if not user:
-            app.logger.info(
-                "Creating new user with email %s and name %s", email, form.name.data
-            )
+            app.logger.info("Creating new user with email %s and name %s", email, form.name.data)
             user = User(email, form.name.data)
             db.session.add(user)
-            flash("Created account for %s" % email)
+            flash(f"Created account for {email}")
 
         basket = form.create_basket(user)
         app.logger.info("Admin basket for %s %s", user.email, basket)
@@ -105,7 +102,7 @@ def tickets_issue_free(email):
 
         except CapacityException as e:
             db.session.rollback()
-            app.logger.warn("Limit exceeded creating admin tickets: %s", e)
+            app.logger.warning("Limit exceeded creating admin tickets: %s", e)
             return redirect(url_for(".tickets_issue_free", email=email))
 
         for p in basket.purchases:
@@ -140,9 +137,7 @@ def tickets_issue_free(email):
 
         flash(f"Allocated {len(basket.purchases)} {ticket_noun}")
         return redirect(url_for(".tickets_issue"))
-    return render_template(
-        "admin/tickets/tickets-issue-free.html", form=form, user=user, email=email
-    )
+    return render_template("admin/tickets/tickets-issue-free.html", form=form, user=user, email=email)
 
 
 @admin.route("/tickets/list-free")
@@ -150,26 +145,23 @@ def list_free_tickets():
     # Complimentary tickets and transferred tickets can both have no payment.
     # This page is actually intended to be a list of complimentary tickets.
     free_tickets = (
-        Purchase.query.join(PriceTier, Product)
+        Purchase.query.join(PriceTier)
+        .join(Product)
         .filter(
             Purchase.is_paid_for,
             Purchase.payment_id.is_(None),
-            ~PurchaseTransfer.query.filter(
-                PurchaseTransfer.purchase.expression
-            ).exists(),
+            ~PurchaseTransfer.query.filter(PurchaseTransfer.purchase.expression).exists(),
         )
         .order_by(Purchase.owner_id, Purchase.id)
         .all()
     )
 
-    return render_template(
-        "admin/tickets/tickets-list-free.html", free_tickets=free_tickets
-    )
+    return render_template("admin/tickets/tickets-list-free.html", free_tickets=free_tickets)
 
 
 @admin.route("/ticket/<int:ticket_id>", methods=["GET"])
 def view_ticket(ticket_id):
-    ticket = Ticket.query.get_or_404(ticket_id)
+    ticket = get_or_404(db, Ticket, ticket_id)
     return render_template(
         "admin/tickets/view_ticket.html",
         ticket=ticket,
@@ -178,7 +170,7 @@ def view_ticket(ticket_id):
 
 @admin.route("/ticket/<int:ticket_id>/cancel-free", methods=["GET", "POST"])
 def cancel_free_ticket(ticket_id):
-    ticket = Purchase.query.get_or_404(ticket_id)
+    ticket = get_or_404(db, Purchase, ticket_id)
 
     form = CancelTicketForm()
     if form.validate_on_submit():
@@ -191,17 +183,13 @@ def cancel_free_ticket(ticket_id):
             flash("Ticket cancelled")
             return redirect(url_for("admin.list_free_tickets"))
 
-    return render_template(
-        "admin/tickets/ticket-cancel-free.html", ticket=ticket, form=form
-    )
+    return render_template("admin/tickets/ticket-cancel-free.html", ticket=ticket, form=form)
 
 
 @admin.route("/ticket/<int:ticket_id>/convert")
-@admin.route(
-    "/ticket/<int:ticket_id>/convert/<int:price_tier_id>", methods=["GET", "POST"]
-)
+@admin.route("/ticket/<int:ticket_id>/convert/<int:price_tier_id>", methods=["GET", "POST"])
 def convert_ticket(ticket_id, price_tier_id=None):
-    ticket = Purchase.query.get_or_404(ticket_id)
+    ticket = get_or_404(db, Purchase, ticket_id)
 
     new_tier = None
     if price_tier_id is not None:
@@ -244,9 +232,7 @@ def convert_ticket(ticket_id, price_tier_id=None):
             return redirect(url_for(".convert_ticket", ticket_id=ticket.id))
 
     convertible_tiers = (
-        Price.query.filter_by(
-            currency=ticket.price.currency, price_int=ticket.price.price_int
-        )
+        Price.query.filter_by(currency=ticket.price.currency, price_int=ticket.price.price_int)
         .join(PriceTier)
         .with_entities(PriceTier)
         .order_by(PriceTier.id)
@@ -273,7 +259,8 @@ def tickets_reserve(email):
         new_user = False
 
     pts = (
-        PriceTier.query.join(Product, ProductGroup)
+        PriceTier.query.join(Product)
+        .join(ProductGroup)
         .order_by(ProductGroup.name, Product.display_name, Product.id)
         .all()
     )
@@ -286,7 +273,7 @@ def tickets_reserve(email):
 
             app.logger.info("Creating new user with email %s and name %s", email, name)
             user = User(email, name)
-            flash("Created account for %s" % name)
+            flash(f"Created account for {name}")
             db.session.add(user)
 
         basket = form.create_basket(user)
@@ -304,7 +291,7 @@ def tickets_reserve(email):
 
         except CapacityException as e:
             db.session.rollback()
-            app.logger.warn("Limit exceeded creating admin tickets: %s", e)
+            app.logger.warning("Limit exceeded creating admin tickets: %s", e)
             return redirect(url_for(".tickets_reserve", email=email))
 
         code = user.login_code(app.config["SECRET_KEY"])
@@ -330,24 +317,20 @@ def tickets_reserve(email):
         flash(f"Reserved {ticket_noun} and emailed {user.email}")
         return redirect(url_for(".tickets_issue"))
 
-    return render_template(
-        "admin/tickets/tickets-reserve.html", form=form, pts=pts, user=user
-    )
+    return render_template("admin/tickets/tickets-reserve.html", form=form, pts=pts, user=user)
 
 
 @admin.route("/tickets/<int:ticket_id>/transfer", methods=["GET", "POST"])
 def transfer_ticket(ticket_id):
     form = TransferTicketInitialForm()
     if form.validate_on_submit():
-        return redirect(
-            url_for(".transfer_ticket_user", ticket_id=ticket_id, email=form.email.data)
-        )
+        return redirect(url_for(".transfer_ticket_user", ticket_id=ticket_id, email=form.email.data))
     return render_template("admin/tickets/transfer-ticket.html", form=form)
 
 
 @admin.route("/tickets/<int:ticket_id>/transfer/<email>", methods=["GET", "POST"])
 def transfer_ticket_user(ticket_id, email):
-    ticket = Ticket.query.get_or_404(ticket_id)
+    ticket = get_or_404(db, Ticket, ticket_id)
 
     if not ticket.is_paid_for:
         flash("Unpaid tickets cannot be transferred")
@@ -370,7 +353,7 @@ def transfer_ticket_user(ticket_id, email):
 
             app.logger.info("Creating new user with email %s and name %s", email, name)
             user = User(email, name)
-            flash("Created account for %s" % name)
+            flash(f"Created account for {name}")
             db.session.add(user)
 
         ticket = Ticket.query.with_for_update().get(ticket.id)
@@ -380,31 +363,25 @@ def transfer_ticket_user(ticket_id, email):
         ticket.transfer(from_user=previous_owner, to_user=user)
         db.session.commit()
 
-        app.logger.info(
-            "Ticket %s transferred from %s to %s", ticket, previous_owner, user
-        )
+        app.logger.info("Ticket %s transferred from %s to %s", ticket, previous_owner, user)
 
         # We don't send any emails because this is an admin operation
 
-        flash("Transferred ticket {}".format(ticket.id))
+        flash(f"Transferred ticket {ticket.id}")
         return redirect(url_for(".user", user_id=user.id))
 
-    return render_template(
-        "admin/tickets/transfer-ticket-user.html", form=form, ticket=ticket, user=user
-    )
+    return render_template("admin/tickets/transfer-ticket-user.html", form=form, ticket=ticket, user=user)
 
 
 @admin.route("/user/<int:user_id>/tickets")
 @admin.route("/user/<int:user_id>/tickets<ext>")
 def user_tickets(user_id, ext=None):
-    user = User.query.get_or_404(user_id)
+    user = get_or_404(db, User, user_id)
 
     receipt = render_receipt(user)
 
     if ext == ".pdf":
         url = external_url(".user_tickets", user_id=user_id)
-        return send_file(
-            render_pdf(url, receipt), mimetype="application/pdf", max_age=60
-        )
+        return send_file(render_pdf(url, receipt), mimetype="application/pdf", max_age=60)
 
     return receipt

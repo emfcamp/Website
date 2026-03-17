@@ -1,12 +1,17 @@
+from geoalchemy2.shape import from_shape, to_shape
+from shapely import Point
 from wtforms import (
-    SubmitField,
-    StringField,
-    SelectField,
-    TextAreaField,
+    FloatField,
     IntegerField,
+    SelectField,
+    StringField,
+    SubmitField,
+    TextAreaField,
 )
-from wtforms.validators import Optional, Length, URL
-from geoalchemy2.shape import to_shape
+from wtforms.validators import URL, Length, Optional
+
+from models import Village
+from models.village import VillageRequirements
 
 from ..common.forms import Form
 
@@ -38,47 +43,57 @@ class VillageForm(Form):
 
     submit = SubmitField("Submit")
 
-    def populate(self, village):
+    def populate(self, village: Village) -> None:
         self.name.data = village.name
         self.description.data = village.description
         self.url.data = village.url
 
         requirements = village.requirements
+        if requirements is not None:
+            self.num_attendees.data = requirements.num_attendees
+            self.size_sqm.data = requirements.size_sqm
+            self.power_requirements.data = requirements.power_requirements
+            self.noise.data = requirements.noise
+            self.structures.data = requirements.structures
 
-        self.num_attendees.data = requirements.num_attendees
-        self.size_sqm.data = requirements.size_sqm
-        self.power_requirements.data = requirements.power_requirements
-        self.noise.data = requirements.noise
-        self.structures.data = requirements.structures
-
-    def validate_name(form, field):
-        field.data = field.data.strip()
-
-class AdminVillageForm(VillageForm):
-    latlon = StringField("Location", [Optional()])
-
-    def populate(self, village):
-        super().populate(village)
-
-        if village.location is None:
-            self.latlon.data = ""
-        else:
-            latlon = to_shape(village.location)
-            self.latlon.data = "{}, {}".format(latlon.x, latlon.y)
-
-    def populate_obj(self, village):
+    def populate_obj(self, village: Village) -> None:
+        assert self.name.data is not None
         village.name = self.name.data
         village.description = self.description.data
         village.url = self.url.data
-        if self.latlon.data:
-            latlon = self.latlon.data.split(",")
-            location = f"POINT({latlon[0]} {latlon[1]})"
-        else:
-            location = None
-        village.location = location
+
+        if village.requirements is None:
+            village.requirements = VillageRequirements()
 
         village.requirements.num_attendees = self.num_attendees.data
         village.requirements.size_sqm = self.size_sqm.data
         village.requirements.power_requirements = self.power_requirements.data
         village.requirements.noise = self.noise.data
         village.requirements.structures = self.structures.data
+
+    def validate_name(self, field: StringField) -> None:
+        field.data = (field.data or "").strip()
+
+
+class AdminVillageForm(VillageForm):
+    lat = FloatField("Latitude", [Optional()])
+    lon = FloatField("Longitude", [Optional()])
+
+    def populate(self, village: Village) -> None:
+        super().populate(village)
+
+        if village.location is None:
+            self.lat.data = None
+            self.lon.data = None
+        else:
+            latlon = to_shape(village.location)
+            self.lat.data = latlon.y
+            self.lon.data = latlon.x
+
+    def populate_obj(self, village: Village) -> None:
+        super().populate_obj(village)
+
+        if self.lat.data is not None and self.lon.data is not None:
+            village.location = from_shape(Point(self.lon.data, self.lat.data))
+        else:
+            village.location = None

@@ -1,7 +1,15 @@
+from typing import TYPE_CHECKING
+
+from sqlalchemy import Column, ForeignKey, Integer, Table
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from main import db
-import sqlalchemy
+from models.user import CFPReviewerTags, User
+
 from . import BaseModel
 
+if TYPE_CHECKING:
+    from .cfp import Proposal
 
 DEFAULT_TAGS = [
     "accessibility",
@@ -41,12 +49,25 @@ DEFAULT_TAGS = [
 ]
 
 
+ProposalTag = Table(
+    "proposal_tag",
+    BaseModel.metadata,
+    Column("proposal_id", Integer, ForeignKey("proposal.id"), primary_key=True),
+    Column("tag_id", Integer, ForeignKey("tag.id"), primary_key=True),
+)
+
+
 class Tag(BaseModel):
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
     __tablename__ = "tag"
 
-    id = db.Column(db.Integer, primary_key=True)
-    tag = db.Column(db.String, nullable=False, unique=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tag: Mapped[str] = mapped_column(unique=True)
+
+    proposals: Mapped[list["Proposal"]] = relationship(secondary=ProposalTag)
+    reviewers: Mapped[list[User]] = relationship(
+        back_populates="cfp_reviewer_tags", secondary=CFPReviewerTags
+    )
 
     def __init__(self, tag: str):
         self.tag = tag.strip().lower()
@@ -79,12 +100,15 @@ class Tag(BaseModel):
     def get_by_value(cls, value):
         return cls.query.filter_by(tag=value).one_or_none()
 
-
-ProposalTag: sqlalchemy.Table = db.Table(
-    "proposal_tag",
-    BaseModel.metadata,
-    db.Column(
-        "proposal_id", db.Integer, db.ForeignKey("proposal.id"), primary_key=True
-    ),
-    db.Column("tag_id", db.Integer, db.ForeignKey("tag.id"), primary_key=True),
-)
+    @classmethod
+    def get_export_data(cls):
+        tag_proposals_q = db.select(Tag, db.func.count(Tag.id)).join(Tag.proposals).group_by(Tag)
+        tag_reviewers_q = db.select(Tag, db.func.count(Tag.id)).join(Tag.reviewers).group_by(Tag)
+        tags = {
+            "proposals": {tag.tag: c for tag, c in db.session.execute(tag_proposals_q)},
+            "reviewers": {tag.tag: c for tag, c in db.session.execute(tag_reviewers_q)},
+        }
+        return {
+            "public": {"tags": tags},
+            "tables": ["tag", "proposal_tag", "cfp_reviewer_tags"],
+        }

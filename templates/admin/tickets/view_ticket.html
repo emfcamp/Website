@@ -29,11 +29,11 @@
     </tr>
     <tr>
       <th>Product</th>
-      <td><a href="{{ url_for('.product_details', product_id=ticket.product_id) }}">{{ ticket.product }}</a></td>
+      <td><a href="{{ url_for('admin.products.product_details', product_id=ticket.product_id) }}">{{ ticket.product }}</a></td>
     </tr>
     <tr>
       <th>Price Tier</th>
-      <td><a href="{{ url_for('.price_tier_details', tier_id=ticket.price_tier_id) }}">{{ ticket.price_tier }}</a></td>
+      <td><a href="{{ url_for('admin.products.price_tier_details', tier_id=ticket.price_tier_id) }}">{{ ticket.price_tier }}</a></td>
     </tr>
     <tr>
       <th>Payment</th>

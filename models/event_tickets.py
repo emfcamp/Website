@@ -1,11 +1,19 @@
 from random import choices
 
+from sqlalchemy import ForeignKey, func, select
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from main import db
-from . import BaseModel
+
+from . import BaseModel, bucketise, export_attr_counts
+from .cfp import Proposal
 from .site_state import get_signup_state
 from .user import User
-from .cfp import Proposal
 
+__all__ = [
+    "EventTicket",
+    "EventTicketException",
+]
 
 # entered-lottery -- An entry in the lottery for a ticket
 # ticket -- either a converted lottery ticket or a simply issued ticket
@@ -42,13 +50,16 @@ class EventTicketException(Exception):
 class EventTicket(BaseModel):
     __tablename__ = "event_ticket"
 
-    id = db.Column(db.Integer, primary_key=True)
-    state = db.Column(db.String, nullable=False)
-    proposal_id = db.Column(db.Integer, db.ForeignKey("proposal.id"), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    rank = db.Column(db.Integer, nullable=True)
-    ticket_count = db.Column(db.Integer, nullable=False, default=1)
-    ticket_codes = db.Column(db.String, nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    state: Mapped[str]
+    proposal_id: Mapped[int] = mapped_column(ForeignKey("proposal.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    rank: Mapped[int | None]
+    ticket_count: Mapped[int] = mapped_column(default=1)
+    ticket_codes: Mapped[str | None]
+
+    proposal: Mapped[Proposal] = relationship(back_populates="tickets")
+    user: Mapped[User] = relationship(back_populates="event_tickets")
 
     def __init__(self, user_id, proposal_id, state, ticket_count=1, rank=None):
         if state not in EVENT_TICKET_STATES:
@@ -86,9 +97,7 @@ class EventTicket(BaseModel):
         return [
             t
             for t in self.user.event_tickets
-            if t.state == "entered-lottery"
-            and t != self
-            and t.proposal.type == self.proposal.type
+            if t.state == "entered-lottery" and t != self and t.proposal.type == self.proposal.type
         ]
 
     def is_in_lottery_round(self, round_rank):
@@ -98,7 +107,7 @@ class EventTicket(BaseModel):
         # The force option only exists for ease of resetting this in dev
         if force:
             self.state = new_state
-            return
+            return None
 
         if new_state == self.state:
             return self
@@ -117,10 +126,10 @@ class EventTicket(BaseModel):
                 raise EventTicketException(
                     f"invalid state transition {self.state} -> {new_state} whilst in {signup_state}"
                 )
-        except KeyError:
+        except KeyError as e:
             raise EventTicketException(
                 f"State, {self.state} not found in in {signup_state}, new state {new_state}"
-            )
+            ) from e
 
         self.state = new_state
         return self
@@ -130,7 +139,7 @@ class EventTicket(BaseModel):
         # These are in no way cryptographically secure etc but 1 in 308m should
         # be low enough odds for guessing.
         codes = []
-        for i in range(self.ticket_count):
+        for _ in range(self.ticket_count):
             codes.append("".join(choices(SAFECHARS, k=6)))
         self.ticket_codes = ",".join(codes)
         return self
@@ -166,10 +175,10 @@ class EventTicket(BaseModel):
         return self.change_state("entered-lottery", force=force)
 
     @classmethod
-    def get_event_ticket(cls, user: User, proposal: Proposal):
-        return EventTicket.query.filter_by(
-            user_id=user.id, proposal_id=proposal.id
-        ).one_or_none()
+    def get_event_ticket(cls, user: User, proposal: Proposal) -> "EventTicket | None":
+        return db.session.execute(
+            select(EventTicket).where(EventTicket.user_id == user.id, EventTicket.proposal_id == proposal.id)
+        ).scalar_one_or_none()
 
     @classmethod
     def create_ticket(self, user, proposal, ticket_count=1):
@@ -177,20 +186,47 @@ class EventTicket(BaseModel):
 
         if signup_state == "issue-lottery-tickets":
             rank = get_max_rank_for_user(user, proposal.type)
-            return EventTicket(
-                user.id, proposal.id, "entered-lottery", ticket_count, rank
-            )
-        elif signup_state == "issue-event-tickets" and (ticket_count <= proposal.get_total_capacity()):
+            return EventTicket(user.id, proposal.id, "entered-lottery", ticket_count, rank)
+        if signup_state == "issue-event-tickets" and (ticket_count <= proposal.get_total_capacity()):
             return EventTicket(user.id, proposal.id, "ticket", ticket_count).issue_codes()
 
-        elif (
-            signup_state == "issue-event-tickets" and not (ticket_count < proposal.get_total_capacity())
-        ):
-            raise EventTicketException(
-                f"This {proposal.human_type} is currently full."
-            )
+        if signup_state == "issue-event-tickets" and not (ticket_count < proposal.get_total_capacity()):
+            raise EventTicketException(f"This {proposal.human_type} is currently full.")
 
         raise EventTicketException("Tickets are not currently being issued")
+
+    @classmethod
+    def get_export_data(cls):
+        user_count_subq = (
+            select(cls.user_id, func.count().label("user_count")).group_by(cls.user_id).subquery()
+        )
+        user_count_q = select(user_count_subq.c.user_count, func.count()).group_by(
+            user_count_subq.c.user_count
+        )
+
+        proposal_count_subq = (
+            select(cls.proposal_id, func.count().label("proposal_count")).group_by(cls.proposal_id).subquery()
+        )
+        proposal_count_q = select(proposal_count_subq.c.proposal_count, func.count()).group_by(
+            proposal_count_subq.c.proposal_count
+        )
+
+        data = {
+            "public": {
+                "counts": {
+                    "users": bucketise(
+                        db.session.execute(user_count_q),
+                        [0, 10, 20, 30, 40, 50],
+                    ),
+                    "proposal_counts": bucketise(
+                        db.session.execute(proposal_count_q),
+                        [0, 10, 20, 30, 40, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500],
+                    ),
+                }
+            }
+        }
+        data["public"]["counts"].update(export_attr_counts(cls, ["state", "rank", "ticket_count"]))
+        return data
 
 
 def get_max_rank_for_user(user, proposal_type):

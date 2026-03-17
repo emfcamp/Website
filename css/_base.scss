@@ -226,14 +226,6 @@ div.micro img {
   color: #333;
 }
 
-.form-control {
-  background-color: $form-element;
-}
-
-.form-horizontal .form-group .help-block {
-  padding-left: 0.5em;
-}
-
 legend {
   margin-bottom: 0px;
   border-bottom: 1px solid #aaa;
@@ -384,17 +376,6 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
   }
 }
 
-input[type="checkbox"].big-checkbox {
-  width: 20px;
-  height: 20px;
-  margin-right: 5px;
-}
-label.big-checkbox {
-  /* Increase the target area */
-  padding: 11px 10px 10px 40px !important;
-  margin: -4px 0 -10px -40px !important;
-  vertical-align: 4px;
-}
 
 /* Modals for the schedules */
 .modal {
@@ -410,45 +391,6 @@ label.big-checkbox {
 }
 
 .role-description { display: none; }
-
-/* Form tweakery */
-
-fieldset legend {
-  margin-bottom: 10px;
-}
-
-input[type=range] {
-  appearance: none;
-  border: none;
-  box-shadow: none;
-  background: transparent;
-  margin-bottom: 6px;
-}
-
-input[type=range]::range-track {
-  appearance: none;
-  height: 8.4px;
-  cursor: pointer;
-  background: $main-link-hover;
-  border-radius: 3px;
-}
-
-input[type=range]:focus::range-track {
-  background: lighten($main-link-hover, 5%);
-}
-
-input[type=range]::range-thumb {
-  appearance: none;
-  box-shadow: 1px 1px 1px lighten($main-background, 50%);
-  border: 1px solid $main-background;
-  height: 30px;
-  width: 16px;
-  border-radius: 3px;
-  background: $highlight-3-background;
-  cursor: pointer;
-  margin-top: -11px;
-}
-
 
 #mailing-list-form #name-field {
   display: none;

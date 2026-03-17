@@ -1,11 +1,14 @@
-import pendulum
 from datetime import datetime
 
-from sqlalchemy import or_
+import pendulum
+from sqlalchemy import ForeignKey, or_
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.functions import func
 
-from main import db
-from . import BaseModel
+from . import BaseModel, naive_utcnow
+from .user import User
+
+__all__ = ["AdminMessage"]
 
 INITIAL_TOPICS = {
     "heralds",
@@ -16,24 +19,22 @@ INITIAL_TOPICS = {
 
 class AdminMessage(BaseModel):
     __tablename__ = "admin_message"
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
 
-    id = db.Column(db.Integer, primary_key=True)
-    message = db.Column(db.String, nullable=False)
-    show = db.Column(db.Boolean, nullable=False, default=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    message: Mapped[str]
+    show: Mapped[bool] = mapped_column(default=False)
 
-    topic = db.Column(db.String, nullable=True)
+    topic: Mapped[str | None]
 
-    end = db.Column(db.DateTime)
+    end: Mapped[datetime | None]
 
-    created_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    created_by: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
-    created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    modified = db.Column(
-        db.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow
-    )
+    created: Mapped[datetime] = mapped_column(default=naive_utcnow)
+    modified: Mapped[datetime] = mapped_column(default=naive_utcnow, onupdate=naive_utcnow)
 
-    creator = db.relationship("User", backref="admin_messages")
+    creator: Mapped[User] = relationship(back_populates="admin_messages")
 
     def __init__(self, message, user, end=None, show=False, topic=None):
         self.message = message
@@ -52,7 +53,7 @@ class AdminMessage(BaseModel):
 
     @property
     def is_visible(self):
-        return self.show and (self.end is None or self.end > datetime.utcnow())
+        return self.show and (self.end is None or self.end > naive_utcnow())
 
     @classmethod
     def get_visible_messages(cls):
@@ -71,7 +72,7 @@ class AdminMessage(BaseModel):
         return AdminMessage.query.filter(
             AdminMessage.topic == topic,
             or_(
-                AdminMessage.end > datetime.utcnow(),
+                AdminMessage.end > naive_utcnow(),
                 AdminMessage.end == None,  # noqa: E711
             ),
         ).all()

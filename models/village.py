@@ -1,36 +1,55 @@
 from __future__ import annotations
-from typing import Optional
-from sqlalchemy.ext.associationproxy import association_proxy
 
-from geoalchemy2 import Geometry
+from typing import TYPE_CHECKING
+
+from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import to_shape
-from sqlalchemy import Index
+from sqlalchemy import ForeignKey, Index, select
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from main import db
 from models.user import User
+
 from . import BaseModel
+
+if TYPE_CHECKING:
+    from .cfp import Venue
+
+__all__ = [
+    "Village",
+    "VillageMember",
+    "VillageRequirements",
+]
 
 
 class Village(BaseModel):
     __tablename__ = "village"
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
 
-    id = db.Column(db.Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
 
-    name = db.Column(db.String, nullable=False, unique=True)
-    description = db.Column(db.String)
-    url = db.Column(db.String)
-    location = db.Column(Geometry("POINT", srid=4326, spatial_index=False))
+    name: Mapped[str] = mapped_column(unique=True)
+    description: Mapped[str | None]
+    url: Mapped[str | None]
+    location: Mapped[WKBElement | None] = mapped_column(Geometry("POINT", srid=4326, spatial_index=False))
 
-    village_memberships = db.relationship("VillageMember", back_populates="village")
+    village_memberships: Mapped[list[VillageMember]] = relationship(
+        back_populates="village", cascade="all, delete-orphan"
+    )
+    requirements: Mapped[VillageRequirements | None] = relationship(
+        back_populates="village", cascade="all, delete-orphan"
+    )
+    venues: Mapped[list[Venue]] = relationship(back_populates="village", cascade="all, delete-orphan")
     members = association_proxy("village_memberships", "user")
 
     @classmethod
-    def get_by_name(cls, name) -> Optional[Village]:
-        return cls.query.filter_by(name=name).one_or_none()
+    def get_by_name(cls, name: str) -> Village | None:
+        return db.session.execute(select(cls).where(cls.name == name)).scalar_one_or_none()
 
     @classmethod
-    def get_by_id(cls, id) -> Optional[Village]:
-        return cls.query.filter_by(id=id).one_or_none()
+    def get_by_id(cls, id: int) -> Village | None:
+        return db.session.execute(select(cls).where(cls.id == id)).scalar_one_or_none()
 
     def admins(self) -> list[User]:
         return [m.user for m in self.village_memberships if m.admin]
@@ -65,11 +84,40 @@ class Village(BaseModel):
         return None
 
     @property
-    def map_link(self) -> Optional[str]:
-        latlon = self.latlon
-        if latlon:
-            return "https://map.emfcamp.org/#18.5/%s/%s/m=%s,%s" % (latlon[0], latlon[1], latlon[0], latlon[1])
-        return None
+    def map_link(self) -> str | None:
+        if not self.latlon:
+            return None
+        lat, lon = self.latlon
+        return f"https://map.emfcamp.org/#18.5/{lat}/{lon}/m={lat},{lon}"
+
+    @classmethod
+    def get_export_data(cls):
+        data = {
+            "public": {
+                "villages": {
+                    v.id: {
+                        "name": v.name,
+                        "description": v.description,
+                        "url": v.url,
+                        "location": v.latlon,
+                    }
+                    for v in Village.query.all()
+                }
+            },
+            "tables": ["village", "village_member", "village_requirements"],
+            "private": {
+                # Village contact/attendee counts are exported here to issue vouchers for the next event
+                "village_info": {
+                    v.id: {
+                        "admin_emails": [u.email for u in v.admins()],
+                        "predicted_attendees": v.requirements.num_attendees,
+                    }
+                    for v in Village.query.all()
+                },
+            },
+        }
+
+        return data
 
 
 # I'm not entirely sure why we create this index separately but this is how
@@ -80,18 +128,14 @@ Index("ix_village_location", Village.location, postgresql_using="gist")
 class VillageMember(BaseModel):
     __tablename__ = "village_member"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
     # We only allow one village per user. TODO: make this the primary key
-    user_id = db.Column(
-        db.Integer, db.ForeignKey("user.id"), unique=True, nullable=False
-    )
-    village_id = db.Column(db.Integer, db.ForeignKey("village.id"), nullable=False)
-    admin = db.Column(db.Boolean, default=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), unique=True)
+    village_id: Mapped[int] = mapped_column(ForeignKey("village.id"))
+    admin: Mapped[bool] = mapped_column(default=False)
 
-    village = db.relationship(
-        "Village", back_populates="village_memberships", uselist=False
-    )
-    user = db.relationship("User", back_populates="village_membership", uselist=False)
+    village: Mapped[list[Village]] = relationship(back_populates="village_memberships")
+    user: Mapped[User] = relationship(back_populates="village_membership")
 
     def __repr__(self):
         return f"<VillageMember {self.user} member of {self.village}>"
@@ -100,15 +144,13 @@ class VillageMember(BaseModel):
 class VillageRequirements(BaseModel):
     __tablename__ = "village_requirements"
 
-    village_id = db.Column(db.Integer, db.ForeignKey("village.id"), primary_key=True)
-    village = db.relationship(
-        "Village", backref=db.backref("requirements", uselist=False)
-    )
+    village_id: Mapped[int] = mapped_column(ForeignKey("village.id"), primary_key=True)
+    village: Mapped[Village] = relationship(back_populates="requirements")
 
-    num_attendees = db.Column(db.Integer)
-    size_sqm = db.Column(db.Integer)
+    num_attendees: Mapped[int | None]
+    size_sqm: Mapped[int | None]
 
-    power_requirements = db.Column(db.String)
-    noise = db.Column(db.String)
+    power_requirements: Mapped[str | None]
+    noise: Mapped[str | None]
 
-    structures = db.Column(db.String)
+    structures: Mapped[str | None]

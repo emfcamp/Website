@@ -1,0 +1,45 @@
+# Reusable workflow for running tests
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  COMPOSE_INTERACTIVE_NO_CLI: 1
+
+jobs:
+  lint:
+    name: Run linting checks
+    runs-on: ubuntu-latest
+    env:
+      RUFF_OUTPUT_FORMAT: github
+    steps:
+      - uses: actions/checkout@v4
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Install packages
+        run: uv sync --locked --all-extras --dev
+      - name: Lint
+        run: uv run make check-syntax
+      - name: Adding report
+        run: printf "\`\`\`\n%s\n\`\`\`" "$(cat mypy-report/index.txt)" >> $GITHUB_STEP_SUMMARY
+
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build containers
+        run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml build --parallel
+      - name: Test
+        run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml run --quiet-pull -e GITHUB_ACTIONS=true -T app uv run make pytest
+      - name: Adding report
+        run: cat cov.md >> $GITHUB_STEP_SUMMARY

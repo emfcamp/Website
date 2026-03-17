@@ -1,21 +1,20 @@
 import json
 import os
+
 import markdown
-from . import v_user_required, volunteer
-
+from flask import abort, flash, redirect, render_template, url_for
+from flask import current_app as app
 from flask_login import current_user
-from flask import render_template, flash, redirect
-from flask import url_for, current_app as app, abort
-from main import db
-
-from wtforms import SubmitField, RadioField, FormField, FieldList
+from wtforms import FieldList, FormField, RadioField, SubmitField
 from wtforms.validators import InputRequired, ValidationError
-from ..common.forms import Form
-from ..common.fields import HiddenIntegerField
 
+from main import db
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer
 
+from ..common.fields import HiddenIntegerField
+from ..common.forms import Form
+from . import v_user_required, volunteer
 
 APPLICATION_ROOT = os.path.abspath(os.path.join(__file__, "..", "..", ".."))
 
@@ -61,7 +60,7 @@ def load_training_json(path):
     if not os.path.exists(file_path):
         return None
 
-    return json.load(open(file_path, "r"))
+    return json.load(open(file_path))
 
 
 def load_training_markdown(path):
@@ -104,7 +103,7 @@ class TrainingForm(Form):
         """
 
         # Check if the question already exists in the form, if not add it
-        for qid in question_data.keys():
+        for qid in question_data:
             question_exists = False
             for q in self.questions:
                 if q.question_id.data == qid:
@@ -132,14 +131,10 @@ def bar_training():
     volunteer = Volunteer.get_for_user(current_user)
     trained = bar in volunteer.trained_roles
 
-    training_json_path = app.config.get(
-        "BAR_TRAINING_JSON", "models/fixtures/training/bar.json"
-    )
+    training_json_path = app.config.get("BAR_TRAINING_JSON", "models/fixtures/training/bar.json")
     training_json = load_training_json(training_json_path)
     if training_json is None:  # Error loading training data
-        app.logger.error(
-            f"Bar training failed -- unable to load JSON: '{training_json_path}'"
-        )
+        app.logger.error(f"Bar training failed -- unable to load JSON: '{training_json_path}'")
         abort(404)
 
     global question_data  # Otherwise we can't access it in the form validator
@@ -151,7 +146,7 @@ def bar_training():
         if trained:  # The user might be re-doing the traing, no need to rewrite DB
             flash("You answered all the questions correctly!")
         else:
-            app.logger.info(f"{str(current_user)} passed the bar training.")
+            app.logger.info(f"{current_user} passed the bar training.")
             bar.trained_volunteers.append(volunteer)
             cybar.trained_volunteers.append(volunteer)
             db.session.commit()
@@ -170,9 +165,7 @@ def bar_training():
         page["content"] = load_training_markdown(json_page["content"])
 
         if page["content"] is None:
-            app.logger.error(
-                f"Bar training failed -- unable to load Markdown: '{json_page['content']}'"
-            )
+            app.logger.error(f"Bar training failed -- unable to load Markdown: '{json_page['content']}'")
             abort(404)
 
         page["questions"] = json_page["questions"]

@@ -1,9 +1,10 @@
 import os
 import socket
+
 from flask import current_app as app
 
 
-def irc_send(channel: str, message: str):
+def irc_send(channel: str, message: str) -> None:
     message = f"{channel} {message}"
     irc_host = os.environ.get("IRCCAT", "")
     if not irc_host:
@@ -16,7 +17,7 @@ def irc_send(channel: str, message: str):
         s.connect((host, port))
         s.sendall(message.encode() + b"\n")
         s.close()
-    except socket.timeout:
-        app.logger.warn("Timeout connecting to irccat")
-    except socket.error as e:
-        app.logger.warn("Error sending IRC message (%s): %s", message, e)
+    except TimeoutError:
+        app.logger.warning("Timeout connecting to irccat")
+    except OSError as e:
+        app.logger.warning("Error sending IRC message (%s): %s", message, e)

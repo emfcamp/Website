@@ -1,17 +1,20 @@
-from datetime import datetime, timedelta
-import click
 import csv
+from datetime import timedelta
 from io import StringIO
 
+import click
 from flask import current_app as app
-from models.payment import BankPayment, RefundRequest, Payment
+
 from main import db
+from models import naive_utcnow
+from models.payment import BankPayment, Payment, RefundRequest
+
 from . import payments
 from .refund import (
-    handle_refund_request,
-    manual_bank_refund,
     ManualRefundRequired,
     RefundException,
+    handle_refund_request,
+    manual_bank_refund,
 )
 
 
@@ -48,7 +51,7 @@ def bulk_refund(yes, number, provider):
         try:
             handle_refund_request(request)
         except ManualRefundRequired as e:
-            app.logger.warn(f"Manual refund required for request {request}: {e}")
+            app.logger.warning(f"Manual refund required for request {request}: {e}")
         except RefundException as e:
             app.logger.exception(f"Error refunding request {request}: {e}")
 
@@ -57,16 +60,14 @@ def bulk_refund(yes, number, provider):
     if yes:
         app.logger.info(f"{count} refunds processed")
     else:
-        app.logger.info(
-            f"{count} refunds would be processed. Pass the -y option to refund these for real."
-        )
+        app.logger.info(f"{count} refunds would be processed. Pass the -y option to refund these for real.")
 
 
-@payments.cli.command("transferwise_refund")
+@payments.cli.command("wise_refund")
 @click.option("-n", "--number", type=int, help="number of refunds to export")
 @click.option("-a", "--amount", type=int, help="value of refunds to export")
 @click.argument("currency", type=click.Choice(["GBP", "EUR"]))
-def transferwise_refund(number, amount, currency):
+def wise_refund(number, amount, currency):
     """Emit a CSV file for refunding with Transferwise"""
     query = (
         RefundRequest.query.join(Payment)
@@ -137,10 +138,10 @@ def transferwise_refund(number, amount, currency):
     app.logger.info(f"Refunds produced for currency {currency} up to id {max_id}")
 
 
-@payments.cli.command("transferwise_refund_complete")
+@payments.cli.command("wise_refund_complete")
 @click.argument("currency", type=click.Choice(["GBP", "EUR"]))
 @click.argument("max_id", type=int)
-def transferwise_refund_complete(max_id, currency):
+def wise_refund_complete(max_id, currency):
     """Mark Transferwise bulk refunds as completed"""
     query = (
         RefundRequest.query.join(Payment)
@@ -169,8 +170,8 @@ def expire_pending_payments(yes):
         app.logger.info("Not expiring payments. Pass the -y option to do so.")
     query = (
         BankPayment.query.filter(BankPayment.state == "inprogress")
-        .filter(BankPayment.expires < datetime.utcnow())
-        .filter(BankPayment.reminder_sent_at < datetime.utcnow() - timedelta(days=5))
+        .filter(BankPayment.expires < naive_utcnow())
+        .filter(BankPayment.reminder_sent_at < naive_utcnow() - timedelta(days=5))
     )
     for payment in query:
         if yes:
@@ -179,4 +180,16 @@ def expire_pending_payments(yes):
         else:
             app.logger.info(f"Would expire payment {payment}")
 
+    db.session.commit()
+
+
+@payments.cli.command("mark_transfer_paid")
+@click.argument("payment_id", type=int)
+def mark_paid(payment_id: int) -> None:
+    """Mark a Bank transfer payment as paid. Useful for testing."""
+    p = db.session.get(BankPayment, payment_id)
+    if p is None:
+        app.logger.error("Payment id %d not found!", payment_id)
+        return
+    p.paid()
     db.session.commit()

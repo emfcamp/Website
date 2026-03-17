@@ -1,15 +1,16 @@
-import pytest
 from datetime import datetime
+
+import pytest
 from lxml import etree
 
 from apps.schedule import event_tz
 from apps.schedule.schedule_xml import (
-    make_root,
     add_day,
-    add_room,
     add_event,
-    get_duration,
+    add_room,
     export_frab,
+    get_duration,
+    make_root,
 )
 
 
@@ -20,8 +21,8 @@ def _local_datetime(*args):
 
 @pytest.fixture(scope="session")
 def frab_schema():
-    xml_file = open("tests/frabs_schema.xml")
-    schema_doc = etree.parse(xml_file)
+    with open("tests/frabs_schema.xml") as xml_file:
+        schema_doc = etree.parse(xml_file)
     _schema = etree.XMLSchema(schema_doc)
     yield _schema
 

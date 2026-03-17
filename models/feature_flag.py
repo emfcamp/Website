@@ -1,5 +1,14 @@
-from main import db, cache
+from sqlalchemy import select
+from sqlalchemy.orm import Mapped, mapped_column
+
+from main import cache, db
+
 from . import BaseModel
+
+__all__ = [
+    "DB_FEATURE_FLAGS",
+    "FeatureFlag",
+]
 
 # feature flags that can be overridden in the DB
 DB_FEATURE_FLAGS = [
@@ -28,9 +37,9 @@ DB_FEATURE_FLAGS = [
 class FeatureFlag(BaseModel):
     __tablename__ = "feature_flag"
     __export_data__ = False
-    __versioned__: dict = {}
-    feature = db.Column(db.String, primary_key=True)
-    enabled = db.Column(db.Boolean, nullable=False)
+    __versioned__: dict[str, str] = {}
+    feature: Mapped[str] = mapped_column(primary_key=True)
+    enabled: Mapped[bool]
 
     def __init__(self, feature, enabled=False):
         self.feature = feature
@@ -38,11 +47,9 @@ class FeatureFlag(BaseModel):
 
 
 @cache.cached(timeout=60, key_prefix="get_db_flags")
-def get_db_flags():
-    flags = FeatureFlag.query.all()
-    flags = {f.feature: f.enabled for f in flags}
-
-    return flags
+def get_db_flags() -> dict[str, bool]:
+    flags = db.session.execute(select(FeatureFlag)).scalars().all()
+    return {f.feature: f.enabled for f in flags}
 
 
 def refresh_flags():

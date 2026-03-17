@@ -1,14 +1,13 @@
-import pytest
-
-from pyzbar.pyzbar import decode
 import re
+
+import pytest
+from pyzbar.pyzbar import decode
 from stdnum import iso11649
 
-from main import db
 from apps.common.epc import format_inline_epc_qr
+from main import db
 from models.payment import BankPayment
 from models.user import User
-
 from tests._utils import render_svg
 
 

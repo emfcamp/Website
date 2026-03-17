@@ -1,0 +1,46 @@
+{% extends "about/template.html" %}
+{% block title %}Diversity stats {{year}}{% endblock %}
+{% block body %}
+{% macro stats_table(data, title) %}
+<h3>{{ title }}</h3>
+
+{% set total = data.values() | sum %}
+<table class="table">
+  <thead><tr>
+    <th></th>
+    <th>Count</th>
+    <th>Percent of respondents</th>
+  </tr></thead>
+  <tbody>
+    {% for category, count in data.items() %}
+      <tr>
+        <td>{{ category | capitalize }}{% if category == "" %}No response{% endif %}</td>
+        <td>{{ count }}</td>
+        <td>{{ (100 * count/total) | round | int }}%</td>
+      </tr>
+    {% endfor %}
+    <tr>
+      <th>Total</th>
+      <td>{{ total }}</td>
+      <td>{{ (100 * total/total) | round | int }}%</td>
+    </tr>
+  </tbody>
+</table>
+{% endmacro %}
+
+<h2>Diversity stats for {{year}}</h2>
+
+<h3>Note on limitations</h3>
+<p>This data is compiled from self reporting via free-text fields. Where obvious
+  classification can be made it has been (e.g. for age '22' -> '15-24') but if such a
+  classification cannot be made they've been grouped as 'other'.</p>
+
+<p>All questions were optional so totals may not be consistent between categories.</p>
+
+<p>Prior to 2024 there was no tracking of reviewer or speaker data.</p>
+
+{{ stats_table(data["sex"], "Sex") }}
+{{ stats_table(data["ethnicity"], "Ethnicity") }}
+{{ stats_table(data["age"], "Age") }}
+
+{% endblock %}

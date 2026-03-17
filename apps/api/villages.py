@@ -1,25 +1,34 @@
+from typing import Any, TypedDict
+
 from flask import abort, request
 from flask_login import current_user
 from flask_restful import Resource
-from models.user import User
-from models.village import Village, VillageMember
-from models.cfp import Venue
+from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import Point
-from geoalchemy2.shape import to_shape, from_shape
 
 from main import db
+from models.cfp import Venue
+from models.user import User
+from models.village import Village, VillageMember
+
 from . import api
 
 
-def render_village(village: Village):
+class VillageResponse(TypedDict):
+    id: int
+    name: str
+    url: str | None
+    description: str | None
+    location: dict[str, Any] | None
+
+
+def render_village(village: Village) -> VillageResponse:
     return {
         "id": village.id,
         "name": village.name,
         "url": village.url,
         "description": village.description,
-        "location": (
-            to_shape(village.location).__geo_interface__ if village.location else None
-        ),
+        "location": to_shape(village.location).__geo_interface__ if village.location else None,
     }
 
 
@@ -30,9 +39,7 @@ class VillagesMap(Resource):
             data = obj.__geo_interface__
             if data["properties"].get("description") is not None:
                 desc = data["properties"]["description"]
-                data["properties"]["description"] = (
-                    (desc[:230] + "...") if len(desc) > 230 else desc
-                )
+                data["properties"]["description"] = (desc[:230] + "...") if len(desc) > 230 else desc
             features.append(data)
         return {"type": "FeatureCollection", "features": features}
 
@@ -51,9 +58,7 @@ class MyVillages(Resource):
             return abort(404)
 
         my_villages = Village.query.join(VillageMember)
-        if (not current_user.has_permission("villages")) or request.args.get(
-            "all"
-        ) != "true":
+        if (not current_user.has_permission("villages")) or request.args.get("all") != "true":
             my_villages = my_villages.filter(
                 (VillageMember.user == current_user) & (VillageMember.admin.is_(True))
             )
@@ -87,18 +92,17 @@ class VillageResource(Resource):
             .all()
         )
 
-        if (current_user not in village_admins) and not current_user.has_permission(
-            "villages"
-        ):
+        if (current_user not in village_admins) and not current_user.has_permission("villages"):
             return abort(403)
 
         data = request.get_json()
 
         if "location" not in data:
-            return
+            return None
 
         obj.location = from_shape(Point(data["location"]), srid=4326)
         db.session.commit()
+        return None
 
 
 class VenuesMap(Resource):

@@ -1,67 +1,64 @@
 """
-    Tickets App
+Tickets App
 
-    This handles users selecting tickets, entering their details, and choosing a payment method.
-    Users are then passed onto the appropriate view in the payment app to enter their payment
-    details.
+This handles users selecting tickets, entering their details, and choosing a payment method.
+Users are then passed onto the appropriate view in the payment app to enter their payment
+details.
 """
 
 import re
 
 from flask import (
-    render_template,
-    redirect,
-    request,
-    flash,
     Blueprint,
-    url_for,
-    send_file,
     abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    url_for,
+)
+from flask import (
     current_app as app,
 )
-from flask_login import login_required, current_user
+from flask_login import current_user, login_required
 from flask_mailman import EmailMessage
 from prometheus_client import Counter
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
 
 from main import db, external_url
-from models.user import User, checkin_code_re
-from models.product import ProductView
 from models.basket import Basket
+from models.product import ProductView
 from models.purchase import Purchase, Ticket
+from models.user import User, checkin_code_re
 
 from ..common import (
     CURRENCY_SYMBOLS,
+    feature_enabled,
     get_user_currency,
     set_user_currency,
-    feature_enabled,
 )
 from ..common.email import from_email
 from ..common.receipt import (
-    make_qr_png,
+    attach_tickets,
+    make_qrfile,
     render_pdf,
     render_receipt,
-    attach_tickets,
     set_tickets_emailed,
 )
-
 from .forms import TicketTransferForm
 
 tickets = Blueprint("tickets", __name__)
 
 invalid_vouchers = Counter("emf_invalid_vouchers_total", "Invalid ticket vouchers")
-no_capacity = Counter(
-    "emf_basket_no_capacity_total", "Attempted purchases that failed due to capacity"
-)
+no_capacity = Counter("emf_basket_no_capacity_total", "Attempted purchases that failed due to capacity")
 
 price_changed = Counter(
     "emf_basket_price_changed_total",
     "Attempted purchases that failed due to changed prices",
 )
 
-empty_baskets = Counter(
-    "emf_basket_empty_total", "Attempted purchases of empty baskets"
-)
+empty_baskets = Counter("emf_basket_empty_total", "Attempted purchases of empty baskets")
 
 
 @tickets.route("/tickets/reserved")
@@ -70,9 +67,7 @@ empty_baskets = Counter(
 @tickets.route("/tickets/<flow>/reserved/<currency>")
 def tickets_reserved(flow=None, currency=None):
     if current_user.is_anonymous:
-        return redirect(
-            url_for("users.login", next=url_for(".tickets_reserved", flow=flow))
-        )
+        return redirect(url_for("users.login", next=url_for(".tickets_reserved", flow=flow)))
 
     basket = Basket(current_user, get_user_currency())
     basket.load_purchases_from_db()
@@ -123,9 +118,7 @@ def transfer(ticket_id):
         purchase.transfer(from_user=current_user, to_user=to_user)
         db.session.commit()
 
-        app.logger.info(
-            "Purchase %s transferred from %s to %s", purchase, current_user, to_user
-        )
+        app.logger.info("Purchase %s transferred from %s to %s", purchase, current_user, to_user)
 
         is_ticket = isinstance(purchase, Ticket)
 
@@ -195,7 +188,7 @@ def receipt(user_id=None, format=None):
 
     png = bool(request.args.get("png"))
     pdf = False
-    if format == 'pdf':
+    if format == "pdf":
         pdf = True
 
     page = render_receipt(user, png, pdf)
@@ -206,18 +199,15 @@ def receipt(user_id=None, format=None):
     return page
 
 
-# Generate a PNG-based QR code as xhtml2pdf doesn't support SVG.
-#
-# This only accepts the code on purpose - we can't authenticate the
-# user from the PDF renderer, and a full URL is awkward to validate.
+# This used to be for xhtml2pdf, but is handy for creating a shareable image
 @tickets.route("/receipt/<checkin_code>/qr")
 def tickets_qrcode(checkin_code):
-    if not re.match("%s$" % checkin_code_re, checkin_code):
+    if not re.match(f"{checkin_code_re}$", checkin_code):
         abort(404)
 
     url = app.config.get("CHECKIN_BASE") + checkin_code
 
-    qrfile = make_qr_png(url)
+    qrfile = make_qrfile(url, kind="png", scale=3)
     return send_file(qrfile, mimetype="image/png")
 
 

@@ -1,28 +1,52 @@
+from __future__ import annotations
+
 import random
 import re
-from decimal import Decimal
+import typing
+from collections.abc import Iterable
 from datetime import datetime, timedelta
-from typing import Iterable, Optional
+from decimal import Decimal
 
-from sqlalchemy import event, func, column
-from sqlalchemy.orm import Session, aliased
-from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-from sqlalchemy_continuum.utils import version_class, transaction_class
+from sqlalchemy import ForeignKey, Index, Numeric, column, event, func, select
+from sqlalchemy.exc import MultipleResultsFound, NoResultFound
+from sqlalchemy.orm import Mapped, Session, aliased, mapped_column, relationship
+from sqlalchemy_continuum.utils import transaction_class, version_class
 from stdnum import iso11649
 from stdnum.iso7064 import mod_97_10
 
-from main import db
+if typing.TYPE_CHECKING:
+    from .purchase import Purchase
+    from .user import User
+
+from main import NaiveDT, db
+
 from . import (
-    export_attr_counts,
-    export_intervals,
-    bucketise,
-    event_year,
     BaseModel,
     Currency,
+    bucketise,
+    event_year,
+    export_attr_counts,
+    export_intervals,
+    naive_utcnow,
 )
-from .purchase import Ticket
 from .product import Voucher
+from .purchase import Ticket
 from .site_state import get_refund_state
+
+__all__ = [
+    "BankAccount",
+    "BankPayment",
+    "BankRefund",
+    "BankTransaction",
+    "Payment",
+    "PaymentSequence",
+    "Refund",
+    "RefundRequest",
+    "StateException",
+    "StripePayment",
+    "StripeRefund",
+    "payment_change",
+]
 
 safechars = "2346789BCDFGHJKMPQRTVWXY"
 
@@ -33,36 +57,36 @@ class StateException(Exception):
 
 class Payment(BaseModel):
     __tablename__ = "payment"
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
 
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
-    provider = db.Column(db.String, nullable=False)
-    currency = db.Column(db.String, nullable=False)
-    amount_int = db.Column(db.Integer, nullable=False)
+    provider: Mapped[str]
+    currency: Mapped[Currency]
+    amount_int: Mapped[int]
 
-    state = db.Column(db.String, nullable=False, default="new")
-    reminder_sent_at = db.Column(db.DateTime, nullable=True)
+    state: Mapped[str] = mapped_column(default="new")
+    reminder_sent_at: Mapped[datetime | None]
 
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    expires = db.Column(db.DateTime, nullable=True)
-    voucher_code = db.Column(
-        db.String, db.ForeignKey("voucher.code"), nullable=True, default=None
-    )
+    created: Mapped[NaiveDT] = mapped_column(default=naive_utcnow)
+    expires: Mapped[NaiveDT | None]
+    voucher_code: Mapped[str | None] = mapped_column(ForeignKey("voucher.code"), default=None)
 
     # VAT invoice number, if issued
-    vat_invoice_number = db.Column(db.Integer, nullable=True)
+    vat_invoice_number: Mapped[int | None]
 
-    refunds = db.relationship("Refund", backref="payment", cascade="all")
-    purchases = db.relationship("Purchase", backref="payment", cascade="all")
-    refund_requests = db.relationship(
-        "RefundRequest", backref="payment", cascade="all, delete-orphan"
+    refunds: Mapped[list[Refund]] = relationship(back_populates="payment", cascade="all")
+    purchases: Mapped[list[Purchase]] = relationship(back_populates="payment", cascade="all")
+    refund_requests: Mapped[list[RefundRequest]] = relationship(
+        back_populates="payment", cascade="all, delete-orphan"
     )
+    voucher: Mapped[Voucher | None] = relationship(back_populates="payment")
+    user: Mapped[User] = relationship("User", back_populates="payments")
 
-    __mapper_args__ = {"polymorphic_on": provider}
+    __mapper_args__ = {"polymorphic_on": "provider"}
 
-    def __init__(self, currency: Currency, amount, voucher_code: Optional[str] = None):
+    def __init__(self, currency: Currency, amount: int | float, voucher_code: str | None = None):
         self.currency = currency
         self.amount = amount
 
@@ -76,24 +100,18 @@ class Payment(BaseModel):
             return {}
 
         purchase_counts = (
-            cls.query.outerjoin(cls.purchases)
-            .group_by(cls.id)
-            .with_entities(func.count(Ticket.id))
+            cls.query.outerjoin(cls.purchases).group_by(cls.id).with_entities(func.count(Ticket.id))
         )
-        refund_counts = (
-            cls.query.outerjoin(cls.refunds)
-            .group_by(cls.id)
-            .with_entities(func.count(Refund.id))
-        )
+        refund_counts = cls.query.outerjoin(cls.refunds).group_by(cls.id).with_entities(func.count(Refund.id))
 
         cls_version = version_class(cls)
         cls_transaction = transaction_class(cls)
         changes = cls.query.join(cls.versions).group_by(cls.id)
         change_counts = changes.with_entities(func.count(cls_version.id))
-        first_changes = (
+        first_changes = select(column("created")).select_from(
             changes.join(cls_version.transaction)
             .with_entities(func.min(cls_transaction.issued_at).label("created"))
-            .from_self()
+            .subquery()
         )
 
         cls_ver_new = aliased(cls_version)
@@ -113,25 +131,20 @@ class Payment(BaseModel):
         )
 
         time_buckets = [timedelta(0), timedelta(minutes=1), timedelta(hours=1)] + [
-            timedelta(d)
-            for d in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 28, 60]
+            timedelta(d) for d in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 28, 60]
         ]
 
         data = {
             "public": {
                 "payments": {
                     "counts": {
-                        "purchases": bucketise(
-                            purchase_counts, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20]
-                        ),
+                        "purchases": bucketise(purchase_counts, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20]),
                         "refunds": bucketise(refund_counts, [0, 1, 2, 3, 4]),
                         "changes": bucketise(change_counts, range(10)),
                         "created_week": export_intervals(
                             first_changes, column("created"), "week", "YYYY-MM-DD"
                         ),
-                        "active_time": bucketise(
-                            [r.active_time for r in active_times], time_buckets
-                        ),
+                        "active_time": bucketise([r.active_time for r in active_times], time_buckets),
                         "amounts": bucketise(
                             cls.query.with_entities(cls.amount_int / 100),
                             [0, 10, 20, 30, 40, 50, 100, 150, 200],
@@ -143,13 +156,11 @@ class Payment(BaseModel):
         }
 
         count_attrs = ["state", "currency"]
-        data["public"]["payments"]["counts"].update(
-            export_attr_counts(cls, count_attrs)
-        )
+        data["public"]["payments"]["counts"].update(export_attr_counts(cls, count_attrs))
 
         return data
 
-    def is_refundable(self, ignore_event_refund_state=False) -> bool:
+    def is_refundable(self, ignore_event_refund_state: bool = False) -> bool:
         return self.state in [
             "charged",
             "paid",
@@ -166,12 +177,12 @@ class Payment(BaseModel):
     def amount(self, val):
         self.amount_int = int(val * 100)
 
-    def change_currency(self, currency: Currency):
+    def change_currency(self, currency: Currency) -> None:
         if self.state in {"paid", "partrefunded", "refunded"}:
             raise StateException("Cannot change currency after payment is reconciled")
 
         if self.currency == currency:
-            raise Exception("Currency is already {}".format(currency))
+            raise Exception(f"Currency is already {currency}")
 
         # Sanity check
         assert self.amount == sum(p.price.value for p in self.purchases)
@@ -195,7 +206,7 @@ class Payment(BaseModel):
         if self.state == "cancelled":
             raise StateException("Payment is already cancelled")
 
-        elif self.state == "refunded":
+        if self.state == "refunded":
             raise StateException("Refunded payments cannot be cancelled")
 
         with db.session.no_autoflush:
@@ -220,7 +231,7 @@ class Payment(BaseModel):
         if self.state == "refunded":
             raise StateException("Payment is already refunded")
 
-        elif self.state == "cancelled":
+        if self.state == "cancelled":
             # If we receive money for a cancelled payment, it will be set to paid
             raise StateException("Refunded payments cannot be cancelled")
 
@@ -229,15 +240,13 @@ class Payment(BaseModel):
             for purchase in self.purchases:
                 if purchase.owner != self.user:
                     raise StateException("Cannot refund transferred purchase")
-                if (
-                    purchase.price_tier.get_price(self.currency).value > 0
-                    and not purchase.is_paid_for
-                ):
+                if purchase.price_tier.get_price(self.currency).value > 0 and not purchase.is_paid_for:
                     # This might turn out to be too strict
                     raise StateException("Purchase is not paid, so cannot be refunded")
 
                 purchase.refund_purchase(refund)
 
+        db.session.add(refund)
         self.state = "refunded"
 
     # TESTME
@@ -253,17 +262,13 @@ class Payment(BaseModel):
 
     def order_number(self):
         """Note this is not a VAT invoice number."""
-        return "WEB-%s-%05d" % (event_year(), self.id)
+        return f"WEB-{event_year()}-{self.id:05d}"
 
     def issue_vat_invoice_number(self):
         if not self.vat_invoice_number:
             sequence_name = "vat_invoice"
             try:
-                seq = (
-                    PaymentSequence.query.filter_by(name=sequence_name)
-                    .with_for_update()
-                    .one()
-                )
+                seq = PaymentSequence.query.filter_by(name=sequence_name).with_for_update().one()
                 seq.value += 1
             except NoResultFound:
                 seq = PaymentSequence()
@@ -272,11 +277,11 @@ class Payment(BaseModel):
                 db.session.add(seq)
 
             self.vat_invoice_number = seq.value
-        return "WEBV-%s-%05d" % (event_year(), self.vat_invoice_number)
+        return f"WEBV-{event_year()}-{self.vat_invoice_number:05d}"
 
     @property
     def expires_in(self):
-        return self.expires - datetime.utcnow()
+        return self.expires - naive_utcnow()
 
     def lock(self):
         Payment.query.with_for_update().get(self.id)
@@ -293,24 +298,24 @@ class BankPayment(Payment):
     name = "Bank transfer"
 
     __mapper_args__ = {"polymorphic_identity": "banktransfer"}
-    bankref = db.Column(db.String, unique=True)
+    bankref: Mapped[str | None] = mapped_column(unique=True)
 
-    def __init__(self, currency: Currency, amount, voucher_code: Optional[str] = None):
+    transactions: Mapped[list[BankTransaction]] = relationship(back_populates="payment")
+
+    def __init__(self, currency: Currency, amount: int | float, voucher_code: str | None = None):
         Payment.__init__(self, currency, amount, voucher_code)
 
         # not cryptographic
         self.bankref = "".join(random.sample(safechars, 8))
 
     def __repr__(self):
-        return "<BankPayment: %s %s>" % (self.state, self.bankref)
+        return f"<BankPayment: {self.state} {self.bankref}>"
 
     def manual_refund(self):
         if self.state not in {"paid", "refund-requested"}:
-            raise StateException(
-                "Only BankPayments that have been paid can be marked as refunded"
-            )
+            raise StateException("Only BankPayments that have been paid can be marked as refunded")
 
-        super(BankPayment, self).manual_refund()
+        super().manual_refund()
 
     @property
     def recommended_destination(self):
@@ -319,13 +324,13 @@ class BankPayment(Payment):
                 return BankAccount.query.filter_by(currency=currency, active=True).one()
             except (MultipleResultsFound, NoResultFound):
                 continue
+        return None
 
     @property
     def customer_reference(self):
         if self.id is None:
             raise Exception(
-                "Customer references can only be generated for payments that have "
-                "been persisted to the database."
+                "Customer references can only be generated for payments that have been persisted to the database."
             )
 
         # Derive an ISO-11649 payment reference for EUR-currency payments
@@ -334,24 +339,33 @@ class BankPayment(Payment):
             customer_reference = f"RF{order_check_digits}{self.bankref}"
             assert iso11649.is_valid(customer_reference)
             return customer_reference
-        else:
-            return self.bankref
+        return self.bankref
 
 
 class BankAccount(BaseModel):
     __tablename__ = "bank_account"
     __export_data__ = False
-    id = db.Column(db.Integer, primary_key=True)
-    sort_code = db.Column(db.String)
-    acct_id = db.Column(db.String)
-    currency = db.Column(db.String, nullable=False)
-    active = db.Column(db.Boolean)
-    payee_name = db.Column(db.String)
-    institution = db.Column(db.String, nullable=False)
-    address = db.Column(db.String, nullable=False)
-    swift = db.Column(db.String)
-    iban = db.Column(db.String)
-    borderless_account_id = db.Column(db.Integer)
+    __table_args__ = (
+        Index(
+            "ix_bank_account_sort_code_acct_id",
+            "sort_code",
+            "acct_id",
+            unique=True,
+        ),
+    )
+    id: Mapped[int] = mapped_column(primary_key=True)
+    sort_code: Mapped[str | None]
+    acct_id: Mapped[str | None]
+    currency: Mapped[str]
+    active: Mapped[bool | None]
+    payee_name: Mapped[str | None]
+    institution: Mapped[str]
+    address: Mapped[str]
+    swift: Mapped[str | None]
+    iban: Mapped[str | None]
+    wise_balance_id: Mapped[int | None]
+
+    transactions: Mapped[list[BankTransaction]] = relationship(back_populates="account")
 
     def __init__(
         self,
@@ -364,7 +378,7 @@ class BankAccount(BaseModel):
         address,
         swift,
         iban,
-        borderless_account_id=None,
+        wise_balance_id=None,
     ):
         self.sort_code = sort_code
         self.acct_id = acct_id
@@ -375,46 +389,47 @@ class BankAccount(BaseModel):
         self.address = address
         self.swift = swift
         self.iban = iban
-        self.borderless_account_id = borderless_account_id
+        self.wise_balance_id = wise_balance_id
 
     @classmethod
     def get(cls, sort_code, acct_id):
         return cls.query.filter_by(acct_id=acct_id, sort_code=sort_code).one()
 
     def __repr__(self):
-        return "<BankAccount: %s %s>" % (self.sort_code, self.acct_id)
-
-
-db.Index(
-    "ix_bank_account_sort_code_acct_id",
-    BankAccount.sort_code,
-    BankAccount.acct_id,
-    unique=True,
-)
+        return f"<BankAccount: {self.sort_code} {self.acct_id}>"
 
 
 class BankTransaction(BaseModel):
     __tablename__ = "bank_transaction"
     __export_data__ = False
+    __table_args__ = (
+        Index(
+            "ix_bank_transaction_u1",
+            "account_id",
+            "posted",
+            "type",
+            "amount_int",
+            "payee",
+            "fit_id",
+            unique=True,
+        ),
+    )
 
-    id = db.Column(db.Integer, primary_key=True)
-    account_id = db.Column(db.Integer, db.ForeignKey(BankAccount.id), nullable=False)
-    posted = db.Column(db.DateTime, nullable=False)
-    type = db.Column(db.String, nullable=False)
-    amount_int = db.Column(db.Integer, nullable=False)
-    fit_id = db.Column(db.String, index=True)  # allegedly unique, but don't trust it
-    wise_id = db.Column(db.String, index=True)
-    payee = db.Column(
-        db.String, nullable=False
-    )  # this is what OFX calls it. it's really description
-    payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"))
-    suppressed = db.Column(db.Boolean, nullable=False, default=False)
-    account = db.relationship(BankAccount, backref="transactions")
-    payment = db.relationship(BankPayment, backref="transactions")
+    id: Mapped[int] = mapped_column(primary_key=True)
+    account_id: Mapped[int] = mapped_column(ForeignKey(BankAccount.id))
+    posted: Mapped[datetime]
+    type: Mapped[str]
+    amount_int: Mapped[int]
+    fit_id: Mapped[str | None] = mapped_column(index=True)  # allegedly unique, but don't trust it
+    wise_id: Mapped[str | None] = mapped_column(index=True)
+    payee: Mapped[str]  # this is what OFX calls it. it's really description
+    payment_id: Mapped[int | None] = mapped_column(ForeignKey("payment.id"))
+    suppressed: Mapped[bool] = mapped_column(default=False)
 
-    def __init__(
-        self, account_id, posted, type, amount, payee, fit_id=None, wise_id=None
-    ):
+    account: Mapped[BankAccount] = relationship(back_populates="transactions")
+    payment: Mapped[BankPayment | None] = relationship(back_populates="transactions")
+
+    def __init__(self, account_id, posted, type, amount, payee, fit_id=None, wise_id=None):
         self.account_id = account_id
         self.posted = posted
         self.type = type
@@ -424,7 +439,7 @@ class BankTransaction(BaseModel):
         self.wise_id = wise_id
 
     def __repr__(self):
-        return "<BankTransaction: %s, %s>" % (self.amount, self.payee)
+        return f"<BankTransaction: {self.amount}, {self.payee}>"
 
     @property
     def amount(self):
@@ -445,10 +460,12 @@ class BankTransaction(BaseModel):
         )
         return matching
 
-    def match_payment(self) -> Optional[BankPayment]:
+    def match_payment(self) -> BankPayment | None:
         for bankref in self._recognized_bankrefs:
             try:
-                return BankPayment.query.filter_by(bankref=bankref).one()
+                return db.session.execute(
+                    select(BankPayment).where(BankPayment.bankref == bankref)
+                ).scalar_one()
             except NoResultFound:
                 continue
 
@@ -496,7 +513,7 @@ class BankTransaction(BaseModel):
         ref = self.payee.upper()
         hdr = "(RF[0-9][0-9] ?)?"  # optional ISO11649 header + check-digits
 
-        found = re.findall("%s([%s]{4}[- ]?[%s]{4})" % (hdr, safechars, safechars), ref)
+        found = re.findall(f"{hdr}([{safechars}]{{4}}[- ]?[{safechars}]{{4}})", ref)
         for iso_header, f in found:
             bankref = f.replace("-", "").replace(" ", "")
             if iso_header and not iso11649.is_valid(iso_header + bankref):
@@ -504,36 +521,22 @@ class BankTransaction(BaseModel):
             yield bankref
 
 
-db.Index(
-    "ix_bank_transaction_u1",
-    BankTransaction.account_id,
-    BankTransaction.posted,
-    BankTransaction.type,
-    BankTransaction.amount_int,
-    BankTransaction.payee,
-    BankTransaction.fit_id,
-    unique=True,
-)
-
-
 class StripePayment(Payment):
     name = "Stripe payment"
 
     __mapper_args__ = {"polymorphic_identity": "stripe"}
-    intent_id = db.Column(db.String, unique=True)
-    charge_id = db.Column(db.String, unique=True)
+    intent_id: Mapped[str | None] = mapped_column(unique=True)
+    charge_id: Mapped[str | None] = mapped_column(unique=True)
 
     def cancel(self):
         if self.state in ["charged", "paid"]:
-            raise StateException(
-                "Cannot automatically cancel charging/charged Stripe payments"
-            )
+            raise StateException("Cannot automatically cancel charging/charged Stripe payments")
 
-        super(StripePayment, self).cancel()
+        super().cancel()
 
     @property
     def description(self):
-        return "EMF {} purchase".format(event_year())
+        return f"EMF {event_year()} purchase"
 
     def manual_refund(self):
         if self.state not in {"charged", "paid", "refund-requested"}:
@@ -541,20 +544,22 @@ class StripePayment(Payment):
                 "Only StripePayments that have been paid or charged can be marked as refunded"
             )
 
-        super(StripePayment, self).manual_refund()
+        super().manual_refund()
 
 
 class Refund(BaseModel):
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
     __tablename__ = "refund"
-    id = db.Column(db.Integer, primary_key=True)
-    payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"), nullable=False)
-    provider = db.Column(db.String, nullable=False)
-    amount_int = db.Column(db.Integer, nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    purchases = db.relationship("Purchase", backref=db.backref("refund", cascade="all"))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    payment_id: Mapped[int] = mapped_column(ForeignKey("payment.id"))
+    provider: Mapped[str]
+    amount_int: Mapped[int]
+    timestamp: Mapped[datetime] = mapped_column(default=naive_utcnow)
 
-    __mapper_args__ = {"polymorphic_on": provider}
+    purchases: Mapped[list[Purchase]] = relationship(back_populates="refund")
+    payment: Mapped[Payment] = relationship(back_populates="refunds")
+
+    __mapper_args__ = {"polymorphic_on": "provider"}
 
     def __init__(self, payment, amount):
         self.payment_id = payment.id
@@ -568,17 +573,13 @@ class Refund(BaseModel):
             return {}
 
         purchase_counts = (
-            cls.query.outerjoin(cls.purchases)
-            .group_by(cls.id)
-            .with_entities(func.count("Ticket.id"))
+            cls.query.outerjoin(cls.purchases).group_by(cls.id).with_entities(func.count("Ticket.id"))
         )
         data = {
             "public": {
                 "refunds": {
                     "counts": {
-                        "timestamp_week": export_intervals(
-                            cls.query, cls.timestamp, "week", "YYYY-MM-DD"
-                        ),
+                        "timestamp_week": export_intervals(cls.query, cls.timestamp, "week", "YYYY-MM-DD"),
                         "purchases": bucketise(purchase_counts, [0, 1, 2, 3, 4]),
                         "amounts": bucketise(
                             cls.query.with_entities(cls.amount_int / 100),
@@ -608,24 +609,25 @@ class BankRefund(Refund):
 class StripeRefund(Refund):
     __mapper_args__ = {"polymorphic_identity": "stripe"}
 
-    refundid = db.Column(db.String, unique=True)
+    refundid: Mapped[str | None] = mapped_column(unique=True)
 
 
 class RefundRequest(BaseModel):
-    id = db.Column(db.Integer, primary_key=True)
-    payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"))
-    donation = db.Column(db.Numeric, server_default="0", nullable=False)
-    currency = db.Column(db.String)
-    sort_code = db.Column(db.String)
-    account = db.Column(db.String)
-    swiftbic = db.Column(db.String)
-    iban = db.Column(db.String)
-    payee_name = db.Column(db.String)
-    note = db.Column(db.String)
+    __tablename__ = "refund_request"
 
-    purchases = db.relationship(
-        "Purchase", backref=db.backref("refund_request", cascade="all")
-    )
+    id: Mapped[int] = mapped_column(primary_key=True)
+    payment_id: Mapped[int] = mapped_column(ForeignKey("payment.id"))
+    donation: Mapped[Decimal] = mapped_column(Numeric, default=0)
+    currency: Mapped[str | None]
+    sort_code: Mapped[str | None]
+    account: Mapped[str | None]
+    swiftbic: Mapped[str | None]
+    iban: Mapped[str | None]
+    payee_name: Mapped[str | None]
+    note: Mapped[str | None]
+
+    purchases: Mapped[list[Purchase]] = relationship(back_populates="refund_request")
+    payment: Mapped[Payment] = relationship(back_populates="refund_requests")
 
     @property
     def method(self):
@@ -634,13 +636,9 @@ class RefundRequest(BaseModel):
         This will be "stripe" if the payment can be refunded through Stripe,
         and "banktransfer" otherwise.
         """
-        if (
-            type(self.payment) is StripePayment
-            and self.payment.currency == self.currency
-        ):
+        if type(self.payment) is StripePayment and self.payment.currency == self.currency:
             return "stripe"
-        else:
-            return "banktransfer"
+        return "banktransfer"
 
 
 class PaymentSequence(BaseModel):
@@ -648,5 +646,12 @@ class PaymentSequence(BaseModel):
     Currently used for storing VAT invoice sequences, which must be monotonic.
     """
 
-    name = db.Column(db.String, primary_key=True)
-    value = db.Column(db.Integer, nullable=False)
+    __tablename__ = "payment_sequence"
+
+    name: Mapped[str] = mapped_column(primary_key=True)
+    value: Mapped[int]
+
+    @classmethod
+    def get_export_data(cls):
+        rows = db.session.scalars(select(cls))
+        return {"public": {r.name: r.value for r in rows}}

@@ -1,19 +1,24 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta, time
+import typing
 from collections import namedtuple
-from typing import Optional
+from collections.abc import Sequence
+from typing import Optional, cast
 from dateutil.parser import parse as parse_date
 import re
 from itertools import groupby
-from geoalchemy2 import Geometry
+from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import to_shape
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.mutable import MutableList
 
-from sqlalchemy import UniqueConstraint, func, select, text
-from sqlalchemy.orm import column_property
-from slugify import slugify_unicode
+from sqlalchemy import Column, ForeignKey, Integer, Table, UniqueConstraint, func, select, or_
+from sqlalchemy.orm import column_property, relationship, Mapped, mapped_column
+from slugify.slugify import slugify
 from models import (
     export_attr_counts,
+    naive_utcnow,
     export_attr_edits,
     export_intervals,
     bucketise,
@@ -24,10 +29,29 @@ from models import (
 from main import db
 from .user import User
 from .cfp_tag import ProposalTag
+from .village import Village
 from . import BaseModel
 
+if typing.TYPE_CHECKING:
+    from .cfp_tag import Tag
+    from .event_tickets import EventTicket
+    from .volunteer.shift import Shift
 
-HUMAN_CFP_TYPES = {
+__all__ = [
+    "Proposal",
+    "PerformanceProposal",
+    "TalkProposal",
+    "WorkshopProposal",
+    "YouthWorkshopProposal",
+    "InstallationProposal",
+    "LightningTalkProposal",
+    "CFPMessage",
+    "CFPVote",
+    "Venue",
+]
+
+
+HUMAN_CFP_TYPES: dict[str, str] = {
     "performance": "performance",
     "talk": "talk",
     "workshop": "workshop",
@@ -246,13 +270,16 @@ def get_days_map():
 
 
 def proposal_slug(title) -> str:
-    slug = slugify_unicode(title).lower()
+    replacements = [
+        ["'", ""],
+    ]
+    slug = slugify(title, replacements=replacements, allow_unicode=True)
     if len(slug) > 60:
         words = re.split(" +|[,.;:!?]+", title)
         break_words = ["and", "which", "with", "without", "for", "-", ""]
 
         for i, word in reversed(list(enumerate(words))):
-            new_slug = slugify_unicode(" ".join(words[:i])).lower()
+            new_slug = slugify(" ".join(words[:i]), replacements=replacements, allow_unicode=True)
             if word in break_words:
                 if len(new_slug) > 10 and not len(new_slug) > 60:
                     slug = new_slug
@@ -292,13 +319,8 @@ def make_periods_contiguous(time_periods):
     time_periods.sort(key=lambda x: x.start)
     contiguous_periods = [time_periods.pop(0)]
     for time_period in time_periods:
-        if (
-            time_period.start <= contiguous_periods[-1].end
-            and contiguous_periods[-1].end < time_period.end
-        ):
-            contiguous_periods[-1] = cfp_period(
-                contiguous_periods[-1].start, time_period.end
-            )
+        if time_period.start <= contiguous_periods[-1].end and contiguous_periods[-1].end < time_period.end:
+            contiguous_periods[-1] = cfp_period(contiguous_periods[-1].start, time_period.end)
             continue
 
         contiguous_periods.append(time_period)
@@ -313,27 +335,25 @@ class InvalidVenueException(Exception):
     pass
 
 
-FavouriteProposal = db.Table(
+FavouriteProposal = Table(
     "favourite_proposal",
     BaseModel.metadata,
-    db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
-    db.Column(
+    Column("user_id", Integer, ForeignKey("user.id"), primary_key=True),
+    Column(
         "proposal_id",
-        db.Integer,
-        db.ForeignKey("proposal.id"),
+        Integer,
+        ForeignKey("proposal.id"),
         primary_key=True,
         index=True,
     ),
 )
 
 
-ProposalAllowedVenues = db.Table(
+ProposalAllowedVenues = Table(
     "proposal_allowed_venues",
     BaseModel.metadata,
-    db.Column(
-        "proposal_id", db.Integer, db.ForeignKey("proposal.id"), primary_key=True
-    ),
-    db.Column("venue_id", db.Integer, db.ForeignKey("venue.id"), primary_key=True),
+    Column("proposal_id", Integer, ForeignKey("proposal.id"), primary_key=True),
+    Column("venue_id", Integer, ForeignKey("venue.id"), primary_key=True),
 )
 
 
@@ -341,110 +361,112 @@ class Proposal(BaseModel):
     __versioned__ = {"exclude": ["favourites", "favourite_count"]}
     __tablename__ = "proposal"
 
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    anonymiser_id = db.Column(db.Integer, db.ForeignKey("user.id"), default=None)
-    created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    modified = db.Column(
-        db.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow
-    )
-    state = db.Column(db.String, nullable=False, default="new")
-    type = db.Column(db.String, nullable=False)  # talk, workshop or installation
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    anonymiser_id: Mapped[int | None] = mapped_column(ForeignKey("user.id"), default=None)
+    created: Mapped[datetime] = mapped_column(default=naive_utcnow)
+    modified: Mapped[datetime] = mapped_column(default=naive_utcnow, onupdate=naive_utcnow)
+    state: Mapped[str] = mapped_column(default="new")
+    type: Mapped[str]  # talk, workshop or installation
 
-    is_accepted = column_property(state.in_(["accepted", "finalised"]))
+    is_accepted: Mapped[bool] = column_property(state.in_(["accepted", "finalised"]))
+    should_be_exported: Mapped[bool] = column_property(state.in_(["accepted", "finalised"]))
 
     # Core information
-    title = db.Column(db.String, nullable=False)
-    description = db.Column(db.String, nullable=False)
+    title: Mapped[str]
+    description: Mapped[str]
 
-    equipment_required = db.Column(db.String)
-    funding_required = db.Column(db.String)
-    additional_info = db.Column(db.String)
-    length = db.Column(db.String)  # only used for talks and workshops
-    notice_required = db.Column(db.String)
-    private_notes = db.Column(db.String)
+    equipment_required: Mapped[str | None]
+    funding_required: Mapped[str | None]
+    additional_info: Mapped[str | None]
+    length: Mapped[str | None]  # only used for talks and workshops
+    notice_required: Mapped[str | None]
+    private_notes: Mapped[str | None]
 
-    tags = db.relationship(
-        "Tag",
-        backref="proposals",
+    tags: Mapped[list[Tag]] = relationship(
+        back_populates="proposals",
         cascade="all",
         secondary=ProposalTag,
     )
 
     # Flags
-    needs_help = db.Column(db.Boolean, nullable=False, default=False)
-    needs_money = db.Column(db.Boolean, nullable=False, default=False)
-    one_day = db.Column(db.Boolean, nullable=False, default=False)
-    has_rejected_email = db.Column(db.Boolean, nullable=False, default=False)
-    user_scheduled = db.Column(db.Boolean, nullable=False, default=False)
+    needs_help: Mapped[bool] = mapped_column(default=False)
+    needs_money: Mapped[bool] = mapped_column(default=False)
+    one_day: Mapped[bool] = mapped_column(default=False)
+    has_rejected_email: Mapped[bool] = mapped_column(default=False)
+    user_scheduled: Mapped[bool] = mapped_column(default=False)
 
     # References to this table
-    messages = db.relationship("CFPMessage", backref="proposal")
-    votes = db.relationship("CFPVote", backref="proposal")
-    favourites = db.relationship(
-        User, secondary=FavouriteProposal, backref=db.backref("favourites")
+    messages: Mapped[list[CFPMessage]] = relationship(back_populates="proposal")
+    votes: Mapped[list[CFPVote]] = relationship(back_populates="proposal")
+    favourites: Mapped[list[User]] = relationship(
+        secondary=FavouriteProposal,
+        back_populates="favourites",
     )
+    user: Mapped[User] = relationship(back_populates="proposals", foreign_keys=[user_id])
+    anonymiser: Mapped[User | None] = relationship(
+        back_populates="anonymised_proposals", foreign_keys=[anonymiser_id]
+    )
+    shifts: Mapped[list["Shift"]] = relationship(back_populates="proposal")
 
     # Convenience for individual objects. Use an outerjoin and groupby for more than a few records
     favourite_count = column_property(
-        select([func.count(FavouriteProposal.c.proposal_id)])
+        select(func.count(FavouriteProposal.c.proposal_id))
         .where(FavouriteProposal.c.proposal_id == id)
-        .scalar_subquery(),  # type: ignore[attr-defined]
+        .scalar_subquery(),
         deferred=True,
     )
 
     # Fields for finalised info
-    published_names = db.Column(db.String)
-    published_pronouns = db.Column(db.String)
-    published_title = db.Column(db.String)
-    published_description = db.Column(db.String)
-    arrival_period = db.Column(db.String)
-    departure_period = db.Column(db.String)
-    telephone_number = db.Column(db.String)
-    eventphone_number = db.Column(db.String)
-    may_record = db.Column(db.Boolean)
-    video_privacy = db.Column(db.String)
-    needs_laptop = db.Column(db.Boolean)
-    available_times = db.Column(db.String)
-    family_friendly = db.Column(db.Boolean, default=False)
-    content_note = db.Column(db.String, nullable=True)
+    published_names: Mapped[str | None]
+    published_pronouns: Mapped[str | None]
+    published_title: Mapped[str | None]
+    published_description: Mapped[str | None]
+    arrival_period: Mapped[str | None]
+    departure_period: Mapped[str | None]
+    telephone_number: Mapped[str | None]
+    eventphone_number: Mapped[str | None]
+    may_record: Mapped[bool | None]
+    video_privacy: Mapped[str | None]
+    needs_laptop: Mapped[bool | None]
+    available_times: Mapped[str | None]
+    family_friendly: Mapped[bool | None] = mapped_column(default=False)
+    content_note: Mapped[str | None]
 
     # Fields for scheduling
     # hide_from_schedule -- do not display this item
-    hide_from_schedule = db.Column(db.Boolean, default=False, nullable=False)
+    hide_from_schedule: Mapped[bool] = mapped_column(default=False)
     # manually_scheduled -- make the scheduler ignore this
-    manually_scheduled = db.Column(db.Boolean, default=False, nullable=False)
-    allowed_venues = db.relationship(
-        "Venue",
+    manually_scheduled: Mapped[bool] = mapped_column(default=False)
+    allowed_venues: Mapped[list[Venue]] = relationship(
         secondary=ProposalAllowedVenues,
-        backref="allowed_proposals",
+        back_populates="allowed_proposals",
     )
-    allowed_times = db.Column(db.String, nullable=True)
-    scheduled_duration = db.Column(db.Integer, nullable=True)
-    scheduled_time = db.Column(db.DateTime, nullable=True)
-    scheduled_venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"))
-    potential_time = db.Column(db.DateTime, nullable=True)
-    potential_venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"))
+    allowed_times: Mapped[str | None]
+    scheduled_duration: Mapped[int | None]
+    scheduled_time: Mapped[datetime | None]
+    scheduled_venue_id: Mapped[int | None] = mapped_column(ForeignKey("venue.id"))
+    potential_time: Mapped[datetime | None]
+    potential_venue_id: Mapped[int | None] = mapped_column(ForeignKey("venue.id"))
 
-    scheduled_venue = db.relationship(
-        "Venue",
-        backref="proposals",
+    scheduled_venue: Mapped[Venue | None] = relationship(
+        back_populates="proposals",
         primaryjoin="Venue.id == Proposal.scheduled_venue_id",
     )
-    potential_venue = db.relationship(
-        "Venue", primaryjoin="Venue.id == Proposal.potential_venue_id"
+    potential_venue: Mapped[Venue | None] = relationship(
+        primaryjoin="Venue.id == Proposal.potential_venue_id"
     )
 
     # Video stuff
-    c3voc_url = db.Column(db.String)
-    youtube_url = db.Column(db.String)
-    thumbnail_url = db.Column(db.String)
-    video_recording_lost = db.Column(db.Boolean, default=False)
+    c3voc_url: Mapped[str | None]
+    youtube_url: Mapped[str | None]
+    thumbnail_url: Mapped[str | None]
+    video_recording_lost: Mapped[bool | None] = mapped_column(default=False)
 
     type_might_require_ticket = False
-    tickets = db.relationship("EventTicket", backref="proposal")
+    tickets: Mapped[list[EventTicket]] = relationship(back_populates="proposal")
 
-    __mapper_args__ = {"polymorphic_on": type}
+    __mapper_args__ = {"polymorphic_on": "type"}
 
     @classmethod
     def query_accepted(cls, include_user_scheduled=False):
@@ -452,6 +474,21 @@ class Proposal(BaseModel):
         if not include_user_scheduled:
             query = query.filter(cls.user_scheduled.is_(False))
         return query
+
+    @classmethod
+    def public_export_columns(cls):
+        return [
+            cls.published_title,
+            cls.published_description,
+            cls.published_names.label("names"),
+            cls.published_pronouns.label("pronouns"),
+            cls.may_record,
+            cls.video_privacy,
+            cls.scheduled_time,
+            cls.scheduled_duration,
+            Venue.name.label("venue"),
+            Village.id.label("venue_village_id"),
+        ]
 
     @classmethod
     def get_export_data(cls):
@@ -519,7 +556,7 @@ class Proposal(BaseModel):
         ).order_by(cls.id)
 
         if cls.__name__ == "WorkshopProposal":
-            proposals = proposals.add_columns(cls.attendees, cls.cost)
+            proposals = proposals.add_columns(cls.attendees, cls.cost, cls.age_range)
         elif cls.__name__ == "InstallationProposal":
             proposals = proposals.add_columns(cls.size, cls.installation_funding)
         elif cls.__name__ == "YouthWorkshopProposal":
@@ -558,21 +595,11 @@ class Proposal(BaseModel):
             anon_favourites.append([p.id for p in proposals])
         anon_favourites.sort()
 
-        public_columns = (
-            cls.published_title,
-            cls.published_description,
-            cls.published_names.label("names"),
-            cls.published_pronouns.label("pronouns"),
-            cls.may_record,
-            cls.video_privacy,
-            cls.scheduled_time,
-            cls.scheduled_duration,
-            Venue.name.label("venue"),
-        )
-        accepted_public = (
-            cls.query.filter(cls.is_accepted)
+        exported_public = (
+            cls.query.filter(cls.should_be_exported)
             .outerjoin(cls.scheduled_venue)
-            .with_entities(*public_columns)
+            .outerjoin(Venue.village)
+            .with_entities(*cls.public_export_columns())
         )
 
         favourite_counts = [p.favourite_count for p in proposals]
@@ -589,13 +616,10 @@ class Proposal(BaseModel):
                 "proposals": {
                     "counts": export_attr_counts(cls, count_attrs),
                     "edits": export_attr_edits(cls, edits_attrs),
-                    "accepted": accepted_public,
+                    # This is still called accepted, but might not 'just' be accepted (e.g. Lightning Talks)
+                    "accepted": exported_public,
                 },
-                "favourites": {
-                    "counts": bucketise(
-                        favourite_counts, [0, 1, 10, 20, 30, 40, 50, 100, 200]
-                    )
-                },
+                "favourites": {"counts": bucketise(favourite_counts, [0, 1, 10, 20, 30, 40, 50, 100, 200])},
             },
             "tables": [
                 "proposal",
@@ -610,9 +634,15 @@ class Proposal(BaseModel):
 
         return data
 
-    def get_user_vote(self, user) -> "CFPVote":
+    def get_user_vote(self, user) -> CFPVote | None:
         # there can't be more than one vote per user per proposal
-        return CFPVote.query.filter_by(proposal_id=self.id, user_id=user.id).first()
+        return (
+            db.session.execute(
+                select(CFPVote).where(CFPVote.proposal_id == self.id, CFPVote.user_id == user.id)
+            )
+            .scalars()
+            .first()
+        )
 
     def set_state(self, state):
         state = state.lower()
@@ -620,9 +650,7 @@ class Proposal(BaseModel):
             raise CfpStateException('"%s" is not a valid state' % state)
 
         if state not in CFP_STATES[self.state]:
-            raise CfpStateException(
-                '"%s->%s" is not a valid transition' % (self.state, state)
-            )
+            raise CfpStateException('"%s->%s" is not a valid transition' % (self.state, state))
 
         self.state = state
 
@@ -633,11 +661,7 @@ class Proposal(BaseModel):
         return len([v for v in self.votes if v.note and len(v.note) > 0])
 
     def get_unread_messages(self, user):
-        return [
-            m
-            for m in self.messages
-            if (not m.has_been_read and m.is_user_recipient(user))
-        ]
+        return [m for m in self.messages if (not m.has_been_read and m.is_user_recipient(user))]
 
     def get_unread_count(self, user):
         return len(self.get_unread_messages(user))
@@ -650,18 +674,20 @@ class Proposal(BaseModel):
 
     def has_ticket(self) -> bool:
         "Does the submitter have a ticket?"
-        admission_tickets = len(
-            list(self.user.get_owned_tickets(paid=True, type="admission_ticket"))
-        )
+        admission_tickets = len(list(self.user.get_owned_tickets(paid=True, type="admission_ticket")))
         return admission_tickets > 0 or self.user.will_have_ticket
 
-    def get_allowed_venues(self) -> list["Venue"]:
+    def get_allowed_venues(self) -> Sequence["Venue"]:
         if self.allowed_venues:
             return self.allowed_venues
         elif self.user_scheduled:
-            return Venue.query.filter(~Venue.scheduled_content_only).all()
+            return db.session.execute(select(Venue).where(~Venue.scheduled_content_only)).scalars().all()
         else:
-            return Venue.query.filter(Venue.default_for_types.any(self.type)).all()
+            return (
+                db.session.execute(select(Venue).where(Venue.default_for_types.any_() == self.type))
+                .scalars()
+                .all()
+            )
 
     def fix_hard_time_limits(self, time_periods):
         # This should be fixed by the string periods being burned and replaced
@@ -672,9 +698,7 @@ class Proposal(BaseModel):
                     p.start.hour <= HARD_START_LIMIT[self.type][0]
                     and p.start.minute < HARD_START_LIMIT[self.type][1]
                 ):
-                    p = cfp_period(
-                        p.start.replace(minute=HARD_START_LIMIT[self.type][1]), p.end
-                    )
+                    p = cfp_period(p.start.replace(minute=HARD_START_LIMIT[self.type][1]), p.end)
                 trimmed_periods.append(p)
             time_periods = trimmed_periods
         return time_periods
@@ -687,13 +711,9 @@ class Proposal(BaseModel):
                 if p:
                     start, end = p.split(" > ")
                     try:
-                        time_periods.append(
-                            cfp_period(
-                                parse_date(start.strip()), parse_date(end.strip())
-                            )
-                        )
+                        time_periods.append(cfp_period(parse_date(start.strip()), parse_date(end.strip())))
                     # If someone has entered garbage, dump the lot
-                    except ValueError as e:
+                    except ValueError:
                         time_periods = []
                         break
 
@@ -711,16 +731,13 @@ class Proposal(BaseModel):
         return make_periods_contiguous(time_periods)
 
     def get_allowed_time_periods_serialised(self):
-        return "\n".join(
-            ["%s > %s" % (v.start, v.end) for v in self.get_allowed_time_periods()]
-        )
+        return "\n".join(["%s > %s" % (v.start, v.end) for v in self.get_allowed_time_periods()])
 
     def get_allowed_time_periods_with_default(self):
         allowed_time_periods = self.get_allowed_time_periods()
         if not allowed_time_periods:
             allowed_time_periods = [
-                timeslot_to_period(ts, type=self.type)
-                for ts in PROPOSAL_TIMESLOTS[self.type]
+                timeslot_to_period(ts, type=self.type) for ts in PROPOSAL_TIMESLOTS[self.type]
             ]
 
         allowed_time_periods = self.fix_hard_time_limits(allowed_time_periods)
@@ -728,8 +745,7 @@ class Proposal(BaseModel):
 
     def get_preferred_time_periods_with_default(self):
         preferred_time_periods = [
-            timeslot_to_period(ts, type=self.type)
-            for ts in PREFERRED_TIMESLOTS.get(self.type, [])
+            timeslot_to_period(ts, type=self.type) for ts in PREFERRED_TIMESLOTS.get(self.type, [])
         ]
 
         preferred_time_periods = self.fix_hard_time_limits(preferred_time_periods)
@@ -749,17 +765,25 @@ class Proposal(BaseModel):
     def get_conflicting_content(self) -> list["Proposal"]:
         # This is for attendee content, so will only conflict with other attendee
         # content or workshops. Workshops may not have a scheduled time/duration.
+        if self.scheduled_time is None or self.scheduled_duration is None:
+            # TODO: should this just return [] ?
+            raise ValueError("scheduled_time or scheduled_duration are None")
         return [
             p
-            for p in Proposal.query.filter(
-                Proposal.id != self.id,
-                Proposal.scheduled_venue_id == self.scheduled_venue_id,
-                Proposal.scheduled_time.is_not(None),
-                Proposal.scheduled_duration.is_not(None),
-            ).all()
+            for p in db.session.execute(
+                select(Proposal).filter(
+                    Proposal.id != self.id,
+                    Proposal.scheduled_venue_id == self.scheduled_venue_id,
+                    Proposal.scheduled_time.is_not(None),
+                    Proposal.scheduled_duration.is_not(None),
+                )
+            )
+            .scalars()
+            .all()
+            # These casts are safe given the query above checks for NULL
             if self.scheduled_time + timedelta(minutes=self.scheduled_duration)
-            > p.scheduled_time
-            and p.scheduled_time + timedelta(minutes=p.scheduled_duration)
+            > cast(datetime, p.scheduled_time)
+            and cast(datetime, p.scheduled_time) + timedelta(minutes=cast(int, p.scheduled_duration))
             > self.scheduled_time
         ]
 
@@ -799,36 +823,71 @@ class Proposal(BaseModel):
 
     @property
     def latlon(self):
-        if self.scheduled_venue and self.scheduled_venue.location:
-            loc = to_shape(self.scheduled_venue.location)
-            return (loc.y, loc.x)
-        return None
+        return self.scheduled_venue.latlon if self.scheduled_venue else None
 
     @property
     def map_link(self) -> Optional[str]:
-        latlon = self.latlon
-        if latlon:
-            return "https://map.emfcamp.org/#18.5/%s/%s/m=%s,%s" % (
-                latlon[0],
-                latlon[1],
-                latlon[0],
-                latlon[1],
-            )
-        return None
+        return self.scheduled_venue.map_link if self.scheduled_venue else None
 
     @property
     def display_title(self) -> str:
         return self.published_title or self.title
 
+
+class PerformanceProposal(Proposal):
+    __mapper_args__ = {"polymorphic_identity": "performance"}
+    human_type = HUMAN_CFP_TYPES["performance"]
+
+
+class TalkProposal(Proposal):
+    __mapper_args__ = {"polymorphic_identity": "talk"}
+    human_type = HUMAN_CFP_TYPES["talk"]
+
+
+class WorkshopProposal(Proposal):
+    __mapper_args__ = {"polymorphic_identity": "workshop"}
+    human_type = HUMAN_CFP_TYPES["workshop"]
+    attendees: Mapped[str | None]
+    cost: Mapped[str | None]
+    age_range: Mapped[str | None]
+    participant_equipment: Mapped[str | None]
+    published_age_range: Mapped[str | None]
+    published_cost: Mapped[str | None]
+    published_participant_equipment: Mapped[str | None]
+
+    requires_ticket: Mapped[bool | None] = mapped_column(default=False)
+    total_tickets: Mapped[int | None]
+    non_lottery_tickets: Mapped[int | None] = mapped_column(default=5)
+    max_tickets_per_person = 2
+    type_might_require_ticket = True
+
+    def get_total_capacity(self):
+        if not self.requires_ticket:
+            return 0
+        return self.total_tickets - self.sum_tickets_in_state("ticket")
+
+    def has_ticket_capacity(self):
+        return self.get_total_capacity() > 0
+
+    def get_lottery_capacity(self):
+        return self.get_total_capacity() - self.non_lottery_tickets
+
+    def has_lottery_capacity(self):
+        return self.get_lottery_capacity() > 0
+
+    def sum_tickets_in_state(self, state: str) -> int:
+        if not self.requires_ticket:
+            return 0
+        return sum([t.ticket_count for t in self.tickets if t.state == state])
+
     @property
     def display_cost(self) -> str:
-        if self.cost is None and self.published_cost is None:
-            return ""
-
         if self.published_cost is not None:
             cost = self.published_cost.strip()
-        else:
+        elif self.cost is not None:
             cost = self.cost.strip()
+        else:
+            return ""
 
         # Some people put in a string, some just put in a £ amount
         try:
@@ -860,72 +919,52 @@ class Proposal(BaseModel):
         return ""
 
 
-class PerformanceProposal(Proposal):
-    __mapper_args__ = {"polymorphic_identity": "performance"}
-    human_type = HUMAN_CFP_TYPES["performance"]
-
-
-class TalkProposal(Proposal):
-    __mapper_args__ = {"polymorphic_identity": "talk"}
-    human_type = HUMAN_CFP_TYPES["talk"]
-
-
-class WorkshopProposal(Proposal):
-    __mapper_args__ = {"polymorphic_identity": "workshop"}
-    human_type = HUMAN_CFP_TYPES["workshop"]
-    attendees = db.Column(db.String)
-    cost = db.Column(db.String)
-    age_range = db.Column(db.String)
-    participant_equipment = db.Column(db.String)
-    published_age_range = db.Column(db.String)
-    published_cost = db.Column(db.String)
-    published_participant_equipment = db.Column(db.String)
-
-    requires_ticket = db.Column(db.Boolean, default=False, nullable=True)
-    total_tickets = db.Column(db.Integer, nullable=True)
-    non_lottery_tickets = db.Column(db.Integer, default=5, nullable=True)
-    max_tickets_per_person = 2
-    type_might_require_ticket = True
-
-    def get_total_capacity(self):
-        if not self.requires_ticket:
-            return 0
-        return self.total_tickets - self.sum_tickets_in_state("ticket")
-
-    def has_ticket_capacity(self):
-        return self.get_total_capacity() > 0
-
-    def get_lottery_capacity(self):
-        return self.get_total_capacity() - self.non_lottery_tickets
-
-    def has_lottery_capacity(self):
-        return self.get_lottery_capacity() > 0
-
-    def sum_tickets_in_state(self, state: str) -> int:
-        if not self.requires_ticket:
-            return 0
-        return sum([t.ticket_count for t in self.tickets if t.state == state])
-
-
 class YouthWorkshopProposal(WorkshopProposal):
     __mapper_args__ = {"polymorphic_identity": "youthworkshop"}
     human_type = HUMAN_CFP_TYPES["youthworkshop"]
-    valid_dbs = db.Column(db.Boolean, nullable=False, default=False)
+    valid_dbs: Mapped[bool] = mapped_column(default=False)
     max_tickets_per_person = 2
 
 
 class InstallationProposal(Proposal):
     __mapper_args__ = {"polymorphic_identity": "installation"}
     human_type = HUMAN_CFP_TYPES["installation"]
-    size = db.Column(db.String)
-    installation_funding = db.Column(db.String, nullable=True)
+    size: Mapped[str | None]
+    installation_funding: Mapped[str | None]
 
 
 class LightningTalkProposal(Proposal):
     __mapper_args__ = {"polymorphic_identity": "lightning"}
     human_type = HUMAN_CFP_TYPES["lightning"]
-    slide_link = db.Column(db.String, nullable=True)
-    session = db.Column(db.String, default="fri")
+    slide_link: Mapped[str | None]
+    session: Mapped[str | None] = mapped_column(default="fri")
+
+    should_be_exported = column_property(
+        or_(
+            Proposal.is_accepted.expression,
+            Proposal.state == "new",
+        )
+    )
+
+    @classmethod
+    def public_export_columns(cls):
+        return [
+            # Use the submitted fields directly
+            cls.title.label("published_title"),
+            cls.description.label("published_description"),
+            User.name.label("names"),
+            # We omit fields that we don't have since they didn't go through CfP:
+            # pronouns
+            # may_record
+            # video_privacy
+            # scheduled_time
+            # scheduled_duration
+            # venue
+            # venue_village_id
+            # Lightning Talk specific fields:
+            cls.session,
+            cls.slide_link,
+        ]
 
     def pretty_session(self):
         return LIGHTNING_TALK_SESSIONS[self.session]["human"]
@@ -980,15 +1019,18 @@ PYTHON_CFP_TYPES = {
 
 class CFPMessage(BaseModel):
     __tablename__ = "cfp_message"
-    id = db.Column(db.Integer, primary_key=True)
-    created = db.Column(db.DateTime, default=datetime.utcnow)
-    from_user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    proposal_id = db.Column(db.Integer, db.ForeignKey("proposal.id"), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    created: Mapped[datetime | None] = mapped_column(default=naive_utcnow)
+    from_user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    proposal_id: Mapped[int] = mapped_column(ForeignKey("proposal.id"))
 
-    message = db.Column(db.String, nullable=False)
+    message: Mapped[str]
     # Flags
-    is_to_admin = db.Column(db.Boolean)
-    has_been_read = db.Column(db.Boolean, default=False)
+    is_to_admin: Mapped[bool | None]
+    has_been_read: Mapped[bool | None] = mapped_column(default=False)
+
+    from_user: Mapped[User] = relationship(back_populates="messages_from")
+    proposal: Mapped[Proposal] = relationship(back_populates="messages")
 
     def is_user_recipient(self, user):
         """
@@ -1040,21 +1082,22 @@ class CFPMessage(BaseModel):
 
 
 class CFPVote(BaseModel):
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
     __tablename__ = "cfp_vote"
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    proposal_id = db.Column(db.Integer, db.ForeignKey("proposal.id"), nullable=False)
-    state = db.Column(db.String, nullable=False)
-    has_been_read = db.Column(db.Boolean, nullable=False, default=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    proposal_id: Mapped[int] = mapped_column(ForeignKey("proposal.id"))
+    state: Mapped[str]
+    has_been_read: Mapped[bool] = mapped_column(default=False)
 
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    modified = db.Column(
-        db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
+    created: Mapped[datetime] = mapped_column(default=naive_utcnow)
+    modified: Mapped[datetime] = mapped_column(default=naive_utcnow, onupdate=naive_utcnow)
 
-    vote = db.Column(db.Integer)  # Vote can be null for abstentions
-    note = db.Column(db.String)
+    vote: Mapped[int | None]  # Vote can be null for abstentions
+    note: Mapped[str | None]
+
+    user: Mapped[User] = relationship(back_populates="votes")
+    proposal: Mapped[Proposal] = relationship(back_populates="votes")
 
     def __init__(self, user: User, proposal: Proposal):
         self.user = user
@@ -1067,9 +1110,7 @@ class CFPVote(BaseModel):
             raise CfpStateException('"%s" is not a valid state' % state)
 
         if state not in VOTE_STATES[self.state]:
-            raise CfpStateException(
-                '"%s->%s" is not a valid transition' % (self.state, state)
-            )
+            raise CfpStateException('"%s->%s" is not a valid transition' % (self.state, state))
 
         self.state = state
 
@@ -1098,39 +1139,37 @@ class Venue(BaseModel):
     __tablename__ = "venue"
     __export_data__ = False
 
-    id = db.Column(db.Integer, primary_key=True)
-    village_id = db.Column(
-        db.Integer, db.ForeignKey("village.id"), nullable=True, default=None
-    )
-    name = db.Column(db.String, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    village_id: Mapped[int | None] = mapped_column(ForeignKey("village.id"), default=None)
+    name: Mapped[str]
 
     # Which type of proposals are allowed to be scheduled in this venue.
     # (This is not really used yet.)
-    allowed_types = db.Column(
+    allowed_types: Mapped[list[str]] = mapped_column(
         MutableList.as_mutable(ARRAY(db.String)),
-        nullable=False,
-        server_default=text(
-            r"'{}'::varchar[]"
-        ),  # TODO(jayaddison): array([], type_=db.String)
+        default=lambda: [],
     )
 
     # What type of proposals are the default for this venue.
     # These are where the automatic scheduler will put proposals.
-    default_for_types = db.Column(
+    default_for_types: Mapped[list[str]] = mapped_column(
         MutableList.as_mutable(ARRAY(db.String)),
-        nullable=False,
-        server_default=text(
-            r"'{}'::varchar[]"
-        ),  # TODO(jayaddison): array([], type_=db.String)
+        default=lambda: [],
     )
-    priority = db.Column(db.Integer, nullable=True, default=0)
-    capacity = db.Column(db.Integer, nullable=True)
-    location = db.Column(Geometry("POINT", srid=4326))
-    scheduled_content_only = db.Column(db.Boolean)
-    village = db.relationship(
-        "Village",
-        backref="venues",
+    priority: Mapped[int | None] = mapped_column(default=0)
+    capacity: Mapped[int | None]
+    location: Mapped[WKBElement | None] = mapped_column(Geometry("POINT", srid=4326))
+    scheduled_content_only: Mapped[bool | None]
+
+    village: Mapped[Village] = relationship(
+        back_populates="venues",
         primaryjoin="Village.id == Venue.village_id",
+    )
+    proposals: Mapped[list[Proposal]] = relationship(
+        back_populates="scheduled_venue", foreign_keys=[Proposal.scheduled_venue_id]
+    )
+    allowed_proposals: Mapped[list[Proposal]] = relationship(
+        back_populates="allowed_venues", secondary=ProposalAllowedVenues
     )
 
     __table_args__ = (UniqueConstraint("name", name="_venue_name_uniq"),)
@@ -1162,9 +1201,7 @@ class Venue(BaseModel):
 
     @classmethod
     def emf_venues(cls):
-        return cls.query.filter(
-            db.func.array_length(cls.default_for_types, 1) > 0
-        ).all()
+        return cls.query.filter(db.func.array_length(cls.default_for_types, 1) > 0).all()
 
     @classmethod
     def emf_venue_names_by_type(cls):
@@ -1172,8 +1209,8 @@ class Venue(BaseModel):
         unnest = db.func.unnest(cls.default_for_types).table_valued()
         return {
             type: venue_names
-            for venue_names, type in db.engine.execute(
-                db.select([db.func.array_agg(cls.name), unnest.column])
+            for venue_names, type in db.session.execute(
+                db.select(db.func.array_agg(cls.name), unnest.column)
                 .join(unnest, db.true())
                 .group_by(unnest.column)
             )
@@ -1183,11 +1220,30 @@ class Venue(BaseModel):
     def get_by_name(cls, name):
         return cls.query.filter_by(name=name).one()
 
+    @property
+    def latlon(self):
+        if self.location:
+            loc = to_shape(self.location)
+            return (loc.y, loc.x)
+        if self.village and self.village.latlon:
+            return self.village.latlon
+        return None
+
+    @property
+    def map_link(self) -> Optional[str]:
+        latlon = self.latlon
+        if latlon:
+            return "https://map.emfcamp.org/#18.5/%s/%s/m=%s,%s" % (
+                latlon[0],
+                latlon[1],
+                latlon[0],
+                latlon[1],
+            )
+        return None
+
 
 # TODO: change the relationships on User and Proposal to 1-to-1
-db.Index(
-    "ix_cfp_vote_user_id_proposal_id", CFPVote.user_id, CFPVote.proposal_id, unique=True
-)
+db.Index("ix_cfp_vote_user_id_proposal_id", CFPVote.user_id, CFPVote.proposal_id, unique=True)
 
 __all__ = [
     "HUMAN_CFP_TYPES",

@@ -1,88 +1,105 @@
-import pendulum  # preferred over datetime
 from collections import defaultdict
-from werkzeug.datastructures import MultiDict
-from flask_login import current_user
-from slugify import slugify_unicode as slugify
+from collections.abc import Sequence
+from datetime import datetime
+from typing import NotRequired, TypedDict
 
-from models import event_year
-from models.cfp import Proposal, Venue
-from models.ical import CalendarSource
+import pendulum  # preferred over datetime
+from flask_login import current_user
+from slugify import slugify
+from werkzeug.datastructures import MultiDict
 
 from main import external_url
+from models import event_year
+from models.cfp import Proposal, Venue, WorkshopProposal, YouthWorkshopProposal
+
 from . import event_tz
 
 
-def _get_proposal_dict(proposal: Proposal, favourites_ids):
-    res = {
-        "id": proposal.id,
-        "slug": proposal.slug,
-        "start_date": event_tz.localize(proposal.start_date),
-        "end_date": event_tz.localize(proposal.end_date) if proposal.end_date else None,
-        "venue": proposal.scheduled_venue.name,
-        "latlon": proposal.latlon,
-        "map_link": proposal.map_link,
-        "title": proposal.display_title,
-        "speaker": proposal.published_names or proposal.user.name,
-        "pronouns": proposal.published_pronouns,
-        "user_id": proposal.user.id,
-        "description": proposal.published_description or proposal.description,
-        "type": proposal.type,
-        "video_privacy": proposal.video_privacy,
-        "is_fave": proposal.id in favourites_ids,
-        "is_family_friendly": proposal.family_friendly,
-        "is_from_cfp": not proposal.user_scheduled,
-        "content_note": proposal.content_note,
-        "source": "database",
-        "link": external_url(
+class VideoProposalDict(TypedDict):
+    ccc: NotRequired[str]
+    youtube: NotRequired[str]
+    preview_image: NotRequired[str]
+    recording_lost: NotRequired[bool]
+
+
+class ProposalDict(TypedDict):
+    id: int
+    slug: str
+    start_date: datetime
+    end_date: datetime | None
+    venue: str
+    latlon: str
+    map_link: str | None
+    title: str
+    speaker: str
+    pronouns: str | None
+    user_id: int
+    description: str
+    type: str
+    video_privacy: str | None
+    is_fave: bool
+    is_family_friendly: bool | None
+    is_from_cfp: bool
+    content_note: str | None
+    source: str
+    link: str
+
+    # workshop stuff
+    cost: NotRequired[str]
+    equipment: NotRequired[str]
+    age_range: NotRequired[str]
+    attendees: NotRequired[str | None]
+    requires_ticket: NotRequired[bool | None]
+
+    video: NotRequired[VideoProposalDict]
+
+
+def _get_proposal_dict(proposal: Proposal, favourites_ids: Sequence[int]) -> ProposalDict:
+    assert proposal.scheduled_venue is not None
+    res = ProposalDict(
+        id=proposal.id,
+        slug=proposal.slug,
+        start_date=event_tz.localize(proposal.start_date),
+        end_date=event_tz.localize(proposal.end_date) if proposal.end_date else None,
+        venue=proposal.scheduled_venue.name,
+        latlon=proposal.latlon,
+        map_link=proposal.map_link,
+        title=proposal.display_title,
+        speaker=proposal.published_names or proposal.user.name,
+        pronouns=proposal.published_pronouns,
+        user_id=proposal.user.id,
+        description=proposal.published_description or proposal.description,
+        type=proposal.type,
+        video_privacy=proposal.video_privacy,
+        is_fave=proposal.id in favourites_ids,
+        is_family_friendly=proposal.family_friendly,
+        is_from_cfp=not proposal.user_scheduled,
+        content_note=proposal.content_note,
+        source="database",
+        link=external_url(
             ".item",
             year=event_year(),
             proposal_id=proposal.id,
             slug=proposal.slug,
         ),
-    }
-    if proposal.type in ["workshop", "youthworkshop"]:
+    )
+    if isinstance(proposal, WorkshopProposal | YouthWorkshopProposal):
         res["cost"] = proposal.display_cost
         res["equipment"] = proposal.display_participant_equipment
         res["age_range"] = proposal.display_age_range
         res["attendees"] = proposal.attendees
         res["requires_ticket"] = proposal.requires_ticket
-    video_res = {}
+    video_res = VideoProposalDict()
     if proposal.c3voc_url:
         video_res["ccc"] = proposal.c3voc_url
     if proposal.youtube_url:
         video_res["youtube"] = proposal.youtube_url
     if proposal.thumbnail_url:
         video_res["preview_image"] = proposal.thumbnail_url
-    video_res["recording_lost"] = proposal.video_recording_lost
+    if proposal.video_recording_lost is not None:
+        video_res["recording_lost"] = proposal.video_recording_lost
     if video_res:
         res["video"] = video_res
-    return res
-
-
-def _get_ical_dict(event, favourites_ids):
-    res = {
-        "id": -event.id,
-        "start_date": event_tz.localize(event.start_dt),
-        "end_date": event_tz.localize(event.end_dt),
-        "venue": event.location or "(Unknown)",
-        "latlon": event.latlon,
-        "map_link": event.map_link,
-        "title": event.summary,
-        "speaker": "",
-        "user_id": None,
-        "description": event.description,
-        "type": "talk",
-        "may_record": False,
-        "is_fave": event.id in favourites_ids,
-        "source": "external",
-        "link": external_url(
-            ".item_external", year=event_year(), slug=event.slug, event_id=event.id
-        ),
-    }
-    if event.type in ["workshop", "youthworkshop"]:
-        res["cost"] = event.display_cost
-        res["equipment"] = event.display_participant_equipment
-        res["age_range"] = event.display_age_range
     return res
 
 
@@ -90,12 +107,14 @@ def _filter_obj_to_dict(filter_obj):
     """Request.args uses a MulitDict this lets us pass filter_obj as plain dicts
     and have everything work as expected.
     """
-    if type(filter_obj) == MultiDict:
+    if isinstance(filter_obj, MultiDict):
         return filter_obj.to_dict()
     return filter_obj
 
 
-def _get_scheduled_proposals(filter_obj={}, override_user=None):
+def _get_scheduled_proposals(filter_obj=None, override_user=None):
+    if filter_obj is None:
+        filter_obj = dict()
     filter_obj = _filter_obj_to_dict(filter_obj)
     if override_user:
         user = override_user
@@ -103,10 +122,9 @@ def _get_scheduled_proposals(filter_obj={}, override_user=None):
         user = current_user
 
     if user.is_anonymous:
-        proposal_favourites = external_favourites = []
+        proposal_favourites = []
     else:
         proposal_favourites = [f.id for f in user.favourites]
-        external_favourites = [f.id for f in user.calendar_favourites]
 
     schedule = Proposal.query.filter(
         Proposal.is_accepted,
@@ -118,15 +136,7 @@ def _get_scheduled_proposals(filter_obj={}, override_user=None):
 
     schedule = [_get_proposal_dict(p, proposal_favourites) for p in schedule]
 
-    ical_sources = CalendarSource.query.filter_by(enabled=True, published=True)
-
-    for source in ical_sources:
-        for e in source.events:
-            d = _get_ical_dict(e, external_favourites)
-            d["venue"] = source.mapobj.name
-            schedule.append(d)
-
-    if "is_favourite" in filter_obj and filter_obj["is_favourite"]:
+    if filter_obj.get("is_favourite"):
         schedule = [s for s in schedule if s.get("is_fave", False)]
 
     if "venue" in filter_obj:
@@ -135,7 +145,9 @@ def _get_scheduled_proposals(filter_obj={}, override_user=None):
     return schedule
 
 
-def _get_upcoming(filter_obj={}, override_user=None):
+def _get_upcoming(filter_obj=None, override_user=None):
+    if filter_obj is None:
+        filter_obj = dict()
     filter_obj = _filter_obj_to_dict(filter_obj)
     now = pendulum.now(event_tz)
     proposals = _get_scheduled_proposals(filter_obj, override_user)
@@ -171,16 +183,9 @@ def _get_priority_sorted_venues(venues_to_allow):
     main_venues = Venue.query.filter().all()
     main_venue_names = [(v.name, "main", v.priority) for v in main_venues]
 
-    ical_sources = CalendarSource.query.filter_by(enabled=True, published=True)
-    ical_source_names = [
-        (v.mapobj.name, "ical", v.priority)
-        for v in ical_sources
-        if v.mapobj and v.events
-    ]
-
     res = []
     seen_names = []
-    for venue in main_venue_names + ical_source_names:
+    for venue in main_venue_names:
         name = venue[0]
         if name not in seen_names and name in venues_to_allow:
             seen_names.append(name)
@@ -193,5 +198,5 @@ def _get_priority_sorted_venues(venues_to_allow):
                 }
             )
 
-    res = sorted(res, key=lambda v: (v["source"] != "ical", v["order"]), reverse=True)
+    res = sorted(res, key=lambda v: v["order"], reverse=True)
     return res

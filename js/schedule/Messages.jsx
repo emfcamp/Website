@@ -6,7 +6,7 @@ function Messages() {
   const [messages, setMessages] = useState([]);
 
   function reloadMessages() {
-    fetch(`/api/schedule_messages`)
+    fetch(`/api/schedule-messages`)
       .then(response => response.json())
       .then(body => {
         setMessages(body);
