@@ -3,8 +3,6 @@
 
 <h2>Lottery info</h2>
 
-<p><strong>Current signup state:</strong> {{ SIGNUP_STATE }}</p>
-
 <div>To run the lottery shell into the server and run <pre>./flask cfp lottery</pre></div>
 
 <p>These workshops require tickets:</p>
@@ -16,7 +14,7 @@
         <tr>
             <th>Title</th>
             <th>Max workshop tickets</th>
-            <th>Max lottery tickets</th>
+            <th>Available lottery tickets</th>
             <th>Lottery tickets requested</th>
             <th>Workshop tickets issued</th>
             <th>Lottery/workshop tickets cancelled</th>
@@ -28,7 +26,7 @@
                 <td><a href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}">{{ proposal.title }}</a></td>
                 <td>{{ proposal.total_tickets }}</td>
                 <td>{{ proposal.get_lottery_capacity() }}</td>
-                <td>{{ proposal.sum_tickets_in_state("entered-lottery") }}</td>
+                <td>{{ proposal.sum_tickets_in_state("entered") }}</td>
                 <td>{{ proposal.sum_tickets_in_state("ticket") }}</td>
                 <td>{{ proposal.sum_tickets_in_state("cancelled") }}</td>
             </tr>

@@ -1,132 +1,130 @@
 import click
 
 from random import shuffle
-from sqlalchemy import func
+from sqlalchemy import func, select
+from sqlalchemy.orm import selectinload
 
 from flask import render_template, current_app as app
 from flask_mailman import EmailMessage
 
 from main import db
-from models.cfp import WorkshopProposal, Proposal
-from models.event_tickets import EventTicket
-from models.site_state import SiteState, refresh_states, get_signup_state
+from models.cfp import Occurrence, ScheduleItem
+from models.lottery import LotteryEntry, Lottery
 
 from ..common.email import from_email
 
 from . import cfp
 
 
-@cfp.cli.command("lottery")
-@click.option("--dry-run/--no-dry-run", default=True, help="Actually run the lottery")
-def lottery(dry_run):
-    # In theory this can be extended to other types but currently only workshops & youthworkshops care
+"""
+Here are the rules for the lottery.
+* Each user can only have one lottery ticket per lottery
+* A user's lottery tickets are ranked by preference
+* Drawings are done by rank
+* Once a user wins a lottery their other tickets for that ScheduleItemType
+  are cancelled. This is for fairness, so someone who enters one lottery
+  has as much chance of winning as someone who enters loads. However, we
+  don't prevent them entering a new lottery that opens up later.
+"""
 
+
+@cfp.cli.command("lottery")
+@click.option("-t", "--type", type=str, help="Schedule item type")
+@click.option("--dry-run/--no-dry-run", default=True, help="Actually run the lottery")
+def lottery(schedule_item_type, dry_run) -> None:
     if dry_run:
         app.logger.info(f"'dry-run' is set, lottery results will not be saved, to run use '--no-dry-run'")
     else:
         app.logger.info(f"'no-dry-run' is set, running lottery")
 
-    if get_signup_state() not in ["issue-lottery-tickets", "run-lottery"]:
-        raise Exception(f"Expected signup state to be 'issue-lottery-tickets'.")
-
-    workshops = (
-        WorkshopProposal.query.filter_by(requires_ticket=True, type="workshop")
-        .filter(Proposal.state.in_(["accepted", "finalised"]))
-        .all()
+    lotteries_to_lock: list[Lottery] = list(
+        db.session.scalars(
+            select(Lottery)
+            .where(Lottery.state == "allow-entry")
+            .join(Lottery.occurrence)
+            .join(Occurrence.schedule_item)
+            .where(ScheduleItem.type == schedule_item_type)
+        )
     )
 
-    app.logger.info(f"Running lottery for {len(workshops)} workshops")
-    winning_tickets = run_lottery(workshops, dry_run)
-    app.logger.info(f"{len(winning_tickets)} won")
+    app.logger.info(f"Found {len(lotteries_to_lock)} lotteries")
 
-    youthworkshops = (
-        WorkshopProposal.query.filter_by(requires_ticket=True, type="youthworkshop")
-        .filter(Proposal.state.in_(["accepted", "finalised"]))
-        .all()
+    # "Lock" the lotteries. TODO: should we actually lock here (and on entry creation)?
+    for lottery in lotteries_to_lock:
+        lottery.state = "running-lottery"
+    db.session.commit()
+
+    lotteries: list[Lottery] = list(
+        db.session.scalars(
+            select(Lottery)
+            .where(Lottery.state == "running-lottery")
+            .join(Lottery.schedule_item)
+            .where(ScheduleItem.type == schedule_item_type)
+            .options(selectinload(Lottery.occurrence).selectinload(Occurrence.schedule_item))
+            .options(selectinload(Lottery.entries).selectinload(LotteryEntry.user))
+        )
     )
-    app.logger.info(f"Running lottery for {len(youthworkshops)} youthworkshops")
-    winning_tickets = run_lottery(youthworkshops, dry_run)
-    app.logger.info(f"{len(winning_tickets)} won")
 
+    # Grab this before we change any states
+    all_lottery_entry_holders = {
+        e.user for lottery in lotteries for e in lottery.entries if e.state == "entered"
+    }
 
-def run_lottery(ticketed_proposals, dry_run=False):
-    """
-    Here are the rules for the lottery.
-    * Each user can only have one lottery ticket per workshop
-    * A user's lottery tickets are ranked by preference
-    * Drawings are done by rank
-    * Once a user wins a lottery their other tickets are cancelled
-    """
+    max_rank = db.session.query(func.max(LotteryEntry.rank)).scalar() + 1
+    lottery_capacities = {lottery.id: lottery.get_lottery_capacity() for lottery in lotteries}
+    winning_entries = []
+
     lottery_round = 0
-
-    winning_tickets = []
-
-    app.logger.info(f"Found {len(ticketed_proposals)} proposals to run a lottery for")
-    # Lock the lottery
-    signup = SiteState.query.get("signup_state")
-    if not signup:
-        raise Exception("'signup_state' not found.")
-
-    initial_state = signup.state  # only used for dry-run mode
-
-    # This is the only state for running the lottery
-    signup.state = "run-lottery"
-    db.session.flush()
-    refresh_states()
-
-    max_rank = db.session.query(func.max(EventTicket.rank)).scalar() + 1
-    proposal_capacities = {p.id: p.get_lottery_capacity() for p in ticketed_proposals}
-    winning_tickets = []
-
-    all_lottery_ticket_holders = {t.user for t in EventTicket.query.filter_by(state="enter-lottery").all()}
-
     for lottery_round in range(max_rank):
-        for proposal in ticketed_proposals:
-            tickets_remaining = proposal_capacities[proposal.id]
+        for lottery in lotteries:
+            tickets_remaining = lottery_capacities[lottery.id]
 
-            tickets_for_round = [t for t in proposal.tickets if t.is_in_lottery_round(lottery_round)]
-            shuffle(tickets_for_round)
+            entries_for_round = [t for t in lottery.entries if t.is_in_lottery_round(lottery_round)]
+            shuffle(entries_for_round)
 
             if tickets_remaining <= 0:
-                for ticket in tickets_for_round:
-                    ticket.lost_lottery()
+                for entry in entries_for_round:
+                    entry.lost_lottery()
                 continue
 
-            for ticket in tickets_for_round:
-                if ticket.ticket_count <= tickets_remaining:
-                    ticket.won_lottery_and_cancel_others()
-                    winning_tickets.append(ticket)
-                    tickets_remaining -= ticket.ticket_count
+            for entry in entries_for_round:
+                if entry.ticket_count <= tickets_remaining:
+                    entry.won_lottery_and_cancel_others()
+                    winning_entries.append(entry)
+                    tickets_remaining -= entry.ticket_count
                 else:
-                    ticket.lost_lottery()
+                    entry.lost_lottery()
 
-            proposal_capacities[proposal.id] = tickets_remaining
+            lottery_capacities[lottery.id] = tickets_remaining
 
-    app.logger.info(f"Issued {len(winning_tickets)} winning tickets over {lottery_round} rounds")
+    app.logger.info(f"Issued {len(winning_entries)} winning entries over {lottery_round} rounds")
 
     format_string = "{: >80s} {: >15} {: >15} {: >15}  {: >10}  {: >10}"
     app.logger.info(
         format_string.format(
-            "title", "total tickets", "lottery-tickets", "entered-lottery", "ticket", "cancelled"
+            "title", "total tickets", "lottery tickets", "entered", "valid-tickets", "cancelled"
         )
     )
-    for prop in ticketed_proposals:
+    for lottery in lotteries:
         counts = {
-            "entered-lottery": 0,
-            "ticket": 0,
+            "entered": 0,
+            "valid-tickets": 0,
             "cancelled": 0,
         }
 
-        for ticket in prop.tickets:
-            counts[ticket.state] += 1
+        for entry in lottery.entries:
+            counts[entry.state] += 1
+
+        assert lottery.total_tickets is not None
+        assert lottery.reserved_tickets is not None
 
         app.logger.info(
             format_string.format(
-                prop.title,
-                prop.total_tickets,
-                (prop.total_tickets - prop.non_lottery_tickets),
-                counts["entered-lottery"],
-                counts["ticket"],
+                lottery.schedule_item.title,
+                lottery.total_tickets,
+                (lottery.total_tickets - lottery.reserved_tickets),
+                counts["entered"],
+                counts["valid-tickets"],
                 counts["cancelled"],
             )
         )
@@ -134,36 +132,36 @@ def run_lottery(ticketed_proposals, dry_run=False):
     if dry_run:
         app.logger.info("Undoing lottery")
         db.session.rollback()
-        # Reset the state
-        signup.state = initial_state
+
     else:
         app.logger.info("Saving lottery result")
-        signup.state = "pending-tickets"
-    db.session.commit()
-    db.session.flush()
-    refresh_states()
+        for lottery in lotteries:
+            lottery.state = "completed"
 
-    losing_ticket_holders = all_lottery_ticket_holders - {t.user for t in winning_tickets}
-    app.logger.info(f"people who didn't win a ticket are: {losing_ticket_holders}")
+    if not dry_run:
+        db.session.commit()
 
-    # Email winning tickets here
+    losing_entry_holders = all_lottery_entry_holders - {t.user for t in winning_entries}
+    app.logger.info(f"people who didn't win a ticket are: {losing_entry_holders}")
+
+    # Email winning entries here
     # We should probably also check for users who didn't win anything?
     app.logger.info("sending emails")
     send_from = from_email("CONTENT_EMAIL")
 
     sent_emails = 0
-    for ticket in winning_tickets:
+    for entry in winning_entries:
         msg = EmailMessage(
-            f"You have a ticket for the {ticket.proposal.human_type} '{ticket.proposal.title}'",
+            f"You won the lottery for the {entry.occurrence.schedule_item.human_type} '{entry.occurrence.schedule_item.title}'",
             from_email=send_from,
-            to=[ticket.user.email],
+            to=[entry.occurrence.schedule_item.user.email],
         )
 
         msg.body = render_template(
-            "emails/event_ticket_won.txt",
-            user=ticket.user,
-            proposal=ticket.proposal,
-            ticket=ticket,
+            "emails/lottery_entry_won.txt",
+            user=entry.user,
+            occurrence=entry.occurrence,
+            entry=entry,
         )
         sent_emails += 1
         if dry_run:
@@ -171,8 +169,7 @@ def run_lottery(ticketed_proposals, dry_run=False):
         msg.send()
 
     if dry_run:
-        app.logger.info(f"Would have sent {sent_emails} emails for {len(winning_tickets)} winners")
+        app.logger.info(f"Would have sent {sent_emails} emails for {len(winning_entries)} winners")
+        db.session.rollback()
     else:
-        app.logger.info(f"sent {sent_emails} emails for {len(winning_tickets)} winners")
-
-    return winning_tickets
+        app.logger.info(f"sent {sent_emails} emails for {len(winning_entries)} winners")

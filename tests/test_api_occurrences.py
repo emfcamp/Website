@@ -1,22 +1,29 @@
 import pytest
 
-from models.cfp import Proposal, TalkProposal
+from models.cfp import Occurrence, ScheduleItem
 
 
 @pytest.fixture(scope="module")
-def proposal(db, user):
-    proposal = TalkProposal()
-    proposal.title = "Title"
-    proposal.description = "Description"
-    proposal.user = user
+def occurrence(db, user):
+    occurrence = Occurrence(
+        occurrence_num=1,
+        video_privacy="public",
+        schedule_item=ScheduleItem(
+            type="talk",
+            user=user,
+            title="Title",
+            description="Description",
+            default_video_privacy="public",
+        ),
+    )
 
-    db.session.add(proposal)
+    db.session.add(occurrence)
     db.session.commit()
 
-    return proposal
+    return occurrence
 
 
-def test_denies_request_without_api_key(client, app, proposal):
+def test_denies_request_without_api_key(client, app, occurrence):
     app.config.update(
         {
             "VIDEO_API_KEY": "api-key",
@@ -24,7 +31,7 @@ def test_denies_request_without_api_key(client, app, proposal):
     )
 
     rv = client.patch(
-        f"/api/proposal/{proposal.id}",
+        f"/api/occurrence/{occurrence.id}",
         json={
             "youtube_url": "https://example.com/youtube.com",
             "thumbnail_url": "https://example.com/thumbnail",
@@ -34,7 +41,7 @@ def test_denies_request_without_api_key(client, app, proposal):
     assert rv.status_code == 401
 
 
-def test_can_set_video_urls(client, app, proposal):
+def test_can_set_video_urls(client, app, occurrence):
     app.config.update(
         {
             "VIDEO_API_KEY": "api-key",
@@ -42,7 +49,7 @@ def test_can_set_video_urls(client, app, proposal):
     )
 
     rv = client.patch(
-        f"/api/proposal/{proposal.id}",
+        f"/api/occurrence/{occurrence.id}",
         json={
             "youtube_url": "https://example.com/youtube.com",
             "thumbnail_url": "https://example.com/thumbnail",
@@ -54,25 +61,25 @@ def test_can_set_video_urls(client, app, proposal):
     )
     assert rv.status_code == 200
 
-    proposal = Proposal.query.get(proposal.id)
-    assert proposal.youtube_url == "https://example.com/youtube.com"
-    assert proposal.thumbnail_url == "https://example.com/thumbnail"
-    assert proposal.c3voc_url == "https://example.com/media.ccc.de"
+    occurrence = Occurrence.query.get(occurrence.id)
+    assert occurrence.youtube_url == "https://example.com/youtube.com"
+    assert occurrence.thumbnail_url == "https://example.com/thumbnail"
+    assert occurrence.c3voc_url == "https://example.com/media.ccc.de"
 
 
-def test_clearing_video_url(client, app, db, proposal):
+def test_clearing_video_url(client, app, db, occurrence):
     app.config.update(
         {
             "VIDEO_API_KEY": "api-key",
         }
     )
 
-    proposal.youtube_url = "https://example.com/youtube.com"
-    db.session.add(proposal)
+    occurrence.youtube_url = "https://example.com/youtube.com"
+    db.session.add(occurrence)
     db.session.commit()
 
     rv = client.patch(
-        f"/api/proposal/{proposal.id}",
+        f"/api/occurrence/{occurrence.id}",
         json={
             "youtube_url": None,
         },
@@ -82,11 +89,11 @@ def test_clearing_video_url(client, app, db, proposal):
     )
     assert rv.status_code == 200
 
-    proposal = Proposal.query.get(proposal.id)
-    assert proposal.youtube_url is None
+    occurrence = Occurrence.query.get(occurrence.id)
+    assert occurrence.youtube_url is None
 
 
-def test_rejects_disallowed_attributes(client, app, proposal):
+def test_rejects_disallowed_attributes(client, app, occurrence):
     app.config.update(
         {
             "VIDEO_API_KEY": "api-key",
@@ -94,7 +101,7 @@ def test_rejects_disallowed_attributes(client, app, proposal):
     )
 
     rv = client.patch(
-        f"/api/proposal/{proposal.id}",
+        f"/api/occurrence/{occurrence.id}",
         json={
             "youtube_url": "https://example.com/youtube.com",
             "thumbnail_url": "https://example.com/thumbnail",

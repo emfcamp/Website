@@ -14,7 +14,7 @@
         <tr>
             <td>{{ venue.name }}</td>
             <td>{{ venue.village and venue.village.name }}</td>
-            <td>{{ not venue.scheduled_content_only }}</td>
+            <td>{{ venue.allows_attendee_content }}</td>
             <td><a href="{{ url_for('.edit_venue', venue_id=venue.id) }}">Edit</a></td>
         </tr>
     {% endfor %}
@@ -26,9 +26,9 @@
 
     {{ render_field(form.name) }}
     {{ render_field(form.village_id) }}
-    {{ render_field(form.scheduled_content_only) }}
-    {{ render_field(form.lat) }}
-    {{ render_field(form.lon) }}
+    {{ render_field(form.allows_attendee_content) }}
+    {{ render_field(form.location_lat) }}
+    {{ render_field(form.location_lon) }}
     {{ render_field(form.capacity) }}
     {{ render_field(form.allowed_types) }}
     {{ render_field(form.default_for_types) }}

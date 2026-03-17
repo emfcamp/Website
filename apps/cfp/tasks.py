@@ -3,13 +3,20 @@ from csv import DictReader
 
 from faker import Faker
 from flask import current_app as app
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from main import db
-from models.cfp import Proposal, TalkProposal, WorkshopProposal, InstallationProposal
+from models.cfp import (
+    Occurrence,
+    Proposal,
+    ProposalInstallationAttributes,
+    ProposalWorkshopAttributes,
+    ScheduleItem,
+)
 from models.cfp_tag import Tag, DEFAULT_TAGS
 from models.user import User
 from apps.cfp_review.base import send_email_for_proposal
-from ..common.email import from_email
 
 from . import cfp
 
@@ -20,7 +27,7 @@ from . import cfp
     "-s",
     "--state",
     type=str,
-    default="locked",
+    default="new",
     help="The state to import the proposals as",
 )
 def csv_import(csv_file, state):
@@ -37,30 +44,28 @@ def csv_import(csv_file, state):
         user = User("cfp_%s@test.invalid" % count, faker.name())
         db.session.add(user)
 
-        proposal = (
-            TalkProposal()
-            if row["type"] == "talk"
-            else WorkshopProposal()
-            if row["type"] == "workshop"
-            else InstallationProposal()
+        assert row["type"] in {"talk", "workshop", "installation"}
+
+        proposal = Proposal(
+            type=row["type"],
+            state=state,
+            title=row["title"],
+            description=row["description"],
+            one_day=True if row.get("one_day") == "t" else False,
+            needs_money=True if row.get("need_finance") == "t" else False,
         )
 
-        proposal.state = state
-        proposal.title = row["title"]
-        proposal.description = row["description"]
-
-        proposal.one_day = True if row.get("one_day") == "t" else False
-        proposal.needs_money = True if row.get("need_finance") == "t" else False
-
         if row["type"] == "talk":
-            proposal.length = row["length"]
+            proposal.duration = row["length"]
 
         elif row["type"] == "workshop":
-            proposal.length = row["length"]
-            proposal.attendees = row["attendees"]
+            proposal.duration = row["length"]
+            assert isinstance(proposal.attributes, ProposalWorkshopAttributes)
+            proposal.attributes.participant_count = row["attendees"]
 
-        else:
-            proposal.size = row["size"]
+        elif row["type"] == "installation":
+            assert isinstance(proposal.attributes, ProposalInstallationAttributes)
+            proposal.attributes.size = row["size"]
 
         proposal.user = user
         db.session.add(proposal)
@@ -73,20 +78,27 @@ def csv_import(csv_file, state):
 
 @cfp.cli.command("email_check")
 def email_check():
-    """Email speakers about their slot"""
-    proposals = (
-        Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
-        .filter(Proposal.is_accepted)
-        .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]))
-        .all()
+    """Email speakers about their scheduled duration"""
+    proposals = list(
+        db.session.scalars(
+            select(Proposal)
+            .where(Proposal.state == "accepted")
+            .where(
+                Proposal.schedule_item.has(
+                    ScheduleItem.state != "hidden",
+                    ScheduleItem.occurrences.any(
+                        # TODO: is this actually a secret extra Occurrence.state?
+                        Occurrence.scheduled_duration.isnot(None),
+                    ),
+                )
+            )
+            .where(Proposal.type.in_({"talk", "workshop", "youthworkshop", "performance"}))
+            .options(selectinload(Proposal.schedule_item).selectinload(ScheduleItem.occurrences))
+        )
     )
 
     for proposal in proposals:
-        send_email_for_proposal(
-            proposal,
-            reason="check-your-slot",
-            from_address=from_email("SPEAKERS_EMAIL"),
-        )
+        send_email_for_proposal(proposal, reason="check-scheduled-duration")
 
 
 @cfp.cli.command("email_finalise")
@@ -99,18 +111,13 @@ def email_finalise():
     )
 
     for proposal in proposals:
-        if not proposal.scheduled_duration:
+        if not any(o.scheduled_duration for o in proposal.schedule_item.occurrences):
             app.logger.info(
-                "SKIPPING proposal %s due to lack of a scheduled duration. Set a duration!",
-                proposal.id,
+                f"SKIPPING proposal {proposal.id} due to lack of a scheduled duration. Set a duration!"
             )
             continue
 
-        send_email_for_proposal(
-            proposal,
-            reason="please-finalise",
-            from_address=from_email("SPEAKERS_EMAIL"),
-        )
+        send_email_for_proposal(proposal, reason="please-finalise")
 
 
 @cfp.cli.command("email_reserve")
@@ -123,7 +130,7 @@ def email_reserve():
     )
 
     for proposal in proposals:
-        send_email_for_proposal(proposal, reason="reserve-list", from_address=from_email("SPEAKERS_EMAIL"))
+        send_email_for_proposal(proposal, reason="reserve-list")
 
 
 @cfp.cli.command(
@@ -141,7 +148,7 @@ def create_tags(tags_to_create):
         if Tag.query.filter_by(tag=tag).all():
             continue
 
-        db.session.add(Tag(tag))
+        db.session.add(Tag(tag=tag))
         tags_created += 1
 
     db.session.commit()

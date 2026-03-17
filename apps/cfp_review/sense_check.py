@@ -1,47 +1,53 @@
 from collections import defaultdict
 from datetime import datetime, timedelta
+from typing import TypeGuard, get_args
 
 from flask import render_template, request
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from models import event_start, event_end
-from models.cfp import Proposal
+from models.cfp import Occurrence, ScheduleItem, ScheduleItemType
 
 from . import cfp_review, review_required
+from main import db
 
 
 def not_sensible_reasons(
-    proposal: Proposal, proposals_by_speaker: dict[int, set[Proposal]]
+    occurrence: Occurrence, occurrences_by_speaker: dict[int, set[Occurrence]]
 ) -> dict[str, str]:
     reasons = {}
 
-    # -- Proposal (is accepted/finalised and) does not have a proposed or scheduled time.
-    if proposal.potential_time is None and proposal.scheduled_time is None:
+    # -- Occurrence does not have a proposed or scheduled time.
+    if occurrence.potential_time is None and occurrence.scheduled_time is None:
         reasons["not_scheduled"] = "No proposed or scheduled time"
 
-    # -- Proposal does not have a duration.
-    if proposal.scheduled_duration is None:
+    # -- Occurrence does not have a duration.
+    if occurrence.scheduled_duration is None:
         reasons["no_duration"] = "No scheduled duration set"
 
-    # -- Proposal is in no venue.
-    if proposal.potential_time is not None and proposal.potential_venue is None:
+    # -- Occurrence is in no venue.
+    if occurrence.potential_time is not None and occurrence.potential_venue is None:
         reasons["proposed_without_venue"] = "Proposed time set, but no venue allocated"
-    if proposal.scheduled_time is not None and proposal.scheduled_venue is None:
+    if occurrence.scheduled_time is not None and occurrence.scheduled_venue is None:
         reasons["scheduled_without_venue"] = "Scheduled time set, but no venue allocated"
 
-    # -- Proposal is in a venue that is not in the allowed list for that type of content.
-    if proposal.potential_venue is not None:
-        if proposal.type not in proposal.potential_venue.allowed_types:
+    # -- Occurrence is in a venue that is not in the allowed list for that type of content.
+    if occurrence.potential_venue is not None:
+        if occurrence.schedule_item.type not in occurrence.potential_venue.allowed_types:
             reasons["proposed_venue_illegal"] = (
-                f'{proposal.type} proposed to be in "{proposal.potential_venue.name}", which admits content of types: {proposal.potential_venue.allowed_types}'
+                f'{occurrence.schedule_item.type} proposed to be in "{occurrence.potential_venue.name}", '
+                f"which admits content of types: {occurrence.potential_venue.allowed_types}"
             )
-    if proposal.scheduled_venue is not None:
-        if proposal.type not in proposal.scheduled_venue.allowed_types:
+    if occurrence.scheduled_venue is not None:
+        if occurrence.schedule_item.type not in occurrence.scheduled_venue.allowed_types:
             reasons["scheduled_venue_illegal"] = (
-                f'{proposal.type} scheduled to be in "{proposal.scheduled_venue.name}", which admits content of types: {proposal.scheduled_venue.allowed_types}'
+                f'{occurrence.schedule_item.type} scheduled to be in "{occurrence.scheduled_venue.name}", '
+                f"which admits content of types: {occurrence.scheduled_venue.allowed_types}"
             )
 
-    # -- Proposal has allowed time periods that are after 2am or before 9am.
-    for n, period in enumerate(proposal.get_allowed_time_periods()):
+    # -- Occurrence has allowed time periods that are after 2am or before 9am.
+    for n, period in enumerate(occurrence.get_allowed_time_periods()):
 
         def reason_key(reason):
             return f"period_{n}_{reason}"
@@ -89,7 +95,7 @@ def not_sensible_reasons(
         if not t:
             return
 
-        # -- Proposal is before Wednesday 12 noon, or after Sunday 2am.
+        # -- Occurrence is before Wednesday 12 noon, or after Sunday 2am.
         if t < sensible_start:
             reasons[reason_key] = (
                 f"{note} time ({t.strftime(human_format)}) is before {sensible_start.strftime(human_format)}"
@@ -99,48 +105,50 @@ def not_sensible_reasons(
                 f"{note} time ({t.strftime(human_format)}) is after {sensible_end.strftime(human_format)}"
             )
 
-        # -- Proposal is after 2am or before 9am.
+        # -- Occurrence is after 2am or before 9am.
         if t.hour >= 2 and t.hour < 9:
             reasons[f"{reason_key}_quiet"] = (
                 f"{note} is scheduled between 2am and 9am ({t.strftime(human_format)})"
             )
 
-        # -- Proposal lies outside the allowed time periods.
+        # -- Occurrence lies outside the allowed time periods.
         permitted_time = False
-        for n, period in enumerate(proposal.get_allowed_time_periods()):
+        for n, period in enumerate(occurrence.get_allowed_time_periods()):
             if t >= period.start and t <= period.end:
                 permitted_time = True
 
         if not permitted_time:
             reasons[f"{reason_key}_outside_allowed_times"] = (
-                f"{note} is outside allowed proposal time periods"
+                f"{note} is outside allowed occurrence time periods"
             )
 
-    _check_timing(proposal.potential_time, "Proposed start", "proposed_start")
-    _check_timing(proposal.scheduled_time, "Scheduled start", "scheduled_start")
-    _check_timing(proposal.potential_end_date, "Proposed end", "proposed_end")
-    _check_timing(proposal.end_date, "Scheduled end", "scheduled_end")
+    _check_timing(occurrence.potential_time, "Proposed start", "proposed_start")
+    _check_timing(occurrence.scheduled_time, "Scheduled start", "scheduled_start")
+    _check_timing(occurrence.potential_end_time, "Proposed end", "proposed_end")
+    _check_timing(occurrence.scheduled_end_time, "Scheduled end", "scheduled_end")
 
-    # -- Proposal overlaps another one by the same user.
-    def _talk_ranges(p: Proposal) -> dict[str, tuple[datetime, datetime]]:
+    # -- Occurrence overlaps another one by the same user.
+    def get_occurrence_ranges(occurrence: Occurrence) -> dict[str, tuple[datetime, datetime]]:
         ranges = {}
-        if p.potential_time and p.potential_end_date:
-            ranges["proposed"] = (p.potential_time, p.potential_end_date)
-        if p.scheduled_time and p.end_date:
-            ranges["scheduled"] = (p.scheduled_time, p.end_date)
+        if occurrence.potential_time and occurrence.potential_end_time:
+            ranges["proposed"] = (occurrence.potential_time, occurrence.potential_end_time)
+        if occurrence.scheduled_time and occurrence.scheduled_end_time:
+            ranges["scheduled"] = (occurrence.scheduled_time, occurrence.scheduled_end_time)
         return ranges
 
-    talk_ranges = _talk_ranges(proposal)
-    for other_proposal in proposals_by_speaker[proposal.user_id]:
-        if other_proposal == proposal:
+    occurrence_ranges = get_occurrence_ranges(occurrence)
+    for other_occurrence in occurrences_by_speaker[occurrence.schedule_item.user_id]:
+        if other_occurrence == occurrence:
             continue
-        other_ranges = _talk_ranges(other_proposal)
-        for this_type, (this_start, this_end) in talk_ranges.items():
+        other_ranges = get_occurrence_ranges(other_occurrence)
+        for this_type, (this_start, this_end) in occurrence_ranges.items():
             for other_type, (other_start, other_end) in other_ranges.items():
                 if max(this_start, other_start) < min(this_end, other_end):
                     # Overlap.
-                    reasons[f"{this_type}_overlap_{other_proposal.id}_{other_type}"] = (
-                        f"The {this_type} time ({this_start} > {this_end}) overlaps with a {other_proposal.type} by same user: {other_proposal.display_title}'s {other_type} time ({other_start} > {other_end})"
+                    reasons[f"{this_type}_overlap_{other_occurrence.id}_{other_type}"] = (
+                        f"The {this_type} time ({this_start} > {this_end}) overlaps with a "
+                        f"{other_occurrence.schedule_item.type} by same user: {other_occurrence.schedule_item.title}'s "
+                        f"{other_type} time ({other_start} > {other_end})"
                     )
 
     return reasons
@@ -153,29 +161,40 @@ def sense_check():
     if not types_to_show:
         types_to_show = ["talk", "workshop", "youthworkshop", "performance"]
 
-    accepted_proposals = (
-        Proposal.query_accepted(include_user_scheduled=False)
-        .filter(Proposal.type.in_(types_to_show))
-        .order_by(Proposal.type)
-        .all()
-    )
+    def validate_types(types: list[str]) -> TypeGuard[list[ScheduleItemType]]:
+        invalid_types = {t for t in types_to_show if t not in get_args(ScheduleItemType)}
+        if invalid_types:
+            raise ValueError(f"Invalid schedule item types: {', '.join(invalid_types)}")
+        return True
 
-    proposals_for_overlap = (
-        Proposal.query_accepted(include_user_scheduled=False)
-        .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]))
-        .all()
-    )
-    proposals_by_speaker = defaultdict(set)
-    for proposal in proposals_for_overlap:
-        proposals_by_speaker[proposal.user_id].add(proposal)
+    assert validate_types(types_to_show)
 
-    not_sensible_proposals = []
-    for accepted_proposal in accepted_proposals:
-        if reasons := not_sensible_reasons(accepted_proposal, proposals_by_speaker):
-            not_sensible_proposals.append((accepted_proposal, reasons))
+    def get_occurrences_for_types(types: list[ScheduleItemType]):
+        return list(
+            db.session.scalars(
+                select(Occurrence)
+                .join(Occurrence.schedule_item)
+                .options(selectinload(Occurrence.schedule_item))
+                .where(ScheduleItem.type.in_(types))
+                .order_by(ScheduleItem.type, ScheduleItem.id, Occurrence.id)
+            )
+        )
+
+    occurrences = get_occurrences_for_types(types_to_show)
+    # FIXME: why is this not all types?
+    occurrences_for_overlap = get_occurrences_for_types(["talk", "workshop", "youthworkshop", "performance"])
+
+    occurrences_by_speaker = defaultdict(set)
+    for occurrence in occurrences_for_overlap:
+        occurrences_by_speaker[occurrence.schedule_item.user_id].add(occurrence)
+
+    not_sensible_occurrences = []
+    for occurrence in occurrences:
+        if reasons := not_sensible_reasons(occurrence, occurrences_by_speaker):
+            not_sensible_occurrences.append((occurrence, reasons))
 
     return render_template(
         "cfp_review/sense_check.html",
-        not_sensible_proposals=not_sensible_proposals,
-        proposals_count=len(accepted_proposals),
+        not_sensible_occurrences=not_sensible_occurrences,
+        occurrence_count=len(occurrences),
     )

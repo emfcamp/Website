@@ -166,10 +166,6 @@ class SiteStateForm(Form):
         "Refunds",
         choices=[(s, s) for s in VALID_STATES["refund_state"]],
     )
-    signup_state = SelectField(
-        "Signups",
-        choices=[(s, s) for s in VALID_STATES["signup_state"]],
-    )
     update = SubmitField("Update states")
 
 

@@ -1,6 +1,6 @@
 {% from "_formhelpers.html" import render_field, render_dl_field, render_radio_field %}
 {% extends "cfp_review/base.html" %}
-{% block title %}{{proposal.published_title or proposal.title}}{% endblock %}
+{% block title %}{{ proposal.title }}{% endblock %}
 {% block body %}
 
 {% set active='details' %}
@@ -8,7 +8,7 @@
 
 
 {% if proposal.state == 'new' %}
-<div class="well">
+<div class="alert alert-primary">
     <p>You have the ability to mark this proposal as checked, which will send it to anonymisation. Please do so, but only if:</p>
     <ul>
         <li>You have knowledge of the list of banned speakers and can confirm the submitter is not banned from speaking.</li>
@@ -18,26 +18,40 @@
 </div>
 {% endif %}
 
+{% if proposal.schedule_item %}
+<div class="alert alert-warning">
+    <p>This proposal has an associated schedule item. Editing details below will only update the proposal.</p>
+    <p><a class="btn btn-success" href="{{ url_for("cfp_review.update_schedule_item", schedule_item_id=proposal.schedule_item.id) }}">View schedule item</a></p>
+    {% if not proposal.is_editable %}
+    <p>The proposer will only be able to edit schedule item fields, they will not be able to edit their proposal.</p>
+    {% endif %}
+</div>
+{% else %}
+<div class="alert alert-primary">
+    <p>This proposal does not yet have an associated schedule item. These are usually created when the proposal is accepted.</p>
+    <form method="post" action="{{ url_for("cfp_review.create_schedule_item_from_proposal", proposal_id=proposal.id) }}">
+    <p><input type="submit" class="btn btn-default" value="Create schedule item"></p>
+    </form>
+</div>
+{% endif %}
+
 <div class="col-md-12">
-    <h2>{{proposal.published_title or proposal.title}}<br>
+    <h2>{{ proposal.title }}<br>
         <small>
-            {% if proposal.user_scheduled %}
-                An attendee {{proposal.human_type}} by
-            {% else %}
-                A {{proposal.human_type}} by
-            {% endif %}
-            <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id) }}">{{proposal.user.name}}</small></a>
+            A {{ proposal.human_type }} by
+            <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id) }}">{{ proposal.user.name }}</small></a>
     </h2>
 </div>
 <form method="post" action="{{ url_for('.update_proposal', proposal_id=proposal.id) }}" class="shrink">
     {{ form.hidden_tag() }}
     <div class="col-md-8">
         <div class="panel-group" id="formAccordion" role="tablist" aria-multiselectable="true">
+
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="basicsPanelHeading">
                     <h4 class="panel-title">
                         <a role="button" data-toggle="collapse" href="#basicsPanel" aria-expanded="true" aria-controls="basicsPanel">
-                            Basics (title, description ...)
+                            Proposal
                         </a>
                     </h4>
                 </div>
@@ -45,102 +59,96 @@
                     <div class="panel-body">
                         <dl class="dl-horizontal">
                             <dt>Submitted</dt>
-                            <dd>{{proposal.created.strftime("%Y-%m-%d %H:%M")}}</dd>
+                            <dd>{{ proposal.created.strftime("%Y-%m-%d %H:%M") }}</dd>
                             <dt>Email</dt>
-                            <dd>{{proposal.user.email}}</dd>
+                            <dd>{{ proposal.user.email }}</dd>
                             <dt>Has ticket</dt>
-                            <dd>{{proposal.has_ticket()}}</dd>
+                            <dd>{{ proposal.user.check_will_have_ticket() }}</dd>
                             {% if proposal.anonymiser_id %}
                             <dt>Anoymised by</dt>
                             <dd>{{ proposal.anonymiser.name }}</dd>
                             {% endif %}
-                            <dt>Num favourites</dt>
-                            <dd>{{ proposal.favourite_count }}</dd>
                             {{ render_dl_field(form.state) }}
                             {{ render_dl_field(form.title) }}
                             {{ render_dl_field(form.description, rows=8) }}
+                            {{ render_dl_field(form.duration) }}
                         </dl>
                     </div>
                 </div>
             </div>
+
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="requirementsPanelHeading">
                     <h4 class="panel-title">
                         <a role="button" data-toggle="collapse" href="#requirementsPanel" aria-expanded="false" aria-controls="requirementsPanel">
-                            Requirements (laptop, size, attendees...)
+                            Requirements
                         </a>
                     </h4>
                 </div>
                 <div id="requirementsPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="requirementsPanelHeading">
                     <div class="panel-body">
                         <dl class="dl-horizontal">
+                            {{ render_dl_field(form.needs_help) }}
                             {{ render_dl_field(form.equipment_required, rows=3) }}
                             {{ render_dl_field(form.funding_required, rows=3) }}
-                            {{ render_dl_field(form.additional_info, rows=3) }}
-                            {{ render_dl_field(form.length) }}
                             {{ render_dl_field(form.notice_required) }}
-                            {{ render_dl_field(form.needs_help) }}
+                            {{ render_dl_field(form.additional_info, rows=3) }}
+
                             {{ render_dl_field(form.needs_money) }}
-                            {{ render_dl_field(form.needs_laptop) }}
                             {{ render_dl_field(form.one_day) }}
-                            {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
-                                {{ render_dl_field(form.attendees) }}
-                                {{ render_dl_field(form.cost) }}
-                                {{ render_dl_field(form.participant_equipment) }}
-                                {{ render_dl_field(form.age_range) }}
-                                {% if proposal.type == 'youthworkshop' %}
-                                    {{ render_dl_field(form.valid_dbs) }}
-                                {% endif %}
-                            {% elif proposal.type == 'installation' %}
-                                {{ render_dl_field(form.size) }}
-                                {{ render_dl_field(form.installation_funding) }}
-                            {% endif %}
-                            {{ render_dl_field(form.will_have_ticket) }}
+                            {# rejected_email_sent #}
+
+                            {{ render_dl_field(form.user_will_have_ticket) }}
                         </dl>
                     </div>
                 </div>
             </div>
+
             <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="schedulingPanelHeading">
+                <div class="panel-heading" role="tab" id="attributesPanelHeading">
                     <h4 class="panel-title">
-                        <a role="button" data-toggle="collapse" href="#schedulingPanel" aria-expanded="false" aria-controls="schedulingPanel">
-                            Scheduling (allowed venues, duration...)
+                        <a role="button" data-toggle="collapse" href="#attributesPanel" aria-expanded="false" aria-controls="attributesPanel">
+                            Type-specific attributes
                         </a>
                     </h4>
                 </div>
-                <div id="schedulingPanel" class="panel-collapse" role="tabpanel" aria-labelledby="schedulingPanelHeading">
+                <div id="attributesPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="attributesPanelHeading">
                     <div class="panel-body">
                         <dl class="dl-horizontal">
-                            {% if proposal.type == "lightning" %}
-                                {{ render_dl_field(form.session) }}
-                                {{ render_dl_field(form.slide_link) }}
-                            {% else %}
-                                {{ render_dl_field(form.user_scheduled) }}
-                                {{ render_dl_field(form.hide_from_schedule) }}
-                                {{ render_dl_field(form.manually_scheduled) }}
-                                {% if proposal.type in ["workshop", "youthworkshop"] %}
-                                    {{ render_dl_field(form.requires_ticket) }}
-                                    {{ render_dl_field(form.tickets) }}
-                                    {{ render_dl_field(form.non_lottery_tickets) }}
+                            {% if proposal.type == 'talk' %}
+                                {{ render_dl_field(form.attributes.content_note) }}
+                                {{ render_dl_field(form.attributes.needs_laptop) }}
+                                {{ render_dl_field(form.attributes.family_friendly) }}
+
+                            {% elif proposal.type == 'performance' %}
+                                <div>There are no attributes for the type performance</div>
+
+                            {% elif proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
+                                {{ render_dl_field(form.attributes.participant_count) }}
+                                {{ render_dl_field(form.attributes.participant_cost) }}
+                                {{ render_dl_field(form.attributes.participant_equipment) }}
+                                {{ render_dl_field(form.attributes.age_range) }}
+                                {% if proposal.type == 'workshop' %}
+                                    {{ render_dl_field(form.attributes.family_friendly) }}
+                                {% elif proposal.type == 'youthworkshop' %}
+                                    {{ render_dl_field(form.attributes.valid_dbs) }}
                                 {% endif %}
-                                {{ render_dl_field(form.allowed_venues) }}
-                                {{ render_dl_field(form.available_times, readonly=True) }}
-                                {{ render_dl_field(form.allowed_times) }}
-                                {{ render_dl_field(form.scheduled_duration) }}
-                                {{ render_dl_field(form.scheduled_venue) }}
-                                {{ render_dl_field(form.scheduled_time) }}
-                                {{ render_dl_field(form.potential_venue) }}
-                                {{ render_dl_field(form.potential_time) }}
+
+                            {% elif proposal.type == 'installation' %}
+                                {{ render_dl_field(form.attributes.size) }}
+                                {{ render_dl_field(form.attributes.grant_requested) }}
+
                             {% endif %}
                         </dl>
                     </div>
                 </div>
             </div>
+
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="tagsPanelHeading">
                     <h4 class="panel-title">
                         <a role="button" data-toggle="collapse" href="#tagsPanel" aria-expanded="false" aria-controls="tagsPanel">
-                            Tags ({{ proposal.tags | join(", ", attribute="tag") }})
+                            Tags{% if proposal.tags %} ({{ proposal.tags | join(", ") }}){% endif %}
                         </a>
                     </h4>
                 </div>
@@ -152,76 +160,18 @@
                     </div>
                 </div>
             </div>
-            {% if proposal.is_accepted %}
-                <div class="panel panel-default">
-                    <div class="panel-heading" role="tab" id="publishedPanelHeading">
-                        <h4 class="panel-title">
-                            <a role="button" data-toggle="collapse" href="#publishedPanel" aria-expanded="false" aria-controls="publishedPanel">
-                                User schedule published information (published names, content note, cost...)
-                            </a>
-                        </h4>
-                    </div>
-                    <div id="publishedPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="publishedPanelHeading">
-                        <div class="panel-body">
-                            <dl class="dl-horizontal">
-                                {{ render_dl_field(form.published_names) }}
-                                {{ render_dl_field(form.published_pronouns) }}
-                                {{ render_dl_field(form.published_title) }}
-                                {{ render_dl_field(form.published_description, rows=4) }}
-                                {{ render_dl_field(form.content_note) }}
-                                {{ render_dl_field(form.family_friendly, rows=4) }}
-                                {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
-                                    {{ render_dl_field(form.published_age_range) }}
-                                    {{ render_dl_field(form.published_cost) }}
-                                    {{ render_dl_field(form.published_participant_equipment) }}
-                                {% endif %}
-				{% if proposal.type in ['talk', 'lightning'] %}
-				    {{ render_dl_field(form.thumbnail_url) }}
-				    {{ render_dl_field(form.c3voc_url) }}
-				    {{ render_dl_field(form.youtube_url) }}
-				{% endif %}
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-                <div class="panel panel-default">
-                    <div class="panel-heading" role="tab" id="schedulingUserPanelHeading">
-                        <h4 class="panel-title">
-                            <a role="button" data-toggle="collapse" href="#schedulingUserPanel" aria-expanded="false" aria-controls="schedulingUserPanel">
-                                User scheduling information (telephone, arrival times...)
-                            </a>
-                        </h4>
-                    </div>
-                    <div id="schedulingUserPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="schedulingUserPanelHeading">
-                        <div class="panel-body">
-                            <dl class="dl-horizontal">
-                                {{ render_dl_field(form.telephone_number) }}
-                                {{ render_dl_field(form.eventphone_number) }}
-                                {% if proposal.type in ['talk', 'performance'] %}
-                                    {{ render_dl_field(form.video_privacy) }}
-                                {% endif %}
-                                {% if proposal.type == 'talk' %}
-                                    {{ render_radio_field(form.needs_laptop) }}
-                                {% endif %}
-                                {{ render_dl_field(form.arrival_period) }}
-                                {{ render_dl_field(form.departure_period) }}
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
         </div>
-        {{ form.update(class_="btn btn-primary debounce", tabindex=1) }}
+        {{ form.update(class_="btn btn-primary debounce") }}
     </div>
     <div class="col-md-4 col-xs-12" role="group">
         <h4>Proposal actions</h4>
         <div class="btn-group-vertical" role="group">
             {% if proposal.state == 'new' %}
-                {{ form.checked(class_="btn btn-success debounce", tabindex=2) }}
+                {{ form.checked(class_="btn btn-success debounce") }}
             {% endif %}
-            {{ form.accept(class_="btn btn-danger debounce", tabindex=3) }}
-            {{ form.reject_with_message(class_="btn btn-danger debounce", tabindex=4) }}
-            {{ form.reject(class_="btn btn-danger debounce", tabindex=3) }}
+            {{ form.accept(class_="btn btn-danger debounce") }}
+            {{ form.reject_with_message(class_="btn btn-danger debounce") }}
+            {{ form.reject(class_="btn btn-danger debounce") }}
             <a href="{{ url_for('.convert_proposal', proposal_id=proposal.id) }}"
                     class="btn btn-warning">
                 Convert proposal

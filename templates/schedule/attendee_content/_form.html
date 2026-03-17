@@ -7,13 +7,15 @@
             </strong></p>
             <ul>
                 {% for conflict in conflicts %}
-                    <li>{{ conflict.title }} - {{ conflict.start_date.strftime("%H:%M") }} to {{ conflict.end_date.strftime("%H:%M") }}</li>
+                    <li>{{ conflict.schedule_item.title }} - {{ conflict.scheduled_time.strftime("%H:%M") }} to {{ conflict.scheduled_end_time.strftime("%H:%M") }}</li>
                 {% endfor %}
             </ul>
-            <p>
+            <div class="row">
+            <div style="margin-left: 45px">
                 <input type="checkbox" name="acknowledge_conflicts" id="acknowledge_conflicts" value="1" />
                 <label for="acknowledge_conflicts">Acknowledge conflicts</label>
-            </p>
+            </div>
+            </div>
         </div>
     {% endif %}
     <div class="form-group {%- if form.type.errors %} has-error {%- endif %}">
@@ -38,53 +40,63 @@
             {% endfor %}
         {% endif %}
     </div>
+
+    {% for field in form.occurrences %}
+    {% set occurrence_form = field.form %}
+    {% if form.occurrences | length > 1 %}
+    <h3>Occurrence {{ occurrence_form._occurrence.occurrence_num }}</h3>
+    {% endif %}
+    {% if schedule_item %}
+    <input type="hidden" id="{{ occurrence_form.id.name }}" name="{{ occurrence_form.id.name }}" value="{{ occurrence_form.id.data }}">
+    {% endif %}
     <div class="row">
-        <div class="form-group col-md-4 {%- if form.day.errors %} has-error {%- endif %}">
-            <label for="date">Date</label>
-            <select class="form-control" id="day" name="day">
-                {% for choice in form.day.choices %}
-                    <option value="{{ choice[0] }}" {%- if form.data.day == choice[0] %}selected{%- endif %}>{{ choice[1] }}</option>
+        <div class="form-group col-md-4 {%- if occurrence_form.scheduled_time_day.errors %} has-error {%- endif %}">
+            <label for="{{ occurrence_form.scheduled_time_day.name }}">Date</label>
+            <select class="form-control" id="{{ occurrence_form.scheduled_time_day.name }}" name="{{ occurrence_form.scheduled_time_day.name }}">
+                {% for choice in occurrence_form.scheduled_time_day.choices %}
+                    <option value="{{ choice[0] }}" {%- if occurrence_form.scheduled_time_day.data == choice[0] %}selected{%- endif %}>{{ choice[1] }}</option>
                 {% endfor %}
             </select>
-            {% if form.day.errors %}
-                {% for error in form.day.errors %}
-                    <p class="help-block" id="help-block-day">{{ error }}</p>
+            {% if occurrence_form.scheduled_time_day.errors %}
+                {% for error in occurrence_form.scheduled_time_day.errors %}
+                    <p class="help-block" id="help-block-scheduled_time_day">{{ error }}</p>
                 {% endfor %}
             {% endif %}
         </div>
-        <div class="form-group col-md-4 {%- if form.scheduled_time.errors %} has-error {%- endif %}">
-            <label for="scheduled_time">Start Time</label>
-            <input type="time" class="form-control" id="scheduled_time" name="scheduled_time" value="{%- if form.data.scheduled_time %}{{ form.data.scheduled_time.strftime("%H:%M") }}{%- endif %}">
-            {% if form.scheduled_time.errors %}
-                {% for error in form.scheduled_time.errors %}
-                    <p class="help-block" id="help-block-scheduled_time">{{ error }}</p>
+        <div class="form-group col-md-4 {%- if occurrence_form.scheduled_time_time.errors %} has-error {%- endif %}">
+            <label for="{{ occurrence_form.scheduled_time_time.name }}">Start Time</label>
+            <input type="time" class="form-control" id="{{ occurrence_form.scheduled_time_time.name }}" name="{{ occurrence_form.scheduled_time_time.name }}" value="{%- if occurrence_form.scheduled_time_time.data %}{{ occurrence_form.scheduled_time_time.data.strftime("%H:%M") }}{%- endif %}">
+            {% if occurrence_form.scheduled_time_time.errors %}
+                {% for error in occurrence_form.scheduled_time_time.errors %}
+                    <p class="help-block" id="help-block-scheduled_time_time">{{ error }}</p>
                 {% endfor %}
             {% endif %}
         </div>
-        <div class="form-group col-md-4 {%- if form.scheduled_duration.errors %} has-error {%- endif %}">
-            <label for="scheduled_duration">Duration (in minutes)</label>
-            <input type="number" class="form-control" id="scheduled_duration" name="scheduled_duration" value="{%- if form.data.scheduled_duration %}{{ form.data.scheduled_duration }}{%- endif %}">
-            {% if form.scheduled_duration.errors %}
-                {% for error in form.scheduled_duration.errors %}
+        <div class="form-group col-md-4 {%- if occurrence_form.scheduled_duration.errors %} has-error {%- endif %}">
+            <label for="{{ occurrence_form.scheduled_duration.name }}">Duration (in minutes)</label>
+            <input type="number" class="form-control" id="{{ occurrence_form.scheduled_duration.name }}" name="{{ occurrence_form.scheduled_duration.name }}" value="{%- if occurrence_form.scheduled_duration.data %}{{ occurrence_form.scheduled_duration.data }}{%- endif %}">
+            {% if occurrence_form.scheduled_duration.errors %}
+                {% for error in occurrence_form.scheduled_duration.errors %}
                     <p class="help-block" id="help-block-scheduled_duration">{{ error }}</p>
                 {% endfor %}
             {% endif %}
         </div>
     </div>
-    {% if proposal and not proposal.user_scheduled and proposal.allowed_times %}    
+    {# FIXME why do we show this? #}
+    {% if schedule_item and schedule_item.official_content and schedule_item.occurrences[0].allowed_times %}
         <div class="form-group">
             <p>The person who submitted this content is available at the following times:</p>
             <ul>
-                {% for time in proposal.allowed_times.split("\n") %}
+                {% for time in schedule_item.occurrences[0].allowed_times.split("\n") %}
                     <li>{{ time }}</li>
                 {% endfor %}
             </ul>
         </div>
     {% endif %}
-    <div class="form-group {%- if form.venue.errors %} has-error {%- endif %}">
-        <label for="venue">Venue</label>
-        <select class="form-control" id="venue" name="venue">
-            {% for choice in form.venue.choices %}
+    <div class="form-group {%- if occurrence_form.scheduled_venue_id.errors %} has-error {%- endif %}">
+        <label for="{{ occurrence_form.scheduled_venue_id.name }}">Venue</label>
+        <select class="form-control" id="{{ occurrence_form.scheduled_venue_id.name }}" name="{{ occurrence_form.scheduled_venue_id.name }}">
+            {% for choice in occurrence_form.scheduled_venue_id.choices %}
                 <option value="{{ choice[0] }}" {%- if form.data.venue == choice[0] %}selected{%- endif %}>{{ choice[1] }}</option>
             {% endfor %}
         </select>
@@ -98,19 +110,21 @@
             or if you're part of a village with multiple venues and would like them added please send an email to
             <a href="mailto:contact@emfcamp.org">contact@emfcamp.org</a>.
         </p>
-        {% if form.venue.errors %}
-            {% for error in form.venue.errors %}
-                <p class="help-block" id="help-block-venue">{{ error }}</p>
+        {% if occurrence_form.scheduled_venue_id.errors %}
+            {% for error in occurrence_form.scheduled_venue_id.errors %}
+                <p class="help-block" id="help-block-scheduled_venue_id">{{ error }}</p>
             {% endfor %}
         {% endif %}
     </div>
-    <div class="form-group {%- if form.published_names.errors %} has-error {%- endif %}">
-        <label for="published_names">Name</label>
-        <input type="text" class="form-control" id="published_names" name="published_names" value="{%- if form.data.published_names %}{{ form.data.published_names }}{%- endif %}">
+    {% endfor %}
+
+    <div class="form-group {%- if form.names.errors %} has-error {%- endif %}">
+        <label for="names">Names</label>
+        <input type="text" class="form-control" id="names" name="names" value="{%- if form.data.names %}{{ form.data.names }}{%- endif %}">
         <p class="help-block">The speaker name to show in the schedule.</p>
-        {% if form.published_names.errors %}
-            {% for error in form.published_names.errors %}
-                <p class="help-block" id="help-block-published_names">{{ error }}</p>
+        {% if form.names.errors %}
+            {% for error in form.names.errors %}
+                <p class="help-block" id="help-block-names">{{ error }}</p>
             {% endfor %}
         {% endif %}
     </div>
@@ -123,22 +137,33 @@
             {% endfor %}
         {% endif %}
     </div>
+    <div class="form-group {%- if form.short_description.errors %} has-error {%- endif %}">
+        <label for="short_description">Short description</label>
+        <input type="text" class="form-control" id="short_description" name="short_description" value="{%- if form.data.short_description %}{{ form.data.short_description }}{%- endif %}">
+        {% if form.short_description.errors %}
+            {% for error in form.short_description.errors %}
+                <p class="help-block" id="help-block-short-description">{{ error }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
     <div class="form-group row workshop-fields">
-        <div class="form-group col-md-4 {%- if form.attendees.errors %} has-error {%- endif %}">
-            <label for="attendees">Maximum Attendees</label>
-            <input class="form-control" id="attendees" name="attendees" value="{%- if form.data.attendees %}{{ form.data.attendees }}{%- endif %}">
-            {% if form.attendees.errors %}
-                {% for error in form.attendees.errors %}
-                    <p class="help-block" id="help-block-attendees">{{ error }}</p>
+        {#
+        <div class="form-group col-md-4 {%- if form.participant_count.errors %} has-error {%- endif %}">
+            <label for="participant_count">Maximum Attendees</label>
+            <input class="form-control" id="participant_count" name="participant_count" value="{%- if form.data.participant_count %}{{ form.data.participant_count }}{%- endif %}">
+            {% if form.participant_count.errors %}
+                {% for error in form.participant_count.errors %}
+                    <p class="help-block" id="help-block-participant-count">{{ error }}</p>
                 {% endfor %}
             {% endif %}
         </div>
-        <div class="form-group col-md-4 {%- if form.cost.errors %} has-error {%- endif %}">
-            <label for="cost">Cost (per attendee, in £)</label>
-            <input class="form-control" id="cost" name="cost" value="{%- if form.data.cost %}{{ form.data.cost }}{%- endif %}">
-            {% if form.cost.errors %}
-                {% for error in form.cost.errors %}
-                    <p class="help-block" id="help-block-cost">{{ error }}</p>
+        #}
+        <div class="form-group col-md-4 {%- if form.participant_cost.errors %} has-error {%- endif %}">
+            <label for="participant_cost">Cost (per attendee, in £)</label>
+            <input class="form-control" id="participant_cost" name="participant_cost" value="{%- if form.participant_cost.data %}{{ form.participant_cost.data }}{%- endif %}">
+            {% if form.participant_cost.errors %}
+                {% for error in form.participant_cost.errors %}
+                    <p class="help-block" id="help-block-participant_cost">{{ error }}</p>
                 {% endfor %}
             {% endif %}
         </div>
@@ -167,6 +192,6 @@
         {% endif %}
     </div>
     <div class="form-actions">
-        <button type="submit" class="btn btn-primary">{%- if proposal %}Update{%- else %}Add{%- endif %} Content</button>
+        <button type="submit" class="btn btn-primary">{%- if schedule_item %}Update{%- else %}Add{%- endif %} Content</button>
     </div>
 </form>

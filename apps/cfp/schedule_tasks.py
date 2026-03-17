@@ -1,17 +1,18 @@
 """CLI commands for scheduling"""
 
+from typing import Literal
+
 import click
 from dataclasses import dataclass
 from flask import current_app as app
-from sqlalchemy import func
+from sqlalchemy import func, select, or_
 
 from main import db
-from models.cfp import Proposal, Venue
+from models.cfp import Occurrence, Proposal, ScheduleItem, ScheduleItemType, Venue
 from models.village import Village
 from apps.cfp_review.base import send_email_for_proposal
 from .scheduler import Scheduler
 from . import cfp
-from ..common.email import from_email
 
 
 @dataclass
@@ -19,7 +20,7 @@ class VenueDefinition:
     name: str
     priority: int
     latlon: tuple[float, float]
-    scheduled_content_only: bool
+    allows_attendee_content: bool
     allowed_types: list[str]
     default_for_types: list[str]
     capacity: int | None
@@ -33,7 +34,7 @@ class VenueDefinition:
             name=self.name,
             priority=self.priority,
             location=self.location,
-            scheduled_content_only=self.scheduled_content_only,
+            allows_attendee_content=self.allows_attendee_content,
             allowed_types=self.allowed_types,
             default_for_types=self.default_for_types,
             capacity=self.capacity,
@@ -46,7 +47,7 @@ _EMF_VENUES = [
         name="Stage A",
         priority=100,
         latlon=(52.03961, -2.37787),
-        scheduled_content_only=True,
+        allows_attendee_content=False,
         allowed_types=["talk"],
         default_for_types=["talk"],
         capacity=1000,
@@ -55,7 +56,7 @@ _EMF_VENUES = [
         name="Stage B",
         priority=99,
         latlon=(52.04190, -2.37664),
-        scheduled_content_only=True,
+        allows_attendee_content=False,
         allowed_types=["talk", "performance"],
         default_for_types=["talk", "performance", "lightning"],
         capacity=600,
@@ -64,7 +65,7 @@ _EMF_VENUES = [
         name="Stage C",
         priority=98,
         latlon=(52.04050, -2.37765),
-        scheduled_content_only=True,
+        allows_attendee_content=False,
         allowed_types=["talk"],
         default_for_types=["talk", "lightning"],
         capacity=450,
@@ -73,7 +74,7 @@ _EMF_VENUES = [
         name="Workshop 1",
         priority=97,
         latlon=(52.04259, -2.37515),
-        scheduled_content_only=True,
+        allows_attendee_content=False,
         allowed_types=["workshop"],
         default_for_types=["workshop"],
         capacity=30,
@@ -82,7 +83,7 @@ _EMF_VENUES = [
         name="Workshop 2",
         priority=96,
         latlon=(52.04208, -2.37715),
-        scheduled_content_only=True,
+        allows_attendee_content=False,
         allowed_types=["workshop"],
         default_for_types=["workshop"],
         capacity=30,
@@ -91,7 +92,7 @@ _EMF_VENUES = [
         name="Workshop 3",
         priority=95,
         latlon=(52.04129, -2.37578),
-        scheduled_content_only=True,
+        allows_attendee_content=False,
         allowed_types=["workshop"],
         default_for_types=["workshop"],
         capacity=30,
@@ -100,7 +101,7 @@ _EMF_VENUES = [
         name="Workshop 4",
         priority=94,
         latlon=(52.04329, -2.37590),
-        scheduled_content_only=True,
+        allows_attendee_content=False,
         allowed_types=["workshop"],
         default_for_types=["workshop"],
         capacity=30,
@@ -109,7 +110,7 @@ _EMF_VENUES = [
         name="Workshop 5",
         priority=93,
         latlon=(52.040938, -2.37706),
-        scheduled_content_only=True,
+        allows_attendee_content=False,
         allowed_types=["workshop"],
         default_for_types=["workshop"],
         capacity=30,
@@ -118,7 +119,7 @@ _EMF_VENUES = [
         name="Youth Workshop",
         priority=92,
         latlon=(52.04117, -2.37771),
-        scheduled_content_only=True,
+        allows_attendee_content=False,
         allowed_types=["youthworkshop"],
         default_for_types=["youthworkshop"],
         capacity=30,
@@ -127,7 +128,7 @@ _EMF_VENUES = [
         name="Main Bar",
         priority=91,
         latlon=(52.04180, -2.37727),
-        scheduled_content_only=False,
+        allows_attendee_content=True,
         allowed_types=["talk", "performance"],
         default_for_types=[],
         capacity=None,
@@ -136,7 +137,7 @@ _EMF_VENUES = [
         name="Lounge",
         priority=90,
         latlon=(52.04147, -2.37644),
-        scheduled_content_only=False,
+        allows_attendee_content=True,
         allowed_types=["talk", "performance", "workshop", "youthworkshop"],
         default_for_types=[],
         capacity=None,
@@ -185,14 +186,18 @@ def create_village_venues():
             app.logger.warning(f"Not creating village venue with colliding name {village.name}")
             continue
 
-        venue = Venue(name=village.name, village_id=village.id, scheduled_content_only=False)
+        venue = Venue(name=village.name, village_id=village.id, allows_attendee_content=True)
         db.session.add(venue)
         db.session.commit()
 
 
 @cfp.cli.command("set_rough_durations")
 def set_rough_durations():
-    """Assign durations to proposals based on the proposed length."""
+    """
+    Assign durations to occurrences based on the proposed length.
+    This is what allows them to be sent the "please finalise" email,
+    and to be scheduled.
+    """
     scheduler = Scheduler()
     scheduler.set_rough_durations()
 
@@ -220,56 +225,73 @@ def run_schedule(persist, ignore_potential, type):
 @click.option("--email/--no-email", default=True, help="Send update emails to proposers")
 @click.option(
     "--type",
-    help="Which type of proposal to apply for ('all' selects all proposals)",
+    help="Which type of proposal to apply for ('all' selects all schedule items)",
     required=True,
 )
-def apply_potential_schedule(email, type):
+def apply_potential_schedule(email: bool, type: ScheduleItemType | Literal["all"]):
     app.logger.info(f"Apply schedule for {type} type(s)")
-    if type == "all":
-        query = Proposal.query
-    elif type:
-        query = Proposal.query.filter(Proposal.type == type)
-    else:
+    if not type:
         raise Exception("Set a type")
 
-    proposals = (
-        query.filter(
-            (Proposal.potential_venue != None)  # noqa: E711
-            | (Proposal.potential_time != None)  # noqa: E711
+    query = (
+        select(Occurrence)
+        .where(Occurrence.scheduled_duration.isnot(None))
+        .where(
+            or_(
+                # TODO: when would these ever not be set together?
+                Occurrence.potential_venue_id.isnot(None),
+                Occurrence.potential_time.isnot(None),
+            )
         )
-        .filter(Proposal.scheduled_duration.isnot(None))
-        .filter(Proposal.is_accepted)
-        .all()
+        .where(Occurrence.proposal.has(Proposal.state.in_({"accepted", "finalised"})))
     )
 
-    app.logger.info(f"Got {len(proposals)} proposals")
+    if type != "all":
+        query = query.where(Occurrence.schedule_item.has(ScheduleItem.type == type))
 
-    for proposal in proposals:
-        user = proposal.user
+    occurrences: list[Occurrence] = list(db.session.scalars(query))
 
-        previously_unscheduled = True
-        if proposal.scheduled_venue or proposal.scheduled_time:
-            previously_unscheduled = False
+    app.logger.info(f"Got {len(occurrences)} occurrences")
 
-        if proposal.potential_venue:
-            proposal.scheduled_venue = proposal.potential_venue
-            proposal.potential_venue = None
+    newly_scheduled_schedule_items = []
+    moved_schedule_items = []
 
-        if proposal.potential_time:
-            proposal.scheduled_time = proposal.potential_time
-            proposal.potential_time = None
+    for occurrence in occurrences:
+        user = occurrence.user
 
-        if previously_unscheduled:
-            app.logger.info('Scheduling proposal "%s" by %s', proposal.title, user.email)
-            if email:
-                send_email_for_proposal(
-                    proposal,
-                    reason="scheduled",
-                    from_address=from_email("SPEAKERS_EMAIL"),
-                )
+        # TODO: when would these ever not be set together?
+        if occurrence.potential_venue:
+            occurrence.scheduled_venue = occurrence.potential_venue
+            occurrence.potential_venue = None
+
+        if occurrence.potential_time:
+            occurrence.scheduled_time = occurrence.potential_time
+            occurrence.potential_time = None
+
+        if occurrence.state == "unscheduled" and occurrence.scheduled_venue and occurrence.scheduled_time:
+            occurrence.state = "scheduled"
+
+            app.logger.info('Scheduled occurrence for "%s" by %s', occurrence.schedule_item.title, user.email)
+            newly_scheduled_schedule_items.append(occurrence.schedule_item)
+
+        elif occurrence.state == "scheduled":
+            app.logger.info('Moved occurrence for "%s" by %s', occurrence.schedule_item.title, user.email)
+            moved_schedule_items.append(occurrence.schedule_item)
+
         else:
-            app.logger.info('Moving proposal "%s" by %s', proposal.title, user.email)
-            if email:
-                send_email_for_proposal(proposal, reason="moved", from_address=from_email("SPEAKERS_EMAIL"))
+            # TODO: not fully scheduled yet. When would this ever happen?
+            pass
 
-        db.session.commit()
+    if email:
+        # Only send one email per schedule item, except in the unlikely case where
+        # they have one occurrence that's been scheduled and one that's been moved
+        for schedule_item in newly_scheduled_schedule_items:
+            # We filter on Occurrence.proposal.has() above
+            assert schedule_item.proposal is not None
+            send_email_for_proposal(schedule_item.proposal, reason="slot-scheduled")
+        for schedule_item in moved_schedule_items:
+            # We filter on Occurrence.proposal.has() above
+            assert schedule_item.proposal is not None
+            send_email_for_proposal(schedule_item.proposal, reason="slot-moved")
+
+    db.session.commit()

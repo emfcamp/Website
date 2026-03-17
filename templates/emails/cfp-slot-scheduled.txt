@@ -1,10 +1,26 @@
+{# This email is very similar to cfp-slot-moved.txt. Please apply edits there too. #}
 {% extends "emails/base.txt" %}
 {% block body %}
+{% set schedule_item = proposal.schedule_item %}
 Hi {{ proposal.user.name }},
 
-Your EMF {{ proposal.human_type }} '{{ proposal.title }}' has been scheduled!
+Your EMF {{ schedule_item.human_type }} '{{ schedule_item.title }}' has been scheduled!
 
-You have a {{ proposal.scheduled_duration }} minute slot in {{ proposal.scheduled_venue.name }} on {{ proposal.scheduled_time.strftime('%A at %-I:%M %p') }}. If this is not suitable, please let us know as soon as possible.
+{% if schedule_item.occurrences | length == 1 %}
+{% for occurrence in schedule_item.occurrences %}
+You have a {{ occurrence.scheduled_duration }} minute slot in {{ occurrence.scheduled_venue.name }} on {{ occurrence.scheduled_time.strftime('%A at %-I:%M %p') }}. If this is not suitable, please let us know as soon as possible.
+{% endfor %}
+{% else %}
+You have been allocated slots at the following times:
+{% for occurrence in schedule_item.occurrences %}
+  {% if occurrence.state == "scheduled" %}
+  {{ occurrence.occurrence_num }}: {{ occurrence.scheduled_duration }} minute slot in {{ occurrence.scheduled_venue.name }} on {{ occurrence.scheduled_time.strftime('%A at %-I:%M %p') }}
+  {% else %}
+  {{ occurrence.occurrence_num }}: Not scheduled yet
+  {% endif %}
+{% endfor %}
+If this is not suitable, please let us know as soon as possible.
+{% endif %}
 
 {% include "emails/_cfp-slot-blurb.txt" %}
 

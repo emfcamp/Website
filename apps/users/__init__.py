@@ -24,7 +24,7 @@ from wtforms.validators import DataRequired, ValidationError
 from apps.common import get_next_url
 from main import db, get_or_404
 from models.basket import Basket
-from models.cfp import CFPMessage, Proposal
+from models.cfp import Proposal, ProposalMessage
 from models.user import User, verify_signup_code
 
 from ..common import feature_flag, set_user_currency
@@ -40,14 +40,14 @@ def users_variables():
     unread_count = 0
     if current_user.is_authenticated:
         unread_count = (
-            CFPMessage.query.join(Proposal)
+            ProposalMessage.query.join(Proposal)
             .filter(
                 Proposal.user_id == current_user.id,
-                Proposal.id == CFPMessage.proposal_id,
-                CFPMessage.is_to_admin.is_(False),
+                Proposal.id == ProposalMessage.proposal_id,
+                ProposalMessage.is_to_admin.is_(False),
                 or_(
-                    CFPMessage.has_been_read.is_(False),
-                    CFPMessage.has_been_read.is_(None),
+                    ProposalMessage.has_been_read.is_(False),
+                    ProposalMessage.has_been_read.is_(None),
                 ),
             )
             .count()

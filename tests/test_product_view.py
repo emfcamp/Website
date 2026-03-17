@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from models import naive_utcnow
-from models.cfp import TalkProposal
+from models.cfp import Proposal
 from models.product import VOUCHER_GRACE_PERIOD, ProductView, Voucher
 
 
@@ -29,14 +29,16 @@ def test_product_view_accessible(db, user, monkeypatch):
         "CfP products should not be visible without accepted proposal"
     )
 
-    proposal = TalkProposal()
-    proposal.title = "title"
-    proposal.description = "description"
-    proposal.requirements = "requirements"
-    proposal.user = user
+    proposal = Proposal(
+        type="talk",
+        title="title",
+        description="description",
+        equipment_required="equipment_required",
+        user=user,
+    )
     db.session.add(proposal)
     db.session.commit()
-    proposal.set_state("accepted")
+    proposal.state = "accepted"
     db.session.add(proposal)
     db.session.commit()
 

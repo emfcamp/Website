@@ -1,7 +1,8 @@
 {% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
-{% block title %}Finalise Proposal - {{ proposal.title }}{% endblock %}
+{% block title %}Finalise Proposal - {{ proposal.schedule_item.title or proposal.title }}{% endblock %}
 {% block body %}
+{% set schedule_item = proposal.schedule_item %}
 
 <form class="form-horizontal cfp-form" method="post">
   <div class="well">
@@ -12,40 +13,57 @@
         <p>Please confirm how you would like your name, and those of any
           collaborators to appear in the schedule. Any names you give here
           are separate to the one attached to your ticket.</p>
-        {{ render_field(form.name, 9) }}
+        {{ render_field(form.names, 9) }}
         <p>What pronouns should we use? For example 'they/them' or 'she/her'.
           These will be displayed in the schedule and given to heralds to use.</p>
         {{ render_field(form.pronouns, 9) }}
         <p>If you can supply a telephone number it helps us contact you
           once we're on site. It will be treated with strictest confidence
           and only accessible to those that absolutely need it.</p>
-        {{ render_field(form.telephone_number, 9) }}
+        {{ render_field(form.contact_telephone, 9) }}
         <p>If you have a custom extension (e.g. DECT) issued for
           <a href="/about/phones">our on-site phone network</a>, we'll use
           that as an alternative way to contact you.</p>
-        {{ render_field(form.eventphone_number, 9) }}
+        {{ render_field(form.contact_eventphone, 9) }}
     </fieldset>
 
     <fieldset>
-        <legend>Confirm Your {{proposal.human_type | title}}</legend>
+        <legend>Confirm Your {{ schedule_item.human_type | title }}</legend>
         <p>Please confirm the details you would like to be publicly visible in the schedule</p>
         {{ render_field(form.title, 9) }}
         <div class="col-md-9 col-md-offset-3"><small>Your description should be about 100-150 words.</small></div>
         {{ render_field(form.description, 9) }}
+        <div class="col-md-9 col-md-offset-3"><small>A shorter description for limited-length displays. Ideally less than 20 words.</small></div>
+        {{ render_field(form.short_description, 9) }}
 
-        <p>Will your {{proposal.human_type }} cover any content that people may want to be warned about? e.g. discussions of
-          death, bigotry etc. </p>
-        {{ render_field(form.content_note, 9) }}
-        <p>Do you consider your {{proposal.human_type }} to be family friendly/suitable for all ages?</p>
-        {{ render_field(form.family_friendly, 9) }}
+        {% if schedule_item.type in ["talk", "workshop", "youthworkshop"] %}
+        <p>Will your {{ schedule_item.human_type }} cover any content that people may want to be warned about?
+           For example, discussions of death, bigotry etc.</p>
+        {{ render_field(form.attributes.content_note, 9) }}
+        {% endif %}
+        {% if schedule_item.type in ["talk", "workshop"] %}
+        <p>Do you consider your {{ schedule_item.human_type }} to be family friendly/suitable for all ages?</p>
+        {{ render_field(form.attributes.family_friendly, 9) }}
+        {% endif %}
 
-        {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
+        {% if schedule_item.type in ["workshop", "youthworkshop"] %}
+        <div class="col-md-9 col-md-offset-3"><small>Number of attendees this workshop can accept (this will not be published).</small></div>
+        {{ render_field(form.attributes.proposal_participant_count, 9) }}
         <div class="col-md-9 col-md-offset-3"><small>Please give the cost in pounds (£) per attendee, with any options.</small></div>
-        {{ render_field(form.cost, 9) }}
+        {{ render_field(form.attributes.participant_cost, 9) }}
         <div class="col-md-9 col-md-offset-3"><small>The age range this workshop is suitable for. If anybody can take part, say "All ages".</small></div>
-        {{ render_field(form.age_range, 9) }}
+        {{ render_field(form.attributes.age_range, 9) }}
         <div class="col-md-9 col-md-offset-3"><small>If workshop attendees should bring things, please detail them.</small></div>
-        {{ render_field(form.participant_equipment, 9) }}
+        {{ render_field(form.attributes.participant_equipment, 9) }}
+        {% endif %}
+
+        {% if schedule_item.type in ['youthworkshop'] %}
+        <div class="col-md-9 col-md-offset-3"><small>I have a valid <a href="https://www.gov.uk/government/organisations/disclosure-and-barring-service/about#dbs-checks" target="_blank">DBS check</a>.</small></div>
+        {{ render_field(form.attributes.proposal_valid_dbs, 9) }}
+        {% endif %}
+
+        {% if schedule_item.type in ['installation'] %}
+        {{ render_field(form.attributes.size, 9) }}
         {% endif %}
     </fieldset>
 
@@ -60,9 +78,9 @@
     {% if slot_times %}
     <fieldset>
         <legend>Your Availability</legend>
-        <p>When are you available to deliver your {{ proposal.human_type }}? We'll do our best to pick a time that you are comfortable with.</p>
+        <p>When are you available to deliver your {{ schedule_item.human_type }}? We'll do our best to pick a time that you are comfortable with.</p>
 
-          {% if proposal.type == 'performance' %}
+          {% if schedule_item.type == 'performance' %}
             <p>Performances will be scheduled between <strong>8pm and 1:30am</strong> (midnight)
               every day. There is a 1:30am curfew on amplified music.</p>
             <table class="table">
@@ -106,15 +124,31 @@
 
     <fieldset>
         <legend>Final Requirements</legend>
-        {% if proposal.type in ['talk', 'performance'] %}
-        {{ render_field(form.video_privacy, 7) }}
+        {% if schedule_item.type in ['talk', 'performance'] %}
+        {% if schedule_item.occurrences %}
+        {# The default privacy field probably won't mean much now #}
+        {% else %}
+        {{ render_field(form.default_video_privacy, 7) }}
+        {% endif %}
         {% endif %}
         
-        {% if proposal.type == 'talk' %}
-        {{ render_field(form.needs_laptop, 7) }}
+        {% if schedule_item.type == 'talk' %}
+        {# content_note above #}
+        {{ render_field(form.attributes.needs_laptop, 7) }}
+        {# family_friendly above #}
+
+        {% elif schedule_item.type == 'performance' %}
+        {# no attributes #}
+
+        {% elif schedule_item.type in ['workshop', 'youthworkshop'] %}
+        {# all attributes above #}
+
+        {% elif schedule_item.type == 'installation' %}
+        {# all attributes above #}
+
         {% endif %}
 
-        {% if proposal.type == 'installation' %}
+        {% if schedule_item.type == 'installation' %}
           <p>In addition to any requirements (including being under cover, power
             and water) please let us know if special provisions are needed for
             moving your installation (e.g. if it is fragile, must be disarmed first).</p>
@@ -123,23 +157,41 @@
             <small>Any equipment you might need, or other things you need us to provide.</small>
           </div>
         {% endif %}
-        {{ render_field(form.equipment_required, 9) }}
+        {{ render_field(form.proposal_equipment_required, 9) }}
 
-        {{ render_field(form.additional_info, 9) }}
+        <div class="col-md-9 col-md-offset-3">
+          <small>What costs do you need covered?</small>
+        </div>
+        {{ render_field(form.proposal_funding_required, 9) }}
+
+        {{ render_field(form.proposal_additional_info, 9) }}
     </fieldset>
 
-    {% if proposal.scheduled_duration and (proposal.type == 'talk' or proposal.type == 'workshop') %}
     <fieldset>
-      <legend>Your currently scheduled slot</legend>
-      <dl class="dl-horizontal">
-        <dt>Slot length</dt><dd>{{proposal.scheduled_duration}} minutes</dd>
-        <dt>Slot time</dt><dd>{% if proposal.scheduled_time %}{{proposal.scheduled_time.strftime('%A at %-I:%M %p')}}{% else %}Not yet scheduled{% endif %}</dd>
-        <dt>Venue</dt><dd>{{proposal.scheduled_venue_name or "Not yet scheduled"}}</dd>
-      </dl>
-      <div>If your slot is not suitable, please <b><a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">  get in touch with us!</a></b></div>
+        {% if schedule_item.occurrences | length == 1 %}
+        <legend>Your currently scheduled slot</legend>
+        {% else %}
+        <legend>Your currently scheduled slots</legend>
+        {% endif %}
+
+        {% for occurrence in schedule_item.occurrences %}
+        <dl class="dl-horizontal">
+          <dt>Slot length</dt><dd>{{ occurrence.scheduled_duration }} minutes</dd>
+          <dt>Slot time</dt><dd>{% if occurrence.scheduled_time %}{{ occurrence.scheduled_time.strftime('%A at %-I:%M %p') }}{% else %}Not yet scheduled{% endif %}</dd>
+          <dt>Venue</dt><dd>{{ occurrence.scheduled_venue_name or "Not yet scheduled"}}</dd>
+        </dl>
+        {% endfor %}
+
+        <div>
+        {% if schedule_item.occurrences | length == 1 %}
+        If your slot is not suitable,
+        {% else %}
+        If any of your slots are not suitable,
+        {% endif %}
+        please <b><a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">  get in touch with us!</a></b>
+        </div>
     </fieldset>
 	{% endif %}
-
 
   </div>
   <div class="pull-right">

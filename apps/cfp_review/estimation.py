@@ -6,12 +6,13 @@ from main import db
 from sqlalchemy import select
 from models.cfp import (
     PROPOSAL_TIMESLOTS,
-    Proposal,
+    ScheduleItem,
+    ScheduleItemType,
     Venue,
     get_days_map,
-    ROUGH_LENGTHS,
+    ROUGH_DURATIONS,
     EVENT_SPACING,
-    SLOT_LENGTH,
+    SLOT_DURATION,
     make_periods_contiguous,
     timeslot_to_period,
 )
@@ -19,13 +20,12 @@ from models.cfp import (
 
 @dataclass
 class CFPEstimate:
-    proposal_type: str
-    # The number of proposals currently accepted
-    accepted_count: int
+    schedule_item_type: ScheduleItemType
+    schedule_item_count: int
     available_time: timedelta
     allocated_time: timedelta
     remaining_time: timedelta
-    unknown_lengths: int
+    unknown_durations: int
     venues: list[Venue]
 
 
@@ -41,35 +41,36 @@ def get_available_proposal_minutes():
     return minutes
 
 
-def get_cfp_estimate(proposal_type: str) -> CFPEstimate:
+def get_cfp_estimate(schedule_item_type: ScheduleItemType) -> CFPEstimate:
     """Calculate estimated scheduling capacity statistics for a given proposal type."""
-    if proposal_type not in ["talk", "workshop", "performance", "youthworkshop"]:
-        raise ValueError(f"Invalid proposal type: {proposal_type}")
+    changeover_time = SLOT_DURATION * EVENT_SPACING[schedule_item_type]
 
-    changeover_time = SLOT_LENGTH * EVENT_SPACING[proposal_type]
-
-    accepted_proposals = Proposal.query_accepted().filter(Proposal.type == proposal_type).all()
+    schedule_items = (
+        db.session.query(ScheduleItem)
+        .filter(ScheduleItem.state == "published", ScheduleItem.type == schedule_item_type)
+        .all()
+    )
 
     allocated_time = timedelta()
-    unknown_lengths: int = 0
+    unknown_durations: int = 0
 
-    for proposal in accepted_proposals:
-        length = None
-        if proposal.scheduled_duration:
-            length = timedelta(minutes=proposal.scheduled_duration)
-        else:
-            if proposal.length in ROUGH_LENGTHS:
-                length = timedelta(minutes=ROUGH_LENGTHS[proposal.length])
+    for schedule_item in schedule_items:
+        for occurrence in schedule_item.occurrences:
+            duration = None
+            if occurrence.scheduled_duration:
+                duration = timedelta(minutes=occurrence.scheduled_duration)
+            elif schedule_item.proposal and schedule_item.proposal.duration in ROUGH_DURATIONS:
+                duration = timedelta(minutes=ROUGH_DURATIONS[schedule_item.proposal.duration])
             else:
-                unknown_lengths += 1
+                unknown_durations += 1
                 continue
 
-        allocated_time += length + changeover_time
+            allocated_time += duration + changeover_time
 
     num_days = len(get_days_map().items())
 
     available_venues = list(
-        db.session.execute(select(Venue).where(Venue.default_for_types.any_() == proposal_type))
+        db.session.execute(select(Venue).where(Venue.default_for_types.any_() == schedule_item_type))
         .scalars()
         .all()
     )
@@ -80,14 +81,14 @@ def get_cfp_estimate(proposal_type: str) -> CFPEstimate:
     allocated_time = max(allocated_time - changeover_correction, timedelta(0))
 
     available_minutes = get_available_proposal_minutes()
-    available_time = timedelta(minutes=available_minutes[proposal_type])
+    available_time = timedelta(minutes=available_minutes[schedule_item_type])
 
     return CFPEstimate(
-        proposal_type=proposal_type,
-        accepted_count=len(accepted_proposals),
+        schedule_item_type=schedule_item_type,
+        schedule_item_count=len(schedule_items),
         available_time=available_time,
         allocated_time=allocated_time,
         remaining_time=available_time - allocated_time,
-        unknown_lengths=unknown_lengths,
+        unknown_durations=unknown_durations,
         venues=available_venues,
     )

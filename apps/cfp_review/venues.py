@@ -4,7 +4,7 @@ from flask import (
     url_for,
     flash,
 )
-
+from sqlalchemy import select
 from shapely import Point
 from wtforms import (
     FloatField,
@@ -19,24 +19,24 @@ from wtforms.validators import DataRequired, Optional
 from geoalchemy2.shape import to_shape, from_shape
 
 from main import db, get_or_404
-from models.cfp import Venue, Proposal, HUMAN_CFP_TYPES
+from models.cfp import Occurrence, Venue, SCHEDULE_ITEM_INFOS
 from models.village import Village
 from . import (
     cfp_review,
     admin_required,
 )
-from ..common.forms import Form
+from ..common.forms import Form, coerce_optional
 
 
-VENUE_TYPE_CHOICES = [(k, v) for k, v in HUMAN_CFP_TYPES.items()]
+VENUE_TYPE_CHOICES = [(t.type, t.human_type) for t in SCHEDULE_ITEM_INFOS.values()]
 
 
 class VenueForm(Form):
     name = StringField("Name", [DataRequired()])
-    village_id = SelectField("Village", choices=[], coerce=int)
-    scheduled_content_only = BooleanField("Scheduled Content Only")
-    lat = FloatField("Latitude")
-    lon = FloatField("Longitude")
+    village_id = SelectField("Village", coerce=coerce_optional(int))
+    allows_attendee_content = BooleanField("Allows Attendee Content")
+    location_lat = FloatField("Latitude")
+    location_lon = FloatField("Longitude")
     allowed_types = SelectMultipleField("Allowed for", choices=VENUE_TYPE_CHOICES)
     default_for_types = SelectMultipleField("Default Venue for", choices=VENUE_TYPE_CHOICES)
     capacity = IntegerField("Capacity", validators=[Optional()])
@@ -45,43 +45,33 @@ class VenueForm(Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        choices = [(0, "")]
+        choices = [("", "")]
         for v in Village.query.order_by(Village.name).all():
             choices.append((v.id, v.name))
         self.village_id.choices = choices
 
-    def populate_from_venue(self, venue: Venue):
-        if venue.location is None:
-            self.lat.data = self.lon.data = None
-        else:
-            latlon = to_shape(venue.location)
-            self.lat.data = latlon.y
-            self.lon.data = latlon.x
+    def process(self, formdata=None, obj: Venue | None = None, data=None, **kwargs):
+        super().process(formdata, obj, data, **kwargs)
 
-    def populate_obj(self, venue: Venue):
-        venue.scheduled_content_only = self.scheduled_content_only.data
-        assert self.allowed_types.data is not None
-        assert self.default_for_types.data is not None
-        venue.allowed_types = self.allowed_types.data
-        venue.default_for_types = self.default_for_types.data
-        venue.capacity = self.capacity.data
+        if obj is not None and hasattr(obj, "location") and obj.location is not None:
+            latlon = to_shape(obj.location)
+            self.location_lat.data = latlon.y
+            self.location_lon.data = latlon.x
 
-        if self.lat.data is not None and self.lon.data is not None:
-            location = from_shape(Point(self.lon.data, self.lat.data))
+    def populate_obj(self, obj: Venue):
+        super().populate_obj(obj)
+
+        if self.location_lat.data is not None and self.location_lon.data is not None:
+            location = from_shape(Point(self.location_lon.data, self.location_lat.data))
         else:
             location = None
-        venue.location = location
-
-        if self.village_id.data == 0:
-            venue.village_id = None
-        else:
-            venue.village_id = self.village_id.data
+        obj.location = location
 
 
 @cfp_review.route("/venues", methods=["GET", "POST"])
 @admin_required
 def venues():
-    venues = Venue.query.order_by(Venue.scheduled_content_only.desc(), Venue.name).all()
+    venues = Venue.query.order_by(Venue.allows_attendee_content.desc(), Venue.name).all()
     new_venue = Venue()
     form = VenueForm(obj=new_venue)
 
@@ -102,11 +92,15 @@ def edit_venue(venue_id):
     form = VenueForm(obj=venue)
     if form.validate_on_submit():
         if form.delete.data:
-            scheduled_content = Proposal.query.filter(
-                Proposal.scheduled_venue_id == venue.id, Proposal.is_accepted
-            ).count()
+            occurrences = list(
+                db.session.scalars(
+                    select(Occurrence)
+                    .where(Occurrence.scheduled_venue_id == venue.id)
+                    .where(Occurrence.state == "scheduled")
+                )
+            )
 
-            if scheduled_content > 0:
+            if occurrences:
                 flash("Cannot delete venue with scheduled content")
                 return redirect(url_for(".edit_venue", venue_id=venue_id))
 
@@ -114,12 +108,11 @@ def edit_venue(venue_id):
             db.session.commit()
             flash("Deleted venue")
             return redirect(url_for(".venues"))
-        if form.submit.data:
+
+        elif form.submit.data:
             form.populate_obj(venue)
             db.session.commit()
             flash("Saved venue")
             return redirect(url_for(".venues"))
-    else:
-        form.populate_from_venue(venue)
 
     return render_template("cfp_review/venues/edit.html", venue=venue, form=form)

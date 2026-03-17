@@ -4,10 +4,14 @@ Hi {{ proposal.user.name }},
 
 Your EMF {{ proposal.human_type }} proposal '{{ proposal.title }}' is currently on the reserve list and may be accepted at short notice if we have last minute drop-outs. Your proposal was highly rated, but didn't quite make the main selection.
 
-If you'd like to cancel your proposal as it is too close to the event, or you can no longer attend, please withdraw your proposal on our website: https://www.emfcamp.org/cfp/proposals
+If you'd like to cancel your proposal as it is too close to the event, or you can no longer attend, please withdraw your proposal on our website:
 
+  {{ external_url("cfp.proposals") }}
+
+{% if proposal.type == "talk" and false %}
 We will shortly be opening lightning talk signups, so if you would like to give a very short talk instead please keep an eye out.
 
+{% endif %}
 Thanks,
 The EMF Team
 {% endblock %}

@@ -67,7 +67,7 @@ export default defineConfig({
             "line_up.js": './js/line-up.js',
             "schedule.js": './js/schedule.js',
             "volunteer_schedule.js": './js/volunteer-schedule.js',
-            "event_tickets.js": './js/event-tickets.js',
+            "lottery.js": './js/lottery.js',
             "arrivals.js": './js/arrivals.js',
 
             "admin.scss": './css/admin.scss',

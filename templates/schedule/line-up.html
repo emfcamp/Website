@@ -1,4 +1,4 @@
-{% from "schedule/_proposal_lister.html" import list_proposals with context %}
+{% from "schedule/_schedule_item_lister.html" import list_schedule_items with context %}
 
 {% extends "base.html" %}
 {% block title %}Line-up{% endblock %}
@@ -26,19 +26,19 @@
 
   <p>
     Workshops that require you to sign up for a ticket will be allocated via
-    <a href="{{ url_for('.about_event_tickets') }}" title="About the workshop ticket lottery">a lottery</a>.
+    <a href="{{ url_for('.about_lotteries') }}" title="About ticket lotteries">a lottery</a>.
   </p>
 
   {% if current_user.is_authenticated %}
     <p>
       <strong><a class="btn btn-lg btn-primary" href="{{ url_for('.favourites') }}">View your favourites</a></strong>
-      <strong><a class="btn btn-lg btn-primary" href="{{ url_for('.event_tickets') }}">View your workshop tickets</a></strong>
+      <strong><a class="btn btn-lg btn-primary" href="{{ url_for('.lottery_entries') }}">View your lottery entries</a></strong>
     </p>
   {% endif %}
 </div>
 
 <div class="line-up">
-{{ list_proposals(proposals) }}
+{{ list_schedule_items(grouped_schedule_items, ordered_type_infos) }}
 </div>
 
 {% endblock %}

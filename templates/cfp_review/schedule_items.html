@@ -1,0 +1,76 @@
+{% extends "cfp_review/base.html" %}
+{% block title %}Schedule Items{% endblock %}
+{% block body %}
+<div class="btn-group pull-right dropdown">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Export <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li><a href="{{ url_for('.export_schedule_items', format='csv', **new_qs) }}">CSV</a></li>
+    <li><a href="{{ url_for('.export_schedule_items', format='json', **new_qs) }}">JSON</a></li>
+  </ul>
+</div>
+<h2>Schedule Items</h2>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a role="button" data-toggle="collapse" data-target="#searchPanel"
+                aria-controls="searchPanel" aria-expanded="true">
+                Filter <small>(showing {{ schedule_items | count }}/{{ total_schedule_items }})</small>
+            </a>
+        </h4>
+    </div>
+    <div class="panel-body collapse
+    {%- if is_filtered %}in{% endif %}
+        " id="searchPanel">
+        {% include "cfp_review/_schedule_items_filter_form.html" %}
+    </div>
+</div>
+
+<table class="table table-condensed">
+    <tr>
+        {% if not request.args.get('reverse') %}
+            {% set qs_reverse_new=True %}
+        {% else %}
+            {% set qs_reverse_new=None %}
+        {% endif %}
+        <th class="col-md-1">
+            <a href="{{ url_for('.schedule_items', sort_by='date', reverse=qs_reverse_new, **new_qs) }}">Date</a>
+        </th>
+        <th>
+            <a href="{{ url_for('.schedule_items', sort_by='state', reverse=qs_reverse_new, **new_qs) }}">State</a>
+        </th>
+        <th class="col-md-1">
+            <a href="{{ url_for('.schedule_items', sort_by='type', reverse=qs_reverse_new, **new_qs) }}">Type</a>
+        </th>
+        <th>
+            <a href="{{ url_for('.schedule_items', sort_by='official_content', reverse=qs_reverse_new, **new_qs) }}">Official</a>
+        </th>
+        <th>
+            <a href="{{ url_for('.schedule_items', sort_by='favourites', reverse=qs_reverse_new, **new_qs) }}">#Favs</a>
+        </th>
+        <th>
+            <a href="{{ url_for('.proposals', sort_by='names', reverse=qs_reverse_new, **new_qs) }}">Names</a>
+        </th>
+        <th>
+            <a href="{{ url_for('.proposals', sort_by='title', reverse=qs_reverse_new, **new_qs) }}">Title</a>
+        </th>
+    </tr>
+{% for schedule_item in schedule_items %}
+    <tr class="{{- loop.cycle('odd', 'even') -}}">
+        <td>{{ schedule_item.modified.strftime("%d/%m") }}</td>
+        <td>{{ schedule_item.state | capitalize }}</td>
+        <td>{{ schedule_item.human_type | capitalize }}</td>
+        <td>{% if schedule_item.official_content %}Official{% else %}Attendee{% endif %}</td>
+        <td>{{ schedule_item.favourite_count }}</td>
+        <td>{{ schedule_item.names }}</td>
+        <td>
+            <a href="{{ url_for('.update_schedule_item', schedule_item_id=schedule_item.id, **full_qs) }}">{{ schedule_item.title }}</a>
+        </td>
+    </tr>
+{% else %}
+    <tr><td colspan="5" class="text-center">No schedule items found</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

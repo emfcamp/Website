@@ -11,9 +11,9 @@
 
 <form method="post" action="{{ url_for('.proposal_notes', proposal_id=proposal.id) }}">
     {{ form.hidden_tag() }}
-    {{ render_field(form.notes, tabindex=1, rows=6) }}
+    {{ render_field(form.private_notes, tabindex=1, rows=6) }}
     <div class="pull-right">
-        {{ form.send(class_='btn btn-success debounce', tabindex=2) }}
+        {{ form.update(class_='btn btn-success debounce', tabindex=2) }}
     </div>
 </form>
 

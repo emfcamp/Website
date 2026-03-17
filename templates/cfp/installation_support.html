@@ -56,14 +56,14 @@
 <h2 id="funding">Funding</h2>
 <p>We have a limited amount of funding available for installations - if you can't afford to make your idea happen, we may be able to help!</p>
 <p>We’re expecting grants to be in the range £100-£500, but larger grants may be possible for exceptional projects.</p>
-<p>If you'd like to apply for funding, please submit your installation to the <a href="{{ url_for('cfp.form', cfp_type='installation') + ('?closed' if ignore_closed else '') }}">Call For Participation</a>.</p>
+<p>If you'd like to apply for funding, please submit your installation to the <a href="{{ url_for('cfp.create_proposal', proposal_type='installation') + ('?closed' if ignore_closed else '') }}">Call For Participation</a>.</p>
 <br>
 
 
 <h2 id="tickets">Tickets</h2>
 <p>Bringing an installation does not automatically guaranteed you the opportunity to buy an EMF ticket, unless we’ve funded it. We have a limited number of reserved tickets for exceptional installations available.</p>
 <p>The guarantee is for <strong>two</strong> adult tickets: one for you at a 33% discount, and one for a friend or partner at full price. You are also guaranteed as many child tickets as you need.
-<p>If you'd like to apply for a guaranteed EMF ticket, please submit your installation to the <a href="{{ url_for('cfp.form', cfp_type='installation') + ('?closed' if ignore_closed else '') }}">Call For Participation</a>.</p>
+<p>If you'd like to apply for a guaranteed EMF ticket, please submit your installation to the <a href="{{ url_for('cfp.create_proposal', proposal_type='installation') + ('?closed' if ignore_closed else '') }}">Call For Participation</a>.</p>
 <br>
 
 
@@ -73,7 +73,7 @@
 <p>Yes! You don’t need our agreement, just bring it along. But <a href="#contact">we’d really like to know about it</a>, if only so we can ensure people can find it on-site. And if there is any question at all about safety or logistics, please get in touch.</p>
 
 <h4>How do I apply?</h4>
-<p>Fill in the <a href="{{ url_for('cfp.form', cfp_type='installation') + ('?closed' if ignore_closed else '') }}">Call for Participation</a>, and you have any questions about the application process, please <a href="#contact">get in touch</a>.</p>
+<p>Fill in the <a href="{{ url_for('cfp.create_proposal', proposal_type='installation') + ('?closed' if ignore_closed else '') }}">Call for Participation</a>, and you have any questions about the application process, please <a href="#contact">get in touch</a>.</p>
 
 <h4>When can I expect a decision?</h4>
 <p>We’ll be reviewing submissions every few weeks. Funded projects will be awarded on April 4th. If you need money further in advance, please <a href="#contact">contact us</a>.

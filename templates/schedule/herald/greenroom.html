@@ -37,12 +37,12 @@
     </tr>
   </thead>
   <tbody>
-    {% for prop in upcoming %}
+    {% for schedule_item in upcoming %}
       <tr>
-        <td>{{ prop.scheduled_time.strftime("%a %H:%M") }}</td>
-        <td>{{ prop.scheduled_venue.name }}</td>
-        <td>{{ prop.published_names or prop.user.name }}</td>
-        <td><a href="{{ url_for('cfp_review.update_proposal', proposal_id=prop.id) }}">{{ prop.published_title or prop.title }}</a></td>
+        <td>{{ schedule_item.scheduled_time.strftime("%a %H:%M") }}</td>
+        <td>{{ schedule_item.scheduled_venue.name }}</td>
+        <td>{{ schedule_item.names }}</td>
+        <td><a href="{{ url_for('cfp_review.update_schedule_item', schedule_item_id=schedule_item.id) }}">{{ schedule_item.title }}</a></td>
       </tr>
     {% endfor %}
   </tbody>

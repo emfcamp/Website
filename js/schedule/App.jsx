@@ -18,7 +18,7 @@ function App() {
   const [onlyFavourites, setOnlyFavourites] = useState(false);
   const [onlyFamilyFriendly, setOnlyFamilyFriendly] = useState(false);
   const [onlyNoRecording, setOnlyNoRecording] = useState(false);
-  const [onlyTicketed, setOnlyTicketed] = useState(false);
+  const [onlyLottery, setOnlyLottery] = useState(false);
   const [includeFinished, setIncludeFinished] = useState(false);
   const [debug, setDebug] = useState(false);
 
@@ -61,9 +61,9 @@ function App() {
   useEffect(() => {
     if (rawSchedule == null) { return };
 
-    let newSchedule = new ScheduleData(rawSchedule, { currentTime, onlyFavourites, onlyFamilyFriendly, onlyNoRecording, onlyTicketed, includeFinished, selectedVenues, selectedEventTypes, selectedAgeRanges });
+    let newSchedule = new ScheduleData(rawSchedule, { currentTime, onlyFavourites, onlyFamilyFriendly, onlyNoRecording, onlyLottery, includeFinished, selectedVenues, selectedEventTypes, selectedAgeRanges });
     setSchedule(newSchedule);
-  }, [currentTime, onlyFavourites, onlyFamilyFriendly, onlyNoRecording, onlyTicketed, includeFinished, selectedVenues, selectedEventTypes, selectedAgeRanges, rawSchedule]);
+  }, [currentTime, onlyFavourites, onlyFamilyFriendly, onlyNoRecording, onlyLottery, includeFinished, selectedVenues, selectedEventTypes, selectedAgeRanges, rawSchedule]);
 
   // Update time once a minute
   useEffect(() => {
@@ -98,7 +98,7 @@ function App() {
   }
 
   let filterProps = {
-    schedule, onlyFavourites, setOnlyFavourites, onlyFamilyFriendly, setOnlyFamilyFriendly, onlyNoRecording, setOnlyNoRecording, onlyTicketed, setOnlyTicketed, includeFinished, setIncludeFinished, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, selectedAgeRanges, setSelectedAgeRanges, debug, currentTime, setCurrentTime
+    schedule, onlyFavourites, setOnlyFavourites, onlyFamilyFriendly, setOnlyFamilyFriendly, onlyNoRecording, setOnlyNoRecording, onlyLottery, setOnlyLottery, includeFinished, setIncludeFinished, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, selectedAgeRanges, setSelectedAgeRanges, debug, currentTime, setCurrentTime
   }
 
   return (

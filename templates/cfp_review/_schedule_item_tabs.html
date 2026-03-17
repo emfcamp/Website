@@ -1,0 +1,25 @@
+<ul class="nav nav-tabs">
+    <li role="presentation" {% if active == 'details' %} class="active" {% endif %}>
+        <a href="{{ url_for('.update_schedule_item', schedule_item_id=schedule_item.id, **full_qs) }}">
+            Details
+        </a>
+    </li>
+    {% for occurrence in schedule_item.occurrences %}
+    <li role="presentation" {% if active == 'occurrence-%s' % occurrence.id %} class="active" {% endif %}>
+        <a href="{{ url_for('.update_occurrence', schedule_item_id=schedule_item.id, occurrence_id=occurrence.id, **full_qs) }}">
+            Occurrence {{ occurrence.occurrence_num }}
+        </a>
+    </li>
+    {% endfor %}
+    <li role="presentation" {% if active.startswith('versions-') %} class="active" {% endif %}>
+        {% if active.startswith("occurrence-") or active.startswith("versions-occurrence-") %}
+        <a href="{{ url_for('.entity_latest_version', entity_type='occurrence', entity_id=occurrence.id, **full_qs) }}">
+            Versions ({{ occurrence.versions.count() }})
+        </a>
+        {% else %}
+        <a href="{{ url_for('.entity_latest_version', entity_type='schedule-item', entity_id=schedule_item.id, **full_qs) }}">
+            Versions ({{ schedule_item.versions.count() }})
+        </a>
+        {% endif %}
+    </li>
+</ul>

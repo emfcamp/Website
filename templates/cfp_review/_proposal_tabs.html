@@ -19,8 +19,8 @@
             Votes/Reviewer Notes ({{ proposal.get_unread_vote_note_count() }}/{{ proposal.votes | length }})
         </a>
     </li>
-    <li role="presentation" {% if active == 'versions' %} class="active" {% endif %}>
-        <a href="{{ url_for('.proposal_latest_version', proposal_id=proposal.id, **full_qs) }}">
+    <li role="presentation" {% if active == 'versions-proposal' %} class="active" {% endif %}>
+        <a href="{{ url_for('.entity_latest_version', entity_type='proposal', entity_id=proposal.id, **full_qs) }}">
             Versions ({{proposal.versions.count()}})
         </a>
     </li>

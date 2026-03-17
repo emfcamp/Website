@@ -1,0 +1,167 @@
+{% from "_formhelpers.html" import render_field, render_dl_field, render_radio_field %}
+{% extends "cfp_review/base.html" %}
+{% block title %}{{ schedule_item.title }}{% endblock %}
+{% block body %}
+
+{% set active='details' %}
+{% include "cfp_review/_schedule_item_tabs.html" %}
+
+
+<div class="col-md-12">
+    <h2>{{ schedule_item.title }}<br>
+        <small>
+            {% if schedule_item.official_content %}
+                A {{ schedule_item.human_type }} by
+            {% else %}
+                An attendee {{ schedule_item.human_type }} by
+            {% endif %}
+            {{ schedule_item.names }}
+            {% if schedule_item.pronouns %}
+                ({{ schedule_item.pronouns }})
+            {% endif %}
+        </small>
+    </h2>
+</div>
+<form method="post" action="{{ url_for('.update_schedule_item', schedule_item_id=schedule_item.id) }}" class="shrink">
+    {{ form.hidden_tag() }}
+    <div class="col-md-8">
+        <div class="panel-group" id="formAccordion" role="tablist" aria-multiselectable="true">
+
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="basicsPanelHeading">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" href="#basicsPanel" aria-expanded="true" aria-controls="basicsPanel">
+                            Schedule item
+                        </a>
+                    </h4>
+                </div>
+                <div id="basicsPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="basicsPanelHeading">
+                    <div class="panel-body">
+                        <dl class="dl-horizontal">
+                            <dt>Created</dt>
+                            {% set create_txn = schedule_item.versions[0].transaction %}
+                            <dd>{{ create_txn.issued_at.strftime("%Y-%m-%d %H:%M") }}</dd>
+                            <dt>Created by</dt>
+                            <dd><a href="{{ url_for(".cfp_user", user_id=create_txn.user.id) }}">{{ create_txn.user.name }}</a></dd>
+                            <dt>Owned by</dt>
+                            <dd><a href="{{ url_for(".cfp_user", user_id=schedule_item.user.id) }}">{{ schedule_item.user.name }}</a></dd>
+                            {% if schedule_item.proposal %}
+                            <dt>Source proposal</dt>
+                            <dd><a href="{{ url_for(".update_proposal", proposal_id=schedule_item.proposal.id) }}">{{ schedule_item.proposal.title }}</a></dd>
+                            {% endif %}
+                            <dt>Num favourites</dt>
+                            <dd>{{ schedule_item.favourite_count }}</dd>
+
+                            {{ render_dl_field(form.official_content) }}
+                            {{ render_dl_field(form.state) }}
+
+                        </dl>
+                        <dl class="dl-horizontal">
+                            {{ render_dl_field(form.title) }}
+                            {{ render_dl_field(form.names) }}
+                            {{ render_dl_field(form.pronouns) }}
+                            {{ render_dl_field(form.description, rows=4) }}
+                            {{ render_dl_field(form.short_description) }}
+
+                            {{ render_dl_field(form.default_video_privacy) }}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="attributesPanelHeading">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" href="#attributesPanel" aria-expanded="false" aria-controls="attributesPanel">
+                            Type-specific attributes
+                        </a>
+                    </h4>
+                </div>
+                <div id="attributesPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="attributesPanelHeading">
+                    <div class="panel-body">
+                        <dl class="dl-horizontal">
+                            {% if schedule_item.type == 'talk' %}
+                                {{ render_dl_field(form.attributes.content_note) }}
+                                {{ render_dl_field(form.attributes.needs_laptop) }}
+                                {{ render_dl_field(form.attributes.family_friendly) }}
+
+                            {% elif schedule_item.type == 'performance' %}
+                                <div>There are no attributes for the type performance</div>
+
+                            {% elif schedule_item.type == 'workshop' or schedule_item.type == 'youthworkshop' %}
+                                {{ render_dl_field(form.attributes.participant_cost) }}
+                                {{ render_dl_field(form.attributes.participant_equipment) }}
+                                {{ render_dl_field(form.attributes.age_range) }}
+                                {% if schedule_item.type == 'workshop' %}
+                                    {{ render_dl_field(form.attributes.family_friendly) }}
+                                {% endif %}
+
+                            {% elif schedule_item.type == 'installation' %}
+                                {{ render_dl_field(form.attributes.size) }}
+
+                            {% elif schedule_item.type == "lightning" %}
+                                {{ render_dl_field(form.attributes.session) }}
+                                {{ render_dl_field(form.attributes.slide_link) }}
+
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="schedulingUserPanelHeading">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" href="#schedulingUserPanel" aria-expanded="false" aria-controls="schedulingUserPanel">
+                            User information
+                        </a>
+                    </h4>
+                </div>
+                <div id="schedulingUserPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="schedulingUserPanelHeading">
+                    <div class="panel-body">
+                        <dl class="dl-horizontal">
+                            {{ render_dl_field(form.arrival_period) }}
+                            {{ render_dl_field(form.departure_period) }}
+                            {{ render_dl_field(form.available_times, readonly=True) }}
+
+                            {{ render_dl_field(form.contact_telephone) }}
+                            {{ render_dl_field(form.contact_eventphone) }}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        {{ form.update(class_="btn btn-primary debounce", tabindex=1) }}
+    </div>
+</form>
+<form method="post" action="{{ url_for('.occurrences', schedule_item_id=schedule_item.id) }}">
+    <div class="col-md-4 col-xs-12" role="group">
+        <h4>Schedule item actions</h4>
+        <div class="btn-group-vertical" role="group">
+            <a href="{{ url_for('.convert_schedule_item', schedule_item_id=schedule_item.id) }}"
+                    class="btn btn-warning">
+                Convert schedule item
+            </a>
+            <a href="{{ url_for('.schedule_item_change_owner', schedule_item_id=schedule_item.id) }}"
+                    class="btn btn-warning">
+                Change schedule item owner
+            </a>
+            {{ occurrence_form.create(class_="btn btn-success debounce", tabindex=1) }}
+
+            {% if next_id %}
+                <a href="{{ url_for('.update_schedule_item', schedule_item_id=next_id, **full_qs) }}"
+                    class="btn btn-default">
+                    Next schedule item
+                </a>
+            {% else %}
+                <a href="{{ url_for('.schedule_items', **full_qs) }}"
+                    class="btn btn-default">
+                    All schedule items
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</form>
+
+{% endblock %}

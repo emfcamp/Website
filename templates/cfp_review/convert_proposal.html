@@ -14,8 +14,10 @@
 <div class="col-md-12">
     <h4>Please note:</h4>
     <ul>
-        <li>Converting will reset the allowed venues and user availability to defaults for the new type.</li>
-        <li>Finalised proposals will be set to "accepted" so the user can re-finalise.</li>
+        {% if proposal.schedule_item %}
+        <li>The associated schedule item will be converted, and unpublished so the user can re-finalise.</li>
+        <li>Converting will reset the user's reported availability, and set the allowed venues to defaults for the new type.</li>
+        {% endif %}
         <li>The user is NOT notified of the conversion or need to re-finalise.</li>
     </ul>
 </div>

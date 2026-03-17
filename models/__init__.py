@@ -200,8 +200,8 @@ from .basket import *  # noqa: F403
 from .cfp import *  # noqa: F403
 from .diversity import *  # noqa: F403
 from .email import *  # noqa: F403
-from .event_tickets import *  # noqa: F403
 from .feature_flag import *  # noqa: F403
+from .lottery import *  # noqa: F403
 from .payment import *  # noqa: F403
 from .permission import *  # noqa: F403
 from .product import *  # noqa: F403

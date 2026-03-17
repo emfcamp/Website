@@ -2,8 +2,8 @@ $(function() {
     $('.favourite-button').click(async (event) => {
         event.preventDefault();
         const btn = event.target.closest('.favourite-button');
-        const event_id = btn.value;
-        const response = await fetch(`/api/proposal/${event_id}/favourite`, {
+        const schedule_item_id = btn.value;
+        const response = await fetch(`/api/schedule-item/${schedule_item_id}/favourite`, {
             method: 'PUT',
             credentials: 'include',
             headers: {

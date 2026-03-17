@@ -168,16 +168,17 @@ class UserDiversity(BaseModel):
             update_diversity_dict(data["totals"], parsed_values)
 
             user = row.user
-            if user.has_proposals:
+            if user.proposals:
                 update_diversity_dict(data["submitted_a_proposal"], parsed_values)
 
-            if user.is_cfp_accepted:
+            # FIXME: this isn't just speakers
+            if user.has_accepted_proposal:
                 update_diversity_dict(data["speakers"], parsed_values)
 
-            if user.is_cfp_accepted and user.is_invited_speaker:
+            if user.has_accepted_proposal and user.is_invited_speaker:
                 update_diversity_dict(data["invited_speakers"], parsed_values)
 
-            if user.is_cfp_accepted and not user.is_invited_speaker:
+            if user.has_accepted_proposal and not user.is_invited_speaker:
                 update_diversity_dict(data["non-invited_speakers"], parsed_values)
 
             if user.has_permission("cfp_reviewer", cascade=False):

@@ -29,7 +29,7 @@
           Open for edits
         {% elif proposal.state == 'edit' %}
           Update required (please check your <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">messages</a>)
-        {% elif proposal.state in ['locked', 'checked'] %}
+        {% elif proposal.state == 'checked' %}
           Awaiting anonymisation
         {% elif proposal.state == 'rejected' %}
           Rejected, please check your <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">messages</a>
@@ -55,23 +55,32 @@
             {{ proposal.get_unread_count(current_user) }} unread of {{ proposal.messages | length }}
           </a>
         </dd>
-        {% if not proposal.is_accepted %}
+        {% if not proposal.schedule_item %}
           <dt>Required notice</dt>
           <dd>{{ proposal.notice_required }}</dd>
-        {% endif %}
-        {% if (proposal.type == 'talk' or proposal.type == 'workshop') %}
-            {% if proposal.is_accepted %}
-              <dt>Slot length</dt><dd>{{proposal.scheduled_duration}} minutes</dd>
-              <dt>Slot time</dt><dd>{% if proposal.scheduled_time %}<b><font color="green">{{proposal.scheduled_time.strftime('%A at %-I:%M %p')}}</font></b>{% else %}Not yet scheduled{% endif %}</dd>
-              <dt>Venue</dt><dd>{{proposal.scheduled_venue_name or "Not yet scheduled"}}</dd>
-            {% else %}
-              <dt>Duration</dt>
-              <dd>{{ proposal.length }}</dd>
+        {% else %}
+          {% for occurrence in proposal.schedule_item.occurrences %}
+            {% if proposal.schedule_item.occurrences | length > 1 %}
+            <dt>Instance</dt><dd>{{ occurrence.occurrence_num }}</dd>
             {% endif %}
-        {% elif proposal.type == 'installation' %}
+            {% if occurrence.state == 'scheduled' %}
+              <dt>Slot length</dt><dd>{{ occurrence.scheduled_duration }} minutes</dd>
+              <dt>Slot time</dt><dd><b><font color="green">{{ occurrence.scheduled_time.strftime('%A at %-I:%M %p') }}</font></b></dd>
+              <dt>Venue</dt><dd>{{ occurrence.scheduled_venue.name }}</dd>
+            {% else %}
+              <dt>Venue</dt><dd>Not yet scheduled</dd>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+
+        {% if proposal.type == 'installation' %}
           <dt>Size</dt>
           <dd>{{ proposal.size }}</dd>
+        {% else %}
+          <dt>Duration</dt>
+          <dd>{{ proposal.duration }}</dd>
         {% endif %}
+
       </dl>
     </td>
   </tr>

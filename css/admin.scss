@@ -47,3 +47,10 @@ table.hire-purchases tr.payment-pending td {
   margin-top: -20px; /* To match navbar's margin-bottom */
 }
 
+tr.even {
+    background-color: #ddd;
+}
+
+tr.odd {
+    background-color: #eee;
+}

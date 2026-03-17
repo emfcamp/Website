@@ -42,7 +42,7 @@
     </tr>
     {% for proposal in proposals %}
         <tr>
-            <td>{% if proposal.has_ticket() %}Yes{% endif %}</td>
+            <td>{% if proposal.user.check_will_have_ticket() %}Yes{% endif %}</td>
             <td>{{proposal.state | capitalize}}</td>
             <td>{{proposal.human_type | capitalize}}</td>
             <td>{{proposal.notice_required or ''}}</td>

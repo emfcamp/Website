@@ -14,7 +14,7 @@ from main import db
 from .. import BaseModel
 
 if TYPE_CHECKING:
-    from ..cfp import Proposal
+    from ..cfp import Occurrence
     from ..user import User
     from .role import Role
     from .venue import VolunteerVenue
@@ -94,7 +94,7 @@ class Shift(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     role_id: Mapped[int] = mapped_column(ForeignKey("volunteer_role.id"))
     venue_id: Mapped[int] = mapped_column(ForeignKey("volunteer_venue.id"))
-    proposal_id: Mapped[int | None] = mapped_column(ForeignKey("proposal.id"))
+    occurrence_id: Mapped[int | None] = mapped_column(ForeignKey("occurrence.id"))
     start: Mapped[datetime] = mapped_column()
     end: Mapped[datetime] = mapped_column()
     min_needed: Mapped[int] = mapped_column(default=0)
@@ -102,7 +102,7 @@ class Shift(BaseModel):
 
     role: Mapped["Role"] = relationship(back_populates="shifts")
     venue: Mapped["VolunteerVenue"] = relationship(back_populates="shifts")
-    proposal: Mapped["Proposal"] = relationship(back_populates="shifts")
+    occurrence: Mapped["Occurrence"] = relationship(back_populates="shifts")
     entries: Mapped[list[ShiftEntry]] = relationship(back_populates="shift")
 
     current_count = column_property(
@@ -166,7 +166,7 @@ class Shift(BaseModel):
             "id": self.id,
             "role_id": self.role_id,
             "venue_id": self.venue_id,
-            "proposal_id": self.proposal_id,
+            "occurrence_id": self.occurrence_id,
             "start": start.strftime("%Y-%m-%dT%H:%M:00"),
             "start_time": start.strftime("%H:%M"),
             "end": end.strftime("%Y-%m-%dT%H:%M:00"),

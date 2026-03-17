@@ -2,7 +2,6 @@
 
 * edit - Talks are manually placed into this state if we'd like people to change their submission.
 * new - This talk was just submitted.
-* locked - After two days in "new" talks enter "locked" and can no longer be edited.
 * checked - An admin has checked this person isn't on the watchlist and it can now be anonymised.
 * rejected - An admin saw this person was on the watchlist and rejected it.
 * cancelled - An admin cancelled the talk at the request of the user.

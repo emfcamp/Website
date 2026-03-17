@@ -9,7 +9,7 @@
 <p>
     <strong>You should not add content that you have submitted to the CfP here.</strong>
 </p>
-    {% if content|length > 0 %}
+    {% if schedule_items | length > 0 %}
     <h2>Your Content</h2>
     <table class="table">
         <thead>
@@ -28,21 +28,33 @@
             </tr>
         </thead>
         <tbody>
-            {% for p in content %}
+            {% for schedule_item in schedule_items %}
             <tr>
-                <td>{{ p.display_title }}</td>
-                <td>{{ p.human_type | capitalize }}</td>
-                <td>{{ p.scheduled_venue.name }}</td>
-                <td>{{ p.start_date.strftime("%a %H:%M") }}</td>
-                <td>{{ p.end_date.strftime("%a %H:%M") }}</td>
-                {% if current_user.village %}
-                    <td>{{ not p.user_scheduled }}</td>
-                {% endif %}
-                <td>{{ p.favourite_count }}</td>
-                <td><a href="{{ url_for("schedule.attendee_content_edit", id=p.id) }}">Edit</a></td>
+                <td>{{ schedule_item.title }}</td>
+                <td>{{ schedule_item.human_type | capitalize }}</td>
                 <td>
-                    {% if p.user_scheduled %}
-                        <a href="{{ url_for("schedule.attendee_content_delete", id=p.id) }}">Delete</a>
+                    {% for occurrence in schedule_item.occurrences %}
+                    {{ occurrence.scheduled_venue.name }}<br/>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for occurrence in schedule_item.occurrences %}
+                    {{ occurrence.scheduled_time.strftime("%a %H:%M") }}<br/>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for occurrence in schedule_item.occurrences %}
+                    {{ occurrence.scheduled_end_time.strftime("%a %H:%M") }}<br/>
+                    {% endfor %}
+                </td>
+                {% if current_user.village %}
+                    <td>{{ schedule_item.official_content }}</td>
+                {% endif %}
+                <td>{{ schedule_item.favourite_count }}</td>
+                <td><a href="{{ url_for("schedule.attendee_content_edit", schedule_item_id=schedule_item.id) }}">Edit</a></td>
+                <td>
+                    {% if not schedule_item.official_content %}
+                        <a href="{{ url_for("schedule.attendee_content_delete", schedule_item_id=schedule_item.id) }}">Delete</a>
                     {% endif %}
                 </td>
             </tr>

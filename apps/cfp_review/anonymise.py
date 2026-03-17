@@ -3,7 +3,7 @@ from flask_login import current_user
 from models.cfp import Proposal
 
 from main import db, get_or_404
-from . import cfp_review, anon_required, get_proposal_sort_dict, get_next_proposal_to
+from . import cfp_review, anon_required, sort_proposals, get_next_proposal_to
 from .forms import AnonymiseProposalForm
 
 
@@ -12,8 +12,7 @@ from .forms import AnonymiseProposalForm
 def anonymisation():
     proposals = Proposal.query.filter_by(state="checked").all()
 
-    sort_dict = get_proposal_sort_dict(request.args)
-    proposals.sort(**sort_dict)
+    sort_proposals(proposals)
 
     non_sort_query_string = dict(request.args)
     if "sort_by" in non_sort_query_string:
@@ -32,39 +31,39 @@ def anonymisation():
 @cfp_review.route("/anonymisation/<int:proposal_id>", methods=["GET", "POST"])
 @anon_required
 def anonymise_proposal(proposal_id):
-    prop = get_or_404(db, Proposal, proposal_id)
-    if prop.state in ["new", "edit", "locked"]:
+    proposal = get_or_404(db, Proposal, proposal_id)
+    if proposal.state in ["new", "edit"]:
         # Make sure people only see proposals that are ready
         return abort(404)
 
-    next_prop = get_next_proposal_to(prop, "checked")
+    next_proposal = get_next_proposal_to(proposal, "checked")
     form = AnonymiseProposalForm()
 
-    if prop.state == "checked" and form.validate_on_submit():
+    if proposal.state == "checked" and form.validate_on_submit():
         if form.reject.data:
-            prop.set_state("anon-blocked")
-            prop.anonymiser_id = current_user.id
+            proposal.state = "anon-blocked"
+            proposal.anonymiser_id = current_user.id
             db.session.commit()
             app.logger.info("Proposal %s cannot be anonymised", proposal_id)
 
         if form.anonymise.data:
-            prop.title = form.title.data
-            prop.description = form.description.data
-            prop.set_state("anonymised")
-            prop.anonymiser_id = current_user.id
+            proposal.title = form.title.data
+            proposal.description = form.description.data
+            proposal.state = "anonymised"
+            proposal.anonymiser_id = current_user.id
             db.session.commit()
             app.logger.info("Sending proposal %s for review", proposal_id)
 
-        if not next_prop:
+        if not next_proposal:
             return redirect(url_for(".anonymisation"))
-        return redirect(url_for(".anonymise_proposal", proposal_id=next_prop.id))
+        return redirect(url_for(".anonymise_proposal", proposal_id=next_proposal.id))
 
-    form.title.data = prop.title
-    form.description.data = prop.description
+    form.title.data = proposal.title
+    form.description.data = proposal.description
 
     return render_template(
         "cfp_review/anonymise_proposal.html",
-        proposal=prop,
+        proposal=proposal,
         form=form,
-        next_proposal=next_prop,
+        next_proposal=next_proposal,
     )

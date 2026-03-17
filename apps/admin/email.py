@@ -54,7 +54,7 @@ def get_users(dest: Literal["ticket", "cfp", "purchasers", "villages"]) -> Seque
     elif dest == "purchasers":
         query = query.join(User.payments).where(Payment.state == "paid")
     elif dest == "cfp":
-        query = query.join(User.proposals).where(Proposal.is_accepted)
+        query = query.join(User.proposals).where(Proposal.state.in_({"accepted", "finalised"}))
     elif dest == "villages":
         query = query.join(User.village_membership).where(VillageMember.admin == True)
     else:

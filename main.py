@@ -3,6 +3,7 @@ import logging.config
 import secrets
 import time
 from pathlib import Path
+from typing import Any
 
 import email_validator
 import stripe
@@ -336,6 +337,21 @@ def create_app(dev_server=False, config_override=None):
         # And just for convenience
         ctx["db"] = db
 
+        import sqlalchemy
+
+        for attr in ["select", "and_", "or_", "func", "text"]:
+            ctx[attr] = getattr(sqlalchemy, attr)
+
+        from sqlalchemy import orm
+
+        for attr in ["selectinload", "joinedload", "undefer", "aliased"]:
+            ctx[attr] = getattr(orm, attr)
+
+        from sqlalchemy_continuum import utils
+
+        for attr in ["transaction_class", "version_class"]:
+            ctx[attr] = getattr(utils, attr)
+
         return ctx
 
     if app.config["DEBUG"] or app.testing:
@@ -383,7 +399,7 @@ def create_app(dev_server=False, config_override=None):
     return app
 
 
-def external_url(endpoint, **values):
+def external_url(endpoint: str, **values: Any) -> str:
     """Generate an absolute external URL. If you need to override this,
     you're probably doing something wrong.
     """

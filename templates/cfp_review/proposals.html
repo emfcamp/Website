@@ -4,15 +4,6 @@
 <a role="button" class="btn btn-default pull-right" href="{{ url_for('.message_batch', **request.args) }}">
     Message all {{ proposals | count }} proposals
 </a>
-<div class="btn-group pull-right dropdown">
-  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Export <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu">
-    <li><a href="{{ url_for('.export', format='csv', **new_qs) }}">CSV</a></li>
-    <li><a href="{{ url_for('.export', format='json', **new_qs) }}">JSON</a></li>
-  </ul>
-</div>
 <h2>Proposals</h2>
 
 <div class="panel panel-default">
@@ -20,12 +11,12 @@
         <h4 class="panel-title">
             <a role="button" data-toggle="collapse" data-target="#searchPanel"
                 aria-controls="searchPanel" aria-expanded="true">
-                Filter <small>(showing {{ proposals | count }}/{{total_proposals}})</small>
+                Filter <small>(showing {{ proposals | count }}/{{ total_proposals }})</small>
             </a>
         </h4>
     </div>
     <div class="panel-body collapse
-    {%- if filtered %}in{% endif %}
+    {%- if is_filtered %}in{% endif %}
         " id="searchPanel">
         {% include "cfp_review/_proposals_filter_form.html" %}
     </div>
@@ -57,9 +48,6 @@
             <a href="{{ url_for('.proposals', sort_by='duration', reverse=qs_reverse_new, **new_qs) }}">Duration</a>
         </th>
         <th>
-            <a href="{{ url_for('.proposals', sort_by='favourites', reverse=qs_reverse_new, **new_qs) }}">#Favs</a>
-        </th>
-        <th>
             <a href="{{ url_for('.proposals', sort_by='user', reverse=qs_reverse_new, **new_qs) }}">User</a>
         </th>
         <th>
@@ -67,19 +55,18 @@
         </th>
     </tr>
 {% for proposal in proposals %}
-    <tr>
-        <td>{% if proposal.has_ticket() %}Yes{% endif %}</td>
-        <td>{{proposal.created.strftime("%d/%m")}}</td>
+    <tr class="{{- loop.cycle('odd', 'even') -}}">
+        <td>{% if proposal.user.check_will_have_ticket() %}Yes{% endif %}</td>
+        <td>{{proposal.modified.strftime("%d/%m")}}</td>
         <td>{{proposal.state | capitalize}}</td>
-        <td>{%- if proposal.user_scheduled %}Attendee&nbsp;{% endif -%}{{proposal.human_type | capitalize}}</td>
+        <td>{{proposal.human_type | capitalize}}</td>
         <td>{{proposal.notice_required or ''}}</td>
-        <td>{{proposal.scheduled_duration or ''}}</td>
-        <td>{{proposal.favourite_count}}</td>
+        <td>{{proposal.duration or ''}}</td>
         <td>
-            <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id ) }}">{{proposal.user.name}}</a>
+            <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id ) }}">{{ proposal.user.name }}</a>
         </td>
         <td>
-            <a href="{{ url_for('.update_proposal', proposal_id=proposal.id, **full_qs) }}">{{proposal.published_title or proposal.title}}</a>
+            <a href="{{ url_for('.update_proposal', proposal_id=proposal.id, **full_qs) }}">{{ proposal.title }}</a>
         </td>
     </tr>
 {% else %}

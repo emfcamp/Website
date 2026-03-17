@@ -20,8 +20,8 @@ There are 3 types of proposal which is accepted to the CfP:
 There are 3 main tables used in the CfP:
 
 * Proposal - the information received from the users
-* CFPMessage - implements a simple messaging system between submitters and admin
-* CFPVote - votes from reviewers against a proposal
+* ProposalMessage - implements a simple messaging system between submitters and admin
+* ProposalVote - votes from reviewers against a proposal
 
 ### Polymorphic tables ###
 
@@ -34,7 +34,7 @@ Submissions flow through the following state machine:
 
 * 'edit' - State that indicates the proposal isn't new but can be edited
 * 'new' - Initial state of a proposal
-* 'locked' - After two days 'new' proposals become 'locked'. 'Locked' proposals are then checked and are either:
+* Periodically, proposals are checked for spam/abusive entries and set to either:
     * 'checked' - The proposal is fine and is ready to be anonymised
     * 'rejected' - There is some problem with the proposal, the admin can then work to resolve this with the submitter.
 * 'anonymised' - 'checked' proposals then have their title and description checked for identifying information which might bias the reviewers.

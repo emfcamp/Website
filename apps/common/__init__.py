@@ -35,13 +35,13 @@ from main import JSONValue, db, external_url
 from models import Currency, User, event_end, event_start, naive_utcnow
 from models.basket import Basket
 from models.capacity import UnlimitedType
+from models.cfp import PROPOSAL_INFOS, SCHEDULE_ITEM_INFOS
 from models.feature_flag import get_db_flags
 from models.product import Price
 from models.purchase import Ticket
 from models.site_state import (
     get_refund_state,
     get_sales_state,
-    get_signup_state,
     get_site_state,
 )
 
@@ -117,13 +117,11 @@ def load_utility_functions(app_obj):
         SALES_STATE = get_sales_state()
         SITE_STATE = get_site_state()
         REFUND_STATE = get_refund_state()
-        SIGNUP_STATE = get_signup_state()
 
         return dict(
             SALES_STATE=SALES_STATE,
             SITE_STATE=SITE_STATE,
             REFUND_STATE=REFUND_STATE,
-            SIGNUP_STATE=SIGNUP_STATE,
             CURRENCY_SYMBOLS=CURRENCY_SYMBOLS,
             external_url=external_url,
             feature_enabled=feature_enabled,
@@ -216,6 +214,15 @@ def load_utility_functions(app_obj):
                 cls = "default"
 
         return Markup(f'<span class="label label-{cls}">{ticket.state}</span>')
+
+    app_obj.template_filter("tidy_workshop_cost")(tidy_workshop_cost)
+
+    @app_obj.context_processor
+    def content_processor():
+        return dict(
+            PROPOSAL_INFOS=PROPOSAL_INFOS,
+            SCHEDULE_ITEM_INFOS=SCHEDULE_ITEM_INFOS,
+        )
 
 
 def create_current_user(email: str, name: str) -> User:
@@ -420,3 +427,15 @@ def get_next_url(default=None):
     if default is None:
         default = url_for(".account")
     return default
+
+
+def tidy_workshop_cost(participant_cost: str) -> str:
+    # Some people put in a string, some just put in a £ amount
+    try:
+        floaty = float(participant_cost)
+        # We don't want to return anything if it doesn't cost anything
+        if floaty > 0:
+            return "£" + participant_cost
+        return ""
+    except ValueError:
+        return participant_cost

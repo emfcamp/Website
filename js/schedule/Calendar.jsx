@@ -37,20 +37,20 @@ function ContentWarningIcon({ hasContentWarning }) {
   return <Icon name="alert-fill" className="content-warning" size="32" label="Content Warning" />;
 }
 
-function RequiresTicketIcon({ requiresTicket }) {
-  if (!requiresTicket) { return null; }
+function UsesLotteryIcon({ usesLottery }) {
+  if (!usesLottery) { return null; }
 
   return (<span title="This workshop requires you sign up for a ticket">🎟</span>);
 }
 
-function EventIcons({ noRecording, isFavourite, isFamilyFriendly, hasContentWarning, requiresTicket }) {
+function EventIcons({ noRecording, isFavourite, isFamilyFriendly, hasContentWarning, usesLottery }) {
   return (
     <div className="event-icons">
       <NoRecordingIcon key='no-recording' noRecording={ noRecording } />
       <FavouriteIcon key='favourite' isFavourite={ isFavourite } />
       <FamilyFriendlyIcon key='family-friendly' isFamilyFriendly={ isFamilyFriendly } />
       <ContentWarningIcon key='content-warning' hasContentWarning={ hasContentWarning } />
-      <RequiresTicketIcon key='requires-ticket' requiresTicket={ requiresTicket } />
+      <UsesLotteryIcon key='uses-lottery' usesLottery={ usesLottery } />
     </div>
   );
 }
@@ -68,7 +68,7 @@ function FavouriteButton({ event, toggleFavourite, authenticated }) {
 }
 
 function TicketButton({ event, authenticated }) {
-  if (!authenticated || !event.requires_ticket) { return null; }
+  if (!authenticated || !event.uses_lottery) { return null; }
 
   return (
     <a href={event.link} className="btn btn-primary">Request Tickets</a>
@@ -101,11 +101,11 @@ function Event({ event, toggleFavourite, authenticated }) {
 
     return (
       <div className="event-details">
-        <AdditionalInformation label="Maximum attendees" value={ event.attendees } />
+        <AdditionalInformation label="Maximum attendees" value={ event.participant_count } />
         <AdditionalInformation label="Content warning" value={ event.content_note } />
         <AdditionalInformation label="Age range" value={ event.age_range } />
-        <AdditionalInformation label="Cost" value={ event.cost } />
-        <AdditionalInformation label="Required equipment" value={ event.equipment } />
+        <AdditionalInformation label="Cost" value={ event.participant_cost } />
+        <AdditionalInformation label="Required equipment" value={ event.participant_equipment } />
 
         <p><Linkify options={{target:'blank'}}>{ nl2br(event.description) }</Linkify></p>
         <p>
@@ -130,7 +130,7 @@ function Event({ event, toggleFavourite, authenticated }) {
           <h3 title={ event.title }>{ event.title }</h3>
           <p>{ metadata } | <span className="speaker">{ event.speaker }</span></p>
         </div>
-        <EventIcons noRecording={ event.noRecording } isFavourite={ event.is_fave } isFamilyFriendly={ event.is_family_friendly } hasContentWarning={ event.content_note && event.content_note != ''} requiresTicket={ event.requires_ticket } />
+        <EventIcons noRecording={ event.noRecording } isFavourite={ event.is_fave } isFamilyFriendly={ event.is_family_friendly } hasContentWarning={ event.content_note && event.content_note != ''} usesLottery={ event.uses_lottery } />
       </div>
       { eventDetails() }
     </div>

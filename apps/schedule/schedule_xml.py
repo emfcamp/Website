@@ -3,18 +3,22 @@
 Frab XML is consumed by a number of external tools such as C3VOC.
 """
 
+from collections.abc import Sequence
 from datetime import datetime, time, timedelta
+from typing import Any
 from uuid import NAMESPACE_URL, uuid5
 
 from lxml import etree
+from lxml.etree import _Element as Element
 
+from apps.schedule.data import ScheduleItemDict
 from main import external_url
 from models import event_end, event_start, event_year
 
 from . import event_tz
 
 
-def get_duration(start_time, end_time):
+def get_duration(start_time: datetime, end_time: datetime) -> str:
     # str(timedelta) creates e.g. hrs:min:sec...
     duration = (end_time - start_time).total_seconds() / 60
     hours = int(duration // 60)
@@ -26,7 +30,7 @@ def get_duration(start_time, end_time):
     return f"{days:d}:{hours:02d}:{minutes:02d}"
 
 
-def get_day_start_end(dt, start_time=time(4, 0)):
+def get_day_start_end(dt: datetime, start_time: time = time(4, 0)) -> tuple[datetime, datetime]:
     # A day changeover of 4am allows us to have late events.
     # All in local time because that's what people deal in.
     start_date = dt.date()
@@ -44,13 +48,13 @@ def get_day_start_end(dt, start_time=time(4, 0)):
     return start_dt, end_dt
 
 
-def _add_sub_with_text(parent, element, text, **extra):
-    node = etree.SubElement(parent, element, **extra)
+def _add_sub_with_text(parent: Element, tag: str, text: str, **extra: str) -> Element:
+    node = etree.SubElement(parent, tag, None, None, **extra)
     node.text = text
     return node
 
 
-def make_root():
+def make_root() -> Element:
     root = etree.Element("schedule")
 
     _add_sub_with_text(root, "version", "1.0-public")
@@ -67,7 +71,7 @@ def make_root():
     return root
 
 
-def add_day(root, index, start, end):
+def add_day(root: Element, index: int, start: datetime, end: datetime) -> Element:
     return etree.SubElement(
         root,
         "day",
@@ -78,77 +82,88 @@ def add_day(root, index, start, end):
     )
 
 
-def add_room(day, name):
+def add_room(day: Element, name: str) -> Element:
     return etree.SubElement(day, "room", name=name)
 
 
-def add_event(room, event):
-    url = external_url("schedule.item", year=event_year(), proposal_id=event["id"], slug=event["slug"])
+def add_event(room: Element, room_name: str, flat_sid: ScheduleItemDict) -> Element:
+    event_guid_key = f"emf{event_year()}-{flat_sid['id']}-{flat_sid['occurrences'][0]['occurrence_num']}"
+    event = etree.SubElement(
+        room, "event", id=str(flat_sid["id"]), guid=str(uuid5(NAMESPACE_URL, event_guid_key))
+    )
 
-    event_node = etree.SubElement(room, "event", id=str(event["id"]), guid=str(uuid5(NAMESPACE_URL, url)))
+    # This is a silly schema
+    _add_sub_with_text(event, "room", room_name)
+    _add_sub_with_text(event, "title", flat_sid["title"])
 
-    _add_sub_with_text(event_node, "room", room.attrib["name"])
-    _add_sub_with_text(event_node, "title", event["title"])
-
-    event_type = event.get("type", "talk")
-    _add_sub_with_text(event_node, "type", event_type)
+    _add_sub_with_text(event, "type", flat_sid["type"])
     # infobeamer frab scheduler can color by "track"
-    _add_sub_with_text(event_node, "track", event_type)
+    _add_sub_with_text(event, "track", flat_sid["type"])
 
-    _add_sub_with_text(event_node, "date", event["start_date"].isoformat())
-    _add_sub_with_text(event_node, "url", url)
+    _add_sub_with_text(event, "date", flat_sid["occurrences"][0]["start_date"].isoformat())
 
-    # Start time
-    _add_sub_with_text(event_node, "start", event["start_date"].strftime("%H:%M"))
-
-    duration = get_duration(event["start_date"], event["end_date"])
-    _add_sub_with_text(event_node, "duration", duration)
-
-    _add_sub_with_text(event_node, "abstract", event["description"])
-    _add_sub_with_text(event_node, "description", "")
-
-    _add_sub_with_text(
-        event_node,
-        "slug",
-        "emf{}-{}-{}".format(event_year(), event["id"], event["slug"]),
+    # FIXME: should we actually link to the occurrence?
+    url: str = external_url(
+        "schedule.item", year=event_year(), schedule_item_id=flat_sid["id"], slug=flat_sid["slug"]
     )
+    _add_sub_with_text(event, "url", url)
 
-    _add_sub_with_text(event_node, "subtitle", "")
+    _add_sub_with_text(event, "start", flat_sid["occurrences"][0]["start_date"].strftime("%H:%M"))
 
-    add_persons(event_node, event)
-    add_recording(event_node, event)
+    duration = get_duration(flat_sid["occurrences"][0]["start_date"], flat_sid["occurrences"][0]["end_date"])
+    _add_sub_with_text(event, "duration", duration)
 
+    _add_sub_with_text(event, "abstract", flat_sid["description"])
+    _add_sub_with_text(event, "description", "")
 
-def add_persons(event_node, event):
-    persons_node = etree.SubElement(event_node, "persons")
-
-    _add_sub_with_text(persons_node, "person", event["speaker"], id=str(event["user_id"]))
-
-
-def add_recording(event_node, event):
-    video = event.get("video", {})
-
-    recording_node = etree.SubElement(event_node, "recording")
-
-    _add_sub_with_text(recording_node, "license", "CC BY-SA 4.0")
-    _add_sub_with_text(
-        recording_node, "optout", "false" if event.get("video_privacy") == "public" else "true"
+    slug = "emf{}-{}-{}-{}".format(
+        event_year(), flat_sid["id"], flat_sid["slug"], flat_sid["occurrences"][0]["occurrence_num"]
     )
-    if "ccc" in video:
-        _add_sub_with_text(recording_node, "url", video["ccc"])
-    elif "youtube" in video:
-        _add_sub_with_text(recording_node, "url", video["youtube"])
+    _add_sub_with_text(event, "slug", slug)
+
+    _add_sub_with_text(event, "subtitle", "")
+
+    add_persons(event, flat_sid)
+    add_recording(event, flat_sid)
+
+    return event
 
 
-def export_frab(schedule):
-    root = make_root()
-    days_dict = {}
-    index = 0
+def add_persons(event: Element, flat_sid: ScheduleItemDict) -> Element:
+    persons = etree.SubElement(event, "persons")
 
-    for event in schedule:
-        day_start, day_end = get_day_start_end(event["start_date"])
+    # FIXME: do we need to split up names somehow?
+    _add_sub_with_text(persons, "person", flat_sid["names"], id="1")
+
+    return persons
+
+
+def add_recording(event: Element, flat_sid: ScheduleItemDict) -> Element:
+    recording = etree.SubElement(event, "recording")
+
+    _add_sub_with_text(recording, "license", "CC BY-SA 4.0")
+    _add_sub_with_text(
+        recording,
+        "optout",
+        "false" if flat_sid["occurrences"][0]["video_privacy"] == "public" else "true",
+    )
+    if "ccc_url" in flat_sid["occurrences"][0]:
+        _add_sub_with_text(recording, "url", flat_sid["occurrences"][0]["ccc_url"])
+    elif "youtube_url" in flat_sid["occurrences"][0]:
+        _add_sub_with_text(recording, "url", flat_sid["occurrences"][0]["youtube_url"])
+
+    return recording
+
+
+def export_frab(flat_sids: Sequence[ScheduleItemDict]) -> bytes:
+    root: Element = make_root()
+    days_dict: dict[str, dict[str, Any]] = {}
+    index: int = 0
+
+    for flat_sid in flat_sids:
+        day_start, day_end = get_day_start_end(flat_sid["occurrences"][0]["start_date"])
         day_key = day_start.strftime("%Y-%m-%d")
-        venue_key = event["venue"]
+        venue_key = flat_sid["occurrences"][0]["venue"]
 
         if day_key not in days_dict:
             index += 1
@@ -160,6 +175,6 @@ def export_frab(schedule):
         if venue_key not in day["rooms"]:
             day["rooms"][venue_key] = add_room(day["node"], venue_key)
 
-        add_event(day["rooms"][venue_key], event)
+        add_event(day["rooms"][venue_key], venue_key, flat_sid)
 
     return etree.tostring(root)

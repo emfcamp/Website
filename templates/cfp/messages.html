@@ -1,67 +1,34 @@
-{% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
-{% block title %}Proposal Messages - {{ proposal.title }}{% endblock %}
 {% block body %}
-
-<ul class="nav nav-tabs">
-  <li role="presentation">
-    <a href="{{ url_for('.edit_proposal', proposal_id=proposal.id) }}">Details</a>
-  </li>
-  <li role="presentation" class="active">
-    <a href="">
-      Messages
-      {% set unread_count = proposal.get_unread_count(current_user) %}
-      {% if unread_count > 0 %}
-        <span class="badge">{{ unread_count }}</span>
-      {% endif %}
-    </a>
-  </li>
-</ul>
-
-<br>
-<div>If you have any questions about your proposal or the CFP process, please send us a message via the form below.</div>
-<br>
+{% include "account/_nav.html" %}
+<h2>All messages</h2>
 
 <table class="table">
-{% for msg in messages %}
-<tr class="{{ loop.cycle('odd', 'even') }}">
-  <td>
-    <div class="row">
-      <div class="col-sm-6">
-        {% if msg.is_user_recipient(current_user) and not msg.has_been_read %}
-        {{octicon('mail-16')}}
-        {% endif %}
-        {% if msg.is_user_recipient(current_user) %}
-        {{ msg.from_user.name }}
-        {% else %}
-        {{ current_user.name }}
-        {%- endif -%}
-        {% if msg.is_user_recipient(current_user) and not msg.has_been_read %}
-        </b>
-        {% endif %}
-      </div>
-      <div class="col-sm-3 pull-sm-right">
-        <small>{{ msg.created.strftime('%Y-%m-%d %H:%M') }}</small>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-12">
-        <div class="multiline">{{ msg.message | urlize }}</div>
-      </div>
-    </div>
-  </td>
-</tr>
+<thead>
+    <tr>
+        <th>Date</th>
+        <th>Message Count</th>
+        <th>Proposal Title</th>
+    </tr>
+</thead>
+<tbody>
+{% for proposal in proposal_with_message %}
+    <tr class="{{ loop.cycle('odd', 'even') }}">
+        <td>
+            {% if proposal.get_unread_count(current_user) > 0 %}
+                <span class="badge">{{ proposal.get_unread_count(current_user) }}</span>
+            {% endif %}
+            {{ proposal.messages[0].created.strftime("%Y-%m-%d") }}
+        </td>
+        <td>{{ proposal.messages | length }}</td>
+        <td>
+            <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">
+                {{ proposal.title }}
+            </a>
+        </td>
+    </tr>
 {% endfor %}
+</tbody>
 </table>
-
-<form method="post" action="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">
-    {{ form.hidden_tag() }}
-    {{ render_field(form.message, tabindex=1, rows=6) }}
-    <div class="pull-right">
-        {{ form.send(class_='btn btn-success debounce', tabindex=2) }}
-        &nbsp;
-        {{ form.mark_read(class_='btn btn-default debounce') }}
-    </div>
-</form>
 
 {% endblock %}

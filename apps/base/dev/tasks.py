@@ -10,7 +10,7 @@ from apps.cfp.tasks import create_tags
 from main import db
 from models.feature_flag import FeatureFlag, refresh_flags
 from models.payment import BankAccount
-from models.site_state import SiteState, refresh_states
+from models.site_state import refresh_states
 from models.volunteer.role import Role
 from models.volunteer.shift import Shift
 from models.volunteer.venue import VolunteerVenue
@@ -43,12 +43,6 @@ def enable_cfp():
     for flag in ["LINE_UP", "CFP"]:
         if not FeatureFlag.query.get(flag):
             db.session.add(FeatureFlag(feature=flag, enabled=True))
-
-    signup_state = SiteState.query.filter_by(name="signup_state").one_or_none()
-    if not signup_state:
-        db.session.add(SiteState("signup_state", "issue-lottery-tickets"))
-    else:
-        signup_state.state = "issue-lottery-tickets"
 
     db.session.commit()
     db.session.flush()
