@@ -1,0 +1,76 @@
+@use "./_variables.scss" as *;
+
+.support-catalogue {
+  --panel-grid-min-size: 300px;
+  grid-template-rows: 1fr 1fr;
+  gap: 15px;
+  max-width: 750px;
+  margin-left: auto;
+  margin-right: auto;
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .panel-body {
+    flex-grow: 1;
+  }
+
+  .panel-footer {
+    background-color: $highlight-background;
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+  }
+
+  .panel-footer a {
+    font-weight: 700;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .support-tiers {
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+    padding-top: 10px;
+    margin-top: 10px;
+  }
+
+  .support-tier {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 3px 0;
+  }
+
+  .support-tier-price {
+    font-family: $header-font-stack;
+    font-weight: 700;
+  }
+
+  .support-option--tickets > .panel-heading {
+    background-color: $desaturated-yellow;
+    border-color: $desaturated-yellow;
+    color: $highlight-background-text;
+  }
+
+  .support-option--volunteer > .panel-heading {
+    background-color: $brand-2024-pale-green;
+    border-color: $brand-2024-pale-green;
+    color: $highlight-background-text;
+  }
+
+  .support-option--sponsor > .panel-heading {
+    background-color: $brand-2024-blue;
+    border-color: $brand-2024-blue;
+    color: $highlight-background-text;
+  }
+
+  .support-option--art > .panel-heading {
+    background-color: $brand-2024-pink;
+    border-color: $brand-2024-pink;
+    color: #fff;
+  }
+}

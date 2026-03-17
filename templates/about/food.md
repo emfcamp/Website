@@ -24,14 +24,24 @@ You are welcome to bring your own food and drink if you'd prefer. Please keep in
 There'll be a shop on site offering a range of camping friendly food and drink, and if you need a larger resupply there's a Tesco in Ledbury, which is a five minute drive away, and easily accessible via the shuttle bus.
 
 ## Drink
-The bars accept cards, cash, and contactless payments. You can check the opening hours and see what the bar is currently serving by visiting [bar.emf.camp](https://bar.emf.camp).
+The bars accept cards, cash, and contactless payments. During the event, there will be a page listing the opening hours and what the bar is currently serving.
+
+{# 2024
+
+You can check the opening hours and see what the bar is currently serving by visiting [bar.emf.camp](https://bar.emf.camp).
+
+#}
 
 Drinks from the bars are served in reusable plastic cups. We don't charge a deposit for these, but we need your help to return them to us before the end of the event. Please do not throw them away!
 
 Both bars are entirely run by EMF volunteers, and any surplus is reinvested back into the event. If you’d like to help out, visit the [volunteering page](/volunteer/info). There’s a short online training course to complete before you can sign up for bar shifts (18+ only).
+
+{# 2024
 
 ### The Robot Arms
 Our pub, the Robot Arms, is northwest of Stage B. It sells a wide selection of soft drinks, wine, cider, spirits, and beer. We also have chilled tap water available for you to fill your own bottles.
 
 ### Cybar
 The solarpunks have taken over Null Sector’s Cybar and are now serving draught beers, soft drinks and even water we think they tapped from an underground pipe.
+
+#}
