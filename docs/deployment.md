@@ -14,6 +14,10 @@ This is done after each event, following a clear of the database:
     docker compose -f ./docker-compose.environment.yml exec app uv run flask cfp create_venues
     docker compose -f ./docker-compose.environment.yml exec app uv run flask cfp create_tags
 
+Periodic tasks need to be triggered by calling `flask periodic` - this can be done in the root crontab:
+
+    */2 * * * * /srv/docker/Website/docker-compose exec app uv run flask periodic > /dev/null 2>&1
+
 # Deployments
 
 Deployments run automatically when a new container is built by Github Actions
