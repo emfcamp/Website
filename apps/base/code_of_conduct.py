@@ -20,5 +20,5 @@ def code_of_conduct() -> ResponseValue:
 @base.route("/code-of-conduct/<int:year>")
 def coc_transparency_report(year: int) -> ResponseValue:
     if year in (2024,):
-        return render_markdown("code-of-conduct/{year}", template="markdown.html")
+        return render_markdown(f"code-of-conduct/{year}", template="markdown.html")
     return render_markdown("code-of-conduct/code-of-conduct", template="markdown.html")
