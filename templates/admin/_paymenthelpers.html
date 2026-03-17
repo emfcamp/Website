@@ -13,6 +13,10 @@
 {% if payment.expires %}
 <dt>Expires</dt><dd>{{ payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
 {% endif -%}
+{% if payment.voucher %}
+<dt>Voucher type</dt><dd><a href="{{  url_for('.product_views.product_view', view_id=payment.voucher.view.id) }}">{{payment.voucher.view.name}}</a></dd>
+<dt>Voucher code</dt><dd><a href="{{  url_for('.product_views.product_view_voucher_detail', view_id=payment.voucher.view.id, voucher_code=payment.voucher_code) }}">{{payment.voucher.code}}</a></dd>
+{% endif %}
 </dl>
 {% endmacro %}
 

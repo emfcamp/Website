@@ -14,17 +14,21 @@ EMF is close (5 km) to Ledbury station which is around [three hours](https://tra
 The station at Ledbury has short platforms, so if you are on one of the long 9-coach trains direct
 from Paddington, you will need to be in the front three coaches to get off the train.
 
-We will be providing a free shuttle bus service between Ledbury station and the EMF site during the event. 
-Timetables and further information can be found on the [shuttle bus page](https://bus.emf.camp/about/).
+### Shuttle bus
+
+We will be providing a free shuttle bus service between Ledbury station and the EMF site during the event. Closer to the event date, there will be a dedicated page with timetables and further information about the shuttle bus.
 
 {# 2024
+
+Timetables and further information can be found on the [shuttle bus page](https://bus.emf.camp/about/).
+
 **Note:** There is engineering work on the Sunday of EMF (June 2nd) which means the line between Ledbury and Worcester is closed until 18:00, with a rail replacement bus service. We are planning to run our shuttle bus service to **Worcestershire Parkway** station during the day. Our buses will run to Ledbury after 18:00 to meet the trains there, but if you're travelling by train, we recommend you stay until Monday if possible.
 #}
 
 ## By Car
 If you plan to drive, you will need to [buy a parking ticket or live-in vehicle ticket](/tickets/other). Motorcycles do not require a parking ticket. 
 
-Plan your travel to the south gate on the A438 - postcode **HR8 1RQ** should get you there. The entrance to the site is located at [52.0322, -2.3837](geo:52.03222,-2.3837), grid reference SO 73774 37158.
+Plan your travel to the south gate on the A438 - postcode **HR8 1RQ** should get you there. The entrance to the site is located at [52.0322, -2.3837](https://geohack.toolforge.org/geohack.php?pagename=Electromagnetic_Field_(festival)&params=52.03222_N_2.3837_W_region:GB), grid reference SO 73774 37158.
 
 Once you're near the site, you'll see yellow temporary road signs for EMF - follow these and ignore your sat nav if it tells you differently.
 
@@ -49,5 +53,6 @@ For those travelling long-haul, BHX is likely to be most useful followed by LHR.
 ## Between Ledbury and EMF
 We will be providing a free shuttle bus service between Ledbury station and the EMF site during the event, but not during setup and tear down. Ride share services such as Uber and [taxi service](https://www.malvern-taxis.co.uk/ledbury-taxi-service/) are extremely limited and unlikely to be available.
 
+{# 2024
 Timetables and further information can be found on the [shuttle bus page](https://bus.emf.camp/about/).
-
+#}

@@ -1,7 +1,7 @@
 title: Villages
 ---
 # Villages
-A village is a group of friends, like-minded people, colleagues or even families camping together at EMF. Maybe your village is a collection of sub villages, or maybe it’s just your hackerspace. A village can be based around themes, shared passions and existing communities - great places in the past have been the Maths village, the HAB Village and groups like Milliways and the Scottish Consulate. You can find the list of currently registered villages for EMF 2024 at [emfcamp.org/villages/{{ event_year }}](/villages/{{ event_year }}).
+A village is a group of friends, like-minded people, colleagues or even families camping together at EMF. Maybe your village is a collection of sub villages, or maybe it’s just your hackerspace. A village can be based around themes, shared passions and existing communities - great places in the past have been the Maths village, the HAB Village and groups like Milliways and the Scottish Consulate. You can find the list of currently registered villages for EMF {{ event_year }} at [emfcamp.org/villages/{{ event_year }}](/villages/{{ event_year }}).
 
 If there is a village based around something you are interested in, then you should definitely visit that village during the event to see what's going on. Or you could even join that village to help make more things go on. If there's not a village based around your interests, then you can start your own village and others will probably join you.
 
@@ -12,8 +12,6 @@ If you're planning to bring something especially big or in need of lots of power
 ## Register a Village
 By [registering your village at emfcamp.org/villages/register](/villages/register), you'll be making the Village People aware of the fact you plan to arrive, and how much space you're likely to need, and you'll allow us to get in touch to discuss how we can support your plans and activities at the event.
 
-Once you've registered a village, we encourage you to create a page on the [EMF 2024 wiki](https://wiki.emfcamp.org) including information about your village and who people should talk to if they want to join you. You can then [edit your village at emfcamp.org/villages/register](/villages/register) and set this as your URL so it is linked to in the list of villages.
-
 ## What can we do as a village?
 Villages are great as you can share ideas, equipment and space! The sharing doesn’t stop there - it lets you share resources too. You can come up with a cooking and cleaning rota as a group to reduce waste, make the camp cheaper and interrupt your day with a change of activity. Some people spend all their time cooking for others!
 
@@ -23,8 +21,8 @@ Some villages bring pre-made games and activities for other people to take part 
 
 * [Barbot](https://www.emfcamp.org/schedule/2022/411-barbot): a cocktail-making robot build by Nottingham Hackspace
 * Karaoke nights hosted in the Scottish Consulate tent
-* [The Maths Village](https://wiki-archive.emfcamp.org/2022/wiki/Village:The_Maths_Village) with a drop-in tent full of mathematical puzzles and activities
-* Demoscene competitions at [Field-FX](https://wiki-archive.emfcamp.org/2022/wiki/Village:Field-FX)
+* [The Maths Village](https://wiki.emfcamp.org/2024/wiki/Maths_Village) with a drop-in tent full of mathematical puzzles and activities
+* Demoscene competitions at [Field-FX](https://wiki.emfcamp.org/2024/wiki/Field-FX)
 * Drop-in board game sessions
 
 More generally, villages run all kinds of content - technical presentations or lectures, skill shares, drop-in sessions, Q&As, roundtables or informal 'jam' sessions (not necessarily musical!). Activities can be open to all EMF attendees or private for the village, and we'll circulate details to registered villages of how to add your content to the main schedule.

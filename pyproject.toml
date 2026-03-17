@@ -29,7 +29,7 @@ dependencies = [
     "flask-wtf~=1.0",
     "flask<3.2",
     "freezegun>=1.1.0,<2",
-    "geoalchemy2~=0.13",
+    "geoalchemy2==0.18.1",
     "gunicorn~=23.0",
     "icalendar~=6.3",
     "iso8601",
@@ -57,7 +57,7 @@ dependencies = [
     "sqlalchemy-continuum~=1.4.2",
     "sqlalchemy-utils~=0.41",
     "SQLAlchemy~=2.0",
-    "stripe<13.0",
+    "stripe<15.0",
     "wtforms-sqlalchemy<0.5",
     "wtforms<3.3",
 ]

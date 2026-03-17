@@ -8,7 +8,6 @@ from flask_login import login_user
 from apps.payments.refund import handle_refund_request
 from apps.payments.stripe import (
     stripe_capture,
-    stripe_capture_post,
     stripe_charge_refunded,
     stripe_payment_intent_updated,
     stripe_start,
@@ -71,13 +70,6 @@ def test_create_stripe_purchase(user, app, monkeypatch):
         # doesn't cause any action on our end so we don't simulate this.
         assert payment.intent_id == intent_id
         assert payment.state == "new"
-
-        # User is now on the Stripe form, which captures the card details.
-        # Once this is complete, payment details are sent to Stripe and the form
-        # submission triggers stripe_capture_post
-        stripe_capture_post(payment.id)
-
-    assert payment.state == "charging"
 
     with app.test_request_context("/stripe-webhook"):
         # Stripe will now send a webhook to notify us of the payment success.

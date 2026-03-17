@@ -16,6 +16,7 @@
 {% endfor %}
 </ul>
 
+{% if wise %}
 <h3>Wise</h3>
 <ul>
 {% for success, message in transferwise %}
@@ -63,14 +64,7 @@
 {{ form.hidden_tag() }}
 {{ form.import_accounts(class_="btn btn-success") }}
 </form>
-
-<h3>Bank Transfer</h3>
-<ul>
-  {% if last_bank_payment %}
-    <li>Last bank payment imported at {{last_bank_payment.posted}}</li>
-  {% else %}
-    <li>No bank payments imported - verify bank statement importer.</li>
-  {% endif %}
-</ul>
-
+{% else %}
+<p>Wise payments are disabled.</p>
+{% endif %}
 {% endblock %}
