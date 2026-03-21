@@ -221,7 +221,8 @@ class FrabJsonExporter(FrabExporter):
                                                 f"""emf{event_year()}-event-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}""",
                                             )
                                         ),
-                                        "id": flat_sid["id"],
+                                        "id": flat_sid["id"] * 100
+                                        + flat_sid["occurrences"][0]["occurrence_num"],
                                         "date": flat_sid["occurrences"][0]["start_date"].isoformat(),
                                         "start": flat_sid["occurrences"][0]["start_date"].strftime("%H:%M"),
                                         "duration": self.format_duration(
@@ -329,7 +330,10 @@ class FrabXmlExporter(FrabExporter):
             f"""emf{event_year()}-event-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}"""
         )
         event = etree.SubElement(
-            room, "event", id=str(flat_sid["id"]), guid=str(uuid5(NAMESPACE_URL, event_guid_key))
+            room,
+            "event",
+            id=str(flat_sid["id"] * 100 + flat_sid["occurrences"][0]["occurrence_num"]),
+            guid=str(uuid5(NAMESPACE_URL, event_guid_key)),
         )
 
         # This is a silly schema
