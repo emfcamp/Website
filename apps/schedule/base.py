@@ -138,7 +138,7 @@ def add_favourite():
 
 @schedule.route("/favourites", methods=["GET", "POST"])
 @feature_flag("LINE_UP")
-def favourites():
+def favourites() -> ResponseReturnValue:
     if (request.method == "POST") and current_user.is_authenticated:
         proposal_id = int(request.form["fave"])
         proposal = get_or_404(db, Proposal, proposal_id)
@@ -182,14 +182,14 @@ class ScheduleItemForm(Form):
 
 @schedule.route("/schedule/<int:year>/<int:schedule_item_id>", methods=["GET", "POST"])
 @schedule.route("/schedule/<int:year>/<int:schedule_item_id>-<slug>", methods=["GET", "POST"])
-def item(year, schedule_item_id, slug=None):
+def item(year: int, schedule_item_id: int, slug: str | None = None) -> ResponseReturnValue:
     """Display a detail page for a schedule item"""
     if year == event_year():
         return item_current(year, schedule_item_id, slug)
     return item_historic(year, schedule_item_id, slug)
 
 
-def item_current(year, schedule_item_id, slug=None):
+def item_current(year: int, schedule_item_id: int, slug: str | None = None) -> ResponseReturnValue:
     """Display a detail page for a schedule item from the current event"""
     schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
     if schedule_item.state != "published":
@@ -214,18 +214,18 @@ def item_current(year, schedule_item_id, slug=None):
         occurrence_form = OccurrenceForm()
         occurrence_form.occurrence_id.data = occurrence.id
 
-        if occurrence.type_info.supports_lottery:
+        if schedule_item.type_info.supports_lottery and occurrence.lottery:
             lottery_entry = current_user.get_lottery_entry_for_occurrence(occurrence)
             if lottery_entry:
                 occurrence_form.ticket_count.data = lottery_entry.ticket_count
                 if lottery_entry.state == "cancelled":
                     occurrence_form.enter_lottery.label.text = "Re-enter lottery"
                 else:
-                    occurrence_form.entry_lottery.label.text = "Update ticket count"
+                    occurrence_form.enter_lottery.label.text = "Update ticket count"
                 if lottery_entry.state == "valid-tickets":
-                    occurrence_form.entry_lottery.label.text = "Update ticket count"
+                    occurrence_form.enter_lottery.label.text = "Update ticket count"
 
-            if occurrence.type == "youthworkshop":
+            if schedule_item.type == "youthworkshop":
                 # FIXME: is this because we don't count adults for these events?
                 occurrence_form.ticket_count.label.text = "How many under-12 tickets?"
 
@@ -255,18 +255,19 @@ def item_current(year, schedule_item_id, slug=None):
                     msg = f'Added "{schedule_item.title}" to favourites'
 
             db.session.commit()
-            flash(msg)
+            if msg:
+                flash(msg)
             return redirect(url_for(".lotteries"))
 
-    elif request.form.get("occurrence_id") is not None:
-        occurrence_id = int(request.form.get("occurrence_id"))
-        occurrence = occurrences_dict[occurrence_id]
+    elif occurrence_id := request.form.get("occurrence_id"):
+        occurrence = occurrences_dict[int(occurrence_id)]
         lottery_entry = current_user.get_lottery_entry_for_occurrence(occurrence)
-        occurrence_form = occurrence_forms[occurrence_id]
+        occurrence_form = occurrence_forms[int(occurrence_id)]
 
         if occurrence_form.validate_on_submit():
             msg = None
             if lottery_entry:
+                assert occurrence.lottery
                 if occurrence_form.enter_lottery.data:
                     if occurrence.lottery.state != "allow-entry":
                         abort(400)
@@ -287,9 +288,10 @@ def item_current(year, schedule_item_id, slug=None):
                     lottery_entry.generate_codes()
 
             elif occurrence_form.get_ticket.data or occurrence_form.enter_lottery.data:
+                assert occurrence.lottery
                 # This sets the state automatically
                 lottery_entry = LotteryEntry.create_entry(
-                    current_user, occurrence, occurrence_form.ticket_count.data
+                    current_user, occurrence.lottery, occurrence_form.ticket_count.data
                 )
 
                 if lottery_entry.state == "entered":
@@ -300,7 +302,8 @@ def item_current(year, schedule_item_id, slug=None):
                 db.session.add(lottery_entry)
 
             db.session.commit()
-            flash(msg)
+            if msg:
+                flash(msg)
             return redirect(url_for(".lotteries"))
 
     return render_template(
@@ -376,7 +379,7 @@ def lotteries() -> ResponseReturnValue:
 
 
 @schedule.route("/api/schedule/lottery/<int:entry_id>/cancel", methods=["POST"])
-def cancel_lottery_entry(entry_id):
+def cancel_lottery_entry(entry_id: int) -> ResponseReturnValue:
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for("schedule.lottery_entries")))
 
@@ -393,7 +396,7 @@ def cancel_lottery_entry(entry_id):
 
 
 @schedule.route("/now-and-next")
-def now_and_next():
+def now_and_next() -> ResponseReturnValue:
     filter = ScheduleFilter.from_request()
     per_venue_limit = int(request.args.get("limit", 2))
     venue_slug_sids = get_upcoming(filter, per_venue_limit)
@@ -451,7 +454,7 @@ def time_machine():
 
 @schedule.route("/herald")
 @v_user_required
-def herald_main():
+def herald_main() -> ResponseReturnValue:
     # In theory this should redirect you based on your shift
     venue_list = ("Stage A", "Stage B", "Stage C")
     return render_template("schedule/herald/main.html", venue_list=venue_list)

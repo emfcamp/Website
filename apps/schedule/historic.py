@@ -30,12 +30,13 @@ def parse_event(event):
 
 # @schedule.route("/schedule/<int:year>/<int:proposal_id>", methods=["GET", "POST"])
 # @schedule.route("/schedule/<int:year>/<int:proposal_id>-<slug>", methods=["GET", "POST"])
-def item_historic(year, schedule_item_id, slug):
+def item_historic(year: int, schedule_item_id: int, slug: str | None) -> ResponseReturnValue:
     """Handler to display a detail page for a schedule item."""
     abort_if_invalid_year(year)
 
     #  We might want to look at performance here but I'm not sure it's a huge issue at the moment
     data = load_archive_file(year, "public", "schedule.json")
+    assert isinstance(data, list)
     for item in data:
         if item["id"] == schedule_item_id:
             break
@@ -76,10 +77,10 @@ def historic_talk_data(year):
         elif event["type"] == "talk":
             events_list = stage_events
         elif event["type"] == "performance":
-            if "[Film]" in event.get("title"):
+            if "[Film]" in event.get("title", ""):
                 event["title"] = event["title"].replace("[Film] ", "")
                 events_list = film_events
-            elif "[Music]" in event.get("title") or event.get("venue") == "Null Sector":
+            elif "[Music]" in event.get("title", "") or event.get("venue") == "Null Sector":
                 event["title"] = event["title"].replace("[Music] ", "")
                 events_list = music_events
             else:
@@ -152,4 +153,6 @@ def feed_historic(year: int, fmt: str) -> ResponseReturnValue:
     """Serve a historic feed if it's available."""
     abort_if_invalid_year(year)
     file_path = archive_file(year, "public", f"schedule.{fmt}")
+    if file_path is None:
+        abort(404)
     return send_file(file_path)

@@ -31,7 +31,7 @@ from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import Response
 from yaml import safe_load as parse_yaml
 
-from main import JSONValue, db, external_url
+from main import db, external_url
 from models import Currency, User, event_end, event_start, naive_utcnow
 from models.basket import Basket
 from models.capacity import UnlimitedType
@@ -360,14 +360,17 @@ def archive_file(year, *path, raise_404=True):
     return file_path
 
 
-def load_archive_file(year: int, *path: str, raise_404: bool = True) -> JSONValue:
+ArchivedScheduleData = list[dict[str, Any]]
+
+
+def load_archive_file(year: int, *path: str, raise_404: bool = True) -> ArchivedScheduleData | None:
     """Load the contents of a JSON file from the archive, and optionally
     abort with a 404 if it doesn't exist.
     """
     json_path = archive_file(year, *path, raise_404=raise_404)
     if json_path is None:
         return None
-    return cast(JSONValue, json.load(open(json_path)))
+    return cast(ArchivedScheduleData, json.load(open(json_path)))
 
 
 def page_template(metadata, template):
