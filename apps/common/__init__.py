@@ -1,6 +1,5 @@
 import json
 import logging
-import os.path
 import re
 from decimal import Decimal
 from os import path
@@ -345,19 +344,20 @@ def feature_enabled(feature: str) -> bool:
     return bool(from_conf)
 
 
-def archive_file(year, *path, raise_404=True):
+def archive_file(year: int, *path: str, raise_404: bool = True) -> Path | None:
     """Return the path to a given file within the archive.
     Optionally raise 404 if it doesn't exist.
     """
-    file_path = os.path.abspath(os.path.join(__file__, "..", "..", "..", "exports", str(year), *path))
+    EXPORT_ROOT = (Path(__file__) / ".." / ".." / ".." / "exports").resolve()
+    file_path = (EXPORT_ROOT / str(year) / Path(*path)).resolve()
 
-    if not os.path.exists(file_path):
-        if raise_404:
-            abort(404)
-        else:
-            return None
+    if EXPORT_ROOT in file_path.parents and file_path.exists():
+        return file_path
 
-    return file_path
+    if raise_404:
+        abort(404)
+
+    return None
 
 
 ArchivedScheduleData = list[dict[str, Any]]
