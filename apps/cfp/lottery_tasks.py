@@ -72,7 +72,7 @@ def lottery(schedule_item_type, dry_run) -> None:
 
     max_rank = db.session.query(func.max(LotteryEntry.rank)).scalar() + 1
     lottery_capacities = {lottery.id: lottery.get_lottery_capacity() for lottery in lotteries}
-    winning_entries = []
+    winning_entries: list[LotteryEntry] = []
 
     lottery_round = 0
     for lottery_round in range(max_rank):
@@ -154,7 +154,7 @@ def lottery(schedule_item_type, dry_run) -> None:
         msg = EmailMessage(
             f"You won the lottery for the {entry.occurrence.schedule_item.human_type} '{entry.occurrence.schedule_item.title}'",
             from_email=send_from,
-            to=[entry.occurrence.schedule_item.user.email],
+            to=[entry.user.email],
         )
 
         msg.body = render_template(
