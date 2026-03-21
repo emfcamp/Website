@@ -8,8 +8,8 @@ If you'd like to cancel your proposal as it is too close to the event, or you ca
 
   {{ external_url("cfp.proposals") }}
 
-{% if proposal.type == "talk" and false %}
-We will shortly be opening lightning talk signups, so if you would like to give a very short talk instead please keep an eye out.
+{% if proposal.type == "talk" %}
+We will open signups for lightning talks before the event, so if you would like to give a very short talk instead please keep an eye out.
 
 {% endif %}
 Thanks,
