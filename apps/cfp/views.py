@@ -22,6 +22,7 @@ from sqlalchemy.exc import IntegrityError
 from main import db, external_url, get_or_404
 from models.user import User
 from models.cfp import (
+    AGE_RANGE_OPTIONS,
     PROPOSAL_INFOS,
     ProposalType,
     ProposalWorkshopAttributes,
@@ -94,7 +95,14 @@ class PerformanceAttributesForm(AttributesForm):
 
 class WorkshopAttributesForm(AttributesForm):
     participant_count = StringField("Attendees", [DataRequired()])
-    age_range = StringField("Age range")
+    age_range = SelectField(
+        "Age range",
+        default="all",
+        choices=[
+            (c, f"{t} (this may be considered for a Youth Workshop)" if c == "u12" else t)
+            for c, t in AGE_RANGE_OPTIONS
+        ],
+    )
     participant_cost = StringField("Cost per attendee")
     participant_equipment = StringField("Attendee equipment")
 

@@ -96,7 +96,7 @@
           {% if proposal_type in ('talk', 'performance') %}
             We'll provide a sound system and projector or screen.
           {% elif proposal_type in ('workshop', 'youthworkshop') %}
-            Please let us know if you need a sound system or projector, or any other equipment
+            The tent will have a projector and sound system. Please let us know if you need any other equipment
             you will not be able to easily bring yourself, such as soldering irons.
           {% endif %}
         {% endcall %}
@@ -110,20 +110,18 @@
       {% if proposal_type in ('workshop', 'youthworkshop') %}
         <legend>Attendees</legend>
 
-          {% if proposal_type != 'youthworkshop' %}
-          <p>Our workshop tents can accommodate 10-50 attendees per session; if your workshop
-          is smaller than that, you don't need to use the Call for Participation, but feel free to
-          <a href="mailto:{{ config['CONTENT_EMAIL'][1] }}">drop us an email</a> instead.</p>
-          {% endif %}
-          <p>If volunteers would help you increase capacity, please say so.</p>
+          <p>Our workshop tents will be set up with chairs and tables for 30 people per session.
+            If you would like to run your workshop more than once, or if volunteers would help you
+            increase capacity, please say so.</p>
           {% call render_field(form.attributes.participant_count, horizontal=9,
                 placeholder="The number of people you can accommodate in your workshop") %}
              Please ensure you will have enough kits or equipment to go round.
           {% endcall %}
           {{ render_field(form.attributes.participant_cost, horizontal=9, placeholder="If attendees need to pay for materials") }}
+          <p>If this is only a small amount, we may be able to cover it.</p>
           {{ render_field(form.attributes.participant_equipment, horizontal=9, placeholder="Things they should bring - such as a laptop, arduino, or knitting needles") }}
           {{ render_field(form.attributes.age_range, horizontal=9, placeholder="What age group is this suitable for? Approximate is fine") }}
-
+          <p>All under-16s attending workshops at EMF must be accompanied by an adult.</p>
         <legend></legend>
       {% elif proposal_type == 'installation' %}
           {# For all other types, equipment_required is rendered above #}
