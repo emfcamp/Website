@@ -1,5 +1,11 @@
+.git
 images
 exports
 .mypy_cache
 uv.lock
 package-lock.json
+static/dhtmlx_scheduler.js
+static/dhtmlxscheduler_all_timed.js
+css/dhtmlxscheduler_flat.css
+tests/2014_proposals.csv
+migrations/
