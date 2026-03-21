@@ -13,9 +13,7 @@
     <span style="padding-left: 10px;" title="This {{ schedule_item.human_type }} is family friendly">{{ [ "👪","👩‍👧","👩‍👩‍👧","👨‍👦‍👦","👩‍👩‍👧‍👧"] | random }}</span>
     {% endif %}
   {% endif %}
-  {% if schedule_item.type_info.supports_lottery %}
-    {% if any(occurrence.lottery for occurrence in schedule_item.occurrences) %}
-      <span style="padding-left: 10px;" title="This {{ schedule_item.human_type }} requires you sign up for a ticket">🎟</span>
-    {% endif %}
+  {% if schedule_item.has_lottery %}
+    <span style="padding-left: 10px;" title="This {{ schedule_item.human_type }} requires you sign up for a ticket">🎟</span>
   {% endif %}
 {% endmacro %}

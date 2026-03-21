@@ -1060,6 +1060,10 @@ class ScheduleItem(BaseModel):
         return self.type_info.human_type_a
 
     @property
+    def has_lottery(self) -> bool:
+        return any(occurrence.lottery for occurrence in self.occurrences)
+
+    @property
     def attributes(self) -> Attributes:
         if self.attributes_json is None:
             self.attributes_json = {}
