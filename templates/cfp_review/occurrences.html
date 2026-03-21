@@ -11,7 +11,7 @@
     <h2>{{ schedule_item.title }}<br>
         <small>
             {% if schedule_item.official_content %}
-                A {{ schedule_item.human_type }} by
+                {{ schedule_item.human_type_a | capitalize }} by
             {% else %}
                 An attendee {{ schedule_item.human_type }} by
             {% endif %}

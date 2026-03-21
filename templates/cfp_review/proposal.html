@@ -38,7 +38,7 @@
 <div class="col-md-12">
     <h2>{{ proposal.title }}<br>
         <small>
-            A {{ proposal.human_type }} by
+            {{ proposal.human_type_a | capitalize }} by
             <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id) }}">{{ proposal.user.name }}</small></a>
     </h2>
 </div>

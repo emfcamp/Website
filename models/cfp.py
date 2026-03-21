@@ -904,6 +904,11 @@ class Proposal(BaseModel):
         return self.type_info.human_type
 
     @property
+    def human_type_a(self) -> str:
+        # Same as human_type but includes a/an
+        return self.type_info.human_type_a
+
+    @property
     def attributes(self) -> Attributes:
         if self.attributes_json is None:
             self.attributes_json = {}
@@ -923,6 +928,7 @@ validate_state_transitions(Proposal.state, PROPOSAL_STATE_TRANSITIONS)
 class ProposalInfo:
     type: ProposalType
     human_type: str
+    human_type_a: str
     review_type: ReviewType
     attributes_cls: Type[Attributes]
 
@@ -933,24 +939,28 @@ PROPOSAL_INFOS: dict[ProposalType, ProposalInfo] = {
     "talk": ProposalInfo(
         type="talk",
         human_type="talk",
+        human_type_a="a talk",
         review_type=ReviewType.anonymous,
         attributes_cls=ProposalTalkAttributes,
     ),
     "performance": ProposalInfo(
         type="performance",
         human_type="performance",
+        human_type_a="a performance",
         review_type=ReviewType.manual,
         attributes_cls=ProposalPerformanceAttributes,
     ),
     "workshop": ProposalInfo(
         type="workshop",
         human_type="workshop",
+        human_type_a="a workshop",
         review_type=ReviewType.anonymous,
         attributes_cls=ProposalWorkshopAttributes,
     ),
     "youthworkshop": ProposalInfo(
         type="youthworkshop",
         human_type="youth workshop",
+        human_type_a="a youth workshop",
         review_type=ReviewType.manual,
         attributes_cls=ProposalYouthWorkshopAttributes,
     ),
@@ -958,6 +968,7 @@ PROPOSAL_INFOS: dict[ProposalType, ProposalInfo] = {
         # Installations might not have durations or Occurrences
         type="installation",
         human_type="installation",
+        human_type_a="an installation",
         review_type=ReviewType.manual,
         attributes_cls=ProposalInstallationAttributes,
     ),
@@ -1044,6 +1055,11 @@ class ScheduleItem(BaseModel):
         return self.type_info.human_type
 
     @property
+    def human_type_a(self) -> str:
+        # Same as human_type but includes a/an
+        return self.type_info.human_type_a
+
+    @property
     def attributes(self) -> Attributes:
         if self.attributes_json is None:
             self.attributes_json = {}
@@ -1062,6 +1078,7 @@ validate_state_transitions(ScheduleItem.state, SCHEDULE_ITEM_STATE_TRANSITIONS)
 class ScheduleItemInfo:
     type: ScheduleItemType
     human_type: str
+    human_type_a: str
     supports_lottery: bool
     needs_occurrence: bool
     attributes_cls: Type[Attributes]
@@ -1073,6 +1090,7 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
     "talk": ScheduleItemInfo(
         type="talk",
         human_type="talk",
+        human_type_a="a talk",
         supports_lottery=False,
         needs_occurrence=True,
         attributes_cls=TalkAttributes,
@@ -1080,6 +1098,7 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
     "performance": ScheduleItemInfo(
         type="performance",
         human_type="performance",
+        human_type_a="a performance",
         supports_lottery=False,
         needs_occurrence=True,
         attributes_cls=PerformanceAttributes,
@@ -1087,6 +1106,7 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
     "workshop": ScheduleItemInfo(
         type="workshop",
         human_type="workshop",
+        human_type_a="a workshop",
         supports_lottery=True,
         needs_occurrence=True,
         attributes_cls=WorkshopAttributes,
@@ -1095,6 +1115,7 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
     "youthworkshop": ScheduleItemInfo(
         type="youthworkshop",
         human_type="youth workshop",
+        human_type_a="a youth workshop",
         supports_lottery=True,
         needs_occurrence=True,
         attributes_cls=YouthWorkshopAttributes,
@@ -1103,6 +1124,7 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
     "installation": ScheduleItemInfo(
         type="installation",
         human_type="installation",
+        human_type_a="an installation",
         supports_lottery=False,
         needs_occurrence=False,
         attributes_cls=InstallationAttributes,
@@ -1111,6 +1133,7 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
     "lightning": ScheduleItemInfo(
         type="lightning",
         human_type="lightning talk",
+        human_type_a="a lightning talk",
         supports_lottery=False,
         needs_occurrence=True,
         attributes_cls=LightningTalkAttributes,
