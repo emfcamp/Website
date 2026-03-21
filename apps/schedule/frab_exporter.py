@@ -293,6 +293,7 @@ class FrabXmlExporter(FrabExporter):
         self._add_sub_with_text(conference, "end", event_end().strftime("%Y-%m-%d"))
         self._add_sub_with_text(conference, "days", "3")
         self._add_sub_with_text(conference, "timeslot_duration", "00:10")
+        assert event_tz.zone is not None
         self._add_sub_with_text(conference, "time_zone_name", event_tz.zone)
         self._add_sub_with_text(conference, "url", external_url("base.main"))
 
@@ -332,7 +333,7 @@ class FrabXmlExporter(FrabExporter):
 
         self._add_sub_with_text(event, "type", flat_sid["type"])
         # infobeamer frab scheduler can color by "track"
-        self._add_sub_with_text(event, "track", SCHEDULE_ITEM_INFOS[flat_sid["type"]].human_type)
+        self._add_sub_with_text(event, "track", SCHEDULE_ITEM_INFOS[flat_sid["type"]].human_type)  # type: ignore[index]
 
         self._add_sub_with_text(event, "date", flat_sid["occurrences"][0]["start_date"].isoformat())
 
