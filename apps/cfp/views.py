@@ -57,9 +57,9 @@ class ProposalForm(Form):
         "Required notice",
         default="1 month",
         choices=[
-            ("1 month", "1 month"),
+            ("< 1 month", "Less than 1 month"),
             ("> 1 month", "Longer than 1 month"),
-            ("> 3 months", "Longer than 3 months"),
+            ("> 2 months", "Longer than 2 months"),
         ],
     )
     additional_info = TextAreaField("Additional info")
@@ -120,9 +120,7 @@ class InstallationAttributesForm(AttributesForm):
         "Funding",
         choices=[
             ("0", "No money needed"),
-            ("< £50", "Less than £50"),
             ("< £100", "Less than £100"),
-            ("< £300", "Less than £300"),
             ("< £500", "Less than £500"),
             ("> £500", "More than £500"),
         ],
@@ -131,10 +129,10 @@ class InstallationAttributesForm(AttributesForm):
         "Physical size",
         default="medium",
         choices=[
-            ("small", "Smaller than a wheelie bin"),
-            ("medium", "Smaller than a car"),
-            ("large", "Smaller than a lorry"),
-            ("huge", "Bigger than a lorry"),
+            ("small", "Smaller than a microwave"),
+            ("medium", "Smaller than a wheelie bin"),
+            ("large", "Smaller than a car"),
+            ("huge", "Bigger than a car"),
         ],
     )
 

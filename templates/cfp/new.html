@@ -156,8 +156,21 @@
           {{ form.needs_help() }}
           I'd like advice or help with this proposal
         </label>
-        <small>We're happy to advise on submissions before they are reviewed. We don't consider lack of experience
-            a problem and we welcome those who haven't given talks before.</small>
+        <small>
+          We're happy to advise on submissions before they are reviewed.
+          We don't consider lack of experience a problem and we welcome those who haven't
+          {% if proposal_type in ["talk"] %}
+          given talks
+          {% elif proposal_type in ["performance"] %}
+          performed
+          {% elif proposal_type in ["workshop", "youthworkshop"] %}
+          given a workshop
+          {% elif proposal_type in ["installation"] %}
+          made an installation
+          {% else %}
+          submitted a proposal
+          {% endif %}
+          before.</small>
         </div>
 
       </fieldset>{# More details #}

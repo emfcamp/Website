@@ -65,10 +65,9 @@ class UpdateProposalForm(Form):
     notice_required = SelectField(
         "Required notice",
         choices=[
-            ("1 week", "1 week"),
-            ("1 month", "1 month"),
+            ("< 1 month", "Less than 1 month"),
             ("> 1 month", "Longer than 1 month"),
-            ("> 3 months", "Longer than 3 months"),
+            ("> 2 months", "Longer than 2 months"),
         ],
     )
     additional_info = TextAreaField("Additional Info")
