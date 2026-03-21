@@ -194,7 +194,7 @@ class FrabJsonExporter(FrabExporter):
                             "name": venue.name,
                             "capacity": venue.capacity,
                             # TODO do we have an URL for listing the schedule in a specific room?
-                            "guid": str(uuid5(NAMESPACE_URL, venue.name)),
+                            "guid": str(uuid5(NAMESPACE_URL, f"""emf{event_year()}-venue-{venue.id}""")),
                         }
                         for venue in self.venues
                     ],
@@ -215,7 +215,12 @@ class FrabJsonExporter(FrabExporter):
                             "rooms": {
                                 room["name"]: [
                                     {
-                                        "guid": str(uuid5(NAMESPACE_URL, flat_sid["link"])),
+                                        "guid": str(
+                                            uuid5(
+                                                NAMESPACE_URL,
+                                                f"""emf{event_year()}-event-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}""",
+                                            )
+                                        ),
                                         "id": flat_sid["id"],
                                         "date": flat_sid["occurrences"][0]["start_date"].isoformat(),
                                         "start": flat_sid["occurrences"][0]["start_date"].strftime("%H:%M"),
@@ -224,9 +229,7 @@ class FrabJsonExporter(FrabExporter):
                                             flat_sid["occurrences"][0]["end_date"],
                                         ),
                                         "room": room["name"],
-                                        "slug": "emf{}-{}-{}".format(
-                                            event_year(), flat_sid["id"], flat_sid["slug"]
-                                        ),
+                                        "slug": f"""emf{event_year()}-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}""",
                                         "url": flat_sid["link"],
                                         "title": flat_sid["title"],
                                         "subtitle": "",
@@ -322,7 +325,9 @@ class FrabXmlExporter(FrabExporter):
         return etree.SubElement(day, "room", name=name)
 
     def add_event(self, room: Element, room_name: str, flat_sid: ScheduleItemDict) -> Element:
-        event_guid_key = f"emf{event_year()}-{flat_sid['id']}-{flat_sid['occurrences'][0]['occurrence_num']}"
+        event_guid_key = (
+            f"""emf{event_year()}-event-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}"""
+        )
         event = etree.SubElement(
             room, "event", id=str(flat_sid["id"]), guid=str(uuid5(NAMESPACE_URL, event_guid_key))
         )
@@ -338,10 +343,7 @@ class FrabXmlExporter(FrabExporter):
         self._add_sub_with_text(event, "date", flat_sid["occurrences"][0]["start_date"].isoformat())
 
         # FIXME: should we actually link to the occurrence?
-        url: str = external_url(
-            "schedule.item", year=event_year(), schedule_item_id=flat_sid["id"], slug=flat_sid["slug"]
-        )
-        self._add_sub_with_text(event, "url", url)
+        self._add_sub_with_text(event, "url", flat_sid["link"])
 
         self._add_sub_with_text(event, "start", flat_sid["occurrences"][0]["start_date"].strftime("%H:%M"))
 
@@ -353,9 +355,7 @@ class FrabXmlExporter(FrabExporter):
         self._add_sub_with_text(event, "abstract", flat_sid["description"])
         self._add_sub_with_text(event, "description", "")
 
-        slug = "emf{}-{}-{}-{}".format(
-            event_year(), flat_sid["id"], flat_sid["slug"], flat_sid["occurrences"][0]["occurrence_num"]
-        )
+        slug = f"""emf{event_year()}-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}"""
         self._add_sub_with_text(event, "slug", slug)
 
         self._add_sub_with_text(event, "subtitle", "")
