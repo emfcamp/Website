@@ -1,5 +1,6 @@
 from flask import current_app as app
 from flask import flash, redirect, render_template, request, url_for
+from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 from wtforms import BooleanField, StringField, SubmitField
 from wtforms.validators import DataRequired
@@ -35,7 +36,7 @@ class AccountForm(DiversityForm):
 
 @users.route("/account", methods=["GET", "POST"])
 @login_required
-def account():
+def account() -> ResponseReturnValue:
     if get_site_state() == "cancelled":
         return redirect(url_for(".cancellation_refund"))
 
@@ -51,7 +52,7 @@ def account():
 
 @users.route("/account/details", methods=["GET", "POST"])
 @login_required
-def details():
+def details() -> ResponseReturnValue:
     form = AccountForm(user=current_user)
 
     if form.validate_on_submit():
@@ -70,13 +71,13 @@ def details():
 
 
 @users.route("/account/tickets")
-def purchases_redirect():
+def purchases_redirect() -> ResponseReturnValue:
     return redirect(url_for(".purchases"))
 
 
 @users.route("/account/purchases", methods=["GET", "POST"])
 @login_required
-def purchases():
+def purchases() -> ResponseReturnValue:
     if get_site_state() == "cancelled":
         return redirect(url_for(".cancellation_refund"))
 
