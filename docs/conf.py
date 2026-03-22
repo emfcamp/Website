@@ -1,3 +1,8 @@
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path("..").resolve()))
+
 project = "EMF Website"
 copyright = "Electromagnetic Field Ltd & contributors"
 author = "EMF Web Team"

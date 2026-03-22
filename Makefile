@@ -29,8 +29,10 @@ fix-syntax:
 
 
 docs:
+	rm -Rf ./_docs
 	uv run --group docs sphinx-build ./docs ./_docs
 
 
 docs-dev:
+	rm -Rf ./_docs
 	uv run --group docs sphinx-autobuild --watch . ./docs ./_docs
