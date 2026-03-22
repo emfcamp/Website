@@ -44,12 +44,12 @@ def line_up_year_redirect(year):
     return redirect(url_for(".main_year", year=year), 301)
 
 
-@schedule.route("/talks/<int:year>/<int:proposal_id>")
-@schedule.route("/talks/<int:year>/<int:proposal_id>-<string:slug>")
-@schedule.route("/line-up/<int:year>/<int:proposal_id>")
-@schedule.route("/line-up/<int:year>/<int:proposal_id>-<string:slug>")
-def lineup_talk_redirect(year, proposal_id, slug=None):
-    return redirect(url_for(".item", year=year, proposal_id=proposal_id, slug=slug), 301)
+@schedule.route("/talks/<int:year>/<int:schedule_item_id>")
+@schedule.route("/talks/<int:year>/<int:schedule_item_id>-<string:slug>")
+@schedule.route("/line-up/<int:year>/<int:schedule_item_id>")
+@schedule.route("/line-up/<int:year>/<int:schedule_item_id>-<string:slug>")
+def lineup_talk_redirect(year, schedule_item_id, slug=None):
+    return redirect(url_for(".item", year=year, schedule_item_id=schedule_item_id, slug=slug), 301)
 
 
 @schedule.route("/schedule.<string:fmt>")
