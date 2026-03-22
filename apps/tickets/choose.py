@@ -80,6 +80,10 @@ def main(flow="main"):
     products = products_for_view(view)
     form = TicketAmountsForm(list(products))
     basket = Basket.from_session(current_user, get_user_currency())
+    # This might be somewhere we need to check for reserved tickets associated
+    # with basket_uuid, but let's see if it's needed. basket_uuid should always
+    # be set by this point, so this would be an extra DB access on GET, but it
+    # might be worth it to avoid distress during the rush.
 
     if request.method != "POST":
         # Empty form - populate products with any amounts already in basket
@@ -91,6 +95,7 @@ def main(flow="main"):
         if voucher is not None and voucher.view != view:
             # The user has a voucher but it's not what's allowing them access to this view
             voucher = None
+
     # Validate the capacity in the form, setting the maximum limits where available.
     if not form.ensure_capacity(basket, voucher):
         # We're not able to provide the number of tickets the user has selected.
@@ -297,10 +302,16 @@ def handle_free_tickets(flow: str, view: ProductView, basket: Basket) -> Respons
 def tickets_clear(flow: str | None = None) -> ResponseValue:
     app.logger.info("Clearing basket")
     basket = Basket.from_session(current_user, get_user_currency())
-    if not any(basket.values()):
+    if any(basket.values()):
+        app.logger.info("Found entries in session")
+    else:
         empty_baskets.inc()
         if current_user.is_authenticated:
-            basket.load_purchases_from_db()
+            app.logger.info("Looking for entries by user")
+            basket.load_purchases_by_user()
+        else:
+            app.logger.info("Looking for entries by basket UUID")
+            basket.load_purchases_by_basket_uuid()
 
     basket.cancel_purchases()
     db.session.commit()

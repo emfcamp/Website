@@ -1,3 +1,4 @@
+import uuid
 from collections.abc import MutableMapping
 from decimal import Decimal
 from itertools import groupby
@@ -5,6 +6,7 @@ from typing import Self
 
 from flask import current_app as app
 from flask import session
+from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from main import db
@@ -46,7 +48,9 @@ class Basket(MutableMapping[PriceTier, int]):
     ids should be trustworthy (e.g. stored in flask.session)
     """
 
-    def __init__(self, user: User, currency: Currency, voucher: str | None = None) -> None:
+    def __init__(
+        self, user: User, currency: Currency, voucher: str | None = None, basket_uuid: str | None = None
+    ) -> None:
         self.user = user
         # Due to the Price, reserved Purchases have an implicit currency,
         # but this shouldn't be relied on until they're attached to a Payment.
@@ -54,25 +58,32 @@ class Basket(MutableMapping[PriceTier, int]):
         self.currency = currency
         self._lines: list[Line] = []
         self.voucher = voucher
+        self.basket_uuid = basket_uuid
 
     @classmethod
     def from_session(cls, user: User, currency: Currency) -> Self:
         purchases = session.get("basket_purchase_ids", [])
         surplus_purchases = session.get("basket_surplus_purchase_ids", [])
         voucher = session.get("ticket_voucher", None)
+        if "basket_uuid" not in session:
+            session["basket_uuid"] = str(uuid.uuid4())
+        basket_uuid = session["basket_uuid"]
 
-        basket = cls(user, currency, voucher)
-        basket.load_purchases_from_ids(purchases, surplus_purchases)
+        basket = cls(user, currency, voucher, basket_uuid)
+        basket.load_purchases_by_ids(purchases, surplus_purchases)
         return basket
 
     @classmethod
     def clear_from_session(self):
         session.pop("basket_purchase_ids", None)
         session.pop("basket_surplus_purchase_ids", None)
+        # Do not clear the basket_uuid
 
     def save_to_session(self):
         session["basket_purchase_ids"] = [p.id for p in self.purchases]
         session["basket_surplus_purchase_ids"] = [p.id for p in self.surplus_purchases]
+        if "basket_uuid" not in session:
+            session["basket_uuid"] = self.basket_uuid
 
     def _get_line(self, tier: PriceTier) -> Line:
         for line in self._lines:
@@ -157,26 +168,52 @@ class Basket(MutableMapping[PriceTier, int]):
             app.logger.debug("Basket line: %s %s %s", tier, purchases, surplus_purchases)
             self._lines.append(Line(tier, len(purchases), purchases + surplus_purchases))
 
-    def load_purchases_from_ids(self, chosen_ids, surplus_ids):
+    def load_purchases_by_ids(self, chosen_ids, surplus_ids):
         chosen_ids = set(chosen_ids)
         surplus_ids = set(surplus_ids)
         if chosen_ids | surplus_ids:
-            purchases = (
-                Purchase.query.filter_by(payment_id=None)
-                .filter(Purchase.state.in_(["reserved", "admin-reserved"]))
-                .filter(Purchase.id.in_(chosen_ids | surplus_ids))
-                .options(joinedload(Purchase.price_tier))
+            purchases = list(
+                db.session.scalars(
+                    select(Purchase)
+                    .where(Purchase.payment_id.is_(None))
+                    .where(Purchase.state.in_(["reserved", "admin-reserved"]))
+                    .where(Purchase.id.in_(chosen_ids | surplus_ids))
+                    .options(joinedload(Purchase.price_tier))
+                )
             )
+
+            if len(purchases) != len(chosen_ids | surplus_ids):
+                app.logger.warning("Not all IDs returned from database")
 
             self.load_purchases(purchases, chosen_ids)
 
-    def load_purchases_from_db(self):
-        purchases = (
-            Purchase.query.filter_by(payment_id=None)
-            .filter(Purchase.state.in_(["reserved", "admin-reserved"]))
-            .filter(Purchase.owner_id == self.user.id)
-            .options(joinedload(Purchase.price_tier))
+    def load_purchases_by_basket_uuid(self):
+        if not self.basket_uuid:
+            return
+
+        purchases = list(
+            db.session.scalars(
+                select(Purchase)
+                .where(Purchase.payment_id.is_(None))
+                .where(Purchase.state.in_(["reserved", "admin-reserved"]))
+                .where(Purchase.basket_uuid == self.basket_uuid)
+                .options(joinedload(Purchase.price_tier))
+            )
         )
+
+        self.load_purchases(purchases)
+
+    def load_purchases_by_user(self):
+        purchases = list(
+            db.session.scalars(
+                select(Purchase)
+                .where(Purchase.payment_id.is_(None))
+                .where(Purchase.state.in_(["reserved", "admin-reserved"]))
+                .where(Purchase.owner_id == self.user.id)
+                .options(joinedload(Purchase.price_tier))
+            )
+        )
+
         self.load_purchases(purchases)
 
     def create_purchases(self):
@@ -203,7 +240,10 @@ class Basket(MutableMapping[PriceTier, int]):
                     purchase_cls = product_group_type.purchase_cls if product_group_type else Purchase
 
                     price = line.tier.get_price(self.currency)
-                    purchases = [purchase_cls(price=price, user=user) for _ in range(issue_count)]
+                    purchases = [
+                        purchase_cls(price=price, user=user, basket_uuid=self.basket_uuid)
+                        for _ in range(issue_count)
+                    ]
                     line.purchases += purchases
                     purchases_to_flush += purchases
 

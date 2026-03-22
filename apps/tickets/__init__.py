@@ -16,6 +16,7 @@ from flask import (
     render_template,
     request,
     send_file,
+    session,
     url_for,
 )
 from flask import (
@@ -66,12 +67,22 @@ empty_baskets = Counter("emf_basket_empty_total", "Attempted purchases of empty 
 @tickets.route("/tickets/<flow>/reserved")
 @tickets.route("/tickets/<flow>/reserved/<currency>")
 def tickets_reserved(flow=None, currency=None):
-    if current_user.is_anonymous:
-        return redirect(url_for("users.login", next=url_for(".tickets_reserved", flow=flow)))
+    # This only allows for admin-reserved tickets or a
+    # lost checkout, not both, but I think that's fine
+    if current_user.is_authenticated:
+        basket = Basket(current_user, get_user_currency())
+        basket.load_purchases_by_user()
+        app.logger.info(f"Loaded {len(basket.values())} purchases by user")
+        basket.save_to_session()
 
-    basket = Basket(current_user, get_user_currency())
-    basket.load_purchases_from_db()
-    basket.save_to_session()
+    elif "basket_uuid" in session:
+        basket = Basket.from_session(current_user, get_user_currency())
+        basket.load_purchases_by_basket_uuid()
+        app.logger.info(f"Loaded {len(basket.values())} purchases by UUID")
+        basket.save_to_session()
+
+    else:
+        return redirect(url_for("users.login", next=url_for(".tickets_reserved", flow=flow)))
 
     if currency in CURRENCY_SYMBOLS:
         set_user_currency(currency)

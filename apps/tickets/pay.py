@@ -65,28 +65,35 @@ def pay(flow="main"):
         empty_baskets.inc()
 
         if current_user.is_authenticated:
-            basket.load_purchases_from_db()
+            basket.load_purchases_by_user()
+        else:
+            basket.load_purchases_by_basket_uuid()
 
         if any([p.state == "reserved" for p in basket.purchases]):
             # We've lost the user's state, but we can still show them all
             # tickets they've reserved and let them empty their basket.
-            # Don't show this if the user only has admin-reserved purchases.
+            # This covers the case where the "logged in" response never reached
+            # their browser, which can happen when the server is under load.
+            # In this case, they're unlikely to be logged in. There's a separate
+            # state for admin-reserved purchases to avoid showing this message.
             flash("Your browser doesn't seem to be storing cookies. This may break some parts of the site.")
             app.logger.warning(
-                "Basket is empty, so showing reserved tickets (%s)",
-                request.headers.get("User-Agent"),
+                f"""Basket for {session.get("basket_uuid")} was empty, so showing reserved tickets"""
             )
 
         elif current_user.is_authenticated:
             # This might happen if the user clicks back and then refresh in their browser
             app.logger.info("Empty basket, redirecting back to purchases page")
             flash("Your basket was empty. Please check your purchases below.")
+            basket.save_to_session()
             return redirect(url_for("users.purchases"))
 
         else:
             # This should never normally happen. The user wants to pay
             # for something, but we have no handle on them. Give up.
-            app.logger.info("Empty basket for anonymous user, redirecting back to choose tickets")
+            app.logger.info(
+                f"""Empty basket for anonymous user with basket {session.get("basket_uuid")}, redirecting back to choose tickets"""
+            )
             phrase = "item to buy"
             if view.type == "tickets":
                 phrase = "ticket to buy"

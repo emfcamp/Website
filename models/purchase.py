@@ -78,6 +78,8 @@ class Purchase(BaseModel):
     refund_id: Mapped[int | None] = mapped_column(ForeignKey("refund.id"))
     refund_request_id: Mapped[int | None] = mapped_column(ForeignKey("refund_request.id"))
 
+    basket_uuid: Mapped[str | None]
+
     # History
     created: Mapped[datetime] = mapped_column(default=naive_utcnow)
     modified: Mapped[datetime] = mapped_column(default=naive_utcnow, onupdate=naive_utcnow)
