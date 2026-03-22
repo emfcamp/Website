@@ -1,18 +1,17 @@
 {% from "_formhelpers.html" import render_field %}
-{% from "cfp/_cfp_type_menu.html" import cfp_type_menu with context %}
+{% from "cfp/_proposal_type_menu.html" import proposal_type_menu with context %}
 {% extends "base.html" %}
 {% block title %}Call for Participation{% endblock %}
 {% block body %}
 <h2>Call for Participation</h2>
+    {% if false %}
     <div class="well">
-      <p>The Call for Participation closed for most proposals on
-        <span class="emphasis">Thursday 25th April</span>.</p>
-      {#
-      <p>You will still be able to submit installations, performances and youth
-        workshops after this date</p>
-      #}
-      <p>You can still submit proposals for lightning talks or installations.</p>
+      <div>The Call for Participation will close for talks & workshops on
+        <span class="emphasis">Thursday 11th June{# 2026 #}</span>.</div>
+      <div>&nbsp;</div>
+      <div>You will still be able to submit installations, performances and youth workshops after this date</div>
     </div>
+    {% endif %}
 
     <p class="emphasis"><a href="{{ url_for('base.about') }}">Electromagnetic
       Field</a> is a camping festival for those with an inquisitive mind
@@ -20,7 +19,7 @@
       href="{{ url_for('base.page', page_name='travel') }}">Eastnor
       Castle Deer Park</a> in Herefordshire, UK.</p>
 
-    <p>We're looking for talks, performances, and workshops for
+    <p>We're looking for talks, performances, installations and workshops for
       all ages.  We're especially keen to hear from people with
       different backgrounds than you'd expect to find at a technology conference.</p>
 
@@ -38,15 +37,13 @@
       the ticket cost goes directly towards turning a field into an amazing place
       to spend a weekend, and all those who attend contribute to making the event a success.</p>
 
-    <p>As with all contributors to EMF, speakers do not receive any payment, although
+    <p>Speakers submitting proposals through the CFP do not receive any payment, although
        we have some budget to subsidise travel within the UK for those who could not
-       otherwise afford it. We also have some funds available for up-front costs for
-       workshops, for example, to develop kits for attendees.</p>
+       otherwise afford it. We also have some funds available to cover up-front costs, for
+       example, kits for workshop attendees. Let us know what you need!</p>
 
     <h3>Tickets</h3>
-    <p>You will be guaranteed the opportunity to buy tickets if your talk,
-      workshop, youth workshop, or performance proposal is accepted. There are a
-      limited number of tickets available for exceptional installations. The guarantee is
+    <p>You will be guaranteed the opportunity to buy tickets if your proposal is accepted. The guarantee is
       for <strong>two</strong> adult tickets: one for you at a 33% discount, and one for a
       friend or partner at full price. You are also guaranteed as many child tickets as you
       need.</p>
@@ -57,19 +54,19 @@
     <h2>Submit a new proposal</h2>
     <p>Please select the type of proposal you want to submit:</p>
     <div class="list-group cfp-choose-type">
-        {{ cfp_type_menu('talk', 'A presentation on a stage', 'CFP_TALKS_CLOSED', ignore_closed) }}
-        {{ cfp_type_menu('workshop', 'A workshop in an area with tables &amp; other equipment', 'CFP_WORKSHOPS_CLOSED', ignore_closed) }}
-        {{ cfp_type_menu('youthworkshop', ' A workshop for attendees aged 12 and under', 'CFP_YOUTHWORKSHOPS_CLOSED', ignore_closed, pretty_title="Youth Workshop") }}
-        {{ cfp_type_menu('performance', ' A performance of music, art, dance, or film', 'CFP_PERFORMANCES_CLOSED', ignore_closed) }}
-        {{ cfp_type_menu('installation', ' A creation for attendees to admire or interact with', 'CFP_INSTALLATIONS_CLOSED', ignore_closed) }}
+        {{ proposal_type_menu('talk', 'A presentation on a stage', 'CFP_TALKS_CLOSED', ignore_closed) }}
+        {{ proposal_type_menu('workshop', 'A workshop in a tent with tables &amp; other equipment', 'CFP_WORKSHOPS_CLOSED', ignore_closed) }}
+        {#{{ proposal_type_menu('youthworkshop', ' A workshop for attendees aged 12 and under', 'CFP_YOUTHWORKSHOPS_CLOSED', ignore_closed, pretty_title="Youth Workshop") }}#}
+        {{ proposal_type_menu('performance', ' A performance of music, art, dance, or film', 'CFP_PERFORMANCES_CLOSED', ignore_closed) }}
+        {{ proposal_type_menu('installation', ' A creation for attendees to admire or interact with', 'CFP_INSTALLATIONS_CLOSED', ignore_closed) }}
 
-        {# Lightning talks are different, mostly because they're partially enabled already #}
-        {# FIXME 2024 they should use the same logic as the other types #}
+        {# Lightning talks will go straight in as schedule items, they need their own logic
         {%- if feature_enabled('LIGHTNING_TALKS') and not lightning_talks_closed %}
-          <a href="{{ url_for('cfp.form', cfp_type='lightning') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Lightning Talk</strong> &ndash; A quick-fire (5m) presentation</a>
+          <a href="{{ url_for('cfp.create_lightning_talk') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Lightning Talk</strong> &ndash; A quick-fire (5m) presentation</a>
         {%- elif feature_enabled('LIGHTNING_TALKS') and lightning_talks_closed %}
           <span class="list-group-item"><strong>Lightning Talk</strong> &ndash; A quick-fire (5m) presentation. These are now full.</span>
         {% endif %}
+        #}
     </div>
 
     {% if current_user.is_authenticated %}

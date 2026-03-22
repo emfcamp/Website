@@ -1,7 +1,12 @@
+from collections.abc import Callable
+from typing import TypeVar
+
 from flask_wtf import FlaskForm
+from sqlalchemy import select
 from wtforms import BooleanField, SelectField, ValidationError
 from wtforms.validators import InputRequired
 
+from main import db
 from models.cfp_tag import DEFAULT_TAGS, Tag
 from models.diversity import (
     AGE_CHOICES,
@@ -18,6 +23,22 @@ from models.diversity import (
 from models.purchase import AdmissionTicket
 
 from .fields import HiddenIntegerField, MultiCheckboxField
+
+TCoerce = TypeVar("TCoerce")
+
+
+def coerce_optional[TCoerce](coerce: Callable[[str], TCoerce]) -> Callable[[str], TCoerce | None]:
+    """
+    Coerce to a type but treat an empty string as None.
+    Useful for the coerce argument in SelectFields.
+    """
+
+    def _inner(value: str) -> TCoerce | None:
+        if value == "":
+            return None
+        return coerce(value)
+
+    return _inner
 
 
 class Form(FlaskForm):
@@ -70,10 +91,13 @@ class DiversityForm(Form):
         user.diversity.disability = self.disability.data
 
         if self.cfp_tags_required:
+            tags = [
+                self.cfp_tag_0.data,
+                self.cfp_tag_1.data,
+                self.cfp_tag_2.data,
+            ]
             user.cfp_reviewer_tags = [
-                Tag.get_by_value(self.cfp_tag_0.data),
-                Tag.get_by_value(self.cfp_tag_1.data),
-                Tag.get_by_value(self.cfp_tag_2.data),
+                db.session.scalars(select(Tag).filter_by(tag=tag)).one_or_none() for tag in tags
             ]
 
         return user

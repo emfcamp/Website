@@ -1,8 +1,8 @@
 {% if not available %}
 <div class="well">
-  <p class="emphasis">There are no tickets currently available. See
+  <p class="emphasis">There are no tickets currently available. {# See
   <a href="https://blog.emfcamp.org/2024/01/21/emf-2024-ticket-sales/">our blog</a> for
-  details on ticket sales.</p>
+  details on ticket sales. #}</p>
 
   <p>Please follow us on <a href="https://social.emfcamp.org/@emf">the Fediverse</a> or
   join our mailing list to be notified when more tickets are on sale:</p>
@@ -17,7 +17,7 @@
 
 <h4>A ticket to Electromagnetic Field {{event_year}} will get you:</h4>
 <ul>
-    <li>A secure place to camp from Thursday May 30<sup>th</sup> until Monday June 3<sup>rd</sup></li>
+    <li>A secure place to camp from Thursday July 16<sup>th</sup> until Monday 20<sup>th</sup> July</li>
     <li>Very fast internet access, both wired and wireless</li>
     <li>Mains power</li>
     <li>Access to running water, hot showers, a well-stocked bar, and a variety of food vendors</li>
@@ -34,23 +34,23 @@
 <p>
   <strong>Accessibility:</strong> we're committed to making EMF as accessible as we can.
   If you have any requirements or requests you would like to discuss with us please
-  feel free to email us on <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">{{ config['TICKETS_EMAIL'][1] }}</a>. We offer free tickets for carers; please drop us an email after you've bought your ticket.
+  feel free to email us on <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">{{ config['TICKETS_EMAIL'][1] }}</a>.
+  We offer free tickets for carers; please drop us an email after you've bought your ticket.
 </p>
 
 <p>
-  <strong>Parking:</strong> Only live-in vehicles are permitted to park on site, with the appropriate ticket. Other vehicles must be parked in the designated car parks &mdash; you will need to buy a car parking ticket if you intend to bring a car. If your vehicle is an integral part of a village or installation please contact us.
+  <strong>Parking:</strong> Only live-in vehicles are permitted to park on site, with the appropriate ticket.
+  Other vehicles must be parked in the designated car parks &mdash; you will need to buy a car parking ticket
+  if you intend to bring a car.
 </p>
 
-{#
 <p>
   If you are unable to afford a ticket, we have a limited number of discounted tickets available.
   Please contact <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">{{ config['TICKETS_EMAIL'][1] }}</a>.
 </p>
-#}
 
 <p>
   By buying a ticket you are agreeing to our <a href="{{url_for('payments.terms')}}">Terms
   and Conditions</a> and the EMF <a href="{{url_for('base.code_of_conduct')}}">Code of Conduct</a>.
-  Please see our <a href="{{url_for('base.page', page_name='health')}}">health page</a> for information about COVID-19.
 </p>
 

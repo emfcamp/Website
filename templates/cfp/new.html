@@ -6,20 +6,19 @@
   <div class="alert alert-danger">Could not submit your proposal. Please <a href="#cfp-errors" class="alert-link">check below</a> and try again.</div>
   {% endif %}
 
-<h2>Submit a {{form.model.human_type}} proposal</h2>
+<h2>Propose {{ form.type_info.human_type_a }}</h2>
+  {% if false %}
   <div class="well">
-    <p>The Call for Participation closed for most proposals on
-      <span class="emphasis">Thursday 25th April</span>.</p>
-    {#
-    <p>You will still be able to submit installations, performances and youth
-      workshops after this date</p>
-    #}
-    <p>You can still submit proposals for lightning talks or installations.</p>
+    <div>The Call for Participation will close for talks & workshops on
+      <span class="emphasis">Thursday 11th June{# 2026 #}</span>.</div>
+    <div>&nbsp;</div>
+    <div>You will still be able to submit installations, performances and youth workshops after this date</div>
   </div>
-  {% include 'cfp/form_' + cfp_type + '_include.html' %}
+  {% endif %}
+  {% include 'cfp/form_' + proposal_type + '_include.html' %}
 
   <div class="well" id="cfp-errors">
-    <form action={{ url_for('cfp.form', cfp_type=cfp_type) + ('?closed' if ignore_closed else '') }} method="post" class="form-horizontal cfp-form" role="form">
+    <form action={{ url_for('cfp.create_proposal', proposal_type=proposal_type) + ('?closed' if ignore_closed else '') }} method="post" class="form-horizontal cfp-form" role="form">
       {{ form.hidden_tag() }}
       <fieldset>
         <legend>Your details</legend>
@@ -28,15 +27,15 @@
           <div class="alert alert-warning">
               This email address already exists in our system, possibly because you previously tried to submit a proposal and
               we automatically created an account for you.
-              Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('.main', cfp_type=cfp_type) + ('?closed' if ignore_closed else ''), email=form.email.data) }}" target="_new">click here</a> to log in.
+              Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('.main', proposal_type=proposal_type) + ('?closed' if ignore_closed else ''), email=form.email.data) }}" target="_new">click here</a> to log in.
           </div>
           {% else %}
           <p>
-            <a href="{{ url_for('users.login', next=url_for('.form', cfp_type=cfp_type) + ('?closed' if ignore_closed else '')) }}" target="_blank">Please log in</a> if you've already bought a ticket (or had one transferred to you). We will use this address for any questions about your proposal.</p>
+            <a href="{{ url_for('users.login', next=url_for('.create_proposal', proposal_type=proposal_type) + ('?closed' if ignore_closed else '')) }}" target="_blank">Please log in</a> if you've already bought a ticket (or had one transferred to you). We will use this address for any questions about your proposal.</p>
           {% endif %}
         {% else %}
           <div class="alert alert-info">
-            <div>We will use this address for any questions about your proposal, so if it isn't you, please <a href="{{ url_for('users.logout', next=url_for('.form', cfp_type=cfp_type)) }}">log out</a>.</div>
+            <div>We will use this address for any questions about your proposal, so if it isn't you, please <a href="{{ url_for('users.logout', next=url_for('.create_proposal', proposal_type=proposal_type)) }}">log out</a>.</div>
           </div>
           <div class="form-group">
             <label class="col-sm-3 control-label">Email</label>
@@ -45,24 +44,24 @@
             </div>
           </div>
         {% endif %}
-        {{ render_field(form.name, horizontal=9, placeholder="Your name" + (' (or pseudonym)' if cfp_type != 'youthworkshop' else '')) }}
+        {{ render_field(form.name, horizontal=9, placeholder="Your name" + (' (or pseudonym)' if proposal_type != 'youthworkshop' else '')) }}
         {% if current_user.is_anonymous %}
         {{ render_field(form.email, horizontal=9, placeholder="Your email address") }}
         {% endif %}
       </fieldset>
 
       <fieldset>
-          <legend>About your {{form.model.human_type}}</legend>
-          <p>The title and description of your {{form.model.human_type}} will be made public.
+          <legend>About your {{ form.type_info.human_type }}</legend>
+          <p>The title and description of your {{ form.type_info.human_type }} will be made public.
             You'll be able to tweak these later, but please provide as much detail as you can so we
             can review your submission.
           </p>
-          {% if cfp_type in ('talk', 'workshop') %}
+          {% if proposal_type in ('talk', 'workshop') %}
               <p>We will anonymise these fields before sending them to our reviewers, so please
                 try to avoid including personally identifiable information.
             </p>
           {% endif %}
-          {% if cfp_type == 'talk' %}
+          {% if proposal_type == 'talk' %}
             <p>If you are employed by or affiliated with an organisation which is related to the topic
                 of your talk, you should disclose this in the description.</p>
           {% endif %}
@@ -71,7 +70,7 @@
           placeholder="A full description of your proposal, in no more than 250 words. Don't include your name here.") }}
      </fieldset>
 
-     {% if cfp_type == "lightning" %}
+     {% if proposal_type == "lightning" %}
 
      <fieldset>
         {{ render_field(form.slide_link, horizontal=9, placeholder="https://example.com/my-slides.pdf") }}
@@ -85,68 +84,67 @@
         {{ render_field(form.session, horizontal=9) }}
      </fieldset>
 
-     {% else %}{# cfp_type != "lightning" #}
+     {% else %}{# proposal_type != "lightning" #}
 
      <fieldset>
          <legend>More details</legend>
-         <p>We'll use these details to help us schedule your {{form.model.human_type}}.</p>
+         <p>We'll use these details to help us schedule your {{ form.type_info.human_type }}.</p>
       {# NB this excludes installations, which have a separate section #}
-      {% if cfp_type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
+      {% if proposal_type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
         {% call render_field(form.equipment_required, horizontal=9,
                              placeholder="Additional equipment you need us to provide") %}
-          {% if cfp_type in ('talk', 'performance') %}
+          {% if proposal_type in ('talk', 'performance') %}
             We'll provide a sound system and projector or screen.
-          {% elif cfp_type in ('workshop', 'youthworkshop') %}
-            Please let us know if you need a sound system or projector, or any other equipment
+          {% elif proposal_type in ('workshop', 'youthworkshop') %}
+            The tent will have a projector and sound system. Please let us know if you need any other equipment
             you will not be able to easily bring yourself, such as soldering irons.
           {% endif %}
         {% endcall %}
-        {{ render_field(form.length, horizontal=9, placeholder="Your best guess, whether in minutes or days") }}
+        {{ render_field(form.duration, horizontal=9, placeholder="Your best guess, whether in minutes or days") }}
       {% endif %}
 
       {% call render_field(form.notice_required, horizontal=9) %}
         If accepted, how much notice do you need? We'll try and give you as much time as we can.
       {% endcall %}
 
-      {% if cfp_type in ('workshop', 'youthworkshop') %}
+      {% if proposal_type in ('workshop', 'youthworkshop') %}
         <legend>Attendees</legend>
 
-          {% if cfp_type != 'youthworkshop' %}
-          <p>Our workshop tents can accommodate 10-50 attendees per session; if your workshop
-          is smaller than that, you don't need to use the Call for Participation, but feel free to
-          <a href="mailto:{{ config['CONTENT_EMAIL'][1] }}">drop us an email</a> instead.</p>
-          {% endif %}
-          <p>If volunteers would help you increase capacity, please say so.</p>
-          {% call render_field(form.attendees, horizontal=9,
+          <p>Our workshop tents will be set up with chairs and tables for 30 people per session.
+            If you would like to run your workshop more than once, or if volunteers would help you
+            increase capacity, please say so.</p>
+          {% call render_field(form.attributes.participant_count, horizontal=9,
                 placeholder="The number of people you can accommodate in your workshop") %}
              Please ensure you will have enough kits or equipment to go round.
           {% endcall %}
-          {{ render_field(form.cost, horizontal=9, placeholder="If attendees need to pay for materials") }}
-          {{ render_field(form.participant_equipment, horizontal=9, placeholder="Things they should bring - such as a laptop, arduino, or knitting needles") }}
-          {{ render_field(form.age_range, horizontal=9, placeholder="What age group is this suitable for? Approximate is fine") }}
-
+          {{ render_field(form.attributes.participant_cost, horizontal=9, placeholder="If attendees need to pay for materials") }}
+          <p>If this is only a small amount, we may be able to cover it.</p>
+          {{ render_field(form.attributes.participant_equipment, horizontal=9, placeholder="Things they should bring - such as a laptop, arduino, or knitting needles") }}
+          {{ render_field(form.attributes.age_range, horizontal=9, placeholder="What age group is this suitable for? Approximate is fine") }}
+          <p>All under-16s attending workshops at EMF must be accompanied by an adult.</p>
         <legend></legend>
-      {% elif cfp_type == 'installation' %}
+      {% elif proposal_type == 'installation' %}
+          {# For all other types, equipment_required is rendered above #}
           {% call render_field(form.equipment_required, horizontal=9,
           placeholder="What are your installation's requirements?") %}
             Let us know if your installation has any special requirements (power, to be inside, internet etc).
           {% endcall %}
-          {% call render_field(form.size, horizontal=9) %}
+          {% call render_field(form.attributes.size, horizontal=9) %}
             How much space will your installation take up?
           {% endcall %}
       {% endif %}
 
         {% call render_field(form.additional_info, horizontal=9, placeholder="Anything else you'd like to tell us") %}
-          {% if cfp_type == 'performance' %}
+          {% if proposal_type == 'performance' %}
             If you could give us a SoundCloud link or YouTube video of you performing,
             it'll help with our selection process.
           {% endif %}
         {% endcall %}
 
         <div class="col-md-9 col-sm-offset-3">
-          {% if cfp_type == 'youthworkshop' %}
+          {% if proposal_type == 'youthworkshop' %}
           <label class="checkbox">
-            {{ form.valid_dbs() }}
+            {{ form.attributes.valid_dbs() }}
             I have a valid <a href="https://www.gov.uk/government/organisations/disclosure-and-barring-service/about#dbs-checks" target="_blank">DBS check</a>
           </label>
           <small>This is not a requirement but please let us know if you have one</small>
@@ -158,26 +156,39 @@
           {{ form.needs_help() }}
           I'd like advice or help with this proposal
         </label>
-        <small>We're happy to advise on submissions before they are reviewed. We don't consider lack of experience
-            a problem and we welcome those who haven't given talks before.</small>
+        <small>
+          We're happy to advise on submissions before they are reviewed.
+          We don't consider lack of experience a problem and we welcome those who haven't
+          {% if proposal_type in ["talk"] %}
+          given talks
+          {% elif proposal_type in ["performance"] %}
+          performed
+          {% elif proposal_type in ["workshop", "youthworkshop"] %}
+          given a workshop
+          {% elif proposal_type in ["installation"] %}
+          made an installation
+          {% else %}
+          submitted a proposal
+          {% endif %}
+          before.</small>
         </div>
 
       </fieldset>{# More details #}
 
      <fieldset>
         <legend>Funding</legend>
-        {% if cfp_type in ('installation') %}
+        {% if proposal_type in ['installation'] %}
         <p>
           We have a limited amount of funding available to make the EMF site look great.
           If you'd like to apply for a grant, let us know how much you'll need.
-          {{ render_field(form.installation_funding, horizontal=9) }}
+          {{ render_field(form.attributes.grant_requested, horizontal=9) }}
         </p>
         {% endif %}
 
         <p>
-          We {% if cfp_type in ('installation') %} also {% endif %} have some budget to
+          We {% if proposal_type in ['installation'] %} also {% endif %} have some budget to
           subsidise travel within the UK for those who could not otherwise afford it.
-          {% if cfp_type in ('workshop', 'youthworkshop') %}
+          {% if proposal_type in ('workshop', 'youthworkshop') %}
           We also have some funds available for up-front costs for
           workshops, for example, to build kits for attendees.
           {% endif %}
@@ -186,7 +197,7 @@
 
       </fieldset>
 
-      {% endif %}{# cfp_type == "lighting" #}
+      {% endif %}{# proposal_type == "lighting" #}
 
       {% for error in form.needs_help.errors %}
       <div class="help-block">{{ error }}</div>

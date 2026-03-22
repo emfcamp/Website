@@ -5,9 +5,10 @@ These are served from static files in this repository as the database is wiped e
 
 from dateutil.parser import parse as date_parse
 from flask import abort, redirect, render_template, send_file, url_for
+from flask.typing import ResponseReturnValue
 
 from models import event_year
-from models.cfp import proposal_slug
+from models.cfp import schedule_item_slug
 
 from ..common import archive_file, load_archive_file
 
@@ -27,21 +28,24 @@ def parse_event(event):
     return event
 
 
-def item_historic(year, proposal_id, slug):
+# @schedule.route("/schedule/<int:year>/<int:proposal_id>", methods=["GET", "POST"])
+# @schedule.route("/schedule/<int:year>/<int:proposal_id>-<slug>", methods=["GET", "POST"])
+def item_historic(year: int, schedule_item_id: int, slug: str | None) -> ResponseReturnValue:
     """Handler to display a detail page for a schedule item."""
     abort_if_invalid_year(year)
 
     #  We might want to look at performance here but I'm not sure it's a huge issue at the moment
     data = load_archive_file(year, "public", "schedule.json")
+    assert isinstance(data, list)
     for item in data:
-        if item["id"] == proposal_id:
+        if item["id"] == schedule_item_id:
             break
     else:
         abort(404)
 
-    correct_slug = proposal_slug(item["title"])
+    correct_slug = schedule_item_slug(item["title"])
     if slug != correct_slug:
-        return redirect(url_for(".item", year=year, proposal_id=proposal_id, slug=correct_slug))
+        return redirect(url_for(".item", year=year, schedule_item_id=schedule_item_id, slug=correct_slug))
 
     return render_template("schedule/historic/item.html", event=parse_event(item), year=year)
 
@@ -73,10 +77,10 @@ def historic_talk_data(year):
         elif event["type"] == "talk":
             events_list = stage_events
         elif event["type"] == "performance":
-            if "[Film]" in event.get("title"):
+            if "[Film]" in event.get("title", ""):
                 event["title"] = event["title"].replace("[Film] ", "")
                 events_list = film_events
-            elif "[Music]" in event.get("title") or event.get("venue") == "Null Sector":
+            elif "[Music]" in event.get("title", "") or event.get("venue") == "Null Sector":
                 event["title"] = event["title"].replace("[Music] ", "")
                 events_list = music_events
             else:
@@ -145,8 +149,10 @@ def talks_historic(year):
     )
 
 
-def feed_historic(year, fmt):
+def feed_historic(year: int, fmt: str) -> ResponseReturnValue:
     """Serve a historic feed if it's available."""
     abort_if_invalid_year(year)
     file_path = archive_file(year, "public", f"schedule.{fmt}")
+    if file_path is None:
+        abort(404)
     return send_file(file_path)

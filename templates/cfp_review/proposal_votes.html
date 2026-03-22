@@ -9,7 +9,7 @@
 <p>&nbsp;</p>
 <form method="POST">
     <div class="col-md-8">
-        <h3>{{proposal.title}} <small>&mdash; a {{ proposal.human_type | capitalize }}</small></h3>
+        <h3>{{proposal.title}} <small>&mdash; {{ proposal.human_type_a | title }}</small></h3>
         <table class="table">
         {{ form.hidden_tag() }}
             <tr>
@@ -24,7 +24,7 @@
                 {% set vote = votes[vote_form['id'].data] %}
                 {% set versions = vote.versions.all() %}
                 {# We want to skip versions with minor changes #}
-                {% for ver in (versions | sort(attribute="modified", reverse=True))
+                {% for ver in (versions | sort(attribute="transaction.issued_at", reverse=True))
                     if 'state' in ver.changeset or
                         'vote' in ver.changeset or
                         'note' in ver.changeset
@@ -32,11 +32,11 @@
                     <tr {%- if loop.first %} class="active" {%- endif %}>
                         {% if loop.first %}
                             <td><a href="{{ url_for('admin.user', user_id=vote.user.id) }}">{{vote.user.name}}</small></a></td>
-                            <td>{{ ver.modified.strftime('%d/%m') }}</td>
+                            <td>{{ ver.transaction.issued_at.strftime('%d/%m') }}</td>
                         {% else %}
                             <td>&nbsp;</td>
                             <td>
-                                {{ ver.modified.strftime('%d/%m') }}
+                                {{ ver.transaction.issued_at.strftime('%d/%m') }}
                             </td>
                         {% endif %}
                         <td>{{ ver.state | capitalize }}</td>

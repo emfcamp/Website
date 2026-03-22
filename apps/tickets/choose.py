@@ -105,7 +105,14 @@ def main(flow="main"):
         # If the user has any reservations, they bypass the unavailable state.
         # This means someone can use another view to get access to this one
         # again. I'm not sure what to do about this. It usually won't matter.
-        available = any(p.product in products for p in basket.purchases)
+        #
+        # Note that we override the sales_state above for any non-"main" flow,
+        # so we limit this check to admission tickets.
+        # This prevents people using parking tickets from a different always-open
+        # view bypassing the sales state.
+        available = any(
+            p.product.parent.type == "admissions" and p.product in products for p in basket.purchases
+        )
 
     if form.validate_on_submit() and (form.buy_tickets.data or form.buy_hire.data or form.buy_other.data):
         # User has selected some tickets to buy.

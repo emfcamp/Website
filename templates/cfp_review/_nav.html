@@ -5,7 +5,7 @@
 {% endmacro %}
 
 {% macro menuitem(text, view, badge_count=0) %}
-<li {% if view_name == view and view != '.proposals' -%} class="active" {%- endif %}>
+<li {% if view_name == view and view not in ['.proposals', '.messages', '.schedule_items'] -%} class="active" {%- endif %}>
     <a href="{{url_for(view, **kwargs)}}">{{text}}{{badge(badge_count)}}</a>
 </li>
 {% endmacro %}
@@ -26,14 +26,13 @@
                 {{ menuitem("Installations", ".proposals", type="installation") }}
                 {{ menuitem("Performances", ".proposals", type="performance") }}
                 {{ menuitem("Youth Workshops", ".proposals", type="youthworkshop") }}
-                {{ menuitem("Lightning Talks", ".lightning_talks") }}
                 <li role="separator" class="divider"></li>
                 {{ menuitem('Anon-blocked', ".proposals", proposal_counts['anon-blocked'], state='anon-blocked')}}
                 {{ menuitem('New', ".proposals", proposal_counts['new'], state='new')}}
                 {{ menuitem('Manual Review', ".proposals", proposal_counts['manual-review'], state='manual-review')}}
                 <li role="separator" class="divider"></li>
                 {{ menuitem('Summary', ".proposals_summary")}}
-                {{ menuitem('Changelog', ".proposal_versions" )}}
+                {{ menuitem('Changelog', ".entity_changelog", entity_type="proposal" )}}
             </ul>
         </li>
         <li class="dropdown">
@@ -43,13 +42,13 @@
                 Messages {{ badge(unread_count) }} <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                {{ menuitem("All", ".all_messages", unread_count) }}
+                {{ menuitem("All", ".messages", unread_count) }}
                 <li role="separator" class="divider"></li>
-                {{ menuitem("Talks", ".all_messages", type="talk") }}
-                {{ menuitem("Workshops", ".all_messages", type="workshop") }}
-                {{ menuitem("Youth Workshops", ".all_messages", type="youthworkshop") }}
-                {{ menuitem("Installations", ".all_messages", type="installation") }}
-                {{ menuitem("Performances", ".all_messages", type="performance") }}
+                {{ menuitem("Talks", ".messages", type="talk") }}
+                {{ menuitem("Workshops", ".messages", type="workshop") }}
+                {{ menuitem("Youth Workshops", ".messages", type="youthworkshop") }}
+                {{ menuitem("Installations", ".messages", type="installation") }}
+                {{ menuitem("Performances", ".messages", type="performance") }}
             </ul>
         </li>
         {{ menuitem("Voting", ".vote_summary", unread_reviewer_notes) }}
@@ -71,6 +70,29 @@
                 <li role="separator" class="divider"></li>
                 {{ menuitem('Reviewer diversity', '.reviewer_diversity') }}
                 {{ menuitem('Speaker diversity', '.speaker_diversity') }}
+            </ul>
+        </li>
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                aria-haspopup="true" aria-expanded="false">
+                Schedule items <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                {{ menuitem("All", ".schedule_items") }}
+                <li role="separator" class="divider"></li>
+                {{ menuitem("Talks", ".schedule_items", type="talk") }}
+                {{ menuitem("Workshops", ".schedule_items", type="workshop") }}
+                {{ menuitem("Installations", ".schedule_items", type="installation") }}
+                {{ menuitem("Performances", ".schedule_items", type="performance") }}
+                {{ menuitem("Youth Workshops", ".schedule_items", type="youthworkshop") }}
+                {{ menuitem("Lightning Talks", ".lightning_talks") }}
+                <li role="separator" class="divider"></li>
+                {{ menuitem('Published', ".schedule_items", schedule_item_counts['published'], state='published')}}
+                {{ menuitem('Unpublished', ".schedule_items", schedule_item_counts['unpublished'], state='unpublished')}}
+                {{ menuitem('Hidden', ".schedule_items", schedule_item_counts['hidden'], state='hidden')}}
+                <li role="separator" class="divider"></li>
+                {{ menuitem('Summary', ".schedule_items_summary")}}
+                {{ menuitem('Changelog', ".entity_changelog", entity_type="schedule-item" )}}
             </ul>
         </li>
     {% endif %}

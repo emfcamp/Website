@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import render_field %}
+{% from "schedule/_faves.html" import favourite_icons %}
+{% from "schedule/_proposal_icons.html" import proposal_icons %}
+
+{% macro display_entry(entry, is_draggable=False) %}
+<div class=" panel {% if is_draggable %}list-group-item draggable-panel{% endif %}" data-id="{{ entry.id }}">
+  {{ entry._form.entry_id() }}
+  {% if is_draggable %}
+    {{ octicon("grabber-24") }}<span class="lottery-entry-rank">{{ entry.rank + 1 }}&nbsp;</span>
+  {% endif %}
+  <a href="{{ url_for('.item', schedule_item_id=entry.schedule_item.id, year=event_year ) }}">{{ entry.schedule_item.title }}</a>
+  on <time datetime="{{ entry.occurrence.scheduled_time.strftime('%Y-%m-%dT%H:%M:%S') }}">{{ entry.occurrence.scheduled_time.strftime('%A at %H:%M') }}</time>
+  in <a href="{{ entry.occurrence.map_link }}">{{ entry.occurrence.scheduled_venue.name }}</a>
+  {% if entry.state != "cancelled" %}({{ entry.ticket_count }} tickets){% endif %}
+  {% if entry.state == "valid-tickets" %}
+    <br><em>Codes for this {{ entry.schedule_item.human_type }}: {{ entry.ticket_codes | replace(',', ', ') | upper }}</em>
+  {% endif %}
+  {% if entry.state != "cancelled" %}
+    {{ entry._form.cancel(class_="btn btn-primary pull-right")}}
+    <div class="clearfix"></div>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro draggable_entries_block(heading, lottery_entries, sortable_id) %}
+  {% if lottery_entries %}
+    <h4>{{ heading }}</h4>
+    <div id="{{ sortable_id }}" class="list-group">
+    {% for e in lottery_entries %}
+        {{ display_entry(e, is_draggable=True) }}
+    {% endfor %}
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{% block title %}Lottery Entries{% endblock %}
+{% block body %}
+
+<h2>Your current lottery entries</h2>
+
+<div>
+  For more details about how the lottery works please see
+  <a href="{{ url_for('.about_lotteries') }}">our about page</a>.
+</div>
+
+<noscript>
+  This page requires Javascript, sorry.
+</noscript>
+
+{% if entries_dict %}
+  <div class="lottery-entries">
+    <form method="POST">
+      {{ form.hidden_tag() }}
+
+      {% if open_lotteries %}
+        <h2>Lottery entries</h2>
+
+        <p>
+          You can drag & drop your tickets in order of preference with top being your
+          highest preference and the bottom being your lowest.
+        </p>
+
+        <p>
+          You can only get tickets for a single occurrence of an event on the schedule via the lottery,
+          but any remaining tickets will be made available once the event starts on a first-come, first-served basis.
+        </p>
+
+        {# 2024 #}
+        {#
+        <p>
+          The lottery will be run on Wednesday 29th May 2024.
+        </p>
+        #}
+
+        <hr>
+
+        {% for schedule_item_type, lottery_entries in entries_dict["entered"].items() %}
+          {% set type_info = SCHEDULE_ITEM_INFOS[schedule_item_type] %}
+          {{ draggable_entries_block(type_info.human_name, lottery_entries, "lottery-entries-{{ schedule_item_type }}") }}
+        {% endfor %}
+
+        {% endif %}
+
+      {% for state in ["valid-tickets", "cancelled"] if entries_dict[state] %}
+        {% if state == "cancelled" %}
+          <h2>Cancelled tickets</h2>
+          <p>Tickets you have cancelled, were cancelled because you won a different
+            lottery (you can only win once) or were cancelled because you lost this
+            lottery. If there are still tickets you can apply for them once they re-open.</p>
+        {% elif state == "valid-tickets" %}
+          <h2>Tickets</h2>
+          <p>Tickets you have to won in the lottery.</p>
+          <p>When it's time for the event, aim to arrive 15&nbsp;minutes early and give
+            the assistant a code for each person, your name or your email address.
+            Each code can only be used once.</p>
+        {% endif %}
+
+        {% for schedule_item_type, lottery_entries in entries_dict[state].items() %}
+          {% set type_info = SCHEDULE_ITEM_INFOS[schedule_item_type] %}
+          <strong>{{ type_info.human_type | capitalize }}</strong>
+          {% for e in lottery_entries %}
+            {{ display_entry(e) }}
+          {% endfor %}
+        {% endfor %}
+
+      {% endfor %}
+    </form>
+  </div>
+{% else %}
+  <div class="well">You don't currently have any lottery entries. Check out
+    the <a href="{{url_for('.main_year', year=event_year)}}">line up</a> to add some!</div>
+
+{% endif %}
+
+{% endblock %}
+
+{% block foot %}
+  <script type="text/javascript" src="{{static_url_for('static', filename="js/lottery.js")}}"></script>
+{% endblock -%}

@@ -2,7 +2,7 @@ Hi {{ user.name }},
 
 Just to let you know your EMF {{ proposal.human_type }} "{{ proposal.title}}" is still being considered!
 
-There's still plenty of time for your {{ proposal.human_type }} to be chosen, and we'll be in touch to let you know for certain at least one month before the event.
+There's still plenty of time for your {{ proposal.human_type }} to be chosen, and we'll be in touch to let you know for certain before the event.
 
 If you have any questions, don't hesitate to get in contact:
 

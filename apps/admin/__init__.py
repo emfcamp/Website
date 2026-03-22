@@ -33,15 +33,16 @@ from models.purchase import Purchase
 from models.scheduled_task import ScheduledTaskResult, tasks
 from models.site_state import VALID_STATES, SiteState, get_states, refresh_states
 
-from ..common import require_permission
+from ..common import feature_enabled, require_permission
 from ..common.forms import Form
 from ..payments.stripe import stripe_validate
-from ..payments.wise import (
-    wise_business_profile,
-    wise_retrieve_accounts,
-    wise_validate,
-)
 from .products import product_views, products
+
+# from ..payments.wise import (
+#     wise_business_profile,
+#     wise_retrieve_accounts,
+#     wise_validate,
+# )
 
 admin = Blueprint("admin", __name__)
 
@@ -165,10 +166,6 @@ class SiteStateForm(Form):
         "Refunds",
         choices=[(s, s) for s in VALID_STATES["refund_state"]],
     )
-    signup_state = SelectField(
-        "Signups",
-        choices=[(s, s) for s in VALID_STATES["signup_state"]],
-    )
     update = SubmitField("Update states")
 
 
@@ -235,13 +232,13 @@ def payment_config_verify():
     form = BankAccountRefreshForm()
 
     if form.validate_on_submit():
-        profile_id = wise_business_profile()
+        profile_id = None  # wise_business_profile()
 
         if not profile_id:
             flash("Cannot identify Wise profile", "warning")
             return redirect(url_for(".payment_config_verify"), 303)
 
-        accounts = wise_retrieve_accounts(profile_id)
+        accounts = []  # wise_retrieve_accounts(profile_id)
         for account in accounts:
             existing_account = BankAccount.query.filter_by(
                 wise_balance_id=account.wise_balance_id,
@@ -252,17 +249,22 @@ def payment_config_verify():
             db.session.add(account)
 
         if db.session.new:
-            db.session.commit()
             flash("New Wise bank accounts have been imported", "info")
         else:
             flash("No new Wise bank accounts have been imported", "warning")
 
+        db.session.commit()
         return redirect(url_for(".payment_config_verify"), 303)
+
+    if feature_enabled("BANK_TRANSFER"):
+        wise_state = None  # wise_validate()
+    else:
+        wise_state = None
 
     return render_template(
         "admin/payment-config-verify.html",
         stripe=stripe_validate(),
-        transferwise=wise_validate(),
+        transferwise=wise_state,
         bank_accounts=BankAccount.query.order_by(
             BankAccount.active.desc(), BankAccount.currency.desc()
         ).all(),

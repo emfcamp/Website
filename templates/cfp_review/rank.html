@@ -16,14 +16,14 @@
     </tr>
     </thead>
     <tbody>
-    {% for type in proposal_types%}
+    {% for type in proposal_types %}
     <tr>
         <th>{{type}}</th>
-        <td><a href="{{url_for('cfp_review.proposals', type=type, state=['accepted', 'finalised'])}}">
+        <td><a href="{{url_for('cfp_review.proposals', type=type, state=['accepted'])}}">
                 {{estimates[type].accepted_count}}
             </a>
         </td>
-        <td>{{estimates[type].unknown_lengths}}</td>
+        <td>{{estimates[type].unknown_durations}}</td>
         <td style="white-space:nowrap">{{estimates[type].available_time}}</td>
         <td style="white-space:nowrap">{{estimates[type].allocated_time}}</td>
         <td style="white-space:nowrap">{{estimates[type].remaining_time}}</td>

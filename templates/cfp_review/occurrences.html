@@ -1,0 +1,63 @@
+{% from "_formhelpers.html" import render_field, render_dl_field, render_radio_field %}
+{% extends "cfp_review/base.html" %}
+{% block title %}{{ schedule_item.title }}{% endblock %}
+{% block body %}
+
+{% set active='occurrences' %}
+{% include "cfp_review/_schedule_item_tabs.html" %}
+
+
+<div class="col-md-12">
+    <h2>{{ schedule_item.title }}<br>
+        <small>
+            {% if schedule_item.official_content %}
+                {{ schedule_item.human_type_a | capitalize }} by
+            {% else %}
+                An attendee {{ schedule_item.human_type }} by
+            {% endif %}
+            {{ schedule_item.names }}
+            {% if schedule_item.pronouns %}
+                ({{ schedule_item.pronouns }})
+            {% endif %}
+        </small>
+    </h2>
+</div>
+<form method="post" action="{{ url_for('.occurrences', schedule_item_id=schedule_item.id) }}" class="shrink">
+    {{ form.hidden_tag() }}
+    <div class="col-md-8">
+        {% if schedule_item.occurrences %}
+
+        {% else %}
+        <div>There are currently no occurrences for this schedule item</div>
+        {% endif %}
+
+        {{ form.create(class_="btn btn-success debounce", tabindex=1) }}
+    </div>
+    <div class="col-md-4 col-xs-12" role="group">
+        <h4>Schedule item actions</h4>
+        <div class="btn-group-vertical" role="group">
+            <a href="{{ url_for('.convert_schedule_item', schedule_item_id=schedule_item.id) }}"
+                    class="btn btn-warning">
+                Convert schedule item
+            </a>
+            <a href="{{ url_for('.schedule_item_change_owner', schedule_item_id=schedule_item.id) }}"
+                    class="btn btn-warning">
+                Change schedule item owner
+            </a>
+
+            {% if next_id %}
+                <a href="{{ url_for('.update_schedule_item', schedule_item_id=next_id, **full_qs) }}"
+                    class="btn btn-default">
+                    Next schedule item
+                </a>
+            {% else %}
+                <a href="{{ url_for('.schedule_items', **full_qs) }}"
+                    class="btn btn-default">
+                    All schedule items
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</form>
+
+{% endblock %}

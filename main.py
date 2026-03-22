@@ -3,9 +3,9 @@ import logging.config
 import secrets
 import time
 from pathlib import Path
+from typing import Any
 
 import email_validator
-import pywisetransfer
 import stripe
 import yaml
 from cryptography.hazmat.primitives import hashes
@@ -29,6 +29,8 @@ from sqlalchemy_continuum.plugins import FlaskPlugin
 from werkzeug.exceptions import HTTPException
 
 from loggingmanager import create_logging_manager, set_user_id
+
+# import pywisetransfer
 
 # If we have logging handlers set up here, don't touch them.
 # This is especially problematic during testing as we don't
@@ -120,7 +122,7 @@ wise = None
 def get_stripe_client(config: Config) -> stripe.StripeClient:
     return stripe.StripeClient(
         api_key=config["STRIPE_SECRET_KEY"],
-        stripe_version="2023-10-16",
+        stripe_version="2026-02-25.clover",
     )
 
 
@@ -224,12 +226,12 @@ def create_app(dev_server=False, config_override=None):
 
     login_manager.anonymous_user = load_anonymous_user
 
-    global wise
-    wise = pywisetransfer.Client(
-        api_key=app.config["TRANSFERWISE_API_TOKEN"],
-        environment=app.config["TRANSFERWISE_ENVIRONMENT"],
-        private_key_file=app.config.get("TRANSFERWISE_PRIVATE_KEY_FILE"),
-    )
+    # global wise
+    # wise = pywisetransfer.Client(
+    #     api_key=app.config["TRANSFERWISE_API_TOKEN"],
+    #     environment=app.config["TRANSFERWISE_ENVIRONMENT"],
+    #     private_key_file=app.config.get("TRANSFERWISE_PRIVATE_KEY_FILE"),
+    # )
 
     @app.before_request
     def load_per_request_state():
@@ -335,6 +337,21 @@ def create_app(dev_server=False, config_override=None):
         # And just for convenience
         ctx["db"] = db
 
+        import sqlalchemy
+
+        for attr in ["select", "and_", "or_", "func", "text"]:
+            ctx[attr] = getattr(sqlalchemy, attr)
+
+        from sqlalchemy import orm
+
+        for attr in ["selectinload", "joinedload", "undefer", "aliased"]:
+            ctx[attr] = getattr(orm, attr)
+
+        from sqlalchemy_continuum import utils
+
+        for attr in ["transaction_class", "version_class"]:
+            ctx[attr] = getattr(utils, attr)
+
         return ctx
 
     if app.config["DEBUG"] or app.testing:
@@ -382,7 +399,7 @@ def create_app(dev_server=False, config_override=None):
     return app
 
 
-def external_url(endpoint, **values):
+def external_url(endpoint: str, **values: Any) -> str:
     """Generate an absolute external URL. If you need to override this,
     you're probably doing something wrong.
     """

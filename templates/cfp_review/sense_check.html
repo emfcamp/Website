@@ -12,13 +12,14 @@
   <a href="{{ url_for('cfp_review.sense_check', type='performance') }}">Performance</a>
 </p>
 
-<p>Checked {{ proposals_count }} proposals, found {{ not_sensible_proposals|length }} suspect proposals.</p>
+<p>Checked {{ occurrence_count }} schedule items, found {{ not_sensible_occurrences|length }} suspect schedule items.</p>
 
-{% if not_sensible_proposals|length > 0 %}
+{% if not_sensible_occurrences|length > 0 %}
 <ul>
-{% for proposal, reasons in not_sensible_proposals %}
+{% for occurrence, reasons in not_sensible_occurrences %}
+  {% set schedule_item = occurrence.schedule_item %}
   <li>
-    <h3><a href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}">{{ proposal.display_title }}</a>, {{ proposal.type }} by {{ proposal.user.name }}</h3>
+    <h3><a href="{{ url_for('.update_schedule_item', schedule_item_id=schedule_item.id) }}">{{ schedule_item.title }}</a>, {{ schedule_item.type }} by {{ schedule_item.user.name }}</h3>
     <ul>
       {% for reason in reasons.values() %}
       <li>{{ reason }}</li>

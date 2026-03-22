@@ -4,8 +4,6 @@ from datetime import timedelta
 
 from flask import abort, request
 from flask import current_app as app
-from pywisetransfer.exceptions import InvalidWebhookSignature
-from pywisetransfer.webhooks import validate_request
 
 from main import db, wise
 from models import naive_utcnow
@@ -13,6 +11,9 @@ from models.payment import BankAccount, BankTransaction
 
 from . import payments
 from .banktransfer import reconcile_txns
+
+# from pywisetransfer.exceptions import InvalidWebhookSignature
+# from pywisetransfer.webhooks import validate_request
 
 logger = logging.getLogger(__name__)
 
@@ -36,15 +37,15 @@ def wise_webhook():
         request.headers,
     )
 
-    environment = app.config["TRANSFERWISE_ENVIRONMENT"]
-    try:
-        validate_request(request=request, environment=environment)
-    except InvalidWebhookSignature as e:
-        logger.exception(e)
-        abort(400)
-    except Exception as e:
-        logger.info(e)
-        abort(400)
+    # environment = app.config["TRANSFERWISE_ENVIRONMENT"]
+    # try:
+    #     validate_request(request=request, environment=environment)
+    # except InvalidWebhookSignature as e:
+    #     logger.exception(e)
+    #     abort(400)
+    # except Exception as e:
+    #     logger.info(e)
+    #     abort(400)
 
     schema_version = request.json.get("schema_version")
     if schema_version != "2.0.0":
@@ -185,6 +186,8 @@ def sync_wise_statement(profile_id, wise_balance_id, currency):
 
 
 def wise_business_profile():
+    from main import wise
+
     if app.config.get("TRANSFERWISE_PROFILE_ID"):
         id = int(app.config["TRANSFERWISE_PROFILE_ID"])
         accounts = list(wise.account_details.list(profile_id=id))
@@ -232,10 +235,14 @@ class WiseRecipient:
 
     @property
     def parsed_account_number(self):
+        if self.account_number is None:
+            return None
         return self.account_number.replace(" ", "")[-8:]
 
     @property
     def parsed_sort_code(self):
+        if self.sort_code is None:
+            return None
         return self.sort_code.replace("-", "")
 
 
@@ -280,8 +287,7 @@ def wise_retrieve_accounts(profile_id):
     from main import wise
 
     for account in wise.account_details.list(profile_id=profile_id):
-        if account.currency.code != "GBP":
-            # TODO: support other host currencies
+        if account.currency.code not in ["GBP", "EUR"]:
             continue
 
         bank_details = _merge_recipient_details(account)

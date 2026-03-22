@@ -1,0 +1,16 @@
+{% extends "emails/base.txt" %}
+{% block body %}
+Hi {{ user.name }},
+
+Good news! You've won a spot in the {{ entry.schedule_item.human_type }} '{{ entry.schedule_item.title }}'.
+
+Your codes for this {{ entry.schedule_item.human_type }} are:
+{% for code in (entry.ticket_codes or "").split(",") %}
+  * {{ code | upper }}
+{%- endfor %}
+
+Love
+
+The EMF team
+
+{% endblock %}

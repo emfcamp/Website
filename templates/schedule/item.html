@@ -1,153 +1,207 @@
 {% extends "base.html" %}
 {% from "_formhelpers.html" import render_field %}
 {% from "schedule/_faves.html" import favourite_icons %}
-{% from "schedule/_proposal_icons.html" import proposal_icons %}
-{% block title %}{{ proposal.display_title }}{% endblock %}
+{% from "schedule/_schedule_item_icons.html" import schedule_item_icons %}
+{% block title %}{{ schedule_item.title }}{% endblock %}
 {% block body %}
 
-<h2>{{ proposal.display_title }}</h2>
+<h2>{{ schedule_item.title }}</h2>
 <h2>
   <small>
-  {{ proposal.human_type | title }} by {{ proposal.published_names or proposal.user.name }} {% if proposal.published_pronouns %}({{proposal.published_pronouns}}){% endif %}
-  {{ proposal_icons(proposal) }}
+  {{ schedule_item.human_type | title }} by {{ schedule_item.names }}{% if schedule_item.pronouns %} ({{schedule_item.pronouns}}){% endif %}
+  {{ schedule_item_icons(schedule_item) }}
   </small>
 </h2>
 
-{% if proposal.video_recording_lost %}
-  <div class="alert alert-warning">
-   The video recording for this talk was unfortunately lost due to technical issues.
-  </div>
+{% if schedule_item.occurrences | length > 1 %}
+<h3>{{ schedule_item.occurrences | length }} occurrences</h3>
 {% endif %}
 
+{% for occurrence in schedule_item.occurrences %}
+  {% if schedule_item.occurrences | length > 1 %}
+  <table class="table">
+    <tr>
+      <td>{{ occurrence.occurrence_num }}</td>
+      <td>
+  {% endif %}
 
-{% if proposal.scheduled_time and venue_name %}
-<p><strong>{{ proposal.scheduled_time.strftime('%A from %-I:%M %p') }}</strong> - <strong>{{ proposal.end_date.strftime('%-I:%M %p') }}</strong>
-   {% if feature_enabled('SCHEDULE') and proposal.map_link %}
-   in <strong><a href="{{ proposal.map_link }}" target="_blank">{{ venue_name }}</a></strong>
-   {% else %}
-   in <strong>{{ venue_name }}</strong>
-   {% endif %}
-</p>
-{% endif %}
+  {% if occurrence.state == "scheduled" %}
+  <p><strong>{{ occurrence.scheduled_time.strftime('%A from %-I:%M %p') }}</strong> - <strong>{{ occurrence.end_date.strftime('%-I:%M %p') }}</strong>
+    {% if feature_enabled('SCHEDULE') and occurrence.scheduled_venue.map_link %}
+    in <strong><a href="{{ occurrence.scheduled_venue.map_link }}" target="_blank">{{ schedule_item.scheduled_venue.name }}</a></strong>
+    {% else %}
+    in <strong>{{ schedule_item.scheduled_venue.name }}</strong>
+    {% endif %}
+  </p>
+  {% else %}
+  <p>Currently unscheduled</p>
+  {% endif %}
 
-{% if proposal.content_note %}
-<p><strong>This {{ proposal.human_type }} has the following content notes:</strong><br>
-  {{ proposal.content_note }} </p>
+  {% if occurrence.video_recording_lost %}
+    <div class="alert alert-warning">
+    The video recording for this {{ schedule_item.human_type }} was unfortunately lost due to technical issues.
+    </div>
+  {% endif %}
+
+  {% if schedule_item.occurrences | length > 1 %}
+      </td>
+    </tr>
+  </table>
+  {% endif %}
+
+{% endfor %}
+
+{% if schedule_item.content_note %}
+<p><strong>This {{ schedule_item.human_type }} has the following content notes:</strong><br>
+  {{ schedule_item.content_note }} </p>
 {% endif %}
 
 <div class="well">
 
-<p class="multiline">{{ (proposal.published_description or proposal.description) | urlize }}</p>
+<p class="multiline">{{ (schedule_item.description) | urlize }}</p>
 
-{% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
+{% if isinstance(schedule_item.attributes, WorkshopAttributes | YouthWorkshopAttributes) %}
   <table class="table">
   <tr>
-    <td><b>Attending this workshop will cost</b></td>
-    <td>{% if proposal.display_cost %}{{ proposal.display_cost }}{% else %}Free{% endif %}</td>
+    <td><b>Attending this {{ schedule_item.human_type }} will cost</b></td>
+    <td>
+      {% if schedule_item.attributes.participant_cost %}
+      {{ schedule_item.attributes.participant_cost | tidy_workshop_cost }}
+      {% else %}
+      Free
+      {% endif %}
+    </td>
   <tr>
-  {% if proposal.display_age_range %}
+  {% if schedule_item.attributes.age_range %}
   <tr>
     <td><b>Suitable age range</b></td>
-    <td>{{ proposal.display_age_range }}</td>
+    <td>{{ schedule_item.attributes.age_range }}</td>
   <tr>
   {% endif %}
-  {% if proposal.display_participant_equipment %}
+  {% if schedule_item.attributes.participant_equipment %}
   <tr>
     <td><b>Attendees should bring</b></td>
-    <td>{{ proposal.display_participant_equipment }}</td>
+    <td>{{ schedule_item.attributes.participant_equipment }}</td>
   <tr>
   {% endif %}
   </table>
 {% endif %}
 </div>
-{% if current_user.is_authenticated %}
-  {% if SIGNUP_STATE in ["pending-tickets", "issue-event-tickets"] and event_ticket and event_ticket.ticket_codes %}
+
+{% if current_user.is_anonymous %}
+
+  <p>If you would like to mark this as a favourite please
+    <a href="{{ url_for('users.login', next=url_for('.item', year=event_year, schedule_item_id=schedule_item.id, slug=schedule_item.slug)) }}">log in</a>.
+  </p>
+
+{% else %}
+
+  {% if schedule_item.lottery.state in ["complete", "first-come-first-served"] and lottery_entry and lottery_entry.state == "valid-tickets" %}
     <div class="well">
-      You currently have {{event_ticket.ticket_count}} codes for this {{proposal.human_type}}.
+      You currently have {{ lottery_entry.ticket_count }} codes for this {{ schedule_item.human_type }}.
       When you attend you can either give your name or a code to get in. Your codes are:
       <ul>
-        {% for code in event_ticket.ticket_codes.split(",") %}
+        {% for code in lottery_entry.ticket_codes.split(",") %}
           <li>{{code | upper}}</li>
         {% endfor %}
       </ul>
     </div>
   {% endif %}
-  <form method="post" class="form-inline">
-  {{ form.hidden_tag() }}
 
-  <button name={{form.toggle_favourite.name}} value="{{ proposal.id }}" class="btn btn-primary favourite-button favourite-button-{{ 'faved' if is_fave else 'unfaved' }}">
+  <form method="post" class="form-inline">
+  {{ schedule_item_form.hidden_tag() }}
+
+  <button name={{ schedule_item_form.toggle_favourite.name }} value="{{ schedule_item.id }}"
+      class="btn btn-primary favourite-button favourite-button-{{ 'faved' if is_fave else 'unfaved' }}">
     {{ favourite_icons() }}
     &nbsp;Favourite
   </button>
-  {% if feature_enabled('SCHEDULE') and proposal.map_link %}
-  <a href="{{ proposal.map_link }}" target="_blank" class="btn btn-primary">📍&nbsp;Map</a>
-  {% endif %}
-  {% if proposal.type_might_require_ticket %}
-    <div class="pull-right">
-      {% if not proposal.requires_ticket %}
-        <p>This {{ proposal.human_type }} does not require a lottery ticket.</p>
-      {% elif SIGNUP_STATE == "issue-lottery-tickets" %}
-        {% if proposal.has_lottery_capacity() %}
-          {{ form.ticket_count.label() }}
-          {{ form.ticket_count(class_="form-control") }}
-          {{ form.enter_lottery(class_="btn btn-primary") }}
-        {% else %}
-          <p>This {{ proposal.human_type }} does not have any tickets available via lottery.</p>
-        {% endif %}
-
-      {% elif SIGNUP_STATE == "issue-event-tickets" and proposal.has_ticket_capacity() %}
-        {{ form.ticket_count.label() }}
-        {{ form.ticket_count(class_="form-control") }}
-        {{ form.get_ticket(class_="btn btn-primary") }}
-
-      {% elif SIGNUP_STATE == "issue-event-tickets" and not proposal.has_ticket_capacity() %}
-        <p>This {{proposal.human_type}} is now full, if any slots become available they will be visible here.</p>
-
-      {% elif SIGNUP_STATE == "pending-tickets" %}
-        {# FIXME add info about held tickets here #}
-        <p>The lottery for this {{proposal.human_type}} is currently closed. A small number of tickets will be available first come/first served on the day.</p>
-      {% endif %}
-    </div>
-    <div class="pull-right">
-      <small>
-        You can see your other workshop tickets
-        {% if SIGNUP_STATE=="issue-lottery-tickets" %}(and rank your preferences){% endif %}
-        by going to your <a href="{{ url_for('.event_tickets') }}">account's workshop-tickets page</a>
-      </small>
-    </div>
-  {% endif %}
 
   </form>
-{% else %}
-  <p>If you would like to mark this as a favourite please
-    <a href="{{ url_for('users.login', next=url_for('.item', year=event_year, proposal_id=proposal.id, slug=proposal.slug)) }}">log in</a>.
-  </p>
+
+  {% for occurrence_form in schedule_item.occurrence_forms %}
+    {% set occurrence = occurrences_dict[occurrence_form.occurrence_id.data] %}
+
+    {% if feature_enabled('SCHEDULE') and occurrence.state == "scheduled" %}
+    <a href="{{ occurrence.scheduled_venue.map_link }}" target="_blank" class="btn btn-primary">📍&nbsp;Map</a>
+    {% endif %}
+
+    {% if schedule_item.type_info.supports_lottery %}
+      <form method="post" class="form-inline">
+      {{ occurrence_form.hidden_tag() }}
+
+      <div class="pull-right">
+        {% set lottery = occurrence.lottery %}
+        {% if not lottery %}
+          <p>This {{ schedule_item.human_type }} does not require a lottery ticket.</p>
+
+        {% elif lottery.state == "allow-entry" %}
+          {% if lottery.get_lottery_capacity() > 0 %}
+            {{ occurrence_form.ticket_count.label() }}
+            {{ occurrence_form.ticket_count(class_="form-control") }}
+            {{ occurrence_form.enter_lottery(class_="btn btn-primary") }}
+          {% else %}
+            <p>This {{ schedule_item.human_type }} does not have any tickets available via lottery.</p>
+          {% endif %}
+
+        {% elif lottery.state == "first-come-first-served" %}:
+          {% if lottery.get_all_ticket_capacity() > 0 %}
+            {{ occurrence_form.ticket_count.label() }}
+            {{ occurrence_form.ticket_count(class_="form-control") }}
+            {{ occurrence_form.get_ticket(class_="btn btn-primary") }}
+          {% else %}
+            <p>This {{ schedule_item.human_type }} is now full. If any tickets become available they will be visible here.</p>
+          {% endif %}
+
+        {% elif lottery.state == "complete" %}
+          {# FIXME add info about held tickets here #}
+          {# It's presumably a reference to Lottery.reserved_tickets, and not related to the first-come-first-served functionality? #}
+          <p>The lottery for this {{ schedule_item.human_type }} is currently closed. A small number of tickets will be available first-come, first-served on the day.</p>
+
+        {% endif %}
+      </div>
+      </form>
+
+      <div class="pull-right">
+        <small>
+          You can see your other lottery tickets
+          {% if lottery.state == "allow-entry" %}(and rank your preferences){% endif %}
+          by going to the <a href="{{ url_for('.lotteries') }}">lotteries page</a>
+        </small>
+      </div>
+    {% endif %}
+  {% endfor %}
+
 {% endif %}
 <p>&nbsp;</p>
 
-{% if proposal.youtube_url or proposal.c3voc_url %}
+{% for occurrence in schedule_item.occurrences %}
+
+{% if occurrence.youtube_url or occurrence.c3voc_url %}
 <h4>Video</h4>
 <div class="well">
-  {% if proposal.c3voc_url %}
-    <iframe src="{{proposal.c3voc_url}}/oembed" width="100%" height="500px"
+  {% if occurrence.c3voc_url %}
+    <iframe src="{{ occurrence.c3voc_url }}/oembed" width="100%" height="500px"
         frameborder="0" allowfullscreen></iframe>
-  {% elif proposal.youtube_url %}
-    <iframe src="{{proposal.youtube_url|replace('youtube.com/watch?v=', 'youtube.com/embed/')}}"
+  {% elif occurrence.youtube_url %}
+    <iframe src="{{ occurrence.youtube_url | replace('youtube.com/watch?v=', 'youtube.com/embed/') }}"
         width="100%" height="500px" frameborder="0" 
         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
   {% endif %}
   <strong>Video Hosts:</strong>
   <ul>
-  {% if proposal.c3voc_url %}
-    <li>View this video <a href="{{ proposal.c3voc_url }}">on media.ccc.de</a>.</li>
+  {% if occurrence.c3voc_url %}
+    <li>View this video <a href="{{ occurrence.c3voc_url }}">on media.ccc.de</a>.</li>
   {% endif %}
-  {% if proposal.youtube_url %}
-    <li>View this video <a href="{{ proposal.youtube_url }}">on YouTube</a>.</li>
+  {% if occurrence.youtube_url %}
+    <li>View this video <a href="{{ occurrence.youtube_url }}">on YouTube</a>.</li>
   {% endif %}
   </ul>
 </div>
 <p>&nbsp;</p>
 {% endif %}
+
+{% endfor %}
 
 <h4>Return to:</h4>
 <ul class='nav nav-pills'>

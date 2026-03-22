@@ -69,36 +69,8 @@ class Tag(BaseModel):
         back_populates="cfp_reviewer_tags", secondary=CFPReviewerTags
     )
 
-    def __init__(self, tag: str):
-        self.tag = tag.strip().lower()
-
-    def __str__(self):
-        return self.tag
-
     def __repr__(self):
         return f"<Tag {self.id} '{self.tag}'>"
-
-    @classmethod
-    def serialise_tags(self, tag_list: list["Tag"]) -> str:
-        return ",".join([str(t) for t in tag_list])
-
-    @classmethod
-    def parse_serialised_tags(cls, tag_str: str) -> list["Tag"]:
-        res = []
-        tag_list = [t.strip().lower() for t in tag_str]
-        for tag_value in tag_list:
-            if len(tag_value) == 0:
-                continue
-            tag = cls.get_by_value(tag_value)
-            if tag:
-                res.append(tag)
-            else:
-                res.append(Tag(tag_value))
-        return res
-
-    @classmethod
-    def get_by_value(cls, value):
-        return cls.query.filter_by(tag=value).one_or_none()
 
     @classmethod
     def get_export_data(cls):

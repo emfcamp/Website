@@ -346,7 +346,7 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
         )
         return price
 
-    def is_adult_ticket(self) -> bool:
+    def is_adult_ticket(self, voucher: bool = False) -> bool:
         """Whether this is an "adult" ticket.
 
         This is used for two purposes:
@@ -359,9 +359,13 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
         Day tickets should be able to buy badges/merchandise.
         """
         # FIXME: Make this less awful, we need a less brittle way of detecting this
-        return self.parent.type == "admissions" and (
-            self.name.startswith("full") or self.name.startswith("u18") or self.name.startswith("day")
-        )
+
+        adult_codes = ["full", "day"]
+        if not voucher:
+            # U18 tickets are not adult tickets for the purposes of voucher capacity
+            adult_codes.append("u18")
+
+        return self.parent.type == "admissions" and any(self.name.startswith(code) for code in adult_codes)
 
     @property
     def checkin_display_name(self):
@@ -565,6 +569,8 @@ class Voucher(BaseModel):
     payment: Mapped[list[Payment]] = relationship(back_populates="voucher")
     view: Mapped[ProductView | None] = relationship(back_populates="vouchers")
 
+    __table_args__ = (UniqueConstraint("email", "product_view_id", name="uniq_voucher_email_product_view"),)
+
     is_used = column_property((purchases_remaining == 0) | (tickets_remaining == 0))
 
     @classmethod
@@ -610,7 +616,9 @@ class Voucher(BaseModel):
         if self.purchases_remaining < 1:
             return False
 
-        adult_tickets = sum(line.count for line in basket._lines if line.tier.parent.is_adult_ticket())
+        adult_tickets = sum(
+            line.count for line in basket._lines if line.tier.parent.is_adult_ticket(voucher=True)
+        )
 
         if self.tickets_remaining < adult_tickets:
             return False
@@ -622,7 +630,7 @@ class Voucher(BaseModel):
             raise VoucherUsedError(f"Attempting to use voucher with no remaining purchases: {self}")
 
         adult_tickets = len(
-            [purchase for purchase in payment.purchases if purchase.product.is_adult_ticket()]
+            [purchase for purchase in payment.purchases if purchase.product.is_adult_ticket(voucher=True)]
         )
 
         if self.tickets_remaining < adult_tickets:
@@ -637,7 +645,7 @@ class Voucher(BaseModel):
     def return_capacity(self, payment: Payment) -> None:
         """Return capacity to this voucher based on tickets in a payment."""
         adult_tickets = len(
-            [purchase for purchase in payment.purchases if purchase.product.is_adult_ticket()]
+            [purchase for purchase in payment.purchases if purchase.product.is_adult_ticket(voucher=True)]
         )
         log.info("Returning 1 purchase and %s tickets to %s", adult_tickets, self)
         self.purchases_remaining = Voucher.purchases_remaining + 1
@@ -715,7 +723,7 @@ class ProductView(BaseModel):
 
         # CfP voucher
         if self.cfp_accepted_only:
-            if user and user.is_authenticated and user.is_cfp_accepted:
+            if user and user.is_authenticated and user.has_accepted_proposal:
                 return True
             return False
 

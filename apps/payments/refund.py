@@ -31,7 +31,7 @@ def create_stripe_refund(
     if not payment.charge_id:
         raise ValueError(f"Payment id {payment.id} has no charge_id!")
 
-    charge = stripe_client.charges.retrieve(payment.charge_id)
+    charge = stripe_client.v1.charges.retrieve(payment.charge_id)
     if charge.refunded:
         return None
 

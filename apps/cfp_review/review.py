@@ -3,11 +3,13 @@ from datetime import timedelta
 from flask import session, current_app as app, redirect, url_for, render_template, flash
 from flask_login import current_user
 
+from sqlalchemy import select
 from sqlalchemy.orm import aliased
+from sqlalchemy_continuum.utils import transaction_class, version_class
 
 from main import db, get_or_404
 from models import naive_utcnow
-from models.cfp import CFPVote, Proposal, CfpStateException
+from models.cfp import ProposalVote, Proposal, StateTransitionException
 
 from . import cfp_review, review_required
 from .forms import ReviewListForm, VoteForm
@@ -30,13 +32,19 @@ def review_list():
 
     last_visit = session.get("review_visit_dt")
     if not last_visit:
-        last_vote_cast = (
-            CFPVote.query.filter_by(user_id=current_user.id).order_by(CFPVote.modified.desc()).first()
+        # Make a guess from the last vote they placed
+        ProposalVoteVersion = version_class(ProposalVote)
+        Transaction = transaction_class(ProposalVote)
+        last_vote_time = db.session.scalar(
+            select(Transaction.issued_at)
+            .join(ProposalVoteVersion.transaction)
+            .where(Transaction.user == current_user)
+            .order_by(Transaction.issued_at.desc())
         )
 
-        if last_vote_cast:
-            last_visit = last_vote_cast.modified
-            review_order_dt = last_vote_cast.modified
+        if last_vote_time:
+            last_visit = last_vote_time
+            review_order_dt = last_vote_time
     else:
         last_visit = last_visit.replace(tzinfo=None)
 
@@ -54,7 +62,7 @@ def review_list():
     to_review_old = []
     reviewed = []
 
-    user_votes = aliased(CFPVote, CFPVote.query.filter_by(user_id=current_user.id).subquery())
+    user_votes = aliased(ProposalVote, ProposalVote.query.filter_by(user_id=current_user.id).subquery())
 
     for proposal, vote in proposal_query.outerjoin(user_votes).with_entities(Proposal, user_votes).all():
         proposal.user_vote = vote
@@ -171,12 +179,12 @@ def review_proposal(proposal_id):
 
     form = VoteForm()
 
-    vote = prop.get_user_vote(current_user)
+    vote = db.session.scalar(select(ProposalVote).filter_by(proposal_id=prop.id, user_id=current_user.id))
 
     if form.validate_on_submit():
         # Make a new vote if need-be
         if not vote:
-            vote = CFPVote(current_user, prop)
+            vote = ProposalVote(current_user, prop)
             db.session.add(vote)
 
         # If there's a note add it (will replace the old one but it's versioned)
@@ -218,7 +226,7 @@ def review_proposal(proposal_id):
                 return redirect(url_for(".review_list"))
             return redirect(url_for(".review_proposal", proposal_id=next_proposal_id))
 
-        except CfpStateException as e:
+        except StateTransitionException as e:
             app.logger.warn("Cannot set state: %s", e)
             flash("Your vote could not be updated: %s" % e)
             return redirect(url_for(".review_proposal", proposal_id=proposal_id))

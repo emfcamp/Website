@@ -150,6 +150,7 @@ def enqueue_trusted_emails(users, subject, body, **kwargs):
     db.session.commit()
 
 
-def from_email(name):
-    email = app.config[name][1]
-    return f"Electromagnetic Field <{email}>"
+def from_email(config_name: str) -> str:
+    # config_name is e.g. TICKETS_EMAIL
+    name, email = app.config[config_name]
+    return f"{name} <{email}>"

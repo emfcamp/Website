@@ -1,4 +1,4 @@
-{% from "schedule/_proposal_lister.html" import list_proposals with context %}
+{% from "schedule/_schedule_item_lister.html" import list_schedule_items with context %}
 {% extends "base.html" %}
 {% block title %}Favourites{% endblock %}
 {% block body %}
@@ -13,10 +13,10 @@
 <p><strong><a class="btn btn-lg btn-primary" href="{{ url_for('schedule.main_year', year=event_year) }}">View line-up</a></strong></p>
 
 <div class="line-up">
-{{ list_proposals(proposals) }}
+{{ list_schedule_items(grouped_schedule_items, ordered_type_infos) }}
 </div>
 
-{% if proposals | count == 0 %}
+{% if grouped_schedule_items | count == 0 %}
     <p>
         You currently don't have any favourites, add some by going to our
         <a href="{{ url_for('schedule.main_year', year=event_year) }}">line-up</a>, clicking anything

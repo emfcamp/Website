@@ -3,7 +3,7 @@
 {% block body %}
 <h2>Clashfinder</h2>
 
-<p>These are the clashes in the top 1000 proposals most commonly starred together. "Number" is how far down the 1000-list the clash is, "Count" is the number of people who starred both of these proposals.</p>
+<p>These are the clashes in the top 1000 occurrences most commonly starred together. "Number" is how far down the 1000-list the clash is, "Count" is the number of people who starred both of the corresponding schedule items.</p>
 
 <table class="table table-condensed">
     <tr>
@@ -14,25 +14,25 @@
             Count
         </th>
         <th>
-            Proposal 1
+            Occurrence 1
         </th>
         <th>
-            Proposal 2
+            Occurrence 2
         </th>
     </tr>
 {% for clash in clashes %}
     <tr>
         <td><b>#{{clash.number}}</b></td>
-        <td>{{clash.favourites}}</td>
+        <td>{{clash.favourite_count}}</td>
         <td>
-            <a href="{{ url_for('.update_proposal', proposal_id=clash.proposal_1.id) }}">{{clash.proposal_1.title}}</a>
+            <a href="{{ url_for('.update_occurrence', occurrence_id=clash.occurrence_1.id) }}">{{ clash.occurrence_1.schedule_item.title }}</a>
         </td>
         <td>
-            <a href="{{ url_for('.update_proposal', proposal_id=clash.proposal_2.id) }}">{{clash.proposal_2.title}}</a>
+            <a href="{{ url_for('.update_occurrence', occurrence_id=clash.occurrence_2.id) }}">{{clash.occurrence_2.schedule_item.title}}</a>
         </td>
     </tr>
 {% else %}
-    <tr><td colspan="5" class="text-center">No clashes found in the top-1000 favourite co-occurrances</td></tr>
+    <tr><td colspan="5" class="text-center">No clashes found in the top-1000 favourite co-occurrences</td></tr>
 {% endfor %}
 </table>
 {% endblock %}

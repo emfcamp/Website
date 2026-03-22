@@ -17,9 +17,9 @@
     {{ menuitem("My Tickets", "users.purchases") }}
 
     {% if feature_enabled('CFP') %}
-      {% if current_user.proposals.all()|length > 0 %}
+      {% if current_user.proposals | length > 0 %}
         {{ menuitem("Proposals", "cfp.proposals") }}
-        {{ menuitem("Messages", "cfp.all_messages", unread_count or 0) }}
+        {{ menuitem("Messages", "cfp.messages", unread_count or 0) }}
       {% endif %}
 
       {% if not current_user.has_permission('admin') %}

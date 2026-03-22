@@ -6,10 +6,11 @@ from flask.typing import ResponseValue
 from flask_login import current_user
 from geoalchemy2.shape import to_shape
 from pendulum import parse
+from sqlalchemy import select
 
 from apps.common import render_markdown
 from main import db
-from models.cfp import WorkshopProposal
+from models.cfp import Occurrence, ScheduleItem
 from models.volunteer import (
     Role,
     RoleAdmin,
@@ -47,8 +48,10 @@ def info_page(page_name: str) -> ResponseValue:
 
 
 @volunteer.route("/info")
-@feature_flag("VOLUNTEERS_SIGNUP")
 def info():
+    if not feature_enabled("VOLUNTEERS_SIGNUP"):
+        # Rather than 404ing, point at the misc 'volunteering' page instead.
+        return redirect(url_for("base.page", page_name="volunteering"))
     return render_markdown("volunteer/info/index", page_name="index")
 
 
@@ -115,52 +118,57 @@ def init_workshop_shifts():
     time_before_start = timedelta(minutes=30)
     time_after_start = timedelta(minutes=15)
 
-    proposals = WorkshopProposal.query.filter_by(
-        state="finalised", requires_ticket=True, user_scheduled=False, type="workshop"
-    ).all()
+    schedule_items = list(
+        db.session.scalars(
+            select(ScheduleItem)
+            .where(ScheduleItem.type == "workshop")
+            .where(ScheduleItem.state == "published")
+            .where(ScheduleItem.official_content == True)
+            .where(ScheduleItem.occurrences.any(Occurrence.has(Occurrence.lottery)))
+        )
+    )
 
-    # Yes, I know. We shouldn't be tieing things to human readable role names. It's too
-    # late to do anything about that right now.
-    role = Role.query.filter_by(name="Workshop Steward").first()
+    workshop_steward_role = Role.query.filter_by(name="Workshop Steward").one()
 
     venues = {}
     with db.session.no_autoflush:
-        for proposal in proposals:
-            # This is terrible, and should be rewritten. If you're reading this it presumably hasn't been, and you
-            # need to create some workshop shifts anyway, so here's what's happening.
-            #
-            # For each finalised workshop which requires tickets we want to create a volunteer shift for a workshop
-            # steward. To go with those shifts we need a VolunteerVenue, which is a separate entity representing the
-            # same physical location as the Venue associated with the proposal.
-            #
-            # Because multiple workshops may appear in the same venue we keep a dict of venue_name -> VolunteerVenue
-            # instances to make sure we don't queue multiple instances of the same venue for insertion, which results
-            # in a constraint violation, and makes the whole process throw a 500.
-            #
-            # If, as suspected, you're reading this in the future a week away from opening, I'm sorry, and share your
-            # pain.
-            if proposal.scheduled_venue.name in venues:
-                venue = venues[proposal.scheduled_venue.name]
-            else:
-                venue = VolunteerVenue.query.filter_by(name=proposal.scheduled_venue.name).first()
-                if venue is None:
-                    location = to_shape(proposal.scheduled_venue.location)
-                    mapref = f"https://map.emfcamp.org/#20.82/{location.y}/{location.x}"
-                    venue = VolunteerVenue(name=proposal.scheduled_venue.name, mapref=mapref)
-                    db.session.add(venue)
-                venues[proposal.scheduled_venue.name] = venue
+        for schedule_item in schedule_items:
+            for occurrence in schedule_item.occurrences:
+                # This is terrible, and should be rewritten. If you're reading this it presumably hasn't been, and you
+                # need to create some workshop shifts anyway, so here's what's happening.
+                #
+                # For each finalised workshop which requires tickets we want to create a volunteer shift for a workshop
+                # steward. To go with those shifts we need a VolunteerVenue, which is a separate entity representing the
+                # same physical location as the Venue associated with the proposal.
+                #
+                # Because multiple workshops may appear in the same venue we keep a dict of venue_name -> VolunteerVenue
+                # instances to make sure we don't queue multiple instances of the same venue for insertion, which results
+                # in a constraint violation, and makes the whole process throw a 500.
+                #
+                # If, as suspected, you're reading this in the future a week away from opening, I'm sorry, and share your
+                # pain.
+                if occurrence.scheduled_venue.name in venues:
+                    venue = venues[occurrence.scheduled_venue.name]
+                else:
+                    venue = VolunteerVenue.query.filter_by(name=occurrence.scheduled_venue.name).first()
+                    if venue is None:
+                        location = to_shape(occurrence.scheduled_venue.location)
+                        mapref = f"https://map.emfcamp.org/#20.82/{location.y}/{location.x}"
+                        venue = VolunteerVenue(name=occurrence.scheduled_venue.name, mapref=mapref)
+                        db.session.add(venue)
+                    venues[occurrence.scheduled_venue.name] = venue
 
-            shift = Shift.query.filter_by(proposal=proposal, role=role).first()
-            if shift is None:
-                shift = Shift(proposal=proposal, role=role, venue=venue)
+                shift = Shift.query.filter_by(occurrence=occurrence, role=workshop_steward_role).first()
+                if shift is None:
+                    shift = Shift(occurrence=occurrence, role=workshop_steward_role, venue=venue)
 
-            shift.start = proposal.scheduled_time - time_before_start
-            shift.end = proposal.scheduled_time + time_after_start
-            shift.min_needed = 1
-            shift.max_needed = 1
+                shift.start = occurrence.scheduled_time - time_before_start
+                shift.end = occurrence.scheduled_time + time_after_start
+                shift.min_needed = 1
+                shift.max_needed = 1
 
-            db.session.add(shift)
-            db.session.commit()
+                db.session.add(shift)
+                db.session.commit()
 
     return redirect(url_for(".schedule"))
 

@@ -7,8 +7,8 @@ import random
 import string
 import struct
 import time
-import typing
 from datetime import datetime, timedelta
+from typing import TYPE_CHECKING
 
 from flask import current_app as app
 from flask import session
@@ -25,12 +25,12 @@ from . import BaseModel
 from .permission import Permission, UserPermission
 from .volunteer.shift import ShiftEntry
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from .admin_message import AdminMessage
-    from .cfp import CFPMessage, CFPVote
+    from .cfp import Occurrence, ProposalMessage, ProposalVote, ScheduleItem
     from .cfp_tag import Tag
     from .diversity import UserDiversity
-    from .event_tickets import EventTicket
+    from .lottery import LotteryEntry
     from .payment import Payment
     from .purchase import AdmissionTicket, Purchase, PurchaseTransfer, Ticket
     from .village import VillageMember
@@ -223,34 +223,35 @@ class User(BaseModel, UserMixin):
     permissions: Mapped[list[Permission]] = relationship(
         back_populates="users",
         cascade="all",
-        secondary=UserPermission,  # type: ignore[has-type]  # mypy can't see that this is a Table for some reason
+        secondary=UserPermission,  # type: ignore[has-type]  # see https://github.com/sqlalchemy/sqlalchemy/discussions/9801
         lazy="joined",
     )
-    votes: Mapped[list[CFPVote]] = relationship(back_populates="user", lazy="dynamic")
+    votes: Mapped[list[ProposalVote]] = relationship(back_populates="user")
 
     proposals: Mapped[list[Proposal]] = relationship(
         primaryjoin="Proposal.user_id == User.id",
         back_populates="user",
-        lazy="dynamic",
-        cascade="all, delete-orphan",
     )
     anonymised_proposals: Mapped[list[Proposal]] = relationship(
         primaryjoin="Proposal.anonymiser_id == User.id",
         back_populates="anonymiser",
-        lazy="dynamic",
-        cascade="all, delete-orphan",
-    )
-    favourites: Mapped[list[Proposal]] = relationship(
-        back_populates="favourites", secondary="favourite_proposal"
     )
 
-    messages_from: Mapped[list[CFPMessage]] = relationship(
-        primaryjoin="CFPMessage.from_user_id == User.id",
+    schedule_items: Mapped[list[ScheduleItem]] = relationship(
+        primaryjoin="ScheduleItem.user_id == User.id",
+        back_populates="user",
+    )
+
+    favourites: Mapped[list[ScheduleItem]] = relationship(
+        back_populates="favourited_by", secondary="favourite_schedule_item"
+    )
+
+    messages_from: Mapped[list[ProposalMessage]] = relationship(
+        primaryjoin="ProposalMessage.from_user_id == User.id",
         back_populates="from_user",
-        lazy="dynamic",
     )
 
-    event_tickets: Mapped[list[EventTicket]] = relationship(back_populates="user", lazy="dynamic")
+    lottery_entries: Mapped[list[LotteryEntry]] = relationship(back_populates="user")
 
     purchases: Mapped[list[Purchase]] = relationship(
         lazy="dynamic", primaryjoin="Purchase.purchaser_id == User.id"
@@ -311,7 +312,7 @@ class User(BaseModel, UserMixin):
                 "speaker_emails": [
                     u.email
                     for u in User.query.join(Proposal, Proposal.user_id == User.id).filter(
-                        Proposal.is_accepted
+                        Proposal.state.in_({"accepted", "finalised"}),
                     )
                 ],
             },
@@ -371,14 +372,6 @@ class User(BaseModel, UserMixin):
             if user_perm.name == name:
                 self.permissions.remove(user_perm)
 
-    def has_ticket_for_event(self, proposal_id: int) -> bool:
-        return any([t for t in self.event_tickets if t.proposal_id == proposal_id and t.state == "ticket"])
-
-    def has_lottery_ticket_for_event(self, proposal_id: int) -> bool:
-        return any(
-            [t for t in self.event_tickets if t.proposal_id == proposal_id and t.state == "entered-lottery"]
-        )
-
     def __repr__(self):
         return f"<User {self.email}>"
 
@@ -424,18 +417,24 @@ class User(BaseModel, UserMixin):
 
         return db.session.get_one(User, uid)
 
+    def check_will_have_ticket(self) -> bool:
+        if self.will_have_ticket:
+            return True
+        admission_tickets = list(self.get_owned_tickets(paid=True, type="admission_ticket"))
+        return len(admission_tickets) > 0
+
     @property
-    def is_cfp_accepted(self):
+    def has_accepted_proposal(self):
         for proposal in self.proposals:
-            if proposal.is_accepted:
+            if proposal.state in {"accepted", "finalised"}:
                 return True
         return False
 
-    @property
-    def has_proposals(self):
-        for _ in self.proposals:
-            return True
-        return False
+    def get_lottery_entry_for_occurrence(self, occurrence: Occurrence) -> LotteryEntry | None:
+        for entry in self.lottery_entries:
+            if entry.occurrence == occurrence:
+                return entry
+        return None
 
 
 Index("ix_user_email_lower", func.lower(User.email), unique=True)
@@ -488,4 +487,4 @@ def load_anonymous_user():
     return au
 
 
-from .cfp import Proposal
+from .cfp import Proposal, ScheduleItem

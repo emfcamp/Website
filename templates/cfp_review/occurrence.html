@@ -1,0 +1,126 @@
+{% from "_formhelpers.html" import render_field, render_dl_field, render_radio_field %}
+{% extends "cfp_review/base.html" %}
+{% block title %}{{ schedule_item.title }} occurrence {{ occurrence.occurrence_num }}{% endblock %}
+{% block body %}
+
+{% set active='occurrence-%s' % occurrence.id %}
+{% include "cfp_review/_schedule_item_tabs.html" %}
+
+
+<div class="col-md-12">
+    <h2>Occurrence {{ occurrence.occurrence_num }} of {{ schedule_item.title }}<br>
+        <small>
+            {% if schedule_item.official_content %}
+                {{ schedule_item.human_type | capitalize }} by
+            {% else %}
+                An attendee {{ schedule_item.human_type }} by
+            {% endif %}
+            {{ schedule_item.names }}
+            {% if schedule_item.pronouns %}
+                ({{ schedule_item.pronouns }})
+            {% endif %}
+        </small>
+    </h2>
+</div>
+<form method="post" action="{{ url_for('.update_occurrence', schedule_item_id=schedule_item.id, occurrence_id=occurrence.id) }}" class="shrink">
+    {{ form.hidden_tag() }}
+    <div class="col-md-8">
+        <div class="panel-group" id="formAccordion" role="tablist" aria-multiselectable="true">
+
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="basicsPanelHeading">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" href="#basicsPanel" aria-expanded="true" aria-controls="basicsPanel">
+                            Occurrence
+                        </a>
+                    </h4>
+                </div>
+                <div id="basicsPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="basicsPanelHeading">
+                    <div class="panel-body">
+                        <dl class="dl-horizontal">
+                            {{ render_dl_field(form.state) }}
+
+                            {{ render_dl_field(form.occurrence_num) }}
+
+                        </dl><dl class="dl-horizontal">
+
+                            {{ render_dl_field(form.scheduled_duration) }}
+
+                            {{ render_dl_field(form.allowed_venue_ids) }}
+                            {{ render_dl_field(form.allowed_times_str) }}
+                            {{ render_dl_field(form.scheduled_venue_id) }}
+                            {{ render_dl_field(form.scheduled_time) }}
+                            {{ render_dl_field(form.potential_venue_id) }}
+                            {{ render_dl_field(form.potential_time) }}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="recordingUserPanelHeading">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" href="#recordingUserPanel" aria-expanded="true" aria-controls="recordingUserPanel">
+                            Recording
+                        </a>
+                    </h4>
+                </div>
+                <div id="recordingUserPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="recordingUserPanelHeading">
+                    <div class="panel-body">
+                        <dl class="dl-horizontal">
+                            {% if schedule_item.type in ['talk', 'lightning'] %}
+                                {{ render_dl_field(form.thumbnail_url) }}
+                                {{ render_dl_field(form.c3voc_url) }}
+                                {{ render_dl_field(form.youtube_url) }}
+                            {% else %}
+                                This {{ schedule_item.human_type }} does not support recordings.
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            {% if schedule_item.type_info.supports_lottery %}
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="lotteryPanelHeading">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" href="#lotteryPanel" aria-expanded="false" aria-controls="lotteryPanel">
+                            Lottery
+                        </a>
+                    </h4>
+                </div>
+                <div id="lotteryPanel" class="panel-collapse" role="tabpanel" aria-labelledby="lotteryPanelHeading">
+                    <div class="panel-body">
+                        <dl class="dl-horizontal">
+                            {{ render_dl_field(form.lottery.state) }}
+                            {{ render_dl_field(form.lottery.total_tickets) }}
+                            {{ render_dl_field(form.lottery.reserved_tickets) }}
+                            {{ render_dl_field(form.lottery.max_tickets_per_entry) }}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {{ form.update(class_="btn btn-primary debounce", tabindex=1) }}
+    </div>
+    <div class="col-md-4 col-xs-12" role="group">
+        <h4>Occurrence actions</h4>
+        <div class="btn-group-vertical" role="group">
+            {% if next_id %}
+                <a href="{{ url_for('.update_schedule_item', schedule_item_id=next_id, **full_qs) }}"
+                    class="btn btn-default">
+                    Next schedule item
+                </a>
+            {% else %}
+                <a href="{{ url_for('.schedule_items', **full_qs) }}"
+                    class="btn btn-default">
+                    All schedule items
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</form>
+
+{% endblock %}

@@ -39,7 +39,7 @@ class ScheduleData {
       if (options.onlyFavourites && !e.is_fave) { return null; }
       if (options.onlyFamilyFriendly && !e.is_family_friendly) { return null; }
       if (options.onlyNoRecording && !e.noRecording) { return null; }
-      if (options.onlyTicketed && !e.requires_ticket) { return null; }
+      if (options.onlyLottery && !e.uses_lottery) { return null; }
 
       let startHour = e.startTime.startOf('hour');
       if (e.startTime <= options.currentTime && !options.includeFinished) {

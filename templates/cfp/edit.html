@@ -18,6 +18,8 @@
 
 <h2>Proposal Detail</h2>
 
+{% set schedule_item = proposal.schedule_item %}
+
 {% if proposal.is_editable %}
   <div>You can currently edit your proposal as it has not been sent for review.
      For more information on the selection process, please see our
@@ -27,12 +29,12 @@
   {% include "cfp/edit-form.html" %}
 {% else %}
   <div class="well"><div class="row">
-    {% if feature_enabled('CFP_FINALISE') and proposal.is_accepted %}
+    {% if proposal.state in ["accepted", "finalised"] %}
       <div class="col-md-12">
         Your {{ proposal.human_type }} has been accepted! If you haven't already, please
         <a href="{{ url_for('.finalise_proposal', proposal_id=proposal.id ) }}">finalise your details</a>.
       </div>
-    {% elif proposal.state not in ['new', 'edit', 'rejected', 'cancelled'] %}
+    {% elif proposal.state not in ['new', 'edit', 'rejected'] %}
       <div class="col-md-12">
         You can't currently edit your proposal as it's being reviewed.
         If you have any questions please <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">add a message</a>.
@@ -42,53 +44,102 @@
     <div class="col-md-6">
       <legend>About your {{proposal.human_type}}</legend>
       <dl class="dl-vertical">
-        {% if feature_enabled('CFP_FINALISE') and proposal.state == 'finalised'  %}
-        <dt>Names</dt><dd>{{proposal.published_names}}</dd>
-        <dt>Pronouns</dt><dd>{{proposal.published_pronouns}}</dd>
-        <dt>Title</dt><dd>{{proposal.published_title}}</dd>
-        <dt>Status</dt><dd>{{proposal.state|capitalize}}</dd>
-        <dt>Description</dt><dd class="multiline">{{ proposal.published_description | urlize }}</dd>
+        {% if schedule_item %}
+        <dt>Names</dt><dd>{{ schedule_item.names }}</dd>
+        <dt>Pronouns</dt><dd>{{ schedule_item.pronouns }}</dd>
+        <dt>Title</dt><dd>{{ schedule_item.title }}</dd>
+        <dt>Status</dt><dd>{{ schedule_item.state | capitalize }}</dd>
+        <dt>Description</dt><dd class="multiline">{{ schedule_item.description | urlize }}</dd>
+        <dt>Short description</dt><dd>{{ schedule_item.short_description }}</dd>
         {% else %}
-        <dt>Title</dt><dd>{{proposal.title}}</dd>
-        <dt>Submitted</dt><dd>{{proposal.created.strftime('%d %B')}}</dd>
-        <dt>Status</dt><dd>{{proposal.state|capitalize}}</dd>
+        <dt>Title</dt><dd>{{ proposal.title }}</dd>
+        <dt>Submitted</dt><dd>{{ proposal.created.strftime('%d %B') }}</dd>
+        <dt>Status</dt><dd>{{ proposal.state|capitalize }}</dd>
         <dt>Description</dt><dd class="multiline">{{ proposal.description | urlize }}</dd>
+        <dt>Short description</dt><dd>{{ proposal.short_description }}</dd>
         {% endif %}
       </dl>
     </div>
-    {% if proposal.type != 'lightning' %}
-    {% if proposal.scheduled_duration and (proposal.type in ('talk', 'workshop', 'youthworkshop')) %}
+    {% if schedule_item %}
     <div class="col-md-6">
+      {% if schedule_item.occurrences | length > 1 %}
+      <legend>Your scheduled slots</legend>
+      <table class="table">
+      {% else %}
       <legend>Your scheduled slot</legend>
-      <dl class="dl-horizontal">
-        <dt>Slot length</dt><dd>{{proposal.scheduled_duration}} minutes</dd>
-        <dt>Slot time</dt><dd>{% if proposal.scheduled_time %}{{proposal.scheduled_time.strftime('%A at %-I:%M %p')}}{% else %}Not yet scheduled{% endif %}</dd>
-        <dt>Venue</dt><dd>{{proposal.scheduled_venue_name or "Not yet scheduled"}}</dd>
-      </dl>
-      <div>If your slot is not suitable, please <b><a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">  get in touch with us!</a></b></div>
+      {% endif %}
+      {% for occurrence in schedule_item.occurrences %}
+        {% if schedule_item.occurrences | length > 1 %}
+        <tr>
+          <td>{{ occurrence.occurrence_num }}</td>
+          <td>
+        {% endif %}
+        {% if occurrence.scheduled_duration %}
+          <dl class="dl-horizontal">
+            <dt>Slot length</dt><dd>{{ occurrence.scheduled_duration }} minutes</dd>
+            <dt>Slot time</dt><dd>
+              {% if occurrence.scheduled_time %}
+              {{ occurrence.scheduled_time.strftime('%A at %-I:%M %p')}}
+              {% else %}
+              Not yet scheduled
+              {% endif %}
+            </dd>
+            <dt>Venue</dt><dd>{{ occurrence.scheduled_venue.name or "Not yet scheduled"}}</dd>
+          </dl>
+        {% else %}
+          {% if schedule_item.occurrences | length > 1 %}
+          <div>This occurrence of your {{ schedule_item.human_type }} has not yet been scheduled.</div>
+          {% else %}
+          <div>Your {{ schedule_item.human_type }} has not yet been scheduled.</div>
+          {% endif %}
+        {% endif %}
+
+        {% if schedule_item.occurrences | length > 1 %}
+          </td>
+        </tr>
+        {% endif %}
+      {% endfor %}
+      {% if schedule_item.occurrences | length > 1 %}
+      </table>
+      {% set has_venue = false %}
+      {% for o in schedule_item.occurrences %}
+        {% if o.scheduled_venue or o.potential_venue %}
+          {% set has_venue = true %}
+        {% endif %}
+      {% endfor %}
+      {% if has_venue %}
+      <div>If your slot is not suitable, please <b><a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}"> get in touch with us!</a></b></div>
+      {% endif %}
+      {% endif %}
     </div>
-    {% else %}
+    {% else %}{# not schedule_item #}
     <div class="col-md-6">
       <legend>Further details</legend>
       <dl class="dl-horizontal">
-        {% if proposal.type in ('talk', 'performance') %}
-          <dt>Length</dt><dd>{{proposal.length}}</dd>
+        {% if proposal.type in ['talk', 'performance'] %}
+          <dt>Duration</dt><dd>{{ proposal.duration }}</dd>
+          <dt>Notice Required</dt><dd>{{ proposal.notice_required }}</dd>
+        {% elif proposal.type in ['workshop', 'youthworkshop'] %}
+          <dt>Duration</dt><dd>{{ proposal.duration }}</dd>
+          <dt>Notice Required</dt><dd>{{ proposal.notice_required }}</dd>
+          <dt>Attendees</dt><dd>{{ proposal.attributes.participant_count }}</dd>
+          <dt>Cost per attendee</dt><dd>{{ proposal.attributes.participant_cost }}</dd>
+          {% if proposal.type in ["youthworkshop"] %}
+          <dt>Valid DBS check</dt><dd>{{ proposal.valid_dbs and "Yes" or "No" }}</dd>
+          {% endif %}
+          <dt>Cost per attendee</dt><dd>{{ proposal.attributes.participant_cost }}</dd>
+          <dt>Participant equipment</dt><dd>{{ proposal.attributes.participant_equipment }}</dd>
+          <dt>Age range</dt><dd>{{ proposal.attributes.age_range }}</dd>
+        {% elif proposal.type in ['installation'] %}
+          {# no duration #}
           <dt>Notice Required</dt><dd>{{proposal.notice_required}}</dd>
-        {% elif proposal.type in ('workshop', 'youthworkshop') %}
-          <dt>Length</dt><dd>{{proposal.length}}</dd>
-          <dt>Notice Required</dt><dd>{{proposal.notice_required}}</dd>
-          <dt>Attendees</dt><dd>{{proposal.attendees}}</dd>
-          <dt>Cost per attendee</dt><dd>£{{proposal.cost}}</dd>
-        {% elif proposal.type == 'installation' %}
-          <dt>Notice Required</dt><dd>{{proposal.notice_required}}</dd>
-          <dt>Size</dt><dd>{{proposal.size}}</dd>
-          <dt>Funds requested</dt><dd>£{{proposal.funds}}</dd>
+          <dt>Size</dt><dd>{{proposal.attributes.size}}</dd>
+          <dt>Funds requested</dt><dd>£{{proposal.attributes.grant_requested}}</dd>
         {% endif %}
         <dt>Additional info</dt><dd>{{proposal.additional_info}}</dd>
       </dl>
     </div>
     {% endif %}
-    {% endif %}{# proposal.type != 'lightning' #}
   </div></div>
 {% endif %}
 

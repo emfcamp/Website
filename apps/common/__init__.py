@@ -1,6 +1,5 @@
 import json
 import logging
-import os.path
 import re
 from decimal import Decimal
 from os import path
@@ -31,17 +30,17 @@ from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import Response
 from yaml import safe_load as parse_yaml
 
-from main import JSONValue, db, external_url
+from main import db, external_url
 from models import Currency, User, event_end, event_start, naive_utcnow
 from models.basket import Basket
 from models.capacity import UnlimitedType
+from models.cfp import PROPOSAL_INFOS, SCHEDULE_ITEM_INFOS
 from models.feature_flag import get_db_flags
 from models.product import Price
 from models.purchase import Ticket
 from models.site_state import (
     get_refund_state,
     get_sales_state,
-    get_signup_state,
     get_site_state,
 )
 
@@ -117,13 +116,11 @@ def load_utility_functions(app_obj):
         SALES_STATE = get_sales_state()
         SITE_STATE = get_site_state()
         REFUND_STATE = get_refund_state()
-        SIGNUP_STATE = get_signup_state()
 
         return dict(
             SALES_STATE=SALES_STATE,
             SITE_STATE=SITE_STATE,
             REFUND_STATE=REFUND_STATE,
-            SIGNUP_STATE=SIGNUP_STATE,
             CURRENCY_SYMBOLS=CURRENCY_SYMBOLS,
             external_url=external_url,
             feature_enabled=feature_enabled,
@@ -216,6 +213,15 @@ def load_utility_functions(app_obj):
                 cls = "default"
 
         return Markup(f'<span class="label label-{cls}">{ticket.state}</span>')
+
+    app_obj.template_filter("tidy_workshop_cost")(tidy_workshop_cost)
+
+    @app_obj.context_processor
+    def content_processor():
+        return dict(
+            PROPOSAL_INFOS=PROPOSAL_INFOS,
+            SCHEDULE_ITEM_INFOS=SCHEDULE_ITEM_INFOS,
+        )
 
 
 def create_current_user(email: str, name: str) -> User:
@@ -338,29 +344,33 @@ def feature_enabled(feature: str) -> bool:
     return bool(from_conf)
 
 
-def archive_file(year, *path, raise_404=True):
+def archive_file(year: int, *path: str, raise_404: bool = True) -> Path | None:
     """Return the path to a given file within the archive.
     Optionally raise 404 if it doesn't exist.
     """
-    file_path = os.path.abspath(os.path.join(__file__, "..", "..", "..", "exports", str(year), *path))
+    EXPORT_ROOT = (Path(__file__) / ".." / ".." / ".." / "exports").resolve()
+    file_path = (EXPORT_ROOT / str(year) / Path(*path)).resolve()
 
-    if not os.path.exists(file_path):
-        if raise_404:
-            abort(404)
-        else:
-            return None
+    if EXPORT_ROOT in file_path.parents and file_path.exists():
+        return file_path
 
-    return file_path
+    if raise_404:
+        abort(404)
+
+    return None
 
 
-def load_archive_file(year: int, *path: str, raise_404: bool = True) -> JSONValue:
+ArchivedScheduleData = list[dict[str, Any]]
+
+
+def load_archive_file(year: int, *path: str, raise_404: bool = True) -> ArchivedScheduleData | None:
     """Load the contents of a JSON file from the archive, and optionally
     abort with a 404 if it doesn't exist.
     """
     json_path = archive_file(year, *path, raise_404=raise_404)
     if json_path is None:
         return None
-    return cast(JSONValue, json.load(open(json_path)))
+    return cast(ArchivedScheduleData, json.load(open(json_path)))
 
 
 def page_template(metadata, template):
@@ -420,3 +430,15 @@ def get_next_url(default=None):
     if default is None:
         default = url_for(".account")
     return default
+
+
+def tidy_workshop_cost(participant_cost: str) -> str:
+    # Some people put in a string, some just put in a £ amount
+    try:
+        floaty = float(participant_cost)
+        # We don't want to return anything if it doesn't cost anything
+        if floaty > 0:
+            return "£" + participant_cost
+        return ""
+    except ValueError:
+        return participant_cost

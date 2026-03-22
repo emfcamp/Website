@@ -1,11 +1,13 @@
 import Sortable from 'sortablejs/modular/sortable.core.esm.js';
 
+// FIXME: make this generic by type
+
 var workshops = Sortable.create(
-  document.getElementById('event-tickets-workshops'),
+  document.getElementById('lottery-entries-workshops'),
   {
     ghostClass: "sortable-ghost-class",
     onEnd:  async (event) => {
-      const response = await fetch(`/api/schedule/tickets/workshop/preferences`, {
+      const response = await fetch(`/api/schedule/lottery/workshop/preferences`, {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -20,11 +22,11 @@ var workshops = Sortable.create(
 );
 
 var youthworkshops = Sortable.create(
-  document.getElementById('event-tickets-youthworkshops'),
+  document.getElementById('lottery-entries-youthworkshops'),
   {
     ghostClass: "sortable-ghost-class",
     onEnd:  async (event) => {
-      const response = await fetch(`/api/schedule/tickets/youthworkshop/preferences`, {
+      const response = await fetch(`/api/schedule/lottery/youthworkshop/preferences`, {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -37,4 +39,3 @@ var youthworkshops = Sortable.create(
     },
   },
 );
-

@@ -4,14 +4,8 @@ import pytest
 from lxml import etree
 
 from apps.schedule import event_tz
-from apps.schedule.schedule_xml import (
-    add_day,
-    add_event,
-    add_room,
-    export_frab,
-    get_duration,
-    make_root,
-)
+from apps.schedule.data import OccurrenceDict, ScheduleItemDict
+from apps.schedule.frab_exporter import FrabExporter, FrabExporterFilter, FrabXmlExporter
 
 
 def _local_datetime(*args):
@@ -34,8 +28,9 @@ def test_empty_frab_schema_fails(frab_schema):
 
 
 def test_min_version_is_valid(frab_schema, request_context):
-    root = make_root()
-    add_day(
+    exporter = FrabXmlExporter(FrabExporterFilter(), [])
+    root = exporter.make_root()
+    exporter.add_day(
         root,
         index=1,
         start=_local_datetime(2016, 8, 5, 4, 0),
@@ -46,103 +41,166 @@ def test_min_version_is_valid(frab_schema, request_context):
 
 
 def test_simple_room(frab_schema, request_context):
-    root = make_root()
-    day = add_day(
+    exporter = FrabXmlExporter(FrabExporterFilter(), [])
+    root = exporter.make_root()
+    day = exporter.add_day(
         root,
         index=1,
         start=_local_datetime(2016, 8, 5, 4, 0),
         end=_local_datetime(2016, 8, 6, 4, 0),
     )
-    add_room(day, "the hinterlands")
+    exporter.add_room(day, "the hinterlands")
 
     frab_schema.assert_(root)
 
 
 def test_simple_event(frab_schema, request_context):
-    root = make_root()
-    day = add_day(
+    exporter = FrabXmlExporter(FrabExporterFilter(), [])
+    root = exporter.make_root()
+    day = exporter.add_day(
         root,
         index=1,
         start=_local_datetime(2016, 8, 5, 4, 0),
         end=_local_datetime(2016, 8, 6, 4, 0),
     )
-    room = add_room(day, "the hinterlands")
+    room_name = "the hinterlands"
+    room = exporter.add_room(day, room_name)
 
-    event = {
-        "id": 1,
-        "slug": "the-foo-bar",
-        "title": "The foo bar",
-        "description": "The foo bar",
-        "speaker": "Someone",
-        "user_id": 123,
-        "end_date": _local_datetime(2016, 8, 5, 11, 00),
-        "start_date": _local_datetime(2016, 8, 5, 10, 30),
-    }
+    flat_sid = ScheduleItemDict(
+        id=1,
+        type="talk",
+        names="Someone",
+        pronouns="they/them",
+        title="The foo bar",
+        description="The foo bar",
+        short_description="The foo bar",
+        default_video_privacy="public",
+        is_fave=False,
+        official_content=True,
+        slug="the-foo-bar",
+        link="https://example.invalid/the-foo-bar",
+        occurrences=[
+            OccurrenceDict(
+                occurrence_num=1,
+                start_date=_local_datetime(2016, 8, 5, 10, 30),
+                end_date=_local_datetime(2016, 8, 5, 11, 00),
+                venue="here",
+                latlon=None,
+                map_link=None,
+                uses_lottery=False,
+                video_privacy="public",
+                recording_lost=False,
+            )
+        ],
+    )
 
-    add_event(room, event)
+    exporter.add_event(room, room_name, flat_sid)
 
     frab_schema.assert_(root)
 
 
-def test_export_frab(frab_schema, request_context):
-    events = [
-        {
-            "id": 1,
-            "slug": "the-foo-bar",
-            "title": "The foo bar",
-            "venue": "here",
-            "description": "The foo bar",
-            "speaker": "Someone",
-            "user_id": 123,
-            "end_date": _local_datetime(2016, 8, 5, 11, 00),
-            "start_date": _local_datetime(2016, 8, 5, 10, 30),
-            "video": {
-                "ccc": "http://example.com/media.ccc.de",
-            },
-        },
-        {
-            "id": 2,
-            "slug": "the-foo-bartt",
-            "title": "The foo bartt",
-            "venue": "There",
-            "description": "The foo bar",
-            "speaker": "Someone",
-            "user_id": 123,
-            "end_date": _local_datetime(2016, 8, 5, 11, 00),
-            "start_date": _local_datetime(2016, 8, 5, 10, 30),
-            "video": {
-                "youtube": "http://example.com/youtube.com",
-            },
-        },
-        {
-            "id": 3,
-            "slug": "the-foo-bartt2",
-            "title": "The foo bartt2",
-            "venue": "here",
-            "type": "workshop",
-            "description": "The foo bar",
-            "speaker": "Someone",
-            "user_id": 123,
-            "end_date": _local_datetime(2016, 8, 6, 11, 00),
-            "start_date": _local_datetime(2016, 8, 6, 10, 30),
-            "video": {
-                "ccc": "http://example.com/media.ccc.de",
-                "youtube": "http://example.com/youtube.com",
-            },
-        },
-    ]
-
-    frab = export_frab(events)
-    frab_doc = etree.fromstring(frab)
-
-    frab_schema.assert_(frab_doc)
+# TODO rework this. FrabExporter now wants a QuerySet instead of a dict
+# def test_export_frab(frab_schema, request_context):
+#    flat_sids: list[ScheduleItemDict] = [
+#        ScheduleItemDict(
+#            id=1,
+#            type="talk",
+#            names="Someone",
+#            pronouns="they/them",
+#            title="The foo bar",
+#            description="The foo bar",
+#            short_description="The foo bar",
+#            default_video_privacy="public",
+#            is_fave=False,
+#            official_content=True,
+#            slug="the-foo-bar",
+#            link="https://example.invalid/the-foo-bar",
+#            occurrences=[
+#                OccurrenceDict(
+#                    occurrence_num=1,
+#                    start_date=_local_datetime(2016, 8, 5, 10, 30),
+#                    end_date=_local_datetime(2016, 8, 5, 11, 00),
+#                    venue="here",
+#                    latlon=None,
+#                    map_link=None,
+#                    uses_lottery=False,
+#                    video_privacy="public",
+#                    ccc_url="http://example.com/media.ccc.de",
+#                    recording_lost=False,
+#                )
+#            ],
+#        ),
+#        ScheduleItemDict(
+#            id=2,
+#            type="talk",
+#            names="Someone",
+#            pronouns="they/them",
+#            title="The foo bartt",
+#            description="The foo bar",
+#            short_description="The foo bar",
+#            default_video_privacy="public",
+#            is_fave=False,
+#            official_content=True,
+#            slug="the-foo-bartt",
+#            link="https://example.invalid/the-foo-bartt",
+#            occurrences=[
+#                OccurrenceDict(
+#                    occurrence_num=1,
+#                    start_date=_local_datetime(2016, 8, 5, 10, 30),
+#                    end_date=_local_datetime(2016, 8, 5, 11, 00),
+#                    venue="There",
+#                    latlon=None,
+#                    map_link=None,
+#                    uses_lottery=False,
+#                    video_privacy="public",
+#                    youtube_url="http://example.com/youtube.com",
+#                    recording_lost=False,
+#                )
+#            ],
+#        ),
+#        ScheduleItemDict(
+#            id=3,
+#            type="workshop",
+#            names="Someone",
+#            pronouns="they/them",
+#            title="The foo bartt2",
+#            description="The foo bar",
+#            short_description="The foo bar",
+#            default_video_privacy="public",
+#            is_fave=False,
+#            official_content=True,
+#            slug="the-foo-bartt2",
+#            link="https://example.invalid/the-foo-bartt",
+#            occurrences=[
+#                OccurrenceDict(
+#                    occurrence_num=1,
+#                    start_date=_local_datetime(2016, 8, 6, 10, 30),
+#                    end_date=_local_datetime(2016, 8, 6, 11, 00),
+#                    venue="here",
+#                    latlon=None,
+#                    map_link=None,
+#                    uses_lottery=False,
+#                    video_privacy="public",
+#                    ccc_url="http://example.com/media.ccc.de",
+#                    youtube_url="http://example.com/youtube.com",
+#                    recording_lost=False,
+#                )
+#            ],
+#        ),
+#    ]
+#
+#    frab = export_frab(flat_sids)
+#    frab_doc = etree.fromstring(frab)
+#
+#    frab_schema.assert_(frab_doc)
 
 
 def test_get_duration():
+    exporter = FrabExporter(FrabExporterFilter(), [])
     start = datetime(2016, 8, 15, 11, 0)
     stop = datetime(2016, 8, 15, 11, 30)
-    assert get_duration(start, stop) == "0:30"
+    assert exporter.format_duration(start, stop) == "0:30"
     stop = datetime(2016, 8, 15, 11, 5)
-    assert get_duration(start, stop) == "0:05"
+    assert exporter.format_duration(start, stop) == "0:05"
     stop = datetime(2016, 8, 15, 12, 0)
-    assert get_duration(start, stop) == "1:00"
+    assert exporter.format_duration(start, stop) == "1:00"

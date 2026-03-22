@@ -1,0 +1,40 @@
+{% from "schedule/_faves.html" import favourite_icons %}
+{% from "schedule/_schedule_item_icons.html" import schedule_item_icons %}
+
+{# List schedule items - works for the current event year only #}
+{% macro list_schedule_items(grouped_schedule_items, ordered_type_infos) %}
+    {% include "schedule/_icon_key.html" %}
+    {% for type_info in ordered_type_infos %}
+        {% if grouped_schedule_items[type_info.type] %}
+            <h2 class="event-type" id="{{ type_info.type }}">{{ type_info.human_type | title }}s</h2>
+            <form method="post" action="{{url_for(".add_favourite")}}">
+            <div>
+                {% for schedule_item in grouped_schedule_items[type_info.type] %}
+                <a href="{{ url_for('.item', year=event_year, schedule_item_id=schedule_item.id, slug=schedule_item.slug) }}"
+                   class="event schedule-item" id="schedule_item-{{ schedule_item.id }}">
+                <div class="row">
+                    <div class="col-xs-10">
+                        <div>
+                            <b>{{ schedule_item.names }}</b>
+                            {{ schedule_item_icons(schedule_item) }}
+                        </div>
+                        <div>
+                            {{ schedule_item.title }}
+                        </div>
+                    </div>
+                    {% if current_user.is_authenticated %}
+                    <div class="col-xs-2">
+                        <button name="fave" value="{{ schedule_item.id }}" type="submit" class="btn btn-primary btn-transparent btn-hoverlabel favourite-button favourite-button-{{ 'faved' if schedule_item in current_user.favourites else 'unfaved' }}">
+                            {{ favourite_icons() }}
+                            <span class="hoverlabel">Favourite</span>
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+                </a>
+                {% endfor %}
+            </div>
+            </form>
+        {% endif %}
+    {% endfor %}
+{% endmacro %}

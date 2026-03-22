@@ -1,24 +1,48 @@
+{# This email is basically identical to cfp-check-scheduled-duration.txt. Please apply edits there too. #}
 {% extends "emails/base.txt" %}
 {% block body %}
+{%- set schedule_item = proposal.schedule_item -%}
 Hi {{ proposal.user.name }},
 
-We still need some final information about your {{ proposal.human_type }} '{{ proposal.title }}'!
+We still need some final information about your {{ schedule_item.human_type }} '{{ schedule_item.title }}'!
 
-You have been allocated a {{ proposal.scheduled_duration }} minute slot - if this isn't suitable, please get in touch with us immediately.{% if proposal.type == 'talk' %} Please note that we don't do on-stage Q&A - please ask the audience to meet you somewhere afterwards.{% endif %}
+{% if schedule_item.occurrences | length == 1 %}
+{% for occurrence in schedule_item.occurrences %}
+You have been allocated a {{ occurrence.scheduled_duration }} minute slot - if this isn't suitable, please get in touch with us immediately.
+{% endfor %}
+{% else %}
+You have been allocated slots with the following slot lengths:
+{% for occurrence in schedule_item.occurrences %}
+  {{ occurrence.occurrence_num }}: {% if occurrence.scheduled_duration %}{{ occurrence.scheduled_duration }} minutes{% else %}not set yet{% endif %}
+{% endfor %}
+If this isn't suitable, please get in touch with us immediately.
+{% endif %}
 
-We need you to finalise the details for your {{ proposal.human_type }} on our website. Most importantly you should tell us when you're available so that we don't accidentally schedule a slot when you're not around!
+{% if schedule_item.type in ["talk"] %}
+Please note that we don't do on-stage Q&A - please ask the audience to meet you somewhere afterwards.
+
+{% endif %}
+We need you to finalise the details for your {{ schedule_item.human_type }} on our website. Most importantly you should tell us when you're available so that we don't accidentally schedule you for a time when you're not around!
 
   {{ external_url('cfp.finalise_proposal', proposal_id=proposal.id) }}
 
-Don't worry, you'll be able to update your {{ proposal.human_type }} title and description all the way up to the event - just make sure you set your availability now.{% if proposal.type == 'workshop' %}
+Don't worry, you'll be able to update your {{ schedule_item.human_type }} title and description all the way up to the event - just make sure you set your availability now.
+{% if schedule_item.type == 'workshop' %}
 
-If you think you'll need longer than a 30-minute set-up time for your workshop, email content@emfcamp.org to let us know, so we can feed this in. (This should only be the case if you're setting up any elaborate equipment, and we anticipate most won't need this, but drop us a line if you do).{% endif %}
+If you think you'll need longer than a 30-minute set-up time for your workshop, email content@emfcamp.org to let us know, so we can feed this in. (This should only be the case if you're setting up any elaborate equipment, and we anticipate most won't need this, but drop us a line if you do).
+{% endif %}
 
 To summarise, we urgently need you to:
 
-* Let us know if a {{ proposal.scheduled_duration }} minute slot isn't suitable{% if proposal.type == 'workshop' %}, or if you need a longer set-up time{% endif %}.
+{% if schedule_item.occurrences | length == 1 %}
+{% for occurrence in schedule_item.occurrences %}
+* Let us know if a {{ occurrence.scheduled_duration }} minute slot isn't suitable{% if schedule_item.type == 'workshop' %}, or if you need a longer set-up time{% endif %}.
+{% endfor %}
+{% else %}
+* Let us know if your slot lengths aren't suitable{% if schedule_item.type == 'workshop' %}, or if you need a longer set-up time{% endif %}.
+{% endif %}
 * Fill in the form with your availability so we can schedule you.
-* Write a great description of your {{ proposal.human_type }} we can publish in the schedule!
+* Write a great description of your {{ schedule_item.human_type }} we can publish in the schedule!
 
 If you don't yet have EMF tickets, you can get them on this page:
 
@@ -26,4 +50,4 @@ If you don't yet have EMF tickets, you can get them on this page:
 
 Looking forward to seeing you in the field,
 All the EMF team
-{% endblock %}
+{%- endblock -%}

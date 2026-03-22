@@ -1,95 +1,109 @@
 from __future__ import annotations
 
+import dataclasses
+from dataclasses import dataclass, MISSING
 from datetime import datetime, timedelta, time
+from enum import StrEnum
 import typing
 from collections import namedtuple
-from collections.abc import Sequence
-from typing import Optional, cast
+from typing import (
+    Any,
+    Literal,
+    Optional,
+    Self,
+    Type,
+    TypeVar,
+    get_args,
+)
 from dateutil.parser import parse as parse_date
 import re
 from itertools import groupby
 from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import to_shape
+import sqlalchemy
+from sqlalchemy import (
+    Column,
+    ForeignKey,
+    Integer,
+    Table,
+    UniqueConstraint,
+    func,
+    select,
+    JSON,
+    event,
+)
 from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.ext.mutable import MutableList
-
-from sqlalchemy import Column, ForeignKey, Integer, Table, UniqueConstraint, func, select, or_
-from sqlalchemy.orm import column_property, relationship, Mapped, mapped_column
+from sqlalchemy.ext.associationproxy import association_proxy, AssociationProxy
+from sqlalchemy.ext.mutable import MutableDict, MutableList
+from sqlalchemy.orm import (
+    LoaderCallableStatus,
+    column_property,
+    relationship,
+    Mapped,
+    mapped_column,
+)
 from slugify.slugify import slugify
 from models import (
     export_attr_counts,
     naive_utcnow,
     export_attr_edits,
     export_intervals,
-    bucketise,
     event_start,
     event_end,
 )
 
 from main import db
 from .user import User
-from .cfp_tag import ProposalTag
+from .cfp_tag import Tag, ProposalTag
+from .lottery import Lottery
 from .village import Village
 from . import BaseModel
 
 if typing.TYPE_CHECKING:
-    from .cfp_tag import Tag
-    from .event_tickets import EventTicket
     from .volunteer.shift import Shift
 
 __all__ = [
+    "Attributes",
+    "ProposalType",
     "Proposal",
-    "PerformanceProposal",
-    "TalkProposal",
-    "WorkshopProposal",
-    "YouthWorkshopProposal",
-    "InstallationProposal",
-    "LightningTalkProposal",
-    "CFPMessage",
-    "CFPVote",
+    "ScheduleItemType",
+    "ScheduleItem",
+    "Occurrence",
+    "ProposalMessage",
+    "ProposalVote",
     "Venue",
 ]
 
 
-HUMAN_CFP_TYPES: dict[str, str] = {
-    "performance": "performance",
-    "talk": "talk",
-    "workshop": "workshop",
-    "youthworkshop": "youth workshop",
-    "installation": "installation",
-    "lightning": "lightning talk",
-}
+class StateTransitionException(Exception):
+    pass
 
-# state: [allowed next state, ] pairs
-CFP_STATES = {
-    "edit": ["accepted", "rejected", "withdrawn", "new"],
-    "new": ["accepted", "rejected", "withdrawn", "checked", "manual-review"],
-    "checked": [
-        "accepted",
-        "rejected",
-        "withdrawn",
-        "anonymised",
-        "anon-blocked",
-        "edit",
-    ],
-    "rejected": ["accepted", "rejected", "withdrawn", "edit"],
-    "cancelled": ["accepted", "rejected", "withdrawn", "edit"],
-    "anonymised": ["accepted", "rejected", "withdrawn", "reviewed", "edit"],
-    "anon-blocked": ["accepted", "rejected", "withdrawn", "reviewed", "edit"],
-    "reviewed": ["accepted", "rejected", "withdrawn", "edit", "anonymised"],
-    "manual-review": ["accepted", "rejected", "withdrawn", "edit"],
-    "accepted": ["accepted", "rejected", "withdrawn", "finalised"],
-    "finalised": ["rejected", "withdrawn", "finalised"],
-    "withdrawn": ["accepted", "rejected", "withdrawn", "edit"],
-}
 
-ORDERED_STATES = [
-    "edit",
+TState = TypeVar("TState")
+
+
+# TODO: this should become a column wrapper type
+def validate_state_transitions(column, allowed_transitions: dict[TState, set[TState]]):
+    def on_state_set(target, value, oldvalue, initiator):
+        if oldvalue == LoaderCallableStatus.NO_VALUE:
+            return
+        if value == oldvalue:
+            return
+        if value not in allowed_transitions[oldvalue]:
+            raise StateTransitionException(f"{target} cannot transition from {oldvalue} to {value}")
+
+    event.listen(column, "set", on_state_set)
+
+
+# This might be better as a StrEnum, but would require disallowing hyphens.
+# Using literals does not trigger sqla's native_enum functionality, so
+# this column remains a varchar, and does not generate an enum type.
+# https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html#native-enums-and-naming
+ProposalState = Literal[
     "new",
-    "locked",
+    "edit",
     "checked",
     "rejected",
-    "cancelled",
     "anonymised",
     "anon-blocked",
     "manual-review",
@@ -98,6 +112,28 @@ ORDERED_STATES = [
     "finalised",
     "withdrawn",
 ]
+
+PROPOSAL_STATE_TRANSITIONS: dict[ProposalState, set[ProposalState]] = {
+    "new": {"accepted", "rejected", "withdrawn", "checked", "manual-review"},
+    "edit": {"accepted", "rejected", "withdrawn", "new"},
+    "checked": {
+        "accepted",
+        "rejected",
+        "withdrawn",
+        "anonymised",
+        "anon-blocked",
+        "edit",
+    },
+    "rejected": {"accepted", "rejected", "withdrawn", "edit"},
+    "anonymised": {"accepted", "rejected", "withdrawn", "reviewed", "edit"},
+    "anon-blocked": {"accepted", "rejected", "withdrawn", "reviewed", "edit"},
+    "manual-review": {"accepted", "rejected", "withdrawn", "edit"},
+    "reviewed": {"accepted", "rejected", "withdrawn", "edit", "anonymised"},
+    "accepted": {"accepted", "rejected", "withdrawn", "edit", "finalised"},
+    "finalised": {"accepted", "rejected", "withdrawn"},
+    "withdrawn": {"accepted", "rejected", "withdrawn", "edit"},
+}
+
 
 # Most of these states are the same they're kept distinct for semantic reasons
 # and because I'm lazy
@@ -110,54 +146,65 @@ VOTE_STATES = {
     "stale": ["voted", "recused", "blocked"],
 }
 
+
+class ProposalVoteStateException(Exception):
+    pass
+
+
 # Lengths for talks and workshops as displayed to the user
-LENGTH_OPTIONS = [
+DURATION_OPTIONS = [
     ("< 10 mins", "Shorter than 10 minutes"),
     ("10-25 mins", "10-25 minutes"),
     ("25-45 mins", "25-45 minutes"),
     ("> 45 mins", "Longer than 45 minutes"),
 ]
 
-INITIAL_LIGHTNING_TALK_SLOTS = 6
-LIGHTNING_TALK_SESSIONS = {
-    "fri": {"human": "Friday", "slots": INITIAL_LIGHTNING_TALK_SLOTS},
-    "sat": {"human": "Saturday", "slots": INITIAL_LIGHTNING_TALK_SLOTS},
-    "sun": {"human": "Sunday", "slots": INITIAL_LIGHTNING_TALK_SLOTS},
+
+ScheduleItemState = Literal[
+    "published",
+    "unpublished",
+    "hidden",
+]
+
+SCHEDULE_ITEM_STATE_TRANSITIONS: dict[ScheduleItemState, set[ScheduleItemState]] = {
+    "published": {"unpublished", "hidden"},
+    "unpublished": {"published", "hidden"},
+    "hidden": {"published", "unpublished"},
 }
+
+
+# scheduled implies scheduled_duration, scheduled_time, and scheduled_venue_id are all set
+OccurrenceState = Literal[
+    "unscheduled",
+    "scheduled",
+]
+
+
+OCCURRENCE_STATE_TRANSITIONS: dict[OccurrenceState, set[OccurrenceState]] = {
+    "unscheduled": {"scheduled"},
+    "scheduled": {"unscheduled"},
+}
+
 
 # Options for age range displayed to the user
 AGE_RANGE_OPTIONS = [
-    ("All ages", "All ages"),
-    (
-        "Aimed at adults, but supervised kids welcome.",
-        "Aimed at adults, but supervised kids welcome.",
-    ),
-    ("3+", "3+"),
-    ("4+", "4+"),
-    ("5+", "5+"),
-    ("6+", "6+"),
-    ("7+", "7+"),
-    ("8+", "8+"),
-    ("9+", "9+"),
-    ("10+", "10+"),
-    ("11+", "11+"),
-    ("12+", "12+"),
-    ("13+", "13+"),
-    ("14+", "14+"),
-    ("15+", "15+"),
-    ("16+", "16+"),
-    ("17+", "17+"),
-    ("18+", "18+"),
+    ("all", "Suitable for all ages"),
+    ("u12", "Under 12"),
+    ("12+", "Age 12+"),
+    ("14+", "Age 14+"),
+    ("16+", "Age 16+"),
+    ("18+", "Age 18+"),
+    ("other", "Other"),
 ]
 
 # What we consider these as when scheduling
-ROUGH_LENGTHS = {"> 45 mins": 50, "25-45 mins": 30, "10-25 mins": 20, "< 10 mins": 10}
+ROUGH_DURATIONS = {"> 45 mins": 50, "25-45 mins": 30, "10-25 mins": 20, "< 10 mins": 10}
 
 # These are the time periods speakers can select as being available in the form
 # This needs to go very far away
 # This still needs to go very far away, it is a nightmare
 PROPOSAL_TIMESLOTS = {
-    "talk": (
+    "talk": [
         "fri_10_13",
         "fri_13_16",
         "fri_16_20",
@@ -167,8 +214,8 @@ PROPOSAL_TIMESLOTS = {
         "sun_10_13",
         "sun_13_16",
         "sun_16_20",
-    ),
-    "workshop": (
+    ],
+    "workshop": [
         "fri_10_13",
         "fri_13_16",
         "fri_16_20",
@@ -182,8 +229,8 @@ PROPOSAL_TIMESLOTS = {
         "sun_10_13",
         "sun_13_16",
         "sun_16_20",
-    ),
-    "youthworkshop": (
+    ],
+    "youthworkshop": [
         "fri_9_13",
         "fri_13_16",
         "fri_16_20",
@@ -193,15 +240,15 @@ PROPOSAL_TIMESLOTS = {
         "sun_9_13",
         "sun_13_16",
         "sun_16_20",
-    ),
-    "performance": (
+    ],
+    "performance": [
         "fri_20_22",
         "fri_22_24",
         "sat_20_22",
         "sat_22_24",
         "sun_20_22",
         "sun_22_24",
-    ),
+    ],
 }
 
 # Causes the scheduler to prefer putting these things in these time ranges,
@@ -250,13 +297,9 @@ EVENT_SPACING = {
 }
 
 # The size of a scheduling slot
-SLOT_LENGTH = timedelta(minutes=10)
+SLOT_DURATION = timedelta(minutes=10)
 
 cfp_period = namedtuple("cfp_period", "start end")
-
-# List of submission types which are manually reviewed rather than through
-# the anonymous review system.
-MANUAL_REVIEW_TYPES = ["youthworkshop", "performance", "installation"]
 
 
 # This is a function rather than a constant so we can lean on the configuration
@@ -269,7 +312,7 @@ def get_days_map():
     return {ed.strftime("%a").lower(): ed for ed in event_days}
 
 
-def proposal_slug(title) -> str:
+def schedule_item_slug(title) -> str:
     replacements = [
         ["'", ""],
     ]
@@ -327,182 +370,310 @@ def make_periods_contiguous(time_periods):
     return contiguous_periods
 
 
-class CfpStateException(Exception):
-    pass
-
-
 class InvalidVenueException(Exception):
     pass
 
 
-FavouriteProposal = Table(
-    "favourite_proposal",
+FavouriteScheduleItem = Table(
+    "favourite_schedule_item",
     BaseModel.metadata,
     Column("user_id", Integer, ForeignKey("user.id"), primary_key=True),
     Column(
-        "proposal_id",
+        "schedule_item_id",
         Integer,
-        ForeignKey("proposal.id"),
+        ForeignKey("schedule_item.id"),
         primary_key=True,
         index=True,
     ),
 )
 
 
-ProposalAllowedVenues = Table(
-    "proposal_allowed_venues",
+OccurrenceAllowedVenues = Table(
+    "occurrence_allowed_venues",
     BaseModel.metadata,
-    Column("proposal_id", Integer, ForeignKey("proposal.id"), primary_key=True),
+    Column("occurrence_id", Integer, ForeignKey("occurrence.id"), primary_key=True),
     Column("venue_id", Integer, ForeignKey("venue.id"), primary_key=True),
 )
 
 
+"""
+Skeleton classes to provide typing for attributes.
+
+These are mostly shared between Proposals and ScheduleItems,
+and will be copied when the proposal is about to be finalised.
+There are some extra Proposal attributes that will not be copied.
+
+Anything entered by users probably wants to be a string or enum,
+as people write things like "20-25" or "20 (space permitting)".
+
+We allow None for strings to simplify copying from forms,
+and converting to/from JSON. We include defaults to make
+adding/removing fields easier, but don't account for removed fields yet.
+
+It's possible to filter the underlying attributes_json column with
+sqlalchemy, and part of why we don't use TypedDict is to avoid confusion
+with that column.
+"""
+
+
+@dataclass
+class Attributes:
+    pass
+
+
+# Attributes used by both Proposal and ScheduleItem
+
+
+@dataclass
+class TalkAttributes(Attributes):
+    content_note: str | None = None
+    needs_laptop: bool = False
+    family_friendly: bool = False
+
+
+@dataclass
+class PerformanceAttributes(Attributes):
+    pass
+
+
+@dataclass
+class WorkshopAttributes(Attributes):
+    age_range: str | None = None
+    participant_cost: str | None = None
+    participant_equipment: str | None = None
+    content_note: str | None = None
+    family_friendly: bool = False
+
+
+@dataclass
+class YouthWorkshopAttributes(Attributes):
+    age_range: str | None = None
+    participant_cost: str | None = None
+    participant_equipment: str | None = None
+    content_note: str | None = None
+    # No need for family_friendly
+
+
+@dataclass
+class InstallationAttributes(Attributes):
+    size: str | None = None
+
+
+@dataclass
+class LightningTalkAttributes(Attributes):
+    slide_link: str | None = None
+    session: str | None = None
+
+
+# Attributes only used by the review process
+# These won't get copied across when creating a schedule item
+
+
+@dataclass
+class ProposalTalkAttributes(TalkAttributes):
+    pass
+
+
+@dataclass
+class ProposalPerformanceAttributes(PerformanceAttributes):
+    pass
+
+
+@dataclass
+class ProposalWorkshopAttributes(WorkshopAttributes):
+    participant_count: str | None = None
+
+
+@dataclass
+class ProposalYouthWorkshopAttributes(YouthWorkshopAttributes):
+    participant_count: str | None = None
+    valid_dbs: bool | None = None
+
+
+@dataclass
+class ProposalInstallationAttributes(InstallationAttributes):
+    grant_requested: str | None = None
+
+
+# LightningTalks don't go through the review process
+
+
+def attributes_proxy(attributes_cls: type[Attributes], store: dict[str, Any]) -> type[Attributes]:
+    class AttributesProxy(attributes_cls):  # type: ignore[valid-type, misc]
+        """
+        Forwards dataclass fields to a backing dict, blocking
+        access to anything not defined by the dataclass.
+        """
+
+        def __new__(cls, *args, **kwargs):
+            obj = super().__new__(cls)
+            object.__setattr__(obj, "_store", store)
+            return obj
+
+        def __getattribute__(self, name: str) -> Any:
+            if name.startswith("__") or name == "_store":
+                return super().__getattribute__(name)
+            if name not in self.__dataclass_fields__:
+                raise AttributeError(name)
+            return self._store.get(name)
+
+        def __setattr__(self, name: str, value: Any):
+            if name not in self.__dataclass_fields__:
+                raise AttributeError(name)
+            if self._store.get(name, MISSING) != value:
+                self._store[name] = value
+            else:
+                # MutableDict counts this as a mutation
+                pass
+
+        def __repr__(self) -> str:
+            return f"<{self.__class__.__name__} {self._store!r}>"
+
+    AttributesProxy.__name__ = f"{attributes_cls.__name__}Proxy"
+    return AttributesProxy
+
+
+def convert_attributes_between_types(old_attributes: Attributes, new_attributes: Attributes):
+    # Logic to transfer attributes. Any not copied will be lost except in history.
+    # There aren't currently many attributes that can safely be copied across.
+    attributes_to_copy = [
+        "family_friendly",
+    ]
+    if isinstance(old_attributes, (WorkshopAttributes, YouthWorkshopAttributes)) and isinstance(
+        new_attributes, (WorkshopAttributes, YouthWorkshopAttributes)
+    ):
+        attributes_to_copy += [
+            "participant_count",
+            "age_range",
+            "participant_cost",
+            "participant_equipment",
+        ]
+        # family_friendly and valid_dbs can't be copied
+
+    for a in attributes_to_copy:
+        if hasattr(old_attributes, a):
+            setattr(new_attributes, a, getattr(old_attributes, a))
+
+
+def copy_common_attributes(old_attributes: Attributes, new_attributes: Attributes):
+    for n in new_attributes.__dataclass_fields__:
+        setattr(new_attributes, n, getattr(old_attributes, n))
+
+
+class ReviewType(StrEnum):
+    anonymous = "anonymous"
+    manual = "manual"
+    none = "none"
+
+
+# Currently only used for talks, performances, and lightning talks
+# but there's no reason that should always be the case
+VideoPrivacy = Literal[
+    "public",
+    "review",
+    "none",
+]
+
+ProposalType = Literal[
+    "talk",
+    "performance",
+    "workshop",
+    "youthworkshop",
+    "installation",
+]
+
+
+ScheduleItemType = Literal[
+    "talk",
+    "performance",
+    "workshop",
+    "youthworkshop",
+    "installation",
+    "lightning",
+]
+
+
 class Proposal(BaseModel):
-    __versioned__ = {"exclude": ["favourites", "favourite_count"]}
     __tablename__ = "proposal"
+    __versioned__: dict[str, Any] = {}
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    type: Mapped[ProposalType]
+    state: Mapped[ProposalState] = mapped_column(
+        sqlalchemy.Enum(
+            *get_args(ProposalState),
+            native_enum=False,
+        ),
+        default="new",
+    )
+
+    # Proposals have an associated user, usually the person who submitted it
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     anonymiser_id: Mapped[int | None] = mapped_column(ForeignKey("user.id"), default=None)
-    created: Mapped[datetime] = mapped_column(default=naive_utcnow)
-    modified: Mapped[datetime] = mapped_column(default=naive_utcnow, onupdate=naive_utcnow)
-    state: Mapped[str] = mapped_column(default="new")
-    type: Mapped[str]  # talk, workshop or installation
 
-    is_accepted: Mapped[bool] = column_property(state.in_(["accepted", "finalised"]))
-    should_be_exported: Mapped[bool] = column_property(state.in_(["accepted", "finalised"]))
-
-    # Core information
     title: Mapped[str]
     description: Mapped[str]
+    duration: Mapped[str | None]
 
+    # Other fields shared by all types
+    needs_help: Mapped[bool] = mapped_column(default=False)
     equipment_required: Mapped[str | None]
     funding_required: Mapped[str | None]
-    additional_info: Mapped[str | None]
-    length: Mapped[str | None]  # only used for talks and workshops
     notice_required: Mapped[str | None]
+    additional_info: Mapped[str | None]
+
+    # Flags to be set by reviewers
+    needs_money: Mapped[bool] = mapped_column(default=False)
+    one_day: Mapped[bool] = mapped_column(default=False)
+    rejected_email_sent: Mapped[bool] = mapped_column(default=False)
+
+    # We show the user when their proposal was submitted
+    created: Mapped[datetime] = mapped_column(default=naive_utcnow)
+    # Used for sorting in the CfP review page
+    modified: Mapped[datetime] = mapped_column(default=naive_utcnow, onupdate=naive_utcnow)
+
     private_notes: Mapped[str | None]
 
-    tags: Mapped[list[Tag]] = relationship(
+    attributes_json: Mapped[dict[str, Any] | None] = mapped_column(
+        "attributes", MutableDict.as_mutable(JSON), nullable=False, default=dict
+    )
+
+    user: Mapped[User] = relationship(back_populates="proposals", foreign_keys=[user_id])
+    messages: Mapped[list[ProposalMessage]] = relationship(back_populates="proposal")
+    votes: Mapped[list[ProposalVote]] = relationship(back_populates="proposal")
+    anonymiser: Mapped[User | None] = relationship(
+        back_populates="anonymised_proposals", foreign_keys=[anonymiser_id]
+    )
+    _tags: Mapped[list[Tag]] = relationship(
         back_populates="proposals",
         cascade="all",
         secondary=ProposalTag,
     )
 
-    # Flags
-    needs_help: Mapped[bool] = mapped_column(default=False)
-    needs_money: Mapped[bool] = mapped_column(default=False)
-    one_day: Mapped[bool] = mapped_column(default=False)
-    has_rejected_email: Mapped[bool] = mapped_column(default=False)
-    user_scheduled: Mapped[bool] = mapped_column(default=False)
+    schedule_item: Mapped[ScheduleItem | None] = relationship("ScheduleItem", back_populates="proposal")
 
-    # References to this table
-    messages: Mapped[list[CFPMessage]] = relationship(back_populates="proposal")
-    votes: Mapped[list[CFPVote]] = relationship(back_populates="proposal")
-    favourites: Mapped[list[User]] = relationship(
-        secondary=FavouriteProposal,
-        back_populates="favourites",
-    )
-    user: Mapped[User] = relationship(back_populates="proposals", foreign_keys=[user_id])
-    anonymiser: Mapped[User | None] = relationship(
-        back_populates="anonymised_proposals", foreign_keys=[anonymiser_id]
-    )
-    shifts: Mapped[list["Shift"]] = relationship(back_populates="proposal")
+    @property
+    def tags(self) -> list[str]:
+        return [t.tag for t in self._tags]
 
-    # Convenience for individual objects. Use an outerjoin and groupby for more than a few records
-    favourite_count = column_property(
-        select(func.count(FavouriteProposal.c.proposal_id))
-        .where(FavouriteProposal.c.proposal_id == id)
-        .scalar_subquery(),
-        deferred=True,
-    )
-
-    # Fields for finalised info
-    published_names: Mapped[str | None]
-    published_pronouns: Mapped[str | None]
-    published_title: Mapped[str | None]
-    published_description: Mapped[str | None]
-    arrival_period: Mapped[str | None]
-    departure_period: Mapped[str | None]
-    telephone_number: Mapped[str | None]
-    eventphone_number: Mapped[str | None]
-    may_record: Mapped[bool | None]
-    video_privacy: Mapped[str | None]
-    needs_laptop: Mapped[bool | None]
-    available_times: Mapped[str | None]
-    family_friendly: Mapped[bool | None] = mapped_column(default=False)
-    content_note: Mapped[str | None]
-
-    # Fields for scheduling
-    # hide_from_schedule -- do not display this item
-    hide_from_schedule: Mapped[bool] = mapped_column(default=False)
-    # manually_scheduled -- make the scheduler ignore this
-    manually_scheduled: Mapped[bool] = mapped_column(default=False)
-    allowed_venues: Mapped[list[Venue]] = relationship(
-        secondary=ProposalAllowedVenues,
-        back_populates="allowed_proposals",
-    )
-    allowed_times: Mapped[str | None]
-    scheduled_duration: Mapped[int | None]
-    scheduled_time: Mapped[datetime | None]
-    scheduled_venue_id: Mapped[int | None] = mapped_column(ForeignKey("venue.id"))
-    potential_time: Mapped[datetime | None]
-    potential_venue_id: Mapped[int | None] = mapped_column(ForeignKey("venue.id"))
-
-    scheduled_venue: Mapped[Venue | None] = relationship(
-        back_populates="proposals",
-        primaryjoin="Venue.id == Proposal.scheduled_venue_id",
-    )
-    potential_venue: Mapped[Venue | None] = relationship(
-        primaryjoin="Venue.id == Proposal.potential_venue_id"
-    )
-
-    # Video stuff
-    c3voc_url: Mapped[str | None]
-    youtube_url: Mapped[str | None]
-    thumbnail_url: Mapped[str | None]
-    video_recording_lost: Mapped[bool | None] = mapped_column(default=False)
-
-    type_might_require_ticket = False
-    tickets: Mapped[list[EventTicket]] = relationship(back_populates="proposal")
-
-    __mapper_args__ = {"polymorphic_on": "type"}
-
-    @classmethod
-    def query_accepted(cls, include_user_scheduled=False):
-        query = cls.query.filter(cls.is_accepted)
-        if not include_user_scheduled:
-            query = query.filter(cls.user_scheduled.is_(False))
-        return query
-
-    @classmethod
-    def public_export_columns(cls):
-        return [
-            cls.published_title,
-            cls.published_description,
-            cls.published_names.label("names"),
-            cls.published_pronouns.label("pronouns"),
-            cls.may_record,
-            cls.video_privacy,
-            cls.scheduled_time,
-            cls.scheduled_duration,
-            Venue.name.label("venue"),
-            Village.id.label("venue_village_id"),
-        ]
+    @tags.setter
+    def tags(self, tags: list[str]):
+        found_tags = list(db.session.scalars(select(Tag).where(Tag.tag.in_(tags))))
+        missing_tags = set(tags) - {t.tag for t in found_tags}
+        if missing_tags:
+            raise ValueError(f"Invalid tags {', '.join(missing_tags)}")
+        self._tags = found_tags
 
     @classmethod
     def get_export_data(cls):
-        if cls.__name__ == "Proposal":
-            # Export stats for each proposal type separately
-            return {}
-
+        return {}
+        # FIXME
         count_attrs = [
             "needs_help",
             "needs_money",
             "needs_laptop",
             "one_day",
             "notice_required",
-            "may_record",
             "video_privacy",
             "state",
         ]
@@ -510,7 +681,7 @@ class Proposal(BaseModel):
         edits_attrs = [
             "published_title",
             "published_description",
-            "length",
+            "duration",
             "equipment_required",
             "funding_required",
             "additional_info",
@@ -518,51 +689,49 @@ class Proposal(BaseModel):
             "needs_help",
             "needs_money",
             "one_day",
-            "has_rejected_email",
+            "rejected_email_sent",
             "published_names",
             "published_pronouns",
             "arrival_period",
             "departure_period",
-            "eventphone_number",
-            "telephone_number",
-            "may_record",
+            "contact_eventphone",
+            "contact_telephone",
             "video_privacy",
             "needs_laptop",
             "available_times",
-            "attendees",
-            "cost",
+            "participant_count",
+            "participant_cost",
             "size",
-            "installation_funding",
+            "grant_requested",
             "age_range",
             "participant_equipment",
         ]
 
-        # FIXME: include published_title
         proposals = cls.query.with_entities(
             cls.id,
             cls.title,
             cls.description,
-            cls.favourite_count,  # don't care about performance here
-            cls.length,
+            # cls.favourite_count,  # don't care about performance here
+            cls.duration,
             cls.notice_required,
             cls.needs_money,
-            cls.available_times,
-            cls.allowed_times,
-            cls.arrival_period,
-            cls.departure_period,
-            cls.needs_laptop,
-            cls.may_record,
-            cls.video_privacy,
+            # cls.available_times,
+            # cls.allowed_times,
+            # cls.arrival_period,
+            # cls.departure_period,
+            # cls.needs_laptop,
+            # cls.video_privacy,
         ).order_by(cls.id)
 
-        if cls.__name__ == "WorkshopProposal":
-            proposals = proposals.add_columns(cls.attendees, cls.cost, cls.age_range)
-        elif cls.__name__ == "InstallationProposal":
-            proposals = proposals.add_columns(cls.size, cls.installation_funding)
-        elif cls.__name__ == "YouthWorkshopProposal":
-            proposals = proposals.add_columns(
-                cls.attendees, cls.cost, cls.age_range, cls.participant_equipment
-            )
+        # FIXME
+        # if cls.__name__ == "WorkshopProposal":
+        #    proposals = proposals.add_columns(cls.participant_count, cls.participant_cost, cls.age_range)
+        # elif cls.__name__ == "InstallationProposal":
+        #    proposals = proposals.add_columns(cls.size, cls.grant_requested)
+        # elif cls.__name__ == "YouthWorkshopProposal":
+        #    proposals = proposals.add_columns(
+        #        cls.participant_count, cls.participant_cost, cls.age_range, cls.participant_equipment
+        #    )
 
         # Some unaccepted proposals have scheduling data, but we shouldn't need to keep that
         accepted_columns = (
@@ -575,16 +744,17 @@ class Proposal(BaseModel):
             Venue.name,
         )
         accepted_proposals = (
-            proposals.filter(cls.is_accepted)
+            proposals.filter(cls.state.in_({"accepted", "finalised"}))
             .outerjoin(cls.scheduled_venue)
             .join(cls.user)
             .add_columns(*accepted_columns)
         )
 
-        other_proposals = proposals.filter(~cls.is_accepted)
+        other_proposals = proposals.filter(~cls.state.in_({"accepted", "finalised"}))
 
+        # FIXME schedule_items
         user_favourites = (
-            cls.query.filter(cls.is_accepted)
+            cls.query.filter(cls.state == "accepted")
             .join(cls.favourites)
             .with_entities(User.id.label("user_id"), cls.id)
             .order_by(User.id)
@@ -595,14 +765,48 @@ class Proposal(BaseModel):
             anon_favourites.append([p.id for p in proposals])
         anon_favourites.sort()
 
+        # FIXME: get rid of this
+        if False and cls.__name__ == "LightningTalkScheduleItem":
+            # Lightning talks don't usually get accepted
+            states_to_export = ["accepted", "new"]
+            columns_to_export = [
+                # Use the submitted fields directly
+                cls.title.label("published_title"),
+                cls.description.label("published_description"),
+                User.name.label("names"),
+                # We omit fields that we don't have since they didn't go through CfP:
+                # pronouns
+                # video_privacy
+                # scheduled_time
+                # scheduled_duration
+                # venue
+                # venue_village_id
+                # Lightning Talk specific fields:
+                cls.session,
+                cls.slide_link,
+            ]
+        else:
+            states_to_export = ["accepted"]
+            columns_to_export = [
+                cls.published_title,
+                cls.published_description,
+                cls.published_names.label("names"),
+                cls.published_pronouns.label("pronouns"),
+                cls.video_privacy,
+                cls.scheduled_time,
+                cls.scheduled_duration,
+                Venue.name.label("venue"),
+                Village.id.label("venue_village_id"),
+            ]
+
         exported_public = (
-            cls.query.filter(cls.should_be_exported)
+            cls.query.filter(cls.state.in_(states_to_export))
             .outerjoin(cls.scheduled_venue)
             .outerjoin(Venue.village)
-            .with_entities(*cls.public_export_columns())
+            .with_entities(*columns_to_export)
         )
 
-        favourite_counts = [p.favourite_count for p in proposals]
+        # favourite_counts = [p.favourite_count for p in proposals]
 
         data = {
             "private": {
@@ -619,7 +823,7 @@ class Proposal(BaseModel):
                     # This is still called accepted, but might not 'just' be accepted (e.g. Lightning Talks)
                     "accepted": exported_public,
                 },
-                "favourites": {"counts": bucketise(favourite_counts, [0, 1, 10, 20, 30, 40, 50, 100, 200])},
+                # "favourites": {"counts": bucketise(favourite_counts, [0, 1, 10, 20, 30, 40, 50, 100, 200])},
             },
             "tables": [
                 "proposal",
@@ -634,30 +838,10 @@ class Proposal(BaseModel):
 
         return data
 
-    def get_user_vote(self, user) -> CFPVote | None:
-        # there can't be more than one vote per user per proposal
-        return (
-            db.session.execute(
-                select(CFPVote).where(CFPVote.proposal_id == self.id, CFPVote.user_id == user.id)
-            )
-            .scalars()
-            .first()
-        )
-
-    def set_state(self, state):
-        state = state.lower()
-        if state not in CFP_STATES:
-            raise CfpStateException('"%s" is not a valid state' % state)
-
-        if state not in CFP_STATES[self.state]:
-            raise CfpStateException('"%s->%s" is not a valid transition' % (self.state, state))
-
-        self.state = state
-
     def get_unread_vote_note_count(self):
         return len([v for v in self.votes if not v.has_been_read])
 
-    def get_total_note_count(self):
+    def get_total_vote_note_count(self):
         return len([v for v in self.votes if v.note and len(v.note) > 0])
 
     def get_unread_messages(self, user):
@@ -672,33 +856,371 @@ class Proposal(BaseModel):
             msg.has_been_read = True
         return len(messages)
 
-    def has_ticket(self) -> bool:
-        "Does the submitter have a ticket?"
-        admission_tickets = len(list(self.user.get_owned_tickets(paid=True, type="admission_ticket")))
-        return admission_tickets > 0 or self.user.will_have_ticket
+    def create_schedule_item(self):
+        # Create a schedule item using suitable defaults from the proposal
+        schedule_item = ScheduleItem(
+            type=self.type,
+            state="unpublished",
+            user=self.user,
+            proposal=self,
+            names=self.user.name,
+            # pronouns
+            title=self.title,
+            description=self.description,
+            # short_description
+            official_content=True,
+            default_video_privacy="public",
+            # arrival_period
+            # departure_period
+            # available_times
+            # contact_telephone
+            # contact_eventphone
+        )
+        copy_common_attributes(self.attributes, schedule_item.attributes)
 
-    def get_allowed_venues(self) -> Sequence["Venue"]:
-        if self.allowed_venues:
-            return self.allowed_venues
-        elif self.user_scheduled:
-            return db.session.execute(select(Venue).where(~Venue.scheduled_content_only)).scalars().all()
-        else:
-            return (
-                db.session.execute(select(Venue).where(Venue.default_for_types.any_() == self.type))
-                .scalars()
-                .all()
+        if schedule_item.type_info.needs_occurrence:
+            schedule_item.occurrences.append(
+                Occurrence(
+                    state="unscheduled",
+                    occurrence_num=1,
+                    video_privacy=schedule_item.default_video_privacy,
+                )
             )
+
+        return schedule_item
+
+    @property
+    def is_editable(self) -> bool:
+        if self.state in {"new", "edit", "manual-review"}:
+            return True
+        return False
+
+    @property
+    def type_info(self) -> ProposalInfo:
+        return PROPOSAL_INFOS[self.type]
+
+    @property
+    def human_type(self) -> str:
+        return self.type_info.human_type
+
+    @property
+    def human_type_a(self) -> str:
+        # Same as human_type but includes a/an
+        return self.type_info.human_type_a
+
+    @property
+    def attributes(self) -> Attributes:
+        if self.attributes_json is None:
+            self.attributes_json = {}
+        # if you cache this, you probably want to invalidate when self.type changes
+        Proxy = attributes_proxy(self.type_info.attributes_cls, self.attributes_json)
+        return Proxy(**self.attributes_json)
+
+    @attributes.setter
+    def attributes(self, value: Attributes):
+        self.attributes_json = dataclasses.asdict(value)
+
+
+validate_state_transitions(Proposal.state, PROPOSAL_STATE_TRANSITIONS)
+
+
+@dataclass
+class ProposalInfo:
+    type: ProposalType
+    human_type: str
+    human_type_a: str
+    review_type: ReviewType
+    attributes_cls: Type[Attributes]
+
+
+# Ordering here currently determines ordering in the admin UI,
+# and maybe it shouldn't
+PROPOSAL_INFOS: dict[ProposalType, ProposalInfo] = {
+    "talk": ProposalInfo(
+        type="talk",
+        human_type="talk",
+        human_type_a="a talk",
+        review_type=ReviewType.anonymous,
+        attributes_cls=ProposalTalkAttributes,
+    ),
+    "performance": ProposalInfo(
+        type="performance",
+        human_type="performance",
+        human_type_a="a performance",
+        review_type=ReviewType.manual,
+        attributes_cls=ProposalPerformanceAttributes,
+    ),
+    "workshop": ProposalInfo(
+        type="workshop",
+        human_type="workshop",
+        human_type_a="a workshop",
+        review_type=ReviewType.anonymous,
+        attributes_cls=ProposalWorkshopAttributes,
+    ),
+    "youthworkshop": ProposalInfo(
+        type="youthworkshop",
+        human_type="youth workshop",
+        human_type_a="a youth workshop",
+        review_type=ReviewType.manual,
+        attributes_cls=ProposalYouthWorkshopAttributes,
+    ),
+    "installation": ProposalInfo(
+        # Installations might not have durations or Occurrences
+        type="installation",
+        human_type="installation",
+        human_type_a="an installation",
+        review_type=ReviewType.manual,
+        attributes_cls=ProposalInstallationAttributes,
+    ),
+}
+
+
+class ScheduleItem(BaseModel):
+    __versioned__: dict[str, Any] = {"exclude": ["favourited_by", "favourite_count"]}
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    type: Mapped[ScheduleItemType]
+    state: Mapped[ScheduleItemState] = mapped_column(
+        sqlalchemy.Enum(
+            *get_args(ScheduleItemState),
+            native_enum=False,
+        ),
+        default="published",
+    )
+
+    # An attendee schedule item has an associated owner who can edit it
+    # (in addition to anyone who's an admin for the scheduled village)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    proposal_id: Mapped[int | None] = mapped_column(ForeignKey("proposal.id"))
+
+    # Most of these are optional so that people can fill out data over time
+    # A schedule item should ideally be unpublished until then
+    names: Mapped[str | None]
+    pronouns: Mapped[str | None]
+    title: Mapped[str]
+    description: Mapped[str | None]
+    short_description: Mapped[str | None]
+
+    official_content: Mapped[bool] = mapped_column(default=False)
+
+    # Copied to new Occurrences, will usually be confirmed in finalisation
+    default_video_privacy: Mapped[VideoPrivacy]
+
+    arrival_period: Mapped[str | None]
+    departure_period: Mapped[str | None]
+    available_times: Mapped[str | None]
+
+    contact_telephone: Mapped[str | None]
+    contact_eventphone: Mapped[str | None]
+
+    # Used for sorting in the CfP review page
+    modified: Mapped[datetime] = mapped_column(default=naive_utcnow, onupdate=naive_utcnow)
+
+    attributes_json: Mapped[dict[str, Any] | None] = mapped_column(
+        "attributes", MutableDict.as_mutable(JSON), nullable=False, default=dict
+    )
+
+    user: Mapped[User] = relationship(back_populates="schedule_items", foreign_keys=[user_id])
+    proposal: Mapped[Proposal | None] = relationship(
+        back_populates="schedule_item", foreign_keys=[proposal_id]
+    )
+    occurrences: Mapped[list[Occurrence]] = relationship(
+        back_populates="schedule_item", order_by="Occurrence.occurrence_num"
+    )
+
+    is_published: Mapped[bool] = column_property(state.in_({"published"}))
+
+    favourited_by: Mapped[list[User]] = relationship(
+        secondary=FavouriteScheduleItem,
+        back_populates="favourites",
+    )
+
+    favourite_count = column_property(
+        select(func.count(FavouriteScheduleItem.c.schedule_item_id))
+        .where(FavouriteScheduleItem.c.schedule_item_id == id)
+        .scalar_subquery(),
+        deferred=True,
+    )
+
+    @property
+    def slug(self):
+        return schedule_item_slug(self.title)
+
+    @property
+    def type_info(self) -> ScheduleItemInfo:
+        return SCHEDULE_ITEM_INFOS[self.type]
+
+    @property
+    def human_type(self) -> str:
+        return self.type_info.human_type
+
+    @property
+    def human_type_a(self) -> str:
+        # Same as human_type but includes a/an
+        return self.type_info.human_type_a
+
+    @property
+    def has_lottery(self) -> bool:
+        return any(occurrence.lottery for occurrence in self.occurrences)
+
+    @property
+    def attributes(self) -> Attributes:
+        if self.attributes_json is None:
+            self.attributes_json = {}
+        Proxy = attributes_proxy(self.type_info.attributes_cls, self.attributes_json)
+        return Proxy(**self.attributes_json)
+
+    @attributes.setter
+    def attributes(self, value: Attributes):
+        self.attributes_json = dataclasses.asdict(value)
+
+
+validate_state_transitions(ScheduleItem.state, SCHEDULE_ITEM_STATE_TRANSITIONS)
+
+
+@dataclass
+class ScheduleItemInfo:
+    type: ScheduleItemType
+    human_type: str
+    human_type_a: str
+    supports_lottery: bool
+    needs_occurrence: bool
+    attributes_cls: Type[Attributes]
+    default_max_tickets_per_entry: int | None = None
+
+
+SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
+    # ScheduleItems that typically come via the review process
+    "talk": ScheduleItemInfo(
+        type="talk",
+        human_type="talk",
+        human_type_a="a talk",
+        supports_lottery=False,
+        needs_occurrence=True,
+        attributes_cls=TalkAttributes,
+    ),
+    "performance": ScheduleItemInfo(
+        type="performance",
+        human_type="performance",
+        human_type_a="a performance",
+        supports_lottery=False,
+        needs_occurrence=True,
+        attributes_cls=PerformanceAttributes,
+    ),
+    "workshop": ScheduleItemInfo(
+        type="workshop",
+        human_type="workshop",
+        human_type_a="a workshop",
+        supports_lottery=True,
+        needs_occurrence=True,
+        attributes_cls=WorkshopAttributes,
+        default_max_tickets_per_entry=2,
+    ),
+    "youthworkshop": ScheduleItemInfo(
+        type="youthworkshop",
+        human_type="youth workshop",
+        human_type_a="a youth workshop",
+        supports_lottery=True,
+        needs_occurrence=True,
+        attributes_cls=YouthWorkshopAttributes,
+        default_max_tickets_per_entry=5,
+    ),
+    "installation": ScheduleItemInfo(
+        type="installation",
+        human_type="installation",
+        human_type_a="an installation",
+        supports_lottery=False,
+        needs_occurrence=False,
+        attributes_cls=InstallationAttributes,
+    ),
+    # ScheduleItem types that are only created directly
+    "lightning": ScheduleItemInfo(
+        type="lightning",
+        human_type="lightning talk",
+        human_type_a="a lightning talk",
+        supports_lottery=False,
+        needs_occurrence=True,
+        attributes_cls=LightningTalkAttributes,
+    ),
+}
+
+
+class Occurrence(BaseModel):
+    __versioned__: dict[str, Any] = {}
+    __table_args__ = (UniqueConstraint("schedule_item_id", "occurrence_num"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    state: Mapped[OccurrenceState] = mapped_column(
+        sqlalchemy.Enum(
+            *get_args(OccurrenceState),
+            native_enum=False,
+        ),
+        default="unscheduled",
+    )
+
+    schedule_item_id: Mapped[int] = mapped_column(ForeignKey("schedule_item.id"))
+    occurrence_num: Mapped[int]
+    lottery_id: Mapped[int | None] = mapped_column(ForeignKey("lottery.id"))
+
+    # Prevents the scheduler from trying to move this occurrence
+    manually_scheduled: Mapped[bool] = mapped_column(default=False)
+
+    scheduled_duration: Mapped[int | None]  # in minutes
+    allowed_times: Mapped[str | None]
+    # allowed_venues has an association table
+    potential_time: Mapped[datetime | None]
+    potential_venue_id: Mapped[int | None] = mapped_column(ForeignKey("venue.id"))
+    scheduled_time: Mapped[datetime | None]
+    scheduled_venue_id: Mapped[int | None] = mapped_column(ForeignKey("venue.id"))
+
+    video_privacy: Mapped[VideoPrivacy]
+
+    c3voc_url: Mapped[str | None]
+    youtube_url: Mapped[str | None]
+    thumbnail_url: Mapped[str | None]
+    video_recording_lost: Mapped[bool] = mapped_column(default=False)
+
+    schedule_item: Mapped[ScheduleItem] = relationship(
+        "ScheduleItem", back_populates="occurrences", foreign_keys=[schedule_item_id]
+    )
+    allowed_venues: Mapped[list[Venue]] = relationship(
+        secondary=OccurrenceAllowedVenues,
+        back_populates="allowed_occurrences",
+    )
+    potential_venue: Mapped[Venue | None] = relationship(
+        primaryjoin="Venue.id == Occurrence.potential_venue_id"
+    )
+    scheduled_venue: Mapped[Venue | None] = relationship(
+        back_populates="occurrences",
+        primaryjoin="Venue.id == Occurrence.scheduled_venue_id",
+    )
+    shifts: Mapped[list["Shift"]] = relationship(back_populates="occurrence")
+    lottery: Mapped["Lottery | None"] = relationship(back_populates="occurrence")
+
+    proposal: AssociationProxy[Proposal | None] = association_proxy("schedule_item", "proposal")
+    user: AssociationProxy[User] = association_proxy("schedule_item", "user")
+
+    @property
+    def valid_allowed_venues(self) -> list["Venue"]:
+        if self.schedule_item.official_content:
+            return list(
+                db.session.scalars(select(Venue).where(Venue.allowed_types.any_() == self.schedule_item.type))
+            )
+        else:
+            return list(db.session.scalars(select(Venue).where(Venue.allows_attendee_content == True)))
 
     def fix_hard_time_limits(self, time_periods):
         # This should be fixed by the string periods being burned and replaced
-        if self.type in HARD_START_LIMIT:
+        if self.schedule_item.type in HARD_START_LIMIT:
             trimmed_periods = []
             for p in time_periods:
                 if (
-                    p.start.hour <= HARD_START_LIMIT[self.type][0]
-                    and p.start.minute < HARD_START_LIMIT[self.type][1]
+                    p.start.hour <= HARD_START_LIMIT[self.schedule_item.type][0]
+                    and p.start.minute < HARD_START_LIMIT[self.schedule_item.type][1]
                 ):
-                    p = cfp_period(p.start.replace(minute=HARD_START_LIMIT[self.type][1]), p.end)
+                    p = cfp_period(
+                        p.start.replace(minute=HARD_START_LIMIT[self.schedule_item.type][1]), p.end
+                    )
                 trimmed_periods.append(p)
             time_periods = trimmed_periods
         return time_periods
@@ -718,14 +1240,14 @@ class Proposal(BaseModel):
                         break
 
         # If we've not overridden it, use the user-specified periods
-        if not time_periods and self.available_times:
-            for p in self.available_times.split(","):
+        if not time_periods and self.schedule_item.available_times:
+            for p in self.schedule_item.available_times.split(","):
                 # Filter out timeslots the user selected that are not valid.
                 # This can happen if a proposal is converted between types, or
-                # if we remove timeslots after the proposal has been finalised
+                # if we remove timeslots after the proposal has been finalised.
                 p = p.strip()
-                if p in PROPOSAL_TIMESLOTS[self.type]:
-                    time_periods.append(timeslot_to_period(p, type=self.type))
+                if p in PROPOSAL_TIMESLOTS[self.schedule_item.type]:
+                    time_periods.append(timeslot_to_period(p, type=self.schedule_item.type))
 
         time_periods = self.fix_hard_time_limits(time_periods)
         return make_periods_contiguous(time_periods)
@@ -737,7 +1259,8 @@ class Proposal(BaseModel):
         allowed_time_periods = self.get_allowed_time_periods()
         if not allowed_time_periods:
             allowed_time_periods = [
-                timeslot_to_period(ts, type=self.type) for ts in PROPOSAL_TIMESLOTS[self.type]
+                timeslot_to_period(ts, type=self.schedule_item.type)
+                for ts in PROPOSAL_TIMESLOTS[self.schedule_item.type]
             ]
 
         allowed_time_periods = self.fix_hard_time_limits(allowed_time_periods)
@@ -745,280 +1268,84 @@ class Proposal(BaseModel):
 
     def get_preferred_time_periods_with_default(self):
         preferred_time_periods = [
-            timeslot_to_period(ts, type=self.type) for ts in PREFERRED_TIMESLOTS.get(self.type, [])
+            timeslot_to_period(ts, type=self.schedule_item.type)
+            for ts in PREFERRED_TIMESLOTS.get(self.schedule_item.type, [])
         ]
 
         preferred_time_periods = self.fix_hard_time_limits(preferred_time_periods)
         return make_periods_contiguous(preferred_time_periods)
 
-    def overlaps_with(self, other) -> bool:
-        this_start = self.potential_start_date or self.start_date
-        this_end = self.potential_end_date or self.end_date
-        other_start = other.potential_start_date or other.start_date
-        other_end = other.potential_end_date or other.end_date
+    def overlaps_with(self, other: Self) -> bool:
+        this_start = self.potential_time or self.scheduled_time
+        other_start = other.potential_time or other.scheduled_time
+        this_end = self.potential_end_time or self.scheduled_end_time
+        other_end = other.potential_end_time or other.scheduled_end_time
 
         if this_start and this_end and other_start and other_end:
             return this_end > other_start and other_end > this_start
         else:
             return False
 
-    def get_conflicting_content(self) -> list["Proposal"]:
+    def get_conflicting_content(self) -> list[Occurrence]:
+        # We don't care about schedule item state because we don't want to
+        # make it hard to yank something temporarily.
+
         # This is for attendee content, so will only conflict with other attendee
         # content or workshops. Workshops may not have a scheduled time/duration.
-        if self.scheduled_time is None or self.scheduled_duration is None:
-            # TODO: should this just return [] ?
-            raise ValueError("scheduled_time or scheduled_duration are None")
-        return [
-            p
-            for p in db.session.execute(
-                select(Proposal).filter(
-                    Proposal.id != self.id,
-                    Proposal.scheduled_venue_id == self.scheduled_venue_id,
-                    Proposal.scheduled_time.is_not(None),
-                    Proposal.scheduled_duration.is_not(None),
+        # TODO: what does the last bit above mean? Workshops have a scheduled time.
+        if self.state != "scheduled":
+            return []
+
+        venue_occurrences: list[Occurrence] = list(
+            db.session.scalars(
+                select(Occurrence).filter(
+                    Occurrence.id != self.id,
+                    Occurrence.state == "scheduled",
+                    Occurrence.scheduled_venue_id == self.scheduled_venue_id,
                 )
             )
-            .scalars()
-            .all()
-            # These casts are safe given the query above checks for NULL
-            if self.scheduled_time + timedelta(minutes=self.scheduled_duration)
-            > cast(datetime, p.scheduled_time)
-            and cast(datetime, p.scheduled_time) + timedelta(minutes=cast(int, p.scheduled_duration))
-            > self.scheduled_time
-        ]
-
-    @property
-    def is_editable(self):
-        if self.state in ["new", "edit", "manual-review"]:
-            return True
-        return False
-
-    @property
-    def start_date(self):
-        return self.scheduled_time
-
-    @property
-    def potential_start_date(self):
-        return self.potential_time
-
-    @property
-    def end_date(self) -> Optional[datetime]:
-        start = self.start_date
-        duration = self.scheduled_duration
-        if start and duration:
-            return start + timedelta(minutes=int(duration))
-        return None
-
-    @property
-    def potential_end_date(self) -> Optional[datetime]:
-        start = self.potential_start_date
-        duration = self.scheduled_duration
-        if start and duration:
-            return start + timedelta(minutes=int(duration))
-        return None
-
-    @property
-    def slug(self):
-        return proposal_slug(self.display_title)
-
-    @property
-    def latlon(self):
-        return self.scheduled_venue.latlon if self.scheduled_venue else None
-
-    @property
-    def map_link(self) -> Optional[str]:
-        return self.scheduled_venue.map_link if self.scheduled_venue else None
-
-    @property
-    def display_title(self) -> str:
-        return self.published_title or self.title
-
-
-class PerformanceProposal(Proposal):
-    __mapper_args__ = {"polymorphic_identity": "performance"}
-    human_type = HUMAN_CFP_TYPES["performance"]
-
-
-class TalkProposal(Proposal):
-    __mapper_args__ = {"polymorphic_identity": "talk"}
-    human_type = HUMAN_CFP_TYPES["talk"]
-
-
-class WorkshopProposal(Proposal):
-    __mapper_args__ = {"polymorphic_identity": "workshop"}
-    human_type = HUMAN_CFP_TYPES["workshop"]
-    attendees: Mapped[str | None]
-    cost: Mapped[str | None]
-    age_range: Mapped[str | None]
-    participant_equipment: Mapped[str | None]
-    published_age_range: Mapped[str | None]
-    published_cost: Mapped[str | None]
-    published_participant_equipment: Mapped[str | None]
-
-    requires_ticket: Mapped[bool | None] = mapped_column(default=False)
-    total_tickets: Mapped[int | None]
-    non_lottery_tickets: Mapped[int | None] = mapped_column(default=5)
-    max_tickets_per_person = 2
-    type_might_require_ticket = True
-
-    def get_total_capacity(self):
-        if not self.requires_ticket:
-            return 0
-        return self.total_tickets - self.sum_tickets_in_state("ticket")
-
-    def has_ticket_capacity(self):
-        return self.get_total_capacity() > 0
-
-    def get_lottery_capacity(self):
-        return self.get_total_capacity() - self.non_lottery_tickets
-
-    def has_lottery_capacity(self):
-        return self.get_lottery_capacity() > 0
-
-    def sum_tickets_in_state(self, state: str) -> int:
-        if not self.requires_ticket:
-            return 0
-        return sum([t.ticket_count for t in self.tickets if t.state == state])
-
-    @property
-    def display_cost(self) -> str:
-        if self.published_cost is not None:
-            cost = self.published_cost.strip()
-        elif self.cost is not None:
-            cost = self.cost.strip()
-        else:
-            return ""
-
-        # Some people put in a string, some just put in a £ amount
-        try:
-            floaty = float(cost)
-            # We don't want to return anything if it doesn't cost anything
-            if floaty > 0:
-                return "£" + cost
-            else:
-                return ""
-        except ValueError:
-            return cost
-
-    @property
-    def display_age_range(self) -> str:
-        if self.published_age_range is not None:
-            return self.published_age_range.strip()
-        if self.age_range is not None:
-            return self.age_range.strip()
-
-        return ""
-
-    @property
-    def display_participant_equipment(self) -> str:
-        if self.published_participant_equipment is not None:
-            return self.published_participant_equipment.strip()
-        if self.participant_equipment is not None:
-            return self.participant_equipment.strip()
-
-        return ""
-
-
-class YouthWorkshopProposal(WorkshopProposal):
-    __mapper_args__ = {"polymorphic_identity": "youthworkshop"}
-    human_type = HUMAN_CFP_TYPES["youthworkshop"]
-    valid_dbs: Mapped[bool] = mapped_column(default=False)
-    max_tickets_per_person = 2
-
-
-class InstallationProposal(Proposal):
-    __mapper_args__ = {"polymorphic_identity": "installation"}
-    human_type = HUMAN_CFP_TYPES["installation"]
-    size: Mapped[str | None]
-    installation_funding: Mapped[str | None]
-
-
-class LightningTalkProposal(Proposal):
-    __mapper_args__ = {"polymorphic_identity": "lightning"}
-    human_type = HUMAN_CFP_TYPES["lightning"]
-    slide_link: Mapped[str | None]
-    session: Mapped[str | None] = mapped_column(default="fri")
-
-    should_be_exported = column_property(
-        or_(
-            Proposal.is_accepted.expression,
-            Proposal.state == "new",
         )
-    )
 
-    @classmethod
-    def public_export_columns(cls):
-        return [
-            # Use the submitted fields directly
-            cls.title.label("published_title"),
-            cls.description.label("published_description"),
-            User.name.label("names"),
-            # We omit fields that we don't have since they didn't go through CfP:
-            # pronouns
-            # may_record
-            # video_privacy
-            # scheduled_time
-            # scheduled_duration
-            # venue
-            # venue_village_id
-            # Lightning Talk specific fields:
-            cls.session,
-            cls.slide_link,
-        ]
+        conflicts = []
+        for other in venue_occurrences:
+            # Safe assertions given the check for state == "scheduled":
+            assert self.scheduled_time is not None
+            assert self.scheduled_duration is not None
+            assert other.scheduled_time is not None
+            assert other.scheduled_duration is not None
 
-    def pretty_session(self):
-        return LIGHTNING_TALK_SESSIONS[self.session]["human"]
+            self_finish = self.scheduled_time + timedelta(minutes=self.scheduled_duration)
+            other_finish = other.scheduled_time + timedelta(minutes=other.scheduled_duration)
+            if self_finish > other.scheduled_time and other_finish > self.scheduled_time:
+                conflicts.append(other)
 
-    @classmethod
-    def get_days_with_slots(cls, now=None):
-        remaining_slots = cls.get_remaining_lightning_slots()
-        now = datetime.now() if now is None else now
+        return conflicts
 
-        # If we're before the event start we don't need to worry
-        if now < event_start():
-            return remaining_slots
+    # Basically only available if state == "scheduled"
+    @property
+    def scheduled_end_time(self) -> datetime | None:
+        start = self.scheduled_time
+        duration = self.scheduled_duration
+        if start and duration:
+            return start + timedelta(minutes=duration)
+        return None
 
-        # If the day has passed (or is today) there're no more slots for it
-        for day_name, date in get_days_map().items():
-            if date.date() <= now.date():
-                remaining_slots[day_name] = 0
-
-        return remaining_slots
-
-    @classmethod
-    def get_remaining_lightning_slots(cls):
-        # Find which day's sessions still have spaces
-
-        slots = cls.get_total_lightning_talk_slots()
-
-        day_counts = {
-            day: count
-            for (day, count) in cls.query.with_entities(
-                cls.session,
-                func.count(cls.id),
-            )
-            .filter(cls.state != "withdrawn")
-            .group_by(cls.session)
-            .all()
-        }
-        return {day: (count - day_counts.get(day, 0)) for (day, count) in slots.items()}
-
-    @classmethod
-    def get_total_lightning_talk_slots(cls):
-        return {k: v["slots"] for (k, v) in LIGHTNING_TALK_SESSIONS.items()}
+    # Can be accessible before state == "scheduled"
+    @property
+    def potential_end_time(self) -> datetime | None:
+        start = self.potential_time
+        duration = self.scheduled_duration
+        if start and duration:
+            return start + timedelta(minutes=duration)
+        return None
 
 
-PYTHON_CFP_TYPES = {
-    "performance": PerformanceProposal,
-    "talk": TalkProposal,
-    "workshop": WorkshopProposal,
-    "youthworkshop": YouthWorkshopProposal,
-    "installation": InstallationProposal,
-}
+validate_state_transitions(Occurrence.state, OCCURRENCE_STATE_TRANSITIONS)
 
 
-class CFPMessage(BaseModel):
-    __tablename__ = "cfp_message"
+class ProposalMessage(BaseModel):
+    __tablename__ = "proposal_message"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     created: Mapped[datetime | None] = mapped_column(default=naive_utcnow)
     from_user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
@@ -1047,6 +1374,7 @@ class CFPMessage(BaseModel):
         if is_user_proposer and not self.is_to_admin:
             return True
 
+        # FIXME: this is wrong for an admin who is also the proposer, rename it
         if is_user_admin and self.is_to_admin:
             return True
 
@@ -1081,17 +1409,18 @@ class CFPMessage(BaseModel):
         return data
 
 
-class CFPVote(BaseModel):
-    __versioned__: dict[str, str] = {}
-    __tablename__ = "cfp_vote"
+class ProposalVote(BaseModel):
+    __tablename__ = "proposal_vote"
+    __versioned__: dict[str, Any] = {}
+
+    # TODO: make (user_id, proposal_id) the PK instead?
+    __table_args__ = (UniqueConstraint("user_id", "proposal_id"),)
+
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     proposal_id: Mapped[int] = mapped_column(ForeignKey("proposal.id"))
     state: Mapped[str]
     has_been_read: Mapped[bool] = mapped_column(default=False)
-
-    created: Mapped[datetime] = mapped_column(default=naive_utcnow)
-    modified: Mapped[datetime] = mapped_column(default=naive_utcnow, onupdate=naive_utcnow)
 
     vote: Mapped[int | None]  # Vote can be null for abstentions
     note: Mapped[str | None]
@@ -1107,10 +1436,10 @@ class CFPVote(BaseModel):
     def set_state(self, state):
         state = state.lower()
         if state not in VOTE_STATES:
-            raise CfpStateException('"%s" is not a valid state' % state)
+            raise ProposalVoteStateException('"%s" is not a valid state' % state)
 
         if state not in VOTE_STATES[self.state]:
-            raise CfpStateException('"%s->%s" is not a valid transition' % (self.state, state))
+            raise ProposalVoteStateException('"%s->%s" is not a valid transition' % (self.state, state))
 
         self.state = state
 
@@ -1128,9 +1457,10 @@ class CFPVote(BaseModel):
             },
             "tables": ["cfp_vote", "cfp_vote_version"],
         }
-        data["public"]["votes"]["counts"]["created_day"] = export_intervals(
-            cls.query, cls.created, "day", "YYYY-MM-DD"
-        )
+        # FIXME
+        # data["public"]["votes"]["counts"]["created_day"] = export_intervals(
+        #    cls.query, cls.created, "day", "YYYY-MM-DD"
+        # )
 
         return data
 
@@ -1138,41 +1468,40 @@ class CFPVote(BaseModel):
 class Venue(BaseModel):
     __tablename__ = "venue"
     __export_data__ = False
+    __table_args__ = (UniqueConstraint("name", name="_venue_name_uniq"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     village_id: Mapped[int | None] = mapped_column(ForeignKey("village.id"), default=None)
     name: Mapped[str]
 
-    # Which type of proposals are allowed to be scheduled in this venue.
-    # (This is not really used yet.)
-    allowed_types: Mapped[list[str]] = mapped_column(
+    # Which type of schedule item are allowed to be scheduled in this venue.
+    allowed_types: Mapped[list[ScheduleItemType]] = mapped_column(
         MutableList.as_mutable(ARRAY(db.String)),
-        default=lambda: [],
+        default=list,
     )
 
-    # What type of proposals are the default for this venue.
-    # These are where the automatic scheduler will put proposals.
-    default_for_types: Mapped[list[str]] = mapped_column(
+    # What type of schedule items are the default for this venue.
+    # These are where the automatic scheduler will put items.
+    default_for_types: Mapped[list[ScheduleItemType]] = mapped_column(
         MutableList.as_mutable(ARRAY(db.String)),
-        default=lambda: [],
+        default=list,
     )
-    priority: Mapped[int | None] = mapped_column(default=0)
+    priority: Mapped[int] = mapped_column(default=0)
     capacity: Mapped[int | None]
     location: Mapped[WKBElement | None] = mapped_column(Geometry("POINT", srid=4326))
-    scheduled_content_only: Mapped[bool | None]
+    allows_attendee_content: Mapped[bool | None]
 
     village: Mapped[Village] = relationship(
         back_populates="venues",
         primaryjoin="Village.id == Venue.village_id",
     )
-    proposals: Mapped[list[Proposal]] = relationship(
-        back_populates="scheduled_venue", foreign_keys=[Proposal.scheduled_venue_id]
+    occurrences: Mapped[list[Occurrence]] = relationship(
+        back_populates="scheduled_venue", foreign_keys=[Occurrence.scheduled_venue_id]
     )
-    allowed_proposals: Mapped[list[Proposal]] = relationship(
-        back_populates="allowed_venues", secondary=ProposalAllowedVenues
+    allowed_occurrences: Mapped[list[Occurrence]] = relationship(
+        back_populates="allowed_venues",
+        secondary=OccurrenceAllowedVenues,
     )
-
-    __table_args__ = (UniqueConstraint("name", name="_venue_name_uniq"),)
 
     def __repr__(self):
         return "<Venue id={}, name={}>".format(self.id, self.name)
@@ -1231,47 +1560,36 @@ class Venue(BaseModel):
 
     @property
     def map_link(self) -> Optional[str]:
-        latlon = self.latlon
-        if latlon:
-            return "https://map.emfcamp.org/#18.5/%s/%s/m=%s,%s" % (
-                latlon[0],
-                latlon[1],
-                latlon[0],
-                latlon[1],
-            )
-        return None
+        if not self.latlon:
+            return None
+        lat, lon = self.latlon
+        return f"https://map.emfcamp.org/#18.5/{lat}/{lon}/m={lat},{lon}"
 
-
-# TODO: change the relationships on User and Proposal to 1-to-1
-db.Index("ix_cfp_vote_user_id_proposal_id", CFPVote.user_id, CFPVote.proposal_id, unique=True)
 
 __all__ = [
-    "HUMAN_CFP_TYPES",
-    "PYTHON_CFP_TYPES",
-    "CFP_STATES",
-    "ORDERED_STATES",
+    "PROPOSAL_INFOS",
     "VOTE_STATES",
-    "LENGTH_OPTIONS",
-    "ROUGH_LENGTHS",
+    "DURATION_OPTIONS",
+    "ROUGH_DURATIONS",
     "PROPOSAL_TIMESLOTS",
     "PREFERRED_TIMESLOTS",
     "HARD_START_LIMIT",
     "REMAP_SLOT_PERIODS",
     "EVENT_SPACING",
     "cfp_period",
-    "proposal_slug",
+    "schedule_item_slug",
     "timeslot_to_period",
     "make_periods_contiguous",
-    "CfpStateException",
     "InvalidVenueException",
-    "FavouriteProposal",
+    "FavouriteScheduleItem",
     "Proposal",
-    "PerformanceProposal",
-    "TalkProposal",
-    "WorkshopProposal",
-    "YouthWorkshopProposal",
-    "InstallationProposal",
-    "CFPMessage",
-    "CFPVote",
+    "ProposalMessage",
+    "ProposalVote",
     "Venue",
+    "Attributes",
+    "TalkAttributes",
+    "PerformanceAttributes",
+    "WorkshopAttributes",
+    "YouthWorkshopAttributes",
+    "InstallationAttributes",
 ]

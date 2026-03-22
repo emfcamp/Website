@@ -1,0 +1,26 @@
+{% macro summary_table(counts, key) %}
+<table class="table table-condensed table-striped">
+  <tr>
+    <th></th>
+    <th>Total</th>
+    {% for type_info in SCHEDULE_ITEM_INFOS.values() %}
+      <th>{{ type_info.human_type | capitalize }}</th>
+    {% endfor %}
+  </tr>
+  {% for (value, counts_by_type) in counts.items() | sort(attribute=0) %}
+    <tr>
+      <th scope="row"><a href="{{url_for('.schedule_items', **{key: value})}}">{{ value }}</a></td>
+      <th scope="row">{{ counts_by_type["total"] }}</th>
+      {% for type in schedule_item_types %}
+        <td><a href="{{url_for('.schedule_items', type=type, **{key: value})}}">{{ counts_by_type[type] }}</a></td>
+      {% endfor %}
+    </tr>
+  {% endfor %}
+</table>
+{% endmacro %}
+
+{% extends "cfp_review/base.html" %}
+{% block body %}
+  <h3>By State</h3>
+  {{ summary_table(counts_by_state, key="state") }}
+{% endblock %}

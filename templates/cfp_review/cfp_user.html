@@ -6,7 +6,7 @@
 {% else %}
 {% endif %}
 Email: {{ user.email }}<br/>
-Has ticket: {{ user.proposals[0].has_ticket() }}
+Has ticket: {{ user.check_will_have_ticket() }}
 {% if user.cfp_invite_reason %}
     <b>Invited speaker.</b> Invite reason: {{ user.cfp_invite_reason }}<br/>
 {% else %}
@@ -28,12 +28,12 @@ Has ticket: {{ user.proposals[0].has_ticket() }}
     <tr>
         <td>{{proposal.created.strftime("%d/%m")}}</td>
         <td>{{proposal.state | capitalize}}</td>
-        <td>{%- if proposal.user_scheduled %}Attendee&nbsp;{% endif -%}{{proposal.human_type | capitalize}}</td>
+        <td>{%- if not proposal.official_content %}Attendee&nbsp;{% endif -%}{{proposal.human_type | capitalize}}</td>
         <td>{{proposal.notice_required or ''}}</td>
-        <td>{{proposal.scheduled_duration or ''}}</td>
+        <td>{{proposal.duration or ''}}</td>
         <td>{{proposal.favourite_count}}</td>
         <td>
-            <a href="{{ url_for('.update_proposal', proposal_id=proposal.id, **full_qs) }}">{{proposal.published_title or proposal.title}}</a>
+            <a href="{{ url_for('.update_proposal', proposal_id=proposal.id, **full_qs) }}">{{ proposal.title }}</a>
         </td>
         <td>
             <a href="{{ url_for('.message_proposer', proposal_id=proposal.id, **full_qs) }}">{{ proposal.get_unread_count(current_user) }}/{{ proposal.messages | length }}</a>
