@@ -12,11 +12,14 @@
 <p>If you have any questions,
    please <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}?subject=Refund Query (WEB-{{payment.id}})">drop us an email</a>.</p>
 
-<p>We cannot refund tickets you have transferred to others or checked in. If you have transferred tickets please request them back
+<p>We can't refund tickets you have transferred to others or checked in. If you have transferred tickets please request them back
    and we can then refund them.</p>
 
 {% if REFUND_STATE=="illness" %}
-  <p>We are currently only issuing refunds in case of illness.</p>
+  <p><strong>We are now only issuing refunds if you have an infectious illness which prevents you from attending</strong>.
+      We trust you to use this offer responsibly, as we may not be able to resell your refunded tickets.
+      Thank you for helping keep EMF attendees healthy!
+  </p>
 {% endif %}
 
 <div class="panel panel-default">
@@ -38,7 +41,7 @@
           {{ f.hidden_tag() }} {# Set the purchase ID #}
           {{ f.refund(disabled=f._disabled, class_="big-checkbox") }}
           <label class="control-label big-checkbox" for="{{ f.refund.id }}">
-            {{ f.refund.label.text }} ({{ f._purchase.price_tier.get_price(payment.currency) | price(payment.currency) }})
+            {{ f.refund.label.text }} ({{ f._purchase.price_tier.get_price(payment.currency) | price }})
           </label>
           {% for error in f.refund.errors %}
           <div class="help-block">{{ error }}</div>

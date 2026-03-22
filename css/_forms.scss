@@ -5,7 +5,7 @@
 .form-control {
     background-color: $form-element;
 }
-  
+
 .form-horizontal .form-group .help-block {
     padding-left: 0.5em;
 }
@@ -13,14 +13,13 @@
 input[type="checkbox"] {
     width: 20px;
     height: 20px;
-    margin-left: -25px !important;
     margin-top: 4px !important;
 }
 
 fieldset legend {
     margin-bottom: 10px;
 }
-  
+
 input[type=range] {
     appearance: none;
     border: none;
