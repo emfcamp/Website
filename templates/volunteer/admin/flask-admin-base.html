@@ -1,88 +1,44 @@
-{% import 'admin/layout.html' as layout with context -%}
-{% import 'admin/static.html' as admin_static with context %}
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>{% block title %}{% if admin_view.category %}{{ admin_view.category }} - {% endif %}{{ admin_view.name }} - {{ admin_view.admin.name }}{% endblock %}</title>
-    {% block head_meta %}
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="">
-        <meta name="author" content="">
-    {% endblock %}
-    {% block head_css %}
-        <link href="{{ admin_static.url(filename='bootstrap/bootstrap3/swatch/{swatch}/bootstrap.min.css'.format(swatch=config.get('FLASK_ADMIN_SWATCH', 'default')), v='3.3.5') }}" rel="stylesheet">
-        {%if config.get('FLASK_ADMIN_SWATCH', 'default') == 'default' %}
-        <link href="{{ admin_static.url(filename='bootstrap/bootstrap3/css/bootstrap-theme.min.css', v='3.3.5') }}" rel="stylesheet">
-        {%endif%}
-        <link href="{{ admin_static.url(filename='admin/css/bootstrap3/admin.css', v='1.1.1') }}" rel="stylesheet">
-        {% if admin_view.extra_css %}
-          {% for css_url in admin_view.extra_css %}
-            <link href="{{ css_url }}" rel="stylesheet">
-          {% endfor %}
-        {% endif %}
-        <style>
-        </style>
-    {% endblock %}
-    {% block head %}
-    {% endblock %}
-    {% block head_tail %}
-    {% endblock %}
-  </head>
-  <body>
-    {% if config['STAGING_WARNING'] %}
-    {# Show a banner on systems that aren't in debug mode (e.g. emfcamp-test.org) #}
-    <div class="non-prod-banner alert-warning">This is not the production site. Please <a href="https://www.emfcamp.org/">click here</a> to learn more about Electromagnetic Field.</div>
-    {% endif %}
-    {% block page_body %}
+{% extends "base.html" %}
+{% block css %}
+    <link rel="stylesheet" href="{{ static_url_for('static', filename='css/admin.css') }}">
+{% endblock %}
 
-    <nav class="navbar navbar-default" role="navigation">
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#admin-navbar-collapse">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        {% block brand %}
-        <a class="navbar-brand" href="{{ admin_view.admin.url }}">{{ admin_view.admin.name }}</a>
-        {% endblock %}
-      </div>
-      <!-- navbar content -->
-      <div class="collapse navbar-collapse" id="admin-navbar-collapse">
-        {% include "volunteer/admin/_nav.html" %}
-        {% block access_control %}
-        {% endblock %}
-      </div>
-    </nav>
-
-    <div class="container">
-      {% block messages %}
-      {{ layout.messages() }}
-      {% endblock %}
-
-      {# store the jinja2 context for form_rules rendering logic #}
-      {% set render_ctx = h.resolve_ctx() %}
-
-      {% block body %}{% endblock %}
+{% block document %}
+{% block nav %}
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{{ url_for('admin.home') }}">EMF Admin</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            {% include "volunteer/admin/_nav.html" %}
+            {% block access_control %}
+            {% endblock %}
+        </div>
     </div>
-    {% endblock %}
+</nav>
+{% endblock %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+        {% for category, message in get_flashed_messages(with_categories=True) -%}
+            {% if category == "message" %}
+                {% set category = "info" %}
+            {% endif %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor -%}
 
-    {% block tail_js %}
-    <script src="{{ admin_static.url(filename='vendor/jquery.min.js', v='2.1.4') }}" type="text/javascript"></script>
-    <script src="{{ admin_static.url(filename='bootstrap/bootstrap3/js/bootstrap.min.js', v='3.3.5') }}" type="text/javascript"></script>
-    <script src="{{ admin_static.url(filename='vendor/moment.min.js', v='2.9.0') }}" type="text/javascript"></script>
-    <script src="{{ admin_static.url(filename='vendor/select2/select2.min.js', v='3.5.2') }}" type="text/javascript"></script>
-    {% if admin_view.extra_js %}
-      {% for js_url in admin_view.extra_js %}
-        <script src="{{ js_url }}" type="text/javascript"></script>
-      {% endfor %}
-    {% endif %}
-    {% endblock %}
+        {% block body -%}{% endblock -%}
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-    {% block tail %}
-    {% endblock %}
-  </body>
-</html>
+{% block foot %}
+{% endblock %}
