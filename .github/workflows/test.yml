@@ -15,13 +15,13 @@ jobs:
     env:
       RUFF_OUTPUT_FORMAT: github
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: "Set up Python"
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version-file: "pyproject.toml"
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
       - name: Install packages
@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: lint
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build containers
         run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml build --parallel
       - name: Test

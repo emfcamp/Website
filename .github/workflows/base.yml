@@ -9,17 +9,17 @@ on:
     branches:
       - main
     paths:
-      - '.github/workflows/base.yml'
-      - 'docker/Dockerfile.base'
-      - 'docker/Dockerfile.base.dockerignore'
-      - 'docker/Dockerfile.base-dev'
-      - 'docker/Dockerfile.base-dev.dockerignore'
-      - 'pyproject.toml'
-      - 'uv.lock'
-      - 'package.json'
-      - 'package-lock.json'
+      - ".github/workflows/base.yml"
+      - "docker/Dockerfile.base"
+      - "docker/Dockerfile.base.dockerignore"
+      - "docker/Dockerfile.base-dev"
+      - "docker/Dockerfile.base-dev.dockerignore"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "package.json"
+      - "package-lock.json"
   schedule:
-    - cron:  '30 5 */14 * *'
+    - cron: "30 5 */14 * *"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -31,23 +31,23 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
-      
+        uses: actions/checkout@v6
+
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-    
+
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Build and push base image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
           tags: ghcr.io/emfcamp/website-base:latest
@@ -55,7 +55,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
 
       - name: Build and push base-dev image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
           tags: ghcr.io/emfcamp/website-base-dev:latest
