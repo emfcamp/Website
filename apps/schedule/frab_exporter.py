@@ -230,7 +230,7 @@ class FrabJsonExporter(FrabExporter):
                                             flat_sid["occurrences"][0]["end_date"],
                                         ),
                                         "room": room["name"],
-                                        "slug": f"""emf{event_year()}-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}""",
+                                        "slug": f"""emf{event_year()}-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}-""",
                                         "url": flat_sid["link"],
                                         "title": flat_sid["title"],
                                         "subtitle": "",
@@ -359,7 +359,7 @@ class FrabXmlExporter(FrabExporter):
         self._add_sub_with_text(event, "abstract", flat_sid["description"])
         self._add_sub_with_text(event, "description", "")
 
-        slug = f"""emf{event_year()}-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}"""
+        slug = f"""emf{event_year()}-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}-"""
         self._add_sub_with_text(event, "slug", slug)
 
         self._add_sub_with_text(event, "subtitle", "")
