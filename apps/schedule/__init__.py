@@ -1,7 +1,5 @@
-"""
-Schedule App
+"""This app displays what talks are happening from the CfP system. A deceptively complex task.
 
-This app displays what talks are happening from the CfP system. A deceptively complex task.
 The schedule for an event can be in one of four modes:
 
     * There's no schedule yet, why not look at previous years'?
@@ -10,7 +8,8 @@ The schedule for an event can be in one of four modes:
     * There's actually a schedule and you should probably work out which talks you're going to.
     * The event has finished, and we're displaying an archived schedule.
 
-## Configuration Flags
+Configuration Flags
+^^^^^^^^^^^^^^^^^^^
 
 The schedule app uses two configuration flags to determine how to render the schedule
 for the current event (these don't affect historic events).

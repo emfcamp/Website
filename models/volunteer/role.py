@@ -24,22 +24,31 @@ __all__ = [
 
 
 class Role(BaseModel):
+    """A role which a volunteer can perform."""
+
     __tablename__ = "volunteer_role"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True, index=True)
     description: Mapped[str | None]
     full_description_md: Mapped[str | None] = mapped_column(Text)
     instructions_url: Mapped[str | None]
-    # Things to know for the shift
+    #: Things to know for the shift
     role_notes: Mapped[str | None]
+    #: Whether the role is restricted to over-18s (e.g. bar shifts)
     over_18_only: Mapped[bool] = mapped_column(default=False)
+    #: Whether the role requires training to perform
     requires_training: Mapped[bool] = mapped_column(default=False)
 
+    #: Admins for this role
     admins: Mapped[list["RoleAdmin"]] = relationship(back_populates="role")
+    #: Shifts
     shifts: Mapped[list["Shift"]] = relationship(back_populates="role")
+
+    #: Volunteers who are interested in this role
     interested_volunteers: Mapped[list["Volunteer"]] = relationship(
         back_populates="interested_roles", secondary=VolunteerRoleInterest
     )
+    #: Volunteers who are trained for this role
     trained_volunteers: Mapped[list["Volunteer"]] = relationship(
         back_populates="trained_roles", secondary=VolunteerRoleTraining
     )
@@ -143,7 +152,9 @@ class RoleAdmin(BaseModel):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
     role_id: Mapped[int] = mapped_column(ForeignKey("volunteer_role.id"), primary_key=True)
 
+    #: Website user
     user: Mapped["User"] = relationship(back_populates="volunteer_admin_roles")
+    #: Role the user is an admin for
     role: Mapped[Role] = relationship(back_populates="admins")
 
 

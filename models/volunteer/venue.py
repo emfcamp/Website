@@ -11,6 +11,8 @@ __all__ = ["VolunteerVenue"]
 
 
 class VolunteerVenue(BaseModel):
+    """A location for a volunteering shift."""
+
     __tablename__ = "volunteer_venue"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True, index=True)

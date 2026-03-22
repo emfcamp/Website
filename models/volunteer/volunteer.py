@@ -37,6 +37,8 @@ VolunteerRoleTraining = Table(
 
 
 class Volunteer(BaseModel, UserMixin):
+    """A volunteer, which is mapped 1:1 to a website :class:`User`."""
+
     __tablename__ = "volunteer"
     __versioned__: dict[str, str] = {}
 
@@ -50,13 +52,17 @@ class Volunteer(BaseModel, UserMixin):
 
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
+    #: The website user object for this volunteer
     user: Mapped["User"] = relationship(back_populates="volunteer")
 
+    #: Roles a volunteer is interested in performing
     interested_roles: Mapped[list["Role"]] = relationship(
         back_populates="interested_volunteers",
         secondary=VolunteerRoleInterest,
         lazy="dynamic",
     )
+
+    #: Roles a volunteer has been trained to perform
     trained_roles: Mapped[list["Role"]] = relationship(
         back_populates="trained_volunteers",
         secondary=VolunteerRoleTraining,

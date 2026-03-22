@@ -61,6 +61,8 @@ class ShiftEntryStateException(ValueError):
 
 
 class ShiftEntry(BaseModel):
+    """"""
+
     __tablename__ = "volunteer_shift_entry"
     __versioned__: dict[str, str] = {}
 
@@ -88,6 +90,8 @@ class ShiftEntry(BaseModel):
 
 
 class Shift(BaseModel):
+    """An available shift for one or more volunteers to perform."""
+
     __tablename__ = "volunteer_shift"
     __versioned__: dict[str, str] = {}
 
@@ -97,12 +101,19 @@ class Shift(BaseModel):
     occurrence_id: Mapped[int | None] = mapped_column(ForeignKey("occurrence.id"))
     start: Mapped[datetime] = mapped_column()
     end: Mapped[datetime] = mapped_column()
+
+    #: Minimum number of volunteers required for the shift
     min_needed: Mapped[int] = mapped_column(default=0)
+    #: Maximum number of volunteers required for the shift
     max_needed: Mapped[int] = mapped_column(default=0)
 
+    #: Role that this shift is filling
     role: Mapped["Role"] = relationship(back_populates="shifts")
+    #: Venue where the shift occurs
     venue: Mapped["VolunteerVenue"] = relationship(back_populates="shifts")
+    #: Optional Occurrence (talk/workshop) related to this shift
     occurrence: Mapped["Occurrence"] = relationship(back_populates="shifts")
+    #: Entries (volunteers) for this shift
     entries: Mapped[list[ShiftEntry]] = relationship(back_populates="shift")
 
     current_count = column_property(
@@ -145,10 +156,7 @@ class Shift(BaseModel):
         }
 
     def is_clash(self, other):
-        """
-        If the venues and roles match then the shifts can overlap
-        """
-
+        # If the venues and roles match then the shifts can overlap.
         if self.venue == other.venue and self.role == other.role:
             return False
         return other.start <= self.start <= other.end or self.start <= other.start <= self.end
@@ -184,9 +192,7 @@ class Shift(BaseModel):
 
     @classmethod
     def get_all_for_day(cls, day: str) -> Sequence[Self]:
-        """
-        Return all shifts for the requested day.
-        """
+        """Return all shifts for the requested day."""
         return (
             db.session.execute(
                 select(cls)
@@ -199,9 +205,8 @@ class Shift(BaseModel):
 
     @classmethod
     def generate_for(cls, role, venue, first, final, min, max, base_duration=120, changeover=15):
-        """
-        Will generate shifts between start and end times. The last shift will
-        end at end.
+        """Will generate shifts between start and end times. The last shift will end at end.
+
         changeover is the changeover time in minutes.
         This will mean that during changeover there will be two shifts created.
         """

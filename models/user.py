@@ -47,8 +47,7 @@ checkin_code_re = rf"[0-9a-zA-Z_-]{{{CHECKIN_CODE_LEN}}}"
 
 
 def _generate_hmac(prefix: bytes | str, key: bytes | str, msg: bytes | str) -> bytes:
-    """
-    Generate a keyed HMAC for a unique purpose. You don't want to call this directly.
+    """Generate a keyed HMAC for a unique purpose. You don't want to call this directly.
 
     This returns bytes because we don't want to assume the encoding of msg.
     """

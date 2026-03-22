@@ -1,3 +1,8 @@
+"""The base app is responsible for everything on the website which isn't handled by other apps.
+
+This includes the front page and all the info pages.
+"""
+
 import os
 
 import requests

@@ -500,10 +500,7 @@ class ProposalInstallationAttributes(InstallationAttributes):
 
 def attributes_proxy(attributes_cls: type[Attributes], store: dict[str, Any]) -> type[Attributes]:
     class AttributesProxy(attributes_cls):  # type: ignore[valid-type, misc]
-        """
-        Forwards dataclass fields to a backing dict, blocking
-        access to anything not defined by the dataclass.
-        """
+        """Forwards dataclass fields to a backing dict, blocking access to anything not defined by the dataclass."""
 
         def __new__(cls, *args, **kwargs):
             obj = super().__new__(cls)
@@ -594,11 +591,20 @@ ScheduleItemType = Literal[
 
 
 class Proposal(BaseModel):
+    """A proposal for content submitted to us through the Call for Participation.
+
+    Proposals can be reviewed manually or through the anonymous review system. If a proposal is accepted, a :class:`ScheduleItem` is created.
+    """
+
     __tablename__ = "proposal"
     __versioned__: dict[str, Any] = {}
 
     id: Mapped[int] = mapped_column(primary_key=True)
+
+    #: The type of the proposal. This controls how the proposal is handled.
     type: Mapped[ProposalType]
+
+    #: The state of the proposal: where it is in the review process
     state: Mapped[ProposalState] = mapped_column(
         sqlalchemy.Enum(
             *get_args(ProposalState),
@@ -607,7 +613,6 @@ class Proposal(BaseModel):
         default="new",
     )
 
-    # Proposals have an associated user, usually the person who submitted it
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     anonymiser_id: Mapped[int | None] = mapped_column(ForeignKey("user.id"), default=None)
 
@@ -638,6 +643,7 @@ class Proposal(BaseModel):
         "attributes", MutableDict.as_mutable(JSON), nullable=False, default=dict
     )
 
+    #: The associated user, usually the person who submitted the proposal
     user: Mapped[User] = relationship(back_populates="proposals", foreign_keys=[user_id])
     messages: Mapped[list[ProposalMessage]] = relationship(back_populates="proposal")
     votes: Mapped[list[ProposalVote]] = relationship(back_populates="proposal")
@@ -976,6 +982,13 @@ PROPOSAL_INFOS: dict[ProposalType, ProposalInfo] = {
 
 
 class ScheduleItem(BaseModel):
+    """An item of content in the schedule.
+
+    This contains the details displayed in the schedule on the website. ScheduleItems
+    are created for a Proposal if it's submitted through the CfP and accepted, but
+    they can also be created directly by villages.
+    """
+
     __versioned__: dict[str, Any] = {"exclude": ["favourited_by", "favourite_count"]}
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -1146,6 +1159,12 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
 
 
 class Occurrence(BaseModel):
+    """
+    An occurrence of a ScheduleItem. This indicates when and where a ScheduleItem will occur.
+
+    In some cases (such as workshops), there might be multiple occurrences of a ScheduleItem.
+    """
+
     __versioned__: dict[str, Any] = {}
     __table_args__ = (UniqueConstraint("schedule_item_id", "occurrence_num"),)
 
@@ -1466,6 +1485,13 @@ class ProposalVote(BaseModel):
 
 
 class Venue(BaseModel):
+    """
+    A location where content can be scheduled.
+
+    This can be an official talk stage, a village location, or any other
+    place on site.
+    """
+
     __tablename__ = "venue"
     __export_data__ = False
     __table_args__ = (UniqueConstraint("name", name="_venue_name_uniq"),)
