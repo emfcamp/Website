@@ -1,6 +1,6 @@
 name: Deploy
 
-on: 
+on:
   push:
     branches:
       - main
@@ -15,6 +15,7 @@ jobs:
     uses: ./.github/workflows/test.yml
     permissions:
       contents: read
+
   build:
     name: Build and publish production containers
     runs-on: ubuntu-latest
@@ -42,3 +43,35 @@ jobs:
         run: docker push ghcr.io/emfcamp/website-static:latest
       - name: Publish app image
         run: docker push ghcr.io/emfcamp/website:latest
+
+  build-docs:
+    name: Build docs
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build docs
+        run: make docs
+      - name: Upload docs artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _docs/
+
+  upload-docs:
+    name: Deploy docs
+    needs: build-docs
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

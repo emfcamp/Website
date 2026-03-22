@@ -1,10 +1,8 @@
-Deploying outside a development environment
-===========================================
+# Deployment
 
 Production is on heaviside.emfcamp.org.
-Staging (https://www.emfcamp-test.org) is on kelvin.emfcamp.org.
 
-# First install
+## First install
 
 This is done after each event, following a clear of the database:
 
@@ -18,7 +16,7 @@ Periodic tasks need to be triggered by calling `flask periodic` - this can be do
 
     */2 * * * * /srv/docker/Website/docker-compose exec app uv run flask periodic > /dev/null 2>&1
 
-# Deployments
+## Deployments
 
 Deployments run automatically when a new container is built by Github Actions
 and pushed to Github Container Registry. This is done using [Watchtower](https://containrrr.dev/watchtower/).
@@ -31,7 +29,7 @@ or, if the app won't start:
 
     docker compose -f /root/Website/docker-compose.prod.yml run --rm --entrypoint=uv app run flask db upgrade
 
-# Admin Commands
+## Admin Commands
 
 Admin commands can be listed with:
 

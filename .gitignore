@@ -137,3 +137,4 @@ node_modules
 
 cov.md
 mypy-report/
+_docs/

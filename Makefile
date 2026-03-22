@@ -6,7 +6,7 @@ ifeq ("$(TEST_SETTINGS)", "")
 	TEST_SETTINGS=./config/test.cfg
 endif
 
-.PHONY: test check-syntax fix-syntax pytest
+.PHONY: test check-syntax fix-syntax pytest docs
 
 test: check-syntax pytest
 
@@ -26,3 +26,11 @@ fix-syntax:
 	ruff format ./*.py ./apps ./models ./tests
 	ruff check --fix ./*.py ./apps ./models ./tests
 	mypy ./*.py ./apps ./models
+
+
+docs:
+	uv run --group docs sphinx-build ./docs ./_docs
+
+
+docs-dev:
+	uv run --group docs sphinx-autobuild --watch . ./docs ./_docs
