@@ -36,7 +36,7 @@
     {% elif proposal.type == 'installation' %}
       {# Why is form.equipment_required not shown? #}
       {{ render_field(form.notice_required, 9) }}
-      {{ render_field(form.size, 9) }}
+      {{ render_field(form.attributes.size, 9) }}
 
     {# FIXME: lightning talks aren't proposals #}
     {% elif proposal.type == 'lightning' %}
@@ -72,7 +72,7 @@
     <fieldset>
       <legend>Funding</legend>
       {% if proposal.type in ['installation'] %}
-      {% call render_field(form.installation_funding, 9) %}
+      {% call render_field(form.attributes.grant_requested, 9) %}
           If you'd like to apply for a grant, let us know how much you'll need.
       {% endcall %}
       {% endif %}
