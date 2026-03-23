@@ -19,7 +19,7 @@ from wtforms import BooleanField, FormField, StringField, SubmitField, TextAreaF
 import collections
 from sqlalchemy.exc import IntegrityError
 
-from main import db, external_url, get_or_404
+from main import db, get_or_404
 from models.user import User
 from models.cfp import (
     AGE_RANGE_OPTIONS,
@@ -37,7 +37,6 @@ from ..common import feature_flag, feature_enabled, create_current_user
 from ..common.email import from_email
 from ..common.forms import Form, DiversityForm
 from ..common.fields import TelField, EmailField
-from ..common.irc import irc_send
 
 from . import cfp
 
@@ -315,12 +314,13 @@ def create_proposal(proposal_type: ProposalType = "talk"):
         email.body = render_template("emails/cfp-submission.txt", proposal=proposal, new_user=new_user)
         email.send()
 
-        if channel := app.config.get("CONTENT_IRC_CHANNEL"):
-            # WARNING: don't send personal information via this (the channel is public)
-            msg = f"New CfP {proposal.human_type} submission: {external_url('cfp_review.update_proposal', proposal_id=proposal.id)}"
-            if form.needs_help.data:
-                msg = f"🚨 {msg}. Calls for aid (they've clicked 'needs help') 🚨"
-            irc_send(channel, msg)
+        # TODO: send to Mattermost
+        # if channel := app.config.get("CONTENT_IRC_CHANNEL"):
+        #    # WARNING: don't send personal information via this (the channel is public)
+        #    msg = f"New CfP {proposal.human_type} submission: {external_url('cfp_review.update_proposal', proposal_id=proposal.id)}"
+        #    if form.needs_help.data:
+        #        msg = f"🚨 {msg}. Calls for aid (they've clicked 'needs help') 🚨"
+        #    irc_send(channel, msg)
         return redirect(url_for(".complete"))
 
     return render_template(
@@ -677,17 +677,18 @@ def finalise_proposal(proposal_id) -> ResponseReturnValue:
         # Proposers can change their availability after finalisation and are notified of this
         # this in the scheduling emails. We need to know this in order to re-run scheduling.
         new_availability = form.get_availability_json()
-        has_been_through_scheduler = any(
-            o.potential_time or o.scheduled_time for o in schedule_item.occurrences
-        )
-        if new_availability != schedule_item.available_times and has_been_through_scheduler:
-            # TODO: surface this in the admin pages somewhere?
-            if channel := app.config.get("CONTENT_IRC_CHANNEL"):
-                # WARNING: don't send personal information via this (the channel is public)
-                irc_send(
-                    channel,
-                    f"🗓️🚨 ScheduleItem availability changed for {proposal.human_type}: {external_url('cfp_review.message_proposer', proposal_id=proposal_id)}",
-                )
+        # has_been_through_scheduler = any(
+        #     o.potential_time or o.scheduled_time for o in schedule_item.occurrences
+        # )
+        # TODO: send to Mattermost
+        # if new_availability != schedule_item.available_times and has_been_through_scheduler:
+        #    # TODO: surface this in the admin pages somewhere?
+        #    if channel := app.config.get("CONTENT_IRC_CHANNEL"):
+        #        # WARNING: don't send personal information via this (the channel is public)
+        #        irc_send(
+        #            channel,
+        #            f"🗓️🚨 ScheduleItem availability changed for {proposal.human_type}: {external_url('cfp_review.message_proposer', proposal_id=proposal_id)}",
+        #        )
         schedule_item.available_times = new_availability
 
         form.populate_obj(schedule_item)
@@ -801,12 +802,13 @@ def proposal_messages(proposal_id):
 
             db.session.add(msg)
             db.session.commit()
-            if channel := app.config.get("CONTENT_IRC_CHANNEL"):
-                # WARNING: don't send personal information via this (the channel is public)
-                irc_send(
-                    channel,
-                    f"✉️ New CfP message for {proposal.human_type}: {external_url('cfp_review.message_proposer', proposal_id=proposal_id)} ✉️",
-                )
+            # TODO: send to Mattermost
+            # if channel := app.config.get("CONTENT_IRC_CHANNEL"):
+            #    # WARNING: don't send personal information via this (the channel is public)
+            #    irc_send(
+            #        channel,
+            #        f"✉️ New CfP message for {proposal.human_type}: {external_url('cfp_review.message_proposer', proposal_id=proposal_id)} ✉️",
+            #    )
 
         return redirect(url_for(".proposal_messages", proposal_id=proposal_id))
 
