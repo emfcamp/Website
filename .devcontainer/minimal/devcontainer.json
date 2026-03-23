@@ -1,7 +1,7 @@
 {
-  "name": "EMF Web",
+  "name": "EMF Website (minimal)",
   // Compose config
-  "dockerComposeFile": "../docker-compose.yml",
+  "dockerComposeFile": "../../docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/app",
   "containerEnv": {
@@ -33,24 +33,12 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "dbaeumer.vscode-eslint",
-        "EditorConfig.EditorConfig",
-        "github.vscode-github-actions",
         "ms-python.python",
         "ms-python.mypy-type-checker",
-        "samuelcolvin.jinjahtml",
         "charliermarsh.ruff"
       ],
       "settings": {
-        "files.associations": {
-          "*.html": "jinja-html"
-        },
-        "emmet.includeLanguages": {
-          "jinja-html": "html"
-        },
-        "[jinja-html]": {
-          "editor.defaultFormatter": "vscode.emmet"
-        }
+        "python-envs.globalSearchPaths": ["/venv"]
       }
     }
   }
