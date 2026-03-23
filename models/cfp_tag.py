@@ -44,7 +44,7 @@ DEFAULT_TAGS = [
     "science",
     "security",
     "society",
-    "solarpunk",
+    "space",
     "trains",
 ]
 
