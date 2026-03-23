@@ -1,20 +1,21 @@
-from models.user import User
-from sqlalchemy import select
 from typing import get_args
+
+from dateutil.parser import parse as parse_date
+from sqlalchemy import select
 from wtforms import (
-    DateTimeField,
-    SubmitField,
-    StringField,
-    FieldList,
-    FormField,
-    SelectField,
-    TextAreaField,
     BooleanField,
-    IntegerField,
+    DateTimeField,
+    FieldList,
     FloatField,
+    FormField,
+    IntegerField,
+    SelectField,
     SelectMultipleField,
+    StringField,
+    SubmitField,
+    TextAreaField,
 )
-from wtforms.validators import DataRequired, Optional, NumberRange, ValidationError
+from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
 
 from main import db
 from models.cfp import (
@@ -26,11 +27,11 @@ from models.cfp import (
     Venue,
 )
 from models.cfp_tag import Tag
-from ..common.forms import Form, coerce_optional
-from ..common.fields import HiddenIntegerField, EmailField
-from ..admin.users import NewUserForm
+from models.user import User
 
-from dateutil.parser import parse as parse_date
+from ..admin.users import NewUserForm
+from ..common.fields import EmailField, HiddenIntegerField
+from ..common.forms import Form, coerce_optional
 
 
 # See also ProposalForm, etc in apps/cfp/views.py, but reviewers should be able to edit anything
@@ -97,8 +98,8 @@ class UpdateProposalForm(Form):
                     start, end = p.split(" > ")
                     parse_date(start)
                     parse_date(end)
-        except ValueError:
-            raise ValidationError("Unparsable Allowed Times. Fmt: datetime > datetime per line")
+        except ValueError as e:
+            raise ValidationError("Unparsable Allowed Times. Fmt: datetime > datetime per line") from e
 
     def validate_tags(self, field):
         existing_tags = {tag.tag for tag in db.session.query(Tag).all()}
@@ -424,7 +425,7 @@ class UpdateOccurrenceForm(Form):
             if form.scheduled_duration.data and form.scheduled_venue_id.data and form.scheduled_time.data:
                 return
             raise ValidationError(
-                f"Occurrence cannot be set to Scheduled unless duration, scheduled venue and scheduled time are set"
+                "Occurrence cannot be set to Scheduled unless duration, scheduled venue and scheduled time are set"
             )
 
     def validate_scheduled_duration(form, field):

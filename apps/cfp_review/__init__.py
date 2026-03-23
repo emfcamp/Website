@@ -1,23 +1,27 @@
-from typing import Any, Callable, get_args
-from flask import Blueprint, request, session, redirect, url_for, abort
+from collections.abc import Callable
+from typing import Any, get_args
+
+from flask import Blueprint, abort, redirect, request, session, url_for
+from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from sqlalchemy import func, or_, select
 
+from main import db
 from models.cfp import (
     PROPOSAL_INFOS,
     SCHEDULE_ITEM_INFOS,
     Proposal,
     ProposalMessage,
+    ProposalState,
     ProposalType,
     ProposalVote,
     ScheduleItem,
     ScheduleItemState,
     ScheduleItemType,
     Venue,
-    ProposalState,
 )
+
 from ..common import require_permission
-from main import db
 
 cfp_review = Blueprint("cfp_review", __name__)
 
@@ -36,7 +40,7 @@ CFP_PERMISSIONS = {
 
 
 @cfp_review.before_request
-def before_request():
+def before_request() -> ResponseReturnValue | None:
     if not current_user.is_authenticated:
         return redirect(url_for("users.login", next=request.path))
 
@@ -47,12 +51,14 @@ def before_request():
     if not session.get("cfp_confidentiality") and request.endpoint != "cfp_review.confidentiality_warning":
         return redirect(url_for("cfp_review.confidentiality_warning", next=request.path))
 
+    return None
+
 
 def sort_by_notice(notice):
     return {"1 week": 0, "1 month": 1, "> 1 month": 2}.get(notice, -1)
 
 
-def sort_proposals(proposals: list[Proposal]):
+def sort_proposals(proposals: list[Proposal]) -> None:
     sort_keys: dict[str, Callable[[Proposal], Any]] = {
         "ticket": lambda p: (len(p.user.owned_tickets) > 0, p.title.lower()),
         "date": lambda p: (p.modified, p.title.lower()),
@@ -71,12 +77,12 @@ def sort_proposals(proposals: list[Proposal]):
     )
 
 
-def sort_schedule_items(schedule_items: list[ScheduleItem]):
+def sort_schedule_items(schedule_items: list[ScheduleItem]) -> None:
     sort_keys: dict[str, Callable[[ScheduleItem], Any]] = {
         "date": lambda si: (si.modified, si.title.lower()),
         "state": lambda si: (si.state, si.modified, si.title.lower()),
         "type": lambda si: (si.type, si.title.lower()),
-        "official_content": lambda si: si.official_content and "Official" or "Attendee",
+        "official_content": lambda si: (si.official_content and "Official") or "Attendee",
         "names": lambda si: (si.names and si.names.lower(), si.title.lower()),
         "title": lambda si: si.title.lower(),
         "favourites": lambda si: si.favourite_count,
@@ -152,7 +158,9 @@ def cfp_review_variables():
     }
 
 
-from . import base  # noqa: F401
-from . import review  # noqa: F401
-from . import anonymise  # noqa: F401
-from . import sense_check  # noqa: F401
+from . import (
+    anonymise,  # noqa: F401
+    base,  # noqa: F401
+    review,  # noqa: F401
+    sense_check,  # noqa: F401
+)

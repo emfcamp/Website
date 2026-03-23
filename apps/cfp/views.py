@@ -1,44 +1,46 @@
+import collections
 from typing import get_args
 
 from flask import (
-    render_template,
-    redirect,
-    request,
-    flash,
-    url_for,
     abort,
-    current_app as app,
+    flash,
+    redirect,
+    render_template,
     render_template_string,
+    request,
+    url_for,
+)
+from flask import (
+    current_app as app,
 )
 from flask.typing import ResponseReturnValue
-from markupsafe import Markup
 from flask_login import current_user
 from flask_mailman import EmailMessage
-from wtforms.validators import DataRequired, ValidationError, URL
-from wtforms import BooleanField, FormField, StringField, SubmitField, TextAreaField, SelectField
-import collections
+from markupsafe import Markup
 from sqlalchemy.exc import IntegrityError
+from wtforms import BooleanField, FormField, SelectField, StringField, SubmitField, TextAreaField
+from wtforms.validators import URL, DataRequired, ValidationError
 
 from main import db, external_url, get_or_404
-from models.user import User
 from models.cfp import (
     AGE_RANGE_OPTIONS,
+    DURATION_OPTIONS,
     PROPOSAL_INFOS,
+    PROPOSAL_TIMESLOTS,
+    Proposal,
+    ProposalMessage,
     ProposalType,
     ProposalWorkshopAttributes,
     ProposalYouthWorkshopAttributes,
     ScheduleItem,
-    Proposal,
-    ProposalMessage,
-    DURATION_OPTIONS,
-    PROPOSAL_TIMESLOTS,
 )
-from ..common import feature_flag, feature_enabled, create_current_user
-from ..common.email import from_email
-from ..common.forms import Form, DiversityForm
-from ..common.fields import TelField, EmailField
-from ..common.mattermost import mattermost_notify
+from models.user import User
 
+from ..common import create_current_user, feature_enabled, feature_flag
+from ..common.email import from_email
+from ..common.fields import EmailField, TelField
+from ..common.forms import DiversityForm, Form
+from ..common.mattermost import mattermost_notify
 from . import cfp
 
 
@@ -180,8 +182,8 @@ class LightningTalkForm(Form):
 
     def set_session_choices(self, remaining_lightning_slots):
         self.session.choices = []
-        for day_id, day_count in remaining_lightning_slots.items():
-            raise NotImplementedError
+        # for day_id, day_count in remaining_lightning_slots.items():
+        raise NotImplementedError
 
     def validate_email(form, field):
         if current_user.is_anonymous and User.does_user_exist(field.data):
@@ -225,7 +227,7 @@ def main():
 
 @cfp.route("/cfp/<string:proposal_type>", methods=["GET", "POST"])
 @feature_flag("CFP")
-def create_proposal(proposal_type: ProposalType = "talk"):
+def create_proposal(proposal_type: ProposalType = "talk") -> ResponseReturnValue:
     if proposal_type not in get_args(ProposalType):
         abort(404)
 
@@ -276,7 +278,7 @@ def create_proposal(proposal_type: ProposalType = "talk"):
                 create_current_user(form.email.data, form.name.data)
                 new_user = True
             except IntegrityError as e:
-                app.logger.warn("Adding user raised %r, possible double-click", e)
+                app.logger.warning("Adding user raised %r, possible double-click", e)
                 flash("An error occurred while creating an account for you. Please try again.")
                 return redirect(url_for(".main"))
 
@@ -321,7 +323,7 @@ def create_proposal(proposal_type: ProposalType = "talk"):
                 f"[{proposal.title}]({external_url('cfp_review.update_proposal', proposal_id=proposal.id)})"
             )
             if form.needs_help.data:
-                msg += f"\nCalls for aid (they've clicked 'needs help') 🚨"
+                msg += "\nCalls for aid (they've clicked 'needs help') 🚨"
             mattermost_notify(channel, msg)
 
         return redirect(url_for(".complete"))
@@ -367,7 +369,7 @@ def proposals():
 
 @cfp.route("/cfp/proposals/<int:proposal_id>/edit", methods=["GET", "POST"])
 @feature_flag("CFP")
-def edit_proposal(proposal_id) -> ResponseReturnValue:
+def edit_proposal(proposal_id: int) -> ResponseReturnValue:
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for(".edit_proposal", proposal_id=proposal_id)))
 
@@ -433,7 +435,7 @@ def withdraw_proposal(proposal_id):
 
             db.session.add(msg)
             db.session.commit()
-            flash("We've withdrawn your {0.type}, {0.title}.".format(proposal))
+            flash(f"We've withdrawn your {proposal.human_type}, {proposal.title}.")
 
             return redirect(url_for("cfp.proposals"))
 
@@ -503,7 +505,7 @@ class FinaliseForm(Form):
     # No notice_required for finalised proposals
     proposal_additional_info = TextAreaField("Additional Information")
 
-    def load_choices(self, schedule_item: ScheduleItem):
+    def load_choices(self, schedule_item: ScheduleItem) -> None:
         if schedule_item.default_video_privacy != "review":
             # Don't allow users to choose review themselves
             assert isinstance(self.default_video_privacy.choices, list)
@@ -623,7 +625,7 @@ def get_finalise_form(proposal_type: ProposalType) -> type[FinaliseForm]:
 
 @cfp.route("/cfp/proposals/<int:proposal_id>/finalise", methods=["GET", "POST"])
 @feature_flag("CFP")
-def finalise_proposal(proposal_id) -> ResponseReturnValue:
+def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
     """
     Finalise the details for the schedule, including names, pronouns, and availability.
     This can be done any time after accepting the talk, but is also done in bulk when
@@ -643,7 +645,7 @@ def finalise_proposal(proposal_id) -> ResponseReturnValue:
         abort(404)
 
     if proposal.schedule_item is None:
-        app.logger.warn("Attempt to finalise proposal without schedule item")
+        app.logger.warning("Attempt to finalise proposal without schedule item")
         abort(404)
 
     schedule_item: ScheduleItem = proposal.schedule_item
@@ -701,7 +703,7 @@ def finalise_proposal(proposal_id) -> ResponseReturnValue:
 
         return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
 
-    elif request.method == "POST":
+    if request.method == "POST":
         # Don't overwrite user submitted data
         pass
 
@@ -731,7 +733,7 @@ def finalise_proposal(proposal_id) -> ResponseReturnValue:
     day_form_slots: dict[str, dict[str, Markup]] = collections.defaultdict(dict)
     for slot in Form._available_slots:
         day_str, start_str, end_str = slot.split("_")
-        slot_hour_str = "%s_%s" % (start_str, end_str)
+        slot_hour_str = f"{start_str}_{end_str}"
         day_form_slots[day_str][slot_hour_str] = getattr(form, slot)(class_="form-control")
         headings[int(start_str)] = (int(start_str), int(end_str))
 
@@ -739,7 +741,7 @@ def finalise_proposal(proposal_id) -> ResponseReturnValue:
     slot_titles = []
     for start in sorted(headings.keys()):
         start, end = headings[start]
-        slot_times.append("%s_%s" % (start, end))
+        slot_times.append(f"{start}_{end}")
 
         start_ampm = end_ampm = "am"
         if start > 12:
@@ -748,7 +750,7 @@ def finalise_proposal(proposal_id) -> ResponseReturnValue:
         if end > 12:
             end_ampm = "pm"
             end -= 12
-        slot_titles.append("%s%s - %s%s" % (start, start_ampm, end, end_ampm))
+        slot_titles.append(f"{start}{start_ampm} - {end}{end_ampm}")
 
     return render_template(
         "cfp/finalise.html",

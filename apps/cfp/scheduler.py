@@ -1,24 +1,25 @@
 from collections import defaultdict
-from dateutil import parser
+from typing import Any, cast
 
+from dateutil import parser
 from flask import current_app as app
 from slotmachine import SlotMachine
-from sqlalchemy import select, and_
+from sqlalchemy import and_, select
 from sqlalchemy.orm import joinedload
 
 from main import db
 from models.cfp import (
+    EVENT_SPACING,
+    ROUGH_DURATIONS,
     Occurrence,
     Proposal,
     ScheduleItem,
     ScheduleItemType,
     Venue,
-    ROUGH_DURATIONS,
-    EVENT_SPACING,
 )
 
 
-class Scheduler(object):
+class Scheduler:
     """Automatic Scheduler
 
     This class handles scheduling operations by using the SlotMachine constraint solving scheduler.
@@ -40,17 +41,17 @@ class Scheduler(object):
         for proposal in proposals:
             schedule_item = proposal.schedule_item
             if not schedule_item.occurrences:
-                app.logger.warn(f"Schedule item {schedule_item.id} has no occurrences, ignoring")
+                app.logger.warning(f"Schedule item {schedule_item.id} has no occurrences, ignoring")
                 continue
 
             if not schedule_item.official_content:
-                app.logger.warn(f"Schedule item {schedule_item.id} is not official, ignoring")
+                app.logger.warning(f"Schedule item {schedule_item.id} is not official, ignoring")
                 continue
 
             try:
                 scheduled_duration = ROUGH_DURATIONS[proposal.duration]
             except KeyError:
-                app.logger.warn(
+                app.logger.warning(
                     f"Invalid proposal duration {repr(proposal.duration)} for {proposal}, ignoring"
                 )
                 continue
@@ -67,8 +68,10 @@ class Scheduler(object):
         db.session.commit()
 
     def get_scheduler_data(
-        self, ignore_potential: bool, types: list[ScheduleItemType] = ["talk", "workshop", "youthworkshop"]
-    ):
+        self, ignore_potential: bool, types: list[ScheduleItemType] | None = None
+    ) -> list[dict[str, Any]]:
+        if types is None:
+            types = ["talk", "workshop", "youthworkshop"]
         occurrences = list(
             db.session.scalars(
                 select(Occurrence)
@@ -208,14 +211,9 @@ class Scheduler(object):
         occurrence.potential_time = parsed_time
 
         app.logger.info(
-            'Moved "%s": "%s" at "%s" -> "%s" at "%s"'
-            % (
-                occurrence.schedule_item.title,
-                previous_venue_name,
-                previous_time,
-                occurrence.potential_venue.name,
-                occurrence.potential_time,
-            )
+            f'Moved "{occurrence.schedule_item.title}": '
+            f'"{previous_venue_name}" at "{previous_time}" -> '
+            f'"{occurrence.potential_venue.name}" at "{occurrence.potential_time}"'
         )
 
         return True
@@ -235,7 +233,7 @@ class Scheduler(object):
         if not changes:
             app.logger.info("No schedule changes generated")
 
-    def run(self, persist: bool, ignore_potential: bool, types: list[ScheduleItemType]):
+    def run(self, persist: bool, ignore_potential: bool, types: list[ScheduleItemType]) -> None:
         self.set_rough_durations()
 
         sm = SlotMachine()
@@ -244,7 +242,7 @@ class Scheduler(object):
             app.logger.error("No talks to schedule!")
             return
 
-        new_schedule = sm.schedule(data)
+        new_schedule = sm.schedule(cast(dict[Any, Any], data))
         self.apply_changes(new_schedule, ignore_potential)
 
         if persist:

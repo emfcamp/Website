@@ -1,15 +1,16 @@
 import random
 from datetime import timedelta
-from flask import session, current_app as app, redirect, url_for, render_template, flash
-from flask_login import current_user
 
+from flask import current_app as app
+from flask import flash, redirect, render_template, session, url_for
+from flask_login import current_user
 from sqlalchemy import select
 from sqlalchemy.orm import aliased
 from sqlalchemy_continuum.utils import transaction_class, version_class
 
 from main import db, get_or_404
 from models import naive_utcnow
-from models.cfp import ProposalVote, Proposal, StateTransitionException
+from models.cfp import Proposal, ProposalVote, StateTransitionException
 
 from . import cfp_review, review_required
 from .forms import ReviewListForm, VoteForm
@@ -164,8 +165,8 @@ def review_proposal(proposal_id):
     prop = get_or_404(db, Proposal, proposal_id)
 
     if not can_review_proposal(prop):
-        app.logger.warn("Cannot review proposal %s", proposal_id)
-        flash("Cannot review proposal %s, continuing to next proposal" % proposal_id)
+        app.logger.warning("Cannot review proposal %s", proposal_id)
+        flash(f"Cannot review proposal {proposal_id}, continuing to next proposal")
         return redirect(url_for(".review_proposal_next", proposal_id=proposal_id))
 
     session["review_visit_dt"] = naive_utcnow()
@@ -227,8 +228,8 @@ def review_proposal(proposal_id):
             return redirect(url_for(".review_proposal", proposal_id=next_proposal_id))
 
         except StateTransitionException as e:
-            app.logger.warn("Cannot set state: %s", e)
-            flash("Your vote could not be updated: %s" % e)
+            app.logger.warning("Cannot set state: %s", e)
+            flash(f"Your vote could not be updated: {e}")
             return redirect(url_for(".review_proposal", proposal_id=proposal_id))
 
     if vote and vote.note:

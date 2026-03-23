@@ -1,11 +1,12 @@
-import click
 from csv import DictReader
 
+import click
 from faker import Faker
 from flask import current_app as app
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
+from apps.cfp_review.base import send_email_for_proposal
 from main import db
 from models.cfp import (
     Occurrence,
@@ -14,9 +15,8 @@ from models.cfp import (
     ProposalWorkshopAttributes,
     ScheduleItem,
 )
-from models.cfp_tag import Tag, DEFAULT_TAGS
+from models.cfp_tag import DEFAULT_TAGS, Tag
 from models.user import User
-from apps.cfp_review.base import send_email_for_proposal
 
 from . import cfp
 
@@ -41,7 +41,7 @@ def csv_import(csv_file, state):
         if Proposal.query.filter_by(title=row["title"]).first():
             continue
 
-        user = User("cfp_%s@test.invalid" % count, faker.name())
+        user = User(f"cfp_{count}@test.invalid", faker.name())
         db.session.add(user)
 
         assert row["type"] in {"talk", "workshop", "installation"}
@@ -51,8 +51,8 @@ def csv_import(csv_file, state):
             state=state,
             title=row["title"],
             description=row["description"],
-            one_day=True if row.get("one_day") == "t" else False,
-            needs_money=True if row.get("need_finance") == "t" else False,
+            one_day=bool(row.get("one_day") == "t"),
+            needs_money=bool(row.get("need_finance") == "t"),
         )
 
         if row["type"] == "talk":
@@ -73,7 +73,7 @@ def csv_import(csv_file, state):
         db.session.commit()
         count += 1
 
-    app.logger.info("Imported %s proposals" % count)
+    app.logger.info(f"Imported {count} proposals")
 
 
 @cfp.cli.command("email_check")
@@ -157,7 +157,7 @@ def create_tags(tags_to_create):
 
 @cfp.cli.command(
     "delete_tags",
-    help=f"Delete tags from the Database. Tagged proposals will have the tags removed.",
+    help="Delete tags from the Database. Tagged proposals will have the tags removed.",
 )
 @click.argument("tags_to_delete", required=True, nargs=-1)
 def delete_tags(tags_to_delete):

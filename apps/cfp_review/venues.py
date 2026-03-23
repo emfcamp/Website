@@ -1,32 +1,32 @@
 from flask import (
-    render_template,
-    redirect,
-    url_for,
     flash,
+    redirect,
+    render_template,
+    url_for,
 )
-from sqlalchemy import select
+from geoalchemy2.shape import from_shape, to_shape
 from shapely import Point
+from sqlalchemy import select
 from wtforms import (
-    FloatField,
-    StringField,
-    SelectField,
     BooleanField,
-    SubmitField,
-    SelectMultipleField,
+    FloatField,
     IntegerField,
+    SelectField,
+    SelectMultipleField,
+    StringField,
+    SubmitField,
 )
 from wtforms.validators import DataRequired, Optional
-from geoalchemy2.shape import to_shape, from_shape
 
 from main import db, get_or_404
-from models.cfp import Occurrence, Venue, SCHEDULE_ITEM_INFOS
+from models.cfp import SCHEDULE_ITEM_INFOS, Occurrence, Venue
 from models.village import Village
-from . import (
-    cfp_review,
-    admin_required,
-)
-from ..common.forms import Form, coerce_optional
 
+from ..common.forms import Form, coerce_optional
+from . import (
+    admin_required,
+    cfp_review,
+)
 
 VENUE_TYPE_CHOICES = [(t.type, t.human_type) for t in SCHEDULE_ITEM_INFOS.values()]
 
@@ -50,22 +50,20 @@ class VenueForm(Form):
             choices.append((v.id, v.name))
         self.village_id.choices = choices
 
-    def process(self, formdata=None, obj: Venue | None = None, data=None, **kwargs):
-        super().process(formdata, obj, data, **kwargs)
-
-        if obj is not None and hasattr(obj, "location") and obj.location is not None:
-            latlon = to_shape(obj.location)
+    def populate(self, venue: Venue) -> None:
+        if venue.location is not None:
+            latlon = to_shape(venue.location)
             self.location_lat.data = latlon.y
             self.location_lon.data = latlon.x
 
-    def populate_obj(self, obj: Venue):
-        super().populate_obj(obj)
+    def populate_obj(self, venue: Venue) -> None:
+        super().populate_obj(venue)
 
         if self.location_lat.data is not None and self.location_lon.data is not None:
             location = from_shape(Point(self.location_lon.data, self.location_lat.data))
         else:
             location = None
-        obj.location = location
+        venue.location = location
 
 
 @cfp_review.route("/venues", methods=["GET", "POST"])
@@ -109,10 +107,12 @@ def edit_venue(venue_id):
             flash("Deleted venue")
             return redirect(url_for(".venues"))
 
-        elif form.submit.data:
+        if form.submit.data:
             form.populate_obj(venue)
             db.session.commit()
             flash("Saved venue")
             return redirect(url_for(".venues"))
+
+    form.populate(venue)
 
     return render_template("cfp_review/venues/edit.html", venue=venue, form=form)

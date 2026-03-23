@@ -1,90 +1,94 @@
-from collections import defaultdict, Counter
 import csv
+import json
+from collections import Counter, defaultdict
+from collections.abc import Callable
 from datetime import timedelta
 from http import HTTPStatus
 from io import BytesIO, StringIO
 from itertools import combinations
-import json
-from typing import Any, Callable, Literal, get_args
+from typing import Any, Literal, get_args
 
 import dateutil
 from flask import (
-    redirect,
-    send_file,
-    url_for,
-    request,
     abort,
-    render_template,
     flash,
-    session,
     jsonify,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    session,
+    url_for,
+)
+from flask import (
     current_app as app,
 )
 from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from flask_mailman import EmailMessage
-from models.lottery import Lottery
-from models.permission import Permission
-from sqlalchemy import func, select, and_
-from sqlalchemy.orm import selectinload, undefer, joinedload
+from sqlalchemy import and_, func, select
+from sqlalchemy.orm import joinedload, selectinload, undefer
 from sqlalchemy_continuum.utils import version_class
 from wtforms import FormField
 
 from apps.common import get_next_url
 from main import db, external_url, get_or_404
-from .estimation import get_cfp_estimate
-from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
     SCHEDULE_ITEM_INFOS,
     Occurrence,
+    Proposal,
     ProposalMessage,
+    ProposalState,
     ProposalType,
     ProposalVote,
-    ProposalState,
-    Proposal,
     ScheduleItem,
     ScheduleItemState,
     ScheduleItemType,
     Venue,
     convert_attributes_between_types,
 )
-from models.cfp_tag import Tag, ProposalTag
-from models.user import User
+from models.cfp_tag import ProposalTag, Tag
+from models.diversity import guess_age, guess_ethnicity, guess_gender
+from models.lottery import Lottery
+from models.permission import Permission
 from models.purchase import AdmissionTicket
+from models.user import User
+
+from ..common.email import from_email
+from . import (
+    admin_required,
+    cfp_review,
+    get_next_proposal_to,
+    schedule_required,
+    sort_proposals,
+    sort_schedule_items,
+)
+from .estimation import get_cfp_estimate
 from .forms import (
     UPDATE_PROPOSAL_ATTRIBUTES_FORM_TYPES,
     UPDATE_SCHEDULE_ITEM_ATTRIBUTES_FORM_TYPES,
+    AcceptanceForm,
+    ChangeProposalOwner,
     ChangeScheduleItemOwner,
+    CloseRoundForm,
+    ConvertProposalForm,
     ConvertScheduleItemForm,
     CreateOccurrenceForm,
+    InviteSpeakerForm,
     LotteryForm,
+    PrivateNotesForm,
+    ReversionForm,
+    SendMessageForm,
     UpdateOccurrenceForm,
     UpdateProposalForm,
     UpdateScheduleItemForm,
     UpdateVotesForm,
-    SendMessageForm,
-    CloseRoundForm,
-    AcceptanceForm,
-    ConvertProposalForm,
-    PrivateNotesForm,
-    ChangeProposalOwner,
-    ReversionForm,
-    InviteSpeakerForm,
 )
-from . import (
-    cfp_review,
-    admin_required,
-    sort_schedule_items,
-    schedule_required,
-    sort_proposals,
-    get_next_proposal_to,
-)
-from ..common.email import from_email
-from models.diversity import guess_age, guess_gender, guess_ethnicity
+from .majority_judgement import calculate_max_normalised_score
 
 
-@cfp_review.route("/")
-def main():
+@cfp_review.route("/")  # noqa: RET503
+def main() -> ResponseReturnValue:
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for(".main")))
 
@@ -111,7 +115,7 @@ def bool_qs(val):
     # Explicit true/false values are better than the implicit notset=&set=anything that bool does
     if val in ["True", "1"]:
         return True
-    elif val in ["False", "0"]:
+    if val in ["False", "0"]:
         return False
     raise ValueError("Invalid querystring boolean")
 
@@ -259,7 +263,7 @@ def schedule_items() -> ResponseReturnValue:
 
 @cfp_review.route("/schedule-items.<format>")
 @admin_required
-def export_schedule_items(format: str):
+def export_schedule_items(format: str) -> ResponseReturnValue:
     fields = [
         "id",
         "state",
@@ -334,9 +338,9 @@ ProposalEmailReason = Literal[
 ]
 
 
-def send_email_for_proposal(proposal: Proposal, reason: ProposalEmailReason):
+def send_email_for_proposal(proposal: Proposal, reason: ProposalEmailReason) -> None:
     from_email_ = from_email("CONTENT_EMAIL")
-    title = proposal.schedule_item and proposal.schedule_item.title or proposal.title
+    title = (proposal.schedule_item and proposal.schedule_item.title) or proposal.title
 
     if reason == "accepted":
         subject = f'''Your EMF {proposal.human_type} "{title}" has been accepted!'''
@@ -398,7 +402,7 @@ def send_email_for_proposal(proposal: Proposal, reason: ProposalEmailReason):
 
 @cfp_review.route("/proposals/<int:proposal_id>/convert", methods=["GET", "POST"])
 @admin_required
-def convert_proposal(proposal_id) -> ResponseReturnValue:
+def convert_proposal(proposal_id: int) -> ResponseReturnValue:
     proposal = get_or_404(db, Proposal, proposal_id)
 
     form = ConvertProposalForm()
@@ -435,12 +439,12 @@ def convert_proposal(proposal_id) -> ResponseReturnValue:
 
 @cfp_review.route("/schedule-items/<int:schedule_item_id>/convert", methods=["GET", "POST"])
 @admin_required
-def convert_schedule_item(schedule_item_id) -> ResponseReturnValue:
+def convert_schedule_item(schedule_item_id: int) -> ResponseReturnValue:
     schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
 
     if schedule_item.proposal:
         # We don't want to get into having mismatched proposal/schedule_item types yet
-        flash(f"The schedule item is associated with a proposal, please convert this instead.")
+        flash("The schedule item is associated with a proposal, please convert this instead.")
         return redirect(url_for(".convert_proposal", proposal_id=schedule_item.proposal_id))
 
     form = ConvertScheduleItemForm()
@@ -458,7 +462,7 @@ def convert_schedule_item(schedule_item_id) -> ResponseReturnValue:
     return render_template("cfp_review/convert_schedule_item.html", schedule_item=schedule_item, form=form)
 
 
-def _convert_schedule_item(schedule_item: ScheduleItem, new_type: ScheduleItemType):
+def _convert_schedule_item(schedule_item: ScheduleItem, new_type: ScheduleItemType) -> None:
     # This can also be called by attendee content managers
 
     # People's availability can vary based on type
@@ -502,8 +506,8 @@ def get_update_proposal_type_form(proposal_type: ProposalType) -> type[UpdatePro
 
 @cfp_review.route("/proposals/<int:proposal_id>", methods=["GET", "POST"])
 @admin_required
-def update_proposal(proposal_id: int):
-    def flash_commit_and_go(msg, next_page, proposal_id=None):
+def update_proposal(proposal_id: int) -> ResponseReturnValue:
+    def flash_commit_and_go(msg: str, next_page: str, proposal_id: int | None = None) -> ResponseReturnValue:
         flash(msg)
         app.logger.info(msg)
         db.session.commit()
@@ -526,11 +530,11 @@ def update_proposal(proposal_id: int):
         proposal.user.will_have_ticket = form.user_will_have_ticket.data
 
         if form.update.data:
-            msg = "Updating proposal %s" % proposal_id
+            msg = f"Updating proposal {proposal_id}"
             proposal.state = form.state.data
 
         elif form.reject.data or form.reject_with_message.data:
-            msg = "Rejecting proposal %s" % proposal_id
+            msg = f"Rejecting proposal {proposal_id}"
             proposal.state = "rejected"
 
             if form.reject_with_message.data:
@@ -538,7 +542,7 @@ def update_proposal(proposal_id: int):
                 send_email_for_proposal(proposal, reason="rejected")
 
         elif form.accept.data:
-            msg = "Manually accepting proposal %s" % proposal_id
+            msg = f"Manually accepting proposal {proposal_id}"
             proposal.state = "accepted"
 
             if not proposal.schedule_item:
@@ -549,13 +553,13 @@ def update_proposal(proposal_id: int):
 
         elif form.checked.data:
             if proposal.type_info.review_type == "manual":
-                msg = "Sending proposal %s for manual review" % proposal_id
+                msg = f"Sending proposal {proposal_id} for manual review"
                 proposal.state = "manual-review"
             elif proposal.type_info.review_type == "anonymous":
-                msg = "Sending proposal %s for anonymisation" % proposal_id
+                msg = f"Sending proposal {proposal_id} for anonymisation"
                 proposal.state = "checked"
             else:
-                msg = "Not changing state for automatically accepted proposal %s" % proposal_id
+                msg = f"Not changing state for automatically accepted proposal {proposal_id}"
 
             if not next_id:
                 return flash_commit_and_go(msg, ".proposals")
@@ -573,7 +577,7 @@ def update_proposal(proposal_id: int):
 
 @cfp_review.route("/proposals/<int:proposal_id>/create-schedule-item", methods=["POST"])
 @admin_required
-def create_schedule_item_from_proposal(proposal_id: int):
+def create_schedule_item_from_proposal(proposal_id: int) -> ResponseReturnValue:
     """
     This is usually done on acceptance, but there might be a reason to pre-populate
     a schedule with data before we tell the user that their talk has been accepted.
@@ -603,7 +607,7 @@ def get_update_schedule_item_type_form(schedule_item_type: ScheduleItemType) -> 
 
 @cfp_review.route("/schedule-items/<int:schedule_item_id>", methods=["GET", "POST"])
 @admin_required
-def update_schedule_item(schedule_item_id: int):
+def update_schedule_item(schedule_item_id: int) -> ResponseReturnValue:
     schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
 
     Form = get_update_schedule_item_type_form(schedule_item.type)
@@ -621,7 +625,7 @@ def update_schedule_item(schedule_item_id: int):
         return redirect(url_for(".update_schedule_item", schedule_item_id=schedule_item_id))
 
     if request.method != "POST":
-        form.official_content.data = schedule_item.official_content and "official" or "attendee"
+        form.official_content.data = (schedule_item.official_content and "official") or "attendee"
 
     occurrence_form = CreateOccurrenceForm()
 
@@ -635,7 +639,7 @@ def update_schedule_item(schedule_item_id: int):
 
 @cfp_review.route("/schedule-items/<int:schedule_item_id>/occurrences", methods=["POST"])
 @admin_required
-def occurrences(schedule_item_id: int):
+def occurrences(schedule_item_id: int) -> ResponseReturnValue:
     schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
 
     form = CreateOccurrenceForm()
@@ -679,7 +683,7 @@ def get_update_occurrence_type_form(schedule_item_type: ScheduleItemType) -> typ
     "/schedule-items/<int:schedule_item_id>/occurrences/<int:occurrence_id>", methods=["GET", "POST"]
 )
 @admin_required
-def update_occurrence(schedule_item_id: int, occurrence_id: int):
+def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseReturnValue:
     occurrence: Occurrence | None = db.session.scalar(
         select(Occurrence)
         .filter_by(id=occurrence_id, schedule_item_id=schedule_item_id)
@@ -754,7 +758,7 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int):
     )
 
 
-def sort_messages(messages: list[Proposal]):
+def sort_messages(messages: list[Proposal]) -> None:
     sort_keys: dict[str, Callable[[Proposal], Any]] = {
         "unread": lambda p: (p.get_unread_count(current_user) > 0, p.messages[-1].created),
         "date": lambda p: p.messages[-1].created,
@@ -838,7 +842,7 @@ def message_proposer(proposal_id):
 
         count = proposal.mark_messages_read(current_user)
         db.session.commit()
-        app.logger.info("Marked %s messages to admin on proposal %s as read" % (count, proposal.id))
+        app.logger.info(f"Marked {count} messages to admin on proposal {proposal.id} as read")
 
         return redirect(url_for(".message_proposer", proposal_id=proposal_id))
 
@@ -858,7 +862,7 @@ VersionedEntityType = Literal["proposal", "schedule-item", "occurrence"]
 
 @cfp_review.route("/versions/<entity_type>")
 @admin_required
-def entity_changelog(entity_type: VersionedEntityType):
+def entity_changelog(entity_type: VersionedEntityType) -> ResponseReturnValue:
     if entity_type == "proposal":
         version_cls = version_class(Proposal)
     elif entity_type == "schedule-item":
@@ -879,7 +883,7 @@ def entity_changelog(entity_type: VersionedEntityType):
 
 @cfp_review.route("/versions/<entity_type>/<int:entity_id>")
 @admin_required
-def entity_latest_version(entity_type: VersionedEntityType, entity_id: int):
+def entity_latest_version(entity_type: VersionedEntityType, entity_id: int) -> ResponseReturnValue:
     entity: Proposal | ScheduleItem | Occurrence
     if entity_type == "proposal":
         entity = get_or_404(db, Proposal, entity_id)
@@ -898,7 +902,7 @@ def entity_latest_version(entity_type: VersionedEntityType, entity_id: int):
 
 @cfp_review.route("/versions/<entity_type>/<int:entity_id>/<int:txn_id>", methods=["GET", "POST"])
 @admin_required
-def entity_version(entity_type: VersionedEntityType, entity_id: int, txn_id: int):
+def entity_version(entity_type: VersionedEntityType, entity_id: int, txn_id: int) -> ResponseReturnValue:
     entity: Proposal | ScheduleItem | Occurrence
     if entity_type == "proposal":
         entity = get_or_404(db, Proposal, entity_id)
@@ -962,13 +966,13 @@ def message_batch():
                 )
                 msg.send()
 
-            flash("Messaged %s proposals" % len(proposals), "info")
+            flash(f"Messaged {len(proposals)} proposals", "info")
             return redirect(url_for(".proposals", **request.args))
 
     return render_template("cfp_review/message_batch.html", form=form, proposals=proposals)
 
 
-def sort_for_vote_summary(proposals_with_state_counts: list[tuple[Proposal, dict[str, int]]]):
+def sort_for_vote_summary(proposals_with_state_counts: list[tuple[Proposal, dict[str, int]]]) -> None:
     sort_keys: dict[str, Callable[[tuple[Proposal, dict[str, int]]], Any]] = {
         # Notes == unread first then by date
         "notes": lambda p: (
@@ -1059,7 +1063,7 @@ def proposal_votes(proposal_id):
                     stale_count += 1
 
             if stale_count:
-                msg = "Set %s votes to stale" % stale_count
+                msg = f"Set {stale_count} votes to stale"
 
         elif form.update.data:
             update_count = 0
@@ -1071,7 +1075,7 @@ def proposal_votes(proposal_id):
                     update_count += 1
 
             if update_count:
-                msg = "Set %s votes to resolved" % update_count
+                msg = f"Set {update_count} votes to resolved"
 
         elif form.resolve_all.data:
             resolved_count = 0
@@ -1127,7 +1131,7 @@ def proposal_notes(proposal_id):
 
 @cfp_review.route("/proposals/<int:proposal_id>/change-owner", methods=["GET", "POST"])
 @admin_required
-def proposal_change_owner(proposal_id: int):
+def proposal_change_owner(proposal_id: int) -> ResponseReturnValue:
     form = ChangeProposalOwner()
     proposal = get_or_404(db, Proposal, proposal_id)
 
@@ -1162,7 +1166,7 @@ def proposal_change_owner(proposal_id: int):
 
 @cfp_review.route("/schedule-items/<int:schedule_item_id>/change-owner", methods=["GET", "POST"])
 @admin_required
-def schedule_item_change_owner(schedule_item_id: int):
+def schedule_item_change_owner(schedule_item_id: int) -> ResponseReturnValue:
     form = ChangeScheduleItemOwner()
     schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
 
@@ -1226,11 +1230,11 @@ def close_round():
 
             db.session.commit()
             del session["min_votes"]
-            app.logger.info("CFP Round closed. Set %s proposals to 'reviewed'" % len(proposals))
+            app.logger.info(f"CFP Round closed. Set {len(proposals)} proposals to 'reviewed'")
 
             return redirect(url_for(".rank"))
 
-        elif form.close_round.data:
+        if form.close_round.data:
             preview = True
             session["min_votes"] = form.min_votes.data
             flash(f'Proposals with more than {session["min_votes"]} (blue) will be marked as "reviewed"')
@@ -1259,14 +1263,14 @@ def close_round():
 
 @cfp_review.route("/rank", methods=["GET", "POST"])
 @admin_required
-def rank():
-    proposals = Proposal.query.filter_by(state="reviewed")
+def rank() -> ResponseReturnValue:
+    proposals_query = select(Proposal).where(Proposal.state == "reviewed")
 
     types = request.args.getlist("type")
     if types:
-        proposals = proposals.filter(Proposal.type.in_(types))
+        proposals_query = proposals_query.filter(Proposal.type.in_(types))
 
-    proposals = proposals.all()
+    proposals = list(db.session.scalars(proposals_query))
     form = AcceptanceForm()
     scored_proposals = []
 
@@ -1311,12 +1315,12 @@ def rank():
                 db.session.commit()
 
             del session["min_score"]
-            msg = "Accepted %s %s proposals; min score: %s" % (count, types, min_score)
+            msg = f"Accepted {count} {types} proposals; min score: {min_score}"
             app.logger.info(msg)
             flash(msg, "info")
             return redirect(url_for(".proposals", state="accepted"))
 
-        elif form.set_score.data:
+        if form.set_score.data:
             preview = True
             session["min_score"] = form.min_score.data
             flash("Blue proposals will be accepted", "info")
@@ -1325,7 +1329,7 @@ def rank():
             del session["min_score"]
 
     # FIXME: why are performances in here if installations aren't?
-    proposal_types = ["talk", "workshop", "performance", "youthworkshop"]
+    proposal_types: list[ProposalType] = ["talk", "workshop", "performance", "youthworkshop"]
     estimates = {proposal_type: get_cfp_estimate(proposal_type) for proposal_type in proposal_types}
 
     return render_template(
