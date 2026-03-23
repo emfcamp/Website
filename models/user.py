@@ -8,7 +8,7 @@ import string
 import struct
 import time
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from flask import current_app as app
 from flask import session
@@ -193,17 +193,24 @@ CFPReviewerTags = Table(
 )
 
 
+EmailStatus = Literal["unverified", "verified", "bounced", "spam_report"]
+
+
 class User(BaseModel, UserMixin):
     __tablename__ = "user"
     __versioned__ = {"exclude": ["favourites"]}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(unique=True, index=True)
+
+    #: Whether the user's email address has been verified or bounced
+    email_state: Mapped[EmailStatus] = mapped_column(server_default="unverified", nullable=False)
+
     name: Mapped[str] = mapped_column(index=True)
     company: Mapped[str | None]
     will_have_ticket: Mapped[bool] = mapped_column(default=False)  # for CfP filtering
     checkin_note: Mapped[str | None]
-    # Whether the user has opted in to receive promo emails after this event:
+    #: Whether the user has opted in to receive promo emails after this event
     promo_opt_in: Mapped[bool] = mapped_column(default=False)
 
     cfp_invite_reason: Mapped[str | None]
