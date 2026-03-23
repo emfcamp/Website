@@ -2,6 +2,7 @@ import logging
 import logging.config
 import secrets
 import time
+from base64 import b64encode
 from pathlib import Path
 from typing import Any
 
@@ -247,7 +248,7 @@ def create_app(dev_server=False, config_override=None):
 
     @app.context_processor
     def add_csp_nonce():
-        g.csp_nonce = secrets.token_urlsafe(16)
+        g.csp_nonce = b64encode(secrets.token_bytes(16)).decode("utf-8")
         return {"csp_nonce": g.csp_nonce}
 
     @app.after_request
