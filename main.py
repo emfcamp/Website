@@ -246,9 +246,12 @@ def create_app(dev_server=False, config_override=None):
             response.headers["X-Robots-Tag"] = "noindex, nofollow"
             return response
 
-    @app.context_processor
-    def add_csp_nonce():
+    @app.before_request
+    def generate_csp_nonce():
         g.csp_nonce = b64encode(secrets.token_bytes(16)).decode("utf-8")
+
+    @app.context_processor
+    def csp_nonce():
         return {"csp_nonce": g.csp_nonce}
 
     @app.after_request
