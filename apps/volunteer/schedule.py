@@ -1,7 +1,16 @@
 from collections import defaultdict
 
 import pendulum
-from flask import Response, abort, flash, redirect, render_template, request, session, url_for
+from flask import (
+    Response,
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask import current_app as app
 from flask.typing import ResponseValue
 from flask_login import current_user
