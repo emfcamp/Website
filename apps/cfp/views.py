@@ -805,7 +805,6 @@ def proposal_messages(proposal_id):
             db.session.add(msg)
             db.session.commit()
             if channel := app.config.get("MATTERMOST_CFP_CHANNEL"):
-                # WARNING: don't send personal information via this (the channel is public)
                 mattermost_notify(
                     channel,
                     f"✉️ Message for {proposal.human_type} proposal: "
