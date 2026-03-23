@@ -55,12 +55,12 @@
     <div class="nav-select form-group form-inline">
         <label for="select-day">Day:</label>
         <select id="select-day">
-            <option value="{{ url_for('.schedule', day='wed') }}" {% if active_day == "wed" %}selected{% endif %}>Wednesday</option> 
-            <option value="{{ url_for('.schedule', day='thu') }}" {% if active_day == "thu" %}selected{% endif %}>Thursday</option> 
-            <option value="{{ url_for('.schedule', day='fri') }}" {% if active_day == "fri" %}selected{% endif %}>Friday</option> 
-            <option value="{{ url_for('.schedule', day='sat') }}" {% if active_day == "sat" %}selected{% endif %}>Saturday</option> 
-            <option value="{{ url_for('.schedule', day='sun') }}" {% if active_day == "sun" %}selected{% endif %}>Sunday</option> 
-            <option value="{{ url_for('.schedule', day='mon') }}" {% if active_day == "mon" %}selected{% endif %}>Monday</option> 
+            <option value="{{ url_for('.schedule', day='wed') }}" {% if active_day == "wed" %}selected{% endif %}>Wednesday</option>
+            <option value="{{ url_for('.schedule', day='thu') }}" {% if active_day == "thu" %}selected{% endif %}>Thursday</option>
+            <option value="{{ url_for('.schedule', day='fri') }}" {% if active_day == "fri" %}selected{% endif %}>Friday</option>
+            <option value="{{ url_for('.schedule', day='sat') }}" {% if active_day == "sat" %}selected{% endif %}>Saturday</option>
+            <option value="{{ url_for('.schedule', day='sun') }}" {% if active_day == "sun" %}selected{% endif %}>Sunday</option>
+            <option value="{{ url_for('.schedule', day='mon') }}" {% if active_day == "mon" %}selected{% endif %}>Monday</option>
         </select>
     </div>
     <div class="tab-content table-responsive">
@@ -121,5 +121,5 @@
     </div>
 {% endblock %}
 {% block foot %}
-    <script src="{{ static_url_for('static', filename='js/volunteer-schedule.js') }}"></script>
+    <script src="{{ static_url_for('static', filename='js/volunteer_schedule.js') }}"></script>
 {% endblock %}
