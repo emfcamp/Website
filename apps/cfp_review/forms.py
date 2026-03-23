@@ -51,6 +51,7 @@ class UpdateProposalForm(Form):
                 ("finalised", "Finalised"),
                 ("rejected", "Rejected"),
                 ("withdrawn", "Withdrawn"),
+                ("conduct-blocked", "Blocked for conduct issues"),
             ],
         },
     )

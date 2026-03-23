@@ -111,26 +111,20 @@ ProposalState = Literal[
     "accepted",
     "finalised",
     "withdrawn",
+    "conduct-blocked",
 ]
 
 PROPOSAL_STATE_TRANSITIONS: dict[ProposalState, set[ProposalState]] = {
-    "new": {"accepted", "rejected", "withdrawn", "checked", "manual-review"},
-    "edit": {"accepted", "rejected", "withdrawn", "new"},
-    "checked": {
-        "accepted",
-        "rejected",
-        "withdrawn",
-        "anonymised",
-        "anon-blocked",
-        "edit",
-    },
+    "new": {"accepted", "rejected", "withdrawn", "checked", "manual-review", "conduct-blocked"},
+    "edit": {"accepted", "rejected", "withdrawn", "new", "conduct-blocked"},
+    "checked": {"accepted", "rejected", "withdrawn", "anonymised", "anon-blocked", "edit", "conduct-blocked"},
     "rejected": {"accepted", "rejected", "withdrawn", "edit"},
-    "anonymised": {"accepted", "rejected", "withdrawn", "reviewed", "edit"},
-    "anon-blocked": {"accepted", "rejected", "withdrawn", "reviewed", "edit"},
-    "manual-review": {"accepted", "rejected", "withdrawn", "edit"},
-    "reviewed": {"accepted", "rejected", "withdrawn", "edit", "anonymised"},
-    "accepted": {"accepted", "rejected", "withdrawn", "edit", "finalised"},
-    "finalised": {"accepted", "rejected", "withdrawn"},
+    "anonymised": {"accepted", "rejected", "withdrawn", "reviewed", "edit", "conduct-blocked"},
+    "anon-blocked": {"accepted", "rejected", "withdrawn", "reviewed", "edit", "conduct-blocked"},
+    "manual-review": {"accepted", "rejected", "withdrawn", "edit", "conduct-blocked"},
+    "reviewed": {"accepted", "rejected", "withdrawn", "edit", "anonymised", "conduct-blocked"},
+    "accepted": {"accepted", "rejected", "withdrawn", "edit", "finalised", "conduct-blocked"},
+    "finalised": {"accepted", "rejected", "withdrawn", "conduct-blocked"},
     "withdrawn": {"accepted", "rejected", "withdrawn", "edit"},
 }
 
