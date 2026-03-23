@@ -189,6 +189,7 @@ OCCURRENCE_STATE_TRANSITIONS: dict[OccurrenceState, set[OccurrenceState]] = {
 # Options for age range displayed to the user
 AGE_RANGE_OPTIONS = [
     ("all", "Suitable for all ages"),
+    ("u5", "Under 5"),
     ("u12", "Under 12"),
     ("12+", "Age 12+"),
     ("14+", "Age 14+"),

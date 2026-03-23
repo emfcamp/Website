@@ -99,7 +99,7 @@ class WorkshopAttributesForm(AttributesForm):
         "Age range",
         default="all",
         choices=[
-            (c, f"{t} (this may be considered for a Youth Workshop)" if c == "u12" else t)
+            (c, f"{t} (this may be considered for a Youth Workshop)" if c in {"u5", "u12"} else t)
             for c, t in AGE_RANGE_OPTIONS
         ],
     )
