@@ -252,7 +252,9 @@ def create_app(dev_server=False, config_override=None):
 
     @app.context_processor
     def csp_nonce():
-        return {"csp_nonce": g.csp_nonce}
+        if hasattr(g, "csp_nonce"):
+            return {"csp_nonce": g.csp_nonce}
+        return {}
 
     @app.after_request
     def send_security_headers(response):
