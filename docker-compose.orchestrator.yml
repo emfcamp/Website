@@ -1,0 +1,64 @@
+services:
+  app:
+    build:
+      context: "./"
+    init: true
+    networks:
+      - emfweb
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+      - ./var/vat_invoices:/vat_invoices
+    ports:
+      - "127.0.0.1:${PORT_WEB}:2342"
+    restart: unless-stopped
+    environment:
+      SETTINGS_FILE: ./config/orchestrator.cfg
+      FLASK_APP: dev_server.py  # Required for flask-admin 1.6.1 to work (see #1769)
+      COLORIZE_LOGS: always
+      PYTHONUNBUFFERED: 1
+      IRCCAT: fakeirccat:12345
+      ORCHESTRATOR_SECRET_SEED: "${ORCHESTRATOR_SECRET_SEED}"
+      PORT_WEB_HOSTNAME: "${PORT_WEB_HOSTNAME}"
+
+  rsbuild:
+    restart: unless-stopped
+    build:
+      context: "./docker/rsbuild"
+    init: true
+    volumes:
+      - .:/app
+
+  maildev:
+    restart: unless-stopped
+    image: 'maildev/maildev:2.2.1'
+    ports:
+      - "127.0.0.1:${PORT_MAIL}:1080"
+    networks:
+      - emfweb
+
+  postgres:
+    restart: unless-stopped
+    image: 'postgis/postgis:16-3.4-alpine'
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - emfweb
+
+  fakeirccat:
+    restart: unless-stopped
+    build:
+      context: "./docker/netcat"
+    command: -k -l -p 12345
+    init: true
+    networks:
+      - emfweb
+
+networks:
+  emfweb:
+
+volumes:
+  postgres:
