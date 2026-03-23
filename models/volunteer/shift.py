@@ -14,6 +14,8 @@ from main import db
 from .. import BaseModel
 
 if TYPE_CHECKING:
+    from pendulum import DateTime
+
     from ..cfp import Occurrence
     from ..user import User
     from .role import Role
@@ -61,13 +63,15 @@ class ShiftEntryStateException(ValueError):
 
 
 class ShiftEntry(BaseModel):
-    """"""
+    """Join table used to indicate a volunteer has signed up for a given shift."""
 
     __tablename__ = "volunteer_shift_entry"
     __versioned__: dict[str, str] = {}
 
     shift_id: Mapped[int] = mapped_column(ForeignKey("volunteer_shift.id"), primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
+
+    #: Indicates whether a volunteer has arrived for/completed a shift.
     state: Mapped[ShiftEntryState] = mapped_column(default=ShiftEntryState.SIGNED_UP)
 
     user: Mapped["User"] = relationship(back_populates="shift_entries")
@@ -98,6 +102,7 @@ class Shift(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     role_id: Mapped[int] = mapped_column(ForeignKey("volunteer_role.id"))
     venue_id: Mapped[int] = mapped_column(ForeignKey("volunteer_venue.id"))
+
     occurrence_id: Mapped[int | None] = mapped_column(ForeignKey("occurrence.id"))
     start: Mapped[datetime] = mapped_column()
     end: Mapped[datetime] = mapped_column()
@@ -156,6 +161,15 @@ class Shift(BaseModel):
         }
 
     def is_clash(self, other):
+        """Calculate whether this shift clashes with another.
+
+        We use this to determine if we should allow a volunteer to sign up for
+        both shifts, which is only permitted if the other shift is filling the
+        same role in the same venue. In all other cases a volunteer can't sign
+        up for two shifts at the same time.
+
+        This is needed because contiguous shifts often have a slight overlap.
+        """
         # If the venues and roles match then the shifts can overlap.
         if self.venue == other.venue and self.role == other.role:
             return False
@@ -204,18 +218,43 @@ class Shift(BaseModel):
         )
 
     @classmethod
-    def generate_for(cls, role, venue, first, final, min, max, base_duration=120, changeover=15):
-        """Will generate shifts between start and end times. The last shift will end at end.
+    def generate_for(
+        cls,
+        role: "Role",
+        venue: "VolunteerVenue",
+        first: "DateTime",
+        final: "DateTime",
+        min: int,
+        max: int,
+        base_duration: int = 120,
+        changeover: int = 15,
+    ) -> list["Shift"]:
+        """Build Shift records between start and end times.
 
-        changeover is the changeover time in minutes.
-        This will mean that during changeover there will be two shifts created.
+        Args:
+            first: an ISO8601 datetime indicating the start of the first shift
+
+            final: an ISO8601 datetime indicating the end of the last shift
+
+            min: is the minimum number of people needed to staff these shifts and still
+            get the job done.
+
+            max: is the maximum number of people who can practically staff these
+            shifts and having something to do.
+
+            base_duration: is how long we want a shift to be. The last shift of the
+            day may be slightly shorter.
+
+            changeover: indicates the time in minutes to overlap two shifts, allowing
+            some time for volunteers to handover between each other. Shifts will start
+            `changeover` minutes before the configured start time.
         """
 
         def start(t):
-            return t.subtract(minutes=changeover)
+            return t.add(minutes=changeover)
 
         def end(t):
-            return t.add(minutes=base_duration)
+            return t.subtract(minutes=base_duration)
 
         final_start = final.subtract(minutes=base_duration)
 

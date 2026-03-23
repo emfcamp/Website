@@ -28,9 +28,13 @@ class Role(BaseModel):
 
     __tablename__ = "volunteer_role"
     id: Mapped[int] = mapped_column(primary_key=True)
+    #: The name used to present a role. Should be kept short as it gets used in lists.
     name: Mapped[str] = mapped_column(unique=True, index=True)
+    #: A brief summary of the role
     description: Mapped[str | None]
+    #: A longer description of the role, supports Markdown.
     full_description_md: Mapped[str | None] = mapped_column(Text)
+    #: A link to some instructions on how to perform the role.
     instructions_url: Mapped[str | None]
     #: Things to know for the shift
     role_notes: Mapped[str | None]
@@ -68,6 +72,7 @@ class Role(BaseModel):
             "requires_training": self.requires_training,
         }
 
+    #: Render the full description as Markdown.
     def full_description(self):
         content = self.full_description_md
         if content:
@@ -91,7 +96,11 @@ class Role(BaseModel):
         from . import Shift, ShiftEntry
 
         shift_counts_q = (
-            select(Shift.role_id, ShiftEntry.user_id, func.count(ShiftEntry.shift_id).label("shift_count"))
+            select(
+                Shift.role_id,
+                ShiftEntry.user_id,
+                func.count(ShiftEntry.shift_id).label("shift_count"),
+            )
             .select_from(ShiftEntry)
             .join(Shift)
             .group_by(Shift.role_id, ShiftEntry.user_id)
@@ -148,6 +157,8 @@ class RolePermission(BaseModel):
 
 
 class RoleAdmin(BaseModel):
+    """Join table used to indicate a given volunteer has admin permissions for a role."""
+
     __tablename__ = "volunteer_role_admin"
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
     role_id: Mapped[int] = mapped_column(ForeignKey("volunteer_role.id"), primary_key=True)
