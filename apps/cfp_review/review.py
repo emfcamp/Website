@@ -131,7 +131,7 @@ def review_list() -> ResponseReturnValue:
     return render_template("cfp_review/review_list.html", to_review=to_review, reviewed=reviewed, form=form)
 
 
-def can_review_proposal(proposal):
+def can_review_proposal(proposal: Proposal) -> bool:
     if proposal.state != "anonymised":
         return False
 
@@ -147,23 +147,28 @@ def can_review_proposal(proposal):
     return True
 
 
-def get_next_review_proposal(proposal_id):
-    review_order = session.get("review_order")
-    if proposal_id not in review_order:
+def get_next_review_proposal_id(proposal_id: int) -> int | None:
+    review_order: list[int] | None = session.get("review_order")
+    if not review_order:
         return None
 
-    for i in review_order[review_order.index(proposal_id) + 1 :]:
-        proposal = Proposal.query.get(i)
+    if proposal_id not in review_order:
+        return None
+    cur_index = review_order.index(proposal_id)
+
+    for next_proposal_id in review_order[cur_index + 1 :]:
+        proposal = db.session.get_one(Proposal, next_proposal_id)
+        # TODO: use proposal_query logic from above?
         if can_review_proposal(proposal):
-            return i
+            return next_proposal_id
 
     return None
 
 
 @cfp_review.route("/review/<int:proposal_id>/next")
 @review_required
-def review_proposal_next(proposal_id):
-    next_proposal_id = get_next_review_proposal(proposal_id)
+def review_proposal_next(proposal_id: int) -> ResponseReturnValue:
+    next_proposal_id = get_next_review_proposal_id(proposal_id)
     if next_proposal_id is None:
         return redirect(url_for(".review_list"))
 
@@ -172,31 +177,32 @@ def review_proposal_next(proposal_id):
 
 @cfp_review.route("/review/<int:proposal_id>", methods=["GET", "POST"])
 @review_required
-def review_proposal(proposal_id):
-    prop = get_or_404(db, Proposal, proposal_id)
+def review_proposal(proposal_id: int) -> ResponseReturnValue:
+    proposal = get_or_404(db, Proposal, proposal_id)
 
-    if not can_review_proposal(prop):
+    if not can_review_proposal(proposal):
         app.logger.warning("Cannot review proposal %s", proposal_id)
         flash(f"Cannot review proposal {proposal_id}, continuing to next proposal")
         return redirect(url_for(".review_proposal_next", proposal_id=proposal_id))
 
     session["review_visit_dt"] = naive_utcnow()
 
-    next_proposal_id = get_next_review_proposal(proposal_id)
+    remaining_count = 0
+    next_proposal_id = get_next_review_proposal_id(proposal_id)
     if next_proposal_id is not None:
-        review_order = session.get("review_order")
-        remaining = len(review_order) - review_order.index(next_proposal_id)
-    else:
-        remaining = 0
+        review_order: list[int] | None = session.get("review_order")
+        if review_order is not None:
+            # get_next_review_proposal_id only returns ids from review_order
+            remaining_count = len(review_order) - review_order.index(next_proposal_id)
 
     form = VoteForm()
 
-    vote = db.session.scalar(select(ProposalVote).filter_by(proposal_id=prop.id, user_id=current_user.id))
+    vote = db.session.scalar(select(ProposalVote).filter_by(proposal_id=proposal.id, user_id=current_user.id))
 
     if form.validate_on_submit():
         # Make a new vote if need-be
         if not vote:
-            vote = ProposalVote(current_user, prop)
+            vote = ProposalVote(current_user, proposal)
             db.session.add(vote)
 
         # If there's a note add it (will replace the old one but it's versioned)
@@ -245,10 +251,11 @@ def review_proposal(proposal_id):
 
     if vote and vote.note:
         form.note.data = vote.note
+
     return render_template(
         "cfp_review/review_proposal.html",
         form=form,
-        proposal=prop,
+        proposal=proposal,
         previous_vote=vote,
-        remaining=remaining,
+        remaining_count=remaining_count,
     )
