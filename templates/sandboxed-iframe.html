@@ -4,6 +4,7 @@
 <html lang="en" style="background-color: transparent; margin: 0; padding: 0">
     <head>
         <meta charset="UTF-8">
+        <base target="_top">
         {% block css -%}
         <link rel="stylesheet" href="{{ static_url_for('static', filename="css/main.css") }}">
         {% endblock -%}
