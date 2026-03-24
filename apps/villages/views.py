@@ -103,7 +103,7 @@ def render_markdown(markdown_text: str) -> Markup:
         link_rel="noopener nofollow",  # default includes noreferrer but not nofollow
     )
     inner_html = render_template("sandboxed-iframe.html", body=Markup(content_html))
-    iFrame_html = f'<iframe sandbox="allow-scripts" class="embedded-content" srcdoc="{html.escape(inner_html, True)}"></iframe>'
+    iFrame_html = f'<iframe sandbox="allow-scripts allow-top-navigation-by-user-activation" class="embedded-content" srcdoc="{html.escape(inner_html, True)}"></iframe>'
     return Markup(iFrame_html)
 
 
