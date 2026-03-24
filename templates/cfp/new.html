@@ -53,13 +53,14 @@
       <fieldset>
           <legend>About your {{ form.type_info.human_type }}</legend>
           <p>The title and description of your {{ form.type_info.human_type }} will be made public.
-            You'll be able to tweak these later, but please provide as much detail as you can so we
+            You'll be able to tweak these later, but please provide as much detail as you can now, so we
             can review your submission.
           </p>
           {% if proposal_type in ('talk', 'workshop') %}
-              <p>We will anonymise these fields before sending them to our reviewers, so please
-                try to avoid including personally identifiable information.
-            </p>
+            <p>If you want some advice on how best to write a proposal, take a look at our
+                <a href="{{url_for('cfp.proposal_advice')}}" target="_blank">proposal advice</a>.</p>
+            <p>We will anonymise these fields before sending them to our reviewers, so please
+            try to avoid including personally identifiable information.</p>
           {% endif %}
           {% if proposal_type == 'talk' %}
             <p>If you are employed by or affiliated with an organisation which is related to the topic
