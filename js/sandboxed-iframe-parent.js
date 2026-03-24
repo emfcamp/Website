@@ -9,20 +9,28 @@ function listenForFrameResizedMessages() {
     window.addEventListener("message", receiveMessage, false);
 
     function receiveMessage(evt) {
-        // console.log("Got message: " + JSON.stringify(evt.data) + " from origin: " + evt.origin);// + " and source: " + evt.source);
-        if (evt.data.type !== "frame-resized") {
-            //not our event
+        // console.log(`Got message from origin ${evt.origin}:`, evt.data, evt.source);
+        if (evt.data?.type !== "frame-resized") {
+            // not our event
             return;
         }
         // NB. can't check the origin as for sandboxed iframes it is null
 
         const iFrames = document.getElementsByTagName("iFrame");
         for (const iFrameEle of iFrames) {
+            /* This is also not for security, but multiple iframe support.
+             * An iframe we created could have navigated away, so we still
+             * need to treat any input suspiciously.
+             */
             if (iFrameEle.contentWindow == evt.source) {
-                iFrameEle.style.height = evt.data.value + "px";
+                const height = Number(evt.data.height);
+                if (isFinite(height)) {
+                    iFrameEle.style.height = `${height}px`;
+                }
             }
         }
     }
+
 }
 
 listenForFrameResizedMessages();
