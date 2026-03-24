@@ -29,4 +29,5 @@ function registerFrameResizeObserver() {
     sendHeight();
 }
 
+document.body.style.overflow = "hidden";
 registerFrameResizeObserver();
