@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block title %}Village: {{village.name}}{% endblock %}
-{% block foot %}<script src="{{static_url_for('static', filename="js/sandboxed-iframe-parent.js")}}"></script>{% endblock%}
 {% block body %}
 {% if village.url %}
 <h2>
@@ -23,6 +22,9 @@
 {% endif %}
 
 {% if village_long_description_html %}
+{# This is render-blocking, but we want the listener ready for the iframe.
+   Better to delay first render than to have a two-way handshake that flashes. #}
+<script src="{{static_url_for('static', filename="js/sandboxed-iframe-parent.js")}}"></script>
 <p>{{village_long_description_html}}</p>
 {% endif %}
 

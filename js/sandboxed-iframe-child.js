@@ -5,25 +5,28 @@
  * It will then emit an event for it's parent to resize.
  */
 
-function sendMsg(height) {
+let lastHeight = null;
+
+function sendHeight() {
+    const height = document.body.scrollHeight;
+    if (height == lastHeight) return;
+    lastHeight = height;
+
+    // console.log(`Sending new height ${height} to parent`);
     window.parent.postMessage(
         {
             type: "frame-resized",
-            value: height,
+            height: height,
         },
         "*",
     );
 }
 
 function registerFrameResizeObserver() {
-    const resizeObserver = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-            sendMsg(entry.target.scrollHeight);
-        }
-    });
+    const resizeObserver = new ResizeObserver(sendHeight);
     resizeObserver.observe(document.body);
-    //send initial event
-    sendMsg(document.body.scrollHeight);
+    // send initial event
+    sendHeight();
 }
 
 registerFrameResizeObserver();

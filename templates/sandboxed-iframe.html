@@ -1,7 +1,7 @@
-{# The source of an iFrame used to sandbox user-controlled HTML #}
-{# Once loaded, this emits an event with it's content's size which the parent page can listen for to adapt the iFrame's height #}
+{#- The source of an iFrame used to sandbox user-controlled HTML -#}
+{#- Once loaded, this emits an event with its content's size which the parent page can listen for to adapt the iFrame's height -#}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="background-color: transparent; margin: 0; padding: 0">
     <head>
         <meta charset="UTF-8">
         {% block css -%}
@@ -9,7 +9,7 @@
         {% endblock -%}
         {% block head -%}{% endblock -%}
     </head>
-<body itemscope itemtype="http://schema.org/WebPage" {% block body_class %}{% endblock %} style="overflow: hidden; height:auto;">
+<body itemscope itemtype="http://schema.org/WebPage" {% block body_class %}{% endblock %} style="overflow: hidden; height: auto; background-color: transparent; margin: 0; padding: 0">
 {% block document %}
   <div id="emf-container" style="min-height: 100%;">
     <div class="emf-row">
