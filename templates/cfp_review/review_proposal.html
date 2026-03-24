@@ -104,9 +104,9 @@
         </div>
         <div class="col-xs-12">&nbsp;</div>
         <div class="col-xs-12 btn-group-vertical">
-            {% if remaining %}
+            {% if remaining_count %}
                 <a href="{{ url_for('.review_proposal_next', proposal_id=proposal.id) }}" class="btn btn-default">
-                    View next proposal ({{ remaining }} remaining)
+                    View next proposal ({{ remaining_count }} remaining)
                 </a>
             {% endif %}
             <a href="{{ url_for('.review_list') }}" class="btn btn-default">

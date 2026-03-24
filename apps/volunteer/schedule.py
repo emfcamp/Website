@@ -1,7 +1,16 @@
 from collections import defaultdict
 
 import pendulum
-from flask import Response, abort, flash, redirect, render_template, request, session, url_for
+from flask import (
+    Response,
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask import current_app as app
 from flask.typing import ResponseValue
 from flask_login import current_user
@@ -29,7 +38,7 @@ def _get_roles_with_user_data(user):
     for r in roles:
         to_add = r.to_dict()
         to_add["is_interested"] = r in volunteer.interested_roles
-        to_add["is_trained"] = r in volunteer.trained_roles
+        to_add["is_trained"] = not r.requires_training or r in volunteer.trained_roles
 
         res.append(to_add)
 

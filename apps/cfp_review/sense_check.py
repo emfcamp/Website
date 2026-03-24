@@ -6,11 +6,11 @@ from flask import render_template, request
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-from models import event_start, event_end
+from main import db
+from models import event_end, event_start
 from models.cfp import Occurrence, ScheduleItem, ScheduleItemType
 
 from . import cfp_review, review_required
-from main import db
 
 
 def not_sensible_reasons(
@@ -48,12 +48,8 @@ def not_sensible_reasons(
 
     # -- Occurrence has allowed time periods that are after 2am or before 9am.
     for n, period in enumerate(occurrence.get_allowed_time_periods()):
-
-        def reason_key(reason):
-            return f"period_{n}_{reason}"
-
         if period.start >= period.end:
-            reasons[reason_key("starts_after_end")] = (
+            reasons[f"period_{n}_starts_after_end"] = (
                 f'Allowed time period "{period.start} > {period.end}" starts after it ends.'
             )
             continue
@@ -61,27 +57,27 @@ def not_sensible_reasons(
         period_length = period.end - period.start
         if period_length.total_seconds() > (60 * 60 * 24 - (9 - 2)):
             # If the time period is greater than 24-(9-2) hours, then by necessity it overlaps a 2am-9am quiet period.
-            reasons[reason_key("too_long")] = (
+            reasons[f"period_{n}_too_long"] = (
                 f'Allowed time period "{period.start} > {period.end}" overlaps 2am-9am quiet period (time period too long)'
             )
         elif period.start.hour >= 2 and period.start.hour < 9:
             # Start time lies within quiet period
-            reasons[reason_key("starts_in_quiet")] = (
+            reasons[f"period_{n}_starts_in_quiet"] = (
                 f'Allowed time period "{period.start} > {period.end}" overlaps 2am-9am quiet period (start is between 2am and 9am)'
             )
         elif period.end.hour >= 2 and period.end.hour < 9:
             # End time lies within quiet period
-            reasons[reason_key("ends_in_quiet")] = (
+            reasons[f"period_{n}_ends_in_quiet"] = (
                 f'Allowed time period "{period.start} > {period.end}" overlaps 2am-9am quiet period (end is between 2am and 9am)'
             )
         elif period.start.hour < 2 and period.end.hour >= 9:
             # Start time before quiet period, end time after quiet period
-            reasons[reason_key("same_day_subsumes_quiet")] = (
+            reasons[f"period_{n}_same_day_subsumes_quiet"] = (
                 f'Allowed time period "{period.start} > {period.end}" overlaps 2am-9am quiet period (starts before 2am and ends after 9am)'
             )
         elif period.start.hour > period.end.hour and period.end.hour >= 9:
             # If the start hour is after the end hour, then they must be on different days.
-            reasons[reason_key("different_day_subsumes_quiet")] = (
+            reasons[f"period_{n}_different_day_subsumes_quiet"] = (
                 f'Allowed time period "{period.start} > {period.end}" overlaps 2am-9am quiet period (starts on previous day and ends after 9am)'
             )
 
@@ -113,7 +109,7 @@ def not_sensible_reasons(
 
         # -- Occurrence lies outside the allowed time periods.
         permitted_time = False
-        for n, period in enumerate(occurrence.get_allowed_time_periods()):
+        for period in occurrence.get_allowed_time_periods():
             if t >= period.start and t <= period.end:
                 permitted_time = True
 
@@ -169,7 +165,7 @@ def sense_check():
 
     assert validate_types(types_to_show)
 
-    def get_occurrences_for_types(types: list[ScheduleItemType]):
+    def get_occurrences_for_types(types: list[ScheduleItemType]) -> list[Occurrence]:
         return list(
             db.session.scalars(
                 select(Occurrence)

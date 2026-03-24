@@ -17,7 +17,7 @@ def test_get_floor_median():
     assert get_floor_median([1, 2, 3]) == 2
     assert get_floor_median([1, 2, 3, 4]) == 2
     assert get_floor_median([1, 2, 3, 4, 5]) == 3
-    with pytest.raises(Exception):
+    with pytest.raises(Exception):  # noqa: B017
         get_floor_median([])
 
 

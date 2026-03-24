@@ -1,18 +1,19 @@
 """CLI commands for scheduling"""
 
+from dataclasses import dataclass
 from typing import Literal
 
 import click
-from dataclasses import dataclass
 from flask import current_app as app
-from sqlalchemy import func, select, or_
+from sqlalchemy import func, or_, select
 
+from apps.cfp_review.base import send_email_for_proposal
 from main import db
 from models.cfp import Occurrence, Proposal, ScheduleItem, ScheduleItemType, Venue
 from models.village import Village
-from apps.cfp_review.base import send_email_for_proposal
-from .scheduler import Scheduler
+
 from . import cfp
+from .scheduler import Scheduler
 
 
 @dataclass
@@ -157,7 +158,7 @@ def create_venues():
             venue[0].location = venue_definition.location
             updated += 1
             continue
-        elif venue:
+        if venue:
             continue
 
         db.session.add(venue_definition.as_venue())
@@ -210,7 +211,7 @@ def run_schedule(persist, ignore_potential, type):
     """Run the schedule constraint solver. This can take a while."""
     scheduler = Scheduler()
     if ignore_potential:
-        app.logger.info(f"Ignoring current potential slots, items without a scheduled slot will move!")
+        app.logger.info("Ignoring current potential slots, items without a scheduled slot will move!")
 
     if type:
         app.logger.info(f"Only scheduling {type} proposals.")
@@ -228,7 +229,7 @@ def run_schedule(persist, ignore_potential, type):
     help="Which type of proposal to apply for ('all' selects all schedule items)",
     required=True,
 )
-def apply_potential_schedule(email: bool, type: ScheduleItemType | Literal["all"]):
+def apply_potential_schedule(email: bool, type: ScheduleItemType | Literal["all"]) -> None:
     app.logger.info(f"Apply schedule for {type} type(s)")
     if not type:
         raise Exception("Set a type")

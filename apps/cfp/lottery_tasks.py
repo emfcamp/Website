@@ -1,20 +1,18 @@
-import click
-
 from random import shuffle
+
+import click
+from flask import current_app as app
+from flask import render_template
+from flask_mailman import EmailMessage
 from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
 
-from flask import render_template, current_app as app
-from flask_mailman import EmailMessage
-
 from main import db
 from models.cfp import Occurrence, ScheduleItem
-from models.lottery import LotteryEntry, Lottery
+from models.lottery import Lottery, LotteryEntry
 
 from ..common.email import from_email
-
 from . import cfp
-
 
 """
 Here are the rules for the lottery.
@@ -31,11 +29,11 @@ Here are the rules for the lottery.
 @cfp.cli.command("lottery")
 @click.option("-t", "--type", type=str, help="Schedule item type")
 @click.option("--dry-run/--no-dry-run", default=True, help="Actually run the lottery")
-def lottery(schedule_item_type, dry_run) -> None:
+def lottery(schedule_item_type: str, dry_run: bool) -> None:
     if dry_run:
-        app.logger.info(f"'dry-run' is set, lottery results will not be saved, to run use '--no-dry-run'")
+        app.logger.info("'dry-run' is set, lottery results will not be saved, to run use '--no-dry-run'")
     else:
-        app.logger.info(f"'no-dry-run' is set, running lottery")
+        app.logger.info("'no-dry-run' is set, running lottery")
 
     lotteries_to_lock: list[Lottery] = list(
         db.session.scalars(

@@ -1,76 +1,76 @@
 from __future__ import annotations
 
 import dataclasses
-from dataclasses import dataclass, MISSING
-from datetime import datetime, timedelta, time
-from enum import StrEnum
+import re
 import typing
 from collections import namedtuple
-from typing import (
+from dataclasses import MISSING, dataclass
+from datetime import datetime, time, timedelta
+from enum import StrEnum
+from typing import (  # noqa: UP035
     Any,
     Literal,
-    Optional,
     Self,
     Type,
     TypeVar,
     get_args,
 )
+
+import sqlalchemy
 from dateutil.parser import parse as parse_date
-import re
-from itertools import groupby
 from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import to_shape
-import sqlalchemy
+from slugify.slugify import slugify
 from sqlalchemy import (
+    JSON,
     Column,
     ForeignKey,
     Integer,
     Table,
     UniqueConstraint,
+    event,
     func,
     select,
-    JSON,
-    event,
 )
 from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.ext.associationproxy import association_proxy, AssociationProxy
+from sqlalchemy.ext.associationproxy import AssociationProxy, association_proxy
 from sqlalchemy.ext.mutable import MutableDict, MutableList
 from sqlalchemy.orm import (
     LoaderCallableStatus,
-    column_property,
-    relationship,
     Mapped,
+    column_property,
     mapped_column,
-)
-from slugify.slugify import slugify
-from models import (
-    export_attr_counts,
-    naive_utcnow,
-    export_attr_edits,
-    export_intervals,
-    event_start,
-    event_end,
+    relationship,
 )
 
 from main import db
-from .user import User
-from .cfp_tag import Tag, ProposalTag
-from .lottery import Lottery
-from .village import Village
+from models import (
+    event_end,
+    event_start,
+    export_attr_counts,
+    export_attr_edits,
+    export_intervals,
+    naive_utcnow,
+)
+
 from . import BaseModel
+from .cfp_tag import ProposalTag, Tag
+from .lottery import Lottery
+from .user import User
+from .village import Village
 
 if typing.TYPE_CHECKING:
     from .volunteer.shift import Shift
 
 __all__ = [
     "Attributes",
-    "ProposalType",
-    "Proposal",
-    "ScheduleItemType",
-    "ScheduleItem",
     "Occurrence",
+    "Proposal",
     "ProposalMessage",
+    "ProposalType",
     "ProposalVote",
+    "ScheduleItem",
+    "ScheduleItemType",
     "Venue",
 ]
 
@@ -83,7 +83,7 @@ TState = TypeVar("TState")
 
 
 # TODO: this should become a column wrapper type
-def validate_state_transitions(column, allowed_transitions: dict[TState, set[TState]]):
+def validate_state_transitions(column: Any, allowed_transitions: dict[TState, set[TState]]) -> None:
     def on_state_set(target, value, oldvalue, initiator):
         if oldvalue == LoaderCallableStatus.NO_VALUE:
             return
@@ -111,26 +111,20 @@ ProposalState = Literal[
     "accepted",
     "finalised",
     "withdrawn",
+    "conduct-blocked",
 ]
 
 PROPOSAL_STATE_TRANSITIONS: dict[ProposalState, set[ProposalState]] = {
-    "new": {"accepted", "rejected", "withdrawn", "checked", "manual-review"},
-    "edit": {"accepted", "rejected", "withdrawn", "new"},
-    "checked": {
-        "accepted",
-        "rejected",
-        "withdrawn",
-        "anonymised",
-        "anon-blocked",
-        "edit",
-    },
+    "new": {"accepted", "rejected", "withdrawn", "checked", "manual-review", "conduct-blocked"},
+    "edit": {"accepted", "rejected", "withdrawn", "new", "conduct-blocked"},
+    "checked": {"accepted", "rejected", "withdrawn", "anonymised", "anon-blocked", "edit", "conduct-blocked"},
     "rejected": {"accepted", "rejected", "withdrawn", "edit"},
-    "anonymised": {"accepted", "rejected", "withdrawn", "reviewed", "edit"},
-    "anon-blocked": {"accepted", "rejected", "withdrawn", "reviewed", "edit"},
-    "manual-review": {"accepted", "rejected", "withdrawn", "edit"},
-    "reviewed": {"accepted", "rejected", "withdrawn", "edit", "anonymised"},
-    "accepted": {"accepted", "rejected", "withdrawn", "edit", "finalised"},
-    "finalised": {"accepted", "rejected", "withdrawn"},
+    "anonymised": {"accepted", "rejected", "withdrawn", "reviewed", "edit", "conduct-blocked"},
+    "anon-blocked": {"accepted", "rejected", "withdrawn", "reviewed", "edit", "conduct-blocked"},
+    "manual-review": {"accepted", "rejected", "withdrawn", "edit", "conduct-blocked"},
+    "reviewed": {"accepted", "rejected", "withdrawn", "edit", "anonymised", "conduct-blocked"},
+    "accepted": {"accepted", "rejected", "withdrawn", "edit", "finalised", "conduct-blocked"},
+    "finalised": {"accepted", "rejected", "withdrawn", "conduct-blocked"},
     "withdrawn": {"accepted", "rejected", "withdrawn", "edit"},
 }
 
@@ -189,6 +183,7 @@ OCCURRENCE_STATE_TRANSITIONS: dict[OccurrenceState, set[OccurrenceState]] = {
 # Options for age range displayed to the user
 AGE_RANGE_OPTIONS = [
     ("all", "Suitable for all ages"),
+    ("u5", "Under 5"),
     ("u12", "Under 12"),
     ("12+", "Age 12+"),
     ("14+", "Age 14+"),
@@ -312,11 +307,11 @@ def get_days_map():
     return {ed.strftime("%a").lower(): ed for ed in event_days}
 
 
-def schedule_item_slug(title) -> str:
+def schedule_item_slug(title: str) -> str:
     replacements = [
         ["'", ""],
     ]
-    slug = slugify(title, replacements=replacements, allow_unicode=True)
+    slug: str = slugify(title, replacements=replacements, allow_unicode=True)
     if len(slug) > 60:
         words = re.split(" +|[,.;:!?]+", title)
         break_words = ["and", "which", "with", "without", "for", "-", ""]
@@ -514,7 +509,7 @@ def attributes_proxy(attributes_cls: type[Attributes], store: dict[str, Any]) ->
                 raise AttributeError(name)
             return self._store.get(name)
 
-        def __setattr__(self, name: str, value: Any):
+        def __setattr__(self, name: str, value: Any) -> None:
             if name not in self.__dataclass_fields__:
                 raise AttributeError(name)
             if self._store.get(name, MISSING) != value:
@@ -530,14 +525,14 @@ def attributes_proxy(attributes_cls: type[Attributes], store: dict[str, Any]) ->
     return AttributesProxy
 
 
-def convert_attributes_between_types(old_attributes: Attributes, new_attributes: Attributes):
+def convert_attributes_between_types(old_attributes: Attributes, new_attributes: Attributes) -> None:
     # Logic to transfer attributes. Any not copied will be lost except in history.
     # There aren't currently many attributes that can safely be copied across.
     attributes_to_copy = [
         "family_friendly",
     ]
-    if isinstance(old_attributes, (WorkshopAttributes, YouthWorkshopAttributes)) and isinstance(
-        new_attributes, (WorkshopAttributes, YouthWorkshopAttributes)
+    if isinstance(old_attributes, WorkshopAttributes | YouthWorkshopAttributes) and isinstance(
+        new_attributes, WorkshopAttributes | YouthWorkshopAttributes
     ):
         attributes_to_copy += [
             "participant_count",
@@ -552,7 +547,7 @@ def convert_attributes_between_types(old_attributes: Attributes, new_attributes:
             setattr(new_attributes, a, getattr(old_attributes, a))
 
 
-def copy_common_attributes(old_attributes: Attributes, new_attributes: Attributes):
+def copy_common_attributes(old_attributes: Attributes, new_attributes: Attributes) -> None:
     for n in new_attributes.__dataclass_fields__:
         setattr(new_attributes, n, getattr(old_attributes, n))
 
@@ -663,7 +658,7 @@ class Proposal(BaseModel):
         return [t.tag for t in self._tags]
 
     @tags.setter
-    def tags(self, tags: list[str]):
+    def tags(self, tags: list[str]) -> None:
         found_tags = list(db.session.scalars(select(Tag).where(Tag.tag.in_(tags))))
         missing_tags = set(tags) - {t.tag for t in found_tags}
         if missing_tags:
@@ -674,60 +669,60 @@ class Proposal(BaseModel):
     def get_export_data(cls):
         return {}
         # FIXME
-        count_attrs = [
-            "needs_help",
-            "needs_money",
-            "needs_laptop",
-            "one_day",
-            "notice_required",
-            "video_privacy",
-            "state",
-        ]
+        # count_attrs = [
+        #    "needs_help",
+        #    "needs_money",
+        #    "needs_laptop",
+        #    "one_day",
+        #    "notice_required",
+        #    "video_privacy",
+        #    "state",
+        # ]
 
-        edits_attrs = [
-            "published_title",
-            "published_description",
-            "duration",
-            "equipment_required",
-            "funding_required",
-            "additional_info",
-            "notice_required",
-            "needs_help",
-            "needs_money",
-            "one_day",
-            "rejected_email_sent",
-            "published_names",
-            "published_pronouns",
-            "arrival_period",
-            "departure_period",
-            "contact_eventphone",
-            "contact_telephone",
-            "video_privacy",
-            "needs_laptop",
-            "available_times",
-            "participant_count",
-            "participant_cost",
-            "size",
-            "grant_requested",
-            "age_range",
-            "participant_equipment",
-        ]
+        # edits_attrs = [
+        #    "published_title",
+        #    "published_description",
+        #    "duration",
+        #    "equipment_required",
+        #    "funding_required",
+        #    "additional_info",
+        #    "notice_required",
+        #    "needs_help",
+        #    "needs_money",
+        #    "one_day",
+        #    "rejected_email_sent",
+        #    "published_names",
+        #    "published_pronouns",
+        #    "arrival_period",
+        #    "departure_period",
+        #    "contact_eventphone",
+        #    "contact_telephone",
+        #    "video_privacy",
+        #    "needs_laptop",
+        #    "available_times",
+        #    "participant_count",
+        #    "participant_cost",
+        #    "size",
+        #    "grant_requested",
+        #    "age_range",
+        #    "participant_equipment",
+        # ]
 
-        proposals = cls.query.with_entities(
-            cls.id,
-            cls.title,
-            cls.description,
-            # cls.favourite_count,  # don't care about performance here
-            cls.duration,
-            cls.notice_required,
-            cls.needs_money,
-            # cls.available_times,
-            # cls.allowed_times,
-            # cls.arrival_period,
-            # cls.departure_period,
-            # cls.needs_laptop,
-            # cls.video_privacy,
-        ).order_by(cls.id)
+        # proposals = cls.query.with_entities(
+        #    cls.id,
+        #    cls.title,
+        #    cls.description,
+        #    # cls.favourite_count,  # don't care about performance here
+        #    cls.duration,
+        #    cls.notice_required,
+        #    cls.needs_money,
+        #    # cls.available_times,
+        #    # cls.allowed_times,
+        #    # cls.arrival_period,
+        #    # cls.departure_period,
+        #    # cls.needs_laptop,
+        #    # cls.video_privacy,
+        # ).order_by(cls.id)
 
         # FIXME
         # if cls.__name__ == "WorkshopProposal":
@@ -740,109 +735,109 @@ class Proposal(BaseModel):
         #    )
 
         # Some unaccepted proposals have scheduling data, but we shouldn't need to keep that
-        accepted_columns = (
-            User.name,
-            User.email,
-            cls.published_names,
-            cls.published_pronouns,
-            cls.scheduled_time,
-            cls.scheduled_duration,
-            Venue.name,
-        )
-        accepted_proposals = (
-            proposals.filter(cls.state.in_({"accepted", "finalised"}))
-            .outerjoin(cls.scheduled_venue)
-            .join(cls.user)
-            .add_columns(*accepted_columns)
-        )
+        # accepted_columns = (
+        #    User.name,
+        #    User.email,
+        #    cls.published_names,
+        #    cls.published_pronouns,
+        #    cls.scheduled_time,
+        #    cls.scheduled_duration,
+        #    Venue.name,
+        # )
+        # accepted_proposals = (
+        #    proposals.filter(cls.state.in_({"accepted", "finalised"}))
+        #    .outerjoin(cls.scheduled_venue)
+        #    .join(cls.user)
+        #    .add_columns(*accepted_columns)
+        # )
 
-        other_proposals = proposals.filter(~cls.state.in_({"accepted", "finalised"}))
+        # other_proposals = proposals.filter(~cls.state.in_({"accepted", "finalised"}))
 
         # FIXME schedule_items
-        user_favourites = (
-            cls.query.filter(cls.state == "accepted")
-            .join(cls.favourites)
-            .with_entities(User.id.label("user_id"), cls.id)
-            .order_by(User.id)
-        )
+        # user_favourites = (
+        #    cls.query.filter(cls.state == "accepted")
+        #    .join(cls.favourites)
+        #    .with_entities(User.id.label("user_id"), cls.id)
+        #    .order_by(User.id)
+        # )
 
-        anon_favourites = []
-        for user_id, proposals in groupby(user_favourites, lambda r: r.user_id):
-            anon_favourites.append([p.id for p in proposals])
-        anon_favourites.sort()
+        # anon_favourites = []
+        # for user_id, proposals in groupby(user_favourites, lambda r: r.user_id):
+        #    anon_favourites.append([p.id for p in proposals])
+        # anon_favourites.sort()
 
         # FIXME: get rid of this
-        if False and cls.__name__ == "LightningTalkScheduleItem":
-            # Lightning talks don't usually get accepted
-            states_to_export = ["accepted", "new"]
-            columns_to_export = [
-                # Use the submitted fields directly
-                cls.title.label("published_title"),
-                cls.description.label("published_description"),
-                User.name.label("names"),
-                # We omit fields that we don't have since they didn't go through CfP:
-                # pronouns
-                # video_privacy
-                # scheduled_time
-                # scheduled_duration
-                # venue
-                # venue_village_id
-                # Lightning Talk specific fields:
-                cls.session,
-                cls.slide_link,
-            ]
-        else:
-            states_to_export = ["accepted"]
-            columns_to_export = [
-                cls.published_title,
-                cls.published_description,
-                cls.published_names.label("names"),
-                cls.published_pronouns.label("pronouns"),
-                cls.video_privacy,
-                cls.scheduled_time,
-                cls.scheduled_duration,
-                Venue.name.label("venue"),
-                Village.id.label("venue_village_id"),
-            ]
+        # if cls.__name__ == "LightningTalkScheduleItem":
+        #    # Lightning talks don't usually get accepted
+        #    states_to_export = ["accepted", "new"]
+        #    columns_to_export = [
+        #        # Use the submitted fields directly
+        #        cls.title.label("published_title"),
+        #        cls.description.label("published_description"),
+        #        User.name.label("names"),
+        #        # We omit fields that we don't have since they didn't go through CfP:
+        #        # pronouns
+        #        # video_privacy
+        #        # scheduled_time
+        #        # scheduled_duration
+        #        # venue
+        #        # venue_village_id
+        #        # Lightning Talk specific fields:
+        #        cls.session,
+        #        cls.slide_link,
+        #    ]
+        # else:
+        #    states_to_export = ["accepted"]
+        #    columns_to_export = [
+        #        cls.published_title,
+        #        cls.published_description,
+        #        cls.published_names.label("names"),
+        #        cls.published_pronouns.label("pronouns"),
+        #        cls.video_privacy,
+        #        cls.scheduled_time,
+        #        cls.scheduled_duration,
+        #        Venue.name.label("venue"),
+        #        Village.id.label("venue_village_id"),
+        #    ]
 
-        exported_public = (
-            cls.query.filter(cls.state.in_(states_to_export))
-            .outerjoin(cls.scheduled_venue)
-            .outerjoin(Venue.village)
-            .with_entities(*columns_to_export)
-        )
+        # exported_public = (
+        #    cls.query.filter(cls.state.in_(states_to_export))
+        #    .outerjoin(cls.scheduled_venue)
+        #    .outerjoin(Venue.village)
+        #    .with_entities(*columns_to_export)
+        # )
 
         # favourite_counts = [p.favourite_count for p in proposals]
 
-        data = {
-            "private": {
-                "proposals": {
-                    "accepted_proposals": accepted_proposals,
-                    "other_proposals": other_proposals,
-                },
-                "favourites": anon_favourites,
-            },
-            "public": {
-                "proposals": {
-                    "counts": export_attr_counts(cls, count_attrs),
-                    "edits": export_attr_edits(cls, edits_attrs),
-                    # This is still called accepted, but might not 'just' be accepted (e.g. Lightning Talks)
-                    "accepted": exported_public,
-                },
-                # "favourites": {"counts": bucketise(favourite_counts, [0, 1, 10, 20, 30, 40, 50, 100, 200])},
-            },
-            "tables": [
-                "proposal",
-                "proposal_version",
-                "favourite_proposal",
-                "favourite_proposal_version",
-            ],
-        }
-        data["public"]["proposals"]["counts"]["created_week"] = export_intervals(
-            cls.query, cls.created, "week", "YYYY-MM-DD"
-        )
+        # data = {
+        #    "private": {
+        #        "proposals": {
+        #            "accepted_proposals": accepted_proposals,
+        #            "other_proposals": other_proposals,
+        #        },
+        #        "favourites": anon_favourites,
+        #    },
+        #    "public": {
+        #        "proposals": {
+        #            "counts": export_attr_counts(cls, count_attrs),
+        #            "edits": export_attr_edits(cls, edits_attrs),
+        #            # This is still called accepted, but might not 'just' be accepted (e.g. Lightning Talks)
+        #            "accepted": exported_public,
+        #        },
+        #        # "favourites": {"counts": bucketise(favourite_counts, [0, 1, 10, 20, 30, 40, 50, 100, 200])},
+        #    },
+        #    "tables": [
+        #        "proposal",
+        #        "proposal_version",
+        #        "favourite_proposal",
+        #        "favourite_proposal_version",
+        #    ],
+        # }
+        # data["public"]["proposals"]["counts"]["created_week"] = export_intervals(
+        #    cls.query, cls.created, "week", "YYYY-MM-DD"
+        # )
 
-        return data
+        # return data
 
     def get_unread_vote_note_count(self):
         return len([v for v in self.votes if not v.has_been_read])
@@ -923,7 +918,7 @@ class Proposal(BaseModel):
         return Proxy(**self.attributes_json)
 
     @attributes.setter
-    def attributes(self, value: Attributes):
+    def attributes(self, value: Attributes) -> None:
         self.attributes_json = dataclasses.asdict(value)
 
 
@@ -936,7 +931,7 @@ class ProposalInfo:
     human_type: str
     human_type_a: str
     review_type: ReviewType
-    attributes_cls: Type[Attributes]
+    attributes_cls: Type[Attributes]  # noqa: UP006
 
 
 # Ordering here currently determines ordering in the admin UI,
@@ -1084,7 +1079,7 @@ class ScheduleItem(BaseModel):
         return Proxy(**self.attributes_json)
 
     @attributes.setter
-    def attributes(self, value: Attributes):
+    def attributes(self, value: Attributes) -> None:
         self.attributes_json = dataclasses.asdict(value)
 
 
@@ -1098,7 +1093,7 @@ class ScheduleItemInfo:
     human_type_a: str
     supports_lottery: bool
     needs_occurrence: bool
-    attributes_cls: Type[Attributes]
+    attributes_cls: Type[Attributes]  # noqa: UP006
     default_max_tickets_per_entry: int | None = None
 
 
@@ -1213,20 +1208,19 @@ class Occurrence(BaseModel):
         back_populates="occurrences",
         primaryjoin="Venue.id == Occurrence.scheduled_venue_id",
     )
-    shifts: Mapped[list["Shift"]] = relationship(back_populates="occurrence")
-    lottery: Mapped["Lottery | None"] = relationship(back_populates="occurrence")
+    shifts: Mapped[list[Shift]] = relationship(back_populates="occurrence")
+    lottery: Mapped[Lottery | None] = relationship(back_populates="occurrence")
 
     proposal: AssociationProxy[Proposal | None] = association_proxy("schedule_item", "proposal")
     user: AssociationProxy[User] = association_proxy("schedule_item", "user")
 
     @property
-    def valid_allowed_venues(self) -> list["Venue"]:
+    def valid_allowed_venues(self) -> list[Venue]:
         if self.schedule_item.official_content:
             return list(
                 db.session.scalars(select(Venue).where(Venue.allowed_types.any_() == self.schedule_item.type))
             )
-        else:
-            return list(db.session.scalars(select(Venue).where(Venue.allows_attendee_content == True)))
+        return list(db.session.scalars(select(Venue).where(Venue.allows_attendee_content == True)))
 
     def fix_hard_time_limits(self, time_periods):
         # This should be fixed by the string periods being burned and replaced
@@ -1272,7 +1266,7 @@ class Occurrence(BaseModel):
         return make_periods_contiguous(time_periods)
 
     def get_allowed_time_periods_serialised(self):
-        return "\n".join(["%s > %s" % (v.start, v.end) for v in self.get_allowed_time_periods()])
+        return "\n".join([f"{v.start} > {v.end}" for v in self.get_allowed_time_periods()])
 
     def get_allowed_time_periods_with_default(self):
         allowed_time_periods = self.get_allowed_time_periods()
@@ -1302,8 +1296,7 @@ class Occurrence(BaseModel):
 
         if this_start and this_end and other_start and other_end:
             return this_end > other_start and other_end > this_start
-        else:
-            return False
+        return False
 
     def get_conflicting_content(self) -> list[Occurrence]:
         # We don't care about schedule item state because we don't want to
@@ -1430,7 +1423,7 @@ class ProposalMessage(BaseModel):
 
 class ProposalVote(BaseModel):
     __tablename__ = "proposal_vote"
-    __versioned__: dict[str, Any] = {}
+    __versioned__: dict[str, Any] = {"exclude": ["modified"]}
 
     # TODO: make (user_id, proposal_id) the PK instead?
     __table_args__ = (UniqueConstraint("user_id", "proposal_id"),)
@@ -1444,6 +1437,9 @@ class ProposalVote(BaseModel):
     vote: Mapped[int | None]  # Vote can be null for abstentions
     note: Mapped[str | None]
 
+    # Used for sorting in the CfP review page
+    modified: Mapped[datetime] = mapped_column(default=naive_utcnow, onupdate=naive_utcnow)
+
     user: Mapped[User] = relationship(back_populates="votes")
     proposal: Mapped[Proposal] = relationship(back_populates="votes")
 
@@ -1455,10 +1451,10 @@ class ProposalVote(BaseModel):
     def set_state(self, state):
         state = state.lower()
         if state not in VOTE_STATES:
-            raise ProposalVoteStateException('"%s" is not a valid state' % state)
+            raise ProposalVoteStateException(f'"{state}" is not a valid state')
 
         if state not in VOTE_STATES[self.state]:
-            raise ProposalVoteStateException('"%s->%s" is not a valid transition' % (self.state, state))
+            raise ProposalVoteStateException(f'"{self.state}->{state}" is not a valid transition')
 
         self.state = state
 
@@ -1530,7 +1526,7 @@ class Venue(BaseModel):
     )
 
     def __repr__(self):
-        return "<Venue id={}, name={}>".format(self.id, self.name)
+        return f"<Venue id={self.id}, name={self.name}>"
 
     @property
     def __geo_interface__(self):
@@ -1585,7 +1581,7 @@ class Venue(BaseModel):
         return None
 
     @property
-    def map_link(self) -> Optional[str]:
+    def map_link(self) -> str | None:
         if not self.latlon:
             return None
         lat, lon = self.latlon
@@ -1593,29 +1589,29 @@ class Venue(BaseModel):
 
 
 __all__ = [
-    "PROPOSAL_INFOS",
-    "VOTE_STATES",
     "DURATION_OPTIONS",
-    "ROUGH_DURATIONS",
-    "PROPOSAL_TIMESLOTS",
-    "PREFERRED_TIMESLOTS",
-    "HARD_START_LIMIT",
-    "REMAP_SLOT_PERIODS",
     "EVENT_SPACING",
-    "cfp_period",
-    "schedule_item_slug",
-    "timeslot_to_period",
-    "make_periods_contiguous",
-    "InvalidVenueException",
+    "HARD_START_LIMIT",
+    "PREFERRED_TIMESLOTS",
+    "PROPOSAL_INFOS",
+    "PROPOSAL_TIMESLOTS",
+    "REMAP_SLOT_PERIODS",
+    "ROUGH_DURATIONS",
+    "VOTE_STATES",
+    "Attributes",
     "FavouriteScheduleItem",
+    "InstallationAttributes",
+    "InvalidVenueException",
+    "PerformanceAttributes",
     "Proposal",
     "ProposalMessage",
     "ProposalVote",
-    "Venue",
-    "Attributes",
     "TalkAttributes",
-    "PerformanceAttributes",
+    "Venue",
     "WorkshopAttributes",
     "YouthWorkshopAttributes",
-    "InstallationAttributes",
+    "cfp_period",
+    "make_periods_contiguous",
+    "schedule_item_slug",
+    "timeslot_to_period",
 ]

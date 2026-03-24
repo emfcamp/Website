@@ -95,6 +95,8 @@ def login():
         user = User.get_by_code(app.config["SECRET_KEY"], request.args.get("code"))
         if user is not None:
             login_user(user)
+            user.email_state = "verified"
+            db.session.commit()
             session.permanent = True
             return redirect(get_next_url())
         flash("Your login link was invalid. Please enter your email address below to receive a new link.")

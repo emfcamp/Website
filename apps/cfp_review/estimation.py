@@ -1,18 +1,19 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import timedelta
-from main import db
 
 from sqlalchemy import select
+
+from main import db
 from models.cfp import (
+    EVENT_SPACING,
     PROPOSAL_TIMESLOTS,
+    ROUGH_DURATIONS,
+    SLOT_DURATION,
     ScheduleItem,
     ScheduleItemType,
     Venue,
     get_days_map,
-    ROUGH_DURATIONS,
-    EVENT_SPACING,
-    SLOT_DURATION,
     make_periods_contiguous,
     timeslot_to_period,
 )

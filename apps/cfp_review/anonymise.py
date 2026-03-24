@@ -1,9 +1,11 @@
-from flask import redirect, url_for, request, render_template, current_app as app, abort
+from flask import abort, redirect, render_template, request, url_for
+from flask import current_app as app
 from flask_login import current_user
-from models.cfp import Proposal
 
 from main import db, get_or_404
-from . import cfp_review, anon_required, sort_proposals, get_next_proposal_to
+from models.cfp import Proposal
+
+from . import anon_required, cfp_review, get_next_proposal_to, sort_proposals
 from .forms import AnonymiseProposalForm
 
 
@@ -15,11 +17,9 @@ def anonymisation():
     sort_proposals(proposals)
 
     non_sort_query_string = dict(request.args)
-    if "sort_by" in non_sort_query_string:
-        del non_sort_query_string["sort_by"]
+    non_sort_query_string.pop("sort_by", None)
 
-    if "reverse" in non_sort_query_string:
-        del non_sort_query_string["reverse"]
+    non_sort_query_string.pop("reverse", None)
 
     return render_template(
         "cfp_review/anonymise_list.html",

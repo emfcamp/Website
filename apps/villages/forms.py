@@ -76,24 +76,24 @@ class VillageForm(Form):
 
 
 class AdminVillageForm(VillageForm):
-    lat = FloatField("Latitude", [Optional()])
-    lon = FloatField("Longitude", [Optional()])
+    location_lat = FloatField("Latitude", [Optional()])
+    location_lon = FloatField("Longitude", [Optional()])
 
     def populate(self, village: Village) -> None:
         super().populate(village)
 
         if village.location is None:
-            self.lat.data = None
-            self.lon.data = None
+            self.location_lat.data = None
+            self.location_lon.data = None
         else:
             latlon = to_shape(village.location)
-            self.lat.data = latlon.y
-            self.lon.data = latlon.x
+            self.location_lat.data = latlon.y
+            self.location_lon.data = latlon.x
 
     def populate_obj(self, village: Village) -> None:
         super().populate_obj(village)
 
-        if self.lat.data is not None and self.lon.data is not None:
-            village.location = from_shape(Point(self.lon.data, self.lat.data))
+        if self.location_lat.data is not None and self.location_lon.data is not None:
+            village.location = from_shape(Point(self.location_lon.data, self.location_lat.data))
         else:
             village.location = None

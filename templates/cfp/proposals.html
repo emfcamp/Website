@@ -35,7 +35,7 @@
           Rejected, please check your <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">messages</a>
         {% elif proposal.state == 'cancelled' %}
           Cancelled
-        {% elif proposal.state == 'anonymised' %}
+        {% elif proposal.state in ('anonymised', 'conduct-blocked') %}
           Awaiting review
         {% elif proposal.state == 'reviewed' %}
           Awaiting the next round

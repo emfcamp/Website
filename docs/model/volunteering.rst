@@ -1,7 +1,11 @@
 Volunteering system
 ===================
 
-The volunteering system allows us to manage volunteers at EMF.
+The volunteering system allows us to manage volunteers at EMF. You can find more
+detail on these models are used in the :doc:`volunteering app docs <../apps/index>`.
+
+Volunteer
+---------
 
 .. autoclass:: models.volunteer.volunteer.Volunteer
     :members:
