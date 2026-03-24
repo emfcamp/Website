@@ -74,7 +74,8 @@ def main(year: int) -> ResponseValue:
 def view(year: int, village_id: int) -> ResponseValue:
     village = load_village(year, village_id)
     show_edit = (
-        current_user.village
+        current_user.is_authenticated
+        and current_user.village
         and current_user.village.id == village_id
         and current_user.village_membership.admin
     )
