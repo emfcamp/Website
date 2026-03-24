@@ -1423,7 +1423,7 @@ class ProposalMessage(BaseModel):
 
 class ProposalVote(BaseModel):
     __tablename__ = "proposal_vote"
-    __versioned__: dict[str, Any] = {}
+    __versioned__: dict[str, Any] = {"exclude": ["modified"]}
 
     # TODO: make (user_id, proposal_id) the PK instead?
     __table_args__ = (UniqueConstraint("user_id", "proposal_id"),)
@@ -1436,6 +1436,9 @@ class ProposalVote(BaseModel):
 
     vote: Mapped[int | None]  # Vote can be null for abstentions
     note: Mapped[str | None]
+
+    # Used for sorting in the CfP review page
+    modified: Mapped[datetime] = mapped_column(default=naive_utcnow, onupdate=naive_utcnow)
 
     user: Mapped[User] = relationship(back_populates="votes")
     proposal: Mapped[Proposal] = relationship(back_populates="votes")
