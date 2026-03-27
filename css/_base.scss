@@ -407,8 +407,13 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
   overflow: auto;
 
   p {
-    margin: 0;
+    margin-top: .5em;
+    margin-bottom: 0;
     padding: 0;
+
+    &:first-child {
+      margin-top: 0;
+    }
   }
 
   .admonition-title {
