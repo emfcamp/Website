@@ -397,7 +397,11 @@ def render_markdown(source: str, template: str = "about/template.html", **view_v
         content = Markup(
             markdown(
                 render_template_string(content),
-                extensions=["markdown.extensions.nl2br"],
+                extensions=[
+                    "markdown.extensions.nl2br",
+                    "markdown.extensions.admonition",
+                    "markdown.extensions.toc",
+                ],
             )
         )
 
