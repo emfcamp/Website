@@ -13,3 +13,10 @@ Join with IRCCloud: <a href="https://www.irccloud.com/invite?channel=%23emfcamp-
 ## Documentation
 
 Please see our [developer documentation](https://emfcamp.github.io/Website/).
+
+## License & Acknowledgements
+
+This project is licensed under AGPL-3.0. See [LICENSE](LICENSE).
+
+### Third-Party Code
+- **Admonition Styles and Icons**: Based on BookStack wiki (MIT Licensed)
