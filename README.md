@@ -102,3 +102,10 @@ For more, see:
 - [Testing](docs/testing.md)
 - [Deployment](docs/deployment.md)
 - [Contributing](.github/CONTRIBUTING.md)
+
+## License & Acknowledgements
+
+This project is licensed under AGPL-3.0. See [LICENSE](LICENSE).
+
+### Third-Party Code
+- **Admonition Styles and Icons**: Based on BookStack wiki (MIT Licensed)
