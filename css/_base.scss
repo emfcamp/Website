@@ -395,3 +395,84 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
 #mailing-list-form #name-field {
   display: none;
 }
+
+
+
+.admonition {
+  margin: 1em 0;
+  padding: 1em;
+  border-left: 0.3em solid #bbb;
+  background: #eee;
+  color: #444;
+  overflow: auto;
+  clear: both;
+
+  p {
+    margin-top: .5em;
+    margin-bottom: 0;
+    padding: 0;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  .admonition-title {
+    font-weight: bold;
+  }
+  
+  &.info {
+    color: #01466c;
+    background-color: #d3efff;
+    border-color: #0288d1;
+
+    .admonition-title::before {
+      background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiMwMTUzODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+ICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4gICAgPHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTEgMTVoLTJ2LTZoMnY2em0wLThoLTJWN2gydjJ6Ii8+PC9zdmc+)
+    }
+  }
+
+  &.warning {
+    color: #6a2802;
+    background-color: #fee3d3;
+    border-color: #cf4d03;
+
+    .admonition-title::before {
+      background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNiNjUzMWMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+ICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4gICAgPHBhdGggZD0iTTEgMjFoMjJMMTIgMiAxIDIxem0xMi0zaC0ydi0yaDJ2MnptMC00aC0ydi00aDJ2NHoiLz48L3N2Zz4=)
+    }
+  }
+
+  &.danger {
+    color: #4d0706;
+    background-color: #fcdbdb;
+    border-color: #ab0f0e;
+
+    .admonition-title::before {
+      background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNiOTE4MTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+ICAgIDxwYXRoIGQ9Ik0xNS43MyAzSDguMjdMMyA4LjI3djcuNDZMOC4yNyAyMWg3LjQ2TDIxIDE1LjczVjguMjdMMTUuNzMgM3pNMTIgMTcuM2MtLjcyIDAtMS4zLS41OC0xLjMtMS4zIDAtLjcyLjU4LTEuMyAxLjMtMS4zLjcyIDAgMS4zLjU4IDEuMyAxLjMgMCAuNzItLjU4IDEuMy0xLjMgMS4zem0xLTQuM2gtMlY3aDJ2NnoiLz4gICAgPHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==)
+    }
+  }
+
+  &.info .admonition-title::before,
+  &.warning .admonition-title::before,
+  &.danger .admonition-title::before {
+    content: "";
+    display: inline-block;
+    background-repeat: no-repeat;
+    vertical-align: center;
+    margin-right: .15em;
+    width: 1em;
+    height: 1em;
+  }
+}
+
+.image-right {
+  width:300px;
+  float:right;
+  margin-left: 1em;
+  margin-bottom: 1em;
+
+  @media (max-width: $main-content-width) {
+    width: 100%;
+    float: none;
+    margin-left: 0;
+  }
+}
