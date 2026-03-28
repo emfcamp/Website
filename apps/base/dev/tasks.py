@@ -6,11 +6,14 @@ from pendulum import Duration as Offset
 from pendulum import parse
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 
+from apps.cfp.schedule_tasks import create_venues
 from apps.cfp.tasks import create_tags
+from apps.tickets.tasks import create_product_groups
 from main import db
 from models.feature_flag import FeatureFlag, refresh_flags
 from models.payment import BankAccount
 from models.site_state import refresh_states
+from models.user import User
 from models.volunteer.role import Role
 from models.volunteer.shift import Shift
 from models.volunteer.venue import VolunteerVenue
@@ -21,19 +24,33 @@ from .fake import FakeDataGenerator
 
 @dev_cli.command("data")
 @click.pass_context
-def dev_data(ctx):
+@click.option("--idempotent", is_flag=True)
+def dev_data(ctx, idempotent):
     """Make all categories of fake data for dev"""
     ctx.invoke(enable_cfp)
-    ctx.invoke(fake_data)
     ctx.invoke(volunteer_data)
     ctx.invoke(volunteer_shifts)
     ctx.invoke(create_tags)
+    ctx.invoke(create_venues)
     ctx.invoke(create_bank_accounts)
+    ctx.invoke(create_product_groups)
+    # fake_data always generates 120 users and a bunch of other stuff
+    # so don't automatically run it every time the container starts up
+    ctx.invoke(fake_data, idempotent=idempotent)
 
 
 @dev_cli.command("cfp_data")
-def fake_data():
+@click.option("--idempotent", is_flag=True)
+def fake_data(idempotent=False):
     """Make fake users, proposals, locations, etc"""
+    if idempotent:
+        # As a shortcut, just assume if we've created users already then we
+        # don't need to do anything again.  This does mean we'll miss out
+        # if someone adds new functionality here until the database is
+        # emptied.
+        if db.session.query(User).count() > 120:
+            return
+
     fdg = FakeDataGenerator()
     fdg.run()
 
