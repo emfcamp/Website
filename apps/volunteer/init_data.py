@@ -11,7 +11,8 @@ def load_from_yaml(path_glob: str) -> list[dict[str, Any]]:
 
     for path in Path(app.root_path).glob(path_glob):
         with open(path) as file:
-            items.append(safe_load(file))
+            item: dict[str, Any] = safe_load(file) | {"slug": path.stem}
+            items.append(item)
 
     return items
 

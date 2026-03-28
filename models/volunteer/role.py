@@ -1,13 +1,13 @@
 from itertools import groupby
 from operator import itemgetter
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from markdown import markdown
 from markupsafe import Markup
 from sqlalchemy import ForeignKey, Text, func, select
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, noload, relationship
 
-from main import db
+from main import db, get_or_404
 
 from .. import BaseModel
 from .volunteer import Volunteer, VolunteerRoleInterest, VolunteerRoleTraining
@@ -20,6 +20,8 @@ __all__ = [
     "Role",
     "RoleAdmin",
     "RolePermission",
+    "Team",
+    "TeamAdmin",
 ]
 
 
@@ -43,8 +45,12 @@ class Role(BaseModel):
     #: Whether the role requires training to perform
     requires_training: Mapped[bool] = mapped_column(default=False)
 
+    team_id: Mapped[int] = mapped_column(ForeignKey("volunteer_team.id"))
+    #: The team this role is under
+    team: Mapped["Team"] = relationship(back_populates="roles", lazy="joined")
+
     #: Admins for this role
-    admins: Mapped[list["RoleAdmin"]] = relationship(back_populates="role")
+    admins: Mapped[list["RoleAdmin"]] = relationship(back_populates="role", cascade="all, delete-orphan")
     #: Shifts
     shifts: Mapped[list["Shift"]] = relationship(back_populates="role")
 
@@ -56,6 +62,14 @@ class Role(BaseModel):
     trained_volunteers: Mapped[list["Volunteer"]] = relationship(
         back_populates="trained_roles", secondary=VolunteerRoleTraining
     )
+
+    @property
+    def team_name(self) -> str:
+        return self.team.name
+
+    @property
+    def team_slug(self) -> str:
+        return self.team.slug
 
     def __repr__(self):
         return f"<VolunteerRole {self.name}>"
@@ -112,6 +126,7 @@ class Role(BaseModel):
             .outerjoin(shift_counts_q)
             .group_by(Role, shift_counts_q.c.shift_count)
             .order_by(Role.id)
+            .options(noload(Role.team))
         )
 
         interested_volunteers_q = (
@@ -148,6 +163,35 @@ class Role(BaseModel):
         }
 
 
+class Team(BaseModel):
+    """A team that can have a number of volunteer roles attached."""
+
+    __tablename__ = "volunteer_team"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    #: The name used to present a role. Should be kept short as it gets used in lists.
+    name: Mapped[str] = mapped_column(unique=True)
+
+    #: A stable identifier used for team specific functionality to avoid things
+    #: breaking if the team name changes.
+    slug: Mapped[str] = mapped_column(unique=True, index=True)
+
+    #: Users who are admins for all roles within this team.
+    admins: Mapped[list["TeamAdmin"]] = relationship(back_populates="team", cascade="all, delete-orphan")
+
+    #: Roles that sit under this team.
+    roles: Mapped[list["Role"]] = relationship(back_populates="team")
+
+    @classmethod
+    def get_by_id(cls, id: int) -> "Team":
+        return get_or_404(db, Team, id)
+
+    @classmethod
+    def get_by_slug(cls, slug: str) -> "Team | None":
+        return db.session.scalar(select(cls).where(cls.slug == slug))
+
+
 class RolePermission(BaseModel):
     __versioned__: dict[str, str] = {}
     __tablename__ = "volunteer_role_permission"
@@ -167,6 +211,19 @@ class RoleAdmin(BaseModel):
     user: Mapped["User"] = relationship(back_populates="volunteer_admin_roles")
     #: Role the user is an admin for
     role: Mapped[Role] = relationship(back_populates="admins")
+
+
+class TeamAdmin(BaseModel):
+    """Join table indicating a user has admin permissions for all roles in a team."""
+
+    __tablename__ = "volunteer_team_admin"
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
+    team_id: Mapped[int] = mapped_column(ForeignKey("volunteer_team.id"), primary_key=True)
+
+    #: Website user
+    user: Mapped["User"] = relationship(back_populates="volunteer_admin_teams")
+    #: Team the user is an admin for
+    team: Mapped["Team"] = relationship(back_populates="admins")
 
 
 """
