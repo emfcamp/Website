@@ -359,7 +359,7 @@ def create_app(dev_server=False, config_override=None):
 
         return ctx
 
-    if app.config["DEBUG"] or app.testing:
+    if app.config["DEBUG"] or app.config.get("REVIEW_ENVIRONMENT") or app.testing:
         if not email_validator.TEST_ENVIRONMENT:
             email_validator.TEST_ENVIRONMENT = True
             email_validator.SPECIAL_USE_DOMAIN_NAMES.remove("invalid")
