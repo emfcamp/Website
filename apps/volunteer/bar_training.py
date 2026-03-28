@@ -4,10 +4,12 @@ import os
 import markdown
 from flask import abort, flash, redirect, render_template, url_for
 from flask import current_app as app
+from flask.typing import ResponseValue
 from flask_login import current_user
 from wtforms import FieldList, FormField, RadioField, SubmitField
 from wtforms.validators import InputRequired, ValidationError
 
+from apps.common import render_markdown
 from main import db
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer
@@ -119,6 +121,16 @@ class TrainingForm(Form):
             q.answers.choices = data["choices"]
             q.question = data["question"]
             q.page = data["page"]
+
+
+@volunteer.route("/bar-training/guide", methods=["GET"], defaults={"page_name": "index"})
+@volunteer.route("/bar-training/guide/<page_name>", methods=["GET"])
+def bar_training_page(page_name: str) -> ResponseValue:
+    return render_markdown(
+        f"volunteer/training/{page_name}",
+        page_name=page_name,
+        template="volunteer/training/guide_page.html",
+    )
 
 
 @volunteer.route("/bar-training", methods=["GET", "POST"])
