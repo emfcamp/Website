@@ -22,13 +22,12 @@ docker compose build --parallel
 docker compose up
 ```
 
-You should then be able to view your development server on [http://localhost:2342](http://localhost:2342).
+You should then be able to view your development server on
+[http://localhost:2342](http://localhost:2342), which should automatically have
+some fake data populated.
 
-To create some fake data in your DB, run:
-
-```
-./flask dev data
-```
+If you _don't_ want fake data populated, then set `NO_DEV_DATA=1` when you run
+`docker compose up`.
 
 To stop all containers, use `docker compose stop`
 To delete all data and start over fresh you can use `docker compose down`.
