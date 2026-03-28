@@ -1,19 +1,20 @@
 const { verified } = require("@primer/octicons");
+const filterStorageKey = "volunteer-filters:v3";
 
 function saveFilters() {
-    localStorage.setItem("volunteer-filters:v2", JSON.stringify(getFilters()))
+    localStorage.setItem(filterStorageKey, JSON.stringify(getFilters()))
 }
 
 function loadFilters() {
-    let savedFilters = localStorage.getItem("volunteer-filters:v2");
+    let savedFilters = localStorage.getItem(filterStorageKey);
     if (savedFilters === null) {
         let interestedRoles = Array.from(document.querySelectorAll('input[data-role-id]')).filter(box => box.getAttribute('data-interested') == "True").map(box => box.getAttribute('data-role-id'));
         savedFilters = JSON.stringify({
             "role_ids": interestedRoles,
             "show_past": false,
             "signed_up": false,
-            "hide_full": false,
-            "hide_staffed": false,
+            "hide_full": true,
+            "hide_staffed": true,
             "colourful_mode": false,
         })
     }
@@ -57,8 +58,24 @@ function getNodeData(node) {
 }
 
 function shouldDisplayNode(node_data, filters) {
-    // Yes, there are more efficient ways, but this makes debugging why
-    // a row was filtered easier.
+    // If the signed up shifts filter is active, or we're not set to show shifts
+    // in the past then those take precedence over all others and we short
+    // circuit everything else.
+    if (!filters["show_past"]) {
+        let now = new Date().toISOString()
+        if (now > node_data["end"]) {
+            return false;
+        }
+    }
+
+    if (filters["signed_up"] && node_data["signed_up"]) {
+        return true;
+    }
+
+    // Now run through the other filters and see if there's any other reasons to
+    // filter out a shift. This is done by collecting a list of keys because it
+    // makes debugging easier (you can just console.log(filter_reasons, node_data)
+    // to get a view of why a shift isn't showing).
     let filter_reasons = [];
     if (!filters["role_ids"].includes(node_data["role_id"])) {
         filter_reasons.push("role_id");
@@ -69,15 +86,7 @@ function shouldDisplayNode(node_data, filters) {
     if (filters["hide_staffed"] && node_data["staffed"]) {
         filter_reasons.push("staffed");
     }
-    if (filters["signed_up"] && !node_data["signed_up"]) {
-        filter_reasons.push("signed_up");
-    }
-    if (!filters["show_past"]) {
-        let now = new Date().toISOString()
-        if (now > node_data["end"]) {
-            filter_reasons.push("in_past")
-        }
-    }
+
     return filter_reasons.length === 0;
 }
 

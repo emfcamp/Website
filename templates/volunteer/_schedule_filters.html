@@ -22,7 +22,7 @@
                         {% if r.is_interested %}checked{% endif %}
                         data-role-id="{{ r.id }}"
                         data-trained="{{ r.is_trained }}"
-                        data-interested="{{ r.is_interested }}" 
+                        data-interested="{{ r.is_interested }}"
                     />
                     {{ r.name }}
                 </label>
@@ -42,7 +42,7 @@
                     type="checkbox"
                     id="show_signed_up_only"
                 />
-                Only show my shifts
+                Show my shifts
             </label>
             <label class="checkbox">
                 <input
@@ -57,7 +57,7 @@
                     type="checkbox"
                     id="is_understaffed"
                 />
-                Only show understaffed shifts
+                Hide sufficiently staffed shifts
             </label>
             <label class="checkbox">
                 <input
