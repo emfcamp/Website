@@ -13,7 +13,6 @@ from main import db
 from models.cfp import Occurrence, ScheduleItem
 from models.volunteer import (
     Role,
-    RoleAdmin,
     Shift,
     ShiftEntry,
     Volunteer,
@@ -59,17 +58,18 @@ def info():
 @v_admin_required
 def init_shifts():
     for v in load_initial_venues():
-        venue = VolunteerVenue.get_by_name(v["name"])
+        venue = VolunteerVenue.get_by_slug(v["slug"])
         if not venue:
             db.session.add(VolunteerVenue(**v))
         else:
             venue.mapref = v["mapref"]
 
     for r in load_initial_roles():
-        role = Role.get_by_name(r["name"])
+        role = Role.get_by_slug(r["slug"])
         if not role:
             db.session.add(Role(**r))
         else:
+            role.name = r["name"]
             role.description = r["description"]
             role.full_description = r.get("full_description", "")
             role.role_notes = r.get("role_notes", None)
@@ -182,8 +182,6 @@ def clear_data():
         db.session.delete(se)
     for s in Shift.query.all():
         db.session.delete(s)
-    for ra in RoleAdmin.query.all():
-        db.session.delete(ra)
     for r in Role.query.all():
         db.session.delete(r)
     for v in VolunteerVenue.query.all():

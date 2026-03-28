@@ -125,7 +125,8 @@ def role_admin_index():
     ):
         roles = Role.query.order_by("name").all()
     else:
-        roles = [admin.role for admin in current_user.volunteer_admin_roles]
+        administered_ids = current_user.administered_role_ids
+        roles = Role.query.filter(Role.id.in_(administered_ids)).order_by("name").all()
 
     if len(roles) == 0:
         flash("You're not an admin for any roles.")
@@ -168,7 +169,7 @@ def role(role_id):
 def role_admin_required(f, *args, **kwargs):
     """Check that current user has permissions to be RoleAdmin for role.id that is first entry in args"""
     if current_user.is_authenticated:
-        if int(args[0]) in [ra.role_id for ra in current_user.volunteer_admin_roles] or (
+        if int(args[0]) in current_user.administered_role_ids or (
             current_user.has_permission("volunteer:admin") or current_user.has_permission("volunteer:manager")
         ):
             return f(*args, **kwargs)

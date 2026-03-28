@@ -60,6 +60,7 @@ class Volunteer(BaseModel, UserMixin):
         back_populates="interested_volunteers",
         secondary=VolunteerRoleInterest,
         lazy="dynamic",
+        cascade="all, delete-orphan",
     )
 
     #: Roles a volunteer has been trained to perform
@@ -67,6 +68,7 @@ class Volunteer(BaseModel, UserMixin):
         back_populates="trained_volunteers",
         secondary=VolunteerRoleTraining,
         lazy="dynamic",
+        cascade="all, delete-orphan",
     )
 
     def __repr__(self):
