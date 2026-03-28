@@ -509,6 +509,19 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
   }
 }
 
+.image {
+  max-width: 100%;;
+}
+
+.image-left {
+  width:300px;
+  margin-bottom: 1em;
+
+  @media (max-width: $main-content-width) {
+    width: 100%;
+  }
+}
+
 .image-right {
   width:300px;
   float:right;
@@ -520,4 +533,38 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
     float: none;
     margin-left: 0;
   }
+}
+
+.guide {
+  background: $highlight-background;
+  color: $highlight-background-text;
+  padding: 1em;
+  margin-top: 1em;
+  display: inline-block;
+  text-decoration: none;
+  border-radius: 5px;
+  
+  &:hover, &:focus {
+    background-color: $highlight-2-background;
+    color: $highlight-background-text;
+    text-decoration: none;
+  }
+  &.prev {
+    float: left;
+    
+    &:before {
+      content: '\25C0';
+      margin-right: 2em;
+    }
+  }
+  &.next {
+    float: right;
+    
+    &:after {
+      content: '\27A4';
+      margin-left: 2em;
+    }
+  }
+
+
 }
