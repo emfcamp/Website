@@ -43,6 +43,7 @@
       ],
       "settings": {
         "python-envs.globalSearchPaths": ["/venv"],
+        "python.defaultInterpreterPath": "/venv/bin/python",
         "files.associations": {
           "*.html": "jinja-html"
         },
