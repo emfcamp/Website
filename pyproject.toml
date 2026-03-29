@@ -129,6 +129,7 @@ ignore = [
     # https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
     "SIM102", "SIM103", "SIM105", "SIM108", "SIM110", "SIM113", "SIM114",
 
+    "RET503",  # https://github.com/astral-sh/ruff/issues/5474, mypy already has https://mypy.readthedocs.io/en/latest/error_code_list.html#code-return
     "RET504",  # unnecessary-assign: nice e.g. when constructing then returning big dicts
 ]
 

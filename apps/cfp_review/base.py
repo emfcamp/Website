@@ -87,7 +87,7 @@ from .forms import (
 from .majority_judgement import calculate_max_normalised_score
 
 
-@cfp_review.route("/")  # noqa: RET503
+@cfp_review.route("/")
 def main() -> ResponseReturnValue:
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for(".main")))
