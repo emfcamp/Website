@@ -38,8 +38,7 @@
         "charliermarsh.ruff"
       ],
       "settings": {
-        "python-envs.globalSearchPaths": ["/venv"],
-        "python.defaultInterpreterPath": "/venv/bin/python"
+        "python.venvPath": "/venv"
       }
     }
   }
