@@ -5,7 +5,6 @@ from flask import current_app as app
 from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from geoalchemy2.shape import to_shape
-from pendulum import parse
 from sqlalchemy import select
 
 from apps.common import render_markdown
@@ -20,9 +19,7 @@ from models.volunteer import (
 )
 
 from ..common import feature_enabled, feature_flag
-from . import v_admin_required, volunteer
-from .init_data import load_initial_roles, load_initial_venues
-from .shift_list import get_shift_list
+from . import init_data, v_admin_required, volunteer
 
 
 @volunteer.route("/")
@@ -57,58 +54,7 @@ def info():
 @volunteer.route("/init-shifts")
 @v_admin_required
 def init_shifts():
-    for v in load_initial_venues():
-        venue = VolunteerVenue.get_by_slug(v["slug"])
-        if not venue:
-            db.session.add(VolunteerVenue(**v))
-        else:
-            venue.mapref = v["mapref"]
-
-    for r in load_initial_roles():
-        role = Role.get_by_slug(r["slug"])
-        if not role:
-            db.session.add(Role(**r))
-        else:
-            role.name = r["name"]
-            role.description = r["description"]
-            role.full_description = r.get("full_description", "")
-            role.role_notes = r.get("role_notes", None)
-            role.over_18_only = r.get("over_18_only", False)
-            role.requires_training = r.get("requires_training", False)
-
-    shift_list = get_shift_list()
-
-    for shift_role in shift_list:
-        role = Role.get_by_name(shift_role)
-        if role is None:
-            app.logger.error(f"Unknown role: {shift_role}")
-            continue
-
-        if role.shifts:
-            app.logger.info(f"Skipping making shifts for role: {role.name}")
-            continue
-
-        for shift_venue in shift_list[shift_role]:
-            venue = VolunteerVenue.get_by_name(shift_venue)
-            if venue is None:
-                app.logger.error(f"Unknown venue: {shift_venue}")
-                continue
-
-            for shift_range in shift_list[shift_role][shift_venue]:
-                shifts = Shift.generate_for(
-                    role=role,
-                    venue=venue,
-                    first=parse(shift_range["first"]),
-                    final=parse(shift_range["final"]),
-                    min=shift_range["min"],
-                    max=shift_range["max"],
-                    base_duration=shift_range.get("base_duration", 120),
-                    changeover=shift_range.get("changeover", 15),
-                )
-                for s in shifts:
-                    db.session.add(s)
-
-    db.session.commit()
+    init_data.shifts()
     return redirect(url_for(".main"))
 
 
