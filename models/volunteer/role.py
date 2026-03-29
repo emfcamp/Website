@@ -106,6 +106,17 @@ class Role(BaseModel):
         return cls.query.order_by(Role.name).all()
 
     @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "Role":
+        role = Role.get_by_name(data["name"]) or Role(name=data["name"])
+        role.name = data["name"]
+        role.description = data["description"]
+        role.full_description_md = data.get("full_description_md", "")
+        role.role_notes = data.get("role_notes")
+        role.over_18_only = data.get("over_18_only", False)
+        role.requires_training = data.get("requires_training", False)
+        return role
+
+    @classmethod
     def get_export_data(cls):
         from . import Shift, ShiftEntry
 
@@ -190,6 +201,12 @@ class Team(BaseModel):
     @classmethod
     def get_by_slug(cls, slug: str) -> "Team | None":
         return db.session.scalar(select(cls).where(cls.slug == slug))
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "Team":
+        team = cls.get_by_slug(data["slug"]) or cls(slug=data["slug"])
+        team.name = data["name"]
+        return team
 
 
 class RolePermission(BaseModel):
