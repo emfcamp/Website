@@ -409,9 +409,6 @@ def convert_proposal(proposal_id: int) -> ResponseReturnValue:
     types = get_args(ProposalType)
     form.new_type.choices = [(t, t.title()) for t in types if t != proposal.type]
 
-    if not proposal.schedule_item:
-        del form.convert_schedule_item
-
     if form.validate_on_submit():
         new_type = form.new_type.data
 
