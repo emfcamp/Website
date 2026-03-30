@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from itertools import groupby
 
 from decorator import decorator
 from flask import (
@@ -130,9 +131,15 @@ def role_admin_index():
 
     if len(roles) == 0:
         flash("You're not an admin for any roles.")
-        redirect(url_for(".choose_role"))
+        return redirect(url_for(".choose_role"))
 
-    return render_template("volunteer/role_admin_index.html", roles=roles)
+    if len(roles) == 1:
+        return redirect(url_for(".role_admin", role_id=roles[0].id))
+
+    return render_template(
+        "volunteer/role_admin_index.html",
+        roles={team: list(team_roles) for team, team_roles in groupby(roles, key=lambda r: r.team)},
+    )
 
 
 @volunteer.route("/role/<int:role_id>", methods=["GET", "POST"])

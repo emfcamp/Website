@@ -1,17 +1,30 @@
 {% extends 'base.html' %}
 
 {% block title %}
-  EMF Volunteer Role Admin
+EMF Volunteer Role Admin
 {% endblock %}
 
 {% block body %}
-  {% include "volunteer/_nav.html" %}
-  <h2>Role Admin</h2>
-  <p>Select a role to administer it</p>
-  <ul>
-    {% for role in roles %}
-      <li><a href="{{url_for('.role_admin', role_id=role.id)}}">{{role.name}}</a></li>
+{% include "volunteer/_nav.html" %}
+<h2>Role Admin</h2>
+<p>Select a role to administer it</p>
+{# Users with roles in a single team just see a list of roles #}
+{% if roles|length == 1 %}
+<ul>
+    {% for role in roles[0] %}
+    <li><a href="{{url_for('.role_admin', role_id=role.id)}}">{{role.name}}</a></li>
     {% endfor %}
-  </ul>
-{% endblock %}
+</ul>
 
+{# Users with roles across multiple teams see them grouped by team #}
+{% else %}
+{% for team, team_roles in roles.items() %}
+<h3>{{ team.name }}</h3>
+<ul>
+    {% for role in team_roles %}
+    <li><a href="{{url_for('.role_admin', role_id=role.id)}}">{{role.name}}</a></li>
+    {% endfor %}
+</ul>
+{% endfor %}
+{% endif %}
+{% endblock %}
