@@ -251,10 +251,10 @@ class Shift(BaseModel):
         """
 
         def start(t):
-            return t.add(minutes=changeover)
+            return t.subtract(minutes=changeover)
 
         def end(t):
-            return t.subtract(minutes=base_duration)
+            return t.add(minutes=base_duration)
 
         final_start = final.subtract(minutes=base_duration)
 
