@@ -100,6 +100,7 @@ def main(flow="main"):
     if not form.ensure_capacity(basket, voucher):
         # We're not able to provide the number of tickets the user has selected.
         no_capacity.inc()
+        app.logger.warning("Unable to reserve all purchases")
         flash(
             "We're sorry, but there weren't enough tickets remaining to give "
             "you all the tickets you requested. We've reserved as many as we can for you."
