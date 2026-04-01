@@ -19,8 +19,17 @@ OPT_OUT = [
 GENDER_VALUES = ("female", "male", "non-binary", "other")
 GENDER_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in GENDER_VALUES])
 
-ETHNICITY_VALUES = ("asian", "black", "mixed", "white", "other")
-ETHNICITY_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in ETHNICITY_VALUES])
+# These choices are derived from the top-level categories in the Ethnicity Harmonised Standard
+# https://analysisfunction.civilservice.gov.uk/policy-store/ethnicity-harmonised-standard/
+ETHNICITY_CHOICES = [
+    ("", "Prefer not to say"),
+    ("white", "White"),
+    ("mixed", "Mixed/multiple ethnic groups"),
+    ("asian", "Asian"),
+    ("black", "Black/African/Caribbean"),
+    ("arab", "Arab"),
+    ("other", "Other ethnic group"),
+]
 
 AGE_VALUES = ("0-15", "16-25", "26-35", "36-45", "46-55", "56-65", "66+")
 AGE_CHOICES = tuple(OPT_OUT + [(v, v) for v in AGE_VALUES])
