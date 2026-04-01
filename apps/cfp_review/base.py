@@ -48,7 +48,6 @@ from models.cfp import (
     convert_attributes_between_types,
 )
 from models.cfp_tag import ProposalTag, Tag
-from models.diversity import guess_age, guess_ethnicity, guess_gender
 from models.lottery import Lottery
 from models.permission import Permission
 from models.purchase import AdmissionTicket
@@ -1653,15 +1652,15 @@ def get_diversity_counts(user_list):
             continue
 
         if user.diversity.age:
-            res["age"][guess_age(user.diversity.age)] += 1
+            res["age"][user.diversity.age] += 1
         else:
             res["age"][""] += 1
         if user.diversity.gender:
-            res["gender"][guess_gender(user.diversity.gender)] += 1
+            res["gender"][user.diversity.gender] += 1
         else:
             res["gender"][""] += 1
         if user.diversity.ethnicity:
-            res["ethnicity"][guess_ethnicity(user.diversity.ethnicity)] += 1
+            res["ethnicity"][user.diversity.ethnicity] += 1
         else:
             res["ethnicity"][""] += 1
         for tag in user.cfp_reviewer_tags:

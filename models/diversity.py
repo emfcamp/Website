@@ -1,8 +1,5 @@
-import re
 from collections import defaultdict
-from re import Pattern
 
-from flask import current_app as app
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -20,7 +17,10 @@ GENDER_VALUES = ("female", "male", "non-binary", "other")
 GENDER_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in GENDER_VALUES])
 
 # These choices are derived from the top-level categories in the Ethnicity Harmonised Standard
+# so the numbers can easily be compared to the UK census.
 # https://analysisfunction.civilservice.gov.uk/policy-store/ethnicity-harmonised-standard/
+#
+# We don't collect the more granular categories here, to minimise data collected.
 ETHNICITY_CHOICES = [
     ("", "Prefer not to say"),
     ("white", "White"),
@@ -55,56 +55,6 @@ DISABILITY_CHOICES = tuple(
         ("none", "None of the above"),
     ]
 )
-
-
-# FIXME these are matchers for transition from freetext diversity form -> select boxes
-# This should be deleted for 2026
-
-
-def guess_age(age_str: str) -> str:
-    if age_str in AGE_VALUES:
-        return age_str
-    try:
-        age = int(age_str)
-    except ValueError:  # Can't parse as an int so reset
-        return ""
-
-    if age > 66:
-        return "66+"
-
-    for age_range in AGE_VALUES:
-        if age_range == "66+":
-            continue
-        low_val, high_val = age_range.split("-")
-
-        if int(low_val) <= age <= int(high_val):
-            return age_range
-
-    return ""
-
-
-def __guess_value(match_str: str, matchers_dict: dict[str, Pattern[str]]) -> str:
-    match_str = match_str.lower().strip()
-    for key, matcher in matchers_dict.items():
-        if matcher.fullmatch(match_str):
-            return key
-
-    return ""
-
-
-def guess_gender(gender_str: str) -> str:
-    gender_matchers = app.config.get("GENDER_MATCHERS", {})
-    gender_re_matchers = {k: re.compile(v, re.I) for k, v in gender_matchers.items()}
-    return __guess_value(gender_str, gender_re_matchers)
-
-
-def guess_ethnicity(ethnicity_str: str) -> str:
-    ethnicity_matchers = app.config.get("ETHNICITY_MATCHERS", {})
-    ethnicity_re_matchers = {k: re.compile(v, re.I) for k, v in ethnicity_matchers.items()}
-    return __guess_value(ethnicity_str, ethnicity_re_matchers)
-
-
-# End of stuff to delete for 2026
 
 
 class UserDiversity(BaseModel):
@@ -167,9 +117,9 @@ class UserDiversity(BaseModel):
 
         for row in cls.query:
             parsed_values = {
-                "ages": guess_age(row.age),
-                "genders": guess_gender(row.gender),
-                "ethnicities": guess_ethnicity(row.ethnicity),
+                "ages": row.age,
+                "genders": row.gender,
+                "ethnicities": row.ethnicity,
                 "sexualities": row.sexuality or "",
                 "disabilities": row.disability or "",
             }

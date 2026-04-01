@@ -16,9 +16,6 @@ from models.diversity import (
     OPT_OUT,
     SEXUALITY_CHOICES,
     UserDiversity,
-    guess_age,
-    guess_ethnicity,
-    guess_gender,
 )
 from models.purchase import AdmissionTicket
 
@@ -104,9 +101,9 @@ class DiversityForm(Form):
 
     def set_from_user(self, user):
         if user.diversity:
-            self.age.data = guess_age(user.diversity.age)
-            self.gender.data = guess_gender(user.diversity.gender)
-            self.ethnicity.data = guess_ethnicity(user.diversity.ethnicity)
+            self.age.data = user.diversity.age
+            self.gender.data = user.diversity.gender
+            self.ethnicity.data = user.diversity.ethnicity
             self.sexuality.data = user.diversity.sexuality
             self.disability.data = user.diversity.disability
 
