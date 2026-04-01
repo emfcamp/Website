@@ -88,18 +88,22 @@ def login_by_email(email):
 
 @users.route("/login", methods=["GET", "POST"])
 def login():
-    if current_user.is_authenticated:
-        return redirect(get_next_url())
-
     if request.args.get("code"):
         user = User.get_by_code(app.config["SECRET_KEY"], request.args.get("code"))
-        if user is not None:
+        if user is None:
+            flash("Your login link was invalid. Please enter your email address below to receive a new link.")
+        elif current_user.is_anonymous:
             login_user(user)
             user.email_state = "verified"
             db.session.commit()
             session.permanent = True
             return redirect(get_next_url())
-        flash("Your login link was invalid. Please enter your email address below to receive a new link.")
+        elif user == current_user:
+            return redirect(get_next_url())
+        else:
+            flash(Markup(f"""
+                You are already logged in as a different user. Please <a href="{ url_for('users.logout', next=get_next_url()) }">log out</a> first.
+            """))
 
     form = LoginForm(request.form)
     if form.validate_on_submit():
