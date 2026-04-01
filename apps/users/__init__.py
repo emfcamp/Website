@@ -101,9 +101,11 @@ def login():
         elif user == current_user:
             return redirect(get_next_url())
         else:
-            flash(Markup(f"""
-                You are already logged in as a different user. Please <a href="{ url_for('users.logout', next=get_next_url()) }">log out</a> first.
-            """))
+            flash(
+                Markup(f"""
+                You are already logged in as a different user. Please <a href="{url_for("users.logout", next=get_next_url())}">log out</a> first.
+            """)
+            )
 
     form = LoginForm(request.form)
     if form.validate_on_submit():
