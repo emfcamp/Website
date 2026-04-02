@@ -20,7 +20,7 @@ Every person attempting to buy alcohol who **appears to be under the age of 25**
 
 
 The following documents will be accepted as proof of age:
-<img src="/static/images/bar/pass-card.png" class="image-right">
+<img src="/static/images/bar/pass-card.png" class="image-align-right">
 
 - A card bearing the PASS hologram
 - A photographic driving licence

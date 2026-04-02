@@ -509,11 +509,11 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
   }
 }
 
-.image {
-  max-width: 100%;;
+img {
+  max-width: 100%;
 }
 
-.image-left {
+.image-align-left {
   width:300px;
   margin-bottom: 1em;
 
@@ -522,7 +522,7 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
   }
 }
 
-.image-right {
+.image-align-right {
   width:300px;
   float:right;
   margin-left: 1em;
