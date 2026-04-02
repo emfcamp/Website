@@ -189,6 +189,13 @@ def volunteer_data():
             "requires_training": True,
         },
         {
+            "name": "CYBAR",
+            "description": "Help run the CYBAR @ NullSector. Serve drinks, take payments, help keep the place in order, and have an awesome time.",
+            "role_notes": "Requires training, over 18s only.",
+            "over_18_only": True,
+            "requires_training": True,
+        },
+        {
             "name": "Volunteer Manager",
             "description": "Help people sign up for volunteering. Make sure they know where to go. Run admin on the volunteer system.",
             "role_notes": "Must be trained.",
