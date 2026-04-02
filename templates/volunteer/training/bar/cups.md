@@ -11,7 +11,7 @@ Customers who bring their cups or reuse one of our cups will be eligible for a s
 	For spirits, use a thimble to avoid contaminating the optics through cup reuse.
 
 ## Bring Your Own Cup
-Customers can bring their cups for us to pour into. For beer, these must display a UKCA or CE mark etched or printed on the cup. Unless the cup reads “(half) pint to line” it is (half) pint to brim.
+Customers can bring their cups for us to pour into. For beer, these must display a Crown, UKCA or CE mark etched or printed on the cup. Unless the cup reads “(half) pint to line” it is (half) pint to brim.
 
 If you need clarification, please ask a bar manager.
 
