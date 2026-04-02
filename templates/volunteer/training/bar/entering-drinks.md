@@ -15,7 +15,7 @@ So if a customer asks for Five Points Pale on Tap 2, press "Half Tap 2" or "Pint
 ## Sub Menus
 The buttons for wines, soft drinks and some other buttons correspond to several types of drinks. If you press one of these, a menu will pop up, allowing you to choose from all the options by pressing the number:
 
-<img src="/static/images/bar/till-menu.png" class="image-left">
+<img src="/static/images/bar/till-menu.png" class="image-align-left">
 
 ## Specifying Quantities
 A single press of a button will enter a single drink. 

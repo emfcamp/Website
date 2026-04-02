@@ -47,16 +47,16 @@ The procedure for emptying a drip tray is:
 <img src="/static/images/bar/till-waste-button.png" width="100px">
 
 5. Press the button of the waste to record, for example, "Pint Tap 1":
-<img src="/static/images/bar/till-record-waste.png" class="image-left">
+<img src="/static/images/bar/till-record-waste.png" class="image-align-left">
 
 6. Set Waste reason to "Drip Tray" by pressing Enter on that field and selecting from the list:
-<img src="/static/images/bar/till-waste-options.png" class="image-left">
+<img src="/static/images/bar/till-waste-options.png" class="image-align-left">
 
 7. Enter the amount wasted as "1" pints:
-<img src="/static/images/bar/till-enter-waste.png" class="image">
+<img src="/static/images/bar/till-enter-waste.png">
 
 8. Press "Enter" to confirm.
-<img src="/static/images/bar/till-waste-recorded.png" class="image">
+<img src="/static/images/bar/till-waste-recorded.png">
 
 9. Repeat for each full drip tray. Avoid preemptively emptying drip trays.
 
