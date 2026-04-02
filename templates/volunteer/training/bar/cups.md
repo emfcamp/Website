@@ -11,7 +11,7 @@ Customers who bring their cups or reuse one of our cups will be eligible for a s
 	For spirits, use a thimble to avoid contaminating the optics through cup reuse.
 
 ## Bring Your Own Cup
-Customers can bring their cups for us to pour into. For beer, these must display a UKCA or CE mark etched or printed on the cup. Unless the cup reads “(half) pint to line” it is (half) pint to brim.
+Customers can bring their cups for us to pour into. For beer, these must display a Crown, UKCA or CE mark etched or printed on the cup. Unless the cup reads “(half) pint to line” it is (half) pint to brim.
 
 If you need clarification, please ask a bar manager.
 
@@ -35,4 +35,4 @@ You must not hold the cup by the brim as this will cause contamination of the dr
 <img src="/static/images/bar/cup-no.png" style="width:200px; margin-left: 1em;">
 <img src="/static/images/bar/cup-no2.png" style="width:200px; margin-left: 1em;">
 
-<a href="/volunteer/bar-training/guide/licensing-law" class="guide prev">Licensing Law</a><a href="/volunteer/bar-training/guide/ice" class="guide next">Ice</a>
+<a href="/volunteer/bar-training/guide/hand-pumps" class="guide next">Hand Pumps</a>

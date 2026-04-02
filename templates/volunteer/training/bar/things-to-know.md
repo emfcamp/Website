@@ -19,7 +19,7 @@ To prepare Tschunk:
 2. Square a piece of lime into the drink and leave the piece in the cup.
 3. Squish with the muddler into the cup.
 4. Pour a single shot of Havana Club 7 (dark rum) into the cup.
-5. Place a small amount of ice in a half-pint cup.
+5. Place a small amount of ice in a cup.
 6. Fill with Club Mate
 7. Present the cup and remaining bottle to the customer.
 

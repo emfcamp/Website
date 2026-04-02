@@ -28,4 +28,4 @@ Repeat pulling until the cup is full. Gradually rotate the cup to vertical as it
 When a cask runs out, you’ll serve froth and air. You’ll have to throw it away and tell the customer to pick something different.
 Please tell the bar manager when a cask runs out so they can clean the line and put another cask on it.
 
-<a href="/volunteer/bar-training/guide/ice" class="guide prev">Ice</a><a href="/volunteer/bar-training/guide/keg-taps" class="guide next">Keg Taps</a>
+<a href="/volunteer/bar-training/guide/cups" class="guide prev">Cups</a><a href="/volunteer/bar-training/guide/keg-taps" class="guide next">Keg Taps</a>
