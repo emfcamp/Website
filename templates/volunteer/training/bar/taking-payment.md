@@ -62,4 +62,4 @@ You can print the current transaction for a customer by pressing the Print butto
 
 If a customer wants a receipt but tells you too late and you have already started another transaction, please tell a bar manager who can help.
 
-<a href="/volunteer/bar-training/guide/entering-drinks" class="guide prev">Entering drinks</a><a href="/volunteer/bar-training/guide/bar-tasks" class="guide next">Bar tasks</a>
+<a href="/volunteer/bar-training/guide/entering-drinks" class="guide prev">Entering drinks</a><a href="/volunteer/bar-training/guide/logging-refusals" class="guide next">Logging Refusals</a>
