@@ -127,7 +127,7 @@ class TrainingForm(Form):
 @volunteer.route("/bar-training/guide/<page_name>", methods=["GET"])
 def bar_training_page(page_name: str) -> ResponseValue:
     return render_markdown(
-        f"volunteer/training/{page_name}",
+        f"volunteer/training/bar/{page_name}",
         page_name=page_name,
         template="volunteer/training/guide_page.html",
     )
