@@ -35,4 +35,4 @@ You must not hold the cup by the brim as this will cause contamination of the dr
 <img src="/static/images/bar/cup-no.png" style="width:200px; margin-left: 1em;">
 <img src="/static/images/bar/cup-no2.png" style="width:200px; margin-left: 1em;">
 
-<a href="/volunteer/bar-training/guide/licensing-law" class="guide prev">Licensing Law</a><a href="/volunteer/bar-training/guide/ice" class="guide next">Ice</a>
+<a href="/volunteer/bar-training/guide/hand-pumps" class="guide next">Hand Pumps</a>
