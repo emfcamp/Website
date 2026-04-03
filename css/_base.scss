@@ -408,7 +408,7 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
   clear: both;
 
   a:link, a:visited, a:hover {
-    color: #444
+    color: inherit
   }
 
   p {
@@ -434,10 +434,6 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
     background-color: #def0e5;
     border-color: #20a84e;
 
-    a:link, a:visited, a:hover {
-      color: #114739
-    }
-
     .admonition-title::before {
       background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAyNCAyNCI+CiAgPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDMwLjIuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDIuMS4xIEJ1aWxkIDEpICAtLT4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLnN0MCB7CiAgICAgICAgZmlsbDogbm9uZTsKICAgICAgfQoKICAgICAgLnN0MSB7CiAgICAgICAgZmlsbDogIzFkYTg0ZDsKICAgICAgfQogICAgPC9zdHlsZT4KICA8L2RlZnM+CiAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTAsMGgyNHYyNEgwVjBaIi8+CiAgPHBhdGggY2xhc3M9InN0MSIgZD0iTTEyLDJDNi40OCwyLDIsNi40OCwyLDEyczQuNDgsMTAsMTAsMTAsMTAtNC40OCwxMC0xMFMxNy41MiwyLDEyLDJaTTkuNzgsMTcuOThsLTQuODctNC44NywxLjc3LTEuNzcsMy4xLDMuMSw3LjU0LTcuNTQsMS43NywxLjc3LTkuMzEsOS4zMVoiLz4KPC9zdmc+)
     }
@@ -447,10 +443,6 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
     color: #01466c;
     background-color: #d3efff;
     border-color: #0288d1;
-
-    a:link, a:visited, a:hover {
-      color: #01466c;
-    }
 
     .admonition-title::before {
       background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiMwMTUzODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+ICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4gICAgPHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTEgMTVoLTJ2LTZoMnY2em0wLThoLTJWN2gydjJ6Ii8+PC9zdmc+)
@@ -462,10 +454,6 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
     background-color: #fee3d3;
     border-color: #cf4d03;
 
-    a:link, a:visited, a:hover {
-      color: #6a2802;
-    }
-
     .admonition-title::before {
       background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNiNjUzMWMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+ICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4gICAgPHBhdGggZD0iTTEgMjFoMjJMMTIgMiAxIDIxem0xMi0zaC0ydi0yaDJ2MnptMC00aC0ydi00aDJ2NHoiLz48L3N2Zz4=)
     }
@@ -475,10 +463,6 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
     color: #4d0706;
     background-color: #fcdbdb;
     border-color: #ab0f0e;
-
-    a:link, a:visited, a:hover {
-      color: #4d0706
-    }
 
     .admonition-title::before {
       background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNiOTE4MTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+ICAgIDxwYXRoIGQ9Ik0xNS43MyAzSDguMjdMMyA4LjI3djcuNDZMOC4yNyAyMWg3LjQ2TDIxIDE1LjczVjguMjdMMTUuNzMgM3pNMTIgMTcuM2MtLjcyIDAtMS4zLS41OC0xLjMtMS4zIDAtLjcyLjU4LTEuMyAxLjMtMS4zLjcyIDAgMS4zLjU4IDEuMyAxLjMgMCAuNzItLjU4IDEuMy0xLjMgMS4zem0xLTQuM2gtMlY3aDJ2NnoiLz4gICAgPHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==)
