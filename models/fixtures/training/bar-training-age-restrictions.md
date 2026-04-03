@@ -12,8 +12,9 @@ It is illegal:
 Since it is very difficult to tell if someone is over 18 (are they 17 and 51 weeks?) we have an **Age Verification Policy​** that everyone working on the bar must follow. It is informally referred to as “Challenge 25”. 
 
 ### Age verification policy
-It is our policy that every person attempting to buy alcohol who appears to be under the age of 25 and who has not already provided proof of age to the person serving them will be required to prove that they are aged 18 or over.
+Every person attempting to buy alcohol who **appears to be under the age of 25** and who has not already provided proof of age to the person serving them will be **required to prove that they are aged 18 or over**.
 
+<img src="/static/images/bar/pass-card.png" class="image-align-right">
 The following documents will be accepted as proof:
 
 - Passport
@@ -22,7 +23,17 @@ The following documents will be accepted as proof:
 - National identity card issued by an EU member state, such as Norway, Iceland, Liechtenstein or Switzerland
 - Biometric immigration document
 
-In the event that proof of age is requested and is not provided, the sale of alcohol will not go ahead and the person serving the alcohol will make an entry in the refusals log. The decision to refuse service is solely that of the person serving and this decision will not be overturned by any other member of staff.
+!!! warning "Digital ID is not valid"
+	Although digital ID cards are becoming more common, there are none that are legally acceptable for the sale of alcohol at this time in the UK.
+
+If proof of age is not provided, the sale of alcohol must not proceed, and the person serving the alcohol must make an entry in the refusals log on the till. 
+
+The decision to refuse service is solely that of the person serving, and this decision will not be overturned by any other staff member.
+
+#### Verifying PASS cards
+You can verify a PASS card is valid by [using the PoA (Proof of Age) app available for both iOS and Android.](https://verify.citizencard.com/get-the-verify-app)
+
+The above example PASS card will pass the test if you want to try it out.
 
 ### Penalties
 Licensing authorities take sales to people who are underage very seriously. ​**Police officers** may send people who are obviously underage into licensed premises to attempt to purchase alcohol; if they are successful in doing so the police can issue an on-the-spot fine of ​£90​. In theory we could be fined up to £20,000 if this happens multiple times. This will affect our ability to get a licence for EMF in the future, so please be careful!
