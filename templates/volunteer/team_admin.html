@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ team.name }} Admin
+{% endblock %}
+
+{% block body %}
+{% include "volunteer/_nav.html" %}
+<h2>{{ team.name }} Admin</h2>
+<h3>Admins</h3>
+{% if team.admins|length == 0 %}
+<p>This team has no admins assigned to it.</p>
+{% else %}
+<ul class="list-unstyled">
+    {% for admin in team.admins %}
+    <li>{{ admin.nickname }} <a href="{{url_for('.remove_team_admin', team_id=team.id, volunteer_id=admin.id)}}"
+            rel="nofollow" class="btn btn-xs btn-danger">Remove</a></li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<h3>Add Admin</h3>
+<p>Team admins will be given permission to manage volunteers for all roles under
+    this team, and the ability to manage team admins.</p>
+<form method="post" action="{{ url_for('.add_team_admin', team_id=team.id) }}" class="form-inline">
+    <div class="form-group">
+        <label class="control-label" for="email">Email address</label>
+        <input type="email" name="email" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Add</button>
+</form>
+{% endblock %}

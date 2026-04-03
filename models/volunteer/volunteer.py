@@ -2,7 +2,10 @@ from collections import defaultdict
 from typing import TYPE_CHECKING
 
 from flask_login import UserMixin
+from sqlalchemy import Column, ForeignKey, Integer, Table, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from main import db
 
 from .. import BaseModel
 from .shift import ShiftEntry, ShiftEntryState
@@ -93,6 +96,10 @@ class Volunteer(BaseModel, UserMixin):
     @classmethod
     def get_by_id(cls, id):
         return cls.query.get_or_404(id)
+
+    @classmethod
+    def get_by_email(cls, email_address: str) -> "Volunteer | None":
+        return db.session.scalar(select(cls).where(cls.volunteer_email == email_address))
 
     @classmethod
     def get_for_user(cls, user):

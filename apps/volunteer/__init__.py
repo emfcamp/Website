@@ -118,5 +118,6 @@ from . import (
     schedule,  # noqa: F401
     sign_up,  # noqa: F401
     stats,  # noqa: F401
+    team_admin,  # noqa: F401
     training,  # noqa: F401
 )
