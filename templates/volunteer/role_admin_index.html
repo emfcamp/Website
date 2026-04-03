@@ -10,7 +10,7 @@ EMF Volunteer Role Admin
 <p>Select a role to administer it</p>
 {# Users with roles in a single team just see a list of roles #}
 {% if roles|length == 1 %}
-<ul>
+<ul class="list-unstyled">
     {% for role in roles[0] %}
     <li><a href="{{url_for('.role_admin', role_id=role.id)}}">{{role.name}}</a></li>
     {% endfor %}
@@ -19,8 +19,8 @@ EMF Volunteer Role Admin
 {# Users with roles across multiple teams see them grouped by team #}
 {% else %}
 {% for team, team_roles in roles.items() %}
-<h3>{{ team.name }}</h3>
-<ul>
+<h3>{{ team.name }} <a href="{{url_for('.team_admin', team_id=team.id)}}" class="btn btn-xs btn-default">Manage</a></h3>
+<ul class="list-unstyled">
     {% for role in team_roles %}
     <li><a href="{{url_for('.role_admin', role_id=role.id)}}">{{role.name}}</a></li>
     {% endfor %}
