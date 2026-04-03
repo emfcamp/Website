@@ -236,7 +236,25 @@
     {
       "page": 6,
       "content": "models/fixtures/training/bar-training-safety.md",
-      "questions": []
+      "questions": [
+        {
+          "question": "Where should you hold a cup?",
+          "answers": [
+            {
+              "answer": "From the rim.",
+              "correct": false
+            },
+            {
+              "answer": "You shouldn't touch the cup at all.",
+              "correct": false
+            },
+            {
+              "answer": "From the bottom.",
+              "correct": true
+            }
+          ]
+        }
+      ]
     },
     {
       "page": 7,
