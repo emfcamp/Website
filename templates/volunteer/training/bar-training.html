@@ -19,25 +19,15 @@
 {% else %}
 
 {% if trained %}
-
-<h2>You have completed this training!</h2>
-{% if feature_enabled("VOLUNTEERS_SCHEDULE") %}
-    <p>
-        <strong>Congratulations - you have completed your training for working in the bar.</strong>
-        You can now <a href="{{ url_for('volunteer.schedule') }}">sign up</a> for bar shifts.
-    </p>
-{% else %}
-    <p>
-        <strong>Congratulations - you have completed your training for working in the bar.</strong>
-        You will be able to sign up for bar shifts once the volunteer schedule is live.
-    </p>
-{% endif %}
-<p>
-    You are welcome to review the training material again to boost your knowledge, or even
-    complete the questions again - however you are not required to.
-</p>
-<hr />
-
+<div class="admonition success">
+    <p class="admonition-title">You have completed this training!</p>
+    {% if feature_enabled("VOLUNTEERS_SCHEDULE") %}
+        <p>You can now <a href="{{ url_for('volunteer.schedule') }}">sign up</a> for bar shifts.</p>
+    {% else %}
+        <p>You will be able to sign up for bar shifts once the volunteer schedule is live.</p>
+    {% endif %}
+    <p>You are welcome to review the training material again to boost your knowledge, or even complete the questions again - however you are not required to.</p>
+</div>
 {% endif %}
 
 <form method="post">
