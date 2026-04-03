@@ -9,7 +9,8 @@ When you turn up to work on the bar, we’ll give you an NFC wristband. This let
 When you step away from the till, you can press the Lock button on the keyboard to prevent anyone else from altering your transaction by mistake if they forget to log in themselves. You should get in the habit of tapping the wristband every time you step up to the till and pressing Lock every time you step away.
 
 The till display will look something like this:
-<img src="/static/images/bar/till-buttons.png" class="image-align-left">
+
+<img src="/static/images/bar/till-buttons.png">
 
 Your transaction on the till can be either open or closed. When it’s open, it’s incomplete, and you need to finish it before continuing, usually by telling the till how it was paid. When it’s closed, it’s finished, and you’re ready to start a new transaction.
 
