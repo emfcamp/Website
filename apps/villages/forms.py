@@ -78,6 +78,10 @@ class VillageForm(Form):
         field.data = (field.data or "").strip()
 
 
+class DeleteVillageForm(Form):
+    submit = SubmitField("Delete")
+
+
 class AdminVillageForm(VillageForm):
     location_lat = FloatField("Latitude", [Optional()])
     location_lon = FloatField("Longitude", [Optional()])

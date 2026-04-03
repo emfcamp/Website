@@ -1,0 +1,14 @@
+{% extends "villages/admin/base.html" %}
+{% from "_formhelpers.html" import render_field  %}
+{% block title %}Confirm village deletion: {{village.name}}{% endblock %}
+{% block body %}
+<h3>Confirm village deletion: {{village.name}}</h3>
+<p>Are you sure you want to delete the village "{{village.name}}"?</p>
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    {{ form.submit(class_="btn btn-danger") }}
+    <a class="btn btn-default" href="{{ url_for('.admin_village', village_id=village.id) }}">Back</a>
+</form>
+
+{% endblock %}

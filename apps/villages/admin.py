@@ -5,6 +5,7 @@ NOTE: make sure all admin views are tagged with the @village_admin_required deco
 
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask import current_app as app
+from flask.typing import ResponseValue
 from sqlalchemy import exists, select
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
@@ -22,7 +23,7 @@ from ..common.email import (
 )
 from ..common.forms import Form
 from . import villages
-from .forms import AdminVillageForm
+from .forms import AdminVillageForm, DeleteVillageForm
 
 village_admin_required = require_permission("villages")
 
@@ -38,7 +39,7 @@ class EmailComposeForm(Form):
 
 @villages.route("/admin")
 @village_admin_required
-def admin():
+def admin() -> ResponseValue:
     villages = sorted(Village.query.all(), key=lambda v: v.name)
 
     return render_template("villages/admin/list.html", villages=villages)
@@ -46,7 +47,7 @@ def admin():
 
 @villages.route("/admin/village/<int:village_id>", methods=["GET", "POST"])
 @village_admin_required
-def admin_village(village_id):
+def admin_village(village_id: int) -> ResponseValue:
     village = Village.get_by_id(village_id)
     if not village:
         abort(404)
@@ -54,6 +55,7 @@ def admin_village(village_id):
     form = AdminVillageForm()
 
     if form.validate_on_submit():
+        assert form.name.data
         if db.session.execute(
             select(exists().where(Village.name == form.name.data, Village.id != village.id))
         ).scalar_one():
@@ -76,9 +78,27 @@ def admin_village(village_id):
     return render_template("villages/admin/info.html", village=village, form=form)
 
 
+@villages.route("/admin/village/<int:village_id>/delete", methods=["GET", "POST"])
+@village_admin_required
+def delete(village_id: int) -> ResponseValue:
+    village = Village.get_by_id(village_id)
+    if not village:
+        abort(404)
+
+    form = DeleteVillageForm()
+    if form.validate_on_submit():
+        app.logger.info(f"Village '{village.name}' (id {village.id}) deleted")
+        db.session.delete(village)
+        db.session.commit()
+        flash("Village deleted")
+        return redirect(url_for(".admin"))
+
+    return render_template("villages/admin/delete.html", village=village, form=form)
+
+
 @villages.route("/admin/village/<int:village_id>/admins", methods=["GET"])
 @village_admin_required
-def admin_village_admins_get(village_id):
+def admin_village_admins_get(village_id: int) -> ResponseValue:
     return redirect(url_for(".admin_village", village_id=village_id))
 
 
@@ -88,7 +108,7 @@ def admin_village_admins_get(village_id):
 # This route is for the former users to use to edit a list of the latter for a village
 @villages.route("/admin/village/<int:village_id>/admins", methods=["POST"])
 @village_admin_required
-def admin_village_admins(village_id):
+def admin_village_admins(village_id: int) -> ResponseValue:
     village = Village.get_by_id(village_id)
     if not village:
         abort(404)
@@ -98,7 +118,7 @@ def admin_village_admins(village_id):
         if len(village.admins()) <= 1:
             flash("Can't remove final admin")
         else:
-            user_id = int(request.form.get("user_id"))
+            user_id = int(request.form.get("user_id", 0))
             village_membership = next(
                 member for member in village.village_memberships if member.user_id == user_id
             )
@@ -132,7 +152,7 @@ def admin_village_admins(village_id):
 
 @villages.route("/admin/email-owners", methods=["GET", "POST"])
 @village_admin_required
-def admin_email_owners():
+def admin_email_owners() -> ResponseValue:
     form = EmailComposeForm()
     if form.validate_on_submit():
         users = User.query.join(User.village_membership).filter(VillageMember.admin).distinct()

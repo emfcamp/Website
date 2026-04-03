@@ -43,6 +43,7 @@
     {{ render_field(form.structures) }}
 
     {{ form.submit(class_="btn btn-success") }}
+    <a class="btn btn-danger" href="{{ url_for('.delete', village_id=village.id) }}">Delete</a>
     <a class="btn" href="{{ url_for('.admin') }}">Back</a>
 </form>
 {% endblock %}
