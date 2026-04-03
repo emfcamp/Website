@@ -40,7 +40,7 @@ class EmailComposeForm(Form):
 @villages.route("/admin")
 @village_admin_required
 def admin() -> ResponseValue:
-    villages = sorted(Village.query.all(), key=lambda v: v.name)
+    villages = sorted(db.session.query(Village).all(), key=lambda v: v.name)
 
     return render_template("villages/admin/list.html", villages=villages)
 
@@ -130,21 +130,34 @@ def admin_village_admins(village_id: int) -> ResponseValue:
     elif request.form.get("add"):
         # Add an admin
         user_email = request.form.get("user_email")
-        user = User.query.filter(User.email == user_email).one_or_none()
+        assert user_email
+        user = User.get_by_email(user_email)
 
         if user is None:
             flash(f"No user found with email {user_email}")
-        elif VillageMember.query.filter(VillageMember.user == user).first() is not None:
-            flash(f"user with email {user_email} is already a member of a village")
-        else:
+            return redirect(url_for(".admin_village", village_id=village.id))
+
+        membership = db.session.query(VillageMember).filter(VillageMember.user == user).first()
+
+        if membership is None:
             db.session.add(VillageMember(village_id=village.id, user=user, admin=True))
             db.session.commit()
 
             flash(f"{user_email} has been added as a village admin")
+            return redirect(url_for(".admin_village", village_id=village.id))
+
+        if membership.village == village:
+            membership.admin = True
+            db.session.commit()
+        else:
+            flash(
+                f"User with email {user_email} is already a member of the {membership.village.name} village"
+            )
+
     else:
         # Not sure what is being requested here, log an error
         app.logger.warning(f"Request to alter village admins with unexpected params: ${request.form}")
-        abort(404)
+        abort(400)
 
     # Show the edit page again
     return redirect(url_for(".admin_village", village_id=village.id))
