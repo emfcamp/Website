@@ -307,17 +307,17 @@ def get_days_map():
     return {ed.strftime("%a").lower(): ed for ed in event_days}
 
 
-def schedule_item_slug(title: str) -> str:
+def schedule_item_slug(title: str, allow_unicode: bool = True) -> str:
     replacements = [
         ["'", ""],
     ]
-    slug: str = slugify(title, replacements=replacements, allow_unicode=True)
+    slug: str = slugify(title, replacements=replacements, allow_unicode=allow_unicode)
     if len(slug) > 60:
         words = re.split(" +|[,.;:!?]+", title)
         break_words = ["and", "which", "with", "without", "for", "-", ""]
 
         for i, word in reversed(list(enumerate(words))):
-            new_slug = slugify(" ".join(words[:i]), replacements=replacements, allow_unicode=True)
+            new_slug = slugify(" ".join(words[:i]), replacements=replacements, allow_unicode=allow_unicode)
             if word in break_words:
                 if len(new_slug) > 10 and not len(new_slug) > 60:
                     slug = new_slug
