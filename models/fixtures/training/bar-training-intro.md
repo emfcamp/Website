@@ -1,10 +1,11 @@
-## Bar training
-Thank you for your interest in volunteering behind the bar at EMF Camp!
+# Bar Training
+Thank you for your interest in volunteering behind the bar at EMF Camp.
 
-As a member of bar staff, EMF Camp will provide you with the following course of online training in order to ensure that you have the knowledge required to serve alcohol safely and in compliance with UK licensing laws. 
+In order to ensure you have the knowlege required to serve alcohol safely and in compliance with UK licensing laws you will need to complete the following training and pass a series of multiple choice questions, this shouldn't take more than 15 minutes.
 
-On this page you will be presented with the information you are required to know, and you will then be asked some simple multiple choice questions to confirm your understanding of the material. Once you have completed the training then you will be eligible to sign up for bar shifts in the volunteer schedule.
+Once you have completed the training you will be able to sign up for bar shifts in the volunteer schedule.
 
-Please ensure you have enough time to complete the training before attempting it - it should take no longer than 15 minutes. Read through each section carefully and then answer any questions - not all of the training sections have questions attached to them. Once you have completed all of the questions, you can submit your answers for validation and any incorrect answers will be clearly highlighted for you to review and correct.
+After you compelte the mandatory training on the legal aspects of working on a bar, [there is additional training available on how to use the tills, and serve drinks available online as well.](/volunteer/bar-training/guide)
 
-If you are struggling with the training, or require additional assistance to complete it, do not hesitate to contact us via email at [volunteers@emfcamp.org](mailto:volunteers@emfcamp.org). 
+!!! info ""
+	If you are struggling with the training, or require additional assistance to complete it, do not hesitate to contact us via email at [bar@emfcamp.org](mailto:bar@emfcamp.org). 
