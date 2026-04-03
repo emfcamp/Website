@@ -14,7 +14,7 @@
       "content": "models/fixtures/training/bar-training-alcohol.md",
       "questions": [
         {
-          "question": "At what percentage of abv is a drink legally classed as alcohol?",
+          "question": "At what ABV percentage is a drink legally classed as alcohol?",
           "answers": [
             {
               "answer": "More than 0.1%",
