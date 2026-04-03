@@ -260,6 +260,29 @@
       "page": 7,
       "content": "models/fixtures/training/bar-training-weights-and-measures.md",
       "questions": []
+    },
+    {
+      "page": 8,
+      "content": "models/fixtures/training/bar-training-ask-for-angela.md",
+      "questions": [
+        {
+          "question": "What code word might a customer use when asking for help in a situation where they feel unsafe?",
+          "answers": [
+            {
+              "answer": "Where are the toilets?",
+              "correct": false
+            },
+            {
+              "answer": "Can I speak to Angela?",
+              "correct": true
+            },
+            {
+              "answer": "Do you know where Kerry is?",
+              "correct": false
+            }
+          ]
+        }
+      ]
     }
   ]
 }
