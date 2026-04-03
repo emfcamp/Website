@@ -37,8 +37,6 @@
 
     {% for page in pages %}
         <div id="page-{{ page['number'] }}" class="paged-content">
-            {% if page['number'] != 1 %}<hr />{% endif %}
-
             {{ page.content|safe }}
 
             {% if page.questions %}
