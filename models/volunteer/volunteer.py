@@ -10,7 +10,7 @@ from .shift import ShiftEntry, ShiftEntryState
 
 if TYPE_CHECKING:
     from ..user import User
-    from .role import Role
+    from .role import Role, RoleAdmin, TeamAdmin
 
 __all__ = [
     "Volunteer",
@@ -60,7 +60,6 @@ class Volunteer(BaseModel, UserMixin):
         back_populates="interested_volunteers",
         secondary=VolunteerRoleInterest,
         lazy="dynamic",
-        cascade="all, delete-orphan",
     )
 
     #: Roles a volunteer has been trained to perform
@@ -68,7 +67,14 @@ class Volunteer(BaseModel, UserMixin):
         back_populates="trained_volunteers",
         secondary=VolunteerRoleTraining,
         lazy="dynamic",
-        cascade="all, delete-orphan",
+    )
+
+    volunteer_admin_roles: Mapped[list["RoleAdmin"]] = relationship(
+        back_populates="volunteer", cascade="all, delete-orphan"
+    )
+
+    volunteer_admin_teams: Mapped[list["TeamAdmin"]] = relationship(
+        back_populates="volunteer", cascade="all, delete-orphan"
     )
 
     def __repr__(self):
@@ -110,6 +116,18 @@ class Volunteer(BaseModel, UserMixin):
                 "total_volunteers": total_volunteers,
             },
         }
+
+    @property
+    def administered_role_ids(self) -> set[int]:
+        """Role IDs this user can administer, combining direct role admin and team admin."""
+        role_ids = {ra.role_id for ra in self.volunteer_admin_roles}
+        for ta in self.volunteer_admin_teams:
+            role_ids.update(r.id for r in ta.team.roles)
+        return role_ids
+
+    @property
+    def is_volunteer_admin(self) -> bool:
+        return bool(self.volunteer_admin_roles or self.volunteer_admin_teams)
 
 
 """
