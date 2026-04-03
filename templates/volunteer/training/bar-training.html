@@ -40,25 +40,27 @@
             {{ page.content|safe }}
 
             {% if page.questions %}
+                <div class="well">
                 <h3>Questions</h3>
-                {% for q in form.questions %}
-                    {% if page['number'] == q.page %}
+                    {% for q in form.questions %}
+                        {% if page['number'] == q.page %}
 
-                        {% if q.answers.errors %}
-                            <p>
-                                <mark>
-                                    {{q.question_id.data + 1}}. {{ q.question|safe }}
-                                    <strong class="pull-right" style="color: red">{{ ', '.join(q.answers.errors) }}</strong>
-                                </mark>
-                            </p>
-                        {% else %}
-                            <p>{{q.question_id.data + 1}}. {{ q.question|safe }}</p>
+                            {% if q.answers.errors %}
+                                <p>
+                                    <mark>
+                                        {{q.question_id.data + 1}}. {{ q.question|safe }}
+                                        <strong class="pull-right" style="color: red">{{ ', '.join(q.answers.errors) }}</strong>
+                                    </mark>
+                                </p>
+                            {% else %}
+                                <p>{{q.question_id.data + 1}}. {{ q.question|safe }}</p>
+                            {% endif %}
+
+                            {{ q.answers(class_="no-list-style") }}
+                            {{ q.hidden_tag() }}
                         {% endif %}
-
-                        {{ q.answers(class_="no-list-style") }}
-                        {{ q.hidden_tag() }}
-                    {% endif %}
-                {% endfor %}
+                    {% endfor %}
+                </div>
             {% endif %}
 
             {% if page['number'] == last_page %}
