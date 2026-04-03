@@ -5,21 +5,14 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from apps.volunteer.role_admin import role_admin_required
-from models.volunteer.role import Role, RoleAdmin, Team, TeamAdmin
-
-
-@pytest.fixture(autouse=True)
-def session(db):
-    """Wrap each test in a transaction which gets rolled back on completion."""
-    with db.session.begin():
-        yield
-        db.session.rollback()
+from models.volunteer.role import Role, RoleAdmin, Team
 
 
 @pytest.fixture()
 def team(db):
     t = Team(name="Test Team", slug="test-team")
     db.session.add(t)
+    db.session.flush()
     return t
 
 
@@ -27,6 +20,7 @@ def team(db):
 def role(db, team):
     r = Role(name="Test Role", team=team)
     db.session.add(r)
+    db.session.flush()
     return r
 
 
@@ -34,6 +28,7 @@ def role(db, team):
 def other_role(db, team):
     r = Role(name="Other Test Role", team=team)
     db.session.add(r)
+    db.session.flush()
     return r
 
 
@@ -49,8 +44,7 @@ def test_administered_role_ids_direct(volunteer, role, db):
 
 
 def test_administered_role_ids_via_team(volunteer, team, role, other_role, db):
-    ta = TeamAdmin(volunteer=volunteer, team=team)
-    db.session.add(ta)
+    team.admins.append(volunteer)
     db.session.refresh(volunteer)
     ids = volunteer.administered_role_ids
     assert role.id in ids
@@ -59,8 +53,8 @@ def test_administered_role_ids_via_team(volunteer, team, role, other_role, db):
 
 def test_administered_role_ids_union(volunteer, team, role, other_role, db):
     ra = RoleAdmin(volunteer=volunteer, role=role)
-    ta = TeamAdmin(volunteer=volunteer, team=team)
-    db.session.add_all([ra, ta])
+    db.session.add(ra)
+    team.admins.append(volunteer)
     db.session.refresh(volunteer)
     ids = volunteer.administered_role_ids
     assert role.id in ids
@@ -80,8 +74,7 @@ def test_is_volunteer_admin_via_role(volunteer, role, db):
 
 
 def test_is_volunteer_admin_via_team(volunteer, team, db):
-    ta = TeamAdmin(volunteer=volunteer, team=team)
-    db.session.add(ta)
+    team.admins.append(volunteer)
     db.session.refresh(volunteer)
     assert volunteer.is_volunteer_admin
 
@@ -124,13 +117,12 @@ def test_role_admin_required_allows_direct_role_admin(volunteer, role, db):
 
 
 def test_role_admin_required_allows_team_admin(volunteer, team, role, db):
-    ta = TeamAdmin(volunteer=volunteer, team=team)
-    db.session.add(ta)
+    team.admins.append(volunteer)
     db.session.refresh(volunteer)
     called, mock_abort = _invoke(role.id, volunteer)
     mock_abort.assert_not_called()
     assert called == [role.id]
-    db.session.delete(ta)
+    team.admins.remove(volunteer)
 
 
 def test_role_admin_required_allows_volunteer_admin_permission(volunteer, role, db):

@@ -16,7 +16,6 @@ from main import create_app
 from main import db as db_obj
 from models.site_state import SiteState
 from models.user import User
-from models.volunteer.volunteer import Volunteer
 
 
 @pytest.fixture(scope="module")
@@ -130,18 +129,6 @@ def user(db):
         db.session.commit()
 
     yield user
-
-
-@pytest.fixture(scope="module")
-def volunteer(db, user):
-    volunteer = Volunteer.query.filter(Volunteer.user_id == user.id).one_or_none()
-    if volunteer is None:
-        volunteer = Volunteer(user=user)
-        user.grant_permission("volunteer:user")
-        db.session.add(volunteer)
-        db.session.commit()
-
-    yield volunteer
 
 
 @pytest.fixture

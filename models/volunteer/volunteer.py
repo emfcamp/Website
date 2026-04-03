@@ -2,7 +2,6 @@ from collections import defaultdict
 from typing import TYPE_CHECKING
 
 from flask_login import UserMixin
-from sqlalchemy import Column, ForeignKey, Integer, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .. import BaseModel
@@ -10,7 +9,7 @@ from .shift import ShiftEntry, ShiftEntryState
 
 if TYPE_CHECKING:
     from ..user import User
-    from .role import Role, RoleAdmin, TeamAdmin
+    from .role import Role, RoleAdmin, Team
 
 __all__ = [
     "Volunteer",
@@ -73,8 +72,8 @@ class Volunteer(BaseModel, UserMixin):
         back_populates="volunteer", cascade="all, delete-orphan"
     )
 
-    volunteer_admin_teams: Mapped[list["TeamAdmin"]] = relationship(
-        back_populates="volunteer", cascade="all, delete-orphan"
+    administered_teams: Mapped[list["Team"]] = relationship(
+        "Team", secondary="volunteer_team_admin", back_populates="admins"
     )
 
     def __repr__(self):
@@ -121,13 +120,18 @@ class Volunteer(BaseModel, UserMixin):
     def administered_role_ids(self) -> set[int]:
         """Role IDs this user can administer, combining direct role admin and team admin."""
         role_ids = {ra.role_id for ra in self.volunteer_admin_roles}
-        for ta in self.volunteer_admin_teams:
-            role_ids.update(r.id for r in ta.team.roles)
+        for team in self.administered_teams:
+            role_ids.update(r.id for r in team.roles)
         return role_ids
 
     @property
+    def administered_team_ids(self) -> set[int]:
+        """Team IDs this user can administer."""
+        return {t.id for t in self.administered_teams}
+
+    @property
     def is_volunteer_admin(self) -> bool:
-        return bool(self.volunteer_admin_roles or self.volunteer_admin_teams)
+        return bool(self.volunteer_admin_roles or self.administered_teams)
 
 
 """
