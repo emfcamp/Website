@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 from markdown import markdown
 from markupsafe import Markup
-from sqlalchemy import ForeignKey, Text, func, select
+from sqlalchemy import Column, ForeignKey, Integer, Table, Text, func, select
 from sqlalchemy.orm import Mapped, mapped_column, noload, relationship
 
 from main import db, get_or_404
@@ -21,7 +21,6 @@ __all__ = [
     "RoleAdmin",
     "RolePermission",
     "Team",
-    "TeamAdmin",
 ]
 
 
@@ -189,7 +188,11 @@ class Team(BaseModel):
     slug: Mapped[str] = mapped_column(unique=True, index=True)
 
     #: Users who are admins for all roles within this team.
-    admins: Mapped[list["TeamAdmin"]] = relationship(back_populates="team", cascade="all, delete-orphan")
+    admins: Mapped[list["Volunteer"]] = relationship(
+        "Volunteer",
+        secondary="volunteer_team_admin",
+        back_populates="administered_teams",
+    )
 
     #: Roles that sit under this team.
     roles: Mapped[list["Role"]] = relationship(back_populates="team")
@@ -230,17 +233,12 @@ class RoleAdmin(BaseModel):
     role: Mapped[Role] = relationship(back_populates="admins")
 
 
-class TeamAdmin(BaseModel):
-    """Join table indicating a user has admin permissions for all roles in a team."""
-
-    __tablename__ = "volunteer_team_admin"
-    volunteer_id: Mapped[int] = mapped_column(ForeignKey("volunteer.id"), primary_key=True)
-    team_id: Mapped[int] = mapped_column(ForeignKey("volunteer_team.id"), primary_key=True)
-
-    #: Volunteer to be an admin
-    volunteer: Mapped["Volunteer"] = relationship(back_populates="volunteer_admin_teams")
-    #: Team the user is an admin for
-    team: Mapped["Team"] = relationship(back_populates="admins")
+VolunteerTeamAdmin = Table(
+    "volunteer_team_admin",
+    BaseModel.metadata,
+    Column("volunteer_id", Integer, ForeignKey("volunteer.id"), primary_key=True),
+    Column("team_id", Integer, ForeignKey("volunteer_team.id"), primary_key=True),
+)
 
 
 """
