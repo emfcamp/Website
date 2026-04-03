@@ -407,6 +407,10 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
   overflow: auto;
   clear: both;
 
+  a:link, a:visited, a:hover {
+    color: inherit
+  }
+
   p {
     margin-top: .5em;
     margin-bottom: 0;
@@ -425,8 +429,6 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
     }
   }
 
-  }
-  
   &.info {
     color: #01466c;
     background-color: #d3efff;
