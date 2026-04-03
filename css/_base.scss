@@ -407,6 +407,10 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
   overflow: auto;
   clear: both;
 
+  a:link, a:visited, a:hover {
+    color: #444
+  }
+
   p {
     margin-top: .5em;
     margin-bottom: 0;
@@ -432,6 +436,10 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
     background-color: #d3efff;
     border-color: #0288d1;
 
+    a:link, a:visited, a:hover {
+      color: #01466c;
+    }
+
     .admonition-title::before {
       background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiMwMTUzODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+ICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4gICAgPHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTEgMTVoLTJ2LTZoMnY2em0wLThoLTJWN2gydjJ6Ii8+PC9zdmc+)
     }
@@ -442,6 +450,10 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
     background-color: #fee3d3;
     border-color: #cf4d03;
 
+    a:link, a:visited, a:hover {
+      color: #6a2802;
+    }
+
     .admonition-title::before {
       background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNiNjUzMWMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+ICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4gICAgPHBhdGggZD0iTTEgMjFoMjJMMTIgMiAxIDIxem0xMi0zaC0ydi0yaDJ2MnptMC00aC0ydi00aDJ2NHoiLz48L3N2Zz4=)
     }
@@ -451,6 +463,10 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
     color: #4d0706;
     background-color: #fcdbdb;
     border-color: #ab0f0e;
+
+    a:link, a:visited, a:hover {
+      color: #4d0706
+    }
 
     .admonition-title::before {
       background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNiOTE4MTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+ICAgIDxwYXRoIGQ9Ik0xNS43MyAzSDguMjdMMyA4LjI3djcuNDZMOC4yNyAyMWg3LjQ2TDIxIDE1LjczVjguMjdMMTUuNzMgM3pNMTIgMTcuM2MtLjcyIDAtMS4zLS41OC0xLjMtMS4zIDAtLjcyLjU4LTEuMyAxLjMtMS4zLjcyIDAgMS4zLjU4IDEuMyAxLjMgMCAuNzItLjU4IDEuMy0xLjMgMS4zem0xLTQuM2gtMlY3aDJ2NnoiLz4gICAgPHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==)
