@@ -11,7 +11,7 @@ from lxml.etree import _Element as Element
 
 from main import external_url
 from models import event_end, event_start, event_year
-from models.cfp import SCHEDULE_ITEM_INFOS, ScheduleItem, Venue
+from models.cfp import SCHEDULE_ITEM_INFOS, ScheduleItem, Venue, schedule_item_slug
 
 from . import event_tz
 from .data import ScheduleFilter, ScheduleItemDict, _get_occurrence_dict, _get_schedule_item_dict
@@ -230,7 +230,7 @@ class FrabJsonExporter(FrabExporter):
                                             flat_sid["occurrences"][0]["end_date"],
                                         ),
                                         "room": room["name"],
-                                        "slug": f"""emf{event_year()}-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}-""",
+                                        "slug": f"""emf{event_year()}-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}-{schedule_item_slug(flat_sid["title"], allow_unicode=False)}""",
                                         "url": flat_sid["link"],
                                         "title": flat_sid["title"],
                                         "subtitle": "",
@@ -359,7 +359,7 @@ class FrabXmlExporter(FrabExporter):
         self._add_sub_with_text(event, "abstract", flat_sid["description"])
         self._add_sub_with_text(event, "description", "")
 
-        slug = f"""emf{event_year()}-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}-"""
+        slug = f"""emf{event_year()}-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}-{schedule_item_slug(flat_sid["title"], allow_unicode=False)}"""
         self._add_sub_with_text(event, "slug", slug)
 
         self._add_sub_with_text(event, "subtitle", "")
