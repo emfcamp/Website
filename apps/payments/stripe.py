@@ -20,7 +20,7 @@ from flask import (
 from flask import (
     current_app as app,
 )
-from flask.typing import ResponseValue
+from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 from flask_mailman import EmailMessage
 from sqlalchemy import select
@@ -48,7 +48,7 @@ class StripeUpdateConflict(Exception):
     pass
 
 
-webhook_handlers: dict[str | None, Callable[[str, Any], ResponseValue]] = {}
+webhook_handlers: dict[str | None, Callable[[str, Any], ResponseReturnValue]] = {}
 
 
 def webhook(type=None):
@@ -59,7 +59,7 @@ def webhook(type=None):
     return inner
 
 
-def stripe_start(payment: StripePayment) -> ResponseValue:
+def stripe_start(payment: StripePayment) -> ResponseReturnValue:
     """This is called by the ticket flow to initialise the payment and
     redirect to the capture page. We don't need to do anything here."""
     logger.info("Starting Stripe payment %s", payment.id)
@@ -70,7 +70,7 @@ def stripe_start(payment: StripePayment) -> ResponseValue:
 
 @payments.route("/pay/stripe/<int:payment_id>/capture")
 @login_required
-def stripe_capture(payment_id: int) -> ResponseValue:
+def stripe_capture(payment_id: int) -> ResponseReturnValue:
     """This endpoint displays the card payment form, including the Stripe payment element.
     Card details are validated and submitted to Stripe by XHR, and the user is then sent by
     Stripe to the `stripe_waiting` endpoint.
@@ -126,7 +126,7 @@ class StripeCancelForm(Form):
 
 @payments.route("/pay/stripe/<int:payment_id>/cancel", methods=["GET", "POST"])
 @login_required
-def stripe_cancel(payment_id: int) -> ResponseValue:
+def stripe_cancel(payment_id: int) -> ResponseReturnValue:
     payment = lock_user_payment_or_abort(payment_id, "stripe", valid_states=["new", "captured", "failed"])
     assert isinstance(payment, StripePayment)
 
@@ -147,7 +147,7 @@ def stripe_cancel(payment_id: int) -> ResponseValue:
 
 @payments.route("/pay/stripe/<int:payment_id>/waiting")
 @login_required
-def stripe_waiting(payment_id: int) -> ResponseValue:
+def stripe_waiting(payment_id: int) -> ResponseReturnValue:
     payment = lock_user_payment_or_abort(payment_id, "stripe", valid_states=["new", "paid"])
     assert isinstance(payment, StripePayment)
 
@@ -169,7 +169,7 @@ def stripe_waiting(payment_id: int) -> ResponseValue:
 
 
 @payments.route("/stripe-webhook", methods=["POST"])
-def stripe_webhook() -> ResponseValue:
+def stripe_webhook() -> ResponseReturnValue:
     stripe_client = get_stripe_client(app.config)
 
     webhook_key = app.config.get("STRIPE_WEBHOOK_KEY")
@@ -211,13 +211,13 @@ def stripe_webhook() -> ResponseValue:
 
 
 @webhook()
-def stripe_default(_type: str, _obj: Any) -> ResponseValue:
+def stripe_default(_type: str, _obj: Any) -> ResponseReturnValue:
     """Default webhook handler"""
     return ""
 
 
 @webhook("ping")
-def stripe_ping(_type: str, _obj: Any) -> ResponseValue:
+def stripe_ping(_type: str, _obj: Any) -> ResponseReturnValue:
     return ""
 
 
@@ -390,7 +390,7 @@ def lock_payment_or_abort_by_charge(charge_id: str) -> StripePayment:
 @webhook("payment_intent.created")
 @webhook("payment_intent.payment_failed")
 @webhook("payment_intent.succeeded")
-def stripe_payment_intent_updated(hook_type: str, intent: Any) -> ResponseValue:
+def stripe_payment_intent_updated(hook_type: str, intent: Any) -> ResponseReturnValue:
     payment = lock_payment_or_abort_by_intent(intent.id)
 
     logger.info(
@@ -412,7 +412,7 @@ def stripe_payment_intent_updated(hook_type: str, intent: Any) -> ResponseValue:
 
 
 @webhook("charge.refunded")
-def stripe_charge_refunded(_type: str, charge: Any) -> ResponseValue:
+def stripe_charge_refunded(_type: str, charge: Any) -> ResponseReturnValue:
     payment = lock_payment_or_abort_by_charge(charge.id)
 
     logger.info(

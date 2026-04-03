@@ -10,7 +10,7 @@ from flask import (
     render_template,
     url_for,
 )
-from flask.typing import ResponseValue
+from flask.typing import ResponseReturnValue
 
 from apps.common import render_markdown
 
@@ -18,29 +18,29 @@ from . import base
 
 
 @base.route("/supporting-emf")
-def supporting_emf() -> ResponseValue:
+def supporting_emf() -> ResponseReturnValue:
     return render_markdown("supporting-emf", template="static_page.html")
 
 
 @base.route("/about/branding")
-def branding() -> ResponseValue:
+def branding() -> ResponseReturnValue:
     return render_template("about/branding.html")
 
 
 @base.route("/about/<page_name>")
-def page(page_name: str) -> ResponseValue:
+def page(page_name: str) -> ResponseReturnValue:
     return render_markdown(f"about/{page_name}", page_name=page_name)
 
 
 # About and Contact have actual logic in them, so remain as HTML rather than
 # markdown
 @base.route("/about")
-def about() -> ResponseValue:
+def about() -> ResponseReturnValue:
     return render_template("about/index.html")
 
 
 @base.route("/about/contact")
-def contact() -> ResponseValue:
+def contact() -> ResponseReturnValue:
     return render_template("about/contact.html")
 
 
@@ -48,20 +48,20 @@ def contact() -> ResponseValue:
 
 
 @base.route("/about/covid")
-def covid() -> ResponseValue:
+def covid() -> ResponseReturnValue:
     return redirect(url_for(".page", page_name="health"), code=301)
 
 
 @base.route("/about/diversity")
-def about_diversity() -> ResponseValue:
+def about_diversity() -> ResponseReturnValue:
     return redirect(url_for(".org_page", page_name="diversity"))
 
 
 @base.route("/about/diversity/<int:year>")
-def yearly_diversity_stats_redirect(year: int) -> ResponseValue:
+def yearly_diversity_stats_redirect(year: int) -> ResponseReturnValue:
     return redirect(url_for(".yearly_diversity_stats", year=year))
 
 
 @base.route("/company")
-def company_redirect() -> ResponseValue:
+def company_redirect() -> ResponseReturnValue:
     return redirect(url_for("base.company"))

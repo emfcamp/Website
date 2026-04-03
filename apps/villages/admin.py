@@ -5,7 +5,7 @@ NOTE: make sure all admin views are tagged with the @village_admin_required deco
 
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask import current_app as app
-from flask.typing import ResponseValue
+from flask.typing import ResponseReturnValue
 from sqlalchemy import exists, select
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
@@ -39,7 +39,7 @@ class EmailComposeForm(Form):
 
 @villages.route("/admin")
 @village_admin_required
-def admin() -> ResponseValue:
+def admin() -> ResponseReturnValue:
     villages = sorted(db.session.query(Village).all(), key=lambda v: v.name)
 
     return render_template("villages/admin/list.html", villages=villages)
@@ -47,7 +47,7 @@ def admin() -> ResponseValue:
 
 @villages.route("/admin/village/<int:village_id>", methods=["GET", "POST"])
 @village_admin_required
-def admin_village(village_id: int) -> ResponseValue:
+def admin_village(village_id: int) -> ResponseReturnValue:
     village = Village.get_by_id(village_id)
     if not village:
         abort(404)
@@ -80,7 +80,7 @@ def admin_village(village_id: int) -> ResponseValue:
 
 @villages.route("/admin/village/<int:village_id>/delete", methods=["GET", "POST"])
 @village_admin_required
-def delete(village_id: int) -> ResponseValue:
+def delete(village_id: int) -> ResponseReturnValue:
     village = Village.get_by_id(village_id)
     if not village:
         abort(404)
@@ -98,7 +98,7 @@ def delete(village_id: int) -> ResponseValue:
 
 @villages.route("/admin/village/<int:village_id>/admins", methods=["GET"])
 @village_admin_required
-def admin_village_admins_get(village_id: int) -> ResponseValue:
+def admin_village_admins_get(village_id: int) -> ResponseReturnValue:
     return redirect(url_for(".admin_village", village_id=village_id))
 
 
@@ -108,7 +108,7 @@ def admin_village_admins_get(village_id: int) -> ResponseValue:
 # This route is for the former users to use to edit a list of the latter for a village
 @villages.route("/admin/village/<int:village_id>/admins", methods=["POST"])
 @village_admin_required
-def admin_village_admins(village_id: int) -> ResponseValue:
+def admin_village_admins(village_id: int) -> ResponseReturnValue:
     village = Village.get_by_id(village_id)
     if not village:
         abort(404)
@@ -165,7 +165,7 @@ def admin_village_admins(village_id: int) -> ResponseValue:
 
 @villages.route("/admin/email-owners", methods=["GET", "POST"])
 @village_admin_required
-def admin_email_owners() -> ResponseValue:
+def admin_email_owners() -> ResponseReturnValue:
     form = EmailComposeForm()
     if form.validate_on_submit():
         users = User.query.join(User.village_membership).filter(VillageMember.admin).distinct()

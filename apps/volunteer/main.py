@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from flask import abort, redirect, url_for
 from flask import current_app as app
-from flask.typing import ResponseValue
+from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from geoalchemy2.shape import to_shape
 from pendulum import parse
@@ -43,7 +43,7 @@ def main():
 
 @volunteer.route("/info/<page_name>")
 @feature_flag("VOLUNTEERS_SIGNUP")
-def info_page(page_name: str) -> ResponseValue:
+def info_page(page_name: str) -> ResponseReturnValue:
     return render_markdown(f"volunteer/info/{page_name}", page_name=page_name)
 
 

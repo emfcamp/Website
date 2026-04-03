@@ -3,7 +3,7 @@ import html
 import markdown
 import nh3
 from flask import abort, flash, redirect, render_template, request, url_for
-from flask.typing import ResponseValue
+from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 from markupsafe import Markup
 from sqlalchemy import exists, select
@@ -19,7 +19,7 @@ from .forms import VillageForm
 
 @villages.route("/register", methods=["GET", "POST"])
 @login_required
-def register() -> ResponseValue:
+def register() -> ResponseReturnValue:
     if current_user.village and current_user.village_membership.admin:
         return redirect(url_for(".edit", year=event_year(), village_id=current_user.village.id))
 
@@ -56,12 +56,12 @@ def register() -> ResponseValue:
 
 
 @villages.route("/")
-def villages_redirect() -> ResponseValue:
+def villages_redirect() -> ResponseReturnValue:
     return redirect(url_for(".main", year=event_year()))
 
 
 @villages.route("/<int:year>")
-def main(year: int) -> ResponseValue:
+def main(year: int) -> ResponseReturnValue:
     if year != event_year():
         abort(404)
 
@@ -75,7 +75,7 @@ def main(year: int) -> ResponseValue:
 
 
 @villages.route("/<int:year>/<int:village_id>")
-def view(year: int, village_id: int) -> ResponseValue:
+def view(year: int, village_id: int) -> ResponseReturnValue:
     village = load_village(year, village_id)
     show_edit = (
         current_user.is_authenticated
@@ -113,7 +113,7 @@ def render_markdown(markdown_text: str) -> Markup:
 
 @villages.route("/<int:year>/<int:village_id>/edit", methods=["GET", "POST"])
 @login_required
-def edit(year: int, village_id: int) -> ResponseValue:
+def edit(year: int, village_id: int) -> ResponseReturnValue:
     village = load_village(year, village_id, require_admin=True)
 
     form = VillageForm()

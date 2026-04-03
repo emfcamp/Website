@@ -12,7 +12,7 @@ from flask import (
 from flask import (
     current_app as app,
 )
-from flask.typing import ResponseValue
+from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from sqlalchemy import select
 from wtforms import BooleanField, FieldList, FormField, SubmitField
@@ -228,7 +228,7 @@ def role_admin(role_id):
 
 @volunteer.route("role/<int:role_id>/set-state/<int:shift_id>/<int:user_id>", methods=["POST"])
 @role_admin_required
-def set_state(role_id: int, shift_id: int, user_id: int) -> ResponseValue:
+def set_state(role_id: int, shift_id: int, user_id: int) -> ResponseReturnValue:
     state = request.form["state"]
 
     se = (
@@ -253,7 +253,7 @@ def set_state(role_id: int, shift_id: int, user_id: int) -> ResponseValue:
 
 @volunteer.route("role/<int:role_id>/<int:shift_id>", methods=["POST"])
 @role_admin_required
-def update_shift(role_id: int, shift_id: int) -> ResponseValue:
+def update_shift(role_id: int, shift_id: int) -> ResponseReturnValue:
     shift = get_or_404(db, Shift, shift_id)
     shift.min_needed = int(request.form["min_needed"])
     shift.max_needed = int(request.form["max_needed"])

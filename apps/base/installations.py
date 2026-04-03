@@ -3,7 +3,7 @@ Pages under /installations - the Installations programme
 """
 
 from flask import redirect, render_template, url_for
-from flask.typing import ResponseValue
+from flask.typing import ResponseReturnValue
 
 from apps.common import render_markdown
 from models import event_year
@@ -12,12 +12,12 @@ from . import base
 
 
 @base.route("/installations")
-def yearly_installation_redirection() -> ResponseValue:
+def yearly_installation_redirection() -> ResponseReturnValue:
     return redirect(url_for(".installations", year=event_year()))
 
 
 @base.route("/installations/<int:year>/<page_name>")
-def installations_page(year: int, page_name: str) -> ResponseValue:
+def installations_page(year: int, page_name: str) -> ResponseReturnValue:
     return render_markdown(
         f"installations/{year}/{page_name}",
         template=f"installations/{year}/template.html",
@@ -26,5 +26,5 @@ def installations_page(year: int, page_name: str) -> ResponseValue:
 
 
 @base.route("/installations/<int:year>")
-def installations(year: int) -> ResponseValue:
+def installations(year: int) -> ResponseReturnValue:
     return render_template(f"installations/{year}/main.html")

@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from flask import current_app as app
 from flask import flash, redirect, render_template, url_for
-from flask.typing import ResponseValue
+from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 from flask_mailman import EmailMessage
 from wtforms import HiddenField, SubmitField
@@ -23,7 +23,7 @@ from . import payments
 logger = logging.getLogger(__name__)
 
 
-def transfer_start(payment: BankPayment) -> ResponseValue:
+def transfer_start(payment: BankPayment) -> ResponseReturnValue:
     if not feature_enabled("BANK_TRANSFER"):
         return redirect(url_for("tickets.pay"))
 
