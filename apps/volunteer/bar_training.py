@@ -80,8 +80,6 @@ def load_training_markdown(path):
     return markdown.markdown(md_content, extensions=["markdown.extensions.admonition"])
 
 
-
-
 def check_answer_correct(form, question):
     if not question_data[form.question_id.data]["correct"] == int(question.data):
         raise ValidationError("This answer is not correct.")
