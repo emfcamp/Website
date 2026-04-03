@@ -429,6 +429,16 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
     }
   }
 
+  &.success {
+    color: #114739;
+    background-color: #def0e5;
+    border-color: #20a84e;
+
+    .admonition-title::before {
+      background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAyNCAyNCI+CiAgPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDMwLjIuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDIuMS4xIEJ1aWxkIDEpICAtLT4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLnN0MCB7CiAgICAgICAgZmlsbDogbm9uZTsKICAgICAgfQoKICAgICAgLnN0MSB7CiAgICAgICAgZmlsbDogIzFkYTg0ZDsKICAgICAgfQogICAgPC9zdHlsZT4KICA8L2RlZnM+CiAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTAsMGgyNHYyNEgwVjBaIi8+CiAgPHBhdGggY2xhc3M9InN0MSIgZD0iTTEyLDJDNi40OCwyLDIsNi40OCwyLDEyczQuNDgsMTAsMTAsMTAsMTAtNC40OCwxMC0xMFMxNy41MiwyLDEyLDJaTTkuNzgsMTcuOThsLTQuODctNC44NywxLjc3LTEuNzcsMy4xLDMuMSw3LjU0LTcuNTQsMS43NywxLjc3LTkuMzEsOS4zMVoiLz4KPC9zdmc+)
+    }
+  }
+  
   &.info {
     color: #01466c;
     background-color: #d3efff;
@@ -459,6 +469,7 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
     }
   }
 
+  &.success .admonition-title::before,
   &.info .admonition-title::before,
   &.warning .admonition-title::before,
   &.danger .admonition-title::before {
