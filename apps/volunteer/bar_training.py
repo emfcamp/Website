@@ -77,7 +77,9 @@ def load_training_markdown(path):
     with open(file_path) as md_file:
         md_content = md_file.read()
 
-    return markdown.markdown(md_content)
+    return markdown.markdown(md_content, extensions=["markdown.extensions.admonition"])
+
+
 
 
 def check_answer_correct(form, question):
