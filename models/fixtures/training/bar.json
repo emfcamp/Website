@@ -156,6 +156,10 @@
               "correct": true
             },
             {
+              "answer": "Digital ID card",
+              "correct": false
+            },
+            {
               "answer": "Police authority stamp",
               "correct": false
             }
