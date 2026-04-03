@@ -237,10 +237,10 @@ legend {
 
 .nav a {
   text-decoration: none;
-}
 
-.nav a:hover {
-  color: #555;
+  &:hover {
+    color: #555;
+  }
 }
 
 /* Restore link colours */
