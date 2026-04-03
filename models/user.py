@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from .payment import Payment
     from .purchase import AdmissionTicket, Purchase, PurchaseTransfer, Ticket
     from .village import VillageMember
-    from .volunteer import RoleAdmin, TeamAdmin, Volunteer
+    from .volunteer import Volunteer
 
 __all__ = [
     "AnonymousUser",
@@ -300,27 +300,9 @@ class User(BaseModel, UserMixin):
     admin_messages: Mapped[list[AdminMessage]] = relationship("AdminMessage", back_populates="creator")
 
     volunteer: Mapped[Volunteer | None] = relationship(back_populates="user", cascade="all, delete-orphan")
-    volunteer_admin_roles: Mapped[list[RoleAdmin]] = relationship(
-        back_populates="user", cascade="all, delete-orphan"
-    )
-    volunteer_admin_teams: Mapped[list[TeamAdmin]] = relationship(
-        back_populates="user", cascade="all, delete-orphan"
-    )
     shift_entries: Mapped[list[ShiftEntry]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
-
-    @property
-    def administered_role_ids(self) -> set[int]:
-        """Role IDs this user can administer, combining direct role admin and team admin."""
-        role_ids = {ra.role_id for ra in self.volunteer_admin_roles}
-        for ta in self.volunteer_admin_teams:
-            role_ids.update(r.id for r in ta.team.roles)
-        return role_ids
-
-    @property
-    def is_volunteer_admin(self) -> bool:
-        return bool(self.volunteer_admin_roles or self.volunteer_admin_teams)
 
     def __init__(self, email: str, name: str):
         self.email = email

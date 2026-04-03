@@ -169,7 +169,7 @@ def role(role_id):
 def role_admin_required(f, *args, **kwargs):
     """Check that current user has permissions to be RoleAdmin for role.id that is first entry in args"""
     if current_user.is_authenticated:
-        if int(args[0]) in current_user.administered_role_ids or (
+        if int(args[0]) in current_user.volunteer.administered_role_ids or (
             current_user.has_permission("volunteer:admin") or current_user.has_permission("volunteer:manager")
         ):
             return f(*args, **kwargs)

@@ -10,11 +10,11 @@ from sqlalchemy.orm import Mapped, mapped_column, noload, relationship
 from main import db, get_or_404
 
 from .. import BaseModel
-from .volunteer import Volunteer, VolunteerRoleInterest, VolunteerRoleTraining
+from .volunteer import VolunteerRoleInterest, VolunteerRoleTraining
 
 if TYPE_CHECKING:
-    from ..user import User
     from .shift import Shift
+    from .volunteer import Volunteer
 
 __all__ = [
     "Role",
@@ -221,11 +221,11 @@ class RoleAdmin(BaseModel):
     """Join table used to indicate a given volunteer has admin permissions for a role."""
 
     __tablename__ = "volunteer_role_admin"
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
+    volunteer_id: Mapped[int] = mapped_column(ForeignKey("volunteer.id"), primary_key=True)
     role_id: Mapped[int] = mapped_column(ForeignKey("volunteer_role.id"), primary_key=True)
 
-    #: Website user
-    user: Mapped["User"] = relationship(back_populates="volunteer_admin_roles")
+    #: Volunteer to be an admin
+    volunteer: Mapped["Volunteer"] = relationship(back_populates="volunteer_admin_roles")
     #: Role the user is an admin for
     role: Mapped[Role] = relationship(back_populates="admins")
 
@@ -234,11 +234,11 @@ class TeamAdmin(BaseModel):
     """Join table indicating a user has admin permissions for all roles in a team."""
 
     __tablename__ = "volunteer_team_admin"
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
+    volunteer_id: Mapped[int] = mapped_column(ForeignKey("volunteer.id"), primary_key=True)
     team_id: Mapped[int] = mapped_column(ForeignKey("volunteer_team.id"), primary_key=True)
 
-    #: Website user
-    user: Mapped["User"] = relationship(back_populates="volunteer_admin_teams")
+    #: Volunteer to be an admin
+    volunteer: Mapped["Volunteer"] = relationship(back_populates="volunteer_admin_teams")
     #: Team the user is an admin for
     team: Mapped["Team"] = relationship(back_populates="admins")
 
