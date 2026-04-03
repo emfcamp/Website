@@ -114,6 +114,7 @@ from . import (
     bar_training,  # noqa: F401
     choose_roles,  # noqa: F401
     main,  # noqa: F401
+    role_admin,  # noqa: F401
     schedule,  # noqa: F401
     sign_up,  # noqa: F401
     stats,  # noqa: F401

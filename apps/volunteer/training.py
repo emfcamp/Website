@@ -3,7 +3,7 @@ from flask import flash, redirect, render_template, url_for
 from wtforms import BooleanField, FieldList, FormField, SubmitField
 from wtforms.validators import InputRequired
 
-from apps.volunteer.choose_roles import role_admin_required
+from apps.volunteer.role_admin import role_admin_required
 from main import db
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer

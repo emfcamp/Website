@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from apps.volunteer.choose_roles import role_admin_required
+from apps.volunteer.role_admin import role_admin_required
 from models.volunteer.role import Role, RoleAdmin, Team, TeamAdmin
 
 
@@ -97,9 +97,9 @@ def _invoke(role_id, volunteer):
 
     mock_app = MagicMock()
     with (
-        patch("apps.volunteer.choose_roles.current_user", volunteer.user),
-        patch("apps.volunteer.choose_roles.abort") as mock_abort,
-        patch("apps.volunteer.choose_roles.app", mock_app),
+        patch("apps.volunteer.role_admin.current_user", volunteer.user),
+        patch("apps.volunteer.role_admin.abort") as mock_abort,
+        patch("apps.volunteer.role_admin.app", mock_app),
     ):
         view(role_id)
 
@@ -157,8 +157,8 @@ def test_role_admin_required_unauthenticated(volunteer, db):
     mock_app = MagicMock()
     mock_user = MagicMock(is_authenticated=False)
     with (
-        patch("apps.volunteer.choose_roles.current_user", mock_user),
-        patch("apps.volunteer.choose_roles.app", mock_app),
+        patch("apps.volunteer.role_admin.current_user", mock_user),
+        patch("apps.volunteer.role_admin.app", mock_app),
     ):
         view(42)
         mock_app.login_manager.unauthorized.assert_called_once()
