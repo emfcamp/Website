@@ -423,11 +423,13 @@ class User(BaseModel, UserMixin):
 
         return db.session.get_one(User, uid)
 
+    @property
+    def has_admission_ticket(self) -> bool:
+        """Whether the user has a ticket to the event."""
+        return len(list(self.get_owned_tickets(paid=True, type="admission_ticket"))) > 0
+
     def check_will_have_ticket(self) -> bool:
-        if self.will_have_ticket:
-            return True
-        admission_tickets = list(self.get_owned_tickets(paid=True, type="admission_ticket"))
-        return len(admission_tickets) > 0
+        return self.will_have_ticket or self.has_admission_ticket
 
     @property
     def has_accepted_proposal(self):

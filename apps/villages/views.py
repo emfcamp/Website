@@ -23,6 +23,10 @@ def register() -> ResponseValue:
     if current_user.village and current_user.village_membership.admin:
         return redirect(url_for(".edit", year=event_year(), village_id=current_user.village.id))
 
+    if not current_user.has_admission_ticket:
+        flash("You can't create a village without a ticket to EMF")
+        return redirect(url_for("users.account"))
+
     form = VillageForm()
     if form.validate_on_submit():
         # Checked by form so should never fail
