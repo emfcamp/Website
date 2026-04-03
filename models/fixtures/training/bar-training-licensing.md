@@ -6,14 +6,12 @@ In England and Wales there are four ​licensing objectives:​
 3. The prevention of public nuisance
 4. The protection of children from harm
 
-(Scotland has five, and six are proposed for Northern Ireland, but that doesn’t matter right now...)
-
 Licensing regulates these four activities:
 
-1. the retail sale of alcohol
-2. the supply of alcohol in clubs
-3. the provision of late night refreshment
-4. the provision of regulated entertainment
+1. The retail sale of alcohol
+2. The supply of alcohol in clubs
+3. The provision of late night refreshment
+4. The provision of regulated entertainment
 
 We’re only covering the first of these in this training course.
 
