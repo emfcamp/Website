@@ -136,7 +136,7 @@ class VillageMember(BaseModel):
     village_id: Mapped[int] = mapped_column(ForeignKey("village.id"))
     admin: Mapped[bool] = mapped_column(default=False)
 
-    village: Mapped[list[Village]] = relationship(back_populates="village_memberships")
+    village: Mapped[Village] = relationship(back_populates="village_memberships")
     user: Mapped[User] = relationship(back_populates="village_membership")
 
     def __repr__(self):
