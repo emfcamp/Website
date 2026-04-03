@@ -419,6 +419,12 @@ a.collapse-toggle:hover .glyphicon { text-decoration: none; }
 
   .admonition-title {
     font-weight: bold;
+
+    &::before {
+      margin-bottom: -2px;
+    }
+  }
+
   }
   
   &.info {
