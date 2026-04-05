@@ -14,7 +14,7 @@ from flask import (
     current_app as app,
 )
 from flask.typing import ResponseReturnValue
-from flask_login import current_user
+from flask_login import current_user, login_required
 from flask_mailman import EmailMessage
 from markupsafe import Markup
 from sqlalchemy.exc import IntegrityError
@@ -207,7 +207,7 @@ def get_days_with_slots():
 
 
 @cfp.route("/cfp")
-def main():
+def main() -> ResponseReturnValue:
     if not feature_enabled("CFP"):
         return render_template("cfp/holding-page.html")
 
@@ -339,7 +339,7 @@ def create_proposal(proposal_type: ProposalType = "talk") -> ResponseReturnValue
 
 @cfp.route("/cfp/complete", methods=["GET", "POST"])
 @feature_flag("CFP")
-def complete():
+def complete() -> ResponseReturnValue:
     if current_user.is_anonymous:
         return redirect(url_for(".main"))
 
@@ -407,13 +407,13 @@ def edit_proposal(proposal_id: int) -> ResponseReturnValue:
 
 
 class WithdrawalForm(Form):
-    message = TextAreaField("If you're comfortable, please tell us why you're withdrawing")
+    message = TextAreaField("If you're comfortable, please tell us why you're withdrawing", default="")
     confirm_withdrawal = SubmitField("Confirm proposal withdrawal")
 
 
 @cfp.route("/cfp/proposals/<int:proposal_id>/withdraw", methods=["GET", "POST"])
 @feature_flag("CFP")
-def withdraw_proposal(proposal_id):
+def withdraw_proposal(proposal_id: int) -> ResponseReturnValue:
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for(".edit_proposal", proposal_id=proposal_id)))
 
@@ -422,22 +422,22 @@ def withdraw_proposal(proposal_id):
         abort(404)
 
     form = WithdrawalForm()
-    if form.validate_on_submit():
-        if form.confirm_withdrawal.data:
-            app.logger.info("Proposal %s is being withdrawn.", proposal_id)
-            proposal.state = "withdrawn"
+    if form.validate_on_submit() and form.confirm_withdrawal.data:
+        assert form.message.data
+        app.logger.info("Proposal %s is being withdrawn.", proposal_id)
+        proposal.state = "withdrawn"
 
-            msg = ProposalMessage()
-            msg.is_to_admin = True
-            msg.from_user_id = current_user.id
-            msg.proposal_id = proposal_id
-            msg.message = form.message.data
+        msg = ProposalMessage()
+        msg.is_to_admin = True
+        msg.from_user_id = current_user.id
+        msg.proposal_id = proposal_id
+        msg.message = form.message.data
 
-            db.session.add(msg)
-            db.session.commit()
-            flash(f"We've withdrawn your {proposal.human_type}, {proposal.title}.")
+        db.session.add(msg)
+        db.session.commit()
+        flash(f"We've withdrawn your {proposal.human_type}, {proposal.title}.")
 
-            return redirect(url_for("cfp.proposals"))
+        return redirect(url_for("cfp.proposals"))
 
     return render_template("cfp/withdraw.html", form=form, proposal=proposal)
 
@@ -777,14 +777,8 @@ class MessagesForm(Form):
 
 @cfp.route("/cfp/proposals/<int:proposal_id>/messages", methods=["GET", "POST"])
 @feature_flag("CFP")
-def proposal_messages(proposal_id):
-    if current_user.is_anonymous:
-        return redirect(
-            url_for(
-                "users.login",
-                next=url_for(".proposal_messages", proposal_id=proposal_id),
-            )
-        )
+@login_required
+def proposal_messages(proposal_id: int) -> ResponseReturnValue:
     proposal = get_or_404(db, Proposal, proposal_id)
     if proposal.user_id != current_user.id:
         abort(404)
@@ -798,6 +792,7 @@ def proposal_messages(proposal_id):
         app.logger.info(f"Marked {count} messages from admin on proposal {proposal.id} as read")
 
         if form.send.data:
+            assert form.message.data
             msg = ProposalMessage()
             msg.is_to_admin = True
             msg.from_user_id = current_user.id
@@ -815,19 +810,20 @@ def proposal_messages(proposal_id):
 
         return redirect(url_for(".proposal_messages", proposal_id=proposal_id))
 
-    messages = ProposalMessage.query.filter_by(proposal_id=proposal_id).order_by("created").all()
+    messages = db.session.query(ProposalMessage).filter_by(proposal_id=proposal_id).order_by("created").all()
 
     return render_template("cfp/proposal-messages.html", proposal=proposal, messages=messages, form=form)
 
 
 @cfp.route("/cfp/messages")
 @feature_flag("CFP")
-def messages():
+def messages() -> ResponseReturnValue:
     if current_user.is_anonymous:
         return redirect(url_for(".main"))
 
     proposal_with_message = (
-        Proposal.query.join(ProposalMessage)
+        db.session.query(Proposal)
+        .join(ProposalMessage)
         .filter(Proposal.id == ProposalMessage.proposal_id, Proposal.user_id == current_user.id)
         .order_by(ProposalMessage.has_been_read, ProposalMessage.created.desc())
         .all()
@@ -839,15 +835,15 @@ def messages():
 
 
 @cfp.route("/cfp/guidance")
-def guidance():
+def guidance() -> ResponseReturnValue:
     return render_template("cfp/guidance.html")
 
 
 @cfp.route("/cfp/proposal-advice")
-def proposal_advice():
+def proposal_advice() -> ResponseReturnValue:
     return render_template("cfp/proposal_advice.html")
 
 
 @cfp.route("/cfp/installation-support")
-def installation_support():
+def installation_support() -> ResponseReturnValue:
     return render_template("cfp/installation_support.html")
