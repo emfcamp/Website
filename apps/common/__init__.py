@@ -392,7 +392,7 @@ def render_markdown(source: str, template: str = "about/template.html", **view_v
 
     with open(source_file) as f:
         source = f.read()
-        (metadata, content) = source.split("---", 2)
+        (metadata, content) = source.split("---", 1)
         metadata = parse_yaml(metadata)
         content = Markup(
             markdown(
