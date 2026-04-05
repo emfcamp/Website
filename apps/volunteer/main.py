@@ -7,7 +7,7 @@ from flask_login import current_user
 from geoalchemy2.shape import to_shape
 from sqlalchemy import select
 
-from apps.common import render_markdown
+from apps.common import render_template_markdown
 from main import db
 from models.cfp import Occurrence, ScheduleItem
 from models.volunteer import (
@@ -40,7 +40,7 @@ def main():
 @volunteer.route("/info/<page_name>")
 @feature_flag("VOLUNTEERS_SIGNUP")
 def info_page(page_name: str) -> ResponseReturnValue:
-    return render_markdown(f"volunteer/info/{page_name}", page_name=page_name)
+    return render_template_markdown(f"volunteer/info/{page_name}.md", page_name=page_name)
 
 
 @volunteer.route("/info")
@@ -48,7 +48,7 @@ def info():
     if not feature_enabled("VOLUNTEERS_SIGNUP"):
         # Rather than 404ing, point at the misc 'volunteering' page instead.
         return redirect(url_for("base.page", page_name="volunteering"))
-    return render_markdown("volunteer/info/index", page_name="index")
+    return render_template_markdown("volunteer/info/index.md", page_name="index")
 
 
 @volunteer.route("/init-shifts")

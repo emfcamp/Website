@@ -382,13 +382,25 @@ def page_template(metadata, template):
     return "markdown.html"
 
 
-def render_markdown(source: str, template: str = "about/template.html", **view_variables: Any) -> str:
+def render_template_markdown(filename: str, template: str = "about/template.html", **context: Any) -> str:
+    """Render trusted markdown
+
+    Similar to render_template, but accepts a file that contains markdown, and
+    after rendering converts the output from markdown to HTML. The HTML is then
+    passed to a wrapper template as the context variable "content".
+
+    All Jinja functionality is accessible from within the template, so do not
+    call this on untrusted content.
+
+    You can also change the wrapper template using metadata.
+    """
+
     assert app.template_folder is not None
     template_root = Path(path.join(app.root_path, app.template_folder)).resolve()
-    source_file = template_root.joinpath(f"{source}.md").resolve()
+    source_file = template_root.joinpath(filename).resolve()
 
     if not source_file.is_relative_to(template_root) or not source_file.exists():
-        return abort(404)
+        abort(404)
 
     with open(source_file) as f:
         source = f.read()
@@ -405,8 +417,8 @@ def render_markdown(source: str, template: str = "about/template.html", **view_v
             )
         )
 
-    view_variables.update(content=content, title=metadata["title"])
-    return render_template(page_template(metadata, template), **view_variables)
+    context.update(content=content, title=metadata["title"])
+    return render_template(page_template(metadata, template), **context)
 
 
 def make_safe_url(target: str) -> str | None:

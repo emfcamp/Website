@@ -9,7 +9,7 @@ from flask_login import current_user
 from wtforms import FieldList, FormField, RadioField, SubmitField
 from wtforms.validators import InputRequired, ValidationError
 
-from apps.common import render_markdown
+from apps.common import render_template_markdown
 from main import db
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer
@@ -126,8 +126,8 @@ class TrainingForm(Form):
 @volunteer.route("/bar-training/guide", methods=["GET"], defaults={"page_name": "index"})
 @volunteer.route("/bar-training/guide/<page_name>", methods=["GET"])
 def bar_training_page(page_name: str) -> ResponseReturnValue:
-    return render_markdown(
-        f"volunteer/training/bar/{page_name}",
+    return render_template_markdown(
+        f"volunteer/training/bar/{page_name}.md",
         page_name=page_name,
         template="volunteer/training/guide_page.html",
     )

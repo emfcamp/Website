@@ -4,7 +4,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from apps.common import render_markdown
+from apps.common import render_template_markdown
 
 dev = Blueprint("dev", __name__)
 
@@ -16,4 +16,4 @@ def design_main() -> ResponseReturnValue:
 
 @dev.route("/design/markdown")
 def design_markdown() -> ResponseReturnValue:
-    return render_markdown("dev/design", template="markdown.html")
+    return render_template_markdown("dev/design.md", template="markdown.html")

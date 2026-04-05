@@ -12,14 +12,14 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from apps.common import render_markdown
+from apps.common import render_template_markdown
 
 from . import base
 
 
 @base.route("/supporting-emf")
 def supporting_emf() -> ResponseReturnValue:
-    return render_markdown("supporting-emf", template="markdown.html")
+    return render_template_markdown("supporting-emf.md", template="markdown.html")
 
 
 @base.route("/about/branding")
@@ -29,7 +29,7 @@ def branding() -> ResponseReturnValue:
 
 @base.route("/about/<page_name>")
 def page(page_name: str) -> ResponseReturnValue:
-    return render_markdown(f"about/{page_name}", page_name=page_name)
+    return render_template_markdown(f"about/{page_name}.md", page_name=page_name)
 
 
 # About and Contact have actual logic in them, so remain as HTML rather than

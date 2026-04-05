@@ -8,7 +8,7 @@ import json
 from flask import render_template
 from flask.typing import ResponseReturnValue
 
-from apps.common import render_markdown
+from apps.common import render_template_markdown
 
 from . import base
 
@@ -25,13 +25,15 @@ def finances() -> ResponseReturnValue:
 
 @base.route("/organisation/company")
 def company() -> ResponseReturnValue:
-    return render_markdown("organisation/company", page_name="company", template="organisation/template.html")
+    return render_template_markdown(
+        "organisation/company.md", page_name="company", template="organisation/template.html"
+    )
 
 
 @base.route("/organisation/<page_name>")
 def org_page(page_name: str) -> ResponseReturnValue:
-    return render_markdown(
-        f"organisation/{page_name}", page_name=page_name, template="organisation/template.html"
+    return render_template_markdown(
+        f"organisation/{page_name}.md", page_name=page_name, template="organisation/template.html"
     )
 
 
@@ -46,4 +48,4 @@ def yearly_diversity_stats(year: int) -> ResponseReturnValue:
             year=year,
             data=data["diversity"],
         )
-    return render_markdown(f"about/diversity/{year}")
+    return render_template_markdown(f"about/diversity/{year}.md")
