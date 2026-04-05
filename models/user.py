@@ -370,6 +370,8 @@ class User(BaseModel, UserMixin):
         return False
 
     def grant_permission(self, name: str) -> None:
+        if self.has_permission(name, cascade=False):
+            return
         try:
             perm = db.session.execute(select(Permission).where(Permission.name == name)).scalar_one()
         except NoResultFound:
