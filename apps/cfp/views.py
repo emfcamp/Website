@@ -339,10 +339,8 @@ def create_proposal(proposal_type: ProposalType = "talk") -> ResponseReturnValue
 
 @cfp.route("/cfp/complete", methods=["GET", "POST"])
 @feature_flag("CFP")
+@login_required
 def complete() -> ResponseReturnValue:
-    if current_user.is_anonymous:
-        return redirect(url_for(".main"))
-
     form = DiversityForm(user=current_user)
     if form.validate_on_submit():
         form.update_user(current_user)
@@ -356,10 +354,8 @@ def complete() -> ResponseReturnValue:
 
 @cfp.route("/cfp/proposals")
 @feature_flag("CFP")
-def proposals():
-    if current_user.is_anonymous:
-        return redirect(url_for(".main"))
-
+@login_required
+def proposals() -> ResponseReturnValue:
     proposals = current_user.proposals
     if not proposals:
         return redirect(url_for(".main"))
@@ -369,10 +365,8 @@ def proposals():
 
 @cfp.route("/cfp/proposals/<int:proposal_id>/edit", methods=["GET", "POST"])
 @feature_flag("CFP")
+@login_required
 def edit_proposal(proposal_id: int) -> ResponseReturnValue:
-    if current_user.is_anonymous:
-        return redirect(url_for("users.login", next=url_for(".edit_proposal", proposal_id=proposal_id)))
-
     proposal: Proposal = get_or_404(db, Proposal, proposal_id)
 
     if proposal.user != current_user:
@@ -413,10 +407,8 @@ class WithdrawalForm(Form):
 
 @cfp.route("/cfp/proposals/<int:proposal_id>/withdraw", methods=["GET", "POST"])
 @feature_flag("CFP")
+@login_required
 def withdraw_proposal(proposal_id: int) -> ResponseReturnValue:
-    if current_user.is_anonymous:
-        return redirect(url_for("users.login", next=url_for(".edit_proposal", proposal_id=proposal_id)))
-
     proposal = get_or_404(db, Proposal, proposal_id)
     if proposal.user != current_user:
         abort(404)
@@ -625,6 +617,7 @@ def get_finalise_form(proposal_type: ProposalType) -> type[FinaliseForm]:
 
 @cfp.route("/cfp/proposals/<int:proposal_id>/finalise", methods=["GET", "POST"])
 @feature_flag("CFP")
+@login_required
 def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
     """
     Finalise the details for the schedule, including names, pronouns, and availability.
@@ -632,14 +625,6 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
     the scheduled_duration is set on the schedule_item, and after the talk is scheduled.
     (Obviously setting availability is a bit late after it's been scheduled.)
     """
-    if current_user.is_anonymous:
-        return redirect(
-            url_for(
-                "users.login",
-                next=url_for(".finalise_proposal", proposal_id=proposal_id),
-            )
-        )
-
     proposal = get_or_404(db, Proposal, proposal_id)
     if proposal.user != current_user:
         abort(404)
@@ -817,10 +802,8 @@ def proposal_messages(proposal_id: int) -> ResponseReturnValue:
 
 @cfp.route("/cfp/messages")
 @feature_flag("CFP")
+@login_required
 def messages() -> ResponseReturnValue:
-    if current_user.is_anonymous:
-        return redirect(url_for(".main"))
-
     proposal_with_message = (
         db.session.query(Proposal)
         .join(ProposalMessage)
