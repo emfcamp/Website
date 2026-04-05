@@ -37,7 +37,12 @@
                 {% if ticket.is_paid_for and ticket.is_transferable %}
                 <a class="btn btn-default" href="{{ url_for('.transfer_ticket', ticket_id=ticket.id) }}">Transfer</a>
                 {% endif %}
+                {% if ticket.is_free and ticket.state not in ['cancelled', 'refunded'] %}
+                <a class="btn btn-default" href="{{ url_for('.cancel_free_ticket', ticket_id=ticket.id) }}">Cancel</a>
+                {% endif %}
+                {% if ticket.state not in ['cancelled', 'refunded'] %}
                 <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=ticket.id) }}">Convert</a>
+                {% endif %}
               </div>
             </td>
         </tr>

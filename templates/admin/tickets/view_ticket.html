@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+{% block title %}Ticket {{ticket.id}}{% endblock %}
 {% block body %}
 
 <div class="row">
@@ -6,10 +7,15 @@
     <h2>Viewing Ticket ID: {{ ticket.id }} {{ ticket | ticket_state_label }}</h2>
   </div>
   <div class="col-md-6">
-    <span class="pull-right">
+    {% if ticket.state == 'paid' %}
+    <span class="pull-right btn-group">
       <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=ticket.id) }}">Convert</a>
-      <a href="{{ url_for('.transfer_ticket', ticket_id=ticket.id) }}" class="btn btn-warning">Transfer...</a>
+      {% if ticket.is_free %}
+      <a class="btn btn-default" href="{{ url_for('.cancel_free_ticket', ticket_id=ticket.id) }}">Cancel</a>
+      {% endif %}
+      <a class="btn btn-warning" href="{{ url_for('.transfer_ticket', ticket_id=ticket.id) }}">Transfer</a>
     </span>
+    {% endif %}
   </div>
 </div>
 <table class="table table-condensed">

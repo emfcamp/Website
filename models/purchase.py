@@ -134,6 +134,11 @@ class Purchase(BaseModel):
     def is_transferable(self):
         return self.product.get_attribute("is_transferable") and not self.redeemed
 
+    @property
+    def is_free(self) -> bool:
+        """Whether this is a free item."""
+        return self.price.value == 0
+
     def is_refundable(self, ignore_event_refund_state: bool = False) -> bool:
         return (
             (self.is_paid_for is True)
@@ -162,7 +167,7 @@ class Purchase(BaseModel):
         self.owner_id = user.id
         self.purchaser_id = user.id
 
-    def set_state(self, new_state):
+    def set_state(self, new_state: str) -> None:
         if new_state == self.state:
             return
 
@@ -178,16 +183,23 @@ class Purchase(BaseModel):
 
         self.state = new_state
 
-    def cancel(self):
+    def cancel(self) -> None:
+        """Cancel the purchase, returning capacity to the ProductGroup.
+
+        Purchases can only be cancelled if they are unpaid or if they are a free item.
+        """
         if self.state == "cancelled":
             raise PurchaseStateException(f"{self} is already cancelled")
+
+        if self.state == "paid" and not self.is_free:
+            raise PurchaseStateException("Attempting to cancel a non-free purchase")
 
         if self.state in ["reserved", "admin-reserved", "payment-pending", "paid"]:
             self.price_tier.return_instances(1)
 
         self.set_state("cancelled")
 
-    def refund_purchase(self, refund=None):
+    def refund_purchase(self, refund: "Refund | None" = None) -> None:
         if self.state == "refunded":
             raise PurchaseStateException(f"{self} is already refunded")
 
@@ -197,7 +209,7 @@ class Purchase(BaseModel):
         self.state = "refunded"
         self.refund = refund
 
-    def un_refund(self):
+    def un_refund(self) -> None:
         if self.state != "refunded":
             raise PurchaseStateException(f"{self} is not refunded")
 

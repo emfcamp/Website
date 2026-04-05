@@ -1,13 +1,15 @@
 from flask import (
-    current_app as app,
-)
-from flask import (
+    abort,
     flash,
     redirect,
     render_template,
     send_file,
     url_for,
 )
+from flask import (
+    current_app as app,
+)
+from flask.typing import ResponseReturnValue
 from flask_mailman import EmailMessage
 
 from main import db, external_url, get_or_404
@@ -160,7 +162,7 @@ def list_free_tickets():
 
 
 @admin.route("/ticket/<int:ticket_id>", methods=["GET"])
-def view_ticket(ticket_id):
+def view_ticket(ticket_id: int) -> ResponseReturnValue:
     ticket = get_or_404(db, Ticket, ticket_id)
     return render_template(
         "admin/tickets/view_ticket.html",
@@ -169,8 +171,11 @@ def view_ticket(ticket_id):
 
 
 @admin.route("/ticket/<int:ticket_id>/cancel-free", methods=["GET", "POST"])
-def cancel_free_ticket(ticket_id):
+def cancel_free_ticket(ticket_id: int) -> ResponseReturnValue:
     ticket = get_or_404(db, Purchase, ticket_id)
+
+    if not ticket.is_free:
+        abort(400)
 
     form = CancelTicketForm()
     if form.validate_on_submit():
