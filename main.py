@@ -163,7 +163,10 @@ def create_app(dev_server=False, config_override=None):
 
     derive_secret_key(app)
 
+    from apps.common.jinjaext import IncludemdExtension
+
     app.jinja_env.add_extension("jinja2.ext.do")
+    app.jinja_env.add_extension(IncludemdExtension)
 
     if install_logging:
         create_logging_manager(app)

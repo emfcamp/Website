@@ -280,6 +280,15 @@ div#about-page img, .embed-responsive {
   margin-bottom: 15px;
 }
 
+.checkbox input[type="checkbox"].big-checkbox {
+  margin-left: -30px;
+}
+
+.multiple-choice-and-other-list {
+  list-style-type: none;
+  padding: 0;
+}
+
 th.checkbox-cell {
   width: 30px;
 }

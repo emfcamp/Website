@@ -19,8 +19,9 @@
         {% else %}
         We need a little information about you first.
         {% endif %}
-        This information will be made available to volunteer managers and, should you
-        volunteer during the event, other volunteers on adjacent shifts.
+        This information will be made available to volunteer managers. Should
+        you volunteer during the event, your name will be made available to
+        other volunteers on adjacent shifts.
         </p>
         <div>
         {% if current_user.is_authenticated %}
@@ -31,7 +32,7 @@
         {% endif %}
         </div>
         {% endif %}
-        {% include "volunteer/_buildup-safety.html" %}
+        {% include "volunteer/_buildup-safety.md" %}
     </div>
 
     <div class="panel-body">
