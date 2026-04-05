@@ -137,7 +137,7 @@ class Purchase(BaseModel):
     @property
     def is_free(self) -> bool:
         """Whether this is a free item."""
-        return self.price.value == 0
+        return (self.price.value == 0) is True
 
     def is_refundable(self, ignore_event_refund_state: bool = False) -> bool:
         return (
