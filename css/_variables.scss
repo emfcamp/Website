@@ -58,3 +58,23 @@ $alert-info-border:             $brand-2024-blue;
 $alert-warning-background:      color.adjust($brand-2024-orange, $lightness: +20%);
 $alert-warning-border:          $brand-2024-orange;
 $alert-warning-text:            #1e1e1e;
+
+/* Markdown admonitions
+ * These currently have associated background-images with fixed colours */
+
+$admonition-success-text:       #114739;
+$admonition-success-background: #def0e5;
+$admonition-success-border:     #20a84e;
+
+$admonition-info-text:          #01466c;
+$admonition-info-background:    #d3efff;
+$admonition-info-border:        #0288d1;
+
+$admonition-warning-text:       #6a2802;
+$admonition-warning-background: #fee3d3;
+$admonition-warning-border:     #cf4d03;
+
+$admonition-danger-text:        #4d0706;
+$admonition-danger-background:  #fcdbdb;
+$admonition-danger-border:      #ab0f0e;
+
