@@ -4,7 +4,7 @@ import os
 import markdown
 from flask import abort, flash, redirect, render_template, url_for
 from flask import current_app as app
-from flask.typing import ResponseValue
+from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from wtforms import FieldList, FormField, RadioField, SubmitField
 from wtforms.validators import InputRequired, ValidationError
@@ -125,7 +125,7 @@ class TrainingForm(Form):
 
 @volunteer.route("/bar-training/guide", methods=["GET"], defaults={"page_name": "index"})
 @volunteer.route("/bar-training/guide/<page_name>", methods=["GET"])
-def bar_training_page(page_name: str) -> ResponseValue:
+def bar_training_page(page_name: str) -> ResponseReturnValue:
     return render_markdown(
         f"volunteer/training/bar/{page_name}",
         page_name=page_name,

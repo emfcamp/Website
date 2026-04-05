@@ -1,7 +1,7 @@
 from decorator import decorator
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask import current_app as app
-from flask.typing import ResponseValue
+from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from sqlalchemy import select
 from sqlalchemy.orm import with_parent
@@ -26,7 +26,7 @@ def team_admin_required(f, *args, **kwargs):
 
 @volunteer.route("/team/<int:team_id>")
 @team_admin_required
-def team_admin(team_id: int) -> ResponseValue:
+def team_admin(team_id: int) -> ResponseReturnValue:
     """Allow management of a team."""
     team = get_or_404(db, Team, team_id)
     return render_template("volunteer/team_admin.html", team=team)
@@ -34,7 +34,7 @@ def team_admin(team_id: int) -> ResponseValue:
 
 @volunteer.route("/team/<int:team_id>/add_admin", methods=["POST"])
 @team_admin_required
-def add_team_admin(team_id: int) -> ResponseValue:
+def add_team_admin(team_id: int) -> ResponseReturnValue:
     """Add an admin to a team."""
     team = get_or_404(db, Team, team_id)
 
@@ -55,7 +55,7 @@ def add_team_admin(team_id: int) -> ResponseValue:
 
 @volunteer.route("/team/<int:team_id>/remove_admin/<int:volunteer_id>")
 @team_admin_required
-def remove_team_admin(team_id: int, volunteer_id: int) -> ResponseValue:
+def remove_team_admin(team_id: int, volunteer_id: int) -> ResponseReturnValue:
     """Remove an admin from a team."""
     team = get_or_404(db, Team, team_id)
     volunteer = db.session.scalar(
