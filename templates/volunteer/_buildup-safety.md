@@ -2,7 +2,7 @@
 
 During buildup and teardown, EMF is a construction site. There are some simple rules that everyone must follow to make sure everyone is safe. We have to take safety seriously, so if you refuse to follow these rules, you will be asked to leave the site.
 
-If you don't know how to do a task safety, or you're worried that something is being done in an unsafe way, **please ask**. If someone raises a point to you about safety, don't take it personally.
+If you don't know how to do a task safely, or you're worried that something is being done in an unsafe way, **please ask**. If someone raises a point to you about safety, don't take it personally.
 
 If you still have any questions or concerns about safety, talk to Will or Russ, who are responsible for safety on site.
 
