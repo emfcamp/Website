@@ -52,7 +52,7 @@ DIETARY_RESTRICTIONS_CHOICES = [
 
 class MultipleChoiceAndOtherWidget:
     def __call__(self, field, **kwargs):
-        html = ["<ul>"]
+        html = ['<ul class="multiple-choice-and-other-list">']
         for subfield in field:
             if subfield.name.endswith("-other"):
                 html.append(f"<li>{subfield.label} {subfield(class_='form-control')}</li>")
