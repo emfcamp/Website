@@ -1,15 +1,15 @@
+import xml.etree.ElementTree as etree
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, time, timedelta
 from functools import cached_property
 from hashlib import md5
 from uuid import NAMESPACE_URL, uuid5
+from xml.etree.ElementTree import Element
 
 from flask import request
-from lxml import etree
-from lxml.etree import _Element as Element
 
-from main import external_url
+from main import db, external_url
 from models import event_end, event_start, event_year
 from models.cfp import SCHEDULE_ITEM_INFOS, ScheduleItem, Venue, schedule_item_slug
 
@@ -158,8 +158,8 @@ class FrabJsonExporter(FrabExporter):
         self.url = url
 
     @cached_property
-    def venues(self):
-        venues = Venue.query.order_by(-Venue.priority, Venue.name).all()
+    def venues(self) -> list[Venue]:
+        venues = db.session.query(Venue).order_by(-Venue.priority, Venue.name).all()
         result = []
         for venue in venues:
             if self.filter.official_venues_only and venue.allows_attendee_content:
@@ -280,7 +280,7 @@ class FrabJsonExporter(FrabExporter):
 
 class FrabXmlExporter(FrabExporter):
     def _add_sub_with_text(self, parent: Element, tag: str, text: str, **extra: str) -> Element:
-        node = etree.SubElement(parent, tag, None, None, **extra)
+        node = etree.SubElement(parent, tag, {}, **extra)
         node.text = text
         return node
 

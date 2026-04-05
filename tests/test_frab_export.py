@@ -1,7 +1,8 @@
+import xml.etree.ElementTree as etree
 from datetime import datetime
 
 import pytest
-from lxml import etree
+from xmlschema import XMLSchema
 
 from apps.schedule import event_tz
 from apps.schedule.data import OccurrenceDict, ScheduleItemDict
@@ -15,16 +16,12 @@ def _local_datetime(*args):
 
 @pytest.fixture(scope="session")
 def frab_schema():
-    with open("tests/frabs_schema.xml") as xml_file:
-        schema_doc = etree.parse(xml_file)
-    _schema = etree.XMLSchema(schema_doc)
-    yield _schema
+    yield XMLSchema("tests/frabs_schema.xml")
 
 
 def test_empty_frab_schema_fails(frab_schema):
     empty_root = etree.Element("root")
-    is_invalid = frab_schema.validate(empty_root)
-    assert is_invalid is False
+    assert not frab_schema.is_valid(empty_root)
 
 
 def test_min_version_is_valid(frab_schema, request_context):
@@ -37,7 +34,7 @@ def test_min_version_is_valid(frab_schema, request_context):
         end=_local_datetime(2016, 8, 6, 4, 0),
     )
 
-    frab_schema.assert_(root)
+    assert frab_schema.is_valid(root)
 
 
 def test_simple_room(frab_schema, request_context):
@@ -51,7 +48,7 @@ def test_simple_room(frab_schema, request_context):
     )
     exporter.add_room(day, "the hinterlands")
 
-    frab_schema.assert_(root)
+    assert frab_schema.is_valid(root)
 
 
 def test_simple_event(frab_schema, request_context):
@@ -96,7 +93,7 @@ def test_simple_event(frab_schema, request_context):
 
     exporter.add_event(room, room_name, flat_sid)
 
-    frab_schema.assert_(root)
+    assert frab_schema.is_valid(root)
 
 
 # TODO rework this. FrabExporter now wants a QuerySet instead of a dict
@@ -192,7 +189,7 @@ def test_simple_event(frab_schema, request_context):
 #    frab = export_frab(flat_sids)
 #    frab_doc = etree.fromstring(frab)
 #
-#    frab_schema.assert_(frab_doc)
+#    assert frab_schema.is_valid(root)
 
 
 def test_get_duration():

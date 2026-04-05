@@ -34,7 +34,6 @@ dependencies = [
     "icalendar~=6.3",
     "iso8601",
     "logging_tree~=1.9",
-    "lxml>=6.0.0",
     "markdown~=3.1",
     "nh3>=0.3.1",
     "pendulum~=3.1",
@@ -92,6 +91,7 @@ dev = [
     "types-flask-migrate~=4.1.0.20250809",
     "types-icalendar>=6.3.1.20250822",
     "types-wtforms>=3.2.1.20250809",
+    "xmlschema>=4.3.1",
 ]
 docs = [
     "esbonio>=1.1.0",
