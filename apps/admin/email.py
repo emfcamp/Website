@@ -60,7 +60,7 @@ def get_users(dest: Literal["ticket", "cfp", "purchasers", "villages"]) -> Seque
     else:
         raise ValueError(f"Invalid email destination set: {dest}")
 
-    return db.session.execute(query.distinct()).scalars().all()
+    return list(db.session.scalars(query.distinct()).unique())
 
 
 def get_email_reason(dest: str) -> str:
