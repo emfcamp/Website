@@ -19,7 +19,7 @@ from . import base
 
 @base.route("/supporting-emf")
 def supporting_emf() -> ResponseReturnValue:
-    return render_markdown("supporting-emf", template="static_page.html")
+    return render_markdown("supporting-emf", template="markdown.html")
 
 
 @base.route("/about/branding")

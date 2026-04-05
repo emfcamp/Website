@@ -379,7 +379,7 @@ def page_template(metadata, template):
 
     if "show_nav" not in metadata or metadata["show_nav"] is True:
         return template
-    return "static_page.html"
+    return "markdown.html"
 
 
 def render_markdown(source: str, template: str = "about/template.html", **view_variables: Any) -> str:
