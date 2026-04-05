@@ -25,10 +25,6 @@ code {
   padding: 0;
 }
 
-.well code, .panel code, .table code {
-  color: inherit;
-}
-
 a {
   color: $main-link;
   text-decoration: underline;
@@ -43,22 +39,18 @@ a:hover {
     color: $highlight-background-text;
     border: none;
 
-    a {
+    a, code {
         color: inherit;
+    }
+
+    header, h1, h2, h3, h4, h5, h6 {
+        color: inherit;
+        margin-top: 0;
     }
 
     .has-error .help-block a {
         color: inherit;
     }
-
-    header, h2, h3, h4, h5, h6 {
-        color: inherit;
-        margin-top: 0;
-    }
-}
-
-.well a, .panel a {
-  color: $highlight-background-link;
 }
 
 .content-well {

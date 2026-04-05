@@ -6,11 +6,12 @@ table {
 
 table {
     border-radius: 3px;
-    a {
+
+    a, code {
         color: inherit;
     }
 
-    header, h2, h3, h4, h5, h6 {
+    header, h1, h2, h3, h4, h5, h6 {
         color: inherit;
     }
 

@@ -1,6 +1,6 @@
 @use 'sass:color';
 // Maximum content width
-$main-content-width: 		950px;
+$main-content-width:            950px;
 // Minimum content width: horizontal scrolling below this.
 $min-width:                     380px;
 
@@ -35,7 +35,6 @@ $main-link-hover:               $brand-2024-blue;
 /* Styles for "highlight" elements (wells and panels) */
 $highlight-background:          #cfccc0;
 $highlight-background-text:     #1e1e1e;
-$highlight-background-link:     #171123;
 
 $highlight-2-background:        #d6c8a0;
 $highlight-2-border:            #bfaa7f;
