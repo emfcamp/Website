@@ -1,190 +1,192 @@
 @use "./_variables.scss" as *;
 
-img {
-  max-width: 100%;
-}
-
-.image-align-left {
-  width:300px;
-  margin-bottom: 1em;
-
-  @media (max-width: $main-content-width) {
-    width: 100%;
-  }
-}
-
-.image-align-right {
-  width:300px;
-  float:right;
-  margin-left: 1em;
-  margin-bottom: 1em;
-
-  @media (max-width: $main-content-width) {
-    width: 100%;
-    float: none;
-    margin-left: 0;
-  }
-}
-
-.admonition {
-  margin: 1em 0;
-  padding: 1em;
-  border-left: 0.3em solid #bbb;
-  background: #eee;
-  color: #444;
-  overflow: auto;
-  clear: both;
-
-  a:link, a:visited, a:hover {
-    color: inherit
+.bar-training {
+  img {
+    max-width: 100%;
   }
 
-  p {
-    margin-top: .5em;
-    margin-bottom: 0;
-    padding: 0;
+  .image-align-left {
+    width:300px;
+    margin-bottom: 1em;
 
-    &:first-child {
-      margin-top: 0;
+    @media (max-width: $main-content-width) {
+      width: 100%;
     }
   }
 
-  .admonition-title {
-    font-weight: bold;
+  .image-align-right {
+    width:300px;
+    float:right;
+    margin-left: 1em;
+    margin-bottom: 1em;
+
+    @media (max-width: $main-content-width) {
+      width: 100%;
+      float: none;
+      margin-left: 0;
+    }
+  }
+
+  .admonition {
+    margin: 1em 0;
+    padding: 1em;
+    border-left: 0.3em solid #bbb;
+    background: #eee;
+    color: #444;
+    overflow: auto;
+    clear: both;
+
+    a:link, a:visited, a:hover {
+      color: inherit
+    }
+
+    p {
+      margin-top: .5em;
+      margin-bottom: 0;
+      padding: 0;
+
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+
+    .admonition-title {
+      font-weight: bold;
+
+      &::before {
+        margin-bottom: -2px;
+      }
+    }
+
+    &.success {
+      color: $admonition-success-text;
+      background-color: $admonition-success-background;
+      border-color: $admonition-success-border;
+
+      .admonition-title::before {
+        background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAyNCAyNCI+CiAgPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDMwLjIuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDIuMS4xIEJ1aWxkIDEpICAtLT4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLnN0MCB7CiAgICAgICAgZmlsbDogbm9uZTsKICAgICAgfQoKICAgICAgLnN0MSB7CiAgICAgICAgZmlsbDogIzFkYTg0ZDsKICAgICAgfQogICAgPC9zdHlsZT4KICA8L2RlZnM+CiAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTAsMGgyNHYyNEgwVjBaIi8+CiAgPHBhdGggY2xhc3M9InN0MSIgZD0iTTEyLDJDNi40OCwyLDIsNi40OCwyLDEyczQuNDgsMTAsMTAsMTAsMTAtNC40OCwxMC0xMFMxNy41MiwyLDEyLDJaTTkuNzgsMTcuOThsLTQuODctNC44NywxLjc3LTEuNzcsMy4xLDMuMSw3LjU0LTcuNTQsMS43NywxLjc3LTkuMzEsOS4zMVoiLz4KPC9zdmc+)
+      }
+    }
+
+    &.info {
+      color: $admonition-info-text;
+      background-color: $admonition-info-background;
+      border-color: $admonition-info-border;
+
+      .admonition-title::before {
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiMwMTUzODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+ICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4gICAgPHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTEgMTVoLTJ2LTZoMnY2em0wLThoLTJWN2gydjJ6Ii8+PC9zdmc+)
+      }
+    }
+
+    &.warning {
+      color: $admonition-warning-text;
+      background-color: $admonition-warning-background;
+      border-color: $admonition-warning-border;
+
+      .admonition-title::before {
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNiNjUzMWMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+ICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4gICAgPHBhdGggZD0iTTEgMjFoMjJMMTIgMiAxIDIxem0xMi0zaC0ydi0yaDJ2MnptMC00aC0ydi00aDJ2NHoiLz48L3N2Zz4=)
+      }
+    }
+
+    &.danger {
+      color: $admonition-danger-text;
+      background-color: $admonition-danger-background;
+      border-color: $admonition-danger-border;
+
+      .admonition-title::before {
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNiOTE4MTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+ICAgIDxwYXRoIGQ9Ik0xNS43MyAzSDguMjdMMyA4LjI3djcuNDZMOC4yNyAyMWg3LjQ2TDIxIDE1LjczVjguMjdMMTUuNzMgM3pNMTIgMTcuM2MtLjcyIDAtMS4zLS41OC0xLjMtMS4zIDAtLjcyLjU4LTEuMyAxLjMtMS4zLjcyIDAgMS4zLjU4IDEuMyAxLjMgMCAuNzItLjU4IDEuMy0xLjMgMS4zem0xLTQuM2gtMlY3aDJ2NnoiLz4gICAgPHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==)
+      }
+    }
+
+    &.success .admonition-title::before,
+    &.info .admonition-title::before,
+    &.warning .admonition-title::before,
+    &.danger .admonition-title::before {
+      content: "";
+      display: inline-block;
+      background-repeat: no-repeat;
+      vertical-align: center;
+      margin-right: .15em;
+      width: 1em;
+      height: 1em;
+    }
+  }
+
+  .toc {
+    font-size: .9em;
+    background: #eee;
+    color: black;
+    padding: .5em;
+    margin-bottom: 1em;
+
+    @media (min-width: $main-content-width) {
+      width: 33%;
+      float: right;
+      margin-left: 1em;
+    }
 
     &::before {
-      margin-bottom: -2px;
+      content: 'Table of contents';
+      font-weight: bold;
+      padding-bottom: 0.5em;
+      display: inline-block;
+    }
+
+    a:link,
+    a:visited {
+      color: black;
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: $main-link-hover;
+    }
+
+    ul {
+      margin-left: 0;
+      list-style: none;
+      padding-left: 1em;
+
+      li {
+        margin-bottom: .5em;
+      }
+    }
+
+    & > ul {
+      padding: 0;
     }
   }
 
-  &.success {
-    color: $admonition-success-text;
-    background-color: $admonition-success-background;
-    border-color: $admonition-success-border;
-
-    .admonition-title::before {
-      background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAyNCAyNCI+CiAgPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDMwLjIuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDIuMS4xIEJ1aWxkIDEpICAtLT4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLnN0MCB7CiAgICAgICAgZmlsbDogbm9uZTsKICAgICAgfQoKICAgICAgLnN0MSB7CiAgICAgICAgZmlsbDogIzFkYTg0ZDsKICAgICAgfQogICAgPC9zdHlsZT4KICA8L2RlZnM+CiAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTAsMGgyNHYyNEgwVjBaIi8+CiAgPHBhdGggY2xhc3M9InN0MSIgZD0iTTEyLDJDNi40OCwyLDIsNi40OCwyLDEyczQuNDgsMTAsMTAsMTAsMTAtNC40OCwxMC0xMFMxNy41MiwyLDEyLDJaTTkuNzgsMTcuOThsLTQuODctNC44NywxLjc3LTEuNzcsMy4xLDMuMSw3LjU0LTcuNTQsMS43NywxLjc3LTkuMzEsOS4zMVoiLz4KPC9zdmc+)
-    }
-  }
-
-  &.info {
-    color: $admonition-info-text;
-    background-color: $admonition-info-background;
-    border-color: $admonition-info-border;
-
-    .admonition-title::before {
-      background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiMwMTUzODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+ICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4gICAgPHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTEgMTVoLTJ2LTZoMnY2em0wLThoLTJWN2gydjJ6Ii8+PC9zdmc+)
-    }
-  }
-
-  &.warning {
-    color: $admonition-warning-text;
-    background-color: $admonition-warning-background;
-    border-color: $admonition-warning-border;
-
-    .admonition-title::before {
-      background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNiNjUzMWMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+ICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4gICAgPHBhdGggZD0iTTEgMjFoMjJMMTIgMiAxIDIxem0xMi0zaC0ydi0yaDJ2MnptMC00aC0ydi00aDJ2NHoiLz48L3N2Zz4=)
-    }
-  }
-
-  &.danger {
-    color: $admonition-danger-text;
-    background-color: $admonition-danger-background;
-    border-color: $admonition-danger-border;
-
-    .admonition-title::before {
-      background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNiOTE4MTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+ICAgIDxwYXRoIGQ9Ik0xNS43MyAzSDguMjdMMyA4LjI3djcuNDZMOC4yNyAyMWg3LjQ2TDIxIDE1LjczVjguMjdMMTUuNzMgM3pNMTIgMTcuM2MtLjcyIDAtMS4zLS41OC0xLjMtMS4zIDAtLjcyLjU4LTEuMyAxLjMtMS4zLjcyIDAgMS4zLjU4IDEuMyAxLjMgMCAuNzItLjU4IDEuMy0xLjMgMS4zem0xLTQuM2gtMlY3aDJ2NnoiLz4gICAgPHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==)
-    }
-  }
-
-  &.success .admonition-title::before,
-  &.info .admonition-title::before,
-  &.warning .admonition-title::before,
-  &.danger .admonition-title::before {
-    content: "";
-    display: inline-block;
-    background-repeat: no-repeat;
-    vertical-align: center;
-    margin-right: .15em;
-    width: 1em;
-    height: 1em;
-  }
-}
-
-.toc {
-  font-size: .9em;
-  background: #eee;
-  color: black;
-  padding: .5em;
-  margin-bottom: 1em;
-
-  @media (min-width: $main-content-width) {
-    width: 33%;
-    float: right;
-    margin-left: 1em;
-  }
-
-  &::before {
-    content: 'Table of contents';
-    font-weight: bold;
-    padding-bottom: 0.5em;
-    display: inline-block;
-  }
-
-  a:link,
-  a:visited {
-    color: black;
-    text-decoration: none;
-  }
-
-  a:hover {
-    color: $main-link-hover;
-  }
-
-  ul {
-    margin-left: 0;
-    list-style: none;
-    padding-left: 1em;
-
-    li {
-      margin-bottom: .5em;
-    }
-  }
-
-  & > ul {
-    padding: 0;
-  }
-}
-
-.guide {
-  background: $highlight-background;
-  color: $highlight-background-text;
-  padding: 1em;
-  margin-top: 1em;
-  display: inline-block;
-  text-decoration: none;
-  border-radius: 5px;
-
-  &:hover, &:focus {
-    background-color: $highlight-2-background;
+  .guide {
+    background: $highlight-background;
     color: $highlight-background-text;
+    padding: 1em;
+    margin-top: 1em;
+    display: inline-block;
     text-decoration: none;
-  }
-  &.prev {
-    float: left;
+    border-radius: 5px;
 
-    &:before {
-      content: '\25C0';
-      margin-right: 2em;
+    &:hover, &:focus {
+      background-color: $highlight-2-background;
+      color: $highlight-background-text;
+      text-decoration: none;
     }
-  }
-  &.next {
-    float: right;
+    &.prev {
+      float: left;
 
-    &:after {
-      content: '\25B6';
-      margin-left: 2em;
+      &:before {
+        content: '\25C0';
+        margin-right: 2em;
+      }
     }
-  }
+    &.next {
+      float: right;
 
+      &:after {
+        content: '\25B6';
+        margin-left: 2em;
+      }
+    }
+
+  }
 }
