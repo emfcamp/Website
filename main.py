@@ -372,6 +372,7 @@ def create_app(dev_server=False, config_override=None):
     from apps.api import api_bp
     from apps.arrivals import arrivals
     from apps.base import base
+    from apps.base.dev.dev import dev
     from apps.cfp import cfp
     from apps.cfp_review import cfp_review
     from apps.metrics import metrics
@@ -389,6 +390,8 @@ def create_app(dev_server=False, config_override=None):
     app.register_blueprint(metrics)
     app.register_blueprint(tickets)
     app.register_blueprint(payments)
+    if app.config["DEBUG"]:
+        app.register_blueprint(dev, url_prefix="/dev")
     app.register_blueprint(cfp)
     app.register_blueprint(cfp_review, url_prefix="/admin/cfp-review")
     app.register_blueprint(schedule)

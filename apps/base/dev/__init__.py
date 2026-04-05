@@ -10,3 +10,4 @@ dev_cli = AppGroup("dev")
 base.cli.add_command(dev_cli)
 
 from . import tasks  # noqa
+from . import dev  # noqa
