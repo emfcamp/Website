@@ -22,7 +22,7 @@
 
 {% if trained %}
 <div class="admonition success">
-    <p class="admonition-title">You have completed this training!</p>
+    <h3>You have completed this training!</h3>
     {% if feature_enabled("VOLUNTEERS_SCHEDULE") %}
         <p>You can now <a href="{{ url_for('volunteer.schedule') }}">sign up</a> for bar shifts.</p>
     {% else %}

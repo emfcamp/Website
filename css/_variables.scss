@@ -49,6 +49,8 @@ $schedule-block:                $brand-2024-mid-green;
 
 $form-element:                  color.adjust($brand-2024-yellow, $lightness: +45%);
 
+$small-border-radius:           3px;
+
 /* Alert elements */
 
 $alert-info-background:         color.adjust($brand-2024-blue, $lightness: +20%);

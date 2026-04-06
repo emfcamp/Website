@@ -3,16 +3,21 @@ fixme: EVENT_START, EVENT_END, if you're updating them you need to set times her
 ---
 # Arrival & Departure Times
 
-<ul id="opening-times" class="well">
-  <li>The site is open to the public from: <strong>Thursday 16th July 10:00</strong></li>
-  <li>It closes at: <strong>Monday 20th July 12:00 (midday)</strong></li>
-</ul>
+!!! info "Site opening times"
+	The site is open to the public from: **Thursday 16th July 10:00**
+	It closes: **Monday 20th July 12:00 (midday)**
+
 
 ## More detailed times
 
-**Thursday 16th July 10:00** -- Gates open. You can be on site from now; it's intended for folks to have a chance to set up their tents, find one another and get comfortable.
-**Friday 17th July 11:00** -- Talks start on our main stages.
-**Monday 20th July 12:00 (midday)** -- Site closes to the public.
+- **Thursday 16th July 10:00**
+Gates open. You can be on site from now; it's intended for folks to have a chance to set up their tents, find one another and get comfortable.
+
+- **Friday 17th July 11:00**
+Talks start on our main stages.
+
+- **Monday 20th July 12:00 (midday)**
+Site closes to the public.
 
 ## Set up & tear down
 

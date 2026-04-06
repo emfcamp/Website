@@ -4,9 +4,8 @@ title: Internet
 
 As usual, the EMF Network Operations Centre will be aiming to provide fast wired and wireless networking across the field.
 
-<p class="well">
-  Some of the information on this page references the 2024 event, and will be updated closer to the event start date. 
-</p>
+!!! info ""
+	Some of the information on this page references the 2024 event, and will be updated closer to the event start date. 
 
 ## Wireless
 <table class="table">

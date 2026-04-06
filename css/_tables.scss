@@ -5,7 +5,7 @@ table {
 }
 
 table {
-    border-radius: 3px;
+    border-radius: $small-border-radius;
 
     a, code {
         color: inherit;
