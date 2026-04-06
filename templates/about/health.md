@@ -2,10 +2,8 @@ title: Staying healthy at EMF
 ---
 # Staying healthy at EMF
 
-<div class="well">
-This page applies to Electromagnetic Field 2026.
-It may be updated before the event but any commitments made in this policy will not be weakened.
-</div>
+!!! info "This page applies to Electromagnetic Field 2026"
+	It may be updated before the event but any commitments made in this policy will not be weakened.
 
 While you're at EMF, our medical team will be available to assist you if you're injured or ill, or if you just need some suncream &mdash; just drop by the first aid tent.
 

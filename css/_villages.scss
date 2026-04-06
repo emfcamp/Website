@@ -19,7 +19,7 @@
     .village-table-village {
       background-color: $highlight-background;
       color: $highlight-background-text;
-      border-radius: 3px;
+      border-radius: $small-border-radius;
       padding: 10px 15px 10px 15px;
       margin-bottom: 10px;
     }
@@ -39,7 +39,7 @@
 
     background-color: $highlight-background;
     color: $highlight-background-text;
-    border-radius: 3px;
+    border-radius: $small-border-radius;
 
     .village-table-village, .village-table-header {
       display: contents;
