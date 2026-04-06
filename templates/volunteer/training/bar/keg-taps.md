@@ -5,7 +5,7 @@ title: Keg Taps
 There are 6 keg beer lines running to the bar. There are 2 banks of 6 taps; you can serve from either bank of taps.
 
 !!! warning "Hygienic pouring technique"
-Do not allow any part of the tap to come in contact with the cup or the drink when pouring.
+	Do not allow any part of the tap to come in contact with the cup or the drink when pouring.
 
 All of the taps have a flow control lever on the side. Once this is set up for a particular beer it shouldn’t need to be moved. If you think a beer is flowing too fast, too slow, or is too frothy, please talk to a bar manager about it and **don’t try to fix it yourself!**
 
