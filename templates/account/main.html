@@ -4,10 +4,6 @@
 {% block body %}
 {% include "account/_nav.html" %}
 {% set owned_tickets = current_user.get_owned_tickets(True)|list %}
-<p>
-  You're logged in as <strong>{{current_user.name}}</strong> (<strong>{{ current_user.email }}</strong>).
-    <a href="{{url_for('.details')}}">Edit your account details</a>.
-</p>
 <div class="panel-grid">
   <div class="panel panel-default">
       <div class="panel-heading">
@@ -34,16 +30,29 @@
       </div>
   </div>
 
-  {% if feature_enabled('CFP') and not feature_enabled('CFP_CLOSED') %}
+  {% if feature_enabled('CFP') %}
     <div class="panel panel-default">
       <div class="panel-heading">
         <h3 class="panel-title">Call for Participation</h3>
       </div>
       <div class="panel-body">
-        <p>Our Call for Participation is open!<br>
-        We're looking for talks, workshops, or performances at EMF {{event_year}}.
-        </p>
-        <a class="btn btn-primary" href="{{url_for('cfp.main')}}">Submit a proposal</a>
+        {% set proposal_count = current_user.proposals | length %}
+        {% if not feature_enabled('CFP_CLOSED') %}
+          <p>Our Call for Participation is open!<br>
+          We're looking for talks, workshops, or performances at EMF {{event_year}}.
+          </p>
+        {% endif %}
+        {% if proposal_count %}
+          <p>You've already submitted {{ proposal_count }} {{ 'proposal' if proposal_count == 1 else 'proposals' }}.</p>
+        {% endif %}
+        <div class="btn-group">
+          {% if not feature_enabled('CFP_CLOSED') %}
+            <a class="btn btn-primary" href="{{url_for('cfp.main')}}">Submit {{ 'another' if proposal_count else 'a' }} proposal</a>
+          {% endif %}
+          {% if proposal_count %}
+            <a class="btn btn-default" href="{{ url_for('cfp.proposals') }}">View or edit your {{ 'proposal' if proposal_count == 1 else 'proposals' }}</a>
+          {% endif %}
+        </div>
       </div>
     </div>
   {% endif %}

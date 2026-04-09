@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% set main_class = 'account-purchases' %}
 
-{% block title %}Your tickets{% endblock %}
+{% block title %}Your Tickets{% endblock %}
 {% block body %}
 {% include "account/_nav.html" %}
 {% if tickets %}
-  <h3>Your tickets</h2>
+  <h3>Your Tickets</h3>
   <a id="tickets"></a>
   {% if not config['ISSUE_TICKETS'] %}
   <p>We'll send you a scannable ticket by email shortly before the event.
