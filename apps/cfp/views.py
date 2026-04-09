@@ -415,17 +415,18 @@ def withdraw_proposal(proposal_id: int) -> ResponseReturnValue:
 
     form = WithdrawalForm()
     if form.validate_on_submit() and form.confirm_withdrawal.data:
-        assert form.message.data
         app.logger.info("Proposal %s is being withdrawn.", proposal_id)
         proposal.state = "withdrawn"
 
-        msg = ProposalMessage()
-        msg.is_to_admin = True
-        msg.from_user_id = current_user.id
-        msg.proposal_id = proposal_id
-        msg.message = form.message.data
+        if form.message.data:
+            msg = ProposalMessage()
+            msg.is_to_admin = True
+            msg.from_user_id = current_user.id
+            msg.proposal_id = proposal_id
+            msg.message = form.message.data
 
-        db.session.add(msg)
+            db.session.add(msg)
+
         db.session.commit()
         flash(f"We've withdrawn your {proposal.human_type}, {proposal.title}.")
 
