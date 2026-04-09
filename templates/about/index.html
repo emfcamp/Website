@@ -28,26 +28,25 @@
             allow="autoplay; encrypted-media" allowfullscreen></iframe>
   </div>
 
-  <div class="about-section">
-    <div class="about-section-text">
+  <div class="about-columns">
+    <div class="about-text-col">
       <p>Over a long weekend, you can expect to see a huge variety of talks across three stages,
       a slew of workshops, as well as music, games, and installations dotted around the site.</p>
+
+      <p>At previous events we've heard talks about everything from genetic modification to electronics,
+      blacksmithing to high-energy physics, reverse engineering to lock picking, computer security to crocheting,
+      and quadcopters to brewing.</p>
+
+      <p>We're inviting attendees to set up their own <a href="https://www.emfcamp.org/about/villages">villages</a>
+      &mdash; camps within the camp &mdash;
+      where like-minded people can camp together and put on their own activities. Our hard-working team
+      of volunteers will supply you with power and internet to your tent.</p>
     </div>
-    <div class="about-section-img">
+    <div class="about-img-col">
       <a href="{{ url_for('static', filename='images/about/about_3.jpg') }}" target="_blank">
         <img src="{{ url_for('static', filename='images/about/about_3.jpg') }}"
              alt="EMF sign on the festival grounds">
       </a>
-    </div>
-  </div>
-
-  <div class="about-section">
-    <div class="about-section-text">
-      <p>At previous events we've heard talks about everything from genetic modification to electronics,
-      blacksmithing to high-energy physics, reverse engineering to lock picking, computer security to crocheting,
-      and quadcopters to brewing.</p>
-    </div>
-    <div class="about-section-img">
       <a href="{{ url_for('static', filename='images/about/about_1.jpg') }}" target="_blank">
         <img src="{{ url_for('static', filename='images/about/about_1.jpg') }}"
              alt="A talk on the main stage at EMF">
@@ -55,56 +54,41 @@
     </div>
   </div>
 
-  <div class="about-section">
-    <div class="about-section-text">
-      <p>We're inviting attendees to set up their own <a href="https://www.emfcamp.org/about/villages">villages</a>
-      &mdash; camps within the camp &mdash;
-      where like-minded people can camp together and put on their own activities. Our hard-working team
-      of volunteers will supply you with power and internet to your tent.</p>
-    </div>
-    <div class="about-section-img">
-      <a href="{{ url_for('static', filename='images/about/about_7.jpg') }}" target="_blank">
-        <img src="{{ url_for('static', filename='images/about/about_7.jpg') }}"
-             alt="A notice board at EMF covered in community-written notices for village events">
-      </a>
-    </div>
-  </div>
-
   <div class="about-break-img">
-    <a href="{{ url_for('static', filename='images/about/about_5.jpg') }}" target="_blank">
-      <img src="{{ url_for('static', filename='images/about/about_5.jpg') }}"
-           alt="'Hacky racers', DIY go-kart racing at EMF">
+    <a href="{{ url_for('static', filename='images/about/about_7.jpg') }}" target="_blank">
+      <img src="{{ url_for('static', filename='images/about/about_7.jpg') }}"
+           alt="A notice board at EMF covered in community-written notices for village events">
     </a>
   </div>
 
-  <div class="about-section">
-    <div class="about-section-text">
+  <div class="about-columns">
+    <div class="about-text-col">
       <p>Attendees have the chance to get a conference badge unlike any you've seen before. Our
       badge is a full-blown microcontroller with some secret features we think you'll love.
       After the event, instead of sitting in a drawer, it's fully reprogrammable to do whatever you want.</p>
+
       <p>Expect to run into
       <a href="http://jarkman.co.uk/catalog/random/emfsporks.htm">spork-making workshops</a>,
       <a href="https://www.youtube.com/watch?v=g6_wwhCvkdU">bottle rocket launches</a>,
       high altitude balloon releases,
       <a href="http://msraynsford.blogspot.co.uk/2012/09/distance-range-finder.html">ad-hoc music installations</a>
       and so much more.</p>
+
+      <p>We want EMF to be as family-friendly as possible: thanks to our generous sponsors,
+      we have been able to provide free childcare run by professionals since 2014, and we'll be doing the same again.</p>
+
+      <p>You'll also be able to take advantage of our well-stocked bar selling great beer, cider, and
+      soft drinks at distinctly non-festival prices, and experience late-night gigs.</p>
     </div>
-    <div class="about-section-img">
+    <div class="about-img-col">
       <a href="{{ url_for('static', filename='images/about/about_4.jpg') }}" target="_blank">
         <img src="{{ url_for('static', filename='images/about/about_4.jpg') }}"
              alt="The EMF conference badge — a fully programmable microcontroller">
       </a>
-    </div>
-  </div>
-
-  <div class="about-section">
-    <div class="about-section-text">
-      <p>We want EMF to be as family-friendly as possible: thanks to our generous sponsors,
-      we have been able to provide free childcare run by professionals since 2014, and we'll be doing the same again.</p>
-      <p>You'll also be able to take advantage of our well-stocked bar selling great beer, cider, and
-      soft drinks at distinctly non-festival prices, and experience late-night gigs.</p>
-    </div>
-    <div class="about-section-img">
+      <a href="{{ url_for('static', filename='images/about/about_5.jpg') }}" target="_blank">
+        <img src="{{ url_for('static', filename='images/about/about_5.jpg') }}"
+             alt="'Hacky racers', DIY go-kart racing at EMF">
+      </a>
       <a href="{{ url_for('static', filename='images/about/about_8.jpg') }}" target="_blank">
         <img src="{{ url_for('static', filename='images/about/about_8.jpg') }}"
              alt="Colourful, simple toy robots pushing each other off a board at EMF Hebocon">
