@@ -37,7 +37,7 @@
         {% if form.volunteer_email.was_duplicate %}
         <div class="alert alert-warning">
             This email address already exists in our system.
-            Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('.main'), email=form.volunteer_email.data) }}">click here</a> to log in.
+            Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('.main'), email=form.volunteer_email.data) }}">log in</a> to continue.
         </div>
         {% endif %}
 

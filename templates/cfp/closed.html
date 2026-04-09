@@ -8,19 +8,19 @@
         {#
         <p>If you have been asked to submit a new proposal for a talk, performance, workshop, youth workshop or installation, please
         #}
-        <p>If you need to submit a new proposal for an installation or lightning talk, please
+        <p>You can still
             {% if proposal_type %}
-            <a href="{{ url_for('cfp.create_proposal', proposal_type=proposal_type) + '?closed' }}">click here</a>.</p>
+            <a href="{{ url_for('cfp.create_proposal', proposal_type=proposal_type) + '?closed' }}">submit a new proposal for an installation or lightning talk</a>.</p>
             {% else %}
-            <a href="{{ url_for('cfp.main') + '?closed' }}">click here</a>.</p>
+            <a href="{{ url_for('cfp.main') + '?closed' }}">submit a new proposal for an installation or lightning talk</a>.</p>
             {% endif %}
 
         {% if current_user.is_authenticated %}
           {% if current_user.proposals %}
-          <a class="btn btn-default" href="{{ url_for('cfp.proposals') }}">View my proposals</a>
+          <a class="btn btn-default" href="{{ url_for('cfp.proposals') }}">View your proposals</a>
           {% endif %}
         {% else %}
-          <a class="btn btn-default" href="{{ url_for('users.login', next=url_for('cfp.proposals')) }}">View my proposals</a>
+          <a class="btn btn-default" href="{{ url_for('users.login', next=url_for('cfp.proposals')) }}">View your proposals</a>
         {% endif %}
 
     </div>

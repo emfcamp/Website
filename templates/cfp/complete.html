@@ -3,7 +3,7 @@
 {% block body %}
 <div class="alert alert-success">Thanks for your submission!</div>
 <p>We'll be in touch by email as soon as we can.</p>
-<p><a href="{{ url_for('.proposals') }}" target="_blank">Click here</a> to view or edit your proposals.
+<p>You can still <a href="{{ url_for('.proposals') }}" target="_blank">view or edit your proposals</a>.
 You will be able to make changes until we start the anonymisation process.</p>
 
 {% if not current_user.diversity %}

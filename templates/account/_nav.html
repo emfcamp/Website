@@ -5,16 +5,21 @@
 {% endmacro %}
 
 {% macro menuitem(text, view, badge_count=0, classes="") %}
-<li class="{% if view_name == view %}active{% endif %} {{classes}}">
+<li class="{% if request.endpoint == view %}active{% endif %} {{classes}}">
     <a href="{{ url_for(view) }}">{{text}}</a>
     {{badge(badge_count)}}
   </li>
 {% endmacro %}
 
-<nav>
+<div class="well well-sm">
+  You're logged in as <strong>{{ current_user.name }}</strong> ({{ current_user.email }}).
+  <a class="pull-right" href="{{ url_for('users.logout') }}">Log out</a>
+</div>
+<nav class="mb-3" style="margin-bottom: 1em;">
   <ul class="nav nav-tabs">
     {{ menuitem("Account", "users.account") }}
-    {{ menuitem("My Tickets", "users.purchases") }}
+    {{ menuitem("Your Details", "users.details") }}
+    {{ menuitem("Your Tickets", "users.purchases") }}
 
     {% if feature_enabled('CFP') %}
       {% if current_user.proposals | length > 0 %}
@@ -47,8 +52,6 @@
     {% if current_user.has_permission('admin') %}
       {{ menuitem("Admin", "admin.home") }}
     {% endif %}
-
-    {{ menuitem("Log Out", "users.logout", classes="pull-right") }}
   </ul>
 </nav>
 

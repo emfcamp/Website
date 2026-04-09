@@ -27,7 +27,7 @@
           <div class="alert alert-warning">
               This email address already exists in our system, possibly because you previously tried to submit a proposal and
               we automatically created an account for you.
-              Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('.main', proposal_type=proposal_type) + ('?closed' if ignore_closed else ''), email=form.email.data) }}" target="_new">click here</a> to log in.
+              Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('.main', proposal_type=proposal_type) + ('?closed' if ignore_closed else ''), email=form.email.data) }}" target="_new">log in</a> to continue.
           </div>
           {% else %}
           <p>
@@ -44,7 +44,17 @@
             </div>
           </div>
         {% endif %}
-        {{ render_field(form.name, horizontal=9, placeholder="Your name" + (' (or pseudonym)' if proposal_type != 'youthworkshop' else '')) }}
+        {% if current_user.is_authenticated %}
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Name</label>
+            <div class="col-sm-9">
+              <div class="form-control-static">{{ current_user.name }}</div>
+              <p class="help-block">If your proposal is accepted, you can edit your name before it's publicly shown as part of the schedule.</p>
+            </div>
+          </div>
+        {% else %}
+          {% call render_field(form.name, horizontal=9, placeholder="Your name" + (' (or pseudonym)' if proposal_type != 'youthworkshop' else '')) %}If your proposal is accepted, you can edit your name before it's publicly shown as part of the schedule.{% endcall %}
+        {% endif %}
         {% if current_user.is_anonymous %}
         {{ render_field(form.email, horizontal=9, placeholder="Your email address") }}
         {% endif %}

@@ -17,8 +17,8 @@
             please follow us on <a href="https://social.emfcamp.org/@emf">the Fediverse</a>.</p>
         {% endif %}
         {% if SALES_STATE != 'sales-ended' %}
-        <p>If you have a ticket to EMF and need to order parking tickets, please
-            <a href="{{ url_for('tickets.main', flow='other') }}">click here</a>.
+        <p>If you have a ticket to EMF you can still 
+            <a href="{{ url_for('tickets.main', flow='other') }}">order parking tickets</a>.</p>
         {% endif %}
     </div>
 {% endblock %}
