@@ -18,7 +18,7 @@ def team(db):
 
 @pytest.fixture()
 def role(db, team):
-    r = Role(name="Test Role", team=team)
+    r = Role(name="Test Role", team=team, slug="test-role")
     db.session.add(r)
     db.session.flush()
     return r
@@ -26,7 +26,7 @@ def role(db, team):
 
 @pytest.fixture()
 def other_role(db, team):
-    r = Role(name="Other Test Role", team=team)
+    r = Role(name="Other Test Role", team=team, slug="other-role")
     db.session.add(r)
     db.session.flush()
     return r

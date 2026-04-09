@@ -1,7 +1,7 @@
 from ..event_date import edt
 
 phone_shifts = {
-    "Phone Helpdesk Assistant": {
+    "phone_helpdesk_assistant": {
         "Phone Team Tent": [
             {
                 "first": edt(d, "09:00:00"),

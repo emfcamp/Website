@@ -32,7 +32,7 @@ def shifts():
     shift_list = get_shift_list()
 
     for shift_role in shift_list:
-        role = Role.get_by_name(shift_role)
+        role = Role.get_by_slug(shift_role)
         if role is None:
             app.logger.error(f"Unknown role: {shift_role}")
             continue

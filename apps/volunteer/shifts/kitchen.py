@@ -48,7 +48,7 @@ def dinner(d):
 days = ["wed", "thur", "fri", "sat", "sun", "mon"]
 
 kitchen_shifts = {
-    "Kitchen Assistant": {
+    "kitchen_assistant": {
         "Volunteer Kitchen": [morning(d) for d in days]
         + [afternoon(d) for d in days]
         + [lunch(d) for d in days]

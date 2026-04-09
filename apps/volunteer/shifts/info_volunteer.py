@@ -1,7 +1,7 @@
 from ..event_date import edt
 
 info_vol_shifts = {
-    "Info Desk": {
+    "info_desk": {
         "Info/Volunteer Tent": [
             {
                 "first": edt(d, "10:00:00"),
@@ -20,7 +20,7 @@ info_vol_shifts = {
             },
         ]
     },
-    "Volunteer Manager": {
+    "volunteer_manager": {
         "Info/Volunteer Tent": [
             {
                 "first": edt(d, "09:00:00"),
@@ -39,7 +39,7 @@ info_vol_shifts = {
             },
         ]
     },
-    "Volunteer Welfare Assistant": {
+    "volunteer_welfare": {
         "Info/Volunteer Tent": [
             {
                 "first": edt(d, "09:00:00"),
@@ -58,7 +58,7 @@ info_vol_shifts = {
             },
         ]
     },
-    "Cable Plugger": {
+    "cable_plugger": {
         "Info/Volunteer Tent": [
             {
                 "first": edt(d, "10:00:00"),
