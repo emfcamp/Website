@@ -24,9 +24,9 @@ def shifts():
             app.logger.info(f"Adding role {role}")
             db.session.add(role)
 
-    for v in load_initial_venues():
-        venue = VolunteerVenue.get_by_name(v["name"]) or VolunteerVenue(name=v["name"])
-        venue.mapref = v["mapref"]
+    for v in load_from_yaml("apps/volunteer/data/venues/*.yml"):
+        venue = VolunteerVenue.from_dict(v)
+        app.logger.info(f"Adding venue {venue}")
         db.session.add(venue)
 
     shift_list = get_shift_list()
@@ -42,7 +42,7 @@ def shifts():
             continue
 
         for shift_venue in shift_list[shift_role]:
-            venue = VolunteerVenue.get_by_name(shift_venue)
+            venue = VolunteerVenue.get_by_slug(shift_venue)
             if venue is None:
                 app.logger.error(f"Unknown venue: {shift_venue}")
                 continue
@@ -74,8 +74,3 @@ def load_from_yaml(path_glob: str) -> list[dict[str, Any]]:
             items.append(item)
 
     return items
-
-
-def load_initial_venues() -> list[dict[str, Any]]:
-    """Loads venue data."""
-    return load_from_yaml("apps/volunteer/data/venues/*.yml")
