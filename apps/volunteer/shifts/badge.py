@@ -1,7 +1,7 @@
 from ..event_date import edt
 
 badge_shifts = {
-    "Badge Helper": {
+    "badge_helper": {
         "Badge Tent": [
             {
                 "first": edt(d, "10:00:00"),

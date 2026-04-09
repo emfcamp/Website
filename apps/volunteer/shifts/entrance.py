@@ -1,7 +1,7 @@
 from ..event_date import edt
 
 entrance_shifts = {
-    "Entrance Steward": {
+    "entrance_steward": {
         "Entrance Tent": [
             {
                 "first": edt("thur", "09:00:00"),

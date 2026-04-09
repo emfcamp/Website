@@ -29,8 +29,10 @@ class Role(BaseModel):
 
     __tablename__ = "volunteer_role"
     id: Mapped[int] = mapped_column(primary_key=True)
+    #: A short, stable, urlsafe, identifier used for de-duplication during data seeding.
+    slug: Mapped[str] = mapped_column(unique=True, index=True)
     #: The name used to present a role. Should be kept short as it gets used in lists.
-    name: Mapped[str] = mapped_column(unique=True, index=True)
+    name: Mapped[str]
     #: A brief summary of the role
     description: Mapped[str | None]
     #: A longer description of the role, supports Markdown.
@@ -51,15 +53,15 @@ class Role(BaseModel):
     #: Admins for this role
     admins: Mapped[list["RoleAdmin"]] = relationship(back_populates="role", cascade="all, delete-orphan")
     #: Shifts
-    shifts: Mapped[list["Shift"]] = relationship(back_populates="role")
+    shifts: Mapped[list["Shift"]] = relationship(back_populates="role", cascade="all, delete-orphan")
 
     #: Volunteers who are interested in this role
     interested_volunteers: Mapped[list["Volunteer"]] = relationship(
-        back_populates="interested_roles", secondary=VolunteerRoleInterest
+        back_populates="interested_roles", secondary=VolunteerRoleInterest, passive_deletes=True
     )
     #: Volunteers who are trained for this role
     trained_volunteers: Mapped[list["Volunteer"]] = relationship(
-        back_populates="trained_roles", secondary=VolunteerRoleTraining
+        back_populates="trained_roles", secondary=VolunteerRoleTraining, passive_deletes=True
     )
 
     @property
@@ -97,6 +99,10 @@ class Role(BaseModel):
         return cls.query.filter_by(name=name).one_or_none()
 
     @classmethod
+    def get_by_slug(cls, slug):
+        return cls.query.filter_by(slug=slug).one_or_none()
+
+    @classmethod
     def get_by_id(cls, id):
         return cls.query.get_or_404(id)
 
@@ -106,7 +112,7 @@ class Role(BaseModel):
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Role":
-        role = Role.get_by_name(data["name"]) or Role(name=data["name"])
+        role = Role.get_by_slug(data["slug"]) or Role(slug=data["slug"])
         role.name = data["name"]
         role.description = data["description"]
         role.full_description_md = data.get("full_description_md", "")

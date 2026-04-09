@@ -118,7 +118,7 @@ def set_max(shifts, val=2):
 
 
 talks_shifts = {
-    "Green Room Runner": {
+    "green_room_runner": {
         "Green Room": [
             {
                 "first": edt(d, "09:00:00"),
@@ -129,7 +129,7 @@ talks_shifts = {
             for d in ["fri", "sat", "sun"]
         ]
     },
-    "Content Team": {
+    "content_team": {
         "Green Room": [
             {
                 "first": edt(d, "09:00:00"),
@@ -140,32 +140,32 @@ talks_shifts = {
             for d in ["fri", "sat", "sun"]
         ]
     },
-    "Herald": {
+    "herald": {
         "Stage A": stage_a_herald_vm,
         "Stage B": stage_bc_pattern,
         "Stage C": stage_bc_pattern,
     },
-    "Talks: Camera Operator": {
+    "talks_camera_operator": {
         "Stage A": set_max(stage_a_pattern, 2),
         "Stage B": set_max(stage_bc_pattern, 2),
         "Stage C": set_max(stage_bc_pattern, 2),
     },
-    "Talks: Vision Mixer": {
+    "talks_vision_mixer": {
         "Stage A": stage_a_pattern,
         "Stage B": stage_bc_pattern,
         "Stage C": stage_bc_pattern,
     },
-    "Talks: Sound/Lighting Operator": {
+    "talks_sound_lighting": {
         "Stage A": stage_a_pattern,
         "Stage B": stage_bc_pattern,
         "Stage C": stage_bc_pattern,
     },
-    "Talks: Venue Manager": {
+    "talks_venue_manager": {
         "Stage A": stage_a_herald_vm,
         "Stage B": stage_bc_pattern,
         "Stage C": stage_bc_pattern,
     },
-    "Video Editor": {
+    "video_editor": {
         "VOC": [
             {
                 "first": edt(d, "10:00:00"),

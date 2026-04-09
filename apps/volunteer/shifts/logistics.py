@@ -1,7 +1,7 @@
 from ..event_date import edt
 
 logistics_shifts = {
-    "Logistics Support": {
+    "logistics_support": {
         "Logistics Tent": [
             {
                 "first": edt(d, "10:00:00"),
@@ -12,7 +12,7 @@ logistics_shifts = {
             for d in ["wed", "thur", "fri", "sat", "sun"]
         ]
     },
-    "Vehicle Gate & Escorts": {
+    "vehicle_gate_escort": {
         "Vehicle Gate Y": [
             {
                 "first": edt(d, "09:00:00"),

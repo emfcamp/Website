@@ -1,7 +1,7 @@
 from ..event_date import edt
 
 arcade_shifts = {
-    "Arcade Assistant": {
+    "arcade_assistant": {
         "Arcade": [
             {
                 "first": edt(d, "10:00:00"),

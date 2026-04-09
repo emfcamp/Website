@@ -1,7 +1,7 @@
 from ..event_date import edt
 
 bar_shifts = {
-    "Bar": {
+    "bar": {
         "Bar": [
             {
                 "first": edt("thur", "15:00:00"),
@@ -39,7 +39,7 @@ bar_shifts = {
             for d in [("fri", "sat"), ("sat", "sun"), ("sun", "mon")]
         ]
     },
-    "Cybar": {
+    "cybar": {
         "Cybar": [
             {
                 "first": edt("fri", "18:00:00"),
