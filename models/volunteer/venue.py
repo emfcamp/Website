@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -15,7 +15,8 @@ class VolunteerVenue(BaseModel):
 
     __tablename__ = "volunteer_venue"
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(unique=True, index=True)
+    slug: Mapped[str] = mapped_column(unique=True, index=True)
+    name: Mapped[str]
     mapref: Mapped[str | None]
 
     shifts: Mapped[list["Shift"]] = relationship(back_populates="venue")
@@ -27,7 +28,7 @@ class VolunteerVenue(BaseModel):
         return self.name
 
     def to_dict(self):
-        return {"id": self.id, "name": self.name, "mapref": self.mapref}
+        return {"id": self.id, "slug": self.slug, "name": self.name, "mapref": self.mapref}
 
     @classmethod
     def get_all(cls):
@@ -40,3 +41,14 @@ class VolunteerVenue(BaseModel):
     @classmethod
     def get_by_name(cls, name):
         return cls.query.filter_by(name=name).one_or_none()
+
+    @classmethod
+    def get_by_slug(cls, slug):
+        return cls.query.filter_by(slug=slug).one_or_none()
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "VolunteerVenue":
+        venue = cls.get_by_slug(data["slug"]) or cls(slug=data["slug"])
+        venue.name = data["name"]
+        venue.mapref = data["mapref"]
+        return venue
