@@ -18,7 +18,7 @@ def shifts():
         app.logger.info(f"Adding team {team}")
         db.session.add(team)
 
-        for r in load_from_yaml(f"apps/volunteer/data/roles/{t['slug']}/*.yml"):
+        for r in load_from_yaml(f"apps/volunteer/data/roles/{t['slug'].replace('-', '_')}/*.yml"):
             role = Role.from_dict(r)
             role.team = team
             app.logger.info(f"Adding role {role}")
@@ -70,7 +70,7 @@ def load_from_yaml(path_glob: str) -> list[dict[str, Any]]:
 
     for path in Path(app.root_path).glob(path_glob):
         with open(path) as file:
-            item: dict[str, Any] = safe_load(file) | {"slug": path.stem}
+            item: dict[str, Any] = safe_load(file) | {"slug": path.stem.replace("_", "-")}
             items.append(item)
 
     return items
