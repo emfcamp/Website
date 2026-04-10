@@ -118,8 +118,8 @@ def set_max(shifts, val=2):
 
 
 talks_shifts = {
-    "green_room_runner": {
-        "Green Room": [
+    "green-room-runner": {
+        "green-room": [
             {
                 "first": edt(d, "09:00:00"),
                 "final": edt(d, "21:00:00"),
@@ -129,8 +129,8 @@ talks_shifts = {
             for d in ["fri", "sat", "sun"]
         ]
     },
-    "content_team": {
-        "Green Room": [
+    "content-team": {
+        "green-room": [
             {
                 "first": edt(d, "09:00:00"),
                 "final": edt(d, "21:00:00"),
@@ -141,32 +141,32 @@ talks_shifts = {
         ]
     },
     "herald": {
-        "Stage A": stage_a_herald_vm,
-        "Stage B": stage_bc_pattern,
-        "Stage C": stage_bc_pattern,
+        "stage-a": stage_a_herald_vm,
+        "stage-b": stage_bc_pattern,
+        "stage-c": stage_bc_pattern,
     },
-    "talks_camera_operator": {
-        "Stage A": set_max(stage_a_pattern, 2),
-        "Stage B": set_max(stage_bc_pattern, 2),
-        "Stage C": set_max(stage_bc_pattern, 2),
+    "talks-camera-operator": {
+        "stage-a": set_max(stage_a_pattern, 2),
+        "stage-b": set_max(stage_bc_pattern, 2),
+        "stage-c": set_max(stage_bc_pattern, 2),
     },
-    "talks_vision_mixer": {
-        "Stage A": stage_a_pattern,
-        "Stage B": stage_bc_pattern,
-        "Stage C": stage_bc_pattern,
+    "talks-vision-mixer": {
+        "stage-a": stage_a_pattern,
+        "stage-b": stage_bc_pattern,
+        "stage-c": stage_bc_pattern,
     },
-    "talks_sound_lighting": {
-        "Stage A": stage_a_pattern,
-        "Stage B": stage_bc_pattern,
-        "Stage C": stage_bc_pattern,
+    "talks-sound-lighting": {
+        "stage-a": stage_a_pattern,
+        "stage-b": stage_bc_pattern,
+        "stage-c": stage_bc_pattern,
     },
-    "talks_venue_manager": {
-        "Stage A": stage_a_herald_vm,
-        "Stage B": stage_bc_pattern,
-        "Stage C": stage_bc_pattern,
+    "talks-venue-manager": {
+        "stage-a": stage_a_herald_vm,
+        "stage-b": stage_bc_pattern,
+        "stage-c": stage_bc_pattern,
     },
-    "video_editor": {
-        "VOC": [
+    "video-editor": {
+        "voc": [
             {
                 "first": edt(d, "10:00:00"),
                 "final": edt(d, "18:00:00"),

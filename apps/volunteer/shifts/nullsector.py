@@ -1,8 +1,8 @@
 from ..event_date import edt
 
 nullsector_shifts = {
-    "null_sector_assistant": {
-        "Null Sector": [
+    "null-sector-assistant": {
+        "null-sector": [
             {
                 "first": edt("fri", "18:00:00"),
                 "final": edt("sat", "00:00:00"),
