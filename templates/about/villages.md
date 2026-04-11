@@ -12,6 +12,8 @@ If you're planning to bring something especially big or in need of lots of power
 ## Register a Village
 By [registering your village at emfcamp.org/villages/register](/villages/register), you'll be making the Village People aware of the fact you plan to arrive, and how much space you're likely to need, and you'll allow us to get in touch to discuss how we can support your plans and activities at the event.
 
+The name of your village will be listed on the website at [emfcamp.org/villages](https://www.emfcamp.org/villages), and your 'Long Description' can be used to populate the page with text and links (using Markdown formatting). It's up to you how much information you include here, and if you'd prefer to just be a group of friends, you can keep it brief. If you'd like people to be able to contact you and join your village or come and visit to participate in activities you're running, you can include contact details, links to external websites and information about your planned activities there. (We're no longer using a Wiki for villages info, so this will now be the main place to share details.)
+
 ## What can we do as a village?
 Villages are great as you can share ideas, equipment and space! The sharing doesn’t stop there - it lets you share resources too. You can come up with a cooking and cleaning rota as a group to reduce waste, make the camp cheaper and interrupt your day with a change of activity. Some people spend all their time cooking for others!
 
@@ -21,7 +23,7 @@ Some villages bring pre-made games and activities for other people to take part 
 
 * [Barbot](https://www.emfcamp.org/schedule/2022/411-barbot): a cocktail-making robot build by Nottingham Hackspace
 * Karaoke nights hosted in the Scottish Consulate tent
-* [The Maths Village](https://wiki.emfcamp.org/2024/wiki/Maths_Village) with a drop-in tent full of mathematical puzzles and activities
+* [The Maths Village](https://mathsvilla.ge) with a drop-in tent full of mathematical puzzles and activities
 * Demoscene competitions at [Field-FX](https://wiki.emfcamp.org/2024/wiki/Field-FX)
 * Drop-in board game sessions
 
@@ -35,7 +37,7 @@ If you have any questions about workshop villages or hosting content, you can [e
 The Village People are available to support making things happen in your village. If you have a cool idea, but need help with planning or logistics of doing things on site, please contact us beforehand. The earlier you let us know your plans, the better we can help you. You can contact us by [emailing villages@emfcamp.org](mailto:villages@emfcamp.org) and we will be very happy to discuss anything you might come up with!
 
 ## Village Furniture
-To make things easier for villages, we will offer the opportunity to book a marquee and furniture through us, which will be set up and ready for when you arrive on site. Details of how to book these will be announced nearer to the event.
+To make things easier for villages, we will offer the opportunity to book a marquee and furniture through us, which will be set up and ready for when you arrive on site. Details of how to book these will be circulated to registered villages once they're available, with reminders nearer to the event.
 
 We're happy for you to bring your own tents and furniture for being social in and cooking in. We ask that you remove everything you’ve brought at the end of the event - it’s not fair on our volunteers to have to tidy them up, and it’s also bad for the environment.
 
