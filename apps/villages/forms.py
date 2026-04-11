@@ -17,7 +17,7 @@ from ..common.forms import Form
 
 
 class VillageForm(Form):
-    name = StringField("Village Name", [Length(2, 25)])
+    name = StringField("Village Name", [Length(2, 50)])
     description = TextAreaField("Description", [Optional()])
     long_description = TextAreaField("Long Description", [Optional()])
     url = StringField("URL", [URL(), Optional()])
