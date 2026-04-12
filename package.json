@@ -9,7 +9,8 @@
   },
   "scripts": {
     "watch": "webpack --watch --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js"
+    "build": "webpack --config webpack.prod.js",
+    "lint": "prettier -c ./css"
   },
   "repository": {
     "type": "git",

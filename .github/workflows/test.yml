@@ -10,7 +10,7 @@ env:
 
 jobs:
   lint:
-    name: Run linting checks
+    name: Run Python linting checks
     runs-on: ubuntu-latest
     env:
       RUFF_OUTPUT_FORMAT: github
@@ -30,6 +30,15 @@ jobs:
         run: uv run --group dev make check-syntax
       - name: Adding report
         run: printf "\`\`\`\n%s\n\`\`\`" "$(cat mypy-report/index.txt)" >> $GITHUB_STEP_SUMMARY
+
+  lint-frontend:
+    name: Run Javascript/CSS linting checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+      - run: npm ci
+      - run: npm run lint
 
   test:
     name: Run tests
