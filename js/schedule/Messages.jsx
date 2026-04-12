@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 const messageReloadInterval = 5; // Minutes
 
@@ -7,20 +7,27 @@ function Messages() {
 
   function reloadMessages() {
     fetch(`/api/schedule-messages`)
-      .then(response => response.json())
-      .then(body => {
+      .then((response) => response.json())
+      .then((body) => {
         setMessages(body);
       });
   }
 
   useEffect(() => {
-    let intervalHandle = setInterval(reloadMessages, messageReloadInterval * 6000);
+    let intervalHandle = setInterval(
+      reloadMessages,
+      messageReloadInterval * 6000,
+    );
     reloadMessages();
 
-    return () => { clearInterval(intervalHandle) }
+    return () => {
+      clearInterval(intervalHandle);
+    };
   }, []);
 
-  if (messages.length === 0) { return null; }
+  if (messages.length === 0) {
+    return null;
+  }
 
   return (
     <div className="messages panel panel-primary">
@@ -28,7 +35,11 @@ function Messages() {
         <h2 className="panel-title">Important Messages</h2>
       </div>
       <ul className="list-group">
-        { messages.map(m => <li className="list-group-item" key={m.id}>{m.body}</li>) }
+        {messages.map((m) => (
+          <li className="list-group-item" key={m.id}>
+            {m.body}
+          </li>
+        ))}
       </ul>
     </div>
   );

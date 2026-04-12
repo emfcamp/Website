@@ -10,7 +10,7 @@ repos:
     rev: v3.8.2
     hooks:
       - id: prettier
-        files: ".*\\.scss"
+        files: ".*\\.(scss|js|jsx)"
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.4.0

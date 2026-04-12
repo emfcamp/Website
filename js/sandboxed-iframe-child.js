@@ -8,25 +8,25 @@
 let lastHeight = null;
 
 function sendHeight() {
-    const height = document.body.scrollHeight;
-    if (height == lastHeight) return;
-    lastHeight = height;
+  const height = document.body.scrollHeight;
+  if (height == lastHeight) return;
+  lastHeight = height;
 
-    // console.log(`Sending new height ${height} to parent`);
-    window.parent.postMessage(
-        {
-            type: "frame-resized",
-            height: height,
-        },
-        "*",
-    );
+  // console.log(`Sending new height ${height} to parent`);
+  window.parent.postMessage(
+    {
+      type: "frame-resized",
+      height: height,
+    },
+    "*",
+  );
 }
 
 function registerFrameResizeObserver() {
-    const resizeObserver = new ResizeObserver(sendHeight);
-    resizeObserver.observe(document.body);
-    // send initial event
-    sendHeight();
+  const resizeObserver = new ResizeObserver(sendHeight);
+  resizeObserver.observe(document.body);
+  // send initial event
+  sendHeight();
 }
 
 document.body.style.overflow = "hidden";

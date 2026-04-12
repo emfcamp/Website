@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { DateTime } from 'luxon';
-import { Checkbox, CheckboxGroup, DateTimePicker } from './Controls.jsx';
+import React, { useState, useEffect } from "react";
+import { DateTime } from "luxon";
+import { Checkbox, CheckboxGroup, DateTimePicker } from "./Controls.jsx";
 
 function DebugOptions({ debug, currentTime, setCurrentTime }) {
-  if (!debug) { return null; }
+  if (!debug) {
+    return null;
+  }
 
   return (
     <>
@@ -16,55 +18,82 @@ function DebugOptions({ debug, currentTime, setCurrentTime }) {
   );
 }
 
-function Filters({ schedule, onlyFavourites, setOnlyFavourites, onlyFamilyFriendly, setOnlyFamilyFriendly, onlyNoRecording, setOnlyNoRecording, onlyLottery, setOnlyLottery, includeFinished, setIncludeFinished, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, selectedAgeRanges, setSelectedAgeRanges, debug, currentTime, setCurrentTime }) {
+function Filters({
+  schedule,
+  onlyFavourites,
+  setOnlyFavourites,
+  onlyFamilyFriendly,
+  setOnlyFamilyFriendly,
+  onlyNoRecording,
+  setOnlyNoRecording,
+  onlyLottery,
+  setOnlyLottery,
+  includeFinished,
+  setIncludeFinished,
+  selectedVenues,
+  setSelectedVenues,
+  selectedEventTypes,
+  setSelectedEventTypes,
+  selectedAgeRanges,
+  setSelectedAgeRanges,
+  debug,
+  currentTime,
+  setCurrentTime,
+}) {
   const [visible, setVisible] = useState(false);
 
   function selectOfficialVenues(ev) {
     ev.preventDefault();
-    setSelectedVenues(schedule.venues.filter(v => v.official).map(v => v.name));
+    setSelectedVenues(
+      schedule.venues.filter((v) => v.official).map((v) => v.name),
+    );
   }
 
-  function renderDebugOptions() {
-  }
+  function renderDebugOptions() {}
 
   function renderBody() {
     let venueFilters = [
-      { name: 'Official Venues Only', callback: selectOfficialVenues }
+      { name: "Official Venues Only", callback: selectOfficialVenues },
     ];
 
     return (
       <div className="panel-body">
         <div className="form-group form-inline">
-          <Checkbox checked={ onlyFavourites } onChange={ setOnlyFavourites }>
+          <Checkbox checked={onlyFavourites} onChange={setOnlyFavourites}>
             Favourites only
           </Checkbox>
           <Checkbox checked={onlyLottery} onChange={setOnlyLottery}>
             Ticketed only
           </Checkbox>
-          <Checkbox checked={onlyFamilyFriendly} onChange={setOnlyFamilyFriendly}>
+          <Checkbox
+            checked={onlyFamilyFriendly}
+            onChange={setOnlyFamilyFriendly}
+          >
             Family friendly only
           </Checkbox>
           <Checkbox checked={onlyNoRecording} onChange={setOnlyNoRecording}>
             No Recording only
           </Checkbox>
-          <Checkbox checked={ includeFinished } onChange={ setIncludeFinished }>
+          <Checkbox checked={includeFinished} onChange={setIncludeFinished}>
             Include finished events
           </Checkbox>
         </div>
 
         <h3>Venues</h3>
         <CheckboxGroup
-          options={ schedule.venues.map(v => v.name) }
-          selectedOptions={ selectedVenues }
-          onChange={ setSelectedVenues }
-          filters={ venueFilters } />
+          options={schedule.venues.map((v) => v.name)}
+          selectedOptions={selectedVenues}
+          onChange={setSelectedVenues}
+          filters={venueFilters}
+        />
 
         <h3>Event Types</h3>
         <CheckboxGroup
-          options={ schedule.eventTypes.map(t => t.id) }
-          selectedOptions={ selectedEventTypes }
-          labels={ schedule.eventTypes.map(t => t.name) }
-          onChange={ setSelectedEventTypes } />
+          options={schedule.eventTypes.map((t) => t.id)}
+          selectedOptions={selectedEventTypes}
+          labels={schedule.eventTypes.map((t) => t.name)}
+          onChange={setSelectedEventTypes}
+        />
 
         {/*
         <h3>Age Ranges</h3>
@@ -74,7 +103,11 @@ function Filters({ schedule, onlyFavourites, setOnlyFavourites, onlyFamilyFriend
           labels={ schedule.ageRanges }
           onChange={ setSelectedAgeRanges } />
         */}
-        <DebugOptions debug={ debug } currentTime={ currentTime } setCurrentTime={ setCurrentTime } />
+        <DebugOptions
+          debug={debug}
+          currentTime={currentTime}
+          setCurrentTime={setCurrentTime}
+        />
       </div>
     );
   }
@@ -84,11 +117,21 @@ function Filters({ schedule, onlyFavourites, setOnlyFavourites, onlyFamilyFriend
       <div className="panel-heading">
         <h2 className="panel-title">
           <span className="title">Filtering options</span>
-          <span className="toggle"><a href="#" onClick={ (ev) => { ev.preventDefault(); setVisible(!visible) } }>{ visible ? 'Hide' : 'Show' }</a></span>
+          <span className="toggle">
+            <a
+              href="#"
+              onClick={(ev) => {
+                ev.preventDefault();
+                setVisible(!visible);
+              }}
+            >
+              {visible ? "Hide" : "Show"}
+            </a>
+          </span>
         </h2>
       </div>
 
-      { visible && renderBody() }
+      {visible && renderBody()}
     </div>
   );
 }

@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { DateTime } from 'luxon';
+import React, { useState, useEffect } from "react";
+import { DateTime } from "luxon";
 
-import Calendar from './Calendar.jsx';
-import Filters from './Filters.jsx';
-import ScheduleData from './ScheduleData.jsx';
-import Messages from './Messages.jsx';
+import Calendar from "./Calendar.jsx";
+import Filters from "./Filters.jsx";
+import ScheduleData from "./ScheduleData.jsx";
+import Messages from "./Messages.jsx";
 
 function now() {
-  return DateTime.fromMillis(Date.now(), { zone: 'Europe/London' });
+  return DateTime.fromMillis(Date.now(), { zone: "Europe/London" });
 }
 
 function App() {
@@ -29,41 +29,67 @@ function App() {
 
   // Get the user's API token
   useEffect(() => {
-    let container = document.getElementById('schedule-app');
-    let token = container.getAttribute('data-api-token');
-    let debug = container.getAttribute('data-debug');
+    let container = document.getElementById("schedule-app");
+    let token = container.getAttribute("data-api-token");
+    let debug = container.getAttribute("data-debug");
 
-    if (token !== 'None') { setApiToken(token); }
-    if (debug === 'True') { setDebug(true); }
+    if (token !== "None") {
+      setApiToken(token);
+    }
+    if (debug === "True") {
+      setDebug(true);
+    }
   }, []);
-
 
   // Pull the correct year's schedule if the year changes.
   useEffect(() => {
     fetch(`/schedule.json`)
-      .then(response => response.json())
-      .then(body => {
+      .then((response) => response.json())
+      .then((body) => {
         setRawSchedule(body);
 
         let newSchedule = new ScheduleData(body, { currentTime });
         if (newSchedule.allFinished) {
-            setIncludeFinished(true);
+          setIncludeFinished(true);
         }
         setSchedule(newSchedule);
 
-        setSelectedVenues(newSchedule.venues.map(v => v.name));
-        setSelectedEventTypes([...newSchedule.eventTypes.map(t => t.id)]);
+        setSelectedVenues(newSchedule.venues.map((v) => v.name));
+        setSelectedEventTypes([...newSchedule.eventTypes.map((t) => t.id)]);
         setSelectedAgeRanges([...newSchedule.ageRanges]);
       });
   }, []);
 
   // Refilter the schedule if options change.
   useEffect(() => {
-    if (rawSchedule == null) { return };
+    if (rawSchedule == null) {
+      return;
+    }
 
-    let newSchedule = new ScheduleData(rawSchedule, { currentTime, onlyFavourites, onlyFamilyFriendly, onlyNoRecording, onlyLottery, includeFinished, selectedVenues, selectedEventTypes, selectedAgeRanges });
+    let newSchedule = new ScheduleData(rawSchedule, {
+      currentTime,
+      onlyFavourites,
+      onlyFamilyFriendly,
+      onlyNoRecording,
+      onlyLottery,
+      includeFinished,
+      selectedVenues,
+      selectedEventTypes,
+      selectedAgeRanges,
+    });
     setSchedule(newSchedule);
-  }, [currentTime, onlyFavourites, onlyFamilyFriendly, onlyNoRecording, onlyLottery, includeFinished, selectedVenues, selectedEventTypes, selectedAgeRanges, rawSchedule]);
+  }, [
+    currentTime,
+    onlyFavourites,
+    onlyFamilyFriendly,
+    onlyNoRecording,
+    onlyLottery,
+    includeFinished,
+    selectedVenues,
+    selectedEventTypes,
+    selectedAgeRanges,
+    rawSchedule,
+  ]);
 
   // Update time once a minute
   useEffect(() => {
@@ -78,11 +104,15 @@ function App() {
   });
 
   function toggleFavourite(event) {
-    fetch(`/api/proposal/${event.id}/favourite`, { headers: { 'Authorization': apiToken, 'Content-Type': 'application/json' }, method: 'put', body: '{}' })
+    fetch(`/api/proposal/${event.id}/favourite`, {
+      headers: { Authorization: apiToken, "Content-Type": "application/json" },
+      method: "put",
+      body: "{}",
+    })
       .then((response) => response.json())
       .then((data) => {
-        let schedule = JSON.parse(JSON.stringify(rawSchedule))
-        let idx = schedule.findIndex(e => e.id === event.id);
+        let schedule = JSON.parse(JSON.stringify(rawSchedule));
+        let idx = schedule.findIndex((e) => e.id === event.id);
         schedule[idx].is_fave = data.is_favourite;
 
         setRawSchedule(schedule);
@@ -92,20 +122,42 @@ function App() {
       });
   }
 
-
   if (schedule === null) {
     return <p>Loading...</p>;
   }
 
   let filterProps = {
-    schedule, onlyFavourites, setOnlyFavourites, onlyFamilyFriendly, setOnlyFamilyFriendly, onlyNoRecording, setOnlyNoRecording, onlyLottery, setOnlyLottery, includeFinished, setIncludeFinished, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, selectedAgeRanges, setSelectedAgeRanges, debug, currentTime, setCurrentTime
-  }
+    schedule,
+    onlyFavourites,
+    setOnlyFavourites,
+    onlyFamilyFriendly,
+    setOnlyFamilyFriendly,
+    onlyNoRecording,
+    setOnlyNoRecording,
+    onlyLottery,
+    setOnlyLottery,
+    includeFinished,
+    setIncludeFinished,
+    selectedVenues,
+    setSelectedVenues,
+    selectedEventTypes,
+    setSelectedEventTypes,
+    selectedAgeRanges,
+    setSelectedAgeRanges,
+    debug,
+    currentTime,
+    setCurrentTime,
+  };
 
   return (
     <React.StrictMode>
       <Messages />
       <Filters {...filterProps} />
-      <Calendar schedule={ schedule } toggleFavourite={ toggleFavourite } authenticated={ apiToken !== null } />
+      <Calendar
+        schedule={schedule}
+        toggleFavourite={toggleFavourite}
+        authenticated={apiToken !== null}
+      />
     </React.StrictMode>
   );
 }

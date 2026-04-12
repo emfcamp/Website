@@ -10,7 +10,7 @@
   "scripts": {
     "watch": "webpack --watch --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
-    "lint": "prettier -c ./css"
+    "lint": "prettier -c ./css ./js"
   },
   "repository": {
     "type": "git",

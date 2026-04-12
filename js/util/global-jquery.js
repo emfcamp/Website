@@ -2,7 +2,7 @@
     in order for subsequent imports (namely Bootstrap) to see the object in the global scope,
     as all ES6 imports are executed at the beginning of the file. */
 
-import $ from 'jquery';
+import $ from "jquery";
 
 window.jQuery = $;
 window.$ = $;
