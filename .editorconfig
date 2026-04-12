@@ -5,7 +5,7 @@ insert_final_newline = true
 
 [*.scss]
 indent_style = space
-# indent_size = 2  we're not consistent yet to enforce this but most files are 2
+indent_size = 2
 insert_final_newline = true
 
 [*.js]

@@ -2,8 +2,8 @@
 @use "./_variables.scss" as *;
 
 .btn-primary {
-    background-color: color.adjust($brand-2024-blue, $lightness: -20%);
-    border: 1px solid color.adjust($brand-2024-blue, $lightness: -40%);
+  background-color: color.adjust($brand-2024-blue, $lightness: -20%);
+  border: 1px solid color.adjust($brand-2024-blue, $lightness: -40%);
 }
 
 .btn-primary:hover,
@@ -11,37 +11,37 @@
 .btn-primary:active,
 .btn-primary.active,
 .open > .dropdown-toggle.btn-primary {
-    background-color: color.adjust($brand-2024-blue, $lightness: -30%);
-    border: 1px solid color.adjust($brand-2024-blue, $lightness: -50%);
+  background-color: color.adjust($brand-2024-blue, $lightness: -30%);
+  border: 1px solid color.adjust($brand-2024-blue, $lightness: -50%);
 }
 
 .btn-default {
-    background-color: $form-element;
-    border: 1px solid #adadad;
+  background-color: $form-element;
+  border: 1px solid #adadad;
 }
 
 .btn-info {
-    background-color: $info-background;
-    border: 1px solid color.adjust($info-background, $lightness: -30%);
+  background-color: $info-background;
+  border: 1px solid color.adjust($info-background, $lightness: -30%);
 }
 
 .btn-success {
-    background-color: $success-background;
-    border: 1px solid color.adjust($success-background, $lightness: -20%);
+  background-color: $success-background;
+  border: 1px solid color.adjust($success-background, $lightness: -20%);
 }
 
 .btn-warning {
-    background-color: $warning-background;
-    border: 1px solid color.adjust($warning-background, $lightness: -20%);
+  background-color: $warning-background;
+  border: 1px solid color.adjust($warning-background, $lightness: -20%);
 }
 
 .btn-danger {
-    background-color: $danger-background;
-    border: 1px solid color.adjust($danger-background, $lightness: -20%);
+  background-color: $danger-background;
+  border: 1px solid color.adjust($danger-background, $lightness: -20%);
 }
 
 .btn {
-    text-decoration: none;
+  text-decoration: none;
 }
 
 .alert-danger a.btn-primary,
@@ -50,15 +50,15 @@
 .alert-danger a.btn-success,
 .alert-danger a.btn-warning,
 .alert-danger a.btn-danger {
-    color: $form-element;
+  color: $form-element;
 }
 
 .panel .btn,
 .well .btn {
-    color: $form-element;
+  color: $form-element;
 }
 
 .panel .btn-default,
 .well .btn-default {
-    color: $highlight-background-text;
+  color: $highlight-background-text;
 }

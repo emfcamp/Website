@@ -20,10 +20,12 @@ header h1 .logo {
 header h1 > * {
   font-size: 12pt;
 }
-.message-table .col-sm-2{
-    vertical-align: middle;
+.message-table .col-sm-2 {
+  vertical-align: middle;
 }
-.multiline { white-space: pre-wrap }
+.multiline {
+  white-space: pre-wrap;
+}
 
 .product .expired,
 .product .limit-reached {
@@ -31,16 +33,15 @@ header h1 > * {
   color: #a00;
 }
 
-
 #product_overview .expired,
-    #product_overview .expired a,
-    #product_overview .inactive,
-    #product_overview .inactive a {
-    color: #a99;
+#product_overview .expired a,
+#product_overview .inactive,
+#product_overview .inactive a {
+  color: #a99;
 }
 
 table.hire-purchases tr.payment-pending td {
-    color: #999;
+  color: #999;
 }
 
 .non-prod-banner {
@@ -48,9 +49,9 @@ table.hire-purchases tr.payment-pending td {
 }
 
 tr.even {
-    background-color: #ddd;
+  background-color: #ddd;
 }
 
 tr.odd {
-    background-color: #eee;
+  background-color: #eee;
 }

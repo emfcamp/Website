@@ -41,14 +41,17 @@
     color: $highlight-background-text;
     border-radius: $small-border-radius;
 
-    .village-table-village, .village-table-header {
+    .village-table-village,
+    .village-table-header {
       display: contents;
     }
     .village-table-header h4 {
       font-weight: bold;
     }
 
-    .village-table-title, .village-table-description, .village-table-links {
+    .village-table-title,
+    .village-table-description,
+    .village-table-links {
       margin: 0;
       padding: 10px 15px 5px 15px;
     }
@@ -58,7 +61,7 @@
     }
     .village-table-village::before {
       display: block;
-      content: '';
+      content: "";
       height: 0;
       border-top: 1px solid #aaa;
       grid-column: title-start / links-end;
@@ -82,18 +85,18 @@
 }
 
 .village-form {
-    textarea#description {
-        height: 100px;
-    }
+  textarea#description {
+    height: 100px;
+  }
 
-    textarea#long_description {
-        height: 200px;
-    }
+  textarea#long_description {
+    height: 200px;
+  }
 }
 
 .embedded-content {
-    width: 100%;
-    height: 450px; // default height, recalculated by javascript.
-    border: none;
-    overflow: hidden;
+  width: 100%;
+  height: 450px; // default height, recalculated by javascript.
+  border: none;
+  overflow: hidden;
 }

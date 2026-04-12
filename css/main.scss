@@ -29,9 +29,12 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: local(""),
-    url("../static/fonts/raleway-v22-latin-ext_latin-regular.woff2") format("woff2"),
-    url("../static/fonts/raleway-v22-latin-ext_latin-regular.woff") format("woff");
+  src:
+    local(""),
+    url("../static/fonts/raleway-v22-latin-ext_latin-regular.woff2")
+      format("woff2"),
+    url("../static/fonts/raleway-v22-latin-ext_latin-regular.woff")
+      format("woff");
 }
 
 @font-face {
@@ -39,7 +42,8 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: local(""),
+  src:
+    local(""),
     url("../static/fonts/raleway-v22-latin-ext_latin-700.woff2") format("woff2"),
     url("../static/fonts/raleway-v22-latin-ext_latin-700.woff") format("woff");
 }

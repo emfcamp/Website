@@ -1,7 +1,7 @@
 @use "./_variables.scss" as *;
 
 footer {
-  background: url('../images/brand/2024/header-2.png') left bottom/60%;
+  background: url("../images/brand/2024/header-2.png") left bottom/60%;
   overflow: hidden;
   padding: 10px 15px 0px 15px;
   border-top: 1px solid #272827;
@@ -23,18 +23,17 @@ footer #credits {
   float: left;
 }
 
-#bottom-menu-container ul.menu li{
-  display:inline-block;
+#bottom-menu-container ul.menu li {
+  display: inline-block;
   padding-left: 0;
   padding-right: 1em;
 }
-
 
 #bottom-menu-container .share {
   float: right;
 }
 
-@media(max-width: $header-collapse-width) {
+@media (max-width: $header-collapse-width) {
   footer {
     position: initial;
     bottom: initial;
@@ -43,7 +42,7 @@ footer #credits {
 
   #bottom-menu-container .menu {
     float: none;
-    clear: both
+    clear: both;
   }
 
   #bottom-menu-container ul.menu li {
@@ -51,4 +50,3 @@ footer #credits {
     font-size: 14px;
   }
 }
-

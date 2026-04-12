@@ -2,64 +2,64 @@
 @use "./_variables.scss" as *;
 
 .form-control {
-    background-color: $form-element;
+  background-color: $form-element;
 }
 
 .form-horizontal .form-group .form-control ~ .help-block,
 .form-horizontal .form-group .input-group ~ .help-block {
-    padding-left: 0.5em;
+  padding-left: 0.5em;
 }
 
 input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    margin-top: 4px !important;
+  width: 20px;
+  height: 20px;
+  margin-top: 4px !important;
 }
 
 fieldset legend {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 input[type="range"] {
-    appearance: none;
-    border: none;
-    box-shadow: none;
-    background: transparent;
-    margin-bottom: 6px;
+  appearance: none;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  margin-bottom: 6px;
 }
 
 input[type="range"]::range-track {
-    appearance: none;
-    height: 8.4px;
-    cursor: pointer;
-    background: $main-link-hover;
-    border-radius: 3px;
+  appearance: none;
+  height: 8.4px;
+  cursor: pointer;
+  background: $main-link-hover;
+  border-radius: 3px;
 }
 
 input[type="range"]:focus::range-track {
-    background: color.adjust($main-link-hover, $lightness: 5%);
+  background: color.adjust($main-link-hover, $lightness: 5%);
 }
 
 input[type="range"]::range-thumb {
-    appearance: none;
-    box-shadow: 1px 1px 1px color.adjust($main-background, $lightness: 50%);
-    border: 1px solid $main-background;
-    height: 30px;
-    width: 16px;
-    border-radius: 3px;
-    background: $highlight-3-background;
-    cursor: pointer;
-    margin-top: -11px;
+  appearance: none;
+  box-shadow: 1px 1px 1px color.adjust($main-background, $lightness: 50%);
+  border: 1px solid $main-background;
+  height: 30px;
+  width: 16px;
+  border-radius: 3px;
+  background: $highlight-3-background;
+  cursor: pointer;
+  margin-top: -11px;
 }
 
 ul.form-check-input input {
-    vertical-align: top;
+  vertical-align: top;
 }
 
 ul.form-check-input li {
-    list-style-type: none;
+  list-style-type: none;
 }
 
 ul.form-check-input label {
-    font-weight: normal;
+  font-weight: normal;
 }

@@ -1,7 +1,7 @@
 @use "./_variables.scss" as *;
 
 header {
-  background: url('../images/brand/2024/header-2.png') left top/60%;
+  background: url("../images/brand/2024/header-2.png") left top/60%;
   background-color: $main-background;
   padding: 10px 15px 0px 15px;
 }
@@ -31,7 +31,7 @@ header #header-text {
 
 header #menu-container {
   clear: both;
-  float:right;
+  float: right;
 }
 
 header #menu-button {
@@ -53,8 +53,8 @@ ul.menu {
   letter-spacing: 0.5px;
 }
 
-ul.menu li{
-  display:inline-block;
+ul.menu li {
+  display: inline-block;
   padding-left: 1.5em;
 }
 
@@ -67,7 +67,7 @@ ul.menu a {
 }
 
 // Mobile layout - menu is hidden behind a button.
-@media(max-width: $header-collapse-width) {
+@media (max-width: $header-collapse-width) {
   $header-height: 56px;
 
   // Fixed header, visible on scroll
@@ -88,7 +88,7 @@ ul.menu a {
     font-size: 25px;
     margin-top: 4px;
   }
-  
+
   #logomark {
     width: 16px !important;
     height: auto !important;
@@ -97,7 +97,7 @@ ul.menu a {
 
   header #menu-button {
     appearance: none;
-    border: none; 
+    border: none;
     background-color: #333;
     margin-right: 0px;
     margin-top: 5px;
@@ -108,7 +108,7 @@ ul.menu a {
   }
 
   header #header-text {
-    display:none;
+    display: none;
   }
 
   header #menu-container {
@@ -137,7 +137,7 @@ ul.menu a {
   }
 }
 
-@media(min-width: ($header-collapse-width + 1)) {
+@media (min-width: ($header-collapse-width + 1)) {
   // Override visibility in case menu was hidden in mobile layout
   // and window was subsequently resized.
   header #menu-container {
@@ -162,6 +162,6 @@ ul.menu a {
     height: 0;
   }
   #logo:after {
-    content: url('../images/logo-black-text.svg');
+    content: url("../images/logo-black-text.svg");
   }
 }

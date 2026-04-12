@@ -6,8 +6,14 @@ repos:
       - id: ruff-format
       - id: ruff-check
 
+  - repo: https://github.com/mirrors-prettier/mirrors-prettier
+    rev: v3.8.2
+    hooks:
+      - id: prettier
+        files: ".*\\.scss"
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.4.0
     hooks:
       - id: no-commit-to-branch
-        args: ['--branch', 'main']
+        args: ["--branch", "main"]
