@@ -74,7 +74,7 @@ def init_workshop_shifts():
         )
     )
 
-    workshop_steward_role = Role.query.filter_by(name="Workshop Steward").one()
+    workshop_steward_role = Role.query.filter_by(slug="workshop-ticket-inspector").one()
 
     venues = {}
     with db.session.no_autoflush:

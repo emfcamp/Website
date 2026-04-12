@@ -14,6 +14,7 @@ def team(db):
 
 def test_from_dict_creates_new_role(db, team):
     data = {
+        "slug": "new-role",
         "name": "Brand New Role",
         "description": "A new role",
         "full_description_md": "## Details",
@@ -25,6 +26,7 @@ def test_from_dict_creates_new_role(db, team):
     role.team = team
     db.session.add(role)
 
+    assert role.slug == "new-role"
     assert role.name == "Brand New Role"
     assert role.description == "A new role"
     assert role.full_description_md == "## Details"
@@ -34,10 +36,11 @@ def test_from_dict_creates_new_role(db, team):
 
 
 def test_from_dict_updates_existing_role(db, team):
-    existing = Role(name="Existing Role", description="Old description", team=team)
+    existing = Role(slug="existing-role", name="Existing Role", description="Old description", team=team)
     db.session.add(existing)
 
     data = {
+        "slug": "existing-role",
         "name": "Existing Role",
         "description": "Updated description",
         "full_description_md": "## Updated",
@@ -56,7 +59,7 @@ def test_from_dict_updates_existing_role(db, team):
 
 
 def test_from_dict_optional_fields_default(db, team):
-    data = {"name": "Minimal Role", "description": "Minimal"}
+    data = {"slug": "minimal", "name": "Minimal Role", "description": "Minimal"}
     role = Role.from_dict(data)
 
     assert role.full_description_md == ""

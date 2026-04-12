@@ -30,7 +30,7 @@ VolunteerRoleInterest = Table(
     "volunteer_role_interest",
     BaseModel.metadata,
     Column("volunteer_id", Integer, ForeignKey("volunteer.id"), primary_key=True),
-    Column("role_id", Integer, ForeignKey("volunteer_role.id"), primary_key=True),
+    Column("role_id", Integer, ForeignKey("volunteer_role.id", ondelete="CASCADE"), primary_key=True),
 )
 
 
@@ -39,7 +39,7 @@ VolunteerRoleTraining = Table(
     "volunteer_role_training",
     BaseModel.metadata,
     Column("volunteer_id", Integer, ForeignKey("volunteer.id"), primary_key=True),
-    Column("role_id", Integer, ForeignKey("volunteer_role.id"), primary_key=True),
+    Column("role_id", Integer, ForeignKey("volunteer_role.id", ondelete="CASCADE"), primary_key=True),
 )
 
 

@@ -42,8 +42,8 @@ tech_times = [
 ]
 
 bands_shifts = {
-    "Bands: Artist Liason": {
-        "Stage B": [
+    "bands-artist-liason": {
+        "stage-b": [
             {
                 "first": edt("thur", "17:30:00"),
                 "final": edt("thur", "23:00:00"),
@@ -78,14 +78,14 @@ bands_shifts = {
             },
         ],
     },
-    "Bands: Venue Manager": {
-        "Stage B": vm_times,
+    "bands-venue-manager": {
+        "stage-b": vm_times,
     },
-    "Bands: Sound Operator": {"Stage B": tech_times},
-    "Bands: Sound Technician": {"Stage B": tech_times},
-    "Bands: Lighting Operator": {"Stage B": tech_times},
-    "Bands: Stage Crew": {
-        "Stage B": [
+    "bands-sound-operator": {"stage-b": tech_times},
+    "bands-sound-technician": {"stage-b": tech_times},
+    "bands-lighting-operator": {"stage-b": tech_times},
+    "bands-stage-crew": {
+        "stage-b": [
             {
                 "first": edt(d, "20:00:00"),
                 "final": edt(d, "23:00:00"),

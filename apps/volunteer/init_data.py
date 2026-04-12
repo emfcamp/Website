@@ -18,21 +18,21 @@ def shifts():
         app.logger.info(f"Adding team {team}")
         db.session.add(team)
 
-        for r in load_from_yaml(f"apps/volunteer/data/roles/{t['slug']}/*.yml"):
+        for r in load_from_yaml(f"apps/volunteer/data/roles/{t['slug'].replace('-', '_')}/*.yml"):
             role = Role.from_dict(r)
             role.team = team
             app.logger.info(f"Adding role {role}")
             db.session.add(role)
 
-    for v in load_initial_venues():
-        venue = VolunteerVenue.get_by_name(v["name"]) or VolunteerVenue(name=v["name"])
-        venue.mapref = v["mapref"]
+    for v in load_from_yaml("apps/volunteer/data/venues/*.yml"):
+        venue = VolunteerVenue.from_dict(v)
+        app.logger.info(f"Adding venue {venue}")
         db.session.add(venue)
 
     shift_list = get_shift_list()
 
     for shift_role in shift_list:
-        role = Role.get_by_name(shift_role)
+        role = Role.get_by_slug(shift_role)
         if role is None:
             app.logger.error(f"Unknown role: {shift_role}")
             continue
@@ -42,7 +42,7 @@ def shifts():
             continue
 
         for shift_venue in shift_list[shift_role]:
-            venue = VolunteerVenue.get_by_name(shift_venue)
+            venue = VolunteerVenue.get_by_slug(shift_venue)
             if venue is None:
                 app.logger.error(f"Unknown venue: {shift_venue}")
                 continue
@@ -70,12 +70,7 @@ def load_from_yaml(path_glob: str) -> list[dict[str, Any]]:
 
     for path in Path(app.root_path).glob(path_glob):
         with open(path) as file:
-            item: dict[str, Any] = safe_load(file) | {"slug": path.stem}
+            item: dict[str, Any] = safe_load(file) | {"slug": path.stem.replace("_", "-")}
             items.append(item)
 
     return items
-
-
-def load_initial_venues() -> list[dict[str, Any]]:
-    """Loads venue data."""
-    return load_from_yaml("apps/volunteer/data/venues/*.yml")
