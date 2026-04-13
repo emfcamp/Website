@@ -2,10 +2,10 @@
 {% block title %}Village: {{village.name}}{% endblock %}
 {% block body %}
 <h1>
-    {{village.name}}
-    {% if show_edit %}
-    (<a href="{{url_for('villages.edit', year=event_year, village_id=village.id)}}">edit</a>)
-    {% endif %}
+  {{village.name}}
+  {% if show_edit %}
+  <a href="{{url_for('villages.edit', year=event_year, village_id=village.id)}}" class="btn btn-primary btn-lg pull-right">Edit</a>
+  {% endif %}
 </h1>
 
 {% if village.description %}
@@ -20,13 +20,16 @@
 <p>{{village_long_description_html}}</p>
 {% endif %}
 
-{# TODO: embed a map somehow? #}
-{% if village.map_link %}
-<a href="{{ village.map_link }}" class="btn btn-default" target="_blank">📍&nbsp;View on map</a>
-{% endif %}
-{% if village.url %}
-<a href="{{ village.url }}" class="btn btn-default" rel="nofollow" target="_blank">More about this village</a>
-{% endif %}
+<div>
+  <a href="{{url_for('villages.main', year=event_year)}}" class="btn btn-default pull-right">View all villages</a>
+  {# TODO: embed a map somehow? #}
+  {% if village.map_link %}
+  <a href="{{ village.map_link }}" class="btn btn-default" target="_blank">📍&nbsp;View on map</a>
+  {% endif %}
+  {% if village.url %}
+  <a href="{{ village.url }}" class="btn btn-default" rel="nofollow" target="_blank">More about this village</a>
+  {% endif %}
+</div>
 
 {# TODO: Can we show what's on at the village venues here? #}
 {% endblock %}
