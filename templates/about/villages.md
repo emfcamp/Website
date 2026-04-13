@@ -1,7 +1,9 @@
 title: Villages
 ---
 # Villages
-A village is a group of friends, like-minded people, colleagues or even families camping together at EMF. Maybe your village is a collection of sub villages, or maybe it’s just your hackerspace. A village can be based around themes, shared passions and existing communities - great places in the past have been the Maths village, the HAB Village and groups like Milliways and the Scottish Consulate. You can find the list of currently registered villages for EMF {{ event_year }} at [emfcamp.org/villages/{{ event_year }}](/villages/{{ event_year }}).
+A village is a group of friends, like-minded people, colleagues or even families camping together at EMF. Maybe your village is a collection of sub villages, or maybe it's just your hackerspace. A village can be based around themes, shared passions and existing communities - great places in the past have been the Maths village, the HAB Village and groups like Milliways and the Scottish Consulate. 
+
+<a href="/villages/{{ event_year }}" class="btn btn-primary">View the villages for {{ event_year }}</a>
 
 If there is a village based around something you are interested in, then you should definitely visit that village during the event to see what's going on. Or you could even join that village to help make more things go on. If there's not a village based around your interests, then you can start your own village and others will probably join you.
 
@@ -10,9 +12,11 @@ There is no requirement to be part of a village, so if you'd rather camp on your
 If you're planning to bring something especially big or in need of lots of power to your village, please let us know beforehand so we can provide you with what you need.
 
 ## Register a Village
-By [registering your village at emfcamp.org/villages/register](/villages/register), you'll be making the Village People aware of the fact you plan to arrive, and how much space you're likely to need, and you'll allow us to get in touch to discuss how we can support your plans and activities at the event.
+By registering your village, you'll be making the Village People aware of the fact you plan to arrive, and how much space you're likely to need, and you'll allow us to get in touch to discuss how we can support your plans and activities at the event.
 
-The name of your village will be listed on the website at [emfcamp.org/villages](https://www.emfcamp.org/villages), and your 'Long Description' can be used to populate the page with text and links (using Markdown formatting). It's up to you how much information you include here, and if you'd prefer to just be a group of friends, you can keep it brief. If you'd like people to be able to contact you and join your village or come and visit to participate in activities you're running, you can include contact details, links to external websites and information about your planned activities there. (We're no longer using a Wiki for villages info, so this will now be the main place to share details.)
+<a href="/villages/register" class="btn btn-primary">Register your village</a>
+
+The name of your village will be shown on the [list of villages](/villages), and your 'Long Description' can be used to populate the page with text and links (using Markdown formatting). It's up to you how much information you include here, and if you'd prefer to just be a group of friends, you can keep it brief. If you'd like people to be able to contact you and join your village or come and visit to participate in activities you're running, you can include contact details, links to external websites and information about your planned activities there. (We're no longer using a Wiki for villages info, so this will now be the main place to share details.)
 
 ## What can we do as a village?
 Villages are great as you can share ideas, equipment and space! The sharing doesn’t stop there - it lets you share resources too. You can come up with a cooking and cleaning rota as a group to reduce waste, make the camp cheaper and interrupt your day with a change of activity. Some people spend all their time cooking for others!
