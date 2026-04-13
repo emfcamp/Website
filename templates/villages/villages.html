@@ -4,14 +4,9 @@
 {% block body %}
 <h1>List of villages for {{ event_year }}</h1>
 <p>Not sure what villages are? <a href="{{ url_for('base.page', page_name='villages') }}">Read more about villages at EMF</a>.
-{% if current_user.is_authenticated %}
-  {% if current_user.village %}
-    You're a member of the <strong><a href="{{url_for('villages.view', year=event_year, village_id=current_user.village.id)}}">{{current_user.village.name}}</a></strong> village.
-  {% else %}
-    If you want to create a village, you can
-    <a href="{{url_for('.register')}}">register it here</a>.
-  {% endif %}
-{% else %}
+{% if current_user.is_authenticated and not current_user.village %}
+If you want to create a village, you can <a href="{{url_for('.register')}}">register it here</a>.
+{% elif not current_user.is_authenticated %}
 If you have a ticket, you can <a href="{{url_for('users.login', next=url_for('.register'))}}">log in to register a village</a>.
 {% endif %}
 </p>
@@ -20,7 +15,26 @@ If you have a ticket, you can <a href="{{url_for('users.login', next=url_for('.r
     <h4 class="village-table-title">Name</h4>
     <h4 class="village-table-description">Description</h4>
   </li>
+  {% if current_user.is_authenticated and current_user.village %}
+  <li class="village-table-village">
+    <h4 class="village-table-title">
+      <a href="{{ url_for('villages.view', year=event_year, village_id=current_user.village.id) }}">
+      {{- current_user.village.name -}}
+      </a>
+      <span class="badge bg-primary">Your Village</span>
+    </h4>
+    <p class="village-table-description">
+      {{ current_user.village.description }}
+    </p>
+    {% if current_user.village.map_link %}
+      <div class="village-table-links">
+        <a href="{{ current_user.village.map_link }}" class="btn btn-primary" target="_blank">📍&nbsp;Map</a>
+      </div>
+    {% endif %}
+  </li>
+  {% endif %}
   {% for village in villages %}
+  {% if not (current_user.is_authenticated and current_user.village and village.id == current_user.village.id) %}
   <li class="village-table-village">
     <h4 class="village-table-title">
       <a href="{{ url_for('villages.view', year=event_year, village_id=village.id) }}">
@@ -36,6 +50,7 @@ If you have a ticket, you can <a href="{{url_for('users.login', next=url_for('.r
       </div>
     {% endif %}
   </li>
+  {% endif %}
   {% endfor %}
 </ul>
 {% endblock %}
