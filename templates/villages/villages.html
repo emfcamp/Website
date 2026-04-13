@@ -1,9 +1,9 @@
 {% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
-{% block title %}Villages{% endblock %}
+{% block title %}List of villages for {{ event_year }}{% endblock %}
 {% block body %}
-<h2>Villages</h2>
-<p>For more information on villages, see the <a href="{{ url_for('base.page', page_name='villages') }}">villages page</a>.
+<h1>List of villages for {{ event_year }}</h1>
+<p>Not sure what villages are? <a href="{{ url_for('base.page', page_name='villages') }}">Read more about villages at EMF</a>.
 {% if current_user.is_authenticated %}
   {% if current_user.village %}
     You're a member of the <strong><a href="{{url_for('villages.view', year=event_year, village_id=current_user.village.id)}}">{{current_user.village.name}}</a></strong> village.
@@ -15,7 +15,6 @@
 If you have a ticket, you can <a href="{{url_for('users.login', next=url_for('.register'))}}">log in to register a village</a>.
 {% endif %}
 </p>
-<h3>List of Villages</h3>
 <ul class="village-table{% if any_village_located %} village-table-located{% endif %}">
   <li class="village-table-header">
     <h4 class="village-table-title">Name</h4>
