@@ -197,67 +197,45 @@ EmailStatus = Literal["unverified", "verified", "bounced", "spam_report"]
 
 
 class User(BaseModel, UserMixin):
+    """A user of the EMF website
+
+    User objects are usually created when a user purchases a ticket or submits a proposal
+    to the Call for Participation.
+    """
+
     __tablename__ = "user"
     __versioned__ = {"exclude": ["favourites"]}
 
+    ### Basic user info
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(unique=True, index=True)
 
     #: Whether the user's email address has been verified or bounced
     email_state: Mapped[EmailStatus] = mapped_column(server_default="unverified", nullable=False)
 
+    #: The user's name
     name: Mapped[str] = mapped_column(index=True)
     company: Mapped[str | None]
-    will_have_ticket: Mapped[bool] = mapped_column(default=False)  # for CfP filtering
+    #: A note shown to the entrance volunteer when this person is checked in
     checkin_note: Mapped[str | None]
-    #: Whether the user has opted in to receive promo emails after this event
+    #: Whether the user has opted in to receive promotional emails after this event
     promo_opt_in: Mapped[bool] = mapped_column(default=False)
-
-    cfp_invite_reason: Mapped[str | None]
-
-    cfp_reviewer_tags: Mapped[list[Tag]] = relationship(
-        back_populates="reviewers",
-        cascade="all",
-        secondary=CFPReviewerTags,
-    )
 
     diversity: Mapped[UserDiversity | None] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
-    shipping: Mapped[UserShipping | None] = relationship(back_populates="user", cascade="all, delete-orphan")
-    payments: Mapped[list[Payment]] = relationship(lazy="dynamic", back_populates="user", cascade="all")
+
+    #: Website permissions assigned to this user
     permissions: Mapped[list[Permission]] = relationship(
         back_populates="users",
         cascade="all",
         secondary=UserPermission,  # type: ignore[has-type]  # see https://github.com/sqlalchemy/sqlalchemy/discussions/9801
         lazy="joined",
     )
-    votes: Mapped[list[ProposalVote]] = relationship(back_populates="user")
 
-    proposals: Mapped[list[Proposal]] = relationship(
-        primaryjoin="Proposal.user_id == User.id",
-        back_populates="user",
-    )
-    anonymised_proposals: Mapped[list[Proposal]] = relationship(
-        primaryjoin="Proposal.anonymiser_id == User.id",
-        back_populates="anonymiser",
-    )
-
-    schedule_items: Mapped[list[ScheduleItem]] = relationship(
-        primaryjoin="ScheduleItem.user_id == User.id",
-        back_populates="user",
-    )
-
-    favourites: Mapped[list[ScheduleItem]] = relationship(
-        back_populates="favourited_by", secondary="favourite_schedule_item"
-    )
-
-    messages_from: Mapped[list[ProposalMessage]] = relationship(
-        primaryjoin="ProposalMessage.from_user_id == User.id",
-        back_populates="from_user",
-    )
-
-    lottery_entries: Mapped[list[LotteryEntry]] = relationship(back_populates="user")
+    ### Purchases
+    shipping: Mapped[UserShipping | None] = relationship(back_populates="user", cascade="all, delete-orphan")
+    payments: Mapped[list[Payment]] = relationship(lazy="dynamic", back_populates="user", cascade="all")
 
     purchases: Mapped[list[Purchase]] = relationship(
         lazy="dynamic", primaryjoin="Purchase.purchaser_id == User.id"
@@ -290,6 +268,44 @@ class User(BaseModel, UserMixin):
         cascade="all, delete-orphan",
     )
 
+    ### Content
+    will_have_ticket: Mapped[bool] = mapped_column(default=False)  # for CfP filtering
+    cfp_invite_reason: Mapped[str | None]
+
+    proposals: Mapped[list[Proposal]] = relationship(
+        primaryjoin="Proposal.user_id == User.id",
+        back_populates="user",
+    )
+
+    schedule_items: Mapped[list[ScheduleItem]] = relationship(
+        primaryjoin="ScheduleItem.user_id == User.id",
+        back_populates="user",
+    )
+
+    favourites: Mapped[list[ScheduleItem]] = relationship(
+        back_populates="favourited_by", secondary="favourite_schedule_item"
+    )
+
+    messages_from: Mapped[list[ProposalMessage]] = relationship(
+        primaryjoin="ProposalMessage.from_user_id == User.id",
+        back_populates="from_user",
+    )
+
+    lottery_entries: Mapped[list[LotteryEntry]] = relationship(back_populates="user")
+    votes: Mapped[list[ProposalVote]] = relationship(back_populates="user")
+
+    cfp_reviewer_tags: Mapped[list[Tag]] = relationship(
+        back_populates="reviewers",
+        cascade="all",
+        secondary=CFPReviewerTags,
+    )
+
+    anonymised_proposals: Mapped[list[Proposal]] = relationship(
+        primaryjoin="Proposal.anonymiser_id == User.id",
+        back_populates="anonymiser",
+    )
+
+    ### Villages
     village_membership: Mapped[VillageMember] = relationship(
         cascade="all, delete-orphan",
         back_populates="user",
@@ -297,6 +313,7 @@ class User(BaseModel, UserMixin):
     )
     village = association_proxy("village_membership", "village")
 
+    ### Volunteering
     admin_messages: Mapped[list[AdminMessage]] = relationship("AdminMessage", back_populates="creator")
 
     buildup_volunteer: Mapped[BuildupVolunteer | None] = relationship(
