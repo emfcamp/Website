@@ -23,7 +23,7 @@ from wtforms.validators import InputRequired
 from main import db, get_or_404
 from models import event_year
 from models.admin_message import AdminMessage
-from models.cfp import (
+from models.content import (
     SCHEDULE_ITEM_INFOS,
     Occurrence,
     Proposal,
@@ -31,7 +31,11 @@ from models.cfp import (
     ScheduleItemType,
     Venue,
 )
-from models.lottery import Lottery, LotteryEntry, LotteryEntryState
+from models.content.lottery import (
+    Lottery,
+    LotteryEntry,
+    LotteryEntryState,
+)
 from models.user import generate_api_token
 
 from ..cfp_review import admin_required as cfp_admin_required

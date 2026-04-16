@@ -10,7 +10,7 @@ from prometheus_client.multiprocess import MultiProcessCollector
 from sqlalchemy import String, case, cast, func
 
 from models import count_groups, naive_utcnow
-from models.cfp import Proposal
+from models.content import Proposal
 from models.email import EmailJobRecipient
 from models.payment import Payment
 from models.product import VOUCHER_GRACE_PERIOD, Product, ProductView, Voucher

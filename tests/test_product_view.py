@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from models import naive_utcnow
-from models.cfp import Proposal
+from models.content import Proposal
 from models.product import VOUCHER_GRACE_PERIOD, ProductView, Voucher
 
 

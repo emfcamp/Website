@@ -9,7 +9,7 @@ from wtforms.widgets import TextArea
 
 from main import db
 from models import event_year
-from models.cfp import Proposal
+from models.content import Proposal
 from models.payment import Payment
 from models.purchase import Purchase
 from models.user import User

@@ -14,9 +14,8 @@ from sqlalchemy.orm import selectinload
 from apps.common import tidy_workshop_cost
 from main import db, external_url
 from models import event_year
-from models.cfp import (
-    Occurrence,
-    ScheduleItem,
+from models.content import Occurrence, ScheduleItem
+from models.content.attributes import (
     TalkAttributes,
     WorkshopAttributes,
     YouthWorkshopAttributes,

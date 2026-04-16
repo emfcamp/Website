@@ -33,22 +33,23 @@ from wtforms import FormField
 
 from apps.common import get_next_url
 from main import db, external_url, get_or_404
-from models.cfp import (
+from models.content import (
     SCHEDULE_ITEM_INFOS,
+    Lottery,
     Occurrence,
     Proposal,
     ProposalMessage,
     ProposalState,
+    ProposalTag,
     ProposalType,
     ProposalVote,
     ScheduleItem,
     ScheduleItemState,
     ScheduleItemType,
+    Tag,
     Venue,
-    convert_attributes_between_types,
 )
-from models.cfp_tag import ProposalTag, Tag
-from models.lottery import Lottery
+from models.content.attributes import convert_attributes_between_types
 from models.permission import Permission
 from models.purchase import AdmissionTicket
 from models.user import User

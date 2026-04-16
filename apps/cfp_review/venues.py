@@ -19,7 +19,7 @@ from wtforms import (
 from wtforms.validators import DataRequired, Optional
 
 from main import db, get_or_404
-from models.cfp import SCHEDULE_ITEM_INFOS, Occurrence, Venue
+from models.content import SCHEDULE_ITEM_INFOS, Occurrence, Venue
 from models.village import Village
 
 from ..common.forms import Form, coerce_optional

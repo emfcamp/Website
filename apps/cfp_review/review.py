@@ -11,7 +11,7 @@ from sqlalchemy import and_, select
 
 from main import db, get_or_404
 from models import naive_utcnow
-from models.cfp import PROPOSAL_INFOS, Proposal, ProposalVote, ReviewType, StateTransitionException
+from models.content import PROPOSAL_INFOS, Proposal, ProposalVote, ReviewType, StateTransitionException
 
 from . import cfp_review, review_required
 from .forms import ReviewListForm, VoteForm

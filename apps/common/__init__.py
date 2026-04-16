@@ -34,7 +34,7 @@ from main import db, external_url
 from models import Currency, User, event_end, event_start, naive_utcnow
 from models.basket import Basket
 from models.capacity import UnlimitedType
-from models.cfp import PROPOSAL_INFOS, SCHEDULE_ITEM_INFOS
+from models.content import PROPOSAL_INFOS, SCHEDULE_ITEM_INFOS
 from models.feature_flag import get_db_flags
 from models.product import Price
 from models.purchase import Ticket

@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from main import db
 from models.user import CFPReviewerTags, User
 
-from . import BaseModel
+from .. import BaseModel
 
 if TYPE_CHECKING:
     from .cfp import Proposal

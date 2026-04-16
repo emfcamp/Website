@@ -8,7 +8,7 @@ from sqlalchemy import and_, select
 from sqlalchemy.orm import joinedload
 
 from main import db
-from models.cfp import (
+from models.content import (
     EVENT_SPACING,
     ROUGH_DURATIONS,
     Occurrence,

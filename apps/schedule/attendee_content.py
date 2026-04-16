@@ -34,7 +34,7 @@ from wtforms.validators import DataRequired, NumberRange, Optional
 from apps.cfp_review.base import _convert_schedule_item
 from apps.common.fields import HiddenIntegerField
 from main import db, get_or_404
-from models.cfp import (
+from models.content import (
     AGE_RANGE_OPTIONS,
     Occurrence,
     ScheduleItem,

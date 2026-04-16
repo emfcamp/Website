@@ -10,7 +10,7 @@ from sqlalchemy import select
 
 from main import db, external_url, get_or_404
 from models import event_year
-from models.cfp import Occurrence, ScheduleItem
+from models.content import Occurrence, ScheduleItem
 from models.user import User
 
 from ..common import feature_enabled, feature_flag, json_response

@@ -14,7 +14,7 @@ from models.user import User
 from . import BaseModel
 
 if TYPE_CHECKING:
-    from .cfp import Venue
+    from .content import Venue
 
 __all__ = [
     "Village",

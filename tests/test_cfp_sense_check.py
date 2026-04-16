@@ -5,7 +5,7 @@ import pytest
 from dateutil.parser import parse
 
 from apps.cfp_review.sense_check import not_sensible_reasons
-from models.cfp import Occurrence, ScheduleItem, Venue
+from models.content import Occurrence, ScheduleItem, Venue
 
 
 @pytest.fixture

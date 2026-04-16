@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload
 
 from main import db
 from models import event_end, event_start
-from models.cfp import Occurrence, ScheduleItem, ScheduleItemType
+from models.content import Occurrence, ScheduleItem, ScheduleItemType
 
 from . import cfp_review, review_required
 

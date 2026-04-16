@@ -6,7 +6,7 @@ import requests
 from flask import current_app as app
 
 from main import db
-from models.cfp import Proposal
+from models.content import Proposal
 
 from . import base
 

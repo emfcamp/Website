@@ -8,11 +8,11 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from main import db
 
-from . import BaseModel, bucketise, export_attr_counts
+from .. import BaseModel, bucketise, export_attr_counts
+from ..user import User
 
 if TYPE_CHECKING:
-    from .cfp import Occurrence, ScheduleItem
-from .user import User
+    from .schedule import Occurrence, ScheduleItem
 
 __all__ = [
     "Lottery",

@@ -8,14 +8,17 @@ from sqlalchemy.orm import selectinload
 
 from apps.cfp_review.base import send_email_for_proposal
 from main import db
-from models.cfp import (
+from models.content import (
+    DEFAULT_TAGS,
     Occurrence,
     Proposal,
+    ScheduleItem,
+    Tag,
+)
+from models.content.attributes import (
     ProposalInstallationAttributes,
     ProposalWorkshopAttributes,
-    ScheduleItem,
 )
-from models.cfp_tag import DEFAULT_TAGS, Tag
 from models.user import User
 
 from . import cfp

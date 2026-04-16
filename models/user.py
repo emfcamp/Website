@@ -27,10 +27,11 @@ from .volunteer.shift import ShiftEntry
 
 if TYPE_CHECKING:
     from .admin_message import AdminMessage
-    from .cfp import Occurrence, ProposalMessage, ProposalVote, ScheduleItem
-    from .cfp_tag import Tag
+    from .content.cfp import ProposalMessage, ProposalVote
+    from .content.lottery import LotteryEntry
+    from .content.schedule import Occurrence, ScheduleItem
+    from .content.tagging import Tag
     from .diversity import UserDiversity
-    from .lottery import LotteryEntry
     from .payment import Payment
     from .purchase import AdmissionTicket, Purchase, PurchaseTransfer, Ticket
     from .village import VillageMember
@@ -518,4 +519,5 @@ def load_anonymous_user():
     return au
 
 
-from .cfp import Proposal, ScheduleItem
+from .content.cfp import Proposal
+from .content.schedule import ScheduleItem

@@ -16,7 +16,7 @@ from .. import BaseModel
 if TYPE_CHECKING:
     from pendulum import DateTime
 
-    from ..cfp import Occurrence
+    from ..content.schedule import Occurrence
     from ..user import User
     from .role import Role
     from .venue import VolunteerVenue

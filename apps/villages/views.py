@@ -10,7 +10,7 @@ from sqlalchemy import exists, select
 
 from main import db
 from models import event_year
-from models.cfp import Venue
+from models.content import Venue
 from models.village import Village, VillageMember
 
 from . import load_village, villages

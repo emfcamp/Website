@@ -1,6 +1,6 @@
 import pytest
 
-from models.cfp import Occurrence, ScheduleItem
+from models.content import Occurrence, ScheduleItem
 
 
 @pytest.fixture(scope="module")

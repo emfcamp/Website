@@ -22,7 +22,7 @@ from wtforms import BooleanField, FormField, SelectField, StringField, SubmitFie
 from wtforms.validators import URL, DataRequired, ValidationError
 
 from main import db, external_url, get_or_404
-from models.cfp import (
+from models.content import (
     AGE_RANGE_OPTIONS,
     DURATION_OPTIONS,
     PROPOSAL_INFOS,
@@ -30,9 +30,11 @@ from models.cfp import (
     Proposal,
     ProposalMessage,
     ProposalType,
+    ScheduleItem,
+)
+from models.content.attributes import (
     ProposalWorkshopAttributes,
     ProposalYouthWorkshopAttributes,
-    ScheduleItem,
 )
 from models.user import User
 

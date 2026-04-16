@@ -7,7 +7,7 @@ from flask_login import current_user
 from sqlalchemy import func, or_, select
 
 from main import db
-from models.cfp import (
+from models.content import (
     PROPOSAL_INFOS,
     SCHEDULE_ITEM_INFOS,
     Proposal,

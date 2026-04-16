@@ -9,7 +9,7 @@ from sqlalchemy import select
 
 from apps.common import render_template_markdown
 from main import db
-from models.cfp import Occurrence, ScheduleItem
+from models.content import Occurrence, ScheduleItem
 from models.volunteer import (
     Role,
     Shift,

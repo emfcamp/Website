@@ -197,11 +197,10 @@ def config_date(key):
 from .admin_message import *  # noqa: F403
 from .arrivals import *  # noqa: F403
 from .basket import *  # noqa: F403
-from .cfp import *  # noqa: F403
+from .content import *  # noqa: F403
 from .diversity import *  # noqa: F403
 from .email import *  # noqa: F403
 from .feature_flag import *  # noqa: F403
-from .lottery import *  # noqa: F403
 from .payment import *  # noqa: F403
 from .permission import *  # noqa: F403
 from .product import *  # noqa: F403

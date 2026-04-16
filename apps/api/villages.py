@@ -7,7 +7,7 @@ from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import Point
 
 from main import db
-from models.cfp import Venue
+from models.content import Venue
 from models.user import User
 from models.village import Village, VillageMember
 

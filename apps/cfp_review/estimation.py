@@ -5,7 +5,7 @@ from datetime import timedelta
 from sqlalchemy import select
 
 from main import db
-from models.cfp import (
+from models.content import (
     EVENT_SPACING,
     PROPOSAL_TIMESLOTS,
     ROUGH_DURATIONS,

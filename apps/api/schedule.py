@@ -12,8 +12,7 @@ from sqlalchemy import select
 from main import db, get_or_404
 from models import event_year
 from models.admin_message import AdminMessage
-from models.cfp import SCHEDULE_ITEM_INFOS, Occurrence, ScheduleItem, ScheduleItemType
-from models.lottery import LotteryEntry
+from models.content import SCHEDULE_ITEM_INFOS, LotteryEntry, Occurrence, ScheduleItem, ScheduleItemType
 
 from . import api
 

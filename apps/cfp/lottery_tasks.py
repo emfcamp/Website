@@ -8,8 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
 
 from main import db
-from models.cfp import Occurrence, ScheduleItem
-from models.lottery import Lottery, LotteryEntry
+from models.content import Lottery, LotteryEntry, Occurrence, ScheduleItem
 
 from ..common.email import from_email
 from . import cfp

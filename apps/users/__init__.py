@@ -24,7 +24,7 @@ from wtforms.validators import DataRequired, ValidationError
 from apps.common import get_next_url
 from main import db, get_or_404
 from models.basket import Basket
-from models.cfp import Proposal, ProposalMessage
+from models.content import Proposal, ProposalMessage
 from models.user import User, verify_signup_code
 
 from ..common import feature_flag, set_user_currency

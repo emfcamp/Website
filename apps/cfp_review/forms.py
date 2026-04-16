@@ -18,15 +18,15 @@ from wtforms import (
 from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
 
 from main import db
-from models.cfp import (
+from models.content import (
     PROPOSAL_INFOS,
     OccurrenceState,
     ProposalType,
     ScheduleItemState,
     ScheduleItemType,
+    Tag,
     Venue,
 )
-from models.cfp_tag import Tag
 from models.user import User
 
 from ..admin.users import NewUserForm

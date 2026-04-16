@@ -3,7 +3,7 @@ from flask import current_app as app
 from flask_login import current_user
 
 from main import db, get_or_404
-from models.cfp import Proposal
+from models.content import Proposal
 
 from . import anon_required, cfp_review, get_next_proposal_to, sort_proposals
 from .forms import AnonymiseProposalForm

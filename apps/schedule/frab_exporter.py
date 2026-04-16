@@ -11,7 +11,7 @@ from flask import request
 
 from main import db, external_url
 from models import event_end, event_start, event_year
-from models.cfp import SCHEDULE_ITEM_INFOS, ScheduleItem, Venue, schedule_item_slug
+from models.content import SCHEDULE_ITEM_INFOS, ScheduleItem, Venue, schedule_item_slug
 
 from . import event_tz
 from .data import ScheduleFilter, ScheduleItemDict, _get_occurrence_dict, _get_schedule_item_dict

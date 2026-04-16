@@ -1,7 +1,7 @@
 import pytest
 
 from models import event_year
-from models.cfp import Occurrence, ScheduleItem
+from models.content import Occurrence, ScheduleItem
 
 
 @pytest.fixture

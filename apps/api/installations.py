@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload
 
 from main import db
 from models import event_year
-from models.cfp import ScheduleItem
+from models.content import ScheduleItem
 
 from . import api
 

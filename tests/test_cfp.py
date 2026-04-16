@@ -2,7 +2,7 @@ from hypothesis import assume, given, settings
 from hypothesis.strategies import text
 
 from apps.cfp_review.base import send_email_for_proposal
-from models.cfp import (
+from models.content import (
     PROPOSAL_INFOS,
     SCHEDULE_ITEM_INFOS,
     Proposal,

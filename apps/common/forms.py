@@ -7,7 +7,7 @@ from wtforms import BooleanField, SelectField, ValidationError
 from wtforms.validators import InputRequired
 
 from main import db
-from models.cfp_tag import DEFAULT_TAGS, Tag
+from models.content import DEFAULT_TAGS, Tag
 from models.diversity import (
     AGE_CHOICES,
     DISABILITY_CHOICES,

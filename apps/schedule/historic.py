@@ -8,7 +8,7 @@ from flask import abort, redirect, render_template, send_file, url_for
 from flask.typing import ResponseReturnValue
 
 from models import event_year
-from models.cfp import schedule_item_slug
+from models.content import schedule_item_slug
 
 from ..common import archive_file, load_archive_file
 

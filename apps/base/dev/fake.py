@@ -11,22 +11,30 @@ from sqlalchemy import select
 from main import db
 from models import Currency
 from models.basket import Basket
-from models.cfp import (
+from models.content import (
     DURATION_OPTIONS,
     ROUGH_DURATIONS,
-    InstallationAttributes,
-    LightningTalkAttributes,
     Occurrence,
-    PerformanceAttributes,
     Proposal,
     ProposalType,
     ProposalVote,
+    ScheduleItem,
+)
+from models.content.attributes import (
+    InstallationAttributes,
+    LightningTalkAttributes,
+    PerformanceAttributes,
     ProposalWorkshopAttributes,
     ProposalYouthWorkshopAttributes,
-    ScheduleItem,
     TalkAttributes,
     WorkshopAttributes,
     YouthWorkshopAttributes,
+)
+from models.content.lottery import (
+    Lottery,
+    LotteryEntry,
+    LotteryState,
+    get_max_rank_for_user,
 )
 from models.diversity import (
     AGE_CHOICES,
@@ -36,7 +44,6 @@ from models.diversity import (
     SEXUALITY_CHOICES,
     UserDiversity,
 )
-from models.lottery import Lottery, LotteryEntry, LotteryState, get_max_rank_for_user
 from models.payment import BankPayment, StripePayment
 from models.product import PriceTier
 from models.user import User
