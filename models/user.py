@@ -236,20 +236,26 @@ class User(BaseModel, UserMixin):
 
     ### Purchases
     shipping: Mapped[UserShipping | None] = relationship(back_populates="user", cascade="all, delete-orphan")
+
+    #: Payments created by this user
     payments: Mapped[list[Payment]] = relationship(lazy="dynamic", back_populates="user", cascade="all")
 
+    #: All purchases which this user has made (which may have been transferred to another user)
     purchases: Mapped[list[Purchase]] = relationship(
         lazy="dynamic", primaryjoin="Purchase.purchaser_id == User.id"
     )
 
+    #: Purchases owned by this user
     owned_purchases: Mapped[list[Purchase]] = relationship(
         lazy="dynamic", primaryjoin="Purchase.owner_id == User.id"
     )
 
+    #: Tickets owned by this user
     owned_tickets: Mapped[list[Ticket]] = relationship(
         lazy="select", primaryjoin="Ticket.owner_id == User.id", viewonly=True
     )
 
+    #: Admission tickets owned by this user
     owned_admission_tickets: Mapped[list[AdmissionTicket]] = relationship(
         lazy="select",
         primaryjoin="AdmissionTicket.owner_id == User.id",

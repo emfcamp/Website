@@ -6,3 +6,4 @@ Data Model
 
    content
    volunteering
+   user
