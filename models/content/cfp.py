@@ -526,7 +526,7 @@ class ProposalMessage(BaseModel):
     from_user: Mapped[User] = relationship(back_populates="messages_from")
     proposal: Mapped[Proposal] = relationship(back_populates="messages")
 
-    def is_user_recipient(self, user):
+    def is_user_recipient(self, user: User) -> bool:
         """
         Because we want messages from proposers to be visible to all admin
         we need to infer the 'to' portion of the email, either it is
@@ -552,7 +552,8 @@ class ProposalMessage(BaseModel):
         count_attrs = ["has_been_read"]
 
         message_contents = (
-            cls.query.join(User)
+            db.session.query(cls)
+            .join(User)
             .with_entities(
                 cls.proposal_id,
                 User.email.label("from_user_email"),
@@ -570,7 +571,7 @@ class ProposalMessage(BaseModel):
             "tables": ["cfp_message", "cfp_message_version"],
         }
         data["public"]["messages"]["counts"]["created_day"] = export_intervals(
-            cls.query, cls.created, "day", "YYYY-MM-DD"
+            db.session.query(cls), cls.created, "day", "YYYY-MM-DD"
         )
 
         return data

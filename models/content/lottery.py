@@ -100,7 +100,9 @@ class LotteryEntry(BaseModel):
     occurrence: AssociationProxy["Occurrence"] = association_proxy("lottery", "occurrence")
 
     # add a way to indicate a code has been used?
-    def use_code(self, code):
+    def use_code(self, code: str) -> None:
+        if self.ticket_codes is None:
+            return
         all_codes = self.ticket_codes.split(",")
         if code not in all_codes:
             raise LotteryEntryException(f"Code '{code}' not found")
@@ -108,22 +110,24 @@ class LotteryEntry(BaseModel):
         all_codes.remove(code)
         self.ticket_codes = ",".join(all_codes)
 
-    def use_all_codes(self):
+    def use_all_codes(self) -> None:
         if not self.ticket_codes:
             raise LotteryEntryException("No codes found")
         self.ticket_codes = ""
 
-    def get_users_other_lottery_entries_for_type(self):
+    def get_users_other_lottery_entries_for_type(self) -> list["LotteryEntry"]:
         return [
             e
             for e in self.user.lottery_entries
-            if e.state == "entered" and e != self and e.schedule_item.type == self.schedule_item.type
+            if e.state == "entered"
+            and e != self
+            and e.occurrence.schedule_item.type == self.occurrence.schedule_item.type
         ]
 
     def is_in_lottery_round(self, round_rank):
         return self.state == "entered" and self.rank <= round_rank
 
-    def change_state(self, new_state):
+    def change_state(self, new_state: LotteryEntryState) -> None:
         if new_state == self.state:
             return
 
@@ -138,7 +142,7 @@ class LotteryEntry(BaseModel):
 
         self.state = new_state
 
-    def generate_codes(self):
+    def generate_codes(self) -> None:
         # These are in no way cryptographically secure etc but 1 in 308m should
         # be low enough odds for guessing.
         codes = []
@@ -167,8 +171,8 @@ class LotteryEntry(BaseModel):
                 entry.rank -= 1
         return self.change_state("cancelled")
 
-    def reenter_lottery(self):
-        self.rank = get_max_rank_for_user(self.user, self.schedule_item.type)
+    def reenter_lottery(self) -> None:
+        self.rank = get_max_rank_for_user(self.user, self.occurrence.schedule_item.type)
         return self.change_state("entered")
 
     @classmethod
