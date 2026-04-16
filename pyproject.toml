@@ -92,7 +92,8 @@ dev = [
     "types-icalendar>=6.3.1.20250822",
     "types-wtforms>=3.2.1.20250809",
     "xmlschema>=4.3.1",
-    "lxml>=6.0.2",  # Required for mypy --txt-report
+    "lxml>=6.0.2", # Required for mypy --txt-report
+    "esbonio>=1.1.0",
 ]
 docs = [
     "esbonio>=1.1.0",

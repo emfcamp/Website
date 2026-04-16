@@ -2481,6 +2481,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "cairosvg" },
+    { name = "esbonio" },
     { name = "hypothesis" },
     { name = "ipdb" },
     { name = "locust" },
@@ -2576,6 +2577,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "cairosvg", specifier = ">=2.4.2,<3" },
+    { name = "esbonio", specifier = ">=1.1.0" },
     { name = "hypothesis" },
     { name = "ipdb" },
     { name = "locust" },
