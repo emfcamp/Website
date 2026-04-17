@@ -10,8 +10,9 @@ from sqlalchemy_continuum.utils import is_versioned, version_class
 
 from apps.common.json_export import ExportEncoder
 from main import db
-from models import event_year, naive_utcnow
+from models import naive_utcnow
 
+from ..config import config
 from . import base
 
 
@@ -104,7 +105,7 @@ def export_db(stdout, table):
     shouldn't be called, and that its associated table doesn't need to be checked.
     """
 
-    year = event_year()
+    year = config.event_year
     path = os.path.join("exports", str(year))
     for dirname in ["public", "private"]:
         os.makedirs(os.path.join(path, dirname), exist_ok=True)

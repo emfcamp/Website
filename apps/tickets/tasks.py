@@ -22,7 +22,7 @@ from models.purchase import Purchase
 from models.scheduled_task import scheduled_task
 from models.user import User
 
-from ..common.email import from_email
+from ..config import config
 from . import tickets
 
 
@@ -402,7 +402,7 @@ def email_transfer_reminders():
 
     # for user in users_to_email:
     #     msg = EmailMessage("Your Electromagnetic Field Tickets",
-    #         from_email=from_email('TICKETS_EMAIL'),
+    #         from_email=config.from_email('TICKETS_EMAIL'),
     #         to=[user.email]
     #     )
 
@@ -444,7 +444,7 @@ def email_tickets():
 
         msg = EmailMessage(
             f"Your Electromagnetic Field Ticket{plural}",
-            from_email=from_email("TICKETS_EMAIL"),
+            from_email=config.from_email("TICKETS_EMAIL"),
             to=[user.email],
         )
 

@@ -9,9 +9,10 @@ from playwright.async_api import async_playwright
 
 from apps.common import feature_enabled
 from main import external_url
-from models import event_year
 from models.product import PriceTier, Product, ProductGroup
 from models.purchase import Purchase, PurchaseTransfer
+
+from ..config import config
 
 RECEIPT_TYPES = ["admissions", "parking", "campervan", "merchandise", "hire"]
 
@@ -107,7 +108,7 @@ def attach_tickets(msg, user):
     url = external_url("tickets.receipt", user_id=user.id)
     pdf = render_pdf(url, page)
 
-    msg.attach(f"EMF{event_year()}.pdf", pdf.read(), "application/pdf")
+    msg.attach(f"EMF{config.event_year}.pdf", pdf.read(), "application/pdf")
 
 
 def set_tickets_emailed(user):

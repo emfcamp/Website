@@ -39,10 +39,10 @@ from models.content.attributes import (
 from models.user import User
 
 from ..common import create_current_user, feature_enabled, feature_flag
-from ..common.email import from_email
 from ..common.fields import EmailField, TelField
 from ..common.forms import DiversityForm, Form
 from ..common.mattermost import mattermost_notify
+from ..config import config
 from . import cfp
 
 
@@ -312,7 +312,7 @@ def create_proposal(proposal_type: ProposalType = "talk") -> ResponseReturnValue
         # Send confirmation message
         email = EmailMessage(
             "Electromagnetic Field CFP Submission",
-            from_email=from_email("CONTENT_EMAIL"),
+            from_email=config.from_email("CONTENT_EMAIL"),
             to=[current_user.email],
         )
 

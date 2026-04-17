@@ -34,8 +34,8 @@ from models.user import User
 from ..common.email import (
     format_trusted_html_email,
     format_trusted_plaintext_email,
-    from_email,
 )
+from ..config import config
 from .forms import (
     AddProductViewProductForm,
     BulkVoucherEmailForm,
@@ -661,7 +661,7 @@ def product_view_bulk_add_vouchers_by_email(view_id):
             sent_count = mail.send_mail(
                 subject=form.subject.data,
                 message=plaintext,
-                from_email=from_email("TICKETS_EMAIL"),
+                from_email=config.from_email("TICKETS_EMAIL"),
                 recipient_list=[email],
                 fail_silently=True,
                 connection=conn,

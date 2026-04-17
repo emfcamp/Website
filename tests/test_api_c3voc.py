@@ -1,6 +1,6 @@
 import pytest
 
-from models import event_year
+from apps.config import config
 from models.content import Occurrence, ScheduleItem
 
 
@@ -103,7 +103,7 @@ def test_request_none_unchanged(client, app, db, occurrence, valid_auth_headers)
         json={
             "is_master": True,
             "fahrplan": {
-                "conference": f"emf{event_year()}",
+                "conference": f"emf{config.event_year}",
                 "id": occurrence.id,
             },
             "voctoweb": {
@@ -131,7 +131,7 @@ def test_update_voctoweb_with_correct_url(client, app, db, occurrence, valid_aut
         json={
             "is_master": True,
             "fahrplan": {
-                "conference": f"emf{event_year()}",
+                "conference": f"emf{config.event_year}",
                 "id": occurrence.id,
             },
             "voctoweb": {
@@ -163,7 +163,7 @@ def test_denies_voctoweb_with_wrong_url(client, app, db, occurrence, valid_auth_
         json={
             "is_master": True,
             "fahrplan": {
-                "conference": f"emf{event_year()}",
+                "conference": f"emf{config.event_year}",
                 "id": occurrence.id,
             },
             "voctoweb": {
@@ -194,7 +194,7 @@ def test_clears_voctoweb(client, app, db, occurrence, valid_auth_headers):
         json={
             "is_master": True,
             "fahrplan": {
-                "conference": f"emf{event_year()}",
+                "conference": f"emf{config.event_year}",
                 "id": occurrence.id,
             },
             "voctoweb": {
@@ -220,7 +220,7 @@ def test_update_thumbnail_with_path(client, app, db, occurrence, valid_auth_head
         json={
             "is_master": True,
             "fahrplan": {
-                "conference": f"emf{event_year()}",
+                "conference": f"emf{config.event_year}",
                 "id": occurrence.id,
             },
             "voctoweb": {
@@ -248,7 +248,7 @@ def test_update_thumbnail_with_url(client, app, db, occurrence, valid_auth_heade
         json={
             "is_master": True,
             "fahrplan": {
-                "conference": f"emf{event_year()}",
+                "conference": f"emf{config.event_year}",
                 "id": occurrence.id,
             },
             "voctoweb": {
@@ -279,7 +279,7 @@ def test_denies_thumbnail_not_url(client, app, db, occurrence, valid_auth_header
         json={
             "is_master": True,
             "fahrplan": {
-                "conference": f"emf{event_year()}",
+                "conference": f"emf{config.event_year}",
                 "id": occurrence.id,
             },
             "voctoweb": {
@@ -308,7 +308,7 @@ def test_clears_thumbnail(client, app, db, occurrence, valid_auth_headers):
         json={
             "is_master": True,
             "fahrplan": {
-                "conference": f"emf{event_year()}",
+                "conference": f"emf{config.event_year}",
                 "id": occurrence.id,
             },
             "voctoweb": {
@@ -337,7 +337,7 @@ def test_update_from_youtube_with_correct_url(client, app, db, occurrence, valid
         json={
             "is_master": True,
             "fahrplan": {
-                "conference": f"emf{event_year()}",
+                "conference": f"emf{config.event_year}",
                 "id": occurrence.id,
             },
             "voctoweb": {
@@ -370,7 +370,7 @@ def test_denies_youtube_update_with_existing_url(client, app, db, occurrence, va
         json={
             "is_master": True,
             "fahrplan": {
-                "conference": f"emf{event_year()}",
+                "conference": f"emf{config.event_year}",
                 "id": occurrence.id,
             },
             "voctoweb": {
@@ -403,7 +403,7 @@ def test_denies_youtube_update_with_wrong_url(client, app, db, occurrence, valid
         json={
             "is_master": True,
             "fahrplan": {
-                "conference": f"emf{event_year()}",
+                "conference": f"emf{config.event_year}",
                 "id": occurrence.id,
             },
             "voctoweb": {
@@ -435,7 +435,7 @@ def test_clears_youtube(client, app, db, occurrence, valid_auth_headers):
         json={
             "is_master": True,
             "fahrplan": {
-                "conference": f"emf{event_year()}",
+                "conference": f"emf{config.event_year}",
                 "id": occurrence.id,
             },
             "voctoweb": {

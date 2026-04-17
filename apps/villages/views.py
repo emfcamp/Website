@@ -9,10 +9,10 @@ from markupsafe import Markup
 from sqlalchemy import exists, select
 
 from main import db
-from models import event_year
 from models.content import Venue
 from models.village import Village, VillageMember
 
+from ..config import config
 from . import load_village, villages
 from .forms import VillageForm
 
@@ -21,7 +21,7 @@ from .forms import VillageForm
 @login_required
 def register() -> ResponseReturnValue:
     if current_user.village and current_user.village_membership.admin:
-        return redirect(url_for(".edit", year=event_year(), village_id=current_user.village.id))
+        return redirect(url_for(".edit", year=config.event_year, village_id=current_user.village.id))
 
     if not current_user.has_admission_ticket:
         flash("You can't create a village without a ticket to EMF")
@@ -50,19 +50,19 @@ def register() -> ResponseReturnValue:
             db.session.commit()
 
             flash("Your village registration has been received, thanks! You can edit it below.")
-            return redirect(url_for(".view", year=event_year(), village_id=village.id))
+            return redirect(url_for(".view", year=config.event_year, village_id=village.id))
 
     return render_template("villages/register.html", form=form)
 
 
 @villages.route("/")
 def villages_redirect() -> ResponseReturnValue:
-    return redirect(url_for(".main", year=event_year()))
+    return redirect(url_for(".main", year=config.event_year))
 
 
 @villages.route("/<int:year>")
 def main(year: int) -> ResponseReturnValue:
-    if year != event_year():
+    if year != config.event_year:
         abort(404)
 
     villages = list(db.session.execute(select(Village)).scalars().all())

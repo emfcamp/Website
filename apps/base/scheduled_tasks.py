@@ -5,7 +5,7 @@ from models.email import EmailJobRecipient
 from models.scheduled_task import scheduled_task
 from models.volunteer.notify import VolunteerNotifyRecipient
 
-from ..common.email import from_email
+from ..config import config
 
 
 @scheduled_task(minutes=1)
@@ -23,7 +23,7 @@ def send_email(conn, rec):
     sent_count = mail.send_mail(
         subject=rec.job.subject,
         message=rec.job.text_body,
-        from_email=from_email("CONTACT_EMAIL"),
+        from_email=config.from_email("CONTACT_EMAIL"),
         recipient_list=[rec.user.email],
         fail_silently=True,
         connection=conn,
@@ -49,7 +49,7 @@ def send_volunteer_email(conn, rec):
     sent_count = mail.send_mail(
         subject=rec.job.subject,
         message=rec.job.text_body,
-        from_email=from_email("VOLUNTEER_EMAIL"),
+        from_email=config.from_email("VOLUNTEER_EMAIL"),
         recipient_list=[rec.volunteer.volunteer_email],
         fail_silently=True,
         connection=conn,

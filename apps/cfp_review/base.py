@@ -54,7 +54,7 @@ from models.permission import Permission
 from models.purchase import AdmissionTicket
 from models.user import User
 
-from ..common.email import from_email
+from ..config import config
 from . import (
     admin_required,
     cfp_review,
@@ -339,7 +339,7 @@ ProposalEmailReason = Literal[
 
 
 def send_email_for_proposal(proposal: Proposal, reason: ProposalEmailReason) -> None:
-    from_email_ = from_email("CONTENT_EMAIL")
+    from_email_ = config.from_email("CONTENT_EMAIL")
     title = (proposal.schedule_item and proposal.schedule_item.title) or proposal.title
 
     if reason == "accepted":
@@ -358,31 +358,31 @@ def send_email_for_proposal(proposal: Proposal, reason: ProposalEmailReason) -> 
     elif reason == "reserve-list":
         subject = f'''Your EMF {proposal.human_type} "{title}", and EMF tickets'''
         template = "emails/cfp-reserve-list.txt"
-        from_email_ = from_email("SPEAKERS_EMAIL")
+        from_email_ = config.from_email("SPEAKERS_EMAIL")
 
     elif reason == "please-finalise":
         # Can be sent before or after scheduling. We want them
         # to update for the line-up, so the earlier the better.
         subject = f'''We need information about your EMF {proposal.human_type} "{title}"'''
         template = "emails/cfp-please-finalise.txt"
-        from_email_ = from_email("SPEAKERS_EMAIL")
+        from_email_ = config.from_email("SPEAKERS_EMAIL")
 
     elif reason == "check-scheduled-duration":
         # This email is basically the same as "please-finalise" but less urgent
         subject = f'''Your EMF {proposal.human_type} "{title}" is ready to schedule, please check your slot'''
         template = "emails/cfp-check-scheduled-duration.txt"
-        from_email_ = from_email("SPEAKERS_EMAIL")
+        from_email_ = config.from_email("SPEAKERS_EMAIL")
 
     elif reason == "slot-scheduled":
         subject = f'''Your EMF {proposal.human_type} "{title}" has been scheduled'''
         template = "emails/cfp-slot-scheduled.txt"
-        from_email_ = from_email("SPEAKERS_EMAIL")
+        from_email_ = config.from_email("SPEAKERS_EMAIL")
 
     elif reason == "slot-moved":
         # TODO: might be nice to highlight which slot has moved
         subject = f'''Your EMF {proposal.human_type} slot has been moved ("{title}")'''
         template = "emails/cfp-slot-moved.txt"
-        from_email_ = from_email("SPEAKERS_EMAIL")
+        from_email_ = config.from_email("SPEAKERS_EMAIL")
 
     else:
         raise Exception(f"Invalid proposal email type {reason}")
@@ -825,7 +825,7 @@ def message_proposer(proposal_id):
             msg_url = external_url("cfp.proposal_messages", proposal_id=proposal_id)
             msg = EmailMessage(
                 "New message about your EMF proposal",
-                from_email=from_email("CONTENT_EMAIL"),
+                from_email=config.from_email("CONTENT_EMAIL"),
                 to=[proposal.user.email],
             )
             msg.body = render_template(
@@ -951,7 +951,7 @@ def message_batch():
                 msg_url = external_url("cfp.proposal_messages", proposal_id=proposal.id)
                 msg = EmailMessage(
                     "New message about your EMF proposal",
-                    from_email=from_email("CONTENT_EMAIL"),
+                    from_email=config.from_email("CONTENT_EMAIL"),
                     to=[proposal.user.email],
                 )
                 msg.body = render_template(

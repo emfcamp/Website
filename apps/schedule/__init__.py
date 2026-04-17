@@ -24,7 +24,7 @@ events.
 import pytz
 from flask import Blueprint, abort, redirect, url_for
 
-from models import event_year
+from ..config import config
 
 schedule = Blueprint("schedule", __name__)
 event_tz = pytz.timezone("Europe/London")
@@ -62,7 +62,7 @@ def feed_redirect(fmt):
 
     if fmt not in routes:
         abort(404)
-    return redirect(url_for(routes[fmt], year=event_year()))
+    return redirect(url_for(routes[fmt], year=config.event_year))
 
 
 from . import base  # noqa

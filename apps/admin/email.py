@@ -8,7 +8,6 @@ from wtforms.validators import DataRequired
 from wtforms.widgets import TextArea
 
 from main import db
-from models import event_year
 from models.content import Proposal
 from models.payment import Payment
 from models.purchase import Purchase
@@ -21,6 +20,7 @@ from ..common.email import (
     preview_trusted_email,
 )
 from ..common.forms import Form
+from ..config import config
 from . import admin
 
 
@@ -64,7 +64,7 @@ def get_users(dest: Literal["ticket", "cfp", "purchasers", "villages"]) -> Seque
 
 
 def get_email_reason(dest: str) -> str:
-    event = f"Electromagnetic Field {event_year()}"
+    event = f"Electromagnetic Field {config.event_year}"
     if dest == "ticket":
         return f"You're receiving this email because you have a ticket for {event}."
     if dest == "purchasers":

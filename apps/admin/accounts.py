@@ -11,9 +11,9 @@ from main import db, get_or_404
 from models.payment import BankPayment, BankTransaction
 
 from ..common import feature_enabled
-from ..common.email import from_email
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
+from ..config import config
 from . import admin
 
 
@@ -138,7 +138,7 @@ def transaction_reconcile(txn_id, payment_id):
 
             msg = EmailMessage(
                 "Electromagnetic Field ticket purchase update",
-                from_email=from_email("TICKETS_EMAIL"),
+                from_email=config.from_email("TICKETS_EMAIL"),
                 to=[payment.user.email],
             )
 

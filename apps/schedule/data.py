@@ -13,7 +13,6 @@ from sqlalchemy.orm import selectinload
 
 from apps.common import tidy_workshop_cost
 from main import db, external_url
-from models import event_year
 from models.content import Occurrence, ScheduleItem
 from models.content.attributes import (
     TalkAttributes,
@@ -22,6 +21,7 @@ from models.content.attributes import (
 )
 from models.user import User
 
+from ..config import config
 from . import event_tz
 
 
@@ -107,7 +107,7 @@ def _get_schedule_item_dict(filter: ScheduleFilter, schedule_item: ScheduleItem)
         slug=schedule_item.slug,
         link=external_url(
             ".item",
-            year=event_year(),
+            year=config.event_year,
             schedule_item_id=schedule_item.id,
             slug=schedule_item.slug,
         ),

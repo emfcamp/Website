@@ -7,14 +7,14 @@ from dateutil.parser import parse as date_parse
 from flask import abort, redirect, render_template, send_file, url_for
 from flask.typing import ResponseReturnValue
 
-from models import event_year
 from models.content import schedule_item_slug
 
 from ..common import archive_file, load_archive_file
+from ..config import config
 
 
-def abort_if_invalid_year(year):
-    if not 2012 <= year < event_year():
+def abort_if_invalid_year(year: int) -> None:
+    if not 2012 <= year < config.event_year:
         abort(404)
 
 

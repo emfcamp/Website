@@ -31,7 +31,7 @@ from werkzeug.wrappers import Response
 from yaml import safe_load as parse_yaml
 
 from main import db, external_url
-from models import Currency, User, event_end, event_start, naive_utcnow
+from models import Currency, User, naive_utcnow
 from models.basket import Basket
 from models.capacity import UnlimitedType
 from models.content import PROPOSAL_INFOS, SCHEDULE_ITEM_INFOS
@@ -44,6 +44,7 @@ from models.site_state import (
     get_site_state,
 )
 
+from ..config import config
 from .preload import init_preload
 
 logger = logging.getLogger(__name__)
@@ -133,8 +134,8 @@ def load_utility_functions(app_obj):
         def suffix(d):
             return "th" if 11 <= d <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(d % 10, "th")
 
-        s = event_start()
-        e = event_end()
+        s = config.event_start
+        e = config.event_end
         assert s.year == e.year
         if s.month == e.month:
             fancy_dates = f"""{s.strftime("%B")}<span style="white-space: nowrap">

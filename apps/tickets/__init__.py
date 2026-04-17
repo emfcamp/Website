@@ -39,7 +39,6 @@ from ..common import (
     get_user_currency,
     set_user_currency,
 )
-from ..common.email import from_email
 from ..common.receipt import (
     attach_tickets,
     make_qrfile,
@@ -47,6 +46,7 @@ from ..common.receipt import (
     render_receipt,
     set_tickets_emailed,
 )
+from ..config import config
 from .forms import TicketTransferForm
 
 tickets = Blueprint("tickets", __name__)
@@ -143,7 +143,7 @@ def transfer(ticket_id):
 
         msg = EmailMessage(
             subject,
-            from_email=from_email("TICKETS_EMAIL"),
+            from_email=config.from_email("TICKETS_EMAIL"),
             to=[to_user.email],
         )
 
@@ -166,7 +166,7 @@ def transfer(ticket_id):
 
         msg = EmailMessage(
             "Purchase transfer confirmation",
-            from_email=from_email("TICKETS_EMAIL"),
+            from_email=config.from_email("TICKETS_EMAIL"),
             to=[current_user.email],
         )
         msg.body = render_template(

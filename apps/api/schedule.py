@@ -10,10 +10,10 @@ from flask_restful import Resource, abort
 from sqlalchemy import select
 
 from main import db, get_or_404
-from models import event_year
 from models.admin_message import AdminMessage
 from models.content import SCHEDULE_ITEM_INFOS, LotteryEntry, Occurrence, ScheduleItem, ScheduleItemType
 
+from ..config import config
 from . import api
 
 
@@ -169,7 +169,7 @@ class OccurrenceC3VOCPublishingWebhook(Resource):
                 # accidentially delete video information from the database.
                 abort(403, message="The request referenced a non-master video edit, and has been denied.")
 
-            if conference != f"emf{event_year()}":
+            if conference != f"emf{config.event_year}":
                 abort(
                     422,
                     message="The request did not reference the current event year, and has not been processed.",

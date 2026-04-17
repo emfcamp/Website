@@ -1,23 +1,23 @@
 from apps.common.email import (
     format_trusted_html_email,
     format_trusted_plaintext_email,
-    from_email,
 )
 from main import db, mail
-from models import event_year
 from models.volunteer.notify import VolunteerNotifyJob, VolunteerNotifyRecipient
+
+from ..config import config
 
 
 def preview_trusted_notify(preview_address, subject, body):
     subject = "[PREVIEW] " + subject
-    reason = f"You're receiving this notification because you have volunteered to help at Electromagnetic Field {event_year()}."
+    reason = f"You're receiving this notification because you have volunteered to help at Electromagnetic Field {config.event_year}."
     formatted_plaintext = format_trusted_plaintext_email(body)
     formatted_html = format_trusted_html_email(body, subject, reason)
 
     mail.send_mail(
         subject=subject,
         message=formatted_plaintext,
-        from_email=from_email("VOLUNTEER_EMAIL"),
+        from_email=config.from_email("VOLUNTEER_EMAIL"),
         recipient_list=[preview_address],
         html_message=formatted_html,
     )

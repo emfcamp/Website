@@ -32,9 +32,9 @@ from main import db, get_stripe_client
 from models.payment import StripePayment
 
 from ..common import feature_enabled
-from ..common.email import from_email
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
+from ..config import config
 from . import payments, ticket_admin_email
 
 logger = logging.getLogger(__name__)
@@ -294,7 +294,7 @@ def stripe_payment_paid(payment: StripePayment) -> None:
 
     msg = EmailMessage(
         "Your EMF payment has been confirmed",
-        from_email=from_email("TICKETS_EMAIL"),
+        from_email=config.from_email("TICKETS_EMAIL"),
         to=[payment.user.email],
     )
 

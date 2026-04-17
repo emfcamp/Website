@@ -28,9 +28,9 @@ from models.content import Proposal, ProposalMessage
 from models.user import User, verify_signup_code
 
 from ..common import feature_flag, set_user_currency
-from ..common.email import from_email
 from ..common.fields import EmailField
 from ..common.forms import Form
+from ..config import config
 
 users = Blueprint("users", __name__)
 
@@ -113,7 +113,7 @@ def login():
 
         msg = EmailMessage(
             "Electromagnetic Field: Login details",
-            from_email=from_email("TICKETS_EMAIL"),
+            from_email=config.from_email("TICKETS_EMAIL"),
             to=[form._user.email],
         )
         msg.body = render_template(
@@ -197,7 +197,7 @@ def signup():
 
         msg = EmailMessage(
             "Welcome to the EMF website",
-            from_email=from_email("CONTACT_EMAIL"),
+            from_email=config.from_email("CONTACT_EMAIL"),
             to=[email],
         )
         msg.body = render_template("emails/signup-user.txt", user=user)

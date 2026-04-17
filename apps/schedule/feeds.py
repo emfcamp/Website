@@ -9,11 +9,11 @@ from icalendar import Calendar, Event
 from sqlalchemy import select
 
 from main import db, external_url, get_or_404
-from models import event_year
 from models.content import Occurrence, ScheduleItem
 from models.user import User
 
 from ..common import feature_enabled, feature_flag, json_response
+from ..config import config
 from . import schedule
 from .data import (
     ScheduleFilter,
@@ -56,7 +56,7 @@ def _format_event_description(flat_sid: ScheduleItemDict) -> str:
 @schedule.route("/schedule/<int:year>.json")
 @cross_origin(methods=["GET"])
 def schedule_json(year: int) -> ResponseReturnValue:
-    if year != event_year():
+    if year != config.event_year:
         return feed_historic(year, "json")
 
     if not feature_enabled("SCHEDULE"):
@@ -73,7 +73,7 @@ def schedule_json(year: int) -> ResponseReturnValue:
 
 @schedule.route("/schedule/<int:year>.frab")
 def schedule_frab(year: int) -> ResponseReturnValue:
-    if year != event_year():
+    if year != config.event_year:
         return feed_historic(year, "frab")
 
     return redirect(url_for("schedule.schedule_frab_xml", year=year))
@@ -81,7 +81,7 @@ def schedule_frab(year: int) -> ResponseReturnValue:
 
 @schedule.route("/schedule/<int:year>.frab.xml")
 def schedule_frab_xml(year):
-    if year != event_year():
+    if year != config.event_year:
         return feed_historic(year, "frab")
 
     if not feature_enabled("SCHEDULE"):
@@ -113,7 +113,7 @@ def schedule_frab_xml(year):
 
 @schedule.route("/schedule/<int:year>.frab.json")
 def schedule_frab_json(year):
-    if year != event_year():
+    if year != config.event_year:
         return feed_historic(year, "frab_json")
 
     if not feature_enabled("SCHEDULE"):
@@ -146,7 +146,7 @@ def schedule_frab_json(year):
 @schedule.route("/schedule/<int:year>.ical")
 @schedule.route("/schedule/<int:year>.ics")
 def schedule_ical(year: int) -> ResponseReturnValue:
-    if year != event_year():
+    if year != config.event_year:
         return feed_historic(year, "ics")
 
     if not feature_enabled("SCHEDULE"):
@@ -155,7 +155,7 @@ def schedule_ical(year: int) -> ResponseReturnValue:
     filter = ScheduleFilter.from_request()
     schedule_items = get_schedule_items(filter)
     flat_sids = [flat_sid for si in schedule_items for flat_sid in get_schedule_item_dicts_flat(filter, si)]
-    title = f"EMF {event_year()}"
+    title = f"EMF {config.event_year}"
 
     cal = Calendar()
     cal.add("summary", title)
@@ -228,7 +228,7 @@ def favourites_ical() -> ResponseReturnValue:
 
     schedule_items = get_schedule_items(filter)
     flat_sids = [flat_sid for si in schedule_items for flat_sid in get_schedule_item_dicts_flat(filter, si)]
-    title = f"EMF {event_year()} Favourites for {filter.user.name}"
+    title = f"EMF {config.event_year} Favourites for {filter.user.name}"
 
     cal = Calendar()
     cal.add("summary", title)
@@ -238,7 +238,7 @@ def favourites_ical() -> ResponseReturnValue:
 
     for flat_sid in flat_sids:
         cal_event = Event()
-        cal_event.add("uid", "{}-{}".format(event_year(), flat_sid["id"]))
+        cal_event.add("uid", "{}-{}".format(config.event_year, flat_sid["id"]))
         cal_event.add("summary", flat_sid["title"])
         cal_event.add("description", _format_event_description(flat_sid))
         cal_event.add("location", flat_sid["occurrences"][0]["venue"])
@@ -262,7 +262,7 @@ def now_and_next_json() -> ResponseReturnValue:
 @json_response
 @feature_flag("LINE_UP")
 def item_json(year: int, schedule_item_id: int, slug: str | None = None) -> ResponseReturnValue:
-    if year != event_year():
+    if year != config.event_year:
         abort(404)
     schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
 

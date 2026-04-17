@@ -36,9 +36,10 @@ from sqlalchemy.orm import (
     relationship,
 )
 
+from apps.config import config
 from main import db
 
-from .. import BaseModel, event_end, event_start, naive_utcnow
+from .. import BaseModel, naive_utcnow
 from ..user import User
 from . import validate_state_transitions
 from .attributes import (
@@ -188,8 +189,8 @@ cfp_period = namedtuple("cfp_period", "start end")
 # for event start & end times rather than hard coding stuff
 def get_days_map():
     event_days = [
-        datetime.combine(event_start() + timedelta(days=day_idx), time.min)
-        for day_idx in range((event_end() - event_start()).days + 1)
+        datetime.combine(config.event_start + timedelta(days=day_idx), time.min)
+        for day_idx in range((config.event_end - config.event_start).days + 1)
     ]
     return {ed.strftime("%a").lower(): ed for ed in event_days}
 

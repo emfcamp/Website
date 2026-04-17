@@ -15,9 +15,9 @@ from models import Currency, naive_utcnow
 from models.payment import BankPayment, BankTransaction
 
 from ..common import feature_enabled, get_user_currency
-from ..common.email import from_email
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
+from ..config import config
 from . import payments
 
 logger = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ def transfer_start(payment: BankPayment) -> ResponseReturnValue:
 
     msg = EmailMessage(
         "Your EMF ticket purchase",
-        from_email=from_email("TICKETS_EMAIL"),
+        from_email=config.from_email("TICKETS_EMAIL"),
         to=[current_user.email],
     )
     msg.body = render_template(
@@ -226,7 +226,7 @@ def reconcile_txns(txns: list[BankTransaction], doit: bool = False) -> None:
 def send_confirmation(payment: BankPayment) -> None:
     msg = EmailMessage(
         "Electromagnetic Field ticket purchase update",
-        from_email=from_email("TICKETS_EMAIL"),
+        from_email=config.from_email("TICKETS_EMAIL"),
         to=[payment.user.email],
     )
 

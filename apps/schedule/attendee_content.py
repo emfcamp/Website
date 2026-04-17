@@ -1,10 +1,8 @@
 """Views for attendees to manage their own content."""
 
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
-from flask import (
-    current_app as app,
-)
+from flask import current_app as app
 from flask import (
     flash,
     redirect,
@@ -12,9 +10,7 @@ from flask import (
     request,
     url_for,
 )
-from flask.typing import (
-    ResponseReturnValue,
-)
+from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 from sqlalchemy import or_, select
 from wtforms import (
@@ -45,6 +41,7 @@ from models.user import User
 
 from ..common import feature_flag
 from ..common.forms import Form
+from ..config import config
 from . import schedule
 
 
@@ -84,8 +81,8 @@ class OccurrenceForm(Form):
     )
 
     def day_choices(self):
-        d = date.fromisoformat(app.config["EVENT_START"].split(" ")[0])
-        end_date = date.fromisoformat(app.config["EVENT_END"].split(" ")[0])
+        d = config.event_start.date()
+        end_date = config.event_end.date()
 
         choices = []
         while d <= end_date:

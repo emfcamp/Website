@@ -7,9 +7,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from main import db
-from models import event_end, event_start
 from models.content import Occurrence, ScheduleItem, ScheduleItemType
 
+from ..config import config
 from . import cfp_review, review_required
 
 
@@ -83,9 +83,9 @@ def not_sensible_reasons(
 
     # Assumption: EVENT_START and EVENT_END are the right day (Wednesday and Sunday).
     human_format = "%a %d, %H:%M (%Y-%m-%d %H:%M:%S)"
-    sensible_start = event_start().replace(hour=12, minute=0, second=0, microsecond=0)
+    sensible_start = config.event_start.replace(hour=12, minute=0, second=0, microsecond=0)
     # We'll need to step event_end forward by a day to land on Monday.
-    sensible_end = (event_end() + timedelta(days=1)).replace(hour=2, minute=0, second=0, microsecond=0)
+    sensible_end = (config.event_end + timedelta(days=1)).replace(hour=2, minute=0, second=0, microsecond=0)
 
     def _check_timing(t, note, reason_key):
         if not t:

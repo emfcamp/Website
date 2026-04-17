@@ -2,7 +2,7 @@ from flask import Blueprint, render_template
 from flask import current_app as app
 from flask_mailman import EmailMessage
 
-from ..common.email import from_email
+from ..config import config
 
 payments = Blueprint("payments", __name__)
 
@@ -14,7 +14,7 @@ def ticket_admin_email(title, template, **kwargs):
 
     msg = EmailMessage(
         title,
-        from_email=from_email("TICKETS_EMAIL"),
+        from_email=config.from_email("TICKETS_EMAIL"),
         to=[app.config["TICKETS_NOTICE_EMAIL"][1]],
     )
     msg.body = render_template(template, **kwargs)

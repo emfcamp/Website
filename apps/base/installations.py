@@ -6,14 +6,14 @@ from flask import redirect, render_template, url_for
 from flask.typing import ResponseReturnValue
 
 from apps.common import render_template_markdown
-from models import event_year
 
+from ..config import config
 from . import base
 
 
 @base.route("/installations")
 def yearly_installation_redirection() -> ResponseReturnValue:
-    return redirect(url_for(".installations", year=event_year()))
+    return redirect(url_for(".installations", year=config.event_year))
 
 
 @base.route("/installations/<int:year>/<page_name>")

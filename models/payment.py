@@ -18,13 +18,13 @@ if typing.TYPE_CHECKING:
     from .purchase import Purchase
     from .user import User
 
+from apps.config import config
 from main import NaiveDT, db
 
 from . import (
     BaseModel,
     Currency,
     bucketise,
-    event_year,
     export_attr_counts,
     export_intervals,
     naive_utcnow,
@@ -262,7 +262,7 @@ class Payment(BaseModel):
 
     def order_number(self):
         """Note this is not a VAT invoice number."""
-        return f"WEB-{event_year()}-{self.id:05d}"
+        return f"WEB-{config.event_year}-{self.id:05d}"
 
     def issue_vat_invoice_number(self):
         if not self.vat_invoice_number:
@@ -277,7 +277,7 @@ class Payment(BaseModel):
                 db.session.add(seq)
 
             self.vat_invoice_number = seq.value
-        return f"WEBV-{event_year()}-{self.vat_invoice_number:05d}"
+        return f"WEBV-{config.event_year}-{self.vat_invoice_number:05d}"
 
     @property
     def expires_in(self):
@@ -536,7 +536,7 @@ class StripePayment(Payment):
 
     @property
     def description(self):
-        return f"EMF {event_year()} purchase"
+        return f"EMF {config.event_year} purchase"
 
     def manual_refund(self):
         if self.state not in {"charged", "paid", "refund-requested"}:

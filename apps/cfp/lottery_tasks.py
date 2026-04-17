@@ -10,7 +10,7 @@ from sqlalchemy.orm import selectinload
 from main import db
 from models.content import Lottery, LotteryEntry, Occurrence, ScheduleItem
 
-from ..common.email import from_email
+from ..config import config
 from . import cfp
 
 """
@@ -144,7 +144,7 @@ def lottery(schedule_item_type: str, dry_run: bool) -> None:
     # Email winning entries here
     # We should probably also check for users who didn't win anything?
     app.logger.info("sending emails")
-    send_from = from_email("CONTENT_EMAIL")
+    send_from = config.from_email("CONTENT_EMAIL")
 
     sent_emails = 0
     for entry in winning_entries:

@@ -4,9 +4,10 @@ from sqlalchemy import select
 from sqlalchemy.exc import MultipleResultsFound
 from sqlalchemy.orm import Mapped, mapped_column
 
+from apps.config import config
 from main import cache, db
 
-from . import BaseModel, config_date, naive_utcnow
+from . import BaseModel, naive_utcnow
 from .product import PriceTier, Product, ProductGroup, ProductView, ProductViewProduct
 
 __all__ = [
@@ -53,7 +54,7 @@ def calc_sales_state(date):
     if site_capacity.get_total_remaining_capacity() < 1:
         # We've hit capacity - no more tickets will be sold
         return "sold-out"
-    if date > config_date("EVENT_END"):
+    if date > config.event_end:
         return "sales-ended"
 
     # Active price tier for the full ticket product in the main flow.

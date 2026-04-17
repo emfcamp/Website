@@ -6,8 +6,9 @@ from jinja2.sandbox import ImmutableSandboxedEnvironment
 from markupsafe import Markup
 
 from main import db, mail
-from models import event_year
 from models.email import EmailJob, EmailJobRecipient
+
+from ..config import config as app_config
 
 
 def create_sandbox_env():
@@ -96,9 +97,7 @@ def format_trusted_html_email(markdown_text, subject, reason=None, **kwargs):
     markdown_html = Markup(markdown.markdown(markdown_text, extensions=extensions))
 
     if not reason:
-        reason = (
-            f"You're receiving this email because you have a ticket for Electromagnetic Field {event_year()}."
-        )
+        reason = f"You're receiving this email because you have a ticket for Electromagnetic Field {app_config.event_year}."
 
     inliner = CSSInliner()
     return inliner.inline(
@@ -129,7 +128,7 @@ def preview_trusted_email(preview_address, subject, body):
     mail.send_mail(
         subject=subject,
         message=formatted_plaintext,
-        from_email=from_email("CONTACT_EMAIL"),
+        from_email=app_config.from_email("CONTACT_EMAIL"),
         recipient_list=[preview_address],
         html_message=formatted_html,
     )
@@ -148,9 +147,3 @@ def enqueue_trusted_emails(users, subject, body, **kwargs):
         db.session.add(EmailJobRecipient(job, user))
 
     db.session.commit()
-
-
-def from_email(config_name: str) -> str:
-    # config_name is e.g. TICKETS_EMAIL
-    name, email = app.config[config_name]
-    return f"{name} <{email}>"

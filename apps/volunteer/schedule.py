@@ -18,7 +18,7 @@ from icalendar import Calendar, Event
 from sqlalchemy.orm import joinedload
 
 from main import db, get_or_404
-from models import config_date, event_year, naive_utcnow
+from models import naive_utcnow
 from models.user import User, generate_api_token
 from models.volunteer.role import Role
 from models.volunteer.shift import Shift, ShiftEntry
@@ -26,6 +26,7 @@ from models.volunteer.venue import VolunteerVenue
 from models.volunteer.volunteer import Volunteer
 
 from ..common import feature_flag, get_next_url
+from ..config import config
 from ..schedule import event_tz
 from . import v_admin_required, v_user_required, volunteer
 
@@ -62,9 +63,9 @@ def redirect_next_or_schedule(message: str | None = None) -> ResponseReturnValue
 @feature_flag("VOLUNTEERS_SCHEDULE")
 @v_user_required
 def schedule():
-    if naive_utcnow() < config_date("EVENT_START"):
+    if naive_utcnow() < config.event_start:
         default_day = "wed"
-    elif naive_utcnow() > config_date("EVENT_END"):
+    elif naive_utcnow() > config.event_end:
         default_day = "mon"
     else:
         default_day = pendulum.now().strftime("%a").lower()
@@ -115,7 +116,7 @@ def schedule_ical():
     if not user:
         abort(404)
 
-    title = f"EMF {event_year()} Volunteer Shifts for {user.name}"
+    title = f"EMF {config.event_year} Volunteer Shifts for {user.name}"
 
     cal = Calendar()
     cal.add("summary", title)
@@ -131,7 +132,7 @@ def schedule_ical():
 
     for shift in shifts:
         cal_event = Event()
-        cal_event.add("uid", f"{event_year()}-{shift.id}")
+        cal_event.add("uid", f"{config.event_year}-{shift.id}")
         cal_event.add("summary", f"{shift.role.name} at {shift.venue.name}")
         cal_event.add("location", shift.venue.name)
         cal_event.add("dtstart", event_tz.localize(shift.start))

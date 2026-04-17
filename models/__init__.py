@@ -8,8 +8,6 @@ from itertools import groupby, pairwise
 from typing import TYPE_CHECKING, assert_never
 
 import datetype
-from dateutil.parser import parse
-from flask import current_app as app
 from sqlalchemy import inspect
 from sqlalchemy.engine.row import Row
 from sqlalchemy.orm import Query
@@ -46,19 +44,6 @@ class Currency(enum.StrEnum):
 
 def naive_utcnow() -> datetype.DateTime[None]:
     return datetype.naive(datetime.now(UTC).replace(tzinfo=None))
-
-
-def event_start():
-    return config_date("EVENT_START")
-
-
-def event_year():
-    """Year of the current event"""
-    return event_start().year
-
-
-def event_end():
-    return config_date("EVENT_END")
 
 
 def to_dict(obj):
@@ -188,10 +173,6 @@ def iter_attr_edits(cls, attrs, query=None):
                     attr_vals[attr] = val
 
         yield (pk, attr_times)
-
-
-def config_date(key):
-    return parse(app.config.get(key))
 
 
 from .admin_message import *  # noqa: F403

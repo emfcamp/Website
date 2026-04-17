@@ -7,9 +7,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from main import db
-from models import event_year
 from models.content import ScheduleItem
 
+from ..config import config
 from . import api
 
 
@@ -28,7 +28,7 @@ def render_installation(schedule_item: ScheduleItem) -> InstallationResponse:
         "name": schedule_item.title,
         "url": url_for(
             "schedule.item",
-            year=event_year(),
+            year=config.event_year,
             schedule_item_id=schedule_item.id,
             _external=True,
         ),

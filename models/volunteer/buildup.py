@@ -6,9 +6,10 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from apps.config import config
 from main import db
 
-from .. import BaseModel, event_end, event_start
+from .. import BaseModel
 
 if TYPE_CHECKING:
     from .. import User
@@ -57,19 +58,19 @@ class BuildupVolunteer(BaseModel):
 
 def buildup_start() -> datetime:
     # Beginning of day -7
-    return datetime.combine(event_start().date() - timedelta(days=8), time(hour=0))
+    return datetime.combine(config.event_start.date() - timedelta(days=8), time(hour=0))
 
 
 def buildup_end() -> date:
     # End of day 0
-    return datetime.combine(event_start().date() - timedelta(days=1), time(hour=22))
+    return datetime.combine(config.event_start.date() - timedelta(days=1), time(hour=22))
 
 
 def teardown_start() -> date:
     # We start considering teardown from "midday" on day 5
-    return datetime.combine(event_end().date() + timedelta(days=1), time(hour=12))
+    return datetime.combine(config.event_end.date() + timedelta(days=1), time(hour=12))
 
 
 def teardown_end() -> date:
     # After PM on day 8
-    return datetime.combine(event_end().date() + timedelta(days=4), time(hour=22))
+    return datetime.combine(config.event_end.date() + timedelta(days=4), time(hour=22))

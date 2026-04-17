@@ -21,7 +21,6 @@ from wtforms import (
 from wtforms.validators import InputRequired
 
 from main import db, get_or_404
-from models import event_year
 from models.admin_message import AdminMessage
 from models.content import (
     SCHEDULE_ITEM_INFOS,
@@ -42,6 +41,7 @@ from ..cfp_review import admin_required as cfp_admin_required
 from ..common import feature_enabled, feature_flag
 from ..common.fields import HiddenIntegerField
 from ..common.forms import Form
+from ..config import config
 from ..volunteer import v_user_required
 from . import event_tz, schedule
 from .data import ScheduleFilter, get_upcoming
@@ -59,14 +59,14 @@ LINEUP_TYPE_ORDER: list[ScheduleItemType] = [
 
 @schedule.route("/schedule/")
 def main():
-    return redirect(url_for(".main_year", year=event_year()))
+    return redirect(url_for(".main_year", year=config.event_year))
 
 
 @schedule.route("/schedule/<int:year>")
 def main_year(year):
     # Do we want to show the current year's schedule from the DB,
     # or a previous year's from the static archive?
-    if year == event_year():
+    if year == config.event_year:
         if feature_enabled("SCHEDULE"):
             # Schedule is ready, show it
             return schedule_current()
@@ -87,7 +87,7 @@ def schedule_current():
         "schedule/user_schedule.html",
         token=token,
         debug=app.config.get("DEBUG"),
-        year=event_year(),
+        year=config.event_year,
     )
 
 
@@ -137,7 +137,7 @@ def add_favourite():
         current_user.favourites.append(proposal)
 
     db.session.commit()
-    return redirect(url_for(".main_year", year=event_year()) + f"#proposal-{proposal.id}")
+    return redirect(url_for(".main_year", year=config.event_year) + f"#proposal-{proposal.id}")
 
 
 @schedule.route("/favourites", methods=["GET", "POST"])
@@ -188,7 +188,7 @@ class ScheduleItemForm(Form):
 @schedule.route("/schedule/<int:year>/<int:schedule_item_id>-<slug>", methods=["GET", "POST"])
 def item(year: int, schedule_item_id: int, slug: str | None = None) -> ResponseReturnValue:
     """Display a detail page for a schedule item"""
-    if year == event_year():
+    if year == config.event_year:
         return item_current(year, schedule_item_id, slug)
     return item_historic(year, schedule_item_id, slug)
 

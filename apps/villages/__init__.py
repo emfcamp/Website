@@ -7,15 +7,16 @@ Village registration and management
 from flask import Blueprint, abort
 from flask_login import current_user
 
-from models import event_year
 from models.village import Village
+
+from ..config import config
 
 villages = Blueprint("villages", __name__)
 
 
 def load_village(year: int, village_id: int, require_admin: bool = False) -> Village:
     """Helper to return village or 404"""
-    if year != event_year():
+    if year != config.event_year:
         abort(404)
 
     village = Village.get_by_id(village_id)

@@ -14,9 +14,9 @@ from models.permission import Permission
 from models.user import User, generate_signup_code
 from models.village import Village, VillageMember
 
-from ..common.email import from_email
 from ..common.fields import EmailField
 from ..common.forms import Form
+from ..config import config
 from . import admin
 
 
@@ -51,7 +51,7 @@ def users():
         code = user.login_code(app.config["SECRET_KEY"])
         msg = EmailMessage(
             "Welcome to the EMF website",
-            from_email=from_email("CONTACT_EMAIL"),
+            from_email=config.from_email("CONTACT_EMAIL"),
             to=[email],
         )
         msg.body = render_template("emails/manually-added-user.txt", user=user, code=code)
@@ -231,7 +231,7 @@ def user(user_id):
 def _send_email_changed_from(user: User, old_email: str) -> None:
     msg = EmailMessage(
         "Your email address has been changed",
-        from_email=from_email("CONTACT_EMAIL"),
+        from_email=config.from_email("CONTACT_EMAIL"),
         to=[old_email],
     )
     msg.body = render_template("emails/user-email-changed-from.txt", user=user)
@@ -242,7 +242,7 @@ def _send_email_changed_to(user: User, new_email: str) -> None:
     code = user.login_code(app.config["SECRET_KEY"])
     msg = EmailMessage(
         "Your email address has been changed",
-        from_email=from_email("CONTACT_EMAIL"),
+        from_email=config.from_email("CONTACT_EMAIL"),
         to=[new_email],
     )
     msg.body = render_template("emails/user-email-changed.txt", user=user, code=code)

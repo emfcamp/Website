@@ -19,8 +19,8 @@ from models.purchase import Purchase, PurchaseTransfer, Ticket
 from models.user import User
 
 from ..common import feature_enabled
-from ..common.email import from_email
 from ..common.receipt import attach_tickets, render_pdf, render_receipt, set_tickets_emailed
+from ..config import config
 from . import admin
 from .forms import (
     CancelTicketForm,
@@ -117,7 +117,7 @@ def tickets_issue_free(email):
         ticket_noun = "tickets" if len(basket.purchases) > 1 else "ticket"
         msg = EmailMessage(
             f"Your complimentary {ticket_noun} to Electromagnetic Field",
-            from_email=from_email("TICKETS_EMAIL"),
+            from_email=config.from_email("TICKETS_EMAIL"),
             to=[user.email],
         )
 
@@ -303,7 +303,7 @@ def tickets_reserve(email):
         ticket_noun = "tickets" if len(basket.purchases) > 1 else "ticket"
         msg = EmailMessage(
             f"Your reserved {ticket_noun} to EMF",
-            from_email=from_email("TICKETS_EMAIL"),
+            from_email=config.from_email("TICKETS_EMAIL"),
             to=[user.email],
         )
 

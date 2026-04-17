@@ -31,8 +31,8 @@ from models.payment import (
 from models.product import Price
 from models.purchase import Purchase
 
-from ..common.email import from_email
 from ..common.forms import Form, RefundPurchaseForm, update_refund_purchase_form_details
+from ..config import config
 from ..payments.stripe import (
     StripeUpdateConflict,
     StripeUpdateUnexpected,
@@ -148,7 +148,7 @@ def send_reminder(payment_id):
 
             msg = EmailMessage(
                 "Electromagnetic Field: Your tickets will expire in five days",
-                from_email=from_email("TICKETS_EMAIL"),
+                from_email=config.from_email("TICKETS_EMAIL"),
                 to=[payment.user.email],
             )
             msg.body = render_template(
@@ -533,7 +533,7 @@ def refund(payment_id):
 
             msg = EmailMessage(
                 "Your refund from Electromagnetic Field has been processed",
-                from_email=from_email("TICKETS_EMAIL"),
+                from_email=config.from_email("TICKETS_EMAIL"),
                 to=[payment.user.email],
             )
 

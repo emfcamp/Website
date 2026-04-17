@@ -29,6 +29,7 @@ from sqlalchemy_continuum.manager import VersioningManager
 from sqlalchemy_continuum.plugins import FlaskPlugin
 from werkzeug.exceptions import HTTPException
 
+from apps.config import config
 from loggingmanager import create_logging_manager, set_user_id
 
 # import pywisetransfer
@@ -162,6 +163,7 @@ def create_app(dev_server=False, config_override=None):
         app.config.from_mapping(config_override)
 
     derive_secret_key(app)
+    config.init(app.config)
 
     app.jinja_env.add_extension("jinja2.ext.do")
 

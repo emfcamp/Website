@@ -5,6 +5,7 @@ import pytest
 from dateutil.parser import parse
 
 from apps.cfp_review.sense_check import not_sensible_reasons
+from apps.config import config
 from models.content import Occurrence, ScheduleItem, Venue
 
 
@@ -15,8 +16,10 @@ def override_event_time(app):
     old_start, old_end = app.config["EVENT_START"], app.config["EVENT_END"]
     app.config["EVENT_START"] = "2024-05-30 11:00:00"  # Wednesday, May 30
     app.config["EVENT_END"] = "2024-06-02 19:00:00"  # Sunday, June 2
+    config.init(app.config)
     yield
     app.config["EVENT_START"], app.config["EVENT_END"] = old_start, old_end
+    config.init(app.config)
 
 
 VENUE_TALK = Venue(name="Talk Venue", allowed_types=["talk"])

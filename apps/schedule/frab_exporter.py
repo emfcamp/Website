@@ -10,9 +10,9 @@ from xml.etree.ElementTree import Element
 from flask import request
 
 from main import db, external_url
-from models import event_end, event_start, event_year
 from models.content import SCHEDULE_ITEM_INFOS, ScheduleItem, Venue, schedule_item_slug
 
+from ..config import config
 from . import event_tz
 from .data import ScheduleFilter, ScheduleItemDict, _get_occurrence_dict, _get_schedule_item_dict
 
@@ -182,10 +182,10 @@ class FrabJsonExporter(FrabExporter):
                 "version": VERSION,
                 "base_url": external_url("base.main"),
                 "conference": {
-                    "acronym": f"emf{event_year()}",
-                    "title": f"Electromagnetic Field {event_year()}",
-                    "start": event_start().strftime("%Y-%m-%d"),
-                    "end": event_end().strftime("%Y-%m-%d"),
+                    "acronym": f"emf{config.event_year}",
+                    "title": f"Electromagnetic Field {config.event_year}",
+                    "start": config.event_start.strftime("%Y-%m-%d"),
+                    "end": config.event_end.strftime("%Y-%m-%d"),
                     "daysCount": 3,
                     "timeslot_duration": "00:10",
                     "time_zone_name": event_tz.zone,
@@ -194,7 +194,7 @@ class FrabJsonExporter(FrabExporter):
                             "name": venue.name,
                             "capacity": venue.capacity,
                             # TODO do we have an URL for listing the schedule in a specific room?
-                            "guid": str(uuid5(NAMESPACE_URL, f"""emf{event_year()}-venue-{venue.id}""")),
+                            "guid": str(uuid5(NAMESPACE_URL, f"""emf{config.event_year}-venue-{venue.id}""")),
                         }
                         for venue in self.venues
                     ],
@@ -218,7 +218,7 @@ class FrabJsonExporter(FrabExporter):
                                         "guid": str(
                                             uuid5(
                                                 NAMESPACE_URL,
-                                                f"""emf{event_year()}-event-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}""",
+                                                f"""emf{config.event_year}-event-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}""",
                                             )
                                         ),
                                         "id": flat_sid["id"] * 100
@@ -230,7 +230,7 @@ class FrabJsonExporter(FrabExporter):
                                             flat_sid["occurrences"][0]["end_date"],
                                         ),
                                         "room": room["name"],
-                                        "slug": f"""emf{event_year()}-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}-{schedule_item_slug(flat_sid["title"], allow_unicode=False)}""",
+                                        "slug": f"""emf{config.event_year}-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}-{schedule_item_slug(flat_sid["title"], allow_unicode=False)}""",
                                         "url": flat_sid["link"],
                                         "title": flat_sid["title"],
                                         "subtitle": "",
@@ -291,10 +291,10 @@ class FrabXmlExporter(FrabExporter):
 
         conference = etree.SubElement(root, "conference")
 
-        self._add_sub_with_text(conference, "title", f"Electromagnetic Field {event_year()}")
-        self._add_sub_with_text(conference, "acronym", f"emf{event_year()}")
-        self._add_sub_with_text(conference, "start", event_start().strftime("%Y-%m-%d"))
-        self._add_sub_with_text(conference, "end", event_end().strftime("%Y-%m-%d"))
+        self._add_sub_with_text(conference, "title", f"Electromagnetic Field {config.event_year}")
+        self._add_sub_with_text(conference, "acronym", f"emf{config.event_year}")
+        self._add_sub_with_text(conference, "start", config.event_start.strftime("%Y-%m-%d"))
+        self._add_sub_with_text(conference, "end", config.event_end.strftime("%Y-%m-%d"))
         self._add_sub_with_text(conference, "days", "3")
         self._add_sub_with_text(conference, "timeslot_duration", "00:10")
         assert event_tz.zone is not None
@@ -326,9 +326,7 @@ class FrabXmlExporter(FrabExporter):
         return etree.SubElement(day, "room", name=name)
 
     def add_event(self, room: Element, room_name: str, flat_sid: ScheduleItemDict) -> Element:
-        event_guid_key = (
-            f"""emf{event_year()}-event-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}"""
-        )
+        event_guid_key = f"""emf{config.event_year}-event-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}"""
         event = etree.SubElement(
             room,
             "event",
@@ -359,7 +357,7 @@ class FrabXmlExporter(FrabExporter):
         self._add_sub_with_text(event, "abstract", flat_sid["description"])
         self._add_sub_with_text(event, "description", "")
 
-        slug = f"""emf{event_year()}-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}-{schedule_item_slug(flat_sid["title"], allow_unicode=False)}"""
+        slug = f"""emf{config.event_year}-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}-{schedule_item_slug(flat_sid["title"], allow_unicode=False)}"""
         self._add_sub_with_text(event, "slug", slug)
 
         self._add_sub_with_text(event, "subtitle", "")
