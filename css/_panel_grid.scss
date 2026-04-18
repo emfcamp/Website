@@ -1,4 +1,5 @@
 /* A grid of panels. */
+@use "./_variables.scss" as *;
 
 .panel-grid {
   --panel-grid-min-size: 350px;
@@ -13,9 +14,25 @@
   );
   grid-template-rows: masonry;
   margin-bottom: 20px;
-}
 
-.panel-grid > .panel {
-  block-size: fit-content;
-  margin-bottom: 0;
+  .panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin-bottom: 0;
+  }
+
+  .panel-body {
+    flex-grow: 1;
+
+    p:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+  }
+
+  .panel-footer {
+    background-color: $highlight-background;
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+  }
 }
