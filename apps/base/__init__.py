@@ -20,6 +20,7 @@ from flask import (
     current_app as app,
 )
 from flask.typing import ResponseReturnValue
+from flask_cors import cross_origin
 from flask_login import current_user
 from sqlalchemy import select
 
@@ -184,6 +185,7 @@ def matrix_server() -> ResponseReturnValue:
 
 
 @base.route("/.well-known/matrix/client")
+@cross_origin(methods=["GET"])
 def matrix_client() -> ResponseReturnValue:
     return {"m.homeserver": {"base_url": "https://matrix.emfcamp.org"}}
 
