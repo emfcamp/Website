@@ -21,7 +21,12 @@ from .forms import VillageForm
 @login_required
 def register() -> ResponseReturnValue:
     if current_user.village and current_user.village_membership.admin:
+        # admin member of an existing village, edit that instead.
         return redirect(url_for(".edit", year=config.event_year, village_id=current_user.village.id))
+
+    if current_user.village:
+        # non-admin member of an existing village, view it instead.
+        return redirect(url_for(".view", year=config.event_year, village_id=current_user.village.id))
 
     if not current_user.has_admission_ticket:
         flash("You can't create a village without a ticket to EMF")

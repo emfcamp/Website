@@ -19,7 +19,11 @@
                 <th>Location</th>
                 <th>Start</th>
                 <th>End</th>
-                {% if current_user.village %}
+                <!--
+                TODO: factor this (and same below) out and match logic for offering village venues in /app/apps/schedule/attendee_content.py ?
+                 For now, we only let admins create content in their village but show this column for all members in case they created the content while they *were* an admin
+                -->
+                    {% if current_user.village %}
                     <th>EMF<br />Scheduled</th>
                 {% endif %}
                 <th>Favs</th>
