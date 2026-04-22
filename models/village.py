@@ -55,6 +55,9 @@ class Village(BaseModel):
     def admins(self) -> list[User]:
         return [m.user for m in self.village_memberships if m.admin]
 
+    def non_admins(self) -> list[User]:
+        return [m.user for m in self.village_memberships if not m.admin]
+
     def __repr__(self):
         return f"<Village '{self.name}' (id: {self.id})>"
 
@@ -140,7 +143,7 @@ class VillageMember(BaseModel):
     user: Mapped[User] = relationship(back_populates="village_membership")
 
     def __repr__(self):
-        return f"<VillageMember {self.user} member of {self.village}>"
+        return f"<VillageMember {self.user} {'admin ' if self.admin else ''}member of {self.village}>"
 
 
 class VillageRequirements(BaseModel):

@@ -1,18 +1,15 @@
 from geoalchemy2.shape import from_shape, to_shape
 from shapely import Point
-from wtforms import (
-    FloatField,
-    IntegerField,
-    SelectField,
-    StringField,
-    SubmitField,
-    TextAreaField,
-)
-from wtforms.validators import URL, Length, Optional
+from wtforms import FloatField, IntegerField, SelectField, StringField, SubmitField, TextAreaField
+from wtforms.validators import URL, InputRequired, Length, Optional
 
 from models import Village
 from models.village import VillageRequirements
 
+from ..common.fields import (
+    EmailField,
+    HiddenIntegerField,
+)
 from ..common.forms import Form
 
 
@@ -104,3 +101,33 @@ class AdminVillageForm(VillageForm):
             village.location = from_shape(Point(self.location_lon.data, self.location_lat.data))
         else:
             village.location = None
+
+
+class RemoveVillageAdminForm(Form):
+    submit = SubmitField("Remove")
+    user_id = HiddenIntegerField("user_id", [InputRequired()])
+
+
+class DemoteVillageAdminForm(Form):
+    submit = SubmitField("Demote")
+    user_id = HiddenIntegerField("user_id", [InputRequired()])
+
+
+class AddVillageAdminForm(Form):
+    submit = SubmitField("Add")
+    user_email = EmailField("Email address", [InputRequired()])
+
+
+class RemoveVillageMemberForm(Form):
+    submit = SubmitField("Remove")
+    user_id = HiddenIntegerField("user_id", [InputRequired()])
+
+
+class PromoteVillageMemberForm(Form):
+    submit = SubmitField("Promote")
+    user_id = HiddenIntegerField("user_id", [InputRequired()])
+
+
+class AddVillageMemberForm(Form):
+    submit = SubmitField("Add")
+    user_email = EmailField("Email address", [InputRequired()])

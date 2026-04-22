@@ -3,7 +3,7 @@
 NOTE: make sure all admin views are tagged with the @village_admin_required decorator
 """
 
-from flask import abort, flash, redirect, render_template, request, url_for
+from flask import abort, flash, redirect, render_template, url_for
 from flask import current_app as app
 from flask.typing import ResponseReturnValue
 from sqlalchemy import exists, select
@@ -23,7 +23,16 @@ from ..common.email import (
 )
 from ..common.forms import Form
 from . import villages
-from .forms import AdminVillageForm, DeleteVillageForm
+from .forms import (
+    AddVillageAdminForm,
+    AddVillageMemberForm,
+    AdminVillageForm,
+    DeleteVillageForm,
+    DemoteVillageAdminForm,
+    PromoteVillageMemberForm,
+    RemoveVillageAdminForm,
+    RemoveVillageMemberForm,
+)
 
 village_admin_required = require_permission("villages")
 
@@ -102,65 +111,240 @@ def admin_village_admins_get(village_id: int) -> ResponseReturnValue:
     return redirect(url_for(".admin_village", village_id=village_id))
 
 
+### Village Admin actions
 # Note that there are 2 uses of the word admin here.
 # 1. the very small number of orga who can access the admin UI and change all villages
 # 2. the attendees responsible for a single village who can administer just that village.
-# This route is for the former users to use to edit a list of the latter for a village
-@villages.route("/admin/village/<int:village_id>/admins", methods=["POST"])
+# These routes are for the former users to use to edit a list of the latter for a village
+
+
+@villages.route("/admin/village/<int:village_id>/admins/remove", methods=["POST"])
 @village_admin_required
-def admin_village_admins(village_id: int) -> ResponseReturnValue:
+def admin_village_admins_remove(village_id: int) -> ResponseReturnValue:
     village = Village.get_by_id(village_id)
     if not village:
         abort(404)
 
-    if request.form.get("remove"):
-        # Remove an admin
-        if len(village.admins()) <= 1:
-            flash("Can't remove final admin")
-        else:
-            user_id = int(request.form.get("user_id", 0))
+    # Remove an admin
+    if len(village.admins()) <= 1:
+        flash("Can't remove final admin")
+    else:
+        form = RemoveVillageAdminForm()
+        if form.validate_on_submit():
             village_membership = next(
-                member for member in village.village_memberships if member.user_id == user_id
+                (
+                    member
+                    for member in village.village_memberships
+                    if member.user_id == form.user_id.data
+                    and member.admin
+                ),
+                None,
             )
+
+            if village_membership is None:
+                flash(f"User is not an admin of village '{village.name}'")
+            else:
+                # lazy-load this before committing and detaching the object
+                email = village_membership.user.email
+
+                db.session.delete(village_membership)
+                db.session.commit()
+
+                flash(f"{email} has been removed as a village admin")
+
+    # Show the edit page again
+    return redirect(url_for(".admin_village", village_id=village.id))
+
+
+@villages.route("/admin/village/<int:village_id>/admins/demote", methods=["POST"])
+@village_admin_required
+def admin_village_admins_demote(village_id: int) -> ResponseReturnValue:
+    village = Village.get_by_id(village_id)
+    if not village:
+        abort(404)
+
+    # Demote an admin to a normal non-admin member
+    if len(village.admins()) <= 1:
+        flash("Can't remove final admin")
+    else:
+        form = DemoteVillageAdminForm()
+        if form.validate_on_submit():
+            village_membership = next(
+                (
+                    member
+                    for member in village.village_memberships
+                    if member.user_id == form.user_id.data
+                    and member.admin
+                ),
+                None,
+            )
+
+            if village_membership is None:
+                flash(f"User is not an admin of village '{village.name}'")
+            else:
+                # lazy-load this before committing and detaching the object
+                email = village_membership.user.email
+
+                village_membership.admin = False
+                db.session.commit()
+
+                flash(f"{email} has been demoted from a village admin")
+
+    # Show the edit page again
+    return redirect(url_for(".admin_village", village_id=village.id))
+
+
+@villages.route("/admin/village/<int:village_id>/admins/add", methods=["POST"])
+@village_admin_required
+def admin_village_admins_add(village_id: int) -> ResponseReturnValue:
+    village = Village.get_by_id(village_id)
+    if not village:
+        abort(404)
+
+    # Add an admin
+    form = AddVillageAdminForm()
+    if form.validate_on_submit() and form.user_email.data is not None:
+        user = User.get_by_email(form.user_email.data)
+
+        if user is None:
+            flash(f"No user found with email {form.user_email.data}")
+
+        else:
+            membership = db.session.query(VillageMember).filter(VillageMember.user == user).first()
+
+            if membership is None:
+                db.session.add(VillageMember(village_id=village.id, user=user, admin=True))
+                db.session.commit()
+
+                flash(f"{form.user_email.data} has been added as a village admin")
+            else:
+                if membership.village == village:
+                    membership.admin = True
+                    db.session.commit()
+
+                    # TODO: Do we care if this actually changed anything?
+                    flash(f"{form.user_email.data} has been promoted to a village admin")
+                else:
+                    flash(
+                        f"User with email {form.user_email.data} is already a member of the {membership.village.name} village"
+                    )
+
+    # Show the edit page again
+    return redirect(url_for(".admin_village", village_id=village.id))
+
+
+### Village member actions
+
+
+@villages.route("/admin/village/<int:village_id>/members/remove", methods=["POST"])
+@village_admin_required
+def admin_village_members_remove(village_id: int) -> ResponseReturnValue:
+    village = Village.get_by_id(village_id)
+    if not village:
+        abort(404)
+
+    # Remove a non-admin
+    form = RemoveVillageMemberForm()
+    if form.validate_on_submit():
+        village_membership = next(
+            (
+                member
+                for member in village.village_memberships
+                if member.user_id == form.user_id.data
+                and not member.admin
+            ),
+            None,
+        )
+
+        if village_membership is None:
+            flash(f"User is not a member of village '{village.name}'")
+        else:
+            # lazy-load this before committing and detaching the object
+            email = village_membership.user.email
 
             db.session.delete(village_membership)
             db.session.commit()
 
-            flash(f"{village_membership.user.email} has been removed as a village admin")
-    elif request.form.get("add"):
-        # Add an admin
-        user_email = request.form.get("user_email")
-        assert user_email
-        user = User.get_by_email(user_email)
-
-        if user is None:
-            flash(f"No user found with email {user_email}")
-            return redirect(url_for(".admin_village", village_id=village.id))
-
-        membership = db.session.query(VillageMember).filter(VillageMember.user == user).first()
-
-        if membership is None:
-            db.session.add(VillageMember(village_id=village.id, user=user, admin=True))
-            db.session.commit()
-
-            flash(f"{user_email} has been added as a village admin")
-            return redirect(url_for(".admin_village", village_id=village.id))
-
-        if membership.village == village:
-            membership.admin = True
-            db.session.commit()
-        else:
-            flash(
-                f"User with email {user_email} is already a member of the {membership.village.name} village"
-            )
-
-    else:
-        # Not sure what is being requested here, log an error
-        app.logger.warning(f"Request to alter village admins with unexpected params: ${request.form}")
-        abort(400)
+            flash(f"{email} has been removed as a village member")
 
     # Show the edit page again
     return redirect(url_for(".admin_village", village_id=village.id))
+
+
+@villages.route("/admin/village/<int:village_id>/members/promote", methods=["POST"])
+@village_admin_required
+def admin_village_members_promote(village_id: int) -> ResponseReturnValue:
+    village = Village.get_by_id(village_id)
+    if not village:
+        abort(404)
+
+    form = PromoteVillageMemberForm()
+
+    if form.validate_on_submit():
+        village_membership = next(
+            (
+                member
+                for member in village.village_memberships
+                if member.user_id == form.user_id.data
+                and not member.admin
+            ),
+            None,
+        )
+
+        if village_membership is None:
+            flash(f"User is not a member of village '{village.name}'")
+        else:
+            # lazy-load this before committing and detaching the object
+            email = village_membership.user.email
+
+            village_membership.admin = True
+            db.session.commit()
+
+            flash(f"{email} has been promoted to a village admin")
+
+    # Show the edit page again
+    return redirect(url_for(".admin_village", village_id=village.id))
+
+
+@villages.route("/admin/village/<int:village_id>/members/add", methods=["POST"])
+@village_admin_required
+def admin_village_members_add(village_id: int) -> ResponseReturnValue:
+    village = Village.get_by_id(village_id)
+    if not village:
+        abort(404)
+
+    # Add a non-admin
+    form = AddVillageMemberForm()
+    if form.validate_on_submit() and form.user_email.data is not None:
+        user = User.get_by_email(form.user_email.data)
+
+        if user is None:
+            flash(f"No user found with email {form.user_email.data}")
+        else:
+            membership = db.session.query(VillageMember).filter(VillageMember.user == user).first()
+
+            if membership is None:
+                db.session.add(VillageMember(village_id=village.id, user=user, admin=False))
+                db.session.commit()
+
+                flash(f"{form.user_email.data} has been added as a village member")
+            else:
+                if membership.village == village:
+                    membership.admin = False
+                    db.session.commit()
+
+                    # TODO: Do we care if this actually changed anything?
+                    flash(f"{form.user_email.data} has been demoted to a village member")
+                else:
+                    flash(
+                        f"User with email {form.user_email.data} is already a member of the {membership.village.name} village"
+                    )
+
+    # Show the edit page again
+    return redirect(url_for(".admin_village", village_id=village.id))
+
+
+## Email actions
 
 
 @villages.route("/admin/email-owners", methods=["GET", "POST"])
