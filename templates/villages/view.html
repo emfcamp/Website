@@ -3,7 +3,8 @@
 {% block body %}
 <h1>
   {{village.name}}
-  {% if show_edit %}
+  {% if user_is_village_admin %}
+  <a href="{{url_for('villages.members', year=event_year, village_id=village.id)}}" class="btn btn-primary btn-lg pull-right">Members</a>
   <a href="{{url_for('villages.edit', year=event_year, village_id=village.id)}}" class="btn btn-primary btn-lg pull-right">Edit</a>
   {% endif %}
 </h1>

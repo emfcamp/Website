@@ -138,8 +138,7 @@ def admin_village_admins_remove(village_id: int) -> ResponseReturnValue:
                 (
                     member
                     for member in village.village_memberships
-                    if member.user_id == form.user_id.data
-                    and member.admin
+                    if member.user_id == form.user_id.data and member.admin
                 ),
                 None,
             )
@@ -176,8 +175,7 @@ def admin_village_admins_demote(village_id: int) -> ResponseReturnValue:
                 (
                     member
                     for member in village.village_memberships
-                    if member.user_id == form.user_id.data
-                    and member.admin
+                    if member.user_id == form.user_id.data and member.admin
                 ),
                 None,
             )
@@ -253,8 +251,7 @@ def admin_village_members_remove(village_id: int) -> ResponseReturnValue:
             (
                 member
                 for member in village.village_memberships
-                if member.user_id == form.user_id.data
-                and not member.admin
+                if member.user_id == form.user_id.data and not member.admin
             ),
             None,
         )
@@ -288,8 +285,7 @@ def admin_village_members_promote(village_id: int) -> ResponseReturnValue:
             (
                 member
                 for member in village.village_memberships
-                if member.user_id == form.user_id.data
-                and not member.admin
+                if member.user_id == form.user_id.data and not member.admin
             ),
             None,
         )
