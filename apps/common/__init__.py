@@ -9,6 +9,7 @@ from textwrap import wrap
 from typing import Any, cast, overload
 from urllib.parse import urljoin, urlparse, urlunparse
 
+import nh3
 import pendulum
 from decorator import decorator
 from flask import (
@@ -26,7 +27,6 @@ from flask.json import jsonify
 from flask_login import current_user, login_user
 from jinja2.utils import urlize
 from markdown import markdown
-import nh3
 from markupsafe import Markup
 from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import Response

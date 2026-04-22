@@ -1,5 +1,3 @@
-import re
-
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired, Length, Optional, Regexp, ValidationError
 

@@ -385,9 +385,9 @@ def create_app(dev_server=False, config_override=None):
     from apps.users import users
     from apps.villages import villages
     from apps.volunteer import volunteer
-    from apps.wiki import wiki
     from apps.volunteer.admin import volunteer_admin
     from apps.volunteer.admin.notify import notify
+    from apps.wiki import wiki
 
     app.register_blueprint(base)
     app.register_blueprint(users)
