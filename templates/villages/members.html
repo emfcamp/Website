@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Village members: {{village.name}}{% endblock %}
+{% block body %}
+<h1>
+  Village Members: {{village.name}}
+  <a href="{{url_for('villages.edit', year=event_year, village_id=village.id)}}" class="btn btn-primary btn-lg pull-right">Edit</a>
+  <a href="{{url_for('villages.view', year=event_year, village_id=village.id)}}" class="btn btn-primary btn-lg pull-right">View</a>
+</h1>
+
+<h2>Admins</h2>
+
+<ul>
+  {% for user in village.admins() %}
+    <li>
+      <!-- NB. This is email-ish but we don't correctly escape or quote the alias -->
+      {{ user.name }} &lt;{{ user.email }}&gt;
+    </li>
+  {% endfor %}
+</ul>
+
+<h2>Members</h2>
+
+<ul>
+  {% for user in village.non_admins() %}
+    <li>
+      <!-- NB. This is email-ish but we don't correctly escape or quote the alias -->
+      {{ user.name }} &lt;({{ user.email }})&gt;
+
+      <form method="POST" action="{{ url_for('villages.members_promote', year=event_year, village_id=village.id) }}" class="village-inline-form">
+        <input type="hidden" name="user_id" value="{{ user.id }}" />
+        <input type="submit" name="promote" value="Promote" class="btn btn-sm btn-success"/>
+      </form>
+    </li>
+  {% endfor %}
+</ul>
+
+{% endblock %}

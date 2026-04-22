@@ -11,7 +11,7 @@
       </div>
       {% if current_user.village %}
         <div class="panel-body">
-          <p>You're a member of the <strong><a href="{{url_for('villages.view', year=event_year, village_id=current_user.village.id)}}">{{current_user.village.name}}</a></strong> village.</p>
+          <p>You're a {% if current_user.village_membership.admin %}admin{% else %}member{% endif %} of the <strong><a href="{{url_for('villages.view', year=event_year, village_id=current_user.village.id)}}">{{current_user.village.name}}</a></strong> village.</p>
         </div>
         {% if current_user.village_membership.admin %}
           <div class="panel-footer">

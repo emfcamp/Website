@@ -14,7 +14,7 @@ from models.village import Village, VillageMember
 
 from ..config import config
 from . import load_village, villages
-from .forms import VillageForm
+from .forms import PromoteVillageMemberForm, VillageForm
 
 
 @villages.route("/register", methods=["GET", "POST"])
@@ -82,7 +82,7 @@ def main(year: int) -> ResponseReturnValue:
 @villages.route("/<int:year>/<int:village_id>")
 def view(year: int, village_id: int) -> ResponseReturnValue:
     village = load_village(year, village_id)
-    show_edit = (
+    user_is_village_admin = (
         current_user.is_authenticated
         and current_user.village
         and current_user.village.id == village_id
@@ -92,7 +92,7 @@ def view(year: int, village_id: int) -> ResponseReturnValue:
     return render_template(
         "villages/view.html",
         village=village,
-        show_edit=show_edit,
+        user_is_village_admin=user_is_village_admin,
         village_long_description_html=(
             render_markdown(village.long_description) if village.long_description else None
         ),
@@ -145,3 +145,47 @@ def edit(year: int, village_id: int) -> ResponseReturnValue:
             return redirect(url_for(".view", year=year, village_id=village_id))
 
     return render_template("villages/edit.html", form=form, village=village)
+
+
+# View (and manage) village members.
+# Only for village admins (although there is an orga equivalent in the admin.py views)
+@villages.route("/<int:year>/<int:village_id>/members", methods=["GET"])
+@login_required
+def members(year: int, village_id: int) -> ResponseReturnValue:
+    village = load_village(year, village_id, require_admin=True)
+
+    return render_template("villages/members.html", village=village)
+
+
+@villages.route("/<int:year>/<int:village_id>/members/promote", methods=["POST"])
+@login_required
+def members_promote(year: int, village_id: int) -> ResponseReturnValue:
+    village = load_village(year, village_id, require_admin=True)
+
+    if not village:
+        abort(404)
+
+    form = PromoteVillageMemberForm()
+
+    if form.validate_on_submit():
+        village_membership = next(
+            (
+                member
+                for member in village.village_memberships
+                if member.user_id == form.user_id.data and not member.admin
+            ),
+            None,
+        )
+
+        if village_membership is None:
+            flash(f"User is not a member of village '{village.name}'")
+        else:
+            # lazy-load this before committing and detaching the object
+            email = village_membership.user.email
+
+            village_membership.admin = True
+            db.session.commit()
+
+            flash(f"{email} has been promoted to a village admin")
+
+    return redirect(url_for(".members", year=year, village_id=village_id))
