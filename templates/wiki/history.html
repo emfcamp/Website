@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}History: {{ page.title }} — Wiki{% endblock %}
+{% block body %}
+<h2>
+  History: <a href="{{ url_for('wiki.view', slug=page.slug) }}">{{ page.title }}</a>
+</h2>
+
+{% if versions %}
+<p>Select any two versions below to compare them.</p>
+<form method="get" action="{{ url_for('wiki.list_pages') }}" id="diff-form">
+  {# The action is overridden by JS; plain links are the fallback. #}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th colspan="2">Compare</th>
+        <th>Date</th>
+        <th>Editor</th>
+        <th>Edit summary</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for version in versions %}
+      <tr>
+        <td>
+          {% if not loop.last %}
+          <a href="{{ url_for('wiki.diff', slug=page.slug,
+                              from_txn=versions[loop.index].transaction_id,
+                              to_txn=version.transaction_id) }}">
+            older &rarr; this
+          </a>
+          {% endif %}
+        </td>
+        <td>
+          {% if not loop.first %}
+          <a href="{{ url_for('wiki.diff', slug=page.slug,
+                              from_txn=version.transaction_id,
+                              to_txn=versions[loop.index0 - 1].transaction_id) }}">
+            this &rarr; newer
+          </a>
+          {% endif %}
+        </td>
+        <td>{{ version.transaction.issued_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>
+          {% if version.transaction.user %}
+            {{ version.transaction.user.name }}
+          {% else %}
+            <em>unknown</em>
+          {% endif %}
+        </td>
+        <td>{{ version.edit_note or '' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</form>
+{% else %}
+<p>No version history yet.</p>
+{% endif %}
+
+<p><a href="{{ url_for('wiki.view', slug=page.slug) }}">&larr; Back to page</a></p>
+{% endblock %}

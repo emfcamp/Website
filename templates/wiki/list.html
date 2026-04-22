@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Wiki{% endblock %}
+{% block body %}
+<h2>
+  Wiki
+  {% if current_user.is_authenticated and current_user.has_permission('wiki') %}
+  <a href="{{ url_for('wiki.new_page') }}" class="btn btn-primary btn-lg pull-right">New page</a>
+  {% endif %}
+</h2>
+
+<p>Collaboratively maintained pages for attendees. Anyone with a login can edit these pages.</p>
+
+{% if pages %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Last updated</th>
+      <th>By</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for page in pages %}
+    <tr>
+      <td><a href="{{ url_for('wiki.view', slug=page.slug) }}">{{ page.title }}</a></td>
+      <td>{{ page.updated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td>{{ page.updated_by.name if page.updated_by else '—' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No wiki pages yet.</p>
+{% endif %}
+{% endblock %}

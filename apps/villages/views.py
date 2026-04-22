@@ -1,17 +1,13 @@
-import html
-
-import markdown
-import nh3
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
-from markupsafe import Markup
 from sqlalchemy import exists, select
 
 from main import db
 from models.content import Venue
 from models.village import Village, VillageMember
 
+from ..common import render_markdown
 from ..config import config
 from . import load_village, villages
 from .forms import VillageForm
@@ -92,23 +88,6 @@ def view(year: int, village_id: int) -> ResponseReturnValue:
             render_markdown(village.long_description) if village.long_description else None
         ),
     )
-
-
-def render_markdown(markdown_text: str) -> Markup:
-    """Render untrusted markdown
-
-    This doesn't have access to any templating unlike email markdown
-    which is from a trusted user so is pre-processed with jinja.
-    """
-    extensions = ["markdown.extensions.nl2br", "markdown.extensions.smarty", "tables"]
-    content_html = nh3.clean(
-        markdown.markdown(markdown_text, extensions=extensions),
-        tags=(nh3.ALLOWED_TAGS - {"img"}),
-        link_rel="noopener nofollow",  # default includes noreferrer but not nofollow
-    )
-    inner_html = render_template("sandboxed-iframe.html", body=Markup(content_html))
-    iFrame_html = f'<iframe sandbox="allow-scripts allow-top-navigation-by-user-activation" class="embedded-content" srcdoc="{html.escape(inner_html, True)}"></iframe>'
-    return Markup(iFrame_html)
 
 
 @villages.route("/<int:year>/<int:village_id>/edit", methods=["GET", "POST"])

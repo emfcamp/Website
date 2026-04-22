@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ page.title }} — Wiki{% endblock %}
+{% block body %}
+<h2>
+  {{ page.title }}
+  {% if current_user.is_authenticated %}
+  <a href="{{ url_for('wiki.edit', slug=page.slug) }}" class="btn btn-primary btn-lg pull-right">Edit</a>
+  {% endif %}
+</h2>
+
+{% if content_html %}
+<script src="{{ static_url_for('static', filename='js/sandboxed-iframe-parent.js') }}"></script>
+{{ content_html }}
+{% else %}
+<p><em>This page has no content yet.</em></p>
+{% endif %}
+
+<hr>
+<p class="small">
+  Last updated {{ page.updated_at.strftime('%Y-%m-%d %H:%M') }}
+  {% if page.updated_by %}by {{ page.updated_by.name }}{% endif %}.
+  <a href="{{ url_for('wiki.history', slug=page.slug) }}">View history</a>
+  &middot;
+  <a href="{{ url_for('wiki.list_pages') }}">All wiki pages</a>
+</p>
+<p class="small"><em>Content on this page is provided by attendees and is not the responsibility of EMF.</em></p>
+{% endblock %}

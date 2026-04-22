@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Diff: {{ page.title }} — Wiki{% endblock %}
+{% block head %}
+<style>
+  .diff-view { font-family: monospace; font-size: 13px; line-height: 1.5;
+               background: #1e1e1e; color: #d4d4d4; padding: 12px 0;
+               border-radius: 4px; overflow-x: auto; }
+  .diff-view span { display: block; padding: 0 12px; white-space: pre-wrap; word-break: break-all; }
+  .diff-view .d-add  { background: #1a3a1a; color: #98c379; }
+  .diff-view .d-del  { background: #3a1a1a; color: #e06c75; }
+  .diff-view .d-hunk { background: #1a2a3a; color: #61afef; }
+  .diff-view .d-hdr  { color: #888; }
+</style>
+{% endblock %}
+{% block body %}
+<h2>
+  Diff: <a href="{{ url_for('wiki.view', slug=page.slug) }}">{{ page.title }}</a>
+</h2>
+
+<div class="well well-sm">
+  <dl class="dl-horizontal" style="margin-bottom:0">
+    <dt>From</dt>
+    <dd>
+      Version #{{ from_txn }}
+      &mdash; {{ from_ver.transaction.issued_at.strftime('%Y-%m-%d %H:%M') }}
+      {% if from_ver.transaction.user %}by {{ from_ver.transaction.user.name }}{% endif %}
+    </dd>
+    <dt>To</dt>
+    <dd>
+      Version #{{ to_txn }}
+      &mdash; {{ to_ver.transaction.issued_at.strftime('%Y-%m-%d %H:%M') }}
+      {% if to_ver.transaction.user %}by {{ to_ver.transaction.user.name }}{% endif %}
+    </dd>
+  </dl>
+</div>
+
+{% if diff_lines %}
+<div class="diff-view">
+{% for line in diff_lines %}
+{% if line.startswith('---') or line.startswith('+++') %}<span class="d-hdr">{{ line }}</span>
+{% elif line.startswith('+') %}<span class="d-add">{{ line }}</span>
+{% elif line.startswith('-') %}<span class="d-del">{{ line }}</span>
+{% elif line.startswith('@@') %}<span class="d-hunk">{{ line }}</span>
+{% else %}<span>{{ line }}</span>
+{% endif %}
+{% endfor %}
+</div>
+{% else %}
+<p class="text-muted">No differences between these versions.</p>
+{% endif %}
+  <a href="{{ url_for('wiki.view', slug=page.slug) }}">View current page</a>
+</p>
+{% endblock %}

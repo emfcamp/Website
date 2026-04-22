@@ -1,3 +1,4 @@
+import html
 import json
 import logging
 import re
@@ -25,6 +26,7 @@ from flask.json import jsonify
 from flask_login import current_user, login_user
 from jinja2.utils import urlize
 from markdown import markdown
+import nh3
 from markupsafe import Markup
 from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import Response
@@ -447,6 +449,23 @@ def get_next_url(default=None):
     if default is None:
         default = url_for(".account")
     return default
+
+
+def render_markdown(markdown_text: str) -> Markup:
+    """Render untrusted user-supplied markdown safely.
+
+    Sanitises HTML via nh3 and wraps output in a sandboxed iframe so that
+    arbitrary scripts and navigation from user content cannot affect the page.
+    """
+    extensions = ["markdown.extensions.nl2br", "markdown.extensions.smarty", "tables"]
+    content_html = nh3.clean(
+        markdown(markdown_text, extensions=extensions),
+        tags=(nh3.ALLOWED_TAGS - {"img"}),
+        link_rel="noopener nofollow",
+    )
+    inner_html = render_template("sandboxed-iframe.html", body=Markup(content_html))
+    iframe_html = f'<iframe sandbox="allow-scripts allow-top-navigation-by-user-activation" class="embedded-content" srcdoc="{html.escape(inner_html, True)}"></iframe>'
+    return Markup(iframe_html)
 
 
 def tidy_workshop_cost(participant_cost: str) -> str:
