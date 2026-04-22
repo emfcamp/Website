@@ -20,7 +20,9 @@ def _current_version_token(page: WikiPage) -> str:
     Used for optimistic-concurrency conflict detection. The token is the
     latest transaction_id, or "0" for a page that has never been saved.
     """
-    versions = list(page.versions.order_by(None).order_by(version_class(WikiPage).transaction_id.desc()).limit(1))
+    versions = list(
+        page.versions.order_by(None).order_by(version_class(WikiPage).transaction_id.desc()).limit(1)
+    )
     if versions:
         return str(versions[0].transaction_id)
     return "0"
@@ -121,9 +123,7 @@ def history(slug: str) -> ResponseReturnValue:
         abort(404)
 
     WikiPageVersion = version_class(WikiPage)
-    versions = list(
-        page.versions.order_by(None).order_by(WikiPageVersion.transaction_id.desc())
-    )
+    versions = list(page.versions.order_by(None).order_by(WikiPageVersion.transaction_id.desc()))
     return render_template("wiki/history.html", page=page, versions=versions)
 
 
