@@ -220,6 +220,7 @@ def create_app(dev_server=False, config_override=None):
 
     from models import feature_flag, site_state
     from models.user import User, load_anonymous_user
+    from models.wiki import WikiPage  # noqa: F401 — registers WikiPage with SQLAlchemy Continuum
 
     @login_manager.user_loader
     def load_user(userid: str) -> User | None:
@@ -387,6 +388,7 @@ def create_app(dev_server=False, config_override=None):
     from apps.users import users
     from apps.villages import villages
     from apps.volunteer import volunteer
+    from apps.wiki import wiki
     from apps.volunteer.admin import volunteer_admin
     from apps.volunteer.admin.notify import notify
 
@@ -403,6 +405,7 @@ def create_app(dev_server=False, config_override=None):
     app.register_blueprint(arrivals, url_prefix="/arrivals")
     app.register_blueprint(api_bp, url_prefix="/api")
     app.register_blueprint(villages, url_prefix="/villages")
+    app.register_blueprint(wiki, url_prefix="/wiki")
     app.register_blueprint(admin, url_prefix="/admin")
     app.register_blueprint(volunteer, url_prefix="/volunteer")
     app.register_blueprint(notify, url_prefix="/volunteer/admin/notify")
