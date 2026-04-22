@@ -29,5 +29,5 @@ class CreateWikiPageForm(WikiPageForm):
     submit = SubmitField("Create page")
 
     def validate_slug(self, field: StringField) -> None:
-        if WikiPage.get_by_slug(field.data):
+        if field.data is not None and WikiPage.get_by_slug(field.data):
             raise ValidationError("A wiki page with this slug already exists.")
