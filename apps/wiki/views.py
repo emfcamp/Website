@@ -21,7 +21,7 @@ def _current_version_token(page: WikiPage) -> str:
     latest transaction_id, or "0" for a page that has never been saved.
     """
     versions = list(
-        page.versions.order_by(None).order_by(version_class(WikiPage).transaction_id.desc()).limit(1)
+        page.versions.order_by(None).order_by(version_class(WikiPage).transaction_id.desc()).limit(1)  # type: ignore[attr-defined]
     )
     if versions:
         return str(versions[0].transaction_id)
@@ -106,6 +106,7 @@ def edit(slug: str) -> ResponseReturnValue:
             conflict_diff=conflict_diff,
         )
 
+    assert form.title.data is not None
     page.title = form.title.data
     page.content = form.content.data or ""
     page.updated_by_id = current_user.id
@@ -123,7 +124,7 @@ def history(slug: str) -> ResponseReturnValue:
         abort(404)
 
     WikiPageVersion = version_class(WikiPage)
-    versions = list(page.versions.order_by(None).order_by(WikiPageVersion.transaction_id.desc()))
+    versions = list(page.versions.order_by(None).order_by(WikiPageVersion.transaction_id.desc()))  # type: ignore[attr-defined]
     return render_template("wiki/history.html", page=page, versions=versions)
 
 
@@ -134,8 +135,8 @@ def diff(slug: str, from_txn: int, to_txn: int) -> ResponseReturnValue:
         abort(404)
 
     WikiPageVersion = version_class(WikiPage)
-    from_ver = page.versions.filter(WikiPageVersion.transaction_id == from_txn).first()
-    to_ver = page.versions.filter(WikiPageVersion.transaction_id == to_txn).first()
+    from_ver = page.versions.filter(WikiPageVersion.transaction_id == from_txn).first()  # type: ignore[attr-defined]
+    to_ver = page.versions.filter(WikiPageVersion.transaction_id == to_txn).first()  # type: ignore[attr-defined]
 
     if from_ver is None or to_ver is None:
         abort(404)
