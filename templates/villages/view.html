@@ -7,6 +7,12 @@
   <a href="{{url_for('villages.members', year=event_year, village_id=village.id)}}" class="btn btn-primary btn-lg pull-right">Members</a>
   <a href="{{url_for('villages.edit', year=event_year, village_id=village.id)}}" class="btn btn-primary btn-lg pull-right">Edit</a>
   {% endif %}
+
+  {% if user_has_no_village %}
+  <form method="POST" action="{{ url_for('villages.members_join',  year=event_year, village_id=village.id) }}" class="village-inline-form pull-right">
+    <input type="submit" name="join" value="Join" class="btn btn-success btn-lg" title="Join this village. This village's admins will gain visibility of your name and email address"/>
+  </form>
+  {% endif %}
 </h1>
 
 {% if village.description %}
