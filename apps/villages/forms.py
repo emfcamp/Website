@@ -103,6 +103,10 @@ class AdminVillageForm(VillageForm):
             village.location = None
 
 
+class JoinVillageForm(Form):
+    submit = SubmitField("Join")
+
+
 class RemoveVillageAdminForm(Form):
     submit = SubmitField("Remove")
     user_id = HiddenIntegerField("user_id", [InputRequired()])
