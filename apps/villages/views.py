@@ -14,7 +14,7 @@ from models.village import Village, VillageMember
 
 from ..config import config
 from . import load_village, villages
-from .forms import PromoteVillageMemberForm, VillageForm
+from .forms import JoinVillageForm, PromoteVillageMemberForm, VillageForm
 
 
 @villages.route("/register", methods=["GET", "POST"])
@@ -89,10 +89,13 @@ def view(year: int, village_id: int) -> ResponseReturnValue:
         and current_user.village_membership.admin
     )
 
+    user_has_no_village = current_user.is_authenticated and not current_user.village
+
     return render_template(
         "villages/view.html",
         village=village,
         user_is_village_admin=user_is_village_admin,
+        user_has_no_village=user_has_no_village,
         village_long_description_html=(
             render_markdown(village.long_description) if village.long_description else None
         ),
@@ -189,3 +192,26 @@ def members_promote(year: int, village_id: int) -> ResponseReturnValue:
             flash(f"{email} has been promoted to a village admin")
 
     return redirect(url_for(".members", year=year, village_id=village_id))
+
+
+@villages.route("/<int:year>/<int:village_id>/members/join", methods=["POST"])
+@login_required
+def members_join(year: int, village_id: int) -> ResponseReturnValue:
+    village = load_village(year, village_id)
+
+    if not village:
+        abort(404)
+
+    if current_user.village:
+        flash(f"Already a member of village {current_user.village.name}")
+        return redirect(url_for(".view", year=year, village_id=village_id))
+
+    form = JoinVillageForm()
+
+    if form.validate_on_submit():
+        db.session.add(VillageMember(village_id=village.id, user=current_user, admin=False))
+        db.session.commit()
+
+        flash(f"You've joined village {village.name}")
+
+    return redirect(url_for(".view", year=year, village_id=village_id))

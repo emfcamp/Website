@@ -14,6 +14,7 @@ If you have a ticket, you can <a href="{{url_for('users.login', next=url_for('.r
   <li class="village-table-header">
     <h4 class="village-table-title">Name</h4>
     <h4 class="village-table-description">Description</h4>
+    <h4 class="village-table-member-count">👥</h4>
   </li>
   {% if current_user.is_authenticated and current_user.village %}
   <li class="village-table-village">
@@ -25,6 +26,9 @@ If you have a ticket, you can <a href="{{url_for('users.login', next=url_for('.r
     </h4>
     <p class="village-table-description">
       {{ current_user.village.description }}
+    </p>
+    <p class="village-table-member-count">
+      <span class="village-table-member-count-title">👥</span>{{ current_user.village.village_memberships | length }}
     </p>
     {% if current_user.village.map_link %}
       <div class="village-table-links">
@@ -43,6 +47,9 @@ If you have a ticket, you can <a href="{{url_for('users.login', next=url_for('.r
     </h4>
     <p class="village-table-description">
       {{ village.description }}
+    </p>
+    <p class="village-table-member-count">
+      <span class="village-table-member-count-title">👥</span>{{ village.village_memberships | length }}
     </p>
     {% if village.map_link %}
       <div class="village-table-links">
