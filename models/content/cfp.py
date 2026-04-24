@@ -76,7 +76,7 @@ PROPOSAL_STATE_TRANSITIONS: dict[ProposalState, set[ProposalState]] = {
         "conduct-blocked",
     },
     "anon-blocked": {"accepted", "rejected", "withdrawn", "reviewed", "edit", "conduct-blocked"},
-    "manual-review": {"accepted", "rejected", "withdrawn", "edit", "conduct-blocked"},
+    "manual-review": {"accepted", "rejected", "withdrawn", "new", "edit", "conduct-blocked"},
     "reviewed": {"accepted", "rejected", "withdrawn", "edit", "anonymised", "conduct-blocked"},
     "accepted": {"accepted", "rejected", "withdrawn", "edit", "finalised", "conduct-blocked"},
     "finalised": {"accepted", "rejected", "withdrawn", "conduct-blocked"},
