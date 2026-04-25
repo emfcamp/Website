@@ -25,6 +25,18 @@ def get_naive_session_dt(name: str) -> NaiveDateTime | None:
     return naive(dt.replace(tzinfo=None))
 
 
+def _split_by_review_count(proposals: list[Proposal], well_reviewed_threshold: int) -> list[Proposal]:
+    under = []
+    over = []
+    for p in proposals:
+        if len([v for v in p.votes if v.state != "blocked"]) >= well_reviewed_threshold:
+            over.append(p)
+        else:
+            under.append(p)
+
+    return under + over
+
+
 @cfp_review.route("/review", methods=["GET", "POST"])
 @review_required
 def review_list() -> ResponseReturnValue:
@@ -71,7 +83,7 @@ def review_list() -> ResponseReturnValue:
     to_review_old: list[Proposal] = []
     reviewed_with_order: list[tuple[Any, Proposal]] = []
 
-    for proposal, vote in list(db.session.execute(proposal_vote_query)):
+    for proposal, vote in db.session.execute(proposal_vote_query):
         proposal.user_vote = vote
         if vote:
             if vote.state in ["new", "resolved", "stale"]:
@@ -104,6 +116,10 @@ def review_list() -> ResponseReturnValue:
         random.shuffle(to_review_again)
         random.shuffle(to_review_new)
         random.shuffle(to_review_old)
+
+        well_reviewed_threshold = 10
+        to_review_new = _split_by_review_count(to_review_new, well_reviewed_threshold)
+        to_review_old = _split_by_review_count(to_review_old, well_reviewed_threshold)
 
         to_review_max = 30
 
