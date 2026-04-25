@@ -97,13 +97,15 @@ def view(year: int, village_id: int) -> ResponseReturnValue:
         and not current_user.village_membership.admin
     )
 
-    user_has_no_village = current_user.is_authenticated and not current_user.village
+    user_can_join_village = (
+        current_user.is_authenticated and not current_user.village and current_user.has_admission_ticket
+    )
 
     return render_template(
         "villages/view.html",
         village=village,
         user_is_village_admin=user_is_village_admin,
-        user_has_no_village=user_has_no_village,
+        user_can_join_village=user_can_join_village,
         user_is_village_member=user_is_village_member,
         village_long_description_html=(
             render_markdown(village.long_description) if village.long_description else None
@@ -213,6 +215,10 @@ def members_join(year: int, village_id: int) -> ResponseReturnValue:
 
     if current_user.village:
         flash(f"Already a member of village {current_user.village.name}")
+        return redirect(url_for(".view", year=year, village_id=village_id))
+
+    if not current_user.has_admission_ticket:
+        flash("You can't join a village without a ticket to EMF")
         return redirect(url_for(".view", year=year, village_id=village_id))
 
     form = JoinVillageForm()
