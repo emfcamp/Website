@@ -3,6 +3,7 @@ import html
 import markdown
 import nh3
 from flask import abort, flash, redirect, render_template, request, url_for
+from flask import current_app as app
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 from markupsafe import Markup
@@ -14,7 +15,7 @@ from models.village import Village, VillageMember
 
 from ..config import config
 from . import load_village, villages
-from .forms import JoinVillageForm, PromoteVillageMemberForm, VillageForm
+from .forms import JoinVillageForm, LeaveVillageForm, PromoteVillageMemberForm, VillageForm
 
 
 @villages.route("/register", methods=["GET", "POST"])
@@ -89,6 +90,13 @@ def view(year: int, village_id: int) -> ResponseReturnValue:
         and current_user.village_membership.admin
     )
 
+    user_is_village_member = (
+        current_user.is_authenticated
+        and current_user.village
+        and current_user.village.id == village_id
+        and not current_user.village_membership.admin
+    )
+
     user_has_no_village = current_user.is_authenticated and not current_user.village
 
     return render_template(
@@ -96,6 +104,7 @@ def view(year: int, village_id: int) -> ResponseReturnValue:
         village=village,
         user_is_village_admin=user_is_village_admin,
         user_has_no_village=user_has_no_village,
+        user_is_village_member=user_is_village_member,
         village_long_description_html=(
             render_markdown(village.long_description) if village.long_description else None
         ),
@@ -215,5 +224,63 @@ def members_join(year: int, village_id: int) -> ResponseReturnValue:
         flash(f"You've joined village {village.name}")
 
         return redirect(url_for(".view", year=year, village_id=village_id))
+    return render_template("villages/members_join.html", form=form, year=year, village=village)
+
+
+@villages.route("/<int:year>/<int:village_id>/members/leave", methods=["GET", "POST"])
+@login_required
+def members_leave(year: int, village_id: int) -> ResponseReturnValue:
+    village = load_village(year, village_id)
+
+    if not village:
+        abort(404)
+
+    if current_user.village.id != village_id:
+        flash(f"Not a member of village {current_user.village.name}")
+        return redirect(url_for(".view", year=year, village_id=village_id))
+
+    can_leave = False
+    delete_village = False
+
+    if current_user.village_membership.admin and len(village.admins()) <= 1:
+        if len(village.non_admins()) > 0:
+            # This is the last admin, they can't leave because there are other members
+            pass
+        else:
+            # This is the last admin, they can leave as there are no other members.
+            # The village will be deleted
+            can_leave = True
+            delete_village = True
     else:
-        return render_template("villages/members_join.html", form=form, year=year, village=village)
+        # User can leave
+        can_leave = True
+
+    form = LeaveVillageForm()
+
+    if form.validate_on_submit():
+        if can_leave:
+            # User can leave
+            db.session.delete(current_user.village_membership)
+
+            if delete_village:
+                app.logger.info(
+                    f"Village '{village.name}' (id {village.id}) deleted by {current_user} being the last to leave"
+                )
+                flash(f"You've left village {village.name} and it has been deleted")
+                db.session.delete(village)
+
+                db.session.commit()
+                return redirect(url_for(".main", year=year))
+            flash(f"You've left village {village.name}")
+
+            db.session.commit()
+            return redirect(url_for(".view", year=year, village_id=village_id))
+
+    return render_template(
+        "villages/members_leave.html",
+        form=form,
+        year=year,
+        village=village,
+        can_leave=can_leave,
+        delete_village=delete_village,
+    )
