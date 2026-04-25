@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Join village: {{village.name}}{% endblock %}
+{% block body %}
+<h3>Confirm joining village: {{village.name}}</h3>
+<p>Are you sure you want to join the village "{{village.name}}"?</p>
+<p>This village's admins will gain visibility of your name and email address.</p>
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    {{ form.submit(class_="btn btn-success") }}
+    <a class="btn btn-default" href="{{ url_for('.view', village_id=village.id, year=year) }}">Back</a>
+</form>
+
+{% endblock %}

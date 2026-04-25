@@ -194,7 +194,7 @@ def members_promote(year: int, village_id: int) -> ResponseReturnValue:
     return redirect(url_for(".members", year=year, village_id=village_id))
 
 
-@villages.route("/<int:year>/<int:village_id>/members/join", methods=["POST"])
+@villages.route("/<int:year>/<int:village_id>/members/join", methods=["GET", "POST"])
 @login_required
 def members_join(year: int, village_id: int) -> ResponseReturnValue:
     village = load_village(year, village_id)
@@ -214,4 +214,6 @@ def members_join(year: int, village_id: int) -> ResponseReturnValue:
 
         flash(f"You've joined village {village.name}")
 
-    return redirect(url_for(".view", year=year, village_id=village_id))
+        return redirect(url_for(".view", year=year, village_id=village_id))
+    else:
+        return render_template("villages/members_join.html", form=form, year=year, village=village)
