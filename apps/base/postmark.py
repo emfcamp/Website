@@ -4,6 +4,7 @@ from flask import abort, request
 from flask import current_app as app
 from flask.typing import ResponseReturnValue
 
+from main import db
 from models.user import User
 
 from . import base
@@ -29,5 +30,7 @@ def postmark_webhook() -> ResponseReturnValue:
         user.email_state = "bounced"
     elif data["RecordType"] == "SpamComplaint":
         user.email_state = "spam_report"
+
+    db.session.commit()
 
     return ""
