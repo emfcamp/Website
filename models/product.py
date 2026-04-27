@@ -723,7 +723,7 @@ class ProductView(BaseModel):
 
         # CfP voucher
         if self.cfp_accepted_only:
-            if user and user.is_authenticated and user.has_accepted_proposal:
+            if user and user.is_authenticated and user.cfp_voucher is not None:
                 return True
             return False
 

@@ -33,6 +33,7 @@ if TYPE_CHECKING:
     from .content.tagging import Tag
     from .diversity import UserDiversity
     from .payment import Payment
+    from .product import Voucher
     from .purchase import AdmissionTicket, Purchase, PurchaseTransfer, Ticket
     from .village import VillageMember
     from .volunteer import BuildupVolunteer, Volunteer
@@ -277,6 +278,8 @@ class User(BaseModel, UserMixin):
 
     ### Content
     will_have_ticket: Mapped[bool] = mapped_column(default=False)  # for CfP filtering
+    cfp_voucher_code: Mapped[str | None] = mapped_column(ForeignKey("voucher.code"))
+    cfp_voucher: Mapped[Voucher | None] = relationship("Voucher")
     cfp_invite_reason: Mapped[str | None]
 
     proposals: Mapped[list[Proposal]] = relationship(
@@ -454,9 +457,13 @@ class User(BaseModel, UserMixin):
         return db.session.get_one(User, uid)
 
     @property
+    def admission_tickets_held(self) -> int:
+        return len(list(self.get_owned_tickets(paid=True, type="admission_ticket")))
+
+    @property
     def has_admission_ticket(self) -> bool:
         """Whether the user has a ticket to the event."""
-        return len(list(self.get_owned_tickets(paid=True, type="admission_ticket"))) > 0
+        return self.admission_tickets_held > 0
 
     def check_will_have_ticket(self) -> bool:
         return self.will_have_ticket or self.has_admission_ticket

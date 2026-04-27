@@ -24,10 +24,13 @@ def test_product_view_accessible(db, user, monkeypatch):
         "Product should be inaccessible with incorrect voucher"
     )
 
-    product_view = ProductView(name="cfp", cfp_accepted_only=True, type="ticket")
+    # This has to be called 'speakers'
+    product_view = ProductView(name="speakers", cfp_accepted_only=True, type="ticket")
     assert not product_view.is_accessible(user), (
         "CfP products should not be visible without accepted proposal"
     )
+    db.session.add(product_view)
+    db.session.commit()
 
     proposal = Proposal(
         type="talk",
@@ -38,8 +41,7 @@ def test_product_view_accessible(db, user, monkeypatch):
     )
     db.session.add(proposal)
     db.session.commit()
-    proposal.state = "accepted"
-    db.session.add(proposal)
+    proposal.accept_proposal()
     db.session.commit()
 
     assert product_view.is_accessible(user), "CfP products should be visible with accepted proposal"

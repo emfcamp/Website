@@ -43,10 +43,10 @@ To summarise, we urgently need you to:
 {% endif %}
 * Fill in the form with your availability so we can schedule you.
 * Write a great description of your {{ schedule_item.human_type }} we can publish in the schedule!
-
+{% if proposal.user.cfp_voucher is not None %}
 If you don't yet have EMF tickets, you can get them on this page:
 
-  {{ external_url('tickets.main', flow='speakers') }}
+  {{ external_url('tickets.main', flow='speakers') }}{% endif %}
 
 Looking forward to seeing you in the field,
 All the EMF team
