@@ -543,11 +543,7 @@ def update_proposal(proposal_id: int) -> ResponseReturnValue:
 
         elif form.accept.data:
             msg = f"Manually accepting proposal {proposal_id}"
-            proposal.state = "accepted"
-
-            if not proposal.schedule_item:
-                schedule_item = proposal.create_schedule_item()
-                db.session.add(schedule_item)
+            proposal.accept_proposal()
 
             send_email_for_proposal(proposal, reason="accepted")
 
@@ -1289,11 +1285,7 @@ def rank() -> ResponseReturnValue:
             for proposal, score in scored_proposals:
                 if score >= min_score:
                     count += 1
-                    proposal.state = "accepted"
-
-                    if not proposal.schedule_item:
-                        schedule_item = proposal.create_schedule_item()
-                        db.session.add(schedule_item)
+                    proposal.accept_proposal()
 
                     if form.confirm_type.data in (
                         "accepted_unaccepted",

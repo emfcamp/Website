@@ -55,6 +55,11 @@ def main(flow="main"):
         # CfP-restricted or because they don't have an active voucher.
         abort(404)
 
+    if view.cfp_accepted_only:
+        voucher = current_user.cfp_voucher
+        if voucher:
+            session["ticket_voucher"] = voucher.code
+
     # The sales state controls whether admission tickets are on sale.
     sales_state = get_sales_state()
 

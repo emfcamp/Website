@@ -2,11 +2,11 @@ Hi {{ user.name }},
 
 Your Electromagnetic Field {{ event_year }} {{ proposal.human_type }} "{{ proposal.title }}" has been accepted!
 
-We'll be in contact shortly to check how you'd like it to be listed in the schedule as well as to confirm some other details with you.
+We'll be in contact shortly to check how you'd like it to be listed in the schedule as well as to confirm some other details with you.{% if proposal.type_info.grants_event_tickets %}
 
 If you don't yet have EMF tickets, you can now get them on this page:
 
-  {{ external_url('tickets.main', flow='speakers') }}
+  {{ external_url('tickets.main', flow='speakers') }}{% endif %}
 
 Don't hesitate to get in touch if you have any questions:
 

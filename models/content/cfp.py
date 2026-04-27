@@ -28,6 +28,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from main import db
 
 from .. import BaseModel, export_attr_counts, export_attr_edits, export_intervals, naive_utcnow
+from ..product import ProductView, Voucher
 from ..user import User
 from .attributes import (
     Attributes,
@@ -390,6 +391,26 @@ class Proposal(BaseModel):
             msg.has_been_read = True
         return len(messages)
 
+    def accept_proposal(self) -> None:
+        self.state = "accepted"
+
+        if not self.schedule_item:
+            schedule_item = self.create_schedule_item()
+            db.session.add(schedule_item)
+
+        if self.type_info.grants_event_tickets and self.user.cfp_voucher is None:
+            # Issue a pseudo-voucher, which may have 0 capacity if the user already has 2 tickets.
+            product_view = ProductView.get_by_name("speakers")
+            if not product_view:
+                raise Exception("No 'speakers' product view created yet?")
+            voucher = Voucher(
+                view=product_view,
+                email=self.user.email,
+                tickets_remaining=max(2 - self.user.admission_tickets_held, 0),
+            )
+            db.session.add(voucher)
+            self.user.cfp_voucher = voucher
+
     def create_schedule_item(self):
         # Create a schedule item using suitable defaults from the proposal
         schedule_item = ScheduleItem(
@@ -466,6 +487,7 @@ class ProposalInfo:
     human_type_a: str
     review_type: ReviewType
     attributes_cls: Type[Attributes]  # noqa: UP006
+    grants_event_tickets: bool = False
 
 
 # Ordering here currently determines ordering in the admin UI,
@@ -477,6 +499,7 @@ PROPOSAL_INFOS: dict[ProposalType, ProposalInfo] = {
         human_type_a="a talk",
         review_type=ReviewType.anonymous,
         attributes_cls=ProposalTalkAttributes,
+        grants_event_tickets=True,
     ),
     "performance": ProposalInfo(
         type="performance",
@@ -491,6 +514,7 @@ PROPOSAL_INFOS: dict[ProposalType, ProposalInfo] = {
         human_type_a="a workshop",
         review_type=ReviewType.anonymous,
         attributes_cls=ProposalWorkshopAttributes,
+        grants_event_tickets=True,
     ),
     "youthworkshop": ProposalInfo(
         type="youthworkshop",
@@ -498,6 +522,7 @@ PROPOSAL_INFOS: dict[ProposalType, ProposalInfo] = {
         human_type_a="a youth workshop",
         review_type=ReviewType.manual,
         attributes_cls=ProposalYouthWorkshopAttributes,
+        grants_event_tickets=True,
     ),
     "installation": ProposalInfo(
         # Installations might not have durations or Occurrences
