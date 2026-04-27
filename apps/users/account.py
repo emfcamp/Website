@@ -1,3 +1,9 @@
+import xml.etree.ElementTree as ET
+from datetime import datetime, timedelta
+from typing import Any
+
+import requests
+from dateutil.parser import parse as parse_date
 from flask import current_app as app
 from flask import flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
@@ -34,6 +40,35 @@ class AccountForm(DiversityForm):
         return super().set_from_user(user)
 
 
+BLOG_POSTS: dict[str, Any] = {"timestamp": None, "posts": []}
+
+
+def fetch_blog_posts():
+    global BLOG_POSTS
+    if BLOG_POSTS["timestamp"] is not None and BLOG_POSTS["timestamp"] > datetime.now() - timedelta(
+        minutes=15
+    ):
+        return BLOG_POSTS["posts"]
+    response = requests.get("https://blog.emfcamp.org/rss", timeout=1)
+    if response.status_code != 200:
+        return BLOG_POSTS["posts"]
+
+    posts = []
+
+    rss = ET.fromstring(response.text)
+    for entry in rss.findall(".//{http://www.w3.org/2005/Atom}entry")[:3]:
+        posts.append(
+            {
+                "title": entry.find("{http://www.w3.org/2005/Atom}title").text,
+                "date": parse_date(entry.find("{http://www.w3.org/2005/Atom}published").text),
+                "link": entry.find('{http://www.w3.org/2005/Atom}link[@type="text/html"]').attrib["href"],
+            }
+        )
+
+    BLOG_POSTS = {"timestamp": datetime.now(), "posts": posts}
+    return BLOG_POSTS["posts"]
+
+
 @users.route("/account", methods=["GET", "POST"])
 @login_required
 def account() -> ResponseReturnValue:
@@ -47,7 +82,13 @@ def account() -> ResponseReturnValue:
         )
         return redirect(url_for(".details"))
 
-    return render_template("account/main.html")
+    blog_posts = []
+    try:
+        blog_posts = fetch_blog_posts()
+    except Exception:
+        app.logger.exception("Error fetching blog posts")
+
+    return render_template("account/main.html", blog_posts=blog_posts)
 
 
 @users.route("/account/details", methods=["GET", "POST"])

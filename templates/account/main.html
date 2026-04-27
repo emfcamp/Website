@@ -111,6 +111,22 @@
         </div>
     </div>
 
+    {% if blog_posts %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+        <h3 class="panel-title">Latest Updates</h3>
+        </div>
+        <div class="panel-body">
+            <p>Read the latest updates about EMF from <a href="https://blog.emfcamp.org" target="_blank">our blog</a>:</p>
+        <ul>
+        {% for post in blog_posts %}
+        <li><a href="{{post['link']}}" target="_blank">{{post['title']}}</a> ({{post['date'].strftime("%Y-%m-%d")}})</li>
+        {% endfor %}
+        <ul>
+        </div>
+    </div>
+    {% endif %}
+
   {#
   {% if SITE_STATE in ('sales', 'event') %}
     <div class="panel panel-default">
