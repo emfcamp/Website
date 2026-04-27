@@ -29,7 +29,6 @@ from main import db
 
 from .. import BaseModel, export_attr_counts, export_attr_edits, export_intervals, naive_utcnow
 from ..user import User
-from . import validate_state_transitions
 from .attributes import (
     Attributes,
     ProposalInstallationAttributes,
@@ -456,7 +455,8 @@ class Proposal(BaseModel):
         self.attributes_json = dataclasses.asdict(value)
 
 
-validate_state_transitions(Proposal.state, PROPOSAL_STATE_TRANSITIONS)
+## Disabled while we work out a better approach for this.
+# validate_state_transitions(Proposal.state, PROPOSAL_STATE_TRANSITIONS)
 
 
 @dataclass
