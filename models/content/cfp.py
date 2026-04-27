@@ -637,3 +637,14 @@ class ProposalVote(BaseModel):
 
 
 from .schedule import Occurrence, ScheduleItem
+
+__all__ = [
+    "PROPOSAL_INFOS",
+    "Proposal",
+    "ProposalInfo",
+    "ProposalMessage",
+    "ProposalState",
+    "ProposalType",
+    "ProposalVote",
+    "ReviewType",
+]
