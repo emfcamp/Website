@@ -483,8 +483,11 @@ def find_next_proposal_id(prop):
 
     proposals, _ = filter_proposal_request()
 
-    # FIXME: index might fail
-    idx = proposals.index(prop) + 1
+    try:
+        idx = proposals.index(prop) + 1
+    except ValueError:
+        return None
+
     if len(proposals) <= idx:
         return None
     return proposals[idx].id
