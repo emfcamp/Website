@@ -34,7 +34,7 @@
             </tr>
             {% for (user, proposals) in duplicates.items() %}
                 <tr>
-                    <td rowspan="{{ proposals.count() }}">{{ user.name }}</td>
+                    <td rowspan="{{ proposals|length }}">{{ user.name }}</td>
                 {% for prop in proposals %}
                     {% if not loop.first %}
                     <tr>
