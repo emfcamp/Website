@@ -1,0 +1,153 @@
+{
+  "badge": {
+    "cfp_accepted_only": false,
+    "name": "badge",
+    "products": ["badge", "badge-battery"],
+    "type": "badge",
+    "vouchers_only": false
+  },
+  "badge unused": {
+    "cfp_accepted_only": false,
+    "name": "badge unused",
+    "products": [],
+    "type": "badge",
+    "vouchers_only": true
+  },
+  "discount": {
+    "cfp_accepted_only": false,
+    "name": "discount",
+    "products": [
+      "full-discount-50",
+      "full-discount-80",
+      "u12",
+      "u18",
+      "parking"
+    ],
+    "type": "tickets",
+    "vouchers_only": true
+  },
+  "hire": {
+    "cfp_accepted_only": false,
+    "name": "hire",
+    "products": [
+      "tent-5x5",
+      "pagoda-6x6",
+      "tent-6x6",
+      "flooring-5x5",
+      "flooring-6x6",
+      "chair",
+      "table"
+    ],
+    "type": "hire",
+    "vouchers_only": false
+  },
+  "hire restricted": {
+    "cfp_accepted_only": false,
+    "name": "hire restricted",
+    "products": ["chair", "table"],
+    "type": "rental",
+    "vouchers_only": true
+  },
+  "main": {
+    "cfp_accepted_only": false,
+    "name": "main",
+    "products": [
+      "full",
+      "full-s",
+      "full-sg",
+      "full-bogo",
+      "u18",
+      "u12",
+      "campervan",
+      "parking"
+    ],
+    "type": "tickets",
+    "vouchers_only": false
+  },
+  "other": {
+    "cfp_accepted_only": false,
+    "name": "other",
+    "products": ["campervan", "parking"],
+    "type": "tickets",
+    "vouchers_only": false
+  },
+  "speakers": {
+    "cfp_accepted_only": true,
+    "name": "speakers",
+    "products": [
+      "full-speaker",
+      "full-speaker-plusone",
+      "u18",
+      "u12",
+      "parking",
+      "campervan"
+    ],
+    "type": "tickets",
+    "vouchers_only": false
+  },
+  "sponsor": {
+    "cfp_accepted_only": false,
+    "name": "sponsor",
+    "products": ["sponsor-1k", "sponsor-500", "sponsor-250"],
+    "type": "sponsor",
+    "vouchers_only": false
+  },
+  "tees": {
+    "cfp_accepted_only": false,
+    "name": "tees",
+    "products": [
+      "tshirt-unisex-small",
+      "tshirt-unisex-med",
+      "tshirt-unisex-large",
+      "tshirt-unisex-xl",
+      "tshirt-unisex-2xl",
+      "tshirt-unisex-3xl",
+      "tshirt-unisex-4xl",
+      "tshirt-unisex-5xl",
+      "tshirt-womens-s",
+      "tshirt-womens-m",
+      "tshirt-womens-l",
+      "tshirt-womens-xl",
+      "tshirt-womens-2xl",
+      "tshirt-kids-3-4",
+      "tshirt-kids-5-6",
+      "tshirt-kids-7-8",
+      "tshirt-kids-9-11",
+      "tshirt-kids-12-13"
+    ],
+    "type": "merchandise",
+    "vouchers_only": false
+  },
+  "villages": {
+    "cfp_accepted_only": false,
+    "name": "villages",
+    "products": [
+      "full",
+      "full-s",
+      "full-sg",
+      "full-bogo",
+      "u18",
+      "u12",
+      "campervan",
+      "parking"
+    ],
+    "type": "tickets",
+    "vouchers_only": true
+  },
+  "volunteer": {
+    "cfp_accepted_only": false,
+    "name": "volunteer",
+    "products": [
+      "full",
+      "full-s",
+      "full-sg",
+      "full-bogo",
+      "u18",
+      "u12",
+      "campervan",
+      "parking"
+    ],
+    "type": "tickets",
+    "vouchers_only": true
+  }
+}
