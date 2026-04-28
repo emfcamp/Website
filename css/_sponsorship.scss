@@ -38,6 +38,15 @@
         height: 150px;
       }
     }
+    &--palladium {
+      grid-template-columns: 1fr;
+      margin-left: 20%;
+      margin-right: 20%;
+
+      img.img-sponsor {
+        height: 100px;
+      }
+    }
     &--gold {
       grid-template-columns: 1fr 1fr;
     }
