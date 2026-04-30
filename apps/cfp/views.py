@@ -632,6 +632,9 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
     if proposal.user != current_user:
         abort(404)
 
+    if not feature_enabled("CFP_FINALISE"):
+        return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
+
     if proposal.schedule_item is None:
         app.logger.warning("Attempt to finalise proposal without schedule item")
         abort(404)
