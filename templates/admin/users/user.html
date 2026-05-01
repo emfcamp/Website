@@ -58,7 +58,13 @@
     <tr><th>ID</th><td>{{user.id}}</td></tr>
     <tr><th>Name</th><td>{{user.name}}</td></tr>
     <tr><th>Email</th><td>{{user.email}} (state: {{user.email_state}})</td></tr>
-    <tr><th>CFP Ticket Voucher?</th><td>{% if user.cfp_voucher %}Yes: {{ user.cfp_voucher.tickets_remaining }} tickets left{% else %}No{% endif %}</td></tr>
+    <tr><th>CfP Ticket Voucher?</th><td>
+        {%- if user.cfp_voucher -%}
+            <a href="{{url_for('admin.product_views.product_view_voucher_detail', view_id=user.cfp_voucher.view.id, voucher_code=user.cfp_voucher.code)}}">Yes: {{ user.cfp_voucher.tickets_remaining }} ticket(s) left</a>
+        {%- else -%}
+            No
+        {%- endif -%}
+    </td></tr>
 </table>
 
 <form method="post">
