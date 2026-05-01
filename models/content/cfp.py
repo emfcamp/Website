@@ -18,6 +18,7 @@ from typing import (  # noqa: UP035
     Any,
     Literal,
     Type,
+    cast,
     get_args,
 )
 
@@ -26,7 +27,6 @@ from sqlalchemy import JSON, ForeignKey, UniqueConstraint, select
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from main import db
 from apps.config import config
 from main import NaiveDT, db
 
