@@ -2,11 +2,22 @@ Hi {{ user.name }},
 
 Your Electromagnetic Field {{ event_year }} {{ proposal.human_type }} "{{ proposal.title }}" has been accepted!
 
-We'll be in contact shortly to check how you'd like it to be listed in the schedule as well as to confirm some other details with you.{% if proposal.type_info.grants_event_tickets %}
+We'll be in contact shortly to check how you'd like it to be listed in the schedule as well as to confirm some other details with you.
+{%- if proposal.type_info.grants_event_tickets and user.admission_tickets_held == 0 %} {# FIXME check function name #}
 
-If you don't yet have EMF tickets, you can now get them on this page:
+You can buy your reserved tickets here:
 
-  {{ external_url('tickets.main', flow='speakers') }}{% endif %}
+  {{ external_url('tickets.main', flow='speakers') }}
+{%- elif proposal.type_info.grants_event_tickets and user.admission_tickets_held == 1 %} {# FIXME check function name #}
+
+You already have a ticket to EMF but if you would like to buy another you can do so here:
+
+  {{ external_url('tickets.main', flow='speakers') }}
+{%- elif proposal.type_info.grants_event_tickets and user.admission_tickets_held >= 2 %} {# FIXME check function name #}
+
+You already have two adult admission tickets so cannot buy any more.
+
+{%- endif %}
 
 Don't hesitate to get in touch if you have any questions:
 
