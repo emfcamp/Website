@@ -6,12 +6,12 @@ We'll be in contact shortly to check how you'd like it to be listed in the sched
 {%- if proposal.type_info.grants_event_tickets %}
 {%- if user.cfp_voucher.tickets_remaining > 1 %}
 
-You can buy your reserved tickets here:
+You can buy your reserved tickets here{% if user.cfp_voucher.expiry %} before {{ user.cfp_voucher.expiry.strftime('%Y-%m-%d') }}{% endif %}:
 
   {{ external_url('tickets.main', flow='speakers') }}
 {%- elif user.cfp_voucher.tickets_remaining == 1 %}
 
-You already have a ticket to EMF but if you would like to buy another you can do so here:
+You already have a ticket to EMF but if you would like to buy another{% if user.cfp_voucher.expiry %} before {{ user.cfp_voucher.expiry.strftime('%Y-%m-%d') }}{% endif %} you can do so here:
 
   {{ external_url('tickets.main', flow='speakers') }}
 {%- else %}
