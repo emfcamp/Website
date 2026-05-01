@@ -47,7 +47,7 @@
 </div>
 </form>
 
-{% if view.vouchers_only %}
+{% if view.vouchers_only or view.cfp_accepted_only %}
 <h3>Vouchers</h3>
 <p>A total of <strong>{{view.vouchers|length}}</strong> vouchers issued for this view.
   <strong>{{voucher_stats.active}}</strong> vouchers
@@ -55,8 +55,10 @@
 </p>
 
 <div class="btn-group">
+{% if view.vouchers_only %}
 <a href="{{ url_for('admin.product_views.product_view_add_voucher', view_id=view.id) }}" class="btn btn-default">Create custom voucher code</a>
 <a href="{{ url_for('admin.product_views.product_view_bulk_add_vouchers_by_email', view_id=view.id) }}" class="btn btn-default">Email Vouchers</a>
+{% endif %}
 <a href="{{ url_for('admin.product_views.product_view_voucher_list', view_id=view.id) }}" class="btn btn-default">List vouchers</a>
 </div>
 {% endif %}

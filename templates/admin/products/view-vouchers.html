@@ -9,7 +9,6 @@
   <li><a href="{{url_for('admin.product_views.product_views_main', view_id=view.id)}}">Product View "{{ view.name }}"</a></li>
   <li class="active">Vouchers</li>
 </ol>
-{% if view.vouchers_only %}
 <form method="get" class="form-inline">
   <div class="checkbox">
     <label>
@@ -52,6 +51,7 @@
   {% endfor %}
 </table>
 
+{% if view.vouchers_only %}
 <a href="{{ url_for('admin.product_views.product_view_add_voucher', view_id=view.id) }}" class="btn btn-default">Create custom voucher code</a>
 <a href="{{ url_for('admin.product_views.product_view_bulk_add_vouchers_by_email', view_id=view.id) }}" class="btn btn-default">Email Vouchers</a>
 {% endif %}
