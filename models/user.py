@@ -7,6 +7,7 @@ import random
 import string
 import struct
 import time
+from collections.abc import Iterable
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Literal
 
@@ -365,7 +366,7 @@ class User(BaseModel, UserMixin):
     def is_invited_speaker(self):
         return self.cfp_invite_reason and len(self.cfp_invite_reason.strip()) > 0
 
-    def get_owned_tickets(self, paid=None, type=None):
+    def get_owned_tickets(self, paid: bool | None = None, type: str | None = None) -> Iterable[Ticket]:
         "Get tickets owned by a user, filtered by type and payment state."
         for ticket in self.owned_tickets:
             if (paid is True and not ticket.is_paid_for) or (paid is False and ticket.is_paid_for):
@@ -455,6 +456,14 @@ class User(BaseModel, UserMixin):
             raise ValueError("Invalid token")
 
         return db.session.get_one(User, uid)
+
+    def adult_tickets_held(self, voucher: bool = False) -> int:
+        adult_tickets = [
+            ticket
+            for ticket in self.get_owned_tickets(paid=True, type="admission_ticket")
+            if ticket.product.is_adult_ticket(voucher=voucher)
+        ]
+        return len(adult_tickets)
 
     @property
     def admission_tickets_held(self) -> int:

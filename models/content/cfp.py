@@ -406,7 +406,7 @@ class Proposal(BaseModel):
             voucher = Voucher(
                 view=product_view,
                 email=self.user.email,
-                tickets_remaining=max(2 - self.user.admission_tickets_held, 0),
+                tickets_remaining=max(2 - self.user.adult_tickets_held(voucher=True), 0),
             )
             db.session.add(voucher)
             self.user.cfp_voucher = voucher
