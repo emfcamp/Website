@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import random
 import re
 import typing
@@ -322,7 +320,7 @@ class BankPayment(Payment):
         for currency in [self.currency, "GBP"]:
             try:
                 return BankAccount.query.filter_by(currency=currency, active=True).one()
-            except (MultipleResultsFound, NoResultFound):
+            except MultipleResultsFound, NoResultFound:
                 continue
         return None
 

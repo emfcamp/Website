@@ -48,19 +48,19 @@ class Role(BaseModel):
 
     team_id: Mapped[int] = mapped_column(ForeignKey("volunteer_team.id"))
     #: The team this role is under
-    team: Mapped["Team"] = relationship(back_populates="roles", lazy="joined")
+    team: Mapped[Team] = relationship(back_populates="roles", lazy="joined")
 
     #: Admins for this role
-    admins: Mapped[list["RoleAdmin"]] = relationship(back_populates="role", cascade="all, delete-orphan")
+    admins: Mapped[list[RoleAdmin]] = relationship(back_populates="role", cascade="all, delete-orphan")
     #: Shifts
-    shifts: Mapped[list["Shift"]] = relationship(back_populates="role", cascade="all, delete-orphan")
+    shifts: Mapped[list[Shift]] = relationship(back_populates="role", cascade="all, delete-orphan")
 
     #: Volunteers who are interested in this role
-    interested_volunteers: Mapped[list["Volunteer"]] = relationship(
+    interested_volunteers: Mapped[list[Volunteer]] = relationship(
         back_populates="interested_roles", secondary=VolunteerRoleInterest, passive_deletes=True
     )
     #: Volunteers who are trained for this role
-    trained_volunteers: Mapped[list["Volunteer"]] = relationship(
+    trained_volunteers: Mapped[list[Volunteer]] = relationship(
         back_populates="trained_roles", secondary=VolunteerRoleTraining, passive_deletes=True
     )
 
@@ -111,7 +111,7 @@ class Role(BaseModel):
         return cls.query.order_by(Role.name).all()
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "Role":
+    def from_dict(cls, data: dict[str, Any]) -> Role:
         role = Role.get_by_slug(data["slug"]) or Role(slug=data["slug"])
         role.name = data["name"]
         role.description = data["description"]
@@ -194,25 +194,25 @@ class Team(BaseModel):
     slug: Mapped[str] = mapped_column(unique=True, index=True)
 
     #: Users who are admins for all roles within this team.
-    admins: Mapped[list["Volunteer"]] = relationship(
+    admins: Mapped[list[Volunteer]] = relationship(
         "Volunteer",
         secondary="volunteer_team_admin",
         back_populates="administered_teams",
     )
 
     #: Roles that sit under this team.
-    roles: Mapped[list["Role"]] = relationship(back_populates="team")
+    roles: Mapped[list[Role]] = relationship(back_populates="team")
 
     @classmethod
-    def get_by_id(cls, id: int) -> "Team":
+    def get_by_id(cls, id: int) -> Team:
         return get_or_404(db, Team, id)
 
     @classmethod
-    def get_by_slug(cls, slug: str) -> "Team | None":
+    def get_by_slug(cls, slug: str) -> Team | None:
         return db.session.scalar(select(cls).where(cls.slug == slug))
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "Team":
+    def from_dict(cls, data: dict[str, Any]) -> Team:
         team = cls.get_by_slug(data["slug"]) or cls(slug=data["slug"])
         team.name = data["name"]
         return team
@@ -234,7 +234,7 @@ class RoleAdmin(BaseModel):
     role_id: Mapped[int] = mapped_column(ForeignKey("volunteer_role.id"), primary_key=True)
 
     #: Volunteer to be an admin
-    volunteer: Mapped["Volunteer"] = relationship(back_populates="volunteer_admin_roles")
+    volunteer: Mapped[Volunteer] = relationship(back_populates="volunteer_admin_roles")
     #: Role the user is an admin for
     role: Mapped[Role] = relationship(back_populates="admins")
 

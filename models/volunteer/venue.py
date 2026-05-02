@@ -19,7 +19,7 @@ class VolunteerVenue(BaseModel):
     name: Mapped[str]
     mapref: Mapped[str | None]
 
-    shifts: Mapped[list["Shift"]] = relationship(back_populates="venue")
+    shifts: Mapped[list[Shift]] = relationship(back_populates="venue")
 
     def __repr__(self):
         return f"<VolunteerVenue {self.name}>"
@@ -47,7 +47,7 @@ class VolunteerVenue(BaseModel):
         return cls.query.filter_by(slug=slug).one_or_none()
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "VolunteerVenue":
+    def from_dict(cls, data: dict[str, Any]) -> VolunteerVenue:
         venue = cls.get_by_slug(data["slug"]) or cls(slug=data["slug"])
         venue.name = data["name"]
         venue.mapref = data["mapref"]

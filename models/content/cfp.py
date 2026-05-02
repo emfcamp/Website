@@ -7,8 +7,6 @@ This module deals with accepting content proposals from users and reviewing them
 Once a CfP proposal is accepted, an item is created in the schedule.
 """
 
-from __future__ import annotations
-
 import dataclasses
 import logging
 from dataclasses import dataclass

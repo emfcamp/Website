@@ -101,13 +101,13 @@ class Purchase(BaseModel):
         primaryjoin="Purchase.purchaser_id == User.id",
         back_populates="purchases",
     )
-    price: Mapped["Price"] = relationship("Price", back_populates="purchases")
-    price_tier: Mapped["PriceTier"] = relationship("PriceTier", back_populates="purchases")
-    product: Mapped["Product"] = relationship("Product", back_populates="purchases")
-    payment: Mapped["Payment"] = relationship("Payment", back_populates="purchases")
-    refund: Mapped["Refund | None"] = relationship(back_populates="purchases", cascade="all")
-    refund_request: Mapped["RefundRequest | None"] = relationship(back_populates="purchases")
-    transfers: Mapped[list["PurchaseTransfer"]] = relationship(back_populates="purchase", cascade="all")
+    price: Mapped[Price] = relationship("Price", back_populates="purchases")
+    price_tier: Mapped[PriceTier] = relationship("PriceTier", back_populates="purchases")
+    product: Mapped[Product] = relationship("Product", back_populates="purchases")
+    payment: Mapped[Payment] = relationship("Payment", back_populates="purchases")
+    refund: Mapped[Refund | None] = relationship(back_populates="purchases", cascade="all")
+    refund_request: Mapped[RefundRequest | None] = relationship(back_populates="purchases")
+    transfers: Mapped[list[PurchaseTransfer]] = relationship(back_populates="purchase", cascade="all")
 
     __mapper_args__ = {"polymorphic_on": "type", "polymorphic_identity": "purchase"}
 
@@ -199,7 +199,7 @@ class Purchase(BaseModel):
 
         self.set_state("cancelled")
 
-    def refund_purchase(self, refund: "Refund | None" = None) -> None:
+    def refund_purchase(self, refund: Refund | None = None) -> None:
         if self.state == "refunded":
             raise PurchaseStateException(f"{self} is already refunded")
 

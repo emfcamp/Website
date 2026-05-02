@@ -4,8 +4,6 @@ Round
 The round model exists to store information about a round close
 """
 
-from __future__ import annotations
-
 from datetime import datetime
 
 from sqlalchemy import ForeignKey

@@ -64,7 +64,7 @@ class Tag(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     tag: Mapped[str] = mapped_column(unique=True)
 
-    proposals: Mapped[list["Proposal"]] = relationship(secondary=ProposalTag)
+    proposals: Mapped[list[Proposal]] = relationship(secondary=ProposalTag)
     reviewers: Mapped[list[User]] = relationship(
         back_populates="cfp_reviewer_tags", secondary=CFPReviewerTags
     )

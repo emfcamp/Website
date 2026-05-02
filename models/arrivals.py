@@ -29,7 +29,7 @@ class ArrivalsView(BaseModel):
     )
     required_permission: Mapped[Permission] = relationship()
 
-    arrivals_view_products: Mapped[list["ArrivalsViewProduct"]] = relationship(
+    arrivals_view_products: Mapped[list[ArrivalsViewProduct]] = relationship(
         "ArrivalsViewProduct",
         back_populates="view",
         cascade="all, delete-orphan",

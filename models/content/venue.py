@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import to_shape
 from sqlalchemy import (

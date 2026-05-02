@@ -74,8 +74,8 @@ class ShiftEntry(BaseModel):
     #: Indicates whether a volunteer has arrived for/completed a shift.
     state: Mapped[ShiftEntryState] = mapped_column(default=ShiftEntryState.SIGNED_UP)
 
-    user: Mapped["User"] = relationship(back_populates="shift_entries")
-    shift: Mapped["Shift"] = relationship(back_populates="entries")
+    user: Mapped[User] = relationship(back_populates="shift_entries")
+    shift: Mapped[Shift] = relationship(back_populates="entries")
 
     def set_state(self, state: str | ShiftEntryState) -> None:
         if isinstance(state, str):
@@ -113,11 +113,11 @@ class Shift(BaseModel):
     max_needed: Mapped[int] = mapped_column(default=0)
 
     #: Role that this shift is filling
-    role: Mapped["Role"] = relationship(back_populates="shifts")
+    role: Mapped[Role] = relationship(back_populates="shifts")
     #: Venue where the shift occurs
-    venue: Mapped["VolunteerVenue"] = relationship(back_populates="shifts")
+    venue: Mapped[VolunteerVenue] = relationship(back_populates="shifts")
     #: Optional Occurrence (talk/workshop) related to this shift
-    occurrence: Mapped["Occurrence"] = relationship(back_populates="shifts")
+    occurrence: Mapped[Occurrence] = relationship(back_populates="shifts")
     #: Entries (volunteers) for this shift
     entries: Mapped[list[ShiftEntry]] = relationship(back_populates="shift")
 
@@ -220,15 +220,15 @@ class Shift(BaseModel):
     @classmethod
     def generate_for(
         cls,
-        role: "Role",
-        venue: "VolunteerVenue",
-        first: "DateTime",
-        final: "DateTime",
+        role: Role,
+        venue: VolunteerVenue,
+        first: DateTime,
+        final: DateTime,
         min: int,
         max: int,
         base_duration: int = 120,
         changeover: int = 15,
-    ) -> list["Shift"]:
+    ) -> list[Shift]:
         """Build Shift records between start and end times.
 
         Args:

@@ -28,7 +28,7 @@ class CapacityMixin:
 
     @property
     @abstractmethod
-    def parent(self) -> "CapacityMixin | None": ...
+    def parent(self) -> CapacityMixin | None: ...
 
     @declared_attr
     def __expired(cls):

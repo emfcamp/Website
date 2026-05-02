@@ -28,7 +28,7 @@ class Permission(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True, index=True)
 
-    users: Mapped[list["User"]] = relationship(back_populates="permissions", secondary=UserPermission)
+    users: Mapped[list[User]] = relationship(back_populates="permissions", secondary=UserPermission)
 
     def __init__(self, name: str):
         self.name = name

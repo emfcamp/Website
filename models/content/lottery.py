@@ -68,10 +68,10 @@ class Lottery(BaseModel):
     reserved_tickets: Mapped[int | None] = mapped_column(default=5)
     max_tickets_per_entry: Mapped[int]
 
-    occurrence: Mapped["Occurrence"] = relationship(back_populates="lottery")
-    entries: Mapped[list["LotteryEntry"]] = relationship(back_populates="lottery")
+    occurrence: Mapped[Occurrence] = relationship(back_populates="lottery")
+    entries: Mapped[list[LotteryEntry]] = relationship(back_populates="lottery")
 
-    schedule_item: AssociationProxy["ScheduleItem"] = association_proxy("occurrence", "schedule_item")
+    schedule_item: AssociationProxy[ScheduleItem] = association_proxy("occurrence", "schedule_item")
 
     def get_all_ticket_capacity(self):
         return self.total_tickets - self.sum_tickets_in_state("valid-tickets")
@@ -97,7 +97,7 @@ class LotteryEntry(BaseModel):
     lottery: Mapped[Lottery] = relationship(back_populates="entries")
     user: Mapped[User] = relationship(back_populates="lottery_entries")
 
-    occurrence: AssociationProxy["Occurrence"] = association_proxy("lottery", "occurrence")
+    occurrence: AssociationProxy[Occurrence] = association_proxy("lottery", "occurrence")
 
     # add a way to indicate a code has been used?
     def use_code(self, code: str) -> None:
@@ -115,7 +115,7 @@ class LotteryEntry(BaseModel):
             raise LotteryEntryException("No codes found")
         self.ticket_codes = ""
 
-    def get_users_other_lottery_entries_for_type(self) -> list["LotteryEntry"]:
+    def get_users_other_lottery_entries_for_type(self) -> list[LotteryEntry]:
         return [
             e
             for e in self.user.lottery_entries
@@ -176,7 +176,7 @@ class LotteryEntry(BaseModel):
         return self.change_state("entered")
 
     @classmethod
-    def create_entry(cls, user: User, lottery: Lottery, ticket_count: int = 1) -> "LotteryEntry":
+    def create_entry(cls, user: User, lottery: Lottery, ticket_count: int = 1) -> LotteryEntry:
         # When would this ever happen?
         if ticket_count <= 0:
             raise LotteryEntryException("ticket_count must be greater than 0")
