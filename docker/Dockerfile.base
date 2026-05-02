@@ -1,5 +1,5 @@
 # Base Dockerfile
-# 
+#
 # This image is used as a base image for both production and development builds.
 # It's built separately to speed up build times.
 
@@ -29,4 +29,3 @@ RUN uv run --no-dev playwright install-deps && \
 
 RUN uv run --no-dev playwright install chromium && \
     rm -rf /var/lib/apt/lists/*
-

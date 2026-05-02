@@ -4,7 +4,7 @@ version = "0.1"
 description = "The Electromagnetic Field web site"
 authors = []
 # When upgrading Python versions, you'll need to update docker/Dockerfile.base.
-requires-python = ">=3.13,<3.14"
+requires-python = ">=3.14,<3.15"
 
 dependencies = [
     "alembic~=1.1",
