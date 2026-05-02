@@ -3,7 +3,7 @@
 # This image is used as a base image for both production and development builds.
 # It's built separately to speed up build times.
 
-FROM python:3.13-slim-bookworm
+FROM python:3.14-slim-trixie
 
 WORKDIR /app
 COPY pyproject.toml uv.lock /app/
