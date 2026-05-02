@@ -65,7 +65,7 @@ def sort_proposals(proposals: list[Proposal]) -> None:
         "state": lambda p: (p.state, p.modified, p.title.lower()),
         "type": lambda p: (p.type, p.title.lower()),
         "notice": lambda p: (sort_by_notice(p.notice_required), p.title.lower()),
-        "duration": lambda p: (p.duration or 0),
+        "duration": lambda p: p.duration or 0,
         "user": lambda p: (p.user.name.lower(), p.title.lower()),
         "title": lambda p: p.title.lower(),
     }

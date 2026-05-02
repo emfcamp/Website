@@ -104,7 +104,7 @@ def load_utility_functions(app_obj):
         if vat_rate is None:
             return "Exempt"
         normalized = (vat_rate * 100).normalize()
-        sign, digit, exp = normalized.as_tuple()
+        _sign, _digit, exp = normalized.as_tuple()
         pct = normalized if exp <= 0 else normalized.quantize(1)
         return f"{pct}%"
 

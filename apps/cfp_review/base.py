@@ -930,7 +930,7 @@ def entity_version(entity_type: VersionedEntityType, entity_id: int, txn_id: int
 @cfp_review.route("/message-batch", methods=["GET", "POST"])
 @admin_required
 def message_batch():
-    proposals, is_filtered = filter_proposal_request()
+    proposals, _is_filtered = filter_proposal_request()
 
     form = SendMessageForm()
     if form.validate_on_submit():
