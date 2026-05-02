@@ -6,9 +6,9 @@ ifeq ("$(TEST_SETTINGS)", "")
 	TEST_SETTINGS=./config/test.cfg
 endif
 
-.PHONY: test check-syntax fix-syntax pytest docs
+.PHONY: test pytest check-syntax fix-syntax check-mypy docs docs-dev
 
-test: check-syntax pytest
+test: check-syntax check-mypy pytest
 
 pytest:
 	SETTINGS_FILE=$(TEST_SETTINGS) pytest --random-order --cov-report markdown:cov.md --cov=apps --cov=models ./tests/ ./models/
@@ -19,13 +19,14 @@ check-syntax:
 	uv lock --check
 	ruff format --check ./*.py ./apps ./models ./tests
 	ruff check ./*.py ./apps ./models ./tests
-	mypy ./*.py ./apps ./models --txt-report mypy-report
-
 
 fix-syntax:
 	ruff format ./*.py ./apps ./models ./tests
 	ruff check --fix ./*.py ./apps ./models ./tests
-	mypy ./*.py ./apps ./models
+
+
+check-mypy:
+	mypy ./*.py ./apps ./models --txt-report mypy-report
 
 
 docs:
