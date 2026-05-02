@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from enum import StrEnum
 from typing import (  # noqa: UP035
+    TYPE_CHECKING,
     Any,
     Literal,
     Type,
@@ -46,6 +47,10 @@ from .attributes import (
 from .tagging import ProposalTag, Tag
 
 log = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    from .round import ProposalRound
+
 
 # This might be better as a StrEnum, but would require disallowing hyphens.
 # Using literals does not trigger sqla's native_enum functionality, so
@@ -189,6 +194,7 @@ class Proposal(BaseModel):
         cascade="all",
         secondary=ProposalTag,
     )
+    proposal_rounds: Mapped[list["ProposalRound"]] = relationship(back_populates="proposal")  # noqa UP037
 
     schedule_item: Mapped[ScheduleItem | None] = relationship("ScheduleItem", back_populates="proposal")
 
