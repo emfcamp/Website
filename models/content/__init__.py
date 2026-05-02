@@ -23,6 +23,7 @@ def validate_state_transitions[TState](column: Any, allowed_transitions: dict[TS
 
 from .cfp import *  # noqa: F403
 from .lottery import *  # noqa: F403
+from .round import *  # noqa: F403
 from .schedule import *  # noqa: F403
 from .tagging import *  # noqa: F403
 from .venue import *  # noqa: F403
