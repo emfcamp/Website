@@ -21,7 +21,7 @@ from models.volunteer.volunteer import Volunteer
 
 metrics = Blueprint("metric", __name__)
 
-request_duration = Histogram("emf_request_duration_seconds", "Request duration", ["endpoint", "method"])
+request_duration = Histogram("emf_request_duration_seconds", "Request duration")
 request_total = Counter("emf_request_total", "Total request count", ["endpoint", "method", "http_status"])
 
 

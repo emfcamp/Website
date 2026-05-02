@@ -187,9 +187,7 @@ def create_app(dev_server=False, config_override=None):
     @app.after_request
     def after_request(response):
         try:
-            request_duration.labels(request.endpoint, request.method).observe(
-                time.time() - request._start_time
-            )
+            request_duration.observe(time.time() - request._start_time)
         except AttributeError:
             logger.exception("Request without _start_time - check app.before_request ordering")
         request_total.labels(request.endpoint, request.method, response.status_code).inc()
