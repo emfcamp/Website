@@ -3,7 +3,7 @@ name = "website"
 version = "0.1"
 description = "The Electromagnetic Field web site"
 authors = []
-# When upgrading Python versions, you'll need to update docker/Dockerfile.base.
+# To upgrade python, see https://emfcamp.github.io/Website/development/upgrading-python.html
 requires-python = ">=3.14,<3.15"
 
 dependencies = [

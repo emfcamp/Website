@@ -3,6 +3,7 @@
 # This image is used as a base image for both production and development builds.
 # It's built separately to speed up build times.
 
+# To upgrade python, see https://emfcamp.github.io/Website/development/upgrading-python.html
 FROM python:3.14-slim-trixie
 
 WORKDIR /app
