@@ -26,7 +26,7 @@ from flask import (
 from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from flask_mailman import EmailMessage
-from sqlalchemy import and_, func, select
+from sqlalchemy import and_, desc, func, select
 from sqlalchemy.orm import joinedload, selectinload, undefer
 from sqlalchemy_continuum.utils import version_class
 from wtforms import FormField
@@ -39,10 +39,12 @@ from models.content import (
     Occurrence,
     Proposal,
     ProposalMessage,
+    ProposalRound,
     ProposalState,
     ProposalTag,
     ProposalType,
     ProposalVote,
+    Round,
     ScheduleItem,
     ScheduleItemState,
     ScheduleItemType,
@@ -1195,23 +1197,28 @@ def schedule_item_change_owner(schedule_item_id: int) -> ResponseReturnValue:
     )
 
 
-@cfp_review.route("/close-round", methods=["GET", "POST"])
+@cfp_review.route("/close-round/<proposal_type>", methods=["GET", "POST"])
 @admin_required
-def close_round():
+def close_round(proposal_type: ProposalType) -> ResponseReturnValue:
+    if proposal_type not in get_args(ProposalType):
+        flash("Can only close rounds for talks or workshops")
+        return redirect(url_for(".proposals"))
     form = CloseRoundForm()
     min_votes = 0
 
     vote_subquery = (
-        ProposalVote.query.with_entities(ProposalVote.proposal_id, func.count("*").label("count"))
+        db.session.query(ProposalVote)
+        .with_entities(ProposalVote.proposal_id, func.count("*").label("count"))
         .filter(ProposalVote.state == "voted")
         .group_by("proposal_id")
         .subquery()
     )
 
     proposals = (
-        Proposal.query.with_entities(Proposal, vote_subquery.c.count)
+        db.session.query(Proposal)
+        .with_entities(Proposal, vote_subquery.c.count)
         .join(vote_subquery, Proposal.id == vote_subquery.c.proposal_id)
-        .filter(Proposal.state.in_(["anonymised", "reviewed"]))
+        .filter(Proposal.state == "anonymised", Proposal.type == proposal_type)
         .order_by(vote_subquery.c.count.desc())
         .all()
     )
@@ -1220,15 +1227,27 @@ def close_round():
     if form.validate_on_submit():
         if form.confirm.data:
             min_votes = session["min_votes"]
+            round = Round(proposal_type=proposal_type, minimum_votes=int(min_votes), minimum_score=-1.0)
+            db.session.add(round)
+
             for prop, vote_count in proposals:
-                if vote_count >= min_votes and prop.state != "reviewed":
-                    prop.state = "reviewed"
+                proposal_round = ProposalRound(
+                    round=round,
+                    proposal=prop,
+                    vote_count=vote_count,
+                    score=-1.0,
+                )
+                if vote_count >= min_votes:
+                    proposal_round.outcome = "in-progress"
+                else:
+                    proposal_round.outcome = "not-enough-votes"
+                db.session.add(proposal_round)
 
             db.session.commit()
             del session["min_votes"]
             app.logger.info(f"CFP Round closed. Set {len(proposals)} proposals to 'reviewed'")
 
-            return redirect(url_for(".rank"))
+            return redirect(url_for(".rank", round_id=round.id))
 
         if form.close_round.data:
             preview = True
@@ -1236,7 +1255,7 @@ def close_round():
             flash(f'Proposals with more than {session["min_votes"]} (blue) will be marked as "reviewed"')
 
         elif form.cancel.data:
-            form.min_votes.data = form.min_votes.default
+            form.min_votes.data = form.min_votes.default  # type: ignore [assignment]
             if "min_votes" in session:
                 del session["min_votes"]
 
@@ -1257,23 +1276,32 @@ def close_round():
     )
 
 
-@cfp_review.route("/rank", methods=["GET", "POST"])
+@cfp_review.route("/rank/<int:round_id>", methods=["GET", "POST"])
 @admin_required
-def rank() -> ResponseReturnValue:
-    proposals_query = select(Proposal).where(Proposal.state == "reviewed")
+def rank(round_id: int) -> ResponseReturnValue:
+    round = get_or_404(db, Round, round_id)
 
-    types = request.args.getlist("type")
-    if types:
-        proposals_query = proposals_query.filter(Proposal.type.in_(types))
+    most_recent_round = (
+        db.session.query(Round)
+        .where(Round.proposal_type == round.proposal_type)
+        .order_by(desc(Round.created))
+        .first()
+    )
 
-    proposals = list(db.session.scalars(proposals_query))
+    if round != most_recent_round and most_recent_round:
+        flash(
+            f"WARNING: this is not the most recent {round.proposal_type} round. Did you want {url_for('.rank', round_id=most_recent_round.id)}?"
+        )
+
     form = AcceptanceForm()
     scored_proposals = []
 
-    for proposal in proposals:
-        score_list = [v.vote for v in proposal.votes if v.state == "voted"]
+    for round_prop in round.proposal_rounds:
+        if round_prop.outcome == "not-enough-votes":
+            continue
+        score_list = [v.vote for v in round_prop.proposal.votes if v.state == "voted"]
         score = calculate_max_normalised_score(score_list)
-        scored_proposals.append((proposal, score))
+        scored_proposals.append((round_prop.proposal, score))
 
     scored_proposals = sorted(scored_proposals, key=lambda p: p[1], reverse=True)
 
@@ -1282,10 +1310,22 @@ def rank() -> ResponseReturnValue:
         if form.confirm.data:
             min_score = session["min_score"]
             count = 0
+            round.minimum_score = min_score
             for proposal, score in scored_proposals:
+                proposal_round = (
+                    db.session.query(ProposalRound)
+                    .where(
+                        ProposalRound.round == round,
+                        ProposalRound.proposal == proposal,
+                    )
+                    .one()
+                )
+                proposal_round.score = score
+                app.logger.info(f"score is {score}, type is {type(score)}")
                 if score >= min_score:
                     count += 1
                     proposal.accept_proposal()
+                    proposal_round.outcome = "accepted"
 
                     if form.confirm_type.data in (
                         "accepted_unaccepted",
@@ -1296,18 +1336,20 @@ def rank() -> ResponseReturnValue:
 
                 else:
                     proposal.state = "anonymised"
+                    proposal_round.outcome = "unaccepted"
                     if form.confirm_type.data == "accepted_unaccepted":
                         send_email_for_proposal(proposal, reason="still-considered")
 
                     elif form.confirm_type.data == "accepted_reject":
                         proposal.state = "rejected"
+                        proposal_round.outcome = "rejected"
                         proposal.rejected_email_sent = True
                         send_email_for_proposal(proposal, reason="rejected")
 
                 db.session.commit()
 
             del session["min_score"]
-            msg = f"Accepted {count} {types} proposals; min score: {min_score}"
+            msg = f"Accepted {count} proposals; min score: {min_score}"
             app.logger.info(msg)
             flash(msg, "info")
             return redirect(url_for(".proposals", state="accepted"))
@@ -1320,8 +1362,7 @@ def rank() -> ResponseReturnValue:
         elif form.cancel.data and "min_score" in session:
             del session["min_score"]
 
-    # FIXME: why are performances in here if installations aren't?
-    proposal_types: list[ProposalType] = ["talk", "workshop", "performance", "youthworkshop"]
+    proposal_types: list[ProposalType] = ["talk", "workshop"]
     estimates = {proposal_type: get_cfp_estimate(proposal_type) for proposal_type in proposal_types}
 
     return render_template(
@@ -1331,7 +1372,6 @@ def rank() -> ResponseReturnValue:
         proposals=scored_proposals,
         estimates=estimates,
         min_score=session.get("min_score"),
-        types=types,
         proposal_types=proposal_types,
     )
 
