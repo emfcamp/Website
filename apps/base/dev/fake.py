@@ -130,7 +130,7 @@ class FakeDataGenerator:
         while len(self.users) < 120:
             email = self.fake.safe_email()
             user = get_user(email)
-            if user:
+            if user or any(u for u in self.users if u.email == email):
                 app.logger.warning(f"User found with email address matching fake {email}, skipping")
                 continue
 
@@ -333,8 +333,14 @@ class FakeDataGenerator:
         return occurrence
 
     def create_village(self, user):
+        name = self.fake.sentence(nb_words=4, variable_nb_words=True)
+        name = name.removesuffix(".")
+        if db.session.scalar(select(Village.id).where(Village.name == name)):
+            app.logger.warning("Generated a village name that already exists, skipping")
+            return
+
         village = Village(
-            name=self.fake.text(max_nb_chars=20),
+            name=name,
             description=self.fake.text(max_nb_chars=100),
         )
 
