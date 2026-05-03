@@ -50,6 +50,10 @@ class Venue(BaseModel):
     priority: Mapped[int] = mapped_column(default=0)
     capacity: Mapped[int | None]
     location: Mapped[WKBElement | None] = mapped_column(Geometry("POINT", srid=4326))
+
+    #: Whether this venue allows any attendee to schedule content in it.
+    #: This is only used for official venues (bar, lounge) and is currently null for village stages
+    #: (which allow content to be scheduled by their admins)
     allows_attendee_content: Mapped[bool | None]
 
     village: Mapped[Village] = relationship(
