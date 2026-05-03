@@ -1327,6 +1327,7 @@ def rank(round_id: int) -> ResponseReturnValue:
                     proposal.accept_proposal()
                     proposal_round.outcome = "accepted"
 
+                    # NB there is also the 'nobody' email option
                     if form.confirm_type.data in (
                         "accepted_unaccepted",
                         "accepted",
@@ -1336,8 +1337,12 @@ def rank(round_id: int) -> ResponseReturnValue:
 
                 else:
                     proposal.state = "anonymised"
-                    proposal_round.outcome = "unaccepted"
-                    if form.confirm_type.data == "accepted_unaccepted":
+                    proposal_round.outcome = "still-considering"
+                    if (
+                        form.confirm_type.data == "accepted_unaccepted"
+                        and not proposal.still_considering_email_sent
+                    ):
+                        proposal.still_considering_email_sent = True
                         send_email_for_proposal(proposal, reason="still-considered")
 
                     elif form.confirm_type.data == "accepted_reject":
@@ -1346,7 +1351,15 @@ def rank(round_id: int) -> ResponseReturnValue:
                         proposal.rejected_email_sent = True
                         send_email_for_proposal(proposal, reason="rejected")
 
-                db.session.commit()
+            for round_prop in round.proposal_rounds:
+                if (
+                    round_prop.outcome == "not-enough-votes"
+                    and not round_prop.proposal.still_considering_email_sent
+                ):
+                    round_prop.proposal.still_considering_email_sent = True
+                    send_email_for_proposal(proposal, reason="still-considered")
+
+            db.session.commit()
 
             del session["min_score"]
             msg = f"Accepted {count} proposals; min score: {min_score}"
