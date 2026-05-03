@@ -168,6 +168,7 @@ class Proposal(BaseModel):
     needs_money: Mapped[bool] = mapped_column(default=False)
     one_day: Mapped[bool] = mapped_column(default=False)
     rejected_email_sent: Mapped[bool] = mapped_column(default=False)
+    still_considering_email_sent: Mapped[bool] = mapped_column(default=False, nullable=True)
 
     # We show the user when their proposal was submitted
     created: Mapped[datetime] = mapped_column(default=naive_utcnow)
