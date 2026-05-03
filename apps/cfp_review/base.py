@@ -1361,7 +1361,7 @@ def rank(round_id: int) -> ResponseReturnValue:
                     and not round_prop.proposal.still_considering_email_sent
                 ):
                     round_prop.proposal.still_considering_email_sent = True
-                    send_email_for_proposal(proposal, reason="still-considered")
+                    send_email_for_proposal(round_prop.proposal, reason="still-considered")
 
             db.session.commit()
 
