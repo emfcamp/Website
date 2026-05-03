@@ -350,7 +350,7 @@ def send_email_for_proposal(proposal: Proposal, reason: ProposalEmailReason) -> 
 
     elif reason == "still-considered":
         subject = f'''We're still considering your EMF {proposal.human_type} "{title}"'''
-        template = "cfp_review/email/not_accepted_msg.txt"
+        template = "cfp_review/email/still_considering.txt"
 
     elif reason == "rejected":
         # remember to set rejected_email_sent
