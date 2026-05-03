@@ -701,7 +701,7 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
     else:
         # Default to publishing the schedule item
         if schedule_item.state == "unpublished":
-            form.proposal.data = "published"
+            form.state.data = "published"
 
         # These proxy to the proposal, so it doesn't matter if schedule_item exists
         form.proposal_equipment_required.data = proposal.equipment_required

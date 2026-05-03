@@ -131,7 +131,7 @@
         {{ render_field(form.default_video_privacy, 7) }}
         {% endif %}
         {% endif %}
-        
+
         {% if schedule_item.type == 'talk' %}
         {# content_note above #}
         {{ render_field(form.attributes.needs_laptop, 7) }}
@@ -176,7 +176,7 @@
 
         {% for occurrence in schedule_item.occurrences %}
         <dl class="dl-horizontal">
-          <dt>Slot length</dt><dd>{{ occurrence.scheduled_duration }} minutes</dd>
+          <dt>Slot length</dt><dd>{% if occurrence.scheduled_duration %}{{ occurrence.scheduled_duration }} minutes{% else %}Not yet scheduled{% endif %}</dd>
           <dt>Slot time</dt><dd>{% if occurrence.scheduled_time %}{{ occurrence.scheduled_time.strftime('%A at %-I:%M %p') }}{% else %}Not yet scheduled{% endif %}</dd>
           <dt>Venue</dt><dd>{{ occurrence.scheduled_venue_name or "Not yet scheduled"}}</dd>
         </dl>
@@ -191,7 +191,6 @@
         please <b><a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">  get in touch with us!</a></b>
         </div>
     </fieldset>
-	{% endif %}
 
   </div>
   <div class="pull-right">
