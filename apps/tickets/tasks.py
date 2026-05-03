@@ -218,6 +218,13 @@ def create_product_groups():
 
     db.session.commit()
 
+    # The speakers product view is required for the CfP round close flow (to issue tickets from)
+    speaker_view = ProductView.get_by_name("speakers")
+    if not speaker_view:
+        speaker_view = ProductView(name="speakers", cfp_accepted_only=True, type="ticket")
+        db.session.add(speaker_view)
+        db.session.commit()
+
     # ('t-shirt', 'T-Shirt', 200, 10, 10, 12, "Pre-order the official Electromagnetic Field t-shirt. T-shirts will be available to collect during the event."),
 
 

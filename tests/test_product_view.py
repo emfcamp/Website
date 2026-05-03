@@ -25,7 +25,9 @@ def test_product_view_accessible(db, user, monkeypatch):
     )
 
     # This has to be called 'speakers'
-    product_view = ProductView(name="speakers", cfp_accepted_only=True, type="ticket")
+    product_view = ProductView.get_by_name("speakers")
+    if not product_view:
+        product_view = ProductView(name="speakers", cfp_accepted_only=True, type="ticket")
     assert not product_view.is_accessible(user), (
         "CfP products should not be visible without accepted proposal"
     )
