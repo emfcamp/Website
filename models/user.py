@@ -31,6 +31,7 @@ if TYPE_CHECKING:
     from .content.schedule import Occurrence, ScheduleItem
     from .content.tagging import Tag
     from .diversity import UserDiversity
+    from .email import EmailJobRecipient
     from .payment import Payment
     from .product import Voucher
     from .purchase import AdmissionTicket, Purchase, PurchaseTransfer, Ticket
@@ -274,6 +275,7 @@ class User(BaseModel, UserMixin):
         primaryjoin="PurchaseTransfer.from_user_id == User.id",
         cascade="all, delete-orphan",
     )
+    email_job_recipients: Mapped[list[EmailJobRecipient]] = relationship(back_populates="user")
 
     ### Content
     will_have_ticket: Mapped[bool] = mapped_column(default=False)  # for CfP filtering

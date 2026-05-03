@@ -1,7 +1,7 @@
-from collections.abc import Sequence
 from typing import Literal
 
 from flask import flash, redirect, render_template, url_for
+from flask.typing import ResponseReturnValue
 from sqlalchemy import select
 from wtforms import SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired
@@ -15,8 +15,9 @@ from models.user import User
 from models.village import VillageMember
 
 from ..common.email import (
-    enqueue_trusted_emails,
+    enqueue_emails,
     format_trusted_html_email,
+    format_trusted_plaintext_email,
     preview_trusted_email,
 )
 from ..common.forms import Form
@@ -43,7 +44,7 @@ class EmailComposeForm(Form):
     send = SubmitField("Send Email")
 
 
-def get_users(dest: Literal["ticket", "cfp", "purchasers", "villages"]) -> Sequence[User]:
+def get_users(dest: Literal["ticket", "cfp", "purchasers", "villages"]) -> list[User]:
     query = select(User)
     if dest == "ticket":
         query = (
@@ -81,13 +82,13 @@ def get_email_reason(dest: str) -> str:
 
 
 @admin.route("/email", methods=["GET", "POST"])
-def email():
+def email() -> ResponseReturnValue:
+    # This function is almost identical to apps.villages.admin.admin_email_owners, consider updating there too
     form = EmailComposeForm()
     if form.validate_on_submit():
+        users: list[User]
         if form.destination.data == "ticket_and_cfp":
-            users = set()
-            users.update(get_users("ticket"))
-            users.update(get_users("cfp"))
+            users = list(set(get_users("ticket")) | set(get_users("cfp")))
         else:
             users = get_users(form.destination.data)
 
@@ -117,12 +118,18 @@ def email():
             )
 
         if form.send.data is True:
-            enqueue_trusted_emails(
-                users,
-                form.subject.data,
-                form.text.data,
-                reason=reason,
+            assert form.text.data  # DataRequired()
+            assert form.subject.data  # DataRequired()
+            body: str = form.text.data
+            subject: str = form.subject.data
+            enqueue_emails(
+                "bulk_contact",
+                users=users,
+                subject=subject,
+                text_body=format_trusted_plaintext_email(body),
+                html_body=format_trusted_html_email(body, subject, reason=reason),
             )
+            db.session.commit()
             flash(f"Email queued for sending to {len(users)} users")
             return redirect(url_for(".email"))
 

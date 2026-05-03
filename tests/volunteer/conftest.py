@@ -30,7 +30,7 @@ def session(db, user):
 def volunteer(db, user):
     volunteer = Volunteer.query.filter(Volunteer.user_id == user.id).one_or_none()
     if volunteer is None:
-        volunteer = Volunteer(user=user)
+        volunteer = Volunteer(user=user, volunteer_email=user.email)
         db.session.add(volunteer)
         user.grant_permission("volunteer:user")
         db.session.flush()
