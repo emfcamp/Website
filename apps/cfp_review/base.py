@@ -32,6 +32,7 @@ from sqlalchemy_continuum.utils import version_class
 from wtforms import FormField
 
 from apps.common import get_next_url
+from apps.common.email import enqueue_email
 from main import db, external_url, get_or_404
 from models.content import (
     SCHEDULE_ITEM_INFOS,
@@ -391,15 +392,18 @@ def send_email_for_proposal(proposal: Proposal, reason: ProposalEmailReason) -> 
 
     app.logger.info("Sending %s email for proposal %s", reason, proposal.id)
 
-    msg = EmailMessage(subject, from_email=from_email_, to=[proposal.user.email])
-    msg.body = render_template(
+    text_body = render_template(
         template,
         user=proposal.user,
         proposal=proposal,
         reserve_ticket_link=app.config["RESERVE_LIST_TICKET_LINK"],
     )
-
-    msg.send()
+    enqueue_email(
+        recipient=proposal.user,
+        from_email=from_email_,
+        subject=subject,
+        text_body=text_body,
+    )
 
 
 @cfp_review.route("/proposals/<int:proposal_id>/convert", methods=["GET", "POST"])

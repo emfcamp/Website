@@ -6,7 +6,8 @@ from jinja2.sandbox import ImmutableSandboxedEnvironment
 from markupsafe import Markup
 
 from main import db, mail
-from models.email import EmailJob, EmailJobRecipient
+from models.email import Email, EmailJob, EmailJobRecipient
+from models.user import User
 
 from ..config import config as app_config
 
@@ -135,15 +136,27 @@ def preview_trusted_email(preview_address, subject, body):
 
 
 def enqueue_trusted_emails(users, subject, body, **kwargs):
-    """Queue an email for sending by the background email worker."""
+    """Queue a bulk email for sending by the background email worker."""
     job = EmailJob(
-        subject,
-        format_trusted_plaintext_email(body, **kwargs),
-        format_trusted_html_email(body, subject, **kwargs),
+        subject=subject,
+        text_body=format_trusted_plaintext_email(body, **kwargs),
+        html_body=format_trusted_html_email(body, subject, **kwargs),
     )
     db.session.add(job)
 
     for user in users:
-        db.session.add(EmailJobRecipient(job, user))
+        db.session.add(EmailJobRecipient(job=job, user=user))
 
-    db.session.commit()
+
+def enqueue_email(
+    recipient: User, from_email: str, subject: str, text_body: str, html_body: Markup | None = None
+) -> None:
+    """Queue a transactional email for sending by the background email worker."""
+    email = Email(
+        recipient=recipient,
+        from_email=from_email,
+        subject=subject,
+        text_body=text_body,
+        html_body=html_body,
+    )
+    db.session.add(email)

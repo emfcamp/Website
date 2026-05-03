@@ -123,6 +123,7 @@ def email():
                 form.text.data,
                 reason=reason,
             )
+            db.session.commit()
             flash(f"Email queued for sending to {len(users)} users")
             return redirect(url_for(".email"))
 
