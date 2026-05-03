@@ -34,6 +34,8 @@ def get_available_proposal_minutes():
     minutes = defaultdict(int)
     venue_names_by_type = Venue.emf_venue_names_by_type()
     for type, slots in PROPOSAL_TIMESLOTS.items():
+        if type not in venue_names_by_type:
+            continue
         periods = make_periods_contiguous([timeslot_to_period(ts, type=type) for ts in slots])
         for period in periods:
             minutes[type] += int((period.end - period.start).total_seconds() / 60) * len(
