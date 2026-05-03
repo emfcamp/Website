@@ -1312,6 +1312,9 @@ def rank(round_id: int) -> ResponseReturnValue:
             count = 0
             round.minimum_score = min_score
             for proposal, score in scored_proposals:
+                # We often bounce some things to manual review so skip them
+                if proposal.state == "manual-review":
+                    continue
                 proposal_round = (
                     db.session.query(ProposalRound)
                     .where(
@@ -1322,6 +1325,7 @@ def rank(round_id: int) -> ResponseReturnValue:
                 )
                 proposal_round.score = score
                 app.logger.info(f"score is {score}, type is {type(score)}")
+
                 if score >= min_score:
                     count += 1
                     proposal.accept_proposal()
