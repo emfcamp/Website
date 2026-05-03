@@ -307,7 +307,7 @@ class AcceptanceForm(Form):
             ("nobody", "Email nobody"),
             ("accepted_reject", "Email accepted, reject all unaccepted"),
         ],
-        default="accepted",
+        default="accepted_unaccepted",
     )
     confirm = SubmitField("Confirm")
     cancel = SubmitField("Cancel")
