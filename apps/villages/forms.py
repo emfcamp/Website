@@ -136,6 +136,11 @@ class PromoteVillageMemberForm(Form):
     user_id = HiddenIntegerField("user_id", [InputRequired()])
 
 
+class AcceptVillageMemberForm(Form):
+    submit = SubmitField("Accept")
+    user_id = HiddenIntegerField("user_id", [InputRequired()])
+
+
 class AddVillageMemberForm(Form):
     submit = SubmitField("Add")
     user_email = EmailField("Email address", [InputRequired()])

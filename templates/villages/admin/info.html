@@ -54,6 +54,23 @@
     </li>
 </ul>
 
+<b>Village join requests:</b>
+<ul>
+    {% for user in village.users_who_requested_joining() %}
+        <li>
+            <a href="{{ url_for('admin.user', user_id=user.id) }}">{{ user.name }}</a> ({{ user.email }})
+            <form method="POST" action="{{ url_for('villages.admin_village_members_accept_join_request', village_id=village.id) }}" class="village-inline-form">
+                <input type="hidden" name="user_id" value="{{ user.id }}" />
+                <input type="submit" name="promote" value="Accept" class="btn btn-sm btn-success"/>
+            </form>
+            <form method="POST" action="{{ url_for('villages.admin_village_members_remove', village_id=village.id) }}" class="village-inline-form">
+                <input type="hidden" name="user_id" value="{{ user.id }}" />
+                <input type="submit" name="remove" value="Remove" class="btn btn-sm btn-danger"/>
+            </form>
+        </li>
+    {% endfor %}
+</ul>
+
 <form method="POST">
     {{ form.hidden_tag() }}
 
