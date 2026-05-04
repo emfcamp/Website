@@ -7,7 +7,7 @@ from models.user import User
 
 from . import BaseModel, naive_utcnow
 
-__all__ = ["EmailJob", "EmailJobRecipient"]
+__all__ = ["Email", "EmailJob", "EmailJobRecipient"]
 
 
 class EmailJob(BaseModel):
@@ -17,11 +17,6 @@ class EmailJob(BaseModel):
     text_body: Mapped[str]
     html_body: Mapped[str]
     created: Mapped[datetime] = mapped_column(default=naive_utcnow)
-
-    def __init__(self, subject, text_body, html_body):
-        self.subject = subject
-        self.text_body = text_body
-        self.html_body = html_body
 
     @classmethod
     def get_export_data(cls):
@@ -38,14 +33,11 @@ class EmailJobRecipient(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     job_id: Mapped[int] = mapped_column(ForeignKey("email_job.id"))
+    # TODO: replace with a timestamp like Email
     sent: Mapped[bool] = mapped_column(default=False)
 
     user: Mapped[User] = relationship()
     job: Mapped[EmailJob] = relationship()
-
-    def __init__(self, job, user):
-        self.job = job
-        self.user = user
 
 
 EmailJob.recipient_count = column_property(
@@ -54,3 +46,22 @@ EmailJob.recipient_count = column_property(
     .scalar_subquery(),
     deferred=True,
 )
+
+
+class Email(BaseModel):
+    """
+    Transactional (i.e. non-bulk) email, for things like CfP updates.
+    Having this in the DB allows us to link it to the rest of the database transaction.
+    """
+
+    __tablename__ = "email"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    recipient_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    from_email: Mapped[str]
+    subject: Mapped[str]
+    text_body: Mapped[str]
+    html_body: Mapped[str | None]
+    created: Mapped[datetime] = mapped_column(default=naive_utcnow)
+    sent_at: Mapped[datetime | None] = mapped_column(index=True)
+
+    recipient: Mapped[User] = relationship()

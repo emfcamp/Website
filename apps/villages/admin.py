@@ -190,6 +190,7 @@ def admin_email_owners() -> ResponseReturnValue:
 
         if form.send.data is True:
             enqueue_trusted_emails(users, form.subject.data, form.text.data)
+            db.session.commit()
             flash(f"Email queued for sending to {users.count()} users")
             return redirect(url_for(".admin_email_owners"))
 
