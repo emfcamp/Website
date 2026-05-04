@@ -13,7 +13,7 @@ from wtforms.widgets import TextArea
 
 from main import db
 from models.user import User
-from models.village import Village, VillageMember
+from models.village import Village, VillageJoinRequest, VillageMember
 
 from ..common import require_permission
 from ..common.email import (
@@ -24,6 +24,7 @@ from ..common.email import (
 from ..common.forms import Form
 from . import villages
 from .forms import (
+    AcceptVillageMemberForm,
     AddVillageAdminForm,
     AddVillageMemberForm,
     AdminVillageForm,
@@ -209,8 +210,18 @@ def admin_village_admins_add(village_id: int) -> ResponseReturnValue:
 
         else:
             membership = db.session.query(VillageMember).filter(VillageMember.user == user).first()
+            join_request = (
+                db.session.query(VillageJoinRequest).filter(VillageJoinRequest.user == user).first()
+            )
 
             if membership is None:
+                if join_request is not None:
+                    if join_request.village_id != village_id:
+                        flash(
+                            f"User with email {form.user_email.data} has already requested to be a member of the {join_request.village.name} village"
+                        )
+                        return redirect(url_for(".admin_village", village_id=village.id))
+                    db.session.delete(join_request)
                 db.session.add(VillageMember(village_id=village.id, user=user, admin=True))
                 db.session.commit()
 
@@ -253,16 +264,24 @@ def admin_village_members_remove(village_id: int) -> ResponseReturnValue:
             None,
         )
 
-        if village_membership is None:
-            flash(f"User is not a member of village '{village.name}'")
-        else:
-            # lazy-load this before committing and detaching the object
+        village_join_request = next(
+            (request for request in village.village_join_requests if request.user_id == form.user_id.data),
+            None,
+        )
+
+        # lazy-load this before committing and detaching the object
+        if village_membership is not None:
             email = village_membership.user.email
-
             db.session.delete(village_membership)
-            db.session.commit()
-
             flash(f"{email} has been removed as a village member")
+        elif village_join_request is not None:
+            email = village_join_request.user.email
+            db.session.delete(village_join_request)
+            flash(f"Request to join village by {email} has been removed")
+        else:
+            flash(f"User is not a member of village '{village.name}'")
+
+        db.session.commit()
 
     # Show the edit page again
     return redirect(url_for(".admin_village", village_id=village.id))
@@ -302,6 +321,38 @@ def admin_village_members_promote(village_id: int) -> ResponseReturnValue:
     return redirect(url_for(".admin_village", village_id=village.id))
 
 
+@villages.route("/admin/village/<int:village_id>/members/accept", methods=["POST"])
+@village_admin_required
+def admin_village_members_accept_join_request(village_id: int) -> ResponseReturnValue:
+    village = Village.get_by_id(village_id)
+    if not village:
+        abort(404)
+
+    form = AcceptVillageMemberForm()
+
+    if form.validate_on_submit():
+        village_join_request = next(
+            (request for request in village.village_join_requests if request.user_id == form.user_id.data),
+            None,
+        )
+
+        if village_join_request is None:
+            flash(f"User doesn't have an outstanding request to join village '{village.name}'")
+        else:
+            # lazy-load this before committing and detaching the object
+            email = village_join_request.user.email
+
+            db.session.add(VillageMember(village_id=village.id, user_id=form.user_id.data, admin=False))
+            db.session.delete(village_join_request)
+
+            db.session.commit()
+
+            flash(f"{email} has been accepted as a village member")
+
+    # Show the edit page again
+    return redirect(url_for(".admin_village", village_id=village.id))
+
+
 @villages.route("/admin/village/<int:village_id>/members/add", methods=["POST"])
 @village_admin_required
 def admin_village_members_add(village_id: int) -> ResponseReturnValue:
@@ -318,8 +369,19 @@ def admin_village_members_add(village_id: int) -> ResponseReturnValue:
             flash(f"No user found with email {form.user_email.data}")
         else:
             membership = db.session.query(VillageMember).filter(VillageMember.user == user).first()
+            join_request = (
+                db.session.query(VillageJoinRequest).filter(VillageJoinRequest.user == user).first()
+            )
 
             if membership is None:
+                if join_request is not None:
+                    if join_request.village_id != village_id:
+                        flash(
+                            f"User with email {form.user_email.data} has already requested to be a member of the {join_request.village.name} village"
+                        )
+                        return redirect(url_for(".admin_village", village_id=village.id))
+                    db.session.delete(join_request)
+
                 db.session.add(VillageMember(village_id=village.id, user=user, admin=False))
                 db.session.commit()
 

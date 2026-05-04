@@ -19,6 +19,10 @@
               Edit village details</a>
           </div>
         {% endif %}
+      {% elif current_user.village_join_request %}
+        <div class="panel-body">
+          <p>You've requested to join the <strong><a href="{{url_for('villages.view', year=event_year, village_id=current_user.village_join_request.village.id)}}">{{current_user.village_join_request.village.name}}</a></strong> village.</p>
+        </div>
       {% else %}
         <div class="panel-body">
           <p>Village registration is open! If you're planning on camping with a group of people,

@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from .diversity import UserDiversity
     from .payment import Payment
     from .purchase import AdmissionTicket, Purchase, PurchaseTransfer, Ticket
-    from .village import VillageMember
+    from .village import VillageJoinRequest, VillageMember
     from .volunteer import BuildupVolunteer, Volunteer
 
 __all__ = [
@@ -318,6 +318,12 @@ class User(BaseModel, UserMixin):
         back_populates="user",
         uselist=False,
     )
+    village_join_request: Mapped[VillageJoinRequest] = relationship(
+        cascade="all, delete-orphan",
+        back_populates="user",
+        uselist=False,
+    )
+    # The village this user is a member of. Note that unaccepted requests to join a village won't populate this field
     village = association_proxy("village_membership", "village")
 
     ### Volunteering
