@@ -11,11 +11,17 @@ from sqlalchemy import exists, select
 
 from main import db
 from models.content import Venue
-from models.village import Village, VillageMember
+from models.village import Village, VillageJoinRequest, VillageMember
 
 from ..config import config
 from . import load_village, villages
-from .forms import JoinVillageForm, LeaveVillageForm, PromoteVillageMemberForm, VillageForm
+from .forms import (
+    AcceptVillageMemberForm,
+    JoinVillageForm,
+    LeaveVillageForm,
+    PromoteVillageMemberForm,
+    VillageForm,
+)
 
 
 @villages.route("/register", methods=["GET", "POST"])
@@ -85,20 +91,29 @@ def view(year: int, village_id: int) -> ResponseReturnValue:
     village = load_village(year, village_id)
     user_is_village_admin = (
         current_user.is_authenticated
-        and current_user.village
+        and current_user.village is not None
         and current_user.village.id == village_id
         and current_user.village_membership.admin
     )
 
     user_is_village_member = (
         current_user.is_authenticated
-        and current_user.village
+        and current_user.village is not None
         and current_user.village.id == village_id
         and not current_user.village_membership.admin
     )
 
+    user_has_requested_join_village = (
+        current_user.is_authenticated
+        and current_user.village_join_request is not None
+        and current_user.village_join_request.village.id == village_id
+    )
+
     user_can_join_village = (
-        current_user.is_authenticated and not current_user.village and current_user.has_admission_ticket
+        current_user.is_authenticated
+        and current_user.village is None
+        and current_user.village_join_request is None
+        and current_user.has_admission_ticket
     )
 
     return render_template(
@@ -107,6 +122,7 @@ def view(year: int, village_id: int) -> ResponseReturnValue:
         user_is_village_admin=user_is_village_admin,
         user_can_join_village=user_can_join_village,
         user_is_village_member=user_is_village_member,
+        user_has_requested_join_village=user_has_requested_join_village,
         village_long_description_html=(
             render_markdown(village.long_description) if village.long_description else None
         ),
@@ -205,6 +221,38 @@ def members_promote(year: int, village_id: int) -> ResponseReturnValue:
     return redirect(url_for(".members", year=year, village_id=village_id))
 
 
+@villages.route("/<int:year>/<int:village_id>/members/accept", methods=["POST"])
+@login_required
+def members_accept_join_request(year: int, village_id: int) -> ResponseReturnValue:
+    village = load_village(year, village_id, require_admin=True)
+
+    if not village:
+        abort(404)
+
+    form = AcceptVillageMemberForm()
+
+    if form.validate_on_submit():
+        village_join_request = next(
+            (request for request in village.village_join_requests if request.user_id == form.user_id.data),
+            None,
+        )
+
+        if village_join_request is None:
+            flash(f"User doesn't have an outstanding request to join village '{village.name}'")
+        else:
+            # lazy-load this before committing and detaching the object
+            email = village_join_request.user.email
+
+            db.session.add(VillageMember(village_id=village.id, user_id=form.user_id.data, admin=False))
+            db.session.delete(village_join_request)
+
+            db.session.commit()
+
+            flash(f"{email} has been accepted as a village member")
+
+    return redirect(url_for(".members", year=year, village_id=village_id))
+
+
 @villages.route("/<int:year>/<int:village_id>/members/join", methods=["GET", "POST"])
 @login_required
 def members_join(year: int, village_id: int) -> ResponseReturnValue:
@@ -224,10 +272,10 @@ def members_join(year: int, village_id: int) -> ResponseReturnValue:
     form = JoinVillageForm()
 
     if form.validate_on_submit():
-        db.session.add(VillageMember(village_id=village.id, user=current_user, admin=False))
+        db.session.add(VillageJoinRequest(village_id=village.id, user=current_user))
         db.session.commit()
 
-        flash(f"You've joined village {village.name}")
+        flash(f"You've requested to join village {village.name}")
 
         return redirect(url_for(".view", year=year, village_id=village_id))
     return render_template("villages/members_join.html", form=form, year=year, village=village)
@@ -241,14 +289,21 @@ def members_leave(year: int, village_id: int) -> ResponseReturnValue:
     if not village:
         abort(404)
 
-    if current_user.village.id != village_id:
+    # user has requested to join village, delete their request.
+    requested_to_join_correct_village = (
+        current_user.village_join_request is not None
+        and current_user.village_join_request.village_id == village_id
+    )
+    member_of_correct_village = current_user.village is not None and current_user.village.id == village_id
+
+    if not (requested_to_join_correct_village or member_of_correct_village):
         flash(f"Not a member of village {current_user.village.name}")
         return redirect(url_for(".view", year=year, village_id=village_id))
 
     can_leave = False
     delete_village = False
 
-    if current_user.village_membership.admin and len(village.admins()) <= 1:
+    if member_of_correct_village and current_user.village_membership.admin and len(village.admins()) <= 1:
         if len(village.non_admins()) > 0:
             # This is the last admin, they can't leave because there are other members
             pass
@@ -265,9 +320,6 @@ def members_leave(year: int, village_id: int) -> ResponseReturnValue:
 
     if form.validate_on_submit():
         if can_leave:
-            # User can leave
-            db.session.delete(current_user.village_membership)
-
             if delete_village:
                 app.logger.info(
                     f"Village '{village.name}' (id {village.id}) deleted by {current_user} being the last to leave"
@@ -277,6 +329,13 @@ def members_leave(year: int, village_id: int) -> ResponseReturnValue:
 
                 db.session.commit()
                 return redirect(url_for(".main", year=year))
+
+            # User can leave
+            if member_of_correct_village:
+                db.session.delete(current_user.village_membership)
+            else:
+                db.session.delete(current_user.village_join_request)
+
             flash(f"You've left village {village.name}")
 
             db.session.commit()
