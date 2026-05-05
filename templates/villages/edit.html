@@ -2,7 +2,12 @@
 {% extends "base.html" %}
 {% block title %}Edit Village: {{village.name}}{% endblock %}
 {% block body %}
-<h2>Edit Village: {{village.name}}</h2>
+<h1>
+  Edit Village: {{village.name}}
+  <a href="{{url_for('villages.members', year=event_year, village_id=village.id)}}" class="btn btn-primary btn-lg pull-right">Members</a>
+  <a href="{{url_for('villages.view', year=event_year, village_id=village.id)}}" class="btn btn-primary btn-lg pull-right">View</a>
+  <a href="{{url_for('villages.members_leave', year=event_year, village_id=village.id)}}" class="btn btn-danger btn-lg pull-right">Leave</a>
+</h1>
 
 {% include "villages/_form.html" %}
 

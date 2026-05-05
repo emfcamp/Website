@@ -48,10 +48,10 @@ from . import schedule
 def venues_for_user(user):
     # NB we use this for permissions, not ownership.
     # A user has create/edit access to all content scheduled in their village.
-    # FIXME: enforce village role?
+    # FIXME: enforce village admin role? We are initially
     venues = []
 
-    if user.village:
+    if user.village and user.village_membership.admin:
         venues.extend(user.village.venues)
 
     public_venues = Venue.query.filter_by(village_id=None, allows_attendee_content=True).all()

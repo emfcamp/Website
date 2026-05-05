@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Leave village: {{village.name}}{% endblock %}
+{% block body %}
+<h3>Confirm leaving village: {{village.name}}</h3>
+{% if delete_village %}
+
+<p>Are you sure you want to leave the village "{{village.name}}"?</p>
+<p>Because you are the last member, when you leave, the village will be deleted.</p>
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    {{ form.submit(class_="btn btn-danger") }}
+    <a class="btn btn-default" href="{{ url_for('.view', village_id=village.id, year=year) }}">Back</a>
+</form>
+
+{% elif can_leave %}
+
+<p>Are you sure you want to leave the village "{{village.name}}"?</p>
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    {{ form.submit(class_="btn btn-danger") }}
+    <a class="btn btn-default" href="{{ url_for('.view', village_id=village.id, year=year) }}">Back</a>
+</form>
+{% else %}
+<p>You are the last admin and there are other members, you must promote someone else to admin (on the <a href="{{ url_for('.members', village_id=village.id, year=year) }}">members page</a>) before you can leave</p>
+{% endif %}
+{% endblock %}

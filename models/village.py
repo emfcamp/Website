@@ -36,6 +36,9 @@ class Village(BaseModel):
     village_memberships: Mapped[list[VillageMember]] = relationship(
         back_populates="village", cascade="all, delete-orphan"
     )
+    village_join_requests: Mapped[list[VillageJoinRequest]] = relationship(
+        back_populates="village", cascade="all, delete-orphan"
+    )
     requirements: Mapped[VillageRequirements | None] = relationship(
         back_populates="village", cascade="all, delete-orphan"
     )
@@ -52,6 +55,12 @@ class Village(BaseModel):
 
     def admins(self) -> list[User]:
         return [m.user for m in self.village_memberships if m.admin]
+
+    def non_admins(self) -> list[User]:
+        return [m.user for m in self.village_memberships if not m.admin]
+
+    def users_who_requested_joining(self) -> list[User]:
+        return [m.user for m in self.village_join_requests]
 
     def __repr__(self):
         return f"<Village '{self.name}' (id: {self.id})>"
@@ -129,7 +138,7 @@ class VillageMember(BaseModel):
     __tablename__ = "village_member"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    # We only allow one village per user. TODO: make this the primary key
+    # We only allow one village membership or request per user. TODO: make this the primary key
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), unique=True)
     village_id: Mapped[int] = mapped_column(ForeignKey("village.id"))
     admin: Mapped[bool] = mapped_column(default=False)
@@ -138,7 +147,22 @@ class VillageMember(BaseModel):
     user: Mapped[User] = relationship(back_populates="village_membership")
 
     def __repr__(self):
-        return f"<VillageMember {self.user} member of {self.village}>"
+        return f"<VillageMember {self.user} {'admin ' if self.admin else ''}member of {self.village}>"
+
+
+class VillageJoinRequest(BaseModel):
+    __tablename__ = "village_join_request"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # We only allow one village membership or request per user. TODO: make this the primary key
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), unique=True)
+    village_id: Mapped[int] = mapped_column(ForeignKey("village.id"))
+
+    village: Mapped[Village] = relationship(back_populates="village_join_requests")
+    user: Mapped[User] = relationship(back_populates="village_join_request")
+
+    def __repr__(self):
+        return f"<VillageMember {self.user} {'admin ' if self.admin else ''}member of {self.village}>"
 
 
 class VillageRequirements(BaseModel):
