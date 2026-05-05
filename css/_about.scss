@@ -1,0 +1,136 @@
+.about-hero {
+  position: relative;
+  margin: 0 -15px 0;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(to top, #213018 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  img {
+    width: 100%;
+    display: block;
+    aspect-ratio: 8494 / 3711;
+    object-fit: cover;
+  }
+}
+
+.about-hero-overlay {
+  z-index: 2;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2em 1.5em 1.2em;
+  background: linear-gradient(
+    to top,
+    rgba(33, 48, 24, 0.95) 0%,
+    rgba(33, 48, 24, 0.77) 70%,
+    rgba(33, 48, 24, 0) 100%
+  );
+
+  .about-hero-sub {
+    margin-top: 0.4em;
+    color: #cfccc0;
+    font-size: 0.55em;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+  }
+}
+
+.about-intro {
+  max-width: 680px;
+  margin-bottom: 1em;
+}
+
+.about-video {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 6px;
+  margin-bottom: 1.2em;
+
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+}
+
+.about-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1.5em;
+  align-items: start;
+  margin-bottom: 1em;
+}
+
+.about-text-col {
+  line-height: 1.7;
+
+  p:first-child {
+    margin-top: 0;
+  }
+}
+
+.about-img-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+
+  a {
+    display: block;
+  }
+
+  img {
+    width: 100%;
+    border-radius: 5px;
+    display: block;
+  }
+}
+
+@media (max-width: 720px) {
+  .about-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .about-img-col {
+    margin-top: 1em;
+  }
+}
+
+.about-break-img {
+  margin: 0.5em 0 1em;
+  border-radius: 5px;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    display: block;
+    max-height: 340px;
+    object-fit: cover;
+  }
+}
+
+@media (max-width: 720px) {
+  .about-break-img img {
+    max-height: 220px;
+  }
+}
+
+.about-closing {
+  max-width: 680px;
+  line-height: 1.7;
+  margin-bottom: 1em;
+}
