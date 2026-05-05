@@ -59,9 +59,7 @@ The **Fallback Number** is a number that will be called if the main number doesn
 
 ### DECT 
 
-There's site-wide DECT phone coverage
-
-You can bring your own DECT telephone and join the network, enabling you to call other EMF participants and interactive services for free.
+We intend to have a DECT phone network on site. More details to come closer to the event.
 
 If you're buying a DECT phone and don't know what to get, buy pretty much any Gigaset DECT handset, for example:
 
@@ -71,7 +69,7 @@ If you're buying a DECT phone and don't know what to get, buy pretty much any Gi
 If you've got one already, feel free to bring it. Use Eventphones [DECT Phone Compatibility List](https://eventphone.de/doku/dect_phone_compatibility_list) to find out if your phone is likely compatible.
 
 
-### POTS (Plain old telephone service)
+### POTS (Plain Old Telephone Service)
 
 There will be a site-wide analog POTS network allowing you to connect a traditional analog phone to a phone line, with support for modems and fax machines.
 
@@ -93,13 +91,6 @@ We would prefer it if people didn’t connect SIP servers to the network eg aste
 ### Group
 
 A group number will forward incoming calls to up to 10 other numbers, see the section on Group calling for more specific details.
-
-
-### Apps 
-
-You can register a number as an app and this will point it at our [Jambonz](https://jambonz.org) instance, Jambonz is an open source programmable communications platform, much like Twilio or Infobip.
-
-You will need to host your code somewhere that Jambonz can send a webhook to in order to control what the app does, for more information see the [EMF Developer Docs](https://developer.emfcamp.org)
 
 
 ## Groups
