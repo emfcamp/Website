@@ -1,0 +1,61 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+
+{% block title %}{% if creating %}New Wiki Page{% elif page %}Edit: {{ page.title }} — Wiki{% else %}Edit — Wiki{% endif %}{% endblock %}
+
+{% block body %}
+
+{% if creating %}
+<h2>New wiki page</h2>
+{% else %}
+<h2>Edit: {{ page.title }}</h2>
+{% endif %}
+
+{% if conflict %}
+<div class="alert alert-warning">
+  <strong>Edit conflict!</strong>
+  The page was changed by someone else and your changes could not be automatically merged.
+  The content below has been pre-filled with the merged result — look for
+  <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> markers to find the conflicting sections,
+  resolve them manually, then save.
+  Or <a href="{{ url_for('wiki.view', slug=page.slug) }}">discard your edit</a>
+  and start again from the current version.
+</div>
+{% endif %}
+
+<div class="well">
+  <form method="post" class="form-horizontal" role="form">
+    {{ form.hidden_tag() }}
+    {{ form.version_token() }}
+
+    <fieldset>
+      {% if creating %}
+      {{ render_field(form.slug, horizontal=9, placeholder="wiki-page-name") }}
+      {% endif %}
+      {% if creating or current_user.has_permission('admin') %}
+      {{ render_field(form.title, horizontal=9) }}
+      {% else %}
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Title</label>
+        <div class="col-sm-9"><p class="form-control-static">{{ page.title }}</p></div>
+      </div>
+      {% endif %}
+      {% call render_field(form.content, horizontal=9, rows=20) %}
+        <a href="https://www.markdown-cheatsheet.com" rel="nofollow" target="_blank">Standard Markdown</a>
+        supported, apart from images.
+      {% endcall %}
+    </fieldset>
+
+    <div class="form-group">
+      <div class="col-sm-offset-3 col-sm-9">
+        {{ form.submit(class="btn btn-primary") }}
+        {% if page %}
+        <a href="{{ url_for('wiki.view', slug=page.slug) }}" class="btn btn-default">Cancel</a>
+        {% else %}
+        <a href="{{ url_for('wiki.list_pages') }}" class="btn btn-default">Cancel</a>
+        {% endif %}
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

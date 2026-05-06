@@ -1,3 +1,4 @@
+import html
 import json
 import logging
 import re
@@ -8,6 +9,7 @@ from textwrap import wrap
 from typing import Any, cast, overload
 from urllib.parse import urljoin, urlparse, urlunparse
 
+import nh3
 import pendulum
 from decorator import decorator
 from flask import (
@@ -420,6 +422,23 @@ def render_template_markdown(filename: str, template: str = "about/template.html
 
     context.update(content=content, title=metadata["title"])
     return render_template(page_template(metadata, template), **context)
+
+
+def render_untrusted_markdown(markdown_text: str) -> Markup:
+    """Render untrusted user-supplied markdown safely.
+
+    Sanitises HTML via nh3 and wraps output in a sandboxed iframe so that
+    arbitrary scripts and navigation from user content cannot affect the page.
+    """
+    extensions = ["markdown.extensions.nl2br", "markdown.extensions.smarty", "tables"]
+    content_html = nh3.clean(
+        markdown(markdown_text, extensions=extensions),
+        tags=(nh3.ALLOWED_TAGS - {"img"}),
+        link_rel="noopener nofollow",
+    )
+    inner_html = render_template("sandboxed-iframe.html", body=Markup(content_html))
+    iframe_html = f'<iframe sandbox="allow-scripts allow-top-navigation-by-user-activation" class="embedded-content" srcdoc="{html.escape(inner_html, True)}"></iframe>'
+    return Markup(iframe_html)
 
 
 def make_safe_url(target: str) -> str | None:
