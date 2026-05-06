@@ -32,7 +32,14 @@
       {% if creating %}
       {{ render_field(form.slug, horizontal=9, placeholder="wiki-page-name") }}
       {% endif %}
+      {% if creating or current_user.has_permission('admin') %}
       {{ render_field(form.title, horizontal=9) }}
+      {% else %}
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Title</label>
+        <div class="col-sm-9"><p class="form-control-static">{{ page.title }}</p></div>
+      </div>
+      {% endif %}
       {% call render_field(form.content, horizontal=9, rows=20) %}
         <a href="https://www.markdown-cheatsheet.com" rel="nofollow" target="_blank">Standard Markdown</a>
         supported, apart from images.

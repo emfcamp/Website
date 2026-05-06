@@ -2,7 +2,7 @@ import difflib
 
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
-from flask_login import login_required
+from flask_login import current_user, login_required
 from merge3 import Merge3
 from sqlalchemy_continuum.utils import version_class
 
@@ -83,6 +83,10 @@ def edit(slug: str) -> ResponseReturnValue:
         form.version_token.data = _current_version_token(page)
         return render_template("wiki/edit.html", form=form, page=page, creating=False)
 
+    # Non-admins cannot change the title; fill it in so validation passes
+    if not current_user.has_permission("admin"):
+        form.title.data = page.title
+
     if not form.validate_on_submit():
         return render_template("wiki/edit.html", form=form, page=page, creating=False)
 
@@ -133,7 +137,8 @@ def edit(slug: str) -> ResponseReturnValue:
         )
 
     assert form.title.data is not None
-    page.title = form.title.data
+    if current_user.has_permission("admin"):
+        page.title = form.title.data
     page.content = form.content.data or ""
     db.session.commit()
 
