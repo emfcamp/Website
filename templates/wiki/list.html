@@ -16,15 +16,18 @@
     <tr>
       <th>Title</th>
       <th>Last updated</th>
-      <th>By</th>
+      {% if current_user.is_authenticated and current_user.has_permission('admin') %}<th>By</th>{% endif %}
     </tr>
   </thead>
   <tbody>
     {% for page in pages %}
+    {% set v = latest_versions[page.id] %}
     <tr>
       <td><a href="{{ url_for('wiki.view', slug=page.slug) }}">{{ page.title }}</a></td>
-      <td>{{ page.updated_at.strftime('%Y-%m-%d %H:%M') }}</td>
-      <td>{{ page.updated_by.name if page.updated_by else '—' }}</td>
+      <td>{{ v.transaction.issued_at.strftime('%Y-%m-%d %H:%M') if v else '—' }}</td>
+      {% if current_user.is_authenticated and current_user.has_permission('admin') %}
+      <td>{{ v.transaction.user.name if v and v.transaction.user else '—' }}</td>
+      {% endif %}
     </tr>
     {% endfor %}
   </tbody>

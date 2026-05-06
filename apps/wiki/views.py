@@ -31,7 +31,16 @@ def _current_version_token(page: WikiPage) -> str:
 @wiki.route("/")
 def list_pages() -> ResponseReturnValue:
     pages = WikiPage.all_pages()
-    return render_template("wiki/list.html", pages=pages)
+    WikiPageVersion = version_class(WikiPage)
+    latest_versions = {
+        page.id: (
+            page.versions.order_by(None)  # type: ignore[attr-defined]
+            .order_by(WikiPageVersion.transaction_id.desc())
+            .first()
+        )
+        for page in pages
+    }
+    return render_template("wiki/list.html", pages=pages, latest_versions=latest_versions)
 
 
 @wiki.route("/new", methods=["GET", "POST"])
