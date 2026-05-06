@@ -18,7 +18,7 @@
 <hr>
 <p class="small">
   Last updated {{ page.updated_at.strftime('%Y-%m-%d %H:%M') }}
-  {% if page.updated_by %}by {{ page.updated_by.name }}{% endif %}.
+  {% if page.updated_by and current_user.is_authenticated and current_user.has_permission('admin') %}by {{ page.updated_by.name }}{% endif %}.
   <a href="{{ url_for('wiki.history', slug=page.slug) }}">View history</a>
 </p>
 <p class="small"><em>Content on this page is provided by attendees and is not the responsibility of EMF.</em></p>
