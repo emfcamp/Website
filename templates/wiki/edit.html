@@ -14,14 +14,12 @@
 {% if conflict %}
 <div class="alert alert-warning">
   <strong>Edit conflict!</strong>
-  The page was changed by someone else after you opened the editor.
-  Your changes are shown below against the current version.
-  You can <strong>force save</strong> to overwrite those changes, or
-  <a href="{{ url_for('wiki.view', slug=page.slug) }}">discard your edit</a>
+  The page was changed by someone else and your changes could not be automatically merged.
+  The content below has been pre-filled with the merged result — look for
+  <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> markers to find the conflicting sections,
+  resolve them manually, then save.
+  Or <a href="{{ url_for('wiki.view', slug=page.slug) }}">discard your edit</a>
   and start again from the current version.
-
-  <pre class="pre-scrollable" style="margin-top: 10px; font-size: 12px;">{% for line in conflict_diff %}{{ line }}
-{% endfor %}</pre>
 </div>
 {% endif %}
 
@@ -29,9 +27,6 @@
   <form method="post" class="form-horizontal" role="form">
     {{ form.hidden_tag() }}
     {{ form.version_token() }}
-    {% if conflict %}
-    <input type="hidden" name="force" value="1">
-    {% endif %}
 
     <fieldset>
       {% if creating %}
@@ -46,11 +41,7 @@
 
     <div class="form-group">
       <div class="col-sm-offset-3 col-sm-9">
-        {% if conflict %}
-        {{ form.submit(class="btn btn-danger", value="Force save") }}
-        {% else %}
         {{ form.submit(class="btn btn-primary") }}
-        {% endif %}
         {% if page %}
         <a href="{{ url_for('wiki.view', slug=page.slug) }}" class="btn btn-default">Cancel</a>
         {% else %}

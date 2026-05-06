@@ -3,6 +3,7 @@ import difflib
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 from flask_login import login_required
+from merge3 import Merge3
 from sqlalchemy_continuum.utils import version_class
 
 from main import db
@@ -85,30 +86,50 @@ def edit(slug: str) -> ResponseReturnValue:
     if not form.validate_on_submit():
         return render_template("wiki/edit.html", form=form, page=page, creating=False)
 
-    # Conflict detection: compare stored token against current state
+    # Conflict detection: 3-way merge against the base version the user started from
     saved_token = form.version_token.data or "0"
     current_token = _current_version_token(page)
-    force = request.form.get("force") == "1"
 
-    if saved_token != current_token and not force:
-        # Someone else saved between when this user opened the edit form
-        # and now. Show the diff so the user can decide.
-        conflict_diff = list(
-            difflib.unified_diff(
-                page.content.splitlines(keepends=True),
-                (form.content.data or "").splitlines(keepends=True),
-                fromfile="current version",
-                tofile="your edit",
-                lineterm="",
+    if saved_token != current_token:
+        # Look up base content (what the user started editing from)
+        WikiPageVersion = version_class(WikiPage)
+        if saved_token == "0":
+            base_content = ""
+        else:
+            base_ver = page.versions.filter(  # type: ignore[attr-defined]
+                WikiPageVersion.transaction_id == int(saved_token)
+            ).first()
+            base_content = (base_ver.content or "") if base_ver else ""
+
+        base_lines = base_content.splitlines(keepends=True)
+        current_lines = page.content.splitlines(keepends=True)
+        our_lines = (form.content.data or "").splitlines(keepends=True)
+
+        merged_lines = list(
+            Merge3(base_lines, current_lines, our_lines).merge_lines(
+                name_a="current version", name_b="your edit"
             )
         )
+        has_conflict = any(line.startswith("<<<<<<<") for line in merged_lines)
+
+        if not has_conflict:
+            # Clean 3-way merge — save automatically
+            assert form.title.data is not None
+            page.title = form.title.data
+            page.content = "".join(merged_lines)
+            db.session.commit()
+            flash("Page saved (your changes were automatically merged with a concurrent edit).")
+            return redirect(url_for(".view", slug=slug))
+
+        # True conflict — pre-fill textarea with merged content including conflict markers
+        form.content.data = "".join(merged_lines)
+        form.version_token.data = current_token
         return render_template(
             "wiki/edit.html",
             form=form,
             page=page,
             creating=False,
             conflict=True,
-            conflict_diff=conflict_diff,
         )
 
     assert form.title.data is not None
