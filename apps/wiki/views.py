@@ -2,11 +2,10 @@ import difflib
 
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
-from flask_login import current_user, login_required
+from flask_login import login_required
 from sqlalchemy_continuum.utils import version_class
 
 from main import db
-from models import naive_utcnow
 from models.wiki import WikiPage
 
 from ..common import render_untrusted_markdown, require_permission
@@ -43,8 +42,6 @@ def new_page() -> ResponseReturnValue:
             slug=form.slug.data,
             title=form.title.data,
             content=form.content.data or "",
-            created_by_id=current_user.id,
-            updated_by_id=current_user.id,
         )
         db.session.add(page)
         db.session.commit()
@@ -59,7 +56,15 @@ def view(slug: str) -> ResponseReturnValue:
     if page is None:
         abort(404)
     content_html = render_untrusted_markdown(page.content) if page.content else None
-    return render_template("wiki/view.html", page=page, content_html=content_html)
+    WikiPageVersion = version_class(WikiPage)
+    latest_version = (
+        page.versions.order_by(None)  # type: ignore[attr-defined]
+        .order_by(WikiPageVersion.transaction_id.desc())
+        .first()
+    )
+    return render_template(
+        "wiki/view.html", page=page, content_html=content_html, latest_version=latest_version
+    )
 
 
 @wiki.route("/<slug>/edit", methods=["GET", "POST"])
@@ -109,8 +114,6 @@ def edit(slug: str) -> ResponseReturnValue:
     assert form.title.data is not None
     page.title = form.title.data
     page.content = form.content.data or ""
-    page.updated_by_id = current_user.id
-    page.updated_at = naive_utcnow()
     db.session.commit()
 
     flash("Page saved.")

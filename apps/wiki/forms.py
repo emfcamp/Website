@@ -9,7 +9,6 @@ from ..common.forms import Form
 class WikiPageForm(Form):
     title = StringField("Title", [InputRequired(), Length(1, 200)])
     content = TextAreaField("Content", [Optional()])
-    edit_note = StringField("Edit summary", [Optional(), Length(max=200)])
     version_token = HiddenField()
     submit = SubmitField("Save")
 

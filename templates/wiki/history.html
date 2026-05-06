@@ -15,7 +15,6 @@
         <th colspan="2">Compare</th>
         <th>Date</th>
         {% if current_user.is_authenticated and current_user.has_permission('admin') %}<th>Editor</th>{% endif %}
-        <th>Edit summary</th>
       </tr>
     </thead>
     <tbody>
@@ -49,7 +48,6 @@
           {% endif %}
         </td>
         {% endif %}
-        <td>{{ version.edit_note or '' }}</td>
       </tr>
       {% endfor %}
     </tbody>
