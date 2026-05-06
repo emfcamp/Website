@@ -7,7 +7,7 @@ from main import db
 from models.content import Venue
 from models.village import Village, VillageMember
 
-from ..common import render_markdown
+from ..common import render_untrusted_markdown
 from ..config import config
 from . import load_village, villages
 from .forms import VillageForm
@@ -85,7 +85,7 @@ def view(year: int, village_id: int) -> ResponseReturnValue:
         village=village,
         show_edit=show_edit,
         village_long_description_html=(
-            render_markdown(village.long_description) if village.long_description else None
+            render_untrusted_markdown(village.long_description) if village.long_description else None
         ),
     )
 

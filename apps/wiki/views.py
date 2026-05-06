@@ -9,7 +9,7 @@ from main import db
 from models import naive_utcnow
 from models.wiki import WikiPage
 
-from ..common import render_markdown, require_permission
+from ..common import render_untrusted_markdown, require_permission
 from . import wiki
 from .forms import CreateWikiPageForm, WikiPageForm
 
@@ -58,7 +58,7 @@ def view(slug: str) -> ResponseReturnValue:
     page = WikiPage.get_by_slug(slug)
     if page is None:
         abort(404)
-    content_html = render_markdown(page.content) if page.content else None
+    content_html = render_untrusted_markdown(page.content) if page.content else None
     return render_template("wiki/view.html", page=page, content_html=content_html)
 
 
