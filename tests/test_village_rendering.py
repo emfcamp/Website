@@ -6,7 +6,7 @@ from apps.villages import views
 
 
 def test_render_simple(request_context):
-    rendered = views.render_markdown("Hi *you*. Welcome to [EMF](https://www.emfcamp.org/)")
+    rendered = views.render_untrusted_markdown("Hi *you*. Welcome to [EMF](https://www.emfcamp.org/)")
 
     assert '<iframe sandbox="allow-scripts allow-top-navigation-by-user-activation" ' in rendered, (
         "iFrame should be sandboxed"
@@ -26,7 +26,7 @@ def naive_rendering(input):
 
 
 def check_FAIL_not_rendered(input, message):
-    assert "FAIL" not in views.render_markdown(input), message
+    assert "FAIL" not in views.render_untrusted_markdown(input), message
     assert "FAIL" in naive_rendering(input), "Control didn't contain FAIL either for " + message
 
 
