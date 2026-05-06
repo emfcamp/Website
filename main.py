@@ -219,7 +219,6 @@ def create_app(dev_server=False, config_override=None):
 
     from models import feature_flag, site_state
     from models.user import User, load_anonymous_user
-    from models.wiki import WikiPage  # noqa: F401 — registers WikiPage with SQLAlchemy Continuum
 
     @login_manager.user_loader
     def load_user(userid: str) -> User | None:

@@ -191,5 +191,6 @@ from .site_state import *  # noqa: F403
 from .user import *  # noqa: F403
 from .village import *  # noqa: F403
 from .volunteer import *  # noqa: F403
+from .wiki import *  # noqa: F403
 
 db.configure_mappers()
