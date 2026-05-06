@@ -14,7 +14,7 @@
       <tr>
         <th colspan="2">Compare</th>
         <th>Date</th>
-        <th>Editor</th>
+        {% if current_user.is_authenticated and current_user.has_permission('admin') %}<th>Editor</th>{% endif %}
         <th>Edit summary</th>
       </tr>
     </thead>
@@ -40,6 +40,7 @@
           {% endif %}
         </td>
         <td>{{ version.transaction.issued_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        {% if current_user.is_authenticated and current_user.has_permission('admin') %}
         <td>
           {% if version.transaction.user %}
             {{ version.transaction.user.name }}
@@ -47,6 +48,7 @@
             <em>unknown</em>
           {% endif %}
         </td>
+        {% endif %}
         <td>{{ version.edit_note or '' }}</td>
       </tr>
       {% endfor %}
