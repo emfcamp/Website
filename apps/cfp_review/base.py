@@ -1382,11 +1382,19 @@ def rank(round_id: int) -> ResponseReturnValue:
     proposal_types: list[ProposalType] = ["talk", "workshop"]
     estimates = {proposal_type: get_cfp_estimate(proposal_type) for proposal_type in proposal_types}
 
+    # Find proposals where the submitter has already had an accepted proposal
+    # or another proposal in this list
+    duplicates = {}
+    for prop, _ in scored_proposals:
+        if len(prop.user.proposals) > 1:
+            duplicates[prop.user] = prop.user.proposals
+
     return render_template(
         "cfp_review/rank.html",
         form=form,
         preview=preview,
         proposals=scored_proposals,
+        duplicates=duplicates,
         estimates=estimates,
         min_score=session.get("min_score"),
         proposal_types=proposal_types,
