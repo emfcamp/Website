@@ -64,7 +64,7 @@
 {% for (prop, score) in proposals %}
     <tr {% if preview and score >= min_score %} class="info" {% endif %}>
         <td><small>{{ loop.index }}.</small></td>
-        <td>{{ score|round(4) }}</td>
+        <td><button class="btn btn-success debounce score-setter" data-score="{{ score }}">{{ score|round(4) }}</button></td>
         <td>{{prop.human_type | capitalize}}</td>
         <td>{{prop.user.name}}</td>
         <td><a href="{{ url_for('.update_proposal', proposal_id=prop.id) }}">{{prop.title}}</a></td>
@@ -95,4 +95,20 @@
     {% endif %}
 </form>
 
+{% endblock %}
+{% block script_extra %}
+    <script nonce="{{csp_nonce}}">
+        /*
+            script to make it easier to set the score by selecting it in the
+            table (rather than copying/pasting)
+        */
+        $(() => {
+            var scoreInput = $("input#min_score");
+            $("button.score-setter").each((_, btn) => {
+                $(btn).on("click", () => {
+                    scoreInput.val($(btn).attr("data-score"))
+                });
+            });
+        });
+    </script>
 {% endblock %}
