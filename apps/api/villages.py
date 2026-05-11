@@ -1,6 +1,7 @@
 from typing import Any, TypedDict
 
 from flask import abort, request
+from flask_cors import cross_origin
 from flask_login import current_user
 from flask_restful import Resource
 from geoalchemy2.shape import from_shape, to_shape
@@ -33,6 +34,7 @@ def render_village(village: Village) -> VillageResponse:
 
 
 class VillagesMap(Resource):
+    @cross_origin()
     def get(self):
         features = []
         for obj in Village.query.filter(Village.location.isnot(None)):
@@ -106,6 +108,7 @@ class VillageResource(Resource):
 
 
 class VenuesMap(Resource):
+    @cross_origin()
     def get(self):
         features = []
         for obj in Venue.query.filter(Venue.location.isnot(None)):
