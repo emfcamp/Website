@@ -25,12 +25,6 @@ __all__ = [
     "Ticket",
 ]
 
-# The type of a product determines how we handle it after purchase.
-#
-# Both `admission_ticket` and `parking_ticket` will generate a ticket,
-# but only `admission_ticket` allows access to the site.
-PRODUCT_TYPES = ["admission_ticket", "ticket", "merchandise"]
-
 # state: [allowed next state, ] pairs
 PURCHASE_STATES = {
     "reserved": ["payment-pending", "paid", "cancelled"],
@@ -52,14 +46,19 @@ class CheckinStateException(Exception):
 
 
 class Purchase(BaseModel):
-    """A Purchase. This could be a ticket or an item of merchandise."""
+    """
+    A Purchase. This could be a ticket or an item of merchandise.
+
+    Product groups are mapped to Purchases, Tickets or AdmissionTickets
+    by models.product.PRODUCT_GROUP_TYPES.
+    """
 
     __tablename__ = "purchase"
     __versioned__ = {"exclude": ["is_ticket", "is_paid_for"]}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     type: Mapped[str] = mapped_column()
-    is_ticket = column_property(type == "ticket" or type == "admission_ticket")
+    is_ticket = column_property(type.in_(["ticket", "admission_ticket"]))
 
     # User FKs
     # Store the owner & purchaser separately so that we can track payment statistics
