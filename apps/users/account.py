@@ -126,13 +126,13 @@ def purchases() -> ResponseReturnValue:
         ~Purchase.state.in_(["cancelled", "reserved", "admin-reserved"])
     ).order_by(Purchase.id)
 
-    tickets = purchases.filter_by(is_ticket=True).all()
-    other_items = purchases.filter_by(is_ticket=False).all()
-
     payments = current_user.payments.filter(Payment.state != "cancelled").order_by(Payment.state).all()
 
-    if not tickets and not payments:
+    if purchases.count() == 0 and len(payments) == 0:
         return redirect(url_for("tickets.main"))
+
+    tickets = purchases.filter_by(is_ticket=True).all()
+    other_items = purchases.filter_by(is_ticket=False).all()
 
     transferred_to = current_user.transfers_to.all()
     transferred_from = current_user.transfers_from.all()
