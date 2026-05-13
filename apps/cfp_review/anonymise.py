@@ -14,7 +14,7 @@ from .forms import AnonymiseProposalForm
 def anonymisation():
     proposals = Proposal.query.filter_by(state="checked").all()
 
-    sort_proposals(proposals)
+    proposals = sort_proposals(proposals)
 
     non_sort_query_string = dict(request.args)
     non_sort_query_string.pop("sort_by", None)

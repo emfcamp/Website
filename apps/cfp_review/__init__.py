@@ -2,6 +2,7 @@ from collections.abc import Callable
 from typing import Any, get_args
 
 from flask import Blueprint, abort, redirect, request, session, url_for
+from flask import current_app as app
 from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from sqlalchemy import func, or_, select
@@ -58,7 +59,7 @@ def sort_by_notice(notice):
     return {"1 week": 0, "1 month": 1, "> 1 month": 2}.get(notice, -1)
 
 
-def sort_proposals(proposals: list[Proposal]) -> None:
+def sort_proposals(proposals: list[Proposal]) -> list[Proposal]:
     sort_keys: dict[str, Callable[[Proposal], Any]] = {
         "ticket": lambda p: (len(p.user.owned_tickets) > 0, p.title.lower()),
         "date": lambda p: (p.modified, p.title.lower()),
@@ -68,11 +69,17 @@ def sort_proposals(proposals: list[Proposal]) -> None:
         "duration": lambda p: p.duration or "",
         "user": lambda p: (p.user.name.lower(), p.title.lower()),
         "title": lambda p: p.title.lower(),
+        "notes": lambda p: (p.private_notes or "").lower(),
     }
 
     sort_by_key = request.args.get("sort_by", "state")
-    proposals.sort(
-        key=sort_keys.get(sort_by_key, sort_keys["state"]),
+    if sort_by_key not in sort_keys:
+        app.logger.warning(f"Attempting to sort proposals by unknown key {sort_by_key}")
+        return proposals
+
+    return sorted(
+        proposals,
+        key=sort_keys.get(sort_by_key, lambda p: str(p) or ""),
         reverse=bool(request.args.get("reverse")),
     )
 

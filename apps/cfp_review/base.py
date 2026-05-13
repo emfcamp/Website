@@ -163,7 +163,7 @@ def filter_proposal_request() -> tuple[list[Proposal], bool]:
     ).options(selectinload(Proposal._tags))
     proposals = list(db.session.scalars(proposal_query))
 
-    sort_proposals(proposals)
+    proposals = sort_proposals(proposals)
 
     return proposals, is_filtered
 
