@@ -3,7 +3,7 @@
 {% block title %}My Account{% endblock %}
 {% block body %}
 {% include "account/_nav.html" %}
-{% set owned_tickets = current_user.get_owned_tickets(True)|list %}
+{% set owned_tickets = current_user.get_owned_tickets(True, type="admission_ticket")|list %}
 <div class="panel-grid">
   <div class="panel panel-default">
       <div class="panel-heading">
