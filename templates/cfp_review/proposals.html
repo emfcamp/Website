@@ -65,7 +65,7 @@
         <td>{{proposal.state | capitalize}}</td>
         <td>{{proposal.human_type | capitalize}}</td>
         <td>{{proposal.notice_required or ''}}</td>
-        <td>{{proposal.duration or ''}}</td>
+        <td>{{(proposal.duration or '')|truncate(20)}}</td>
         <td>
             <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id ) }}">{{ proposal.user.name }}</a>
         </td>
