@@ -337,6 +337,32 @@ class Proposal(BaseModel):
     def attributes(self, value: Attributes) -> None:
         self.attributes_json = dataclasses.asdict(value)
 
+    def to_dict(self) -> dict[str, Any]:
+        """JSON-compatible dict representation for CSV export."""
+        data = {
+            "type": self.type,
+            "state": self.state,
+            "proposer_name": self.user.name,
+            "proposer_email": self.user.email,
+            "title": self.title,
+            "description": self.description,
+            "duration": self.duration,
+            "needs_help": self.needs_help,
+            "equipment_required": self.equipment_required,
+            "funding_required": self.funding_required,
+            "notice_required": self.notice_required,
+            "additional_info": self.additional_info,
+            "needs_money": self.needs_money,
+            "one_day": self.one_day,
+            "created": self.created.isoformat(),
+            "modified": self.modified.isoformat(),
+        }
+
+        for field in dataclasses.fields(self.attributes):
+            data[field.name] = getattr(self.attributes, field.name)
+
+        return data
+
 
 ## Disabled while we work out a better approach for this.
 # validate_state_transitions(Proposal.state, PROPOSAL_STATE_TRANSITIONS)

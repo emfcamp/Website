@@ -5,7 +5,7 @@ from collections.abc import Callable
 from datetime import timedelta
 from http import HTTPStatus
 from io import BytesIO, StringIO
-from itertools import combinations
+from itertools import chain, combinations
 from typing import Any, Literal, get_args
 
 import dateutil
@@ -234,6 +234,17 @@ def proposals() -> ResponseReturnValue:
     for proposal in proposals:
         for tag in proposal.tags:
             tag_counts[tag][0] += 1
+
+    if request.args.get("format") == "csv":
+        data = [proposal.to_dict() for proposal in proposals]
+        # Don't use a set to ensure uniqueness here because we want to preserve key ordering
+        fields = list(dict.fromkeys(chain.from_iterable(item.keys() for item in data)))
+        buf = StringIO()
+        writer = csv.DictWriter(buf, fieldnames=fields)
+        writer.writeheader()
+        for row in data:
+            writer.writerow(row)
+        return app.response_class(response=buf.getvalue(), status=200, mimetype="text/csv")
 
     return render_template(
         "cfp_review/proposals.html",
