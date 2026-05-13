@@ -55,17 +55,13 @@ def before_request() -> ResponseReturnValue | None:
     return None
 
 
-def sort_by_notice(notice):
-    return {"1 week": 0, "1 month": 1, "> 1 month": 2}.get(notice, -1)
-
-
 def sort_proposals(proposals: list[Proposal]) -> list[Proposal]:
     sort_keys: dict[str, Callable[[Proposal], Any]] = {
         "ticket": lambda p: (len(p.user.owned_tickets) > 0, p.title.lower()),
         "date": lambda p: (p.modified, p.title.lower()),
         "state": lambda p: (p.state, p.modified, p.title.lower()),
         "type": lambda p: (p.type, p.title.lower()),
-        "notice": lambda p: (sort_by_notice(p.notice_required), p.title.lower()),
+        "notice": lambda p: (p.notice_required or "", p.title.lower()),
         "duration": lambda p: p.duration or "",
         "user": lambda p: (p.user.name.lower(), p.title.lower()),
         "title": lambda p: p.title.lower(),
