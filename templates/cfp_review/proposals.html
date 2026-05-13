@@ -28,9 +28,9 @@
     </th>
     {%- endif -%}
 {%- endmacro %}
-{% macro cell(name) -%}
+{% macro cell(name, no_wrap=False) -%}
     {%- if name in columns -%}
-        <td>{{caller()}}</td>
+        <td {% if no_wrap %}style="text-wrap:nowrap;"{% endif %}>{{caller()}}</td>
     {%- endif -%}
 {%- endmacro %}
 
@@ -75,7 +75,7 @@
                 <div class="form-group pull-right">
                     <div class="btn-group">
                         <button class="btn btn-primary">Apply</button>
-                        <a href="{{url_for('.proposals')}}" class="btn btn-default">Clear</a>
+                        <a href="{{url_for('.proposals')}}" class="btn btn-default">Reset</a>
                     </div>
                 </div>
             </fieldset>
@@ -100,22 +100,22 @@
     </tr>
 {% for proposal in proposals %}
     <tr class="{{- loop.cycle('odd', 'even') -}}">
-        {% call cell("ticket") -%}
+        {% call cell("ticket", True) -%}
             {% if proposal.user.check_will_have_ticket() %}Yes{% endif %}
         {%- endcall %}
-        {% call cell("date") -%}
+        {% call cell("date", True) -%}
             {{proposal.modified.strftime("%d/%m")}}
         {%- endcall %}
-        {% call cell("state") -%}
+        {% call cell("state", True) -%}
             {{proposal.state | capitalize}}
         {%- endcall %}
-        {% call cell("type") -%}
+        {% call cell("type", True) -%}
             {{proposal.human_type | capitalize}}
         {%- endcall %}
-        {% call cell("notice") -%}
+        {% call cell("notice", True) -%}
             {{proposal.notice_required or ''}}
         {%- endcall %}
-        {% call cell("duration") -%}
+        {% call cell("duration", True) -%}
             {{(proposal.duration or '')|truncate(20)}}
         {%- endcall %}
         {% call cell("user") -%}
