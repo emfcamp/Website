@@ -37,6 +37,7 @@
 {% block body %}
 <h2>Proposals</h2>
 
+<form method="get">
 <div class="panel panel-default">
     <div class="panel-heading">
         <h4 class="panel-title">
@@ -63,25 +64,24 @@
         </h4>
     </div>
     <div class="panel-body collapse" id="colsPanel">
-        <form method="get">
-            {% for (id, name) in col_descriptions.items() %}
-                <div class="form-group">
-                    <label>{{name}} <input type="checkbox" id="{{id}}" name="cols" value="{{id}}"
-                        {% if id in columns %}checked="checked"{% endif %}
-                    /></label>
+        {% for (id, name) in col_descriptions.items() %}
+            <div class="form-group">
+                <label>{{name}} <input type="checkbox" id="{{id}}" name="cols" value="{{id}}"
+                    {% if id in columns %}checked="checked"{% endif %}
+                /></label>
+            </div>
+        {% endfor %}
+        <fieldset class="form-horizontal col-md-12">
+            <div class="form-group pull-right">
+                <div class="btn-group">
+                    <button class="btn btn-primary">Apply</button>
+                    <a href="{{url_for('.proposals')}}" class="btn btn-default">Reset</a>
                 </div>
-            {% endfor %}
-            <fieldset class="form-horizontal col-md-6">
-                <div class="form-group pull-right">
-                    <div class="btn-group">
-                        <button class="btn btn-primary">Apply</button>
-                        <a href="{{url_for('.proposals')}}" class="btn btn-default">Reset</a>
-                    </div>
-                </div>
-            </fieldset>
-        </form>
+            </div>
+        </fieldset>
     </div>
 </div>
+</form>
 
 
 <div class="btn-group pull-right">

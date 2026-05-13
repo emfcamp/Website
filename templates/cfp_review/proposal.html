@@ -26,13 +26,6 @@
     <p>The proposer will only be able to edit schedule item fields, they will not be able to edit their proposal.</p>
     {% endif %}
 </div>
-{% else %}
-<div class="alert alert-primary">
-    <p>This proposal does not yet have an associated schedule item. These are usually created when the proposal is accepted.</p>
-    <form method="post" action="{{ url_for("cfp_review.create_schedule_item_from_proposal", proposal_id=proposal.id) }}">
-    <p><input type="submit" class="btn btn-default" value="Create schedule item"></p>
-    </form>
-</div>
 {% endif %}
 
 <div class="col-md-12">

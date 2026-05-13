@@ -1,6 +1,5 @@
 {# Filter form on /admin/cfp-review/proposals #}
-<form method="get">
-    <div class="row">
+<div class="row">
     <fieldset class="form-horizontal col-md-10">
         <div class="form-group">
             <label for="state" class="col-sm-2">State</label>
@@ -67,7 +66,7 @@
             <div class="checkbox">
                 <label>
                     <input name="needs_help" id="needs_help" type="checkbox" value="True"
-                           {%- if request.args.get('needs_help', False) %}checked{% endif %}>
+                            {%- if request.args.get('needs_help', False) %}checked{% endif %}>
                     Needs Help
                 </label>
             </div>
@@ -76,19 +75,18 @@
             <div class="checkbox">
                 <label>
                     <input name="needs_money" id="needs_money" type="checkbox" value="True"
-                           {%- if request.args.get('needs_money', False) %}checked{% endif %}>
+                            {%- if request.args.get('needs_money', False) %}checked{% endif %}>
                     Needs Money
                 </label>
             </div>
         </div>
     </fieldset>
-    </div>
-    <div class="row">
+</div>
+<div class="row">
     <fieldset class="form-horizontal col-md-12">
         <div class="btn-group pull-right">
             <button class="btn btn-primary">Apply</button>
             <a href="{{url_for('.proposals')}}" class="btn btn-default">Clear</a>
         </div>
     </fieldset>
-    </div>
-</form>
+</div>
