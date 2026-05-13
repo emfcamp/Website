@@ -1,12 +1,7 @@
 {% from "_formhelpers.html" import render_field, render_dl_field, render_radio_field %}
-{% extends "cfp_review/base.html" %}
-{% block title %}{{ proposal.title }}{% endblock %}
-{% block body %}
-
-{% set active='details' %}
-{% include "cfp_review/_proposal_tabs.html" %}
-
-
+{% set active = "details" %}
+{% extends "cfp_review/proposal/base.html" %}
+{% block proposal_body %}
 {% if proposal.state == 'new' %}
 <div class="alert alert-primary">
     <p>You have the ability to mark this proposal as checked, which will send it to anonymisation. Please do so, but only if:</p>
@@ -27,14 +22,6 @@
     {% endif %}
 </div>
 {% endif %}
-
-<div class="col-md-12">
-    <h2>{{ proposal.title }}<br>
-        <small>
-            {{ proposal.human_type_a | capitalize }} by
-            <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id) }}">{{ proposal.user.name }}</small></a>
-    </h2>
-</div>
 <form method="post" action="{{ url_for('.update_proposal', proposal_id=proposal.id) }}" class="shrink">
     {{ form.hidden_tag() }}
     <div class="col-md-8">
@@ -188,5 +175,4 @@
         </div>
     </div>
 </form>
-
 {% endblock %}

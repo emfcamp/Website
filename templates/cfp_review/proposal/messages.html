@@ -1,14 +1,7 @@
 {% from "_formhelpers.html" import render_field %}
-{% extends "cfp_review/base.html" %}
-{% block body %}
-
-{% set active='messages' %}
-{% include "cfp_review/_proposal_tabs.html" %}
-
-<h4>{{ proposal.title }} <small>by <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id) }}">{{proposal.user.name}}</a></small></h4>
-<p class="multiline">{{ proposal.description | urlize }}</p>
-<p>&nbsp;</p>
-
+{% set active = "messages" %}
+{% extends "cfp_review/proposal/base.html" %}
+{% block proposal_body %}
 <table class="table table-striped message-table">
 {% for msg in messages %}
 <tr>

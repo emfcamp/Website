@@ -1,16 +1,7 @@
 {% from "_formhelpers.html" import render_field, render_dl_field %}
-{% extends "cfp_review/base.html" %}
-{% block title %}{{ proposal.title }}{% endblock %}
-{% block body %}
-
-<div class="col-md-12">
-    <h2>{{ proposal.title }}</h2>
-    <div>This is currently of type "{{ proposal.human_type }}". To convert to another type, select below.</div>
-
-</div>
-
-<p>&nbsp;</p>
-
+{% extends "cfp_review/proposal/base.html" %}
+{% block proposal_body %}
+<h3>Convert proposal type</h3>
 <div class="col-md-12">
     <h4>Please note:</h4>
     <ul>

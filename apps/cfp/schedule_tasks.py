@@ -7,7 +7,7 @@ import click
 from flask import current_app as app
 from sqlalchemy import func, or_, select
 
-from apps.cfp_review.base import send_email_for_proposal
+from apps.cfp_review.email import send_email_for_proposal
 from main import db
 from models.content import Occurrence, Proposal, ScheduleItem, ScheduleItemType, Venue
 from models.village import Village

@@ -1,0 +1,13 @@
+{% extends "cfp_review/base.html" %}
+{% block title %}{{ proposal.title }}{% endblock %}
+{% block body %}
+    <div class="col-md-12">
+        <h2>{{ proposal.title }}<br>
+            <small>
+                {{ proposal.human_type_a | capitalize }} by
+                <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id) }}">{{ proposal.user.name }}</small></a>
+        </h2>
+    </div>
+    {% include "cfp_review/proposal/_tabs.html" %}
+    {% block proposal_body %}{% endblock %}
+{% endblock %}

@@ -1,15 +1,8 @@
-{% extends "cfp_review/base.html" %}
-{% block body %}
-
 {% set active='votes' %}
-{% include "cfp_review/_proposal_tabs.html" %}
-
-{# <p>{{ proposal.description }}</p> #}
-
-<p>&nbsp;</p>
+{% extends "cfp_review/proposal/base.html" %}
+{% block proposal_body %}
 <form method="POST">
     <div class="col-md-8">
-        <h3>{{proposal.title}} <small>&mdash; {{ proposal.human_type_a | title }}</small></h3>
         <table class="table">
         {{ form.hidden_tag() }}
             <tr>

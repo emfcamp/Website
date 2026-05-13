@@ -161,6 +161,7 @@ def cfp_review_variables():
 from . import (
     anonymise,  # noqa: F401
     base,  # noqa: F401
+    proposal,  # noqa: F401
     review,  # noqa: F401
     sense_check,  # noqa: F401
 )

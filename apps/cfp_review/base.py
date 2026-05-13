@@ -60,31 +60,25 @@ from ..config import config
 from . import (
     admin_required,
     cfp_review,
-    get_next_proposal_to,
     schedule_required,
     sort_proposals,
     sort_schedule_items,
 )
+from .email import send_email_for_proposal
 from .estimation import get_cfp_estimate
 from .forms import (
-    UPDATE_PROPOSAL_ATTRIBUTES_FORM_TYPES,
     UPDATE_SCHEDULE_ITEM_ATTRIBUTES_FORM_TYPES,
     AcceptanceForm,
-    ChangeProposalOwner,
     ChangeScheduleItemOwner,
     CloseRoundForm,
-    ConvertProposalForm,
     ConvertScheduleItemForm,
     CreateOccurrenceForm,
     InviteSpeakerForm,
     LotteryForm,
-    PrivateNotesForm,
     ReversionForm,
     SendMessageForm,
     UpdateOccurrenceForm,
-    UpdateProposalForm,
     UpdateScheduleItemForm,
-    UpdateVotesForm,
 )
 from .majority_judgement import calculate_max_normalised_score
 
@@ -344,114 +338,6 @@ def export_schedule_items(format: str) -> ResponseReturnValue:
     )
 
 
-ProposalEmailReason = Literal[
-    "accepted",
-    "still-considered",
-    "rejected",
-    "check-scheduled-duration",
-    "please-finalise",
-    "reserve-list",
-    "slot-scheduled",
-    "slot-moved",
-]
-
-
-def send_email_for_proposal(proposal: Proposal, reason: ProposalEmailReason) -> None:
-    from_email_ = config.from_email("CONTENT_EMAIL")
-    title = (proposal.schedule_item and proposal.schedule_item.title) or proposal.title
-
-    if reason == "accepted":
-        subject = f'''Your EMF {proposal.human_type} "{title}" has been accepted!'''
-        template = "cfp_review/email/accepted_msg.txt"
-
-    elif reason == "still-considered":
-        subject = f'''We're still considering your EMF {proposal.human_type} "{title}"'''
-        template = "cfp_review/email/still_considering.txt"
-
-    elif reason == "rejected":
-        # remember to set rejected_email_sent
-        subject = f'''Your EMF {proposal.human_type} "{title}" was not accepted.'''
-        template = "emails/cfp-rejected.txt"
-
-    elif reason == "reserve-list":
-        subject = f'''Your EMF {proposal.human_type} "{title}", and EMF tickets'''
-        template = "emails/cfp-reserve-list.txt"
-        from_email_ = config.from_email("SPEAKERS_EMAIL")
-
-    elif reason == "please-finalise":
-        # Can be sent before or after scheduling. We want them
-        # to update for the line-up, so the earlier the better.
-        subject = f'''We need information about your EMF {proposal.human_type} "{title}"'''
-        template = "emails/cfp-please-finalise.txt"
-        from_email_ = config.from_email("SPEAKERS_EMAIL")
-
-    elif reason == "check-scheduled-duration":
-        # This email is basically the same as "please-finalise" but less urgent
-        subject = f'''Your EMF {proposal.human_type} "{title}" is ready to schedule, please check your slot'''
-        template = "emails/cfp-check-scheduled-duration.txt"
-        from_email_ = config.from_email("SPEAKERS_EMAIL")
-
-    elif reason == "slot-scheduled":
-        subject = f'''Your EMF {proposal.human_type} "{title}" has been scheduled'''
-        template = "emails/cfp-slot-scheduled.txt"
-        from_email_ = config.from_email("SPEAKERS_EMAIL")
-
-    elif reason == "slot-moved":
-        # TODO: might be nice to highlight which slot has moved
-        subject = f'''Your EMF {proposal.human_type} slot has been moved ("{title}")'''
-        template = "emails/cfp-slot-moved.txt"
-        from_email_ = config.from_email("SPEAKERS_EMAIL")
-
-    else:
-        raise Exception(f"Invalid proposal email type {reason}")
-
-    app.logger.info("Sending %s email for proposal %s", reason, proposal.id)
-
-    msg = EmailMessage(subject, from_email=from_email_, to=[proposal.user.email])
-    msg.body = render_template(
-        template,
-        user=proposal.user,
-        proposal=proposal,
-        reserve_ticket_link=app.config["RESERVE_LIST_TICKET_LINK"],
-    )
-
-    msg.send()
-
-
-@cfp_review.route("/proposals/<int:proposal_id>/convert", methods=["GET", "POST"])
-@admin_required
-def convert_proposal(proposal_id: int) -> ResponseReturnValue:
-    proposal = get_or_404(db, Proposal, proposal_id)
-
-    form = ConvertProposalForm()
-    types = get_args(ProposalType)
-    form.new_type.choices = [(t, t.title()) for t in types if t != proposal.type]
-
-    if form.validate_on_submit():
-        new_type = form.new_type.data
-
-        old_attributes = proposal.attributes
-        proposal.type = new_type  # affects type_info
-        new_attributes = proposal.type_info.attributes_cls()
-        convert_attributes_between_types(old_attributes, new_attributes)
-        proposal.attributes = new_attributes
-
-        if proposal.schedule_item:
-            schedule_item: ScheduleItem = proposal.schedule_item
-
-            # There may be new attributes for the proposer to complete.
-            # We do not automatically tell them to finalise again, you must send a message.
-            schedule_item.state = "unpublished"
-
-            _convert_schedule_item(schedule_item, new_type)
-
-        db.session.commit()
-
-        return redirect(url_for(".update_proposal", proposal_id=proposal.id))
-
-    return render_template("cfp_review/convert_proposal.html", proposal=proposal, form=form)
-
-
 @cfp_review.route("/schedule-items/<int:schedule_item_id>/convert", methods=["GET", "POST"])
 @admin_required
 def convert_schedule_item(schedule_item_id: int) -> ResponseReturnValue:
@@ -492,120 +378,6 @@ def _convert_schedule_item(schedule_item: ScheduleItem, new_type: ScheduleItemTy
     new_attributes = schedule_item.type_info.attributes_cls()
     convert_attributes_between_types(old_attributes, new_attributes)
     schedule_item.attributes = new_attributes
-
-
-def find_next_proposal_id(prop):
-    if not request.args:
-        res = get_next_proposal_to(prop, prop.state)
-        return res.id if res else None
-
-    proposals, _ = filter_proposal_request()
-
-    try:
-        idx = proposals.index(prop) + 1
-    except ValueError:
-        return None
-
-    if len(proposals) <= idx:
-        return None
-    return proposals[idx].id
-
-
-def get_update_proposal_type_form(proposal_type: ProposalType) -> type[UpdateProposalForm]:
-    class UpdateProposalFormWithAttributes(UpdateProposalForm):
-        pass
-
-    UpdateProposalFormWithAttributes.attributes = FormField(
-        UPDATE_PROPOSAL_ATTRIBUTES_FORM_TYPES[proposal_type]
-    )
-
-    return UpdateProposalFormWithAttributes
-
-
-@cfp_review.route("/proposals/<int:proposal_id>", methods=["GET", "POST"])
-@admin_required
-def update_proposal(proposal_id: int) -> ResponseReturnValue:
-    def flash_commit_and_go(msg: str, next_page: str, proposal_id: int | None = None) -> ResponseReturnValue:
-        flash(msg)
-        app.logger.info(msg)
-        db.session.commit()
-
-        return redirect(url_for(next_page, proposal_id=proposal_id))
-
-    proposal = get_or_404(db, Proposal, proposal_id)
-    next_id = find_next_proposal_id(proposal)
-
-    Form = get_update_proposal_type_form(proposal.type)
-    form = Form(obj=proposal)
-    form.user_will_have_ticket.data = proposal.user.will_have_ticket
-
-    # TODO: this could move to UpdateProposalForm.__init__
-    tags = db.session.scalars(select(Tag).order_by(Tag.tag))
-    form.tags.choices = [(t.tag, t.tag) for t in tags]
-
-    if form.validate_on_submit():
-        form.populate_obj(proposal)
-        proposal.user.will_have_ticket = form.user_will_have_ticket.data
-
-        if form.update.data:
-            msg = f"Updating proposal {proposal_id}"
-            proposal.state = form.state.data
-
-        elif form.reject.data or form.reject_with_message.data:
-            msg = f"Rejecting proposal {proposal_id}"
-            proposal.state = "rejected"
-
-            if form.reject_with_message.data:
-                proposal.rejected_email_sent = True
-                send_email_for_proposal(proposal, reason="rejected")
-
-        elif form.accept.data:
-            msg = f"Manually accepting proposal {proposal_id}"
-            proposal.accept_proposal()
-
-            send_email_for_proposal(proposal, reason="accepted")
-
-        elif form.checked.data:
-            if proposal.type_info.review_type == "manual":
-                msg = f"Sending proposal {proposal_id} for manual review"
-                proposal.state = "manual-review"
-            elif proposal.type_info.review_type == "anonymous":
-                msg = f"Sending proposal {proposal_id} for anonymisation"
-                proposal.state = "checked"
-            else:
-                msg = f"Not changing state for automatically accepted proposal {proposal_id}"
-
-            if not next_id:
-                return flash_commit_and_go(msg, ".proposals")
-            return flash_commit_and_go(msg, ".update_proposal", proposal_id=next_id)
-
-        return flash_commit_and_go(msg, ".update_proposal", proposal_id=proposal_id)
-
-    return render_template(
-        "cfp_review/proposal.html",
-        proposal=proposal,
-        form=form,
-        next_id=next_id,
-    )
-
-
-@cfp_review.route("/proposals/<int:proposal_id>/create-schedule-item", methods=["POST"])
-@admin_required
-def create_schedule_item_from_proposal(proposal_id: int) -> ResponseReturnValue:
-    """
-    This is usually done on acceptance, but there might be a reason to pre-populate
-    a schedule with data before we tell the user that their talk has been accepted.
-    """
-    proposal = get_or_404(db, Proposal, proposal_id)
-    if proposal.schedule_item:
-        flash("Proposal already has a schedule item")
-        return redirect(url_for(".update_proposal", proposal_id=proposal.id))
-
-    schedule_item = proposal.create_schedule_item()
-    db.session.add(schedule_item)
-    db.session.commit()
-
-    return redirect(url_for(".update_schedule_item", schedule_item_id=schedule_item.id))
 
 
 def get_update_schedule_item_type_form(schedule_item_type: ScheduleItemType) -> type[UpdateScheduleItemForm]:
@@ -820,57 +592,6 @@ def messages():
     )
 
 
-@cfp_review.route("/proposals/<int:proposal_id>/message", methods=["GET", "POST"])
-@admin_required
-def message_proposer(proposal_id):
-    form = SendMessageForm()
-    proposal = get_or_404(db, Proposal, proposal_id)
-
-    if form.validate_on_submit():
-        if form.send.data:
-            msg = ProposalMessage()
-            msg.is_to_admin = False
-            msg.from_user_id = current_user.id
-            msg.proposal_id = proposal_id
-            msg.message = form.message.data
-
-            db.session.add(msg)
-            db.session.commit()
-
-            app.logger.info("Sending message from %s to %s", current_user.id, proposal.user_id)
-
-            msg_url = external_url("cfp.proposal_messages", proposal_id=proposal_id)
-            msg = EmailMessage(
-                "New message about your EMF proposal",
-                from_email=config.from_email("CONTENT_EMAIL"),
-                to=[proposal.user.email],
-            )
-            msg.body = render_template(
-                "cfp_review/email/new_message.txt",
-                url=msg_url,
-                to_user=proposal.user,
-                from_user=current_user,
-                proposal=proposal,
-            )
-            msg.send()
-
-        count = proposal.mark_messages_read(current_user)
-        db.session.commit()
-        app.logger.info(f"Marked {count} messages to admin on proposal {proposal.id} as read")
-
-        return redirect(url_for(".message_proposer", proposal_id=proposal_id))
-
-    # Admin can see all messages sent in relation to a proposal
-    messages = ProposalMessage.query.filter_by(proposal_id=proposal_id).order_by("created").all()
-
-    return render_template(
-        "cfp_review/message_proposer.html",
-        form=form,
-        messages=messages,
-        proposal=proposal,
-    )
-
-
 VersionedEntityType = Literal["proposal", "schedule-item", "occurrence"]
 
 
@@ -1053,128 +774,6 @@ def vote_summary() -> ResponseReturnValue:
         "cfp_review/vote_summary.html",
         summary=summary,
         proposals_with_counts=proposals_with_counts,
-    )
-
-
-@cfp_review.route("/proposals/<int:proposal_id>/votes", methods=["GET", "POST"])
-@admin_required
-def proposal_votes(proposal_id):
-    form = UpdateVotesForm()
-    proposal = get_or_404(db, Proposal, proposal_id)
-    all_votes = {v.id: v for v in proposal.votes}
-
-    if form.validate_on_submit():
-        msg = ""
-        if form.set_all_stale.data:
-            stale_count = 0
-            states_to_set = (
-                ["voted", "blocked", "recused"] if form.include_recused.data else ["voted", "blocked"]
-            )
-            for vote in all_votes.values():
-                if vote.state in states_to_set:
-                    vote.set_state("stale")
-                    vote.note = None
-                    stale_count += 1
-
-            if stale_count:
-                msg = f"Set {stale_count} votes to stale"
-
-        elif form.update.data:
-            update_count = 0
-            for form_vote in form.votes_to_resolve:
-                vote = all_votes[form_vote["id"].data]
-                if form_vote.resolve.data and vote.state in ["blocked"]:
-                    vote.set_state("resolved")
-                    vote.note = None
-                    update_count += 1
-
-            if update_count:
-                msg = f"Set {update_count} votes to resolved"
-
-        elif form.resolve_all.data:
-            resolved_count = 0
-            for vote in all_votes.values():
-                if vote.state == "blocked":
-                    vote.set_state("resolved")
-                    vote.note = None
-                    resolved_count += 1
-
-        if msg:
-            flash(msg)
-            app.logger.info(msg)
-
-        # Regardless, set everything to read
-        for v in all_votes.values():
-            v.has_been_read = True
-
-        db.session.commit()
-        return redirect(url_for(".proposal_votes", proposal_id=proposal_id))
-
-    for v_id in all_votes:
-        form.votes_to_resolve.append_entry()
-        form.votes_to_resolve[-1]["id"].data = v_id
-
-    return render_template("cfp_review/proposal_votes.html", proposal=proposal, form=form, votes=all_votes)
-
-
-@cfp_review.route("/proposals/<int:proposal_id>/notes", methods=["GET", "POST"])
-@admin_required
-def proposal_notes(proposal_id):
-    form = PrivateNotesForm()
-    proposal = get_or_404(db, Proposal, proposal_id)
-
-    if form.validate_on_submit():
-        if form.update.data:
-            proposal.private_notes = form.private_notes.data
-
-            db.session.commit()
-
-            flash("Updated notes")
-
-        return redirect(url_for(".proposal_notes", proposal_id=proposal_id))
-
-    if proposal.private_notes:
-        form.private_notes.data = proposal.private_notes
-
-    return render_template(
-        "cfp_review/proposal_notes.html",
-        form=form,
-        proposal=proposal,
-    )
-
-
-@cfp_review.route("/proposals/<int:proposal_id>/change-owner", methods=["GET", "POST"])
-@admin_required
-def proposal_change_owner(proposal_id: int) -> ResponseReturnValue:
-    form = ChangeProposalOwner()
-    proposal = get_or_404(db, Proposal, proposal_id)
-
-    if form.validate_on_submit() and form.submit.data:
-        assert form.user_email.data  # DataRequired
-
-        user = form._user
-        if not user:
-            assert form.user_name.data  # validate_user_name
-            user = User(form.user_email.data, form.user_name.data)
-            db.session.add(user)
-
-            msg = f"Created new user {user.email}"
-            app.logger.info(msg)
-            flash(msg)
-
-        proposal.user = user
-        db.session.commit()
-
-        msg = f"Transferred ownership of proposal {proposal.id} to {user.name}"
-        app.logger.info(msg)
-        flash(msg)
-
-        return redirect(url_for(".update_proposal", proposal_id=proposal_id))
-
-    return render_template(
-        "cfp_review/change_proposal_owner.html",
-        form=form,
-        proposal=proposal,
     )
 
 

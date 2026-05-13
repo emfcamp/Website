@@ -1,10 +1,7 @@
 {% from "_formhelpers.html" import render_field %}
-{% extends "cfp_review/base.html" %}
-{% block body %}
-
-{% include "cfp_review/_proposal_tabs.html" %}
-
-<h4>Change owner of {{proposal.type}} '{{ proposal.title }}'</h4>
+{% extends "cfp_review/proposal/base.html" %}
+{% block proposal_body %}
+<h3>Change owner</h3>
 
 <p>Currently owned by: <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user_id) }}">{{ proposal.user.name }} ({{ proposal.user.email }})</a></p>
 

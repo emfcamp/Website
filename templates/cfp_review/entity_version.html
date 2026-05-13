@@ -6,7 +6,7 @@
 
     {% set proposal = entity %}
     {% set active='versions-proposal' %}
-    {% include "cfp_review/_proposal_tabs.html" %}
+    {% include "cfp_review/proposal/_tabs.html" %}
     <h3>
         {{ proposal.title }}
         <small>by <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id) }}">{{ proposal.user.name }}</a></small>
