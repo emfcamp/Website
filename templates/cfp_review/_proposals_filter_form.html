@@ -1,6 +1,7 @@
 {# Filter form on /admin/cfp-review/proposals #}
-<form method="get" class="row">
-    <fieldset class="form-horizontal col-md-6">
+<form method="get">
+    <div class="row">
+    <fieldset class="form-horizontal col-md-10">
         <div class="form-group">
             <label for="state" class="col-sm-2">State</label>
             <div class="col-sm-10">
@@ -52,7 +53,7 @@
             </div>
         </div>
     </fieldset>
-    <fieldset class="form-horizontal col-md-6">
+    <fieldset class="form-horizontal col-md-2">
         <div class="form-group">
             <div class="checkbox">
                 <label>
@@ -81,13 +82,13 @@
             </div>
         </div>
     </fieldset>
-    <fieldset class="form-horizontal col-md-6">
-        <div class="form-group">
-            <div class="btn-group">
-                <button class="btn btn-primary">Apply</button>
-                <a href="{{url_for('.proposals')}}" class="btn btn-default">Clear</a>
-            </div>
+    </div>
+    <div class="row">
+    <fieldset class="form-horizontal col-md-12">
+        <div class="btn-group pull-right">
+            <button class="btn btn-primary">Apply</button>
+            <a href="{{url_for('.proposals')}}" class="btn btn-default">Clear</a>
         </div>
     </fieldset>
+    </div>
 </form>
-
