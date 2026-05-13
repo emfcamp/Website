@@ -354,6 +354,7 @@ class Proposal(BaseModel):
             "additional_info": self.additional_info,
             "needs_money": self.needs_money,
             "one_day": self.one_day,
+            "private_notes": self.private_notes,
             "created": self.created.isoformat(),
             "modified": self.modified.isoformat(),
         }
