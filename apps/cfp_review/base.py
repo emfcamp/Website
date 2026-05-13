@@ -174,48 +174,13 @@ def filter_proposal_request() -> tuple[list[Proposal], bool]:
     return proposals, is_filtered
 
 
-def filter_schedule_item_request() -> tuple[list[ScheduleItem], bool]:
-    schedule_item_query = select(ScheduleItem)
-    is_filtered = False
-
-    bool_names: list[str] = []
-    bool_vals = [request.args.get(n, type=bool_qs) for n in bool_names]
-    bool_dict = {n: v for n, v in zip(bool_names, bool_vals, strict=True) if v is not None}
-    if bool_dict:
-        is_filtered = True
-        schedule_item_query = schedule_item_query.filter_by(**bool_dict)
-
-    types = request.args.getlist("type")
-    if types:
-        is_filtered = True
-        schedule_item_query = schedule_item_query.where(ScheduleItem.type.in_(types))
-
-    states = request.args.getlist("state")
-    if states:
-        is_filtered = True
-        schedule_item_query = schedule_item_query.where(ScheduleItem.state.in_(states))
-
-    official_content = sorted(request.args.getlist("official_content"))
-    if official_content == ["attendee"] or official_content == ["official"]:
-        is_filtered = True
-        official_content_bool = official_content == ["official"]
-        schedule_item_query = schedule_item_query.where(
-            ScheduleItem.official_content == official_content_bool
-        )
-
-    schedule_item_query = schedule_item_query.options(selectinload(ScheduleItem.occurrences)).options(
-        undefer(ScheduleItem.favourite_count)
-    )
-    schedule_items = list(db.session.scalars(schedule_item_query))
-
-    sort_schedule_items(schedule_items)
-
-    return schedule_items, is_filtered
-
-
 @cfp_review.route("/proposals")
 @admin_required
 def proposals() -> ResponseReturnValue:
+
+    default_columns = ["ticket", "date", "state", "type", "notice", "duration", "user", "title"]
+    columns = request.args.getlist("cols") or default_columns
+
     proposals, is_filtered = filter_proposal_request()
     non_sort_query_string = request.args.to_dict(flat=False)
 
@@ -253,7 +218,47 @@ def proposals() -> ResponseReturnValue:
         is_filtered=is_filtered,
         total_proposals=db.session.scalar(select(func.count(Proposal.id))),
         tag_counts=tag_counts,
+        columns=columns,
     )
+
+
+def filter_schedule_item_request() -> tuple[list[ScheduleItem], bool]:
+    schedule_item_query = select(ScheduleItem)
+    is_filtered = False
+
+    bool_names: list[str] = []
+    bool_vals = [request.args.get(n, type=bool_qs) for n in bool_names]
+    bool_dict = {n: v for n, v in zip(bool_names, bool_vals, strict=True) if v is not None}
+    if bool_dict:
+        is_filtered = True
+        schedule_item_query = schedule_item_query.filter_by(**bool_dict)
+
+    types = request.args.getlist("type")
+    if types:
+        is_filtered = True
+        schedule_item_query = schedule_item_query.where(ScheduleItem.type.in_(types))
+
+    states = request.args.getlist("state")
+    if states:
+        is_filtered = True
+        schedule_item_query = schedule_item_query.where(ScheduleItem.state.in_(states))
+
+    official_content = sorted(request.args.getlist("official_content"))
+    if official_content == ["attendee"] or official_content == ["official"]:
+        is_filtered = True
+        official_content_bool = official_content == ["official"]
+        schedule_item_query = schedule_item_query.where(
+            ScheduleItem.official_content == official_content_bool
+        )
+
+    schedule_item_query = schedule_item_query.options(selectinload(ScheduleItem.occurrences)).options(
+        undefer(ScheduleItem.favourite_count)
+    )
+    schedule_items = list(db.session.scalars(schedule_item_query))
+
+    sort_schedule_items(schedule_items)
+
+    return schedule_items, is_filtered
 
 
 @cfp_review.route("/schedule-items")
