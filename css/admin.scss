@@ -6,6 +6,16 @@ body {
   padding-bottom: 40px;
 }
 
+.container-wide {
+  max-width: 1500px;
+  margin-left: auto;
+  margin-right: auto;
+  @media (max-width: 1400px) {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+}
+
 header h1 {
   text-align: left;
   font-size: 12pt;
@@ -49,9 +59,9 @@ table.hire-purchases tr.payment-pending td {
 }
 
 tr.even {
-  background-color: #ddd;
+  background-color: #efefef;
 }
 
 tr.odd {
-  background-color: #eee;
+  background-color: #fafafa;
 }
