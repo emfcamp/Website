@@ -105,6 +105,7 @@ STATE_FIELDS: dict[ProposalState, set[str]] = {
     "conduct-blocked": {"conduct_issues"},
     "manual-review": {"manual_review"},
     "edit": {"edit"},
+    "withdrawn": {"withdraw"},
 }
 
 
@@ -115,6 +116,7 @@ class ProposalStateForm(Form):
     conduct_issues = SubmitField("Has conduct issues", render_kw={"class": "btn btn-primary"})
 
     manual_review = SubmitField("Send to manual review", render_kw={"class": "btn btn-primary"})
+    withdraw = SubmitField("Mark as withdrawn", render_kw={"class": "btn btn-primary"})
 
     edit = SubmitField("Make editable by user", render_kw={"class": "btn btn-primary"})
 
