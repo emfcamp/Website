@@ -80,6 +80,15 @@
                 </label>
             </div>
         </div>
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input name="has_notes" id="has_notes" type="checkbox" value="True"
+                            {%- if request.args.get('has_notes', False) %}checked{% endif %}>
+                    Has notes
+                </label>
+            </div>
+        </div>
     </fieldset>
 </div>
 <div class="row">

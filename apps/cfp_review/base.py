@@ -158,6 +158,11 @@ def filter_proposal_request() -> tuple[list[Proposal], bool]:
         is_filtered = True
         proposal_query = proposal_query.where(Proposal._tags.any(Tag.tag.in_(tags)))
 
+    has_notes = request.args.get("has_notes", type=bool_qs)
+    if has_notes:
+        is_filtered = True
+        proposal_query = proposal_query.where(Proposal.private_notes.is_not(None))
+
     proposal_query = proposal_query.options(
         selectinload(Proposal.user).selectinload(User.owned_tickets)
     ).options(selectinload(Proposal._tags))
