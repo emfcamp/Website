@@ -1407,9 +1407,9 @@ def reviewer_diversity():
     return render_template("cfp_review/reviewer_diversity.html", counts=counts)
 
 
-@cfp_review.route("/users/<user_id>", methods=["GET"])
+@cfp_review.route("/users/<int:user_id>", methods=["GET"])
 @admin_required
-def cfp_user(user_id):
+def cfp_user(user_id: int) -> ResponseReturnValue:
     user = db.get_or_404(User, user_id)
     if not user.proposals:
         abort(404)
@@ -1417,6 +1417,39 @@ def cfp_user(user_id):
         "cfp_review/cfp_user.html",
         user=user,
     )
+
+
+@cfp_review.route("/users/<int:user_id>/issue_cfp_voucher", methods=["POST"])
+@admin_required
+def issue_cfp_voucher(user_id: int) -> ResponseReturnValue:
+    user = db.get_or_404(User, user_id)
+
+    if request.form.get("issue_voucher") == "True":
+        had_voucher = user.cfp_voucher is not None
+        user.issue_cfp_voucher()
+
+        if not had_voucher:
+            flash("Issued CfP voucher")
+            app.logger.info("Sending manual CfP voucher email for user %s", user.id)
+            msg = EmailMessage(
+                "Your Electromagnetic Field Voucher",
+                from_email=config.from_email("CONTENT_EMAIL"),
+                to=[user.email],
+            )
+            msg.body = render_template(
+                "cfp_review/email/voucher_issued.txt",
+                user=user,
+                reserve_ticket_link=app.config["RESERVE_LIST_TICKET_LINK"],
+            )
+            msg.send()
+        else:
+            flash("Refreshed CfP voucher. The user has not been emailed.")
+
+            app.logger.info("Refreshed CfP voucher for %s", user.id)
+
+        db.session.commit()
+
+    return redirect(url_for(".cfp_user", user_id=user_id))
 
 
 @cfp_review.route("/lottery")

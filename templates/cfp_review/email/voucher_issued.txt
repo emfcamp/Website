@@ -1,0 +1,9 @@
+Hi {{ user.name }},
+
+The Electromagnetic Field content team has issued you a voucher to buy tickets for EMF {{ event_year }}.
+You can buy your reserved tickets here{% if user.cfp_voucher.expiry %} before {{ user.cfp_voucher.expiry.strftime('%Y-%m-%d') }}{% endif %}:
+
+  {{ external_url('tickets.main', flow='speakers') }}
+
+Thanks,
+The EMF Team

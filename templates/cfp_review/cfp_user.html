@@ -1,17 +1,48 @@
 {% extends "cfp_review/base.html" %}
 {% block body %}
-<h2>{% block title %}{{ user.name }}'s Proposals{% endblock %}</h2>
+<h2>{% block title %}{{ user.name }}{% endblock %}</h2>
 {% if current_user.has_permission("admin") %}
     <a class="btn btn-default pull-right" href="{{ url_for('admin.user', user_id=user.id) }}">View user in admin</a>
 {% else %}
 {% endif %}
-Email: {{ user.email }}<br/>
-Has ticket: {{ user.check_will_have_ticket() }}
-{% if user.cfp_invite_reason %}
-    <b>Invited speaker.</b> Invite reason: {{ user.cfp_invite_reason }}<br/>
-{% else %}
-{% endif %}
-<hr>
+<dl class="dl-horizontal">
+    <dt>Email</dt><dd>{{ user.email }}</dd>
+    <dt>Has ticket</dt><dd>{{ user.check_will_have_ticket() }}</dd>
+    {% if user.cfp_invite_reason %}
+        <dt>Invited speaker. Invite reason</dt><dd>{{ user.cfp_invite_reason }}</dd>
+    {% endif %}
+</dl>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Content voucher</h3>
+    </div>
+    <div class="panel-body">
+        <form action="{{url_for('.issue_cfp_voucher', user_id=user.id)}}" method="POST">
+        {% if user.cfp_voucher %}
+        <p>
+            This user was issued a CfP ticket voucher, which has {{user.cfp_voucher.tickets_remaining}} remaining tickets.
+            It expires on {{user.cfp_voucher.expiry.date()}}.
+        </p>
+        <p>They can use their voucher by visiting <code>{{external_url('tickets.main', flow='speakers')}}</code>.</p>
+        <button class="btn btn-primary" name="issue_voucher" value="True">Extend voucher expiry</button>
+        {% else %}
+        <p>This user has {{user.adult_tickets_held(voucher=True)}} adult tickets.</p>
+        {% if user.adult_tickets_held(voucher=True) < 2 %}
+        <p>You can issue a content voucher to this user, which will entitle them to {{[2-user.adult_tickets_held(voucher=True), 0]|max}} adult tickets.
+            They will receive an email with the voucher details.
+        </p>
+        <button class="btn btn-primary" name="issue_voucher" value="True">Issue CfP voucher</button>
+        {% endif %}
+        {% endif %}
+        </form>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">CfP Submissions</h3>
+    </div>
+<div class="panel-body">
+
 <table class="table table-condensed">
     <tr>
         <th class="col-md-1">Date</th>
@@ -19,7 +50,6 @@ Has ticket: {{ user.check_will_have_ticket() }}
         <th class="col-md-1">Type</th>
         <th class="col-md-1">Notice</th>
         <th>Duration</th>
-        <th>#Favs</th>
         <th>Title</th>
         <th>Messages</th>
         <th>Notes</th>
@@ -31,7 +61,6 @@ Has ticket: {{ user.check_will_have_ticket() }}
         <td>{%- if not proposal.official_content %}Attendee&nbsp;{% endif -%}{{proposal.human_type | capitalize}}</td>
         <td>{{proposal.notice_required or ''}}</td>
         <td>{{proposal.duration or ''}}</td>
-        <td>{{proposal.favourite_count}}</td>
         <td>
             <a href="{{ url_for('.proposal', proposal_id=proposal.id, **full_qs) }}">{{ proposal.title }}</a>
         </td>
@@ -42,4 +71,5 @@ Has ticket: {{ user.check_will_have_ticket() }}
     </tr>
 {% endfor %}
 </table>
+</div>
 {% endblock %}

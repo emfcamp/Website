@@ -20,7 +20,6 @@ from sqlalchemy.orm import (
 )
 
 from main import NaiveDT, db
-from models.user import User
 
 from . import BaseModel, Currency, naive_utcnow
 from .capacity import UnlimitedType
@@ -767,3 +766,6 @@ class ProductViewProduct(BaseModel):
 
     def __repr__(self):
         return f"<ProductViewProduct: view {self.view_id}, product {self.product_id}, order {self.order}>"
+
+
+from .user import User

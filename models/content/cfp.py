@@ -10,14 +10,13 @@ Once a CfP proposal is accepted, an item is created in the schedule.
 import dataclasses
 import logging
 from dataclasses import dataclass
-from datetime import date, datetime, time, timedelta
+from datetime import datetime
 from enum import StrEnum
 from typing import (  # noqa: UP035
     TYPE_CHECKING,
     Any,
     Literal,
     Type,
-    cast,
     get_args,
 )
 
@@ -26,11 +25,9 @@ from sqlalchemy import JSON, ForeignKey, UniqueConstraint, select
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from apps.config import config
-from main import NaiveDT, db
+from main import db
 
 from .. import BaseModel, export_attr_counts, export_attr_edits, export_intervals, naive_utcnow
-from ..product import ProductView, Voucher
 from ..user import User
 from .attributes import (
     Attributes,
@@ -238,39 +235,7 @@ class Proposal(BaseModel):
             db.session.add(schedule_item)
 
         if self.type_info.grants_event_tickets:
-            # The voucher code itself implements a 36-hour grace period, so we don't need to pad it here.
-            voucher_expires_on_date = date.today() + timedelta(days=config.get("CFP_VOUCHER_EXPIRY_DAYS", 14))
-            voucher_expires_at = cast(
-                NaiveDT,
-                datetime.combine(
-                    voucher_expires_on_date,
-                    time(),  # 00:00:00
-                    tzinfo=None,
-                ),
-            )
-            if self.user.cfp_voucher is None:
-                # Issue a pseudo-voucher, which may have 0 capacity if the user already has 2 tickets.
-                product_view = ProductView.get_by_name("speakers")
-                if not product_view:
-                    raise Exception("No 'speakers' product view created yet?")
-                voucher = Voucher(
-                    view=product_view,
-                    email=self.user.email,
-                    tickets_remaining=max(2 - self.user.adult_tickets_held(voucher=True), 0),
-                    expiry=voucher_expires_at,
-                )
-                db.session.add(voucher)
-                self.user.cfp_voucher = voucher
-                log.info("Issuing user %s a CfP voucher until %s", self.user, voucher_expires_at)
-            elif self.user.cfp_voucher.is_expired and self.user.cfp_voucher.tickets_remaining > 0:
-                # Give the user an extension on their voucher. It's easier and
-                # friendlier than writing explanatory text in the email.
-                self.user.cfp_voucher.expiry = voucher_expires_at
-                log.info(
-                    "Extending user's %s CfP voucher to %s since a new proposal was accepted and their voucher has already expired",
-                    self.user,
-                    voucher_expires_at,
-                )
+            self.user.issue_cfp_voucher()
 
     def create_schedule_item(self):
         # Create a schedule item using suitable defaults from the proposal

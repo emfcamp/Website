@@ -1,13 +1,15 @@
 import base64
 import hashlib
 import hmac
+import logging
 import random
 import string
 import struct
 import time
 from collections.abc import Iterable
-from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Literal
+from datetime import date, datetime, timedelta
+from datetime import time as dttime
+from typing import TYPE_CHECKING, Literal, cast
 
 from flask import current_app as app
 from flask import session
@@ -17,8 +19,9 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from apps.config import config
 from loggingmanager import set_user_id
-from main import db
+from main import NaiveDT, db
 
 from . import BaseModel
 from .permission import Permission, UserPermission
@@ -45,6 +48,8 @@ __all__ = [
 
 CHECKIN_CODE_LEN = 16
 checkin_code_re = rf"[0-9a-zA-Z_-]{{{CHECKIN_CODE_LEN}}}"
+
+log = logging.getLogger(__name__)
 
 
 def _generate_hmac(prefix: bytes | str, key: bytes | str, msg: bytes | str) -> bytes:
@@ -410,6 +415,48 @@ class User(BaseModel, UserMixin):
             if user_perm.name == name:
                 self.permissions.remove(user_perm)
 
+    def issue_cfp_voucher(self) -> None:
+        """
+        Issue a CfP voucher to the user - this voucher is for a maximum of 2 adult tickets, minus
+        the number of adult tickets the user already holds.
+
+        If the voucher has already been issued, it will be extended.
+        """
+        ADULT_TICKETS = 2
+        # The voucher code itself implements a 36-hour grace period, so we don't need to pad it here.
+        voucher_expires_on_date = date.today() + timedelta(days=config.get("CFP_VOUCHER_EXPIRY_DAYS", 14))
+        voucher_expires_at = cast(
+            NaiveDT,
+            datetime.combine(
+                voucher_expires_on_date,
+                dttime(),  # 00:00:00
+                tzinfo=None,
+            ),
+        )
+        if self.cfp_voucher is None:
+            # Issue a pseudo-voucher, which may have 0 capacity if the user already has 2 tickets.
+            product_view = ProductView.get_by_name("speakers")
+            if not product_view:
+                raise Exception("No 'speakers' product view created yet?")
+            voucher = Voucher(
+                view=product_view,
+                email=self.email,
+                tickets_remaining=max(ADULT_TICKETS - self.adult_tickets_held(voucher=True), 0),
+                expiry=voucher_expires_at,
+            )
+            db.session.add(voucher)
+            self.cfp_voucher = voucher
+            log.info("Issuing user %s a CfP voucher until %s", self, voucher_expires_at)
+        elif self.cfp_voucher.tickets_remaining > 0:
+            # Give the user an extension on their voucher. It's easier and
+            # friendlier than writing explanatory text in the email.
+            self.cfp_voucher.expiry = voucher_expires_at
+            log.info(
+                "Extending user's %s CfP voucher to %s since a new proposal was accepted and their voucher has already expired",
+                self,
+                voucher_expires_at,
+            )
+
     def __repr__(self):
         return f"<User {self.email}>"
 
@@ -541,3 +588,4 @@ def load_anonymous_user():
 
 from .content.cfp import Proposal
 from .content.schedule import ScheduleItem
+from .product import ProductView, Voucher

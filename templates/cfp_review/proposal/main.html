@@ -87,6 +87,9 @@
                     <tr><th>Submitter</th><td><a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id) }}">{{proposal.user.name}}</a></td></tr>
                     <tr><th>Email</th><td>{{proposal.user.email}}</td></tr>
                     <tr><th>Has ticket?</th><td>{{ proposal.user.check_will_have_ticket()|yesno }}</td></tr>
+                    <tr><th>Voucher sent?</th><td>{{ proposal.user.cfp_voucher|yesno }}
+                        {% if not proposal.user.cfp_voucher %}(<a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id) }}">send voucher</a>){%endif %}
+                    </td></tr>
                     {% if proposal.anonymiser_id %}
                     <tr><th>Anonymised by</th><td>{{ proposal.anonymiser.name }}</td></tr>
                     {% endif %}
