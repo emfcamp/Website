@@ -141,7 +141,7 @@ class FakeDataGenerator:
     def create_proposal(self, user: User, reviewers: list[User]) -> Proposal:
         states = {
             "new": 0.05,
-            "edit": 0.2,
+            "edit": 0.05,
             "checked": 0.15,
             "rejected": 0.05,
             "anonymised": 0.1,
@@ -177,7 +177,7 @@ class FakeDataGenerator:
         vote_states = {
             # new
             "voted": 0.65,
-            "recused": 0.1,
+            "recused": 0.01,
             "blocked": 0.05,
             "resolved": 0.1,
             "stale": 0.1,
@@ -189,6 +189,7 @@ class FakeDataGenerator:
                 vote.state = random_choice(vote_states)
                 if vote.state in ("voted", "stale", "resolved"):
                     vote.vote = random.randint(0, 2)
+                proposal.votes.append(vote)
 
         if isinstance(proposal.attributes, ProposalWorkshopAttributes):
             proposal.attributes.participant_count = str(random.randint(5, 50))
