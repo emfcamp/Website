@@ -88,7 +88,7 @@
                     <tr><th>Email</th><td>{{proposal.user.email}}</td></tr>
                     <tr><th>Has ticket?</th><td>{{ proposal.user.check_will_have_ticket()|yesno }}</td></tr>
                     {% if proposal.anonymiser_id %}
-                    <tr><th>Anoymised by</th><td>{{ proposal.anonymiser.name }}</td></tr>
+                    <tr><th>Anonymised by</th><td>{{ proposal.anonymiser.name }}</td></tr>
                     {% endif %}
                 </table>
             </div>
