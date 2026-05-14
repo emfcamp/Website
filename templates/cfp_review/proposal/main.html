@@ -91,6 +91,18 @@
                     <tr><th>Anonymised by</th><td>{{ proposal.anonymiser.name }}</td></tr>
                     {% endif %}
                 </table>
+                {% if proposal.state not in ['new', 'rejected'] %}
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('.convert_proposal', proposal_id=proposal.id) }}"
+                            class="btn btn-default">
+                        Change type
+                    </a>
+                    <a href="{{ url_for('.proposal_change_owner', proposal_id=proposal.id) }}"
+                            class="btn btn-default">
+                        Change owner
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
         <div class="panel panel-default">

@@ -17,18 +17,6 @@
                     {{field()}}
                 {% endfor %}
             </div>
-            {% if proposal.state not in ['new', 'rejected'] %}
-            <div class="btn-group" role="group">
-                <a href="{{ url_for('.convert_proposal', proposal_id=proposal.id) }}"
-                        class="btn btn-warning">
-                    Convert proposal
-                </a>
-                <a href="{{ url_for('.proposal_change_owner', proposal_id=proposal.id) }}"
-                        class="btn btn-warning">
-                    Change proposal owner
-                </a>
-            </div>
-            {% endif %}
             <div class="btn-group pull-right" role="group">
                 <a href="{{ url_for('.proposals', **full_qs) }}"
                     class="btn btn-default">
