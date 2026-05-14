@@ -126,6 +126,29 @@
             </div>
         </div>
     </div>
+    {% if proposal.type_info.review_type == "anonymous" %}
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Anonymous review
+            </div>
+            <div class="panel-body">
+                <p><strong>{{proposal.votes|count}}</strong> votes received.</p>
+                {% if proposal.proposal_rounds %}
+                    <p>Considered in {{proposal.proposal_rounds|count}} round{% if proposal.proposal_rounds|count > 1 %}s{%endif%}:</p>
+                    <ul>
+                    {% for pr in proposal.proposal_rounds %}
+                        <li>{{pr.round.created.strftime("%Y-%m-%d")}}: {{pr.outcome}} (score: {{pr.score|round(3)}})</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Not considered in any rounds yet.</p>
+                {% endif %}
+                <a class="btn btn-default" href="{{ url_for('.proposal_votes', proposal_id=proposal.id, **full_qs) }}">View votes</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     <div class="col-md-12">
         <div class="panel panel-default">
             <div class="panel-heading">
