@@ -31,31 +31,10 @@
             <div class="panel-heading">
                 Description
             </div>
-            <div class="panel-body">
-                <p style="font-size: 1.1em">{{proposal.description}}</p>
+            <div class="panel-body large">
+                {{proposal.description|pretty_text}}
             </div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                Details
-            </div>
-            <div class="panel-body">
-                <table class="table table-condensed">
-                    <tr><th>State</th><td>{{proposal_state(proposal)}}</td></tr>
-                    <tr><th>Submitted</th><td>{{ proposal.created.strftime("%Y-%m-%d %H:%M") }}</td></tr>
-                    <tr><th>Submitter</th><td><a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id) }}">{{proposal.user.name}}</a></td></tr>
-                    <tr><th>Email</th><td>{{proposal.user.email}}</td></tr>
-                    <tr><th>Has ticket?</th><td>{{ proposal.user.check_will_have_ticket()|yesno }}</td></tr>
-                    {% if proposal.anonymiser_id %}
-                    <tr><th>Anoymised by</th><td>{{ proposal.anonymiser.name }}</td></tr>
-                    {% endif %}
-                </table>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-8">
         <div class="panel panel-default">
             <div class="panel-heading">
                 Requirements
@@ -81,8 +60,39 @@
                 </table>
             </div>
         </div>
+        {% if proposal.attributes|length > 0 %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Attributes
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed">
+                    {% for (name, value) in proposal.attributes %}
+                        <tr><th>{{name}}</th><td>{{value}}</td></tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+        {% endif %}
     </div>
     <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Details
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed">
+                    <tr><th>State</th><td>{{proposal_state(proposal)}}</td></tr>
+                    <tr><th>Submitted</th><td>{{ proposal.created.strftime("%Y-%m-%d %H:%M") }}</td></tr>
+                    <tr><th>Submitter</th><td><a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id) }}">{{proposal.user.name}}</a></td></tr>
+                    <tr><th>Email</th><td>{{proposal.user.email}}</td></tr>
+                    <tr><th>Has ticket?</th><td>{{ proposal.user.check_will_have_ticket()|yesno }}</td></tr>
+                    {% if proposal.anonymiser_id %}
+                    <tr><th>Anoymised by</th><td>{{ proposal.anonymiser.name }}</td></tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
         <div class="panel panel-default">
             <div class="panel-heading">
                 Tags
@@ -104,22 +114,6 @@
             </div>
         </div>
     </div>
-    {% if proposal.attributes|length > 0 %}
-    <div class="col-md-8">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                Attributes
-            </div>
-            <div class="panel-body">
-                <table class="table table-condensed">
-                    {% for (name, value) in proposal.attributes %}
-                        <tr><th>{{name}}</th><td>{{value}}</td></tr>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
-    </div>
-    {% endif %}
     <div class="col-md-12">
         <div class="panel panel-default">
             <div class="panel-heading">

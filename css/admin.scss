@@ -10,16 +10,6 @@ h2 {
   margin-top: 0;
 }
 
-.container-wide {
-  max-width: 1500px;
-  margin-left: auto;
-  margin-right: auto;
-  @media (max-width: 1400px) {
-    margin-left: 1rem;
-    margin-right: 1rem;
-  }
-}
-
 header h1 {
   text-align: left;
   font-size: 12pt;
@@ -34,6 +24,21 @@ header h1 .logo {
 header h1 > * {
   font-size: 12pt;
 }
+
+.container-wide {
+  max-width: 1500px;
+  margin-left: auto;
+  margin-right: auto;
+  @media (max-width: 1400px) {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+}
+
+.large {
+  font-size: 1.1em;
+}
+
 .message-table .col-sm-2 {
   vertical-align: mide;
 }
