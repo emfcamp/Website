@@ -29,7 +29,7 @@
     <div class="col-md-8">
         <div class="panel panel-default">
             <div class="panel-heading">
-                Description
+                <h3 class="panel-title">Description</h4>
             </div>
             <div class="panel-body large">
                 {{proposal.description|pretty_text}}
@@ -37,7 +37,7 @@
         </div>
         <div class="panel panel-default">
             <div class="panel-heading">
-                Requirements
+                <h3 class="panel-title">Requirements</h3>
             </div>
             <div class="panel-body">
                 <table class="table table-condensed">
@@ -63,7 +63,7 @@
         {% if proposal.attributes|length > 0 %}
         <div class="panel panel-default">
             <div class="panel-heading">
-                Attributes
+                <h3 class="panel-title">Attributes</h3>
             </div>
             <div class="panel-body">
                 <table class="table table-condensed">
@@ -78,7 +78,7 @@
     <div class="col-md-4">
         <div class="panel panel-default">
             <div class="panel-heading">
-                Details
+                <h3 class="panel-title">Details</h3>
             </div>
             <div class="panel-body">
                 <table class="table table-condensed">
@@ -107,7 +107,7 @@
         </div>
         <div class="panel panel-default">
             <div class="panel-heading">
-                Tags
+                <h3 class="panel-title">Tags</h3>
             </div>
             <div class="panel-body">
             <form method="POST" action="{{url_for('.proposal_tags', proposal_id=proposal.id)}}">
@@ -130,17 +130,18 @@
     <div class="col-md-4">
         <div class="panel panel-default">
             <div class="panel-heading">
-                Anonymous review
+                <h3 class="panel-title">Anonymous review</h3>
             </div>
             <div class="panel-body">
                 <p><strong>{{proposal.votes|count}}</strong> votes received.</p>
                 {% if proposal.proposal_rounds %}
                     <p>Considered in {{proposal.proposal_rounds|count}} round{% if proposal.proposal_rounds|count > 1 %}s{%endif%}:</p>
-                    <ul>
-                    {% for pr in proposal.proposal_rounds %}
-                        <li>{{pr.round.created.strftime("%Y-%m-%d")}}: {{pr.outcome}} (score: {{pr.score|round(3)}})</li>
+                    <table class="table table-condensed">
+                        <tr><th>Date</th><th>Score</th><th>Votes</th><th>Outcome</th></tr>
+                    {% for pr in proposal.proposal_rounds|sort(attribute="round_id") %}
+                        <tr><td>{{pr.round.created.strftime("%Y-%m-%d")}}</td><td>{{pr.score|round(3)}}</td><td>{{pr.vote_count}}</td><td>{{pr.outcome}}</td></tr>
                     {% endfor %}
-                    </ul>
+                    </table>
                 {% else %}
                     <p>Not considered in any rounds yet.</p>
                 {% endif %}
@@ -152,7 +153,7 @@
     <div class="col-md-12">
         <div class="panel panel-default">
             <div class="panel-heading">
-                Private notes
+                <h3 class="panel-title">Private notes</h3>
             </div>
             <div class="panel-body">
                 <form method="post" action="{{ url_for('.proposal_notes', proposal_id=proposal.id) }}">
