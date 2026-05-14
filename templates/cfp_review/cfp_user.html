@@ -33,7 +33,7 @@ Has ticket: {{ user.check_will_have_ticket() }}
         <td>{{proposal.duration or ''}}</td>
         <td>{{proposal.favourite_count}}</td>
         <td>
-            <a href="{{ url_for('.update_proposal', proposal_id=proposal.id, **full_qs) }}">{{ proposal.title }}</a>
+            <a href="{{ url_for('.proposal', proposal_id=proposal.id, **full_qs) }}">{{ proposal.title }}</a>
         </td>
         <td>
             <a href="{{ url_for('.message_proposer', proposal_id=proposal.id, **full_qs) }}">{{ proposal.get_unread_count(current_user) }}/{{ proposal.messages | length }}</a>

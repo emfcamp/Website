@@ -1,3 +1,4 @@
+{% from "cfp_review/_components.html" import proposal_state %}
 {% extends "cfp_review/base.html" %}
 {% block title %}Proposals{% endblock %}
 {% block page_class%}container-wide{% endblock %}
@@ -107,7 +108,7 @@
             {{proposal.modified.strftime("%d/%m")}}
         {%- endcall %}
         {% call cell("state", True) -%}
-            {{proposal.state | capitalize}}
+            {{proposal_state(proposal)}}
         {%- endcall %}
         {% call cell("type", True) -%}
             {{proposal.human_type | capitalize}}
@@ -122,7 +123,7 @@
             <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id ) }}">{{ proposal.user.name }}</a>
         {%- endcall %}
         {% call cell("title") -%}
-            <a href="{{ url_for('.update_proposal', proposal_id=proposal.id, **full_qs) }}">{{ proposal.title }}</a>
+            <a href="{{ url_for('.proposal', proposal_id=proposal.id, **full_qs) }}">{{ proposal.title }}</a>
         {%- endcall %}
         {% call cell("notes") -%}
             {{proposal.private_notes or ''}}

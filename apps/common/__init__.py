@@ -193,6 +193,12 @@ def load_utility_functions(app_obj):
 
         return {"mailing_list": mailing_list}
 
+    @app_obj.template_filter("yesno")
+    def yesno(value):
+        if value:
+            return "Yes"
+        return "No"
+
     @app_obj.template_filter("ticket_state_label")
     def ticket_state_label(ticket: Ticket) -> Markup:
         # see docs/ticket_states.md

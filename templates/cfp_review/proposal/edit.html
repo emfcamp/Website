@@ -1,17 +1,7 @@
 {% from "_formhelpers.html" import render_field, render_dl_field, render_radio_field %}
-{% set active = "details" %}
+{% set active = "edit" %}
 {% extends "cfp_review/proposal/base.html" %}
 {% block proposal_body %}
-{% if proposal.state == 'new' %}
-<div class="alert alert-primary">
-    <p>You have the ability to mark this proposal as checked, which will send it to anonymisation. Please do so, but only if:</p>
-    <ul>
-        <li>You have knowledge of the list of banned speakers and can confirm the submitter is not banned from speaking.</li>
-        <li>The description is not obviously incomplete.</li>
-        <li>The description is superficially valid for the category it is submitted in.</li>
-    </ul>
-</div>
-{% endif %}
 
 {% if proposal.schedule_item %}
 <div class="alert alert-warning">
@@ -24,7 +14,7 @@
 {% endif %}
 <form method="post" action="{{ url_for('.update_proposal', proposal_id=proposal.id) }}" class="shrink">
     {{ form.hidden_tag() }}
-    <div class="col-md-8">
+    <div class="col-md-12">
         <div class="panel-group" id="formAccordion" role="tablist" aria-multiselectable="true">
 
             <div class="panel panel-default">
@@ -38,16 +28,6 @@
                 <div id="basicsPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="basicsPanelHeading">
                     <div class="panel-body">
                         <dl class="dl-horizontal">
-                            <dt>Submitted</dt>
-                            <dd>{{ proposal.created.strftime("%Y-%m-%d %H:%M") }}</dd>
-                            <dt>Email</dt>
-                            <dd>{{ proposal.user.email }}</dd>
-                            <dt>Has ticket</dt>
-                            <dd>{{ proposal.user.check_will_have_ticket() }}</dd>
-                            {% if proposal.anonymiser_id %}
-                            <dt>Anoymised by</dt>
-                            <dd>{{ proposal.anonymiser.name }}</dd>
-                            {% endif %}
                             {{ render_dl_field(form.state) }}
                             {{ render_dl_field(form.title) }}
                             {{ render_dl_field(form.description, rows=8) }}
@@ -60,12 +40,12 @@
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="requirementsPanelHeading">
                     <h4 class="panel-title">
-                        <a role="button" data-toggle="collapse" href="#requirementsPanel" aria-expanded="false" aria-controls="requirementsPanel">
+                        <a role="button" data-toggle="collapse" href="#requirementsPanel" aria-expanded="true" aria-controls="requirementsPanel">
                             Requirements
                         </a>
                     </h4>
                 </div>
-                <div id="requirementsPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="requirementsPanelHeading">
+                <div id="requirementsPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="requirementsPanelHeading">
                     <div class="panel-body">
                         <dl class="dl-horizontal">
                             {{ render_dl_field(form.needs_help) }}
@@ -87,12 +67,12 @@
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="attributesPanelHeading">
                     <h4 class="panel-title">
-                        <a role="button" data-toggle="collapse" href="#attributesPanel" aria-expanded="false" aria-controls="attributesPanel">
+                        <a role="button" data-toggle="collapse" href="#attributesPanel" aria-expanded="true" aria-controls="attributesPanel">
                             Type-specific attributes
                         </a>
                     </h4>
                 </div>
-                <div id="attributesPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="attributesPanelHeading">
+                <div id="attributesPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="attributesPanelHeading">
                     <div class="panel-body">
                         <dl class="dl-horizontal">
                             {% if proposal.type == 'talk' %}
@@ -124,55 +104,7 @@
                 </div>
             </div>
 
-            <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="tagsPanelHeading">
-                    <h4 class="panel-title">
-                        <a role="button" data-toggle="collapse" href="#tagsPanel" aria-expanded="false" aria-controls="tagsPanel">
-                            Tags{% if proposal.tags %} ({{ proposal.tags | join(", ") }}){% endif %}
-                        </a>
-                    </h4>
-                </div>
-                <div id="tagsPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="tagsPanelHeading">
-                    <div class="panel-body">
-                        <dl class="dl-horizontal">
-                            {{ render_field(form.tags, size=(form.tags.choices| count)) }}
-                        </dl>
-                    </div>
-                </div>
-            </div>
-        </div>
         {{ form.update(class_="btn btn-primary debounce") }}
-    </div>
-    <div class="col-md-4 col-xs-12" role="group">
-        <h4>Proposal actions</h4>
-        <div class="btn-group-vertical" role="group">
-            {% if proposal.state == 'new' %}
-                {{ form.checked(class_="btn btn-success debounce") }}
-            {% endif %}
-            {{ form.accept(class_="btn btn-danger debounce") }}
-            {{ form.reject_with_message(class_="btn btn-danger debounce") }}
-            {{ form.reject(class_="btn btn-danger debounce") }}
-            <a href="{{ url_for('.convert_proposal', proposal_id=proposal.id) }}"
-                    class="btn btn-warning">
-                Convert proposal
-            </a>
-            <a href="{{ url_for('.proposal_change_owner', proposal_id=proposal.id) }}"
-                    class="btn btn-warning">
-                Change proposal owner
-            </a>
-
-            {% if next_id %}
-                <a href="{{ url_for('.update_proposal', proposal_id=next_id, **full_qs) }}"
-                    class="btn btn-default">
-                    Next proposal
-                </a>
-            {% else %}
-                <a href="{{ url_for('.proposals', **full_qs) }}"
-                    class="btn btn-default">
-                    All proposals
-                </a>
-            {% endif %}
-        </div>
     </div>
 </form>
 {% endblock %}

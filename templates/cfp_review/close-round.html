@@ -41,7 +41,7 @@
                     {% endif %}
                     <td>{{ prop.type }}</td>
                     <td>{{ prop.state }}</td>
-                    <td><a href="{{ url_for('.update_proposal', proposal_id=prop.id) }}">{{prop.title}}</a></td>
+                    <td><a href="{{ url_for('.proposal', proposal_id=prop.id) }}">{{prop.title}}</a></td>
                 </tr>
                 {% endfor %}
             {% endfor %}
@@ -65,7 +65,7 @@
         <td>{{prop.human_type | capitalize}}</td>
         <td>{{ vote_count }}</td>
         <td>{{prop.user.name}}</td>
-        <td><a href="{{ url_for('.update_proposal', proposal_id=prop.id) }}">{{prop.title}}</a></td>
+        <td><a href="{{ url_for('.proposal', proposal_id=prop.id) }}">{{prop.title}}</a></td>
     </tr>
 {% else %}
     <tr><td colspan="5" class="text-center">No proposals found</td></tr>

@@ -1,17 +1,17 @@
 <ul class="nav nav-tabs">
-    <li role="presentation" {% if active == 'details' %} class="active" {% endif %}>
+    <li role="presentation" {% if active == 'main' %} class="active" {% endif %}>
+        <a href="{{ url_for('.proposal', proposal_id=proposal.id, **full_qs) }}">
+            Main
+        </a>
+    </li>
+    <li role="presentation" {% if active == 'edit' %} class="active" {% endif %}>
         <a href="{{ url_for('.update_proposal', proposal_id=proposal.id, **full_qs) }}">
-            Details
+            Edit
         </a>
     </li>
     <li role="presentation" {% if active == 'messages' %} class="active" {% endif %}>
         <a href="{{ url_for('.message_proposer', proposal_id=proposal.id, **full_qs) }}">
             Messages ({{ proposal.get_unread_count(current_user) }}/{{ proposal.messages | length }})
-        </a>
-    </li>
-    <li role="presentation" {% if active == 'notes' %} class="active" {% endif %}>
-        <a href="{{ url_for('.proposal_notes', proposal_id=proposal.id, **full_qs) }}">
-            Notes {% if proposal.private_notes %}(✔){% else %}(0){% endif %}
         </a>
     </li>
     <li role="presentation" {% if active == 'votes' %} class="active" {% endif %}>
@@ -21,7 +21,7 @@
     </li>
     <li role="presentation" {% if active == 'versions-proposal' %} class="active" {% endif %}>
         <a href="{{ url_for('.entity_latest_version', entity_type='proposal', entity_id=proposal.id, **full_qs) }}">
-            Versions ({{proposal.versions.count()}})
+            History ({{proposal.versions.count()}})
         </a>
     </li>
 </ul>

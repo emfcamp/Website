@@ -69,26 +69,25 @@ ProposalState = Literal[
     "conduct-blocked",
 ]
 
+# Proposal state changes allowed *in normal operation*. This controls which actions
+# admins are allowed to take, but can be overridden.
 PROPOSAL_STATE_TRANSITIONS: dict[ProposalState, set[ProposalState]] = {
-    "new": {"accepted", "rejected", "withdrawn", "checked", "manual-review", "conduct-blocked"},
-    "edit": {"accepted", "rejected", "withdrawn", "new", "conduct-blocked"},
-    "checked": {"accepted", "rejected", "withdrawn", "anonymised", "anon-blocked", "edit", "conduct-blocked"},
-    "rejected": {"accepted", "rejected", "withdrawn", "edit"},
+    "new": {"rejected", "withdrawn", "checked", "conduct-blocked"},
+    "edit": {"manual-review", "checked", "withdrawn", "new"},
+    "checked": {"manual-review", "withdrawn", "anonymised", "anon-blocked", "edit"},
+    "rejected": {"accepted", "withdrawn", "edit"},
     "anonymised": {
-        "accepted",
-        "rejected",
         "withdrawn",
         "manual-review",
         "reviewed",
         "edit",
-        "conduct-blocked",
     },
-    "anon-blocked": {"accepted", "rejected", "withdrawn", "reviewed", "edit", "conduct-blocked"},
-    "manual-review": {"accepted", "rejected", "withdrawn", "new", "edit", "conduct-blocked"},
-    "reviewed": {"accepted", "rejected", "withdrawn", "edit", "anonymised", "conduct-blocked"},
-    "accepted": {"accepted", "rejected", "withdrawn", "edit", "finalised", "conduct-blocked"},
-    "finalised": {"accepted", "rejected", "withdrawn", "conduct-blocked"},
-    "withdrawn": {"accepted", "rejected", "withdrawn", "edit"},
+    "anon-blocked": {"manual-review", "checked", "withdrawn", "reviewed", "edit"},
+    "manual-review": {"accepted", "rejected", "withdrawn", "new"},
+    "reviewed": {"manual-review", "withdrawn", "anonymised"},
+    "accepted": {"rejected", "withdrawn", "finalised"},
+    "finalised": {"rejected", "withdrawn"},
+    "withdrawn": {"edit"},
 }
 
 
@@ -365,10 +364,6 @@ class Proposal(BaseModel):
         return data
 
 
-## Disabled while we work out a better approach for this.
-# validate_state_transitions(Proposal.state, PROPOSAL_STATE_TRANSITIONS)
-
-
 @dataclass
 class ProposalInfo:
     type: ProposalType
@@ -554,6 +549,7 @@ from .schedule import Occurrence, ScheduleItem
 
 __all__ = [
     "PROPOSAL_INFOS",
+    "PROPOSAL_STATE_TRANSITIONS",
     "Proposal",
     "ProposalInfo",
     "ProposalMessage",

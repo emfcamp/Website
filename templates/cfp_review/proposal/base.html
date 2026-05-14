@@ -1,8 +1,8 @@
 {% extends "cfp_review/base.html" %}
-{% block title %}{{ proposal.title }}{% endblock %}
+{% block title %}Proposal "{{ proposal.title }}"{% endblock %}
 {% block body %}
     <div class="col-md-12">
-        <h2>{{ proposal.title }}<br>
+        <h2>Proposal: {{ proposal.title }}<br>
             <small>
                 {{ proposal.human_type_a | capitalize }} by
                 <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id) }}">{{ proposal.user.name }}</small></a>
@@ -10,4 +10,37 @@
     </div>
     {% include "cfp_review/proposal/_tabs.html" %}
     {% block proposal_body %}{% endblock %}
+    <div class="actions-bar" role="group">
+        <form action="{{url_for('.update_proposal_state', proposal_id=proposal.id)}}" method="POST">
+            <div class="btn-group" role="group">
+                {% for field in state_form %}
+                    {{field()}}
+                {% endfor %}
+            </div>
+            {% if proposal.state not in ['new', 'rejected'] %}
+            <div class="btn-group" role="group">
+                <a href="{{ url_for('.convert_proposal', proposal_id=proposal.id) }}"
+                        class="btn btn-warning">
+                    Convert proposal
+                </a>
+                <a href="{{ url_for('.proposal_change_owner', proposal_id=proposal.id) }}"
+                        class="btn btn-warning">
+                    Change proposal owner
+                </a>
+            </div>
+            {% endif %}
+            <div class="btn-group pull-right" role="group">
+                <a href="{{ url_for('.proposals', **full_qs) }}"
+                    class="btn btn-default">
+                        Back to list
+                </a>
+                {% if next_id %}
+                    <a href="{{ url_for('.proposal', proposal_id=next_id, **full_qs) }}"
+                        class="btn btn-default">
+                        Next proposal
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
 {% endblock %}

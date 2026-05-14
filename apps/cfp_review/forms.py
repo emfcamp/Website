@@ -1,3 +1,4 @@
+from itertools import chain
 from typing import get_args
 
 from dateutil.parser import parse as parse_date
@@ -20,13 +21,14 @@ from wtforms.validators import DataRequired, NumberRange, Optional, ValidationEr
 from main import db
 from models.content import (
     PROPOSAL_INFOS,
+    PROPOSAL_STATE_TRANSITIONS,
     OccurrenceState,
     ProposalType,
     ScheduleItemState,
     ScheduleItemType,
-    Tag,
     Venue,
 )
+from models.content.cfp import Proposal, ProposalState
 from models.user import User
 
 from ..admin.users import NewUserForm
@@ -80,16 +82,9 @@ class UpdateProposalForm(Form):
 
     # private_notes is managed by PrivateNotesForm
 
-    tags = SelectMultipleField("Tags (hold ctrl to select multiple)")
-
     user_will_have_ticket = BooleanField("Will have a ticket")
 
-    update = SubmitField("Update")
-    reject = SubmitField("Reject without telling user")
-
-    checked = SubmitField("Mark as checked")
-    accept = SubmitField("Accept and send email")
-    reject_with_message = SubmitField("Reject and send email")
+    update = SubmitField("Save changes")
 
     def validate_allowed_times(self, field):
         try:
@@ -101,11 +96,59 @@ class UpdateProposalForm(Form):
         except ValueError as e:
             raise ValidationError("Unparsable Allowed Times. Fmt: datetime > datetime per line") from e
 
-    def validate_tags(self, field):
-        existing_tags = {tag.tag for tag in db.session.query(Tag).all()}
-        for t in field.data:
-            if t not in existing_tags:
-                raise ValidationError(f"Tag '{t}' does not exist.")
+
+# Mapping of which form fields are allowed for a specific target state
+STATE_FIELDS: dict[ProposalState, set[str]] = {
+    "accepted": {"accept"},
+    "rejected": {"reject", "reject_with_message"},
+    "checked": {"checked"},
+    "conduct-blocked": {"conduct_issues"},
+    "manual-review": {"manual_review"},
+    "edit": {"edit"},
+}
+
+
+class ProposalStateForm(Form):
+    """Form displayed to admins which only shows the appropriate actions for a proposal in this state."""
+
+    checked = SubmitField("Mark as checked", render_kw={"class": "btn btn-primary"})
+    conduct_issues = SubmitField("Has conduct issues", render_kw={"class": "btn btn-primary"})
+
+    manual_review = SubmitField("Send to manual review", render_kw={"class": "btn btn-primary"})
+
+    edit = SubmitField("Make editable by user", render_kw={"class": "btn btn-primary"})
+
+    accept = SubmitField("Accept and send email", render_kw={"class": "btn btn-primary"})
+    reject = SubmitField("Reject without telling user", render_kw={"class": "btn btn-danger"})
+    reject_with_message = SubmitField("Reject and send email", render_kw={"class": "btn btn-danger"})
+
+    _allowed_fields: set[str]
+
+    def __init__(self, proposal: Proposal) -> None:
+        super().__init__()
+        allowed_states = PROPOSAL_STATE_TRANSITIONS.get(proposal.state, set())
+
+        self._allowed_fields = set(
+            chain.from_iterable(STATE_FIELDS.get(state, {}) for state in allowed_states)
+        )
+        for field in list(self):
+            if field.name not in self._allowed_fields:
+                delattr(self, field.name)
+
+        if "checked" in allowed_states and proposal.state != "new":
+            if proposal.type_info.review_type == "anonymous":
+                self.checked.label.text = "Send to anonymisation"
+            else:
+                # We already have the "send to manual review" button which will do the same thing as "checked"
+                del self.checked
+
+    def result(self) -> ProposalState:
+        for field in self._allowed_fields:
+            if getattr(self, field).data:
+                for k, v in STATE_FIELDS.items():
+                    if field in v:
+                        return k
+        raise ValueError("No result for ProposalStateForm")
 
 
 class ConvertProposalForm(Form):
@@ -334,6 +377,9 @@ class SendMessageForm(Form):
 class PrivateNotesForm(Form):
     private_notes = TextAreaField("Private notes")
     update = SubmitField("Update notes")
+
+    def __init__(self, proposal: Proposal) -> None:
+        super().__init__(data={"private_notes": proposal.private_notes})
 
 
 class ChangeProposalOwner(Form):

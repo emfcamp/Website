@@ -11,7 +11,7 @@
     {{ render_field(form.user_name, tabindex=2) }}
     <div class="pull-right">
         {{ form.submit(class_='btn btn-success debounce', tabindex=3) }}
-        <a class="btn btn-default" href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}">Cancel</a>
+        <a class="btn btn-default" href="{{ url_for('.proposal', proposal_id=proposal.id) }}">Cancel</a>
     </div>
 </form>
 

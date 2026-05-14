@@ -44,7 +44,7 @@
         <tr>
             <td>{{ proposal.session }}</td>
             <td><a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id ) }}">{{ proposal.user.name }}</a></td>
-            <td><a href="{{ url_for('.update_proposal', proposal_id=proposal.id, **full_qs) }}">{{ proposal.title }}</a></td>
+            <td><a href="{{ url_for('.proposal', proposal_id=proposal.id, **full_qs) }}">{{ proposal.title }}</a></td>
             <td><a href="{{ proposal.slide_link }}">{{ proposal.slide_link }}</a></td>
         </tr>
     {% else %}

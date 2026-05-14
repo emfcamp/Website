@@ -1,0 +1,142 @@
+{% from "_formhelpers.html" import render_field %}
+{% from "cfp_review/_components.html" import proposal_state %}
+{% set active = "main" %}
+{% extends "cfp_review/proposal/base.html" %}
+{% block proposal_body %}
+<div class="col-md-12">
+{% if proposal.state == 'new' %}
+<div class="alert alert-warning">
+    <p>You have the ability to mark this proposal as checked, which will send it to anonymisation. Please do so, but only if:</p>
+    <ul>
+        <li>You have knowledge of the list of banned speakers and can confirm the submitter is not banned from speaking.</li>
+        <li>The description is not obviously incomplete.</li>
+        <li>The description is superficially valid for the category it is submitted in.</li>
+    </ul>
+</div>
+{% endif %}
+{% if proposal.schedule_item %}
+<div class="alert alert-warning">
+    <p>This proposal has an associated schedule item.</p>
+    <p><a class="btn btn-success" href="{{ url_for("cfp_review.update_schedule_item", schedule_item_id=proposal.schedule_item.id) }}">View schedule item</a></p>
+    {% if not proposal.is_editable %}
+    <p>The proposer will only be able to edit schedule item fields, they will not be able to edit their proposal.</p>
+    {% endif %}
+</div>
+{% endif %}
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Description
+            </div>
+            <div class="panel-body">
+                <p style="font-size: 1.1em">{{proposal.description}}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Details
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed">
+                    <tr><th>State</th><td>{{proposal_state(proposal)}}</td></tr>
+                    <tr><th>Submitted</th><td>{{ proposal.created.strftime("%Y-%m-%d %H:%M") }}</td></tr>
+                    <tr><th>Submitter</th><td><a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id) }}">{{proposal.user.name}}</a></td></tr>
+                    <tr><th>Email</th><td>{{proposal.user.email}}</td></tr>
+                    <tr><th>Has ticket?</th><td>{{ proposal.user.check_will_have_ticket()|yesno }}</td></tr>
+                    {% if proposal.anonymiser_id %}
+                    <tr><th>Anoymised by</th><td>{{ proposal.anonymiser.name }}</td></tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Requirements
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed">
+                    {% if proposal.duration %}
+                    <tr><th>Duration</th><td>{{proposal.duration}}</td></tr>
+                    {% endif %}
+                    <tr><th>Needs help</th><td>{{proposal.needs_help|yesno}}</td></tr>
+                    {% if proposal.equipment_required %}
+                    <tr><th>Equipment</th><td>{{ proposal.equipment_required or '' }}</td></tr>
+                    {% endif %}
+                    {% if proposal.funding_required %}
+                    <tr><th>Funding</th><td>{{proposal.funding_required or ''}}</td></tr>
+                    {% endif %}
+                    {% if proposal.notice_required %}
+                    <tr><th>Notice</th><td>{{proposal.notice_required or ''}}</td></tr>
+                    {% endif %}
+                    {% if proposal.additional_info %}
+                    <tr><th>Additional info</th><td>{{proposal.additional_info or ''}}</td></tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Tags
+            </div>
+            <div class="panel-body">
+            <form method="POST" action="{{url_for('.proposal_tags', proposal_id=proposal.id)}}">
+                <ul>
+                    {% for tag in proposal._tags %}
+                        <li>{{tag.tag}} <button class="btn btn-tiny" name="delete" value="{{tag.id}}">x</button></li>
+                    {% endfor %}
+                </ul>
+                <select name="id">
+                    {% for tag in all_tags %}
+                    <option value="{{tag.id}}">{{tag.tag}}</option>
+                    {% endfor %}
+                </select>
+                <button name="add" value="true">+</button>
+            </form>
+            </div>
+        </div>
+    </div>
+    {% if proposal.attributes|length > 0 %}
+    <div class="col-md-8">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Attributes
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed">
+                    {% for (name, value) in proposal.attributes %}
+                        <tr><th>{{name}}</th><td>{{value}}</td></tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Private notes
+            </div>
+            <div class="panel-body">
+                <form method="post" action="{{ url_for('.proposal_notes', proposal_id=proposal.id) }}">
+                    {{ notes_form.hidden_tag() }}
+                    <div style="width: 100%">
+                    {{ notes_form.private_notes(style="width:100%; height: 8em") }}
+                    </div>
+                    <div class="pull-right">
+                        {{ notes_form.update(class_='btn btn-default debounce') }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

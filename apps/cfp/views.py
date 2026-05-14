@@ -321,9 +321,7 @@ def create_proposal(proposal_type: ProposalType = "talk") -> ResponseReturnValue
 
         if channel := app.config.get("MATTERMOST_CFP_CHANNEL"):
             msg = f"New {proposal.human_type} submission by {proposal.user.name}:\n"
-            msg += (
-                f"[{proposal.title}]({external_url('cfp_review.update_proposal', proposal_id=proposal.id)})"
-            )
+            msg += f"[{proposal.title}]({external_url('cfp_review.proposal', proposal_id=proposal.id)})"
             if form.needs_help.data:
                 msg += "\nCalls for aid (they've clicked 'needs help') 🚨"
             mattermost_notify(channel, msg)

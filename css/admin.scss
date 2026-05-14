@@ -35,7 +35,7 @@ header h1 > * {
   font-size: 12pt;
 }
 .message-table .col-sm-2 {
-  vertical-align: middle;
+  vertical-align: mide;
 }
 .multiline {
   white-space: pre-wrap;
@@ -68,4 +68,62 @@ tr.even {
 
 tr.odd {
   background-color: #fafafa;
+}
+
+.actions-bar {
+  position: fixed;
+  background: #eee;
+  border-top: 1px solid #999;
+  bottom: 0;
+  left: 0;
+  padding: 1em;
+  width: 100%;
+}
+
+:has(.actions-bar) {
+  padding-bottom: 3em;
+}
+
+.btn-tiny {
+  height: 1.5em;
+  width: 1.5em;
+  font-size: 10px;
+  padding: 0;
+}
+
+.proposal-state {
+  color: #000;
+  display: inline-block;
+  border: 1px #ddd solid;
+  background-color: #eee;
+  padding: 0 0.3em;
+  border-radius: 5px;
+}
+
+.proposal-state-new {
+  background-color: #fff;
+}
+
+.proposal-state-accepted {
+  background-color: #bdffb5;
+}
+
+.proposal-state-finalised {
+  background-color: #b1fde1;
+}
+
+.proposal-state-anonymised {
+  background-color: #fbe1f4;
+}
+
+.proposal-state-checked {
+  background-color: #e0ebfb;
+}
+
+.proposal-state-manual-review {
+  background-color: #f7eda1;
+}
+
+.proposal-state-rejected {
+  background-color: #fbe3e7;
 }

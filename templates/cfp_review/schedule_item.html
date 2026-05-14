@@ -47,7 +47,7 @@
                             <dd><a href="{{ url_for(".cfp_user", user_id=schedule_item.user.id) }}">{{ schedule_item.user.name }}</a></dd>
                             {% if schedule_item.proposal %}
                             <dt>Source proposal</dt>
-                            <dd><a href="{{ url_for(".update_proposal", proposal_id=schedule_item.proposal.id) }}">{{ schedule_item.proposal.title }}</a></dd>
+                            <dd><a href="{{ url_for(".proposal", proposal_id=schedule_item.proposal.id) }}">{{ schedule_item.proposal.title }}</a></dd>
                             {% endif %}
                             <dt>Num favourites</dt>
                             <dd>{{ schedule_item.favourite_count }}</dd>

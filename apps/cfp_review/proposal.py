@@ -1,6 +1,6 @@
 """Admin views for viewing and editing proposals"""
 
-from typing import get_args
+from typing import Any, get_args
 
 from flask import (
     current_app as app,
@@ -19,7 +19,13 @@ from sqlalchemy import select
 from wtforms import FormField
 
 from main import db, external_url, get_or_404
-from models.content import Proposal, ProposalMessage, ProposalType, ScheduleItem, Tag
+from models.content import (
+    Proposal,
+    ProposalMessage,
+    ProposalType,
+    ScheduleItem,
+    Tag,
+)
 from models.content.attributes import convert_attributes_between_types
 from models.user import User
 
@@ -32,6 +38,7 @@ from .forms import (
     ChangeProposalOwner,
     ConvertProposalForm,
     PrivateNotesForm,
+    ProposalStateForm,
     SendMessageForm,
     UpdateProposalForm,
     UpdateVotesForm,
@@ -66,26 +73,44 @@ def get_update_proposal_type_form(proposal_type: ProposalType) -> type[UpdatePro
     return UpdateProposalFormWithAttributes
 
 
-@cfp_review.route("/proposals/<int:proposal_id>", methods=["GET", "POST"])
+def render_proposal_template(path: str, proposal: Proposal, **args: Any) -> str:
+    return render_template(
+        path,
+        proposal=proposal,
+        state_form=ProposalStateForm(proposal),
+        next_id=find_next_proposal_id(proposal),
+        **args,
+    )
+
+
+def flash_commit_and_go(msg: str, next_page: str, proposal_id: int | None = None) -> ResponseReturnValue:
+    flash(msg)
+    app.logger.info(msg)
+    db.session.commit()
+
+    return redirect(url_for(next_page, proposal_id=proposal_id))
+
+
+@cfp_review.route("/proposals/<int:proposal_id>")
+@admin_required
+def proposal(proposal_id: int) -> ResponseReturnValue:
+    proposal = get_or_404(db, Proposal, proposal_id)
+    return render_proposal_template(
+        "cfp_review/proposal/main.html",
+        proposal,
+        notes_form=PrivateNotesForm(proposal),
+        all_tags=db.session.scalars(select(Tag).order_by(Tag.tag)),
+    )
+
+
+@cfp_review.route("/proposals/<int:proposal_id>/edit", methods=["GET", "POST"])
 @admin_required
 def update_proposal(proposal_id: int) -> ResponseReturnValue:
-    def flash_commit_and_go(msg: str, next_page: str, proposal_id: int | None = None) -> ResponseReturnValue:
-        flash(msg)
-        app.logger.info(msg)
-        db.session.commit()
-
-        return redirect(url_for(next_page, proposal_id=proposal_id))
-
     proposal = get_or_404(db, Proposal, proposal_id)
-    next_id = find_next_proposal_id(proposal)
 
     Form = get_update_proposal_type_form(proposal.type)
     form = Form(obj=proposal)
     form.user_will_have_ticket.data = proposal.user.will_have_ticket
-
-    # TODO: this could move to UpdateProposalForm.__init__
-    tags = db.session.scalars(select(Tag).order_by(Tag.tag))
-    form.tags.choices = [(t.tag, t.tag) for t in tags]
 
     if form.validate_on_submit():
         form.populate_obj(proposal)
@@ -94,43 +119,75 @@ def update_proposal(proposal_id: int) -> ResponseReturnValue:
         if form.update.data:
             msg = f"Updating proposal {proposal_id}"
             proposal.state = form.state.data
+            return flash_commit_and_go(msg, ".proposal", proposal_id=proposal_id)
 
-        elif form.reject.data or form.reject_with_message.data:
-            msg = f"Rejecting proposal {proposal_id}"
-            proposal.state = "rejected"
-
-            if form.reject_with_message.data:
-                proposal.rejected_email_sent = True
-                send_email_for_proposal(proposal, reason="rejected")
-
-        elif form.accept.data:
-            msg = f"Manually accepting proposal {proposal_id}"
-            proposal.accept_proposal()
-
-            send_email_for_proposal(proposal, reason="accepted")
-
-        elif form.checked.data:
-            if proposal.type_info.review_type == "manual":
-                msg = f"Sending proposal {proposal_id} for manual review"
-                proposal.state = "manual-review"
-            elif proposal.type_info.review_type == "anonymous":
-                msg = f"Sending proposal {proposal_id} for anonymisation"
-                proposal.state = "checked"
-            else:
-                msg = f"Not changing state for automatically accepted proposal {proposal_id}"
-
-            if not next_id:
-                return flash_commit_and_go(msg, ".proposals")
-            return flash_commit_and_go(msg, ".update_proposal", proposal_id=next_id)
-
-        return flash_commit_and_go(msg, ".update_proposal", proposal_id=proposal_id)
-
-    return render_template(
+    return render_proposal_template(
         "cfp_review/proposal/edit.html",
-        proposal=proposal,
+        proposal,
         form=form,
-        next_id=next_id,
     )
+
+
+@cfp_review.route("/proposals/<int:proposal_id>/tags", methods=["POST"])
+@admin_required
+def proposal_tags(proposal_id: int) -> ResponseReturnValue:
+    proposal = get_or_404(db, Proposal, proposal_id)
+
+    if id := request.form.get("delete"):
+        tag = db.session.scalars(select(Tag).filter_by(id=id)).one()
+        proposal.tags = list(set(proposal.tags) - {tag.tag})
+        db.session.commit()
+
+    if request.form.get("add"):
+        id = request.form.get("id")
+        tag = db.session.scalars(select(Tag).filter_by(id=id)).one()
+        proposal.tags = proposal.tags + [tag.tag]
+        db.session.commit()
+
+    return redirect(url_for(".proposal", proposal_id=proposal_id))
+
+
+@cfp_review.route("/proposals/<int:proposal_id>/state", methods=["POST"])
+@admin_required
+def update_proposal_state(proposal_id: int) -> ResponseReturnValue:
+    """Handle admin changes to the proposal state through the actions form."""
+    proposal = get_or_404(db, Proposal, proposal_id)
+    form = ProposalStateForm(proposal)
+
+    if not form.validate_on_submit():
+        return redirect(url_for(".proposal", proposal_id=proposal_id))
+
+    # This depends on the current proposal state
+    next_id = find_next_proposal_id(proposal)
+
+    goto_next = False  # Whether to try and send the user to the next proposal
+    new_state = form.result()
+
+    if new_state == "rejected" and form.reject_with_message.data:
+        proposal.rejected_email_sent = True
+        send_email_for_proposal(proposal, reason="rejected")
+    elif new_state == "accepted":
+        proposal.accept_proposal()
+        send_email_for_proposal(proposal, reason="accepted")
+    elif new_state == "checked":
+        goto_next = True
+        if proposal.type_info.review_type == "manual":
+            new_state = "manual-review"
+        elif proposal.type_info.review_type != "anonymous":
+            # TODO: work out whether this will ever happen, and stop it
+            raise ValueError("Invalid attempt to mark proposal as checked")
+
+    msg = f"Admin state change for proposal {proposal_id}: {proposal.state} -> {new_state}"
+
+    proposal.state = new_state
+    db.session.commit()
+
+    if goto_next:
+        if next_id:
+            return flash_commit_and_go(msg, ".proposal", proposal_id=next_id)
+        return flash_commit_and_go(msg, ".proposals")
+
+    return flash_commit_and_go(msg, ".proposal", proposal_id=proposal_id)
 
 
 @cfp_review.route("/proposals/<int:proposal_id>/create-schedule-item", methods=["POST"])
@@ -143,7 +200,7 @@ def create_schedule_item_from_proposal(proposal_id: int) -> ResponseReturnValue:
     proposal = get_or_404(db, Proposal, proposal_id)
     if proposal.schedule_item:
         flash("Proposal already has a schedule item")
-        return redirect(url_for(".update_proposal", proposal_id=proposal.id))
+        return redirect(url_for(".proposal", proposal_id=proposal.id))
 
     schedule_item = proposal.create_schedule_item()
     db.session.add(schedule_item)
@@ -193,13 +250,13 @@ def message_proposer(proposal_id):
         return redirect(url_for(".message_proposer", proposal_id=proposal_id))
 
     # Admin can see all messages sent in relation to a proposal
-    messages = ProposalMessage.query.filter_by(proposal_id=proposal_id).order_by("created").all()
+    messages = db.session.query(ProposalMessage).filter_by(proposal_id=proposal_id).order_by("created").all()
 
-    return render_template(
+    return render_proposal_template(
         "cfp_review/proposal/messages.html",
+        proposal,
         form=form,
         messages=messages,
-        proposal=proposal,
     )
 
 
@@ -261,14 +318,14 @@ def proposal_votes(proposal_id):
         form.votes_to_resolve.append_entry()
         form.votes_to_resolve[-1]["id"].data = v_id
 
-    return render_template("cfp_review/proposal/votes.html", proposal=proposal, form=form, votes=all_votes)
+    return render_proposal_template("cfp_review/proposal/votes.html", proposal, form=form, votes=all_votes)
 
 
-@cfp_review.route("/proposals/<int:proposal_id>/notes", methods=["GET", "POST"])
+@cfp_review.route("/proposals/<int:proposal_id>/notes", methods=["POST"])
 @admin_required
 def proposal_notes(proposal_id):
-    form = PrivateNotesForm()
     proposal = get_or_404(db, Proposal, proposal_id)
+    form = PrivateNotesForm(proposal)
 
     if form.validate_on_submit():
         if form.update.data:
@@ -278,16 +335,7 @@ def proposal_notes(proposal_id):
 
             flash("Updated notes")
 
-        return redirect(url_for(".proposal_notes", proposal_id=proposal_id))
-
-    if proposal.private_notes:
-        form.private_notes.data = proposal.private_notes
-
-    return render_template(
-        "cfp_review/proposal/notes.html",
-        form=form,
-        proposal=proposal,
-    )
+    return redirect(url_for(".proposal", proposal_id=proposal_id))
 
 
 @cfp_review.route("/proposals/<int:proposal_id>/change-owner", methods=["GET", "POST"])
@@ -316,13 +364,9 @@ def proposal_change_owner(proposal_id: int) -> ResponseReturnValue:
         app.logger.info(msg)
         flash(msg)
 
-        return redirect(url_for(".update_proposal", proposal_id=proposal_id))
+        return redirect(url_for(".proposal", proposal_id=proposal_id))
 
-    return render_template(
-        "cfp_review/proposal/change_owner.html",
-        form=form,
-        proposal=proposal,
-    )
+    return render_proposal_template("cfp_review/proposal/change_owner.html", proposal, form=form)
 
 
 @cfp_review.route("/proposals/<int:proposal_id>/convert", methods=["GET", "POST"])
@@ -354,6 +398,6 @@ def convert_proposal(proposal_id: int) -> ResponseReturnValue:
 
         db.session.commit()
 
-        return redirect(url_for(".update_proposal", proposal_id=proposal.id))
+        return redirect(url_for(".proposal", proposal_id=proposal.id))
 
-    return render_template("cfp_review/proposal/convert.html", proposal=proposal, form=form)
+    return render_proposal_template("cfp_review/proposal/convert.html", proposal, form=form)

@@ -129,6 +129,12 @@ def attributes_proxy(attributes_cls: type[Attributes], store: dict[str, Any]) ->
                 # MutableDict counts this as a mutation
                 pass
 
+        def __iter__(self):
+            return iter(self._store.items())
+
+        def __len__(self):
+            return len(self._store)
+
         def __repr__(self) -> str:
             return f"<{self.__class__.__name__} {self._store!r}>"
 
