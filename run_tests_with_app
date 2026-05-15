@@ -1,0 +1,182 @@
+#!/usr/bin/env bash
+# Run E2E tests and optionally launch a test app to browse results
+#
+# Usage:
+#   ./run_tests_with_app [TEST_ARGS]           # Run tests, then start test app
+#   ./run_tests_with_app --no-app [TEST_ARGS]  # Run tests only, no app
+#   ./run_tests_with_app --app-only            # Start test app without running tests
+#   ./run_tests_with_app --stop                # Stop the test app
+#   ./run_tests_with_app --cleanup             # Clean up test database
+#
+# The test app runs on http://localhost:2343 pointing to the test database.
+# Press Ctrl+C to stop the test app when done browsing.
+
+set -e
+
+COMPOSE_FILES="-f docker-compose.yml -f docker-compose.test.yml"
+TEST_SETTINGS="./config/test.cfg"
+
+function usage() {
+    echo "Usage: $0 [OPTIONS] [TEST_ARGS]"
+    echo ""
+    echo "Run E2E tests and optionally launch a test app to browse results."
+    echo ""
+    echo "Options:"
+    echo "  --no-app      Run tests only, don't start the test app"
+    echo "  --app-only    Start test app without running tests (use existing test data)"
+    echo "  --stop        Stop the test app"
+    echo "  --cleanup     Clean up test database (drop all tables)"
+    echo "  -h, --help    Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  $0                                    # Run all tests, then start app"
+    echo "  $0 tests/test_cfp_e2e.py -v          # Run specific tests, then start app"
+    echo "  $0 --no-app tests/test_cfp_e2e.py    # Run tests only"
+    echo "  $0 --app-only                         # Just start the test app"
+    echo "  $0 --stop                             # Stop the test app"
+    echo "  $0 --cleanup                          # Clean up test database"
+    echo ""
+    echo "The test app will be available at http://localhost:2343"
+}
+
+function start_test_app() {
+    echo ""
+    echo "=========================================="
+    echo "Starting test app on http://localhost:2343"
+    echo "Press Ctrl+C to stop"
+    echo "=========================================="
+    echo ""
+    docker compose $COMPOSE_FILES up test-app
+}
+
+function stop_test_app() {
+    echo "Stopping test app..."
+    docker compose $COMPOSE_FILES stop test-app
+    docker compose $COMPOSE_FILES rm -f test-app
+    echo "Test app stopped."
+}
+
+function cleanup_test_db() {
+    echo "Cleaning up test database..."
+    docker compose exec --env SETTINGS_FILE="$TEST_SETTINGS" app uv run python -c "
+from main import create_app, db
+app = create_app()
+with app.app_context():
+    db.drop_all()
+    print('Test database cleaned up - all tables dropped.')
+" 2>/dev/null
+    echo "Test database cleanup complete."
+}
+
+function run_tests() {
+    local keep_db=""
+    if [ "$NO_APP" = false ]; then
+        # Keep test data if we're going to start the app afterwards
+        keep_db="--env KEEP_TEST_DB=1"
+    fi
+    echo "Running tests with args: $@"
+    docker compose exec --env SETTINGS_FILE="$TEST_SETTINGS" $keep_db app uv run pytest "$@"
+}
+
+# Parse arguments
+NO_APP=false
+APP_ONLY=false
+STOP=false
+CLEANUP=false
+TEST_ARGS=()
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --no-app)
+            NO_APP=true
+            shift
+            ;;
+        --app-only)
+            APP_ONLY=true
+            shift
+            ;;
+        --stop)
+            STOP=true
+            shift
+            ;;
+        --cleanup)
+            CLEANUP=true
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            TEST_ARGS+=("$1")
+            shift
+            ;;
+    esac
+done
+
+# Handle --stop
+if [ "$STOP" = true ]; then
+    stop_test_app
+    exit 0
+fi
+
+# Handle --cleanup
+if [ "$CLEANUP" = true ]; then
+    cleanup_test_db
+    exit 0
+fi
+
+function enable_schedule_flag() {
+    # Enable SCHEDULE feature flag in test database so schedule is visible
+    echo "Enabling SCHEDULE feature flag in test database..."
+    docker compose exec --env SETTINGS_FILE="$TEST_SETTINGS" app uv run python -c "
+from main import create_app, db
+app = create_app()
+with app.app_context():
+    from models.feature_flag import FeatureFlag
+    for flag_name in ['SCHEDULE', 'LINE_UP', 'CFP']:
+        flag = FeatureFlag.query.filter_by(feature=flag_name).first()
+        if not flag:
+            flag = FeatureFlag(feature=flag_name, enabled=True)
+            db.session.add(flag)
+        else:
+            flag.enabled = True
+    db.session.commit()
+    print('Feature flags enabled: SCHEDULE, LINE_UP, CFP')
+" 2>/dev/null
+}
+
+# Handle --app-only
+if [ "$APP_ONLY" = true ]; then
+    enable_schedule_flag
+    start_test_app
+    exit 0
+fi
+
+# Default test args if none provided
+if [ ${#TEST_ARGS[@]} -eq 0 ]; then
+    TEST_ARGS=("tests/test_cfp_e2e.py" "-v")
+fi
+
+# Run tests
+echo "=========================================="
+echo "Running E2E tests..."
+echo "=========================================="
+run_tests "${TEST_ARGS[@]}"
+TEST_EXIT_CODE=$?
+
+if [ $TEST_EXIT_CODE -ne 0 ]; then
+    echo ""
+    echo "Tests failed with exit code $TEST_EXIT_CODE"
+    if [ "$NO_APP" = false ]; then
+        echo "Starting test app anyway so you can debug..."
+    fi
+fi
+
+# Start app unless --no-app
+if [ "$NO_APP" = false ]; then
+    enable_schedule_flag
+    start_test_app
+fi
+
+exit $TEST_EXIT_CODE
