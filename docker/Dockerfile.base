@@ -19,7 +19,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libxml2-dev libxslt1-dev libffi-dev git glpk-utils \
     postgresql-client make build-essential libpq-dev \
-    libzbar0 coinor-cbc curl && \
+    libzbar0 coinor-cbc curl less && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install uv && \
