@@ -389,6 +389,19 @@ def page_template(metadata, template):
     return "markdown.html"
 
 
+def render_trusted_markdown(markdown_src: str) -> Markup:
+    return Markup(
+        markdown(
+            markdown_src,
+            extensions=[
+                "markdown.extensions.nl2br",
+                "markdown.extensions.admonition",
+                "markdown.extensions.toc",
+            ],
+        )
+    )
+
+
 def render_template_markdown(filename: str, template: str = "about/template.html", **context: Any) -> str:
     """Render trusted markdown
 
@@ -413,16 +426,7 @@ def render_template_markdown(filename: str, template: str = "about/template.html
         source = f.read()
         (metadata, content) = source.split("---", 1)
         metadata = parse_yaml(metadata)
-        content = Markup(
-            markdown(
-                render_template_string(content),
-                extensions=[
-                    "markdown.extensions.nl2br",
-                    "markdown.extensions.admonition",
-                    "markdown.extensions.toc",
-                ],
-            )
-        )
+        content = render_trusted_markdown(render_template_string(content))
 
     context.update(content=content, title=metadata["title"])
     return render_template(page_template(metadata, template), **context)
