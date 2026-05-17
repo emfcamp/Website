@@ -18,6 +18,10 @@ Unfortunately, Ledbury train station is [not fully wheelchair accessible](https:
 
 If you're considering arriving by train and you have accessibility needs, please [let us know](mailto:contact@emfcamp.org) in advance so we can arrange transport from the station.
 
+## Hiring mobility aids
+
+Mobility equipment, including scooters, power chairs and wheelchairs, is available for hire via [Mobility Hire](https://mobilityhire.com/festival-mobility-hire-equipment/). We aren't currently listed in their drop-down of festivals but they will be able to provide delivery to the site. Please [email us](mailto:contact@emfcamp.org) if you need further information.
+
 ## Parking and camping
 
 There is a designated accessible parking area just outside the main gate. Please let the stewards know where you're heading and they can direct you there.
