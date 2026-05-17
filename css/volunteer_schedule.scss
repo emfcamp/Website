@@ -17,7 +17,7 @@ table.shifts-table tr,
 table.shifts-table th,
 table.shifts-table td {
   // !important because I'm a terrible (and very lazy) person
-  border-color: $highlight-2-border !important;
+  border-color: #4a4a4a !important;
 }
 
 table.shifts-table tbody td.hidden {
@@ -43,7 +43,7 @@ table.shifts-table tbody td.mobile-only {
 
   .overtime {
     font-weight: bold;
-    color: $brand-2024-pink;
+    color: $brand-2026-coral;
   }
 
   ul.shift-status {

@@ -1,3 +1,6 @@
+@use "sass:color";
+@use "./_variables.scss" as *;
+
 .about-hero {
   position: relative;
   margin: 0 -15px 0;
@@ -31,9 +34,9 @@
   padding: 2em 1.5em 1.2em;
   background: linear-gradient(
     to top,
-    rgba(33, 48, 24, 0.95) 0%,
-    rgba(33, 48, 24, 0.77) 70%,
-    rgba(33, 48, 24, 0) 100%
+    color.change($main-background, $alpha: 0.95) 0%,
+    color.change($main-background, $alpha: 0.77) 70%,
+    color.change($main-background, $alpha: 0) 100%
   );
 
   .about-hero-sub {

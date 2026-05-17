@@ -1,37 +1,69 @@
 @use "./_variables.scss" as *;
 
 header {
-  background: url("../images/brand/2024/header-2.png") left top/60%;
+  background-image: url("../images/brand/2026/header.jpg");
   background-color: $main-background;
   padding: 10px 15px 0px 15px;
+  background-position: top right;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  display: grid;
+  align-items: center;
+  grid-template-areas:
+    "logo text navbutton"
+    "nav nav nav";
 }
 
 #main-logo {
-  display: block;
-  float: left;
   margin-bottom: 0;
-  margin-top: 7px;
+  margin-right: 24px;
   text-decoration: none;
   font-family: $header-font-stack;
-  font-size: 36px;
+  font-size: 30px;
   color: $main-background-header;
+  grid-area: logo;
+
+  display: grid;
+  grid-template-columns: max-content auto;
+  grid-template-areas:
+    "logo line1"
+    "logo line2";
+
+  img {
+    grid-area: logo;
+  }
+  .logo-line {
+    line-height: 34px;
+  }
+  .logo-line1 {
+    grid-area: line1;
+    align-self: end;
+  }
+  .logo-line2 {
+    grid-area: line2;
+    align-self: start;
+  }
 }
 
 #logomark {
-  width: 40px;
-  margin-top: -7px;
+  height: 120px;
+  width: 48px;
+  margin-right: 12px;
 }
 
-header #header-text {
-  float: right;
-  text-align: right;
-  font-size: 1.5em;
-  margin-top: 25px;
+#header-text {
+  grid-area: text;
+  font-size: 1.2em;
+  justify-items: center;
+
+  .header-date {
+    color: $brand-2026-orange;
+  }
 }
 
-header #menu-container {
-  clear: both;
-  float: right;
+#menu-container {
+  grid-area: nav;
 }
 
 header #menu-button {
@@ -78,6 +110,8 @@ ul.menu a {
     top: 0;
     z-index: 1000;
     width: 100%;
+
+    grid-template-areas: "logo navbutton";
   }
 
   body {
@@ -85,14 +119,22 @@ ul.menu a {
   }
 
   #main-logo {
-    font-size: 25px;
-    margin-top: 4px;
+    display: block;
+
+    .logo-line {
+      font-size: 20px;
+      line-height: 20px;
+      vertical-align: middle;
+    }
+    .logo-line2 {
+      margin-left: -4px;
+    }
   }
 
   #logomark {
-    width: 16px !important;
-    height: auto !important;
-    margin-top: -4px;
+    width: 20px;
+    height: auto;
+    margin-right: 0;
   }
 
   header #menu-button {
@@ -103,7 +145,6 @@ ul.menu a {
     margin-top: 5px;
     padding-top: 7px;
     border-radius: $small-border-radius;
-    float: right;
     display: block;
   }
 
@@ -158,9 +199,11 @@ ul.menu a {
   h1 a[href]:after {
     content: none !important;
   }
+
   #logo {
     height: 0;
   }
+
   #logo:after {
     content: url("../images/logo-black-text.svg");
   }

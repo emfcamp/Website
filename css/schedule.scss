@@ -8,7 +8,7 @@
   }
 }
 .filters {
-  background-color: $brand-2024-pale-green;
+  background-color: $brand-2026-light-blue;
   margin-top: 1em;
 
   h3 {
@@ -20,12 +20,12 @@
   .panel-title {
     display: flex;
     justify-content: space-between;
-    background-color: $brand-2024-pale-green;
+    background-color: $brand-2026-light-blue;
     border: none;
   }
 
   .panel-heading {
-    background-color: $brand-2024-pale-green;
+    background-color: $brand-2026-light-blue;
     border: none;
   }
 }
@@ -34,7 +34,7 @@
   border-bottom: 2px solid #fff;
   padding-bottom: 2px;
   position: sticky;
-  background: $brand-2024-dark-green;
+  background: $brand-2026-dark-blue;
   top: 0;
 }
 
@@ -93,7 +93,7 @@
   margin-bottom: 1em;
 
   &.cfp {
-    border: 2px solid $brand-2024-pale-green;
+    border: 2px solid $brand-2026-light-blue;
   }
 
   .event-synopsis {
@@ -131,7 +131,7 @@
     }
 
     .speaker {
-      color: $brand-2024-yellow;
+      color: $brand-2026-yellow;
       font-weight: bold;
     }
   }
@@ -150,14 +150,14 @@
   }
 
   .btn-warning {
-    background-color: $brand-2024-yellow;
+    background-color: $brand-2026-yellow;
     color: #151735;
     font-weight: bold;
     border: none;
   }
 
   .btn-warning:active {
-    background-color: $brand-2024-yellow;
+    background-color: $brand-2026-yellow;
     color: #151735;
     font-weight: bold;
     border: none;

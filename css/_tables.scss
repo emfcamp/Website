@@ -1,4 +1,5 @@
 @use "./_variables.scss" as *;
+@use "sass:color";
 
 table {
   color: $highlight-background-text;
@@ -96,8 +97,9 @@ tr {
   background-color: $highlight-background;
 }
 
-tr.odd {
-  background-color: $highlight-2-background;
+tr.odd,
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: color.adjust($highlight-background, $lightness: +10%);
 }
 
 .btns-table > tbody > tr > td {
@@ -107,6 +109,86 @@ tr.odd {
 
 .table-actions {
   text-align: right;
+}
+
+.table {
+  & > thead,
+  & > tbody,
+  & > tfoot {
+    & > tr > td.active,
+    & > tr.active > td {
+      background-color: color.adjust($highlight-background, $lightness: +5%);
+    }
+    & > tr > td.success,
+    & > tr > th.success,
+    & > tr.success > td,
+    & > tr.success > th {
+      background-color: $success-background;
+      color: $success-text;
+    }
+    & > tr > td.info,
+    & > tr > th.info,
+    & > tr.info > td,
+    & > tr.info > th {
+      background-color: $info-background;
+      color: $info-text;
+    }
+    & > tr > td.warning,
+    & > tr > th.warning,
+    & > tr.warning > td,
+    & > tr.warning > th {
+      background-color: $warning-background;
+      color: $warning-text;
+    }
+    & > tr > td.danger,
+    & > tr > th.danger,
+    & > tr.danger > td,
+    & > tr.danger > th {
+      background-color: $danger-background;
+      color: $danger-text;
+    }
+  }
+}
+
+.table-hover > tbody {
+  & > tr:hover {
+    background-color: color.adjust($highlight-background, $lightness: +5%);
+  }
+  & > tr > td.active:hover,
+  & > tr > th.active:hover,
+  & > tr.active:hover > td,
+  & > tr:hover > .active,
+  & > tr.active:hover > th {
+    background-color: color.adjust($highlight-background, $lightness: +10%);
+  }
+  & > tr > td.success:hover,
+  & > tr > th.success:hover,
+  & > tr.success:hover > td,
+  & > tr:hover > .success,
+  & > tr.success:hover > th {
+    background-color: color.adjust($success-background, $lightness: +5%);
+  }
+  & > tr > td.info:hover,
+  & > tr > th.info:hover,
+  & > tr.info:hover > td,
+  & > tr:hover > .info,
+  & > tr.info:hover > th {
+    background-color: color.adjust($info-background, $lightness: +5%);
+  }
+  & > tr > td.warning:hover,
+  & > tr > th.warning:hover,
+  & > tr.warning:hover > td,
+  & > tr:hover > .warning,
+  & > tr.warning:hover > th {
+    background-color: color.adjust($warning-background, $lightness: +5%);
+  }
+  & > tr > td.danger:hover,
+  & > tr > th.danger:hover,
+  & > tr.danger:hover > td,
+  & > tr:hover > .danger,
+  & > tr.danger:hover > th {
+    background-color: color.adjust($danger-background, $lightness: +5%);
+  }
 }
 
 @media print {
