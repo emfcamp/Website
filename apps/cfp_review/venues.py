@@ -1,9 +1,16 @@
+from collections import defaultdict
+from datetime import datetime, time, timedelta
+from typing import get_args
+
 from flask import (
+    abort,
     flash,
     redirect,
     render_template,
+    request,
     url_for,
 )
+from flask.typing import ResponseReturnValue
 from geoalchemy2.shape import from_shape, to_shape
 from shapely import Point
 from sqlalchemy import select
@@ -16,13 +23,17 @@ from wtforms import (
     StringField,
     SubmitField,
 )
+from wtforms.fields import TimeField
 from wtforms.validators import DataRequired, Optional
 
 from main import db, get_or_404
 from models.content import SCHEDULE_ITEM_INFOS, Occurrence, Venue
+from models.content.schedule import ScheduleItemType
+from models.content.venue import TimeBlock
 from models.village import Village
 
 from ..common.forms import Form, coerce_optional
+from ..config import config
 from . import (
     admin_required,
     cfp_review,
@@ -37,8 +48,6 @@ class VenueForm(Form):
     allows_attendee_content = BooleanField("Allows Attendee Content")
     location_lat = FloatField("Latitude")
     location_lon = FloatField("Longitude")
-    allowed_types = SelectMultipleField("Allowed for", choices=VENUE_TYPE_CHOICES)
-    default_for_types = SelectMultipleField("Default Venue for", choices=VENUE_TYPE_CHOICES)
     capacity = IntegerField("Capacity", validators=[Optional()])
     submit = SubmitField("Save")
     delete = SubmitField("Delete")
@@ -68,8 +77,12 @@ class VenueForm(Form):
 
 @cfp_review.route("/venues", methods=["GET", "POST"])
 @admin_required
-def venues():
-    venues = Venue.query.order_by(Venue.allows_attendee_content.desc(), Venue.name).all()
+def venues() -> ResponseReturnValue:
+    venues_query = db.session.query(Venue).order_by(Venue.name)
+    if not request.args.get("all"):
+        venues_query = venues_query.where(Venue.village_id.is_(None))
+
+    venues = venues_query.all()
     new_venue = Venue()
     form = VenueForm(obj=new_venue)
 
@@ -83,9 +96,9 @@ def venues():
     return render_template("cfp_review/venues/index.html", venues=venues, form=form)
 
 
-@cfp_review.route("/venues/<int:venue_id>", methods=["GET", "POST"])
+@cfp_review.route("/venues/<int:venue_id>/edit", methods=["GET", "POST"])
 @admin_required
-def edit_venue(venue_id):
+def edit_venue(venue_id: int) -> ResponseReturnValue:
     venue = get_or_404(db, Venue, venue_id)
     form = VenueForm(obj=venue)
     if form.validate_on_submit():
@@ -116,3 +129,115 @@ def edit_venue(venue_id):
     form.populate(venue)
 
     return render_template("cfp_review/venues/edit.html", venue=venue, form=form)
+
+
+class TimeBlockForm(Form):
+    start = TimeField("Start time")
+    end = TimeField("End time")
+    automatic = BooleanField("Enable automatic scheduler")
+    type = SelectField("Content type", choices=get_args(ScheduleItemType))
+
+    submit = SubmitField("Save")
+    delete = SubmitField("Delete")
+
+
+class NewTimeBlockForm(TimeBlockForm):
+    days = SelectMultipleField("Days")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.days.choices = [
+            (str(i), (config.event_start.date() + timedelta(days=i)).strftime("%a %d %B"))
+            for i in range(0, (config.event_end.date() - config.event_start.date()).days + 1)
+        ]
+
+
+@cfp_review.route("/venues/<int:venue_id>/time-blocks", methods=["GET", "POST"])
+@admin_required
+def venue_timeblocks(venue_id: int) -> ResponseReturnValue:
+    venue = get_or_404(db, Venue, venue_id)
+
+    days = [
+        config.event_start.date() + timedelta(days=i)
+        for i in range(0, (config.event_end.date() - config.event_start.date()).days + 1)
+    ]
+
+    new_form = NewTimeBlockForm()
+
+    if new_form.validate_on_submit():
+        assert new_form.days.data and new_form.start.data and new_form.end.data
+        created = 0
+        for day in new_form.days.data:
+            time_block = TimeBlock()
+
+            date = days[int(day)]
+            if new_form.start.data.hour < 5 or new_form.start.data.hour > 23:
+                date = days[int(day)] + timedelta(days=1)
+            time_block.start = datetime.combine(date, new_form.start.data)
+
+            if new_form.end.data.hour < 5 or new_form.end.data.hour > 23:
+                date = days[int(day)] + timedelta(days=1)
+            time_block.end = datetime.combine(date, new_form.end.data)
+            time_block.type = new_form.type.data
+            time_block.automatic = new_form.automatic.data
+            venue.time_blocks += [time_block]
+            created += 1
+
+        db.session.commit()
+
+        flash(f"{created} new time block(s) created")
+        return redirect(url_for(".venue_timeblocks", venue_id=venue.id))
+
+    changeover = time(5, 0, 0)
+
+    time_blocks_by_day = defaultdict(list)
+    for day in days:
+        day_start = datetime.combine(day, changeover)
+        day_end = datetime.combine(day + timedelta(days=1), changeover)
+        for b in venue.time_blocks:
+            if day_start < b.start <= day_end:
+                height = (min(day_end, b.end) - max(day_start, b.start)).seconds * 100 / (24 * 60 * 60)
+                top = (max(day_start, b.start) - day_start).seconds * 100 / (24 * 60 * 60)
+                time_blocks_by_day[day].append({"height": height, "top": top, "block": b})
+
+    timeblock_hours = [time(i % 24, 0, 0) for i in range(changeover.hour, changeover.hour + 24)]
+
+    return render_template(
+        "cfp_review/venues/time_blocks.html",
+        venue=venue,
+        days=days,
+        new_form=new_form,
+        time_blocks_by_day=time_blocks_by_day,
+        day_start=changeover,
+        timeblock_hours=timeblock_hours,
+    )
+
+
+@cfp_review.route("/venues/<int:venue_id>/time-blocks/<int:time_block_id>", methods=["GET", "POST"])
+@admin_required
+def timeblock_edit(venue_id: int, time_block_id: int) -> ResponseReturnValue:
+    venue = get_or_404(db, Venue, venue_id)
+    time_block = get_or_404(db, TimeBlock, time_block_id)
+    if venue.id != time_block.venue_id:
+        abort(404)
+
+    form = TimeBlockForm(obj=time_block)
+
+    if form.validate_on_submit():
+        if form.delete.data:
+            db.session.delete(time_block)
+            flash("Time block deleted")
+        else:
+            assert form.start.data and form.end.data
+            time_block.start = datetime.combine(time_block.start, form.start.data)
+            time_block.end = datetime.combine(time_block.end, form.end.data)
+            time_block.automatic = form.automatic.data
+            time_block.type = form.type.data
+            flash("Time block updated")
+
+        db.session.commit()
+        return redirect(url_for(".venue_timeblocks", venue_id=venue.id))
+
+    return render_template(
+        "cfp_review/venues/time_block_edit.html", venue=venue, form=form, time_block=time_block
+    )

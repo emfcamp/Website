@@ -157,7 +157,7 @@ def cfp_review_variables():
         "schedule_item_counts": schedule_item_counts,
         "unread_reviewer_notes": unread_reviewer_notes,
         "view_name": request.url_rule.endpoint.replace("cfp_review.", "."),
-        "emf_venues": [v.name for v in Venue.emf_venues()],
+        "emf_venues": [v.name for v in Venue.official_venues()],
     }
 
 

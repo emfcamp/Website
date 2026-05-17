@@ -1,11 +1,12 @@
+from datetime import datetime
+
 from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import to_shape
 from sqlalchemy import (
     ForeignKey,
     UniqueConstraint,
+    select,
 )
-from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import (
     Mapped,
     mapped_column,
@@ -35,25 +36,13 @@ class Venue(BaseModel):
     village_id: Mapped[int | None] = mapped_column(ForeignKey("village.id"), default=None)
     name: Mapped[str]
 
-    # Which type of schedule item are allowed to be scheduled in this venue.
-    allowed_types: Mapped[list[ScheduleItemType]] = mapped_column(
-        MutableList.as_mutable(ARRAY(db.String)),
-        default=list,
-    )
-
-    # What type of schedule items are the default for this venue.
-    # These are where the automatic scheduler will put items.
-    default_for_types: Mapped[list[ScheduleItemType]] = mapped_column(
-        MutableList.as_mutable(ARRAY(db.String)),
-        default=list,
-    )
     priority: Mapped[int] = mapped_column(default=0)
     capacity: Mapped[int | None]
     location: Mapped[WKBElement | None] = mapped_column(Geometry("POINT", srid=4326))
 
-    #: Whether this venue allows any attendee to schedule content in it.
-    #: This is only used for official venues (bar, lounge) and is currently null for village stages
-    #: (which allow content to be scheduled by their admins)
+    #: Whether this venue allows *any* attendee to schedule content in it.
+    #: This is only true for official venues which allow attendee content (e.g. bar, lounge)
+    #: and is currently null for village stages (which allow content to be scheduled by their admins)
     allows_attendee_content: Mapped[bool | None]
 
     village: Mapped[Village] = relationship(
@@ -67,6 +56,8 @@ class Venue(BaseModel):
         back_populates="allowed_venues",
         secondary=OccurrenceAllowedVenues,
     )
+
+    time_blocks: Mapped[list[TimeBlock]] = relationship(back_populates="venue")
 
     def __repr__(self):
         return f"<Venue id={self.id}, name={self.name}>"
@@ -90,29 +81,16 @@ class Venue(BaseModel):
         }
 
     @property
-    def is_emf_venue(self):
-        return bool(self.default_for_types)
+    def is_official(self):
+        return self.village_id is not None
 
     @classmethod
-    def emf_venues(cls):
-        return cls.query.filter(db.func.array_length(cls.default_for_types, 1) > 0).all()
-
-    @classmethod
-    def emf_venue_names_by_type(cls):
-        """Return a map of proposal type to official EMF venues."""
-        unnest = db.func.unnest(cls.default_for_types).table_valued()
-        return {
-            type: venue_names
-            for venue_names, type in db.session.execute(
-                db.select(db.func.array_agg(cls.name), unnest.column)
-                .join(unnest, db.true())
-                .group_by(unnest.column)
-            )
-        }
+    def official_venues(cls):
+        return list(db.session.scalars(select(Venue).where(Venue.village_id.is_(None))))
 
     @classmethod
     def get_by_name(cls, name):
-        return cls.query.filter_by(name=name).one()
+        return db.session.query(cls).filter_by(name=name).one()
 
     @property
     def latlon(self):
@@ -129,3 +107,32 @@ class Venue(BaseModel):
             return None
         lat, lon = self.latlon
         return f"https://map.emfcamp.org/#18.5/{lat}/{lon}/m={lat},{lon}"
+
+
+class TimeBlock(BaseModel):
+    """A block of time allocated in a venue for scheduling official content.
+
+    Villages can schedule content in their venues outside a TimeBlock, but all official content must be inside a TimeBlock.
+
+    Constraints:
+        - There can only be one TimeBlock active for a venue at any time.
+        - Each TimeBlock can only allow one content type in it.
+        - TimeBlocks cannot span 5am, when the scheduling day ends.
+    """
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    venue_id: Mapped[int] = mapped_column(ForeignKey("venue.id"))
+
+    #: The type of item which can be scheduled in this TimeBlock
+    type: Mapped[ScheduleItemType]
+
+    #: Whether this block should be considered by the automatic scheduler
+    automatic: Mapped[bool]
+
+    start: Mapped[datetime]
+    end: Mapped[datetime]
+
+    venue: Mapped[Venue] = relationship(back_populates="time_blocks")
+
+    def __repr__(self):
+        return f"<TimeBlock ({self.type}) for {self.venue.name}: {self.start} - {self.end}>"

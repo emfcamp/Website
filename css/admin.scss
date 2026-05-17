@@ -129,3 +129,77 @@ tr.odd {
 .proposal-state-rejected {
   background-color: #fbe3e7;
 }
+
+.content-type-talk {
+  background-color: #b3bced;
+}
+
+.content-type-performance {
+  background-color: #eeb17a;
+}
+
+.content-type-workshop {
+  background-color: #fba0bc;
+}
+
+.content-type-youthworkshop {
+  background-color: #a4c4db;
+}
+
+.content-type-film {
+  background-color: #a0d082;
+}
+
+.timeblocks {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 1em;
+  gap: 0.2em;
+  width: 100%;
+
+  .timeblock-day {
+    flex-grow: 1;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+  }
+
+  .timeblock-day h4 {
+    text-align: center;
+  }
+
+  .timeblock-content {
+    height: 35em;
+    position: relative; // Sub-blocks positioned relative to this
+  }
+
+  .timeblock-hour {
+    color: #aaa;
+    height: 4.1666666%;
+    font-size: 0.7em;
+    border-top: 0.5px solid #ddd;
+    padding-left: 0.5em;
+  }
+
+  .timeblock-hour.night {
+    background-color: #fafafa;
+  }
+
+  .timeblock-hour.midnight {
+    border-top-width: 1px;
+  }
+
+  .timeblock-block {
+    color: black;
+    position: absolute;
+    width: 70%;
+    right: 5%;
+    border: 1px solid #999;
+    border-radius: 5px;
+    padding: 0.25em;
+  }
+
+  .timeblock-icon {
+    float: right;
+    cursor: default;
+  }
+}

@@ -35,6 +35,7 @@ from models.content.lottery import (
     LotteryEntry,
     LotteryEntryState,
 )
+from models.content.venue import TimeBlock
 from models.user import generate_api_token
 
 from ..cfp_review import admin_required as cfp_admin_required
@@ -645,8 +646,13 @@ def greenroom():
 def workshop_steward_main():
     # TODO: support any venue types that might support lottery?
 
-    workshop_venues = Venue.query.filter(Venue.allowed_types.any("workshop")).all()
-    youthworkshop_venues = Venue.query.filter(Venue.allowed_types.any("youthworkshop")).all()
+    workshop_venues = db.session.scalars(
+        select(Venue).join(Venue.time_blocks).where(TimeBlock.type == "workshop")
+    )
+
+    youthworkshop_venues = db.session.scalars(
+        select(Venue).join(Venue.time_blocks).where(TimeBlock.type == "youthworkshop")
+    )
 
     return render_template(
         "schedule/workshop-steward/main.html",

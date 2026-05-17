@@ -1,0 +1,22 @@
+{% extends "cfp_review/base.html" %}
+{% from "_formhelpers.html" import render_field  %}
+{% block body %}
+<h2>Edit time block</h2>
+<div class="well col-md-6">
+    <p>Venue: {{venue.name}}</p>
+    <p>Day: {{time_block.start.date().strftime("%a %d %B")}}</p>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        {{ render_field(form.start) }}
+        {{ render_field(form.end) }}
+        {{ render_field(form.type) }}
+        {{ render_field(form.automatic) }}
+        <div class="btn-group">
+            {{ form.submit(class_="btn btn-success") }}
+            {{ form.delete(class_="btn btn-danger") }}
+            <a class="btn btn-default" href="{{url_for('.venue_timeblocks', venue_id=venue.id)}}">Back</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

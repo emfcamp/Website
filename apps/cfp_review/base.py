@@ -1124,13 +1124,14 @@ def scheduler() -> ResponseReturnValue:
 
         occurrence_data.append(export)
 
-    venue_names_by_type = Venue.emf_venue_names_by_type()
+    ## FIXME: TimeBlock migration
+    # venue_names_by_type = Venue.emf_venue_names_by_type()
 
     return render_template(
         "cfp_review/scheduler.html",
         shown_venues=shown_venues,
         occurrence_data=occurrence_data,
-        default_venues=venue_names_by_type,
+        default_venues={},
     )
 
 

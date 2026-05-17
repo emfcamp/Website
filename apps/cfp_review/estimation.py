@@ -1,4 +1,3 @@
-from collections import defaultdict
 from dataclasses import dataclass
 from datetime import timedelta
 
@@ -7,16 +6,14 @@ from sqlalchemy import select
 from main import db
 from models.content import (
     EVENT_SPACING,
-    PROPOSAL_TIMESLOTS,
     ROUGH_DURATIONS,
     SLOT_DURATION,
     ScheduleItem,
     ScheduleItemType,
     Venue,
     get_days_map,
-    make_periods_contiguous,
-    timeslot_to_period,
 )
+from models.content.venue import TimeBlock
 
 
 @dataclass
@@ -30,18 +27,9 @@ class CFPEstimate:
     venues: list[Venue]
 
 
-def get_available_proposal_minutes():
-    minutes = defaultdict(int)
-    venue_names_by_type = Venue.emf_venue_names_by_type()
-    for type, slots in PROPOSAL_TIMESLOTS.items():
-        if type not in venue_names_by_type:
-            continue
-        periods = make_periods_contiguous([timeslot_to_period(ts, type=type) for ts in slots])
-        for period in periods:
-            minutes[type] += int((period.end - period.start).total_seconds() / 60) * len(
-                venue_names_by_type[type]
-            )
-    return minutes
+def get_available_proposal_time(type: ScheduleItemType) -> timedelta:
+    blocks = db.session.query(TimeBlock).where(TimeBlock.type == type).where(TimeBlock.automatic).all()
+    return sum(((block.end - block.start) for block in blocks), timedelta())
 
 
 def get_cfp_estimate(schedule_item_type: ScheduleItemType) -> CFPEstimate:
@@ -73,9 +61,13 @@ def get_cfp_estimate(schedule_item_type: ScheduleItemType) -> CFPEstimate:
     num_days = len(get_days_map().items())
 
     available_venues = list(
-        db.session.execute(select(Venue).where(Venue.default_for_types.any_() == schedule_item_type))
-        .scalars()
-        .all()
+        db.session.scalars(
+            select(Venue)
+            .join(Venue.time_blocks)
+            .where(TimeBlock.type == schedule_item_type)
+            .where(TimeBlock.automatic)
+            .group_by(Venue.id)
+        )
     )
 
     # Correct for changeover period not being needed at the end of the day
@@ -83,8 +75,7 @@ def get_cfp_estimate(schedule_item_type: ScheduleItemType) -> CFPEstimate:
     changeover_correction = changeover_time * num_days * len(available_venues)
     allocated_time = max(allocated_time - changeover_correction, timedelta(0))
 
-    available_minutes = get_available_proposal_minutes()
-    available_time = timedelta(minutes=available_minutes[schedule_item_type])
+    available_time = get_available_proposal_time(schedule_item_type)
 
     return CFPEstimate(
         schedule_item_type=schedule_item_type,

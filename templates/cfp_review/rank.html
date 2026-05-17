@@ -2,7 +2,7 @@
 {% block body %}
 
 <h2>Current allocations</h2>
-<p>This shows an estimate of the amount of time remaining for scheduling proposals.</p>
+<p>This shows an estimate of the amount of time remaining for scheduling proposals, based on the time blocks defined.</p>
 <table class="table table-condensed table-striped">
     <thead>
     <tr>
@@ -26,7 +26,11 @@
         <td>{{estimates[type].unknown_durations}}</td>
         <td style="white-space:nowrap">{{estimates[type].available_time}}</td>
         <td style="white-space:nowrap">{{estimates[type].allocated_time}}</td>
-        <td style="white-space:nowrap">{{estimates[type].remaining_time}}</td>
+        <td style="white-space:nowrap">{{estimates[type].remaining_time}}
+            {% if estimates[type].available_time %}
+                ({{(estimates[type].remaining_time/estimates[type].available_time * 100)|int}}%)
+            {% endif %}
+        </td>
         <td>{% for v in estimates[type].venues %}{{v.name}}{% if not loop.last %}, {% endif %}{% endfor %}</td>
     </tr>
     {% endfor %}

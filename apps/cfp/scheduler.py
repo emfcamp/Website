@@ -99,9 +99,10 @@ class Scheduler:
         capacity_by_type: dict[ScheduleItemType, dict[int, int]] = defaultdict(dict)
         venues: list[Venue] = list(db.session.scalars(select(Venue)))
         for venue in venues:
-            for type in venue.default_for_types:
-                # FIXME: is it right to treat an unknown capacity as 0?
-                capacity_by_type[type][venue.id] = venue.capacity or 0
+            for block in venue.time_blocks:
+                if not venue.capacity:
+                    raise Exception(f"Official venue has no capacity defined: {venue}")
+                capacity_by_type[block.type][venue.id] = venue.capacity or 0
 
         occurrence_data = []
         for type, occurrences in occurrences_by_type.items():

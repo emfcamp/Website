@@ -152,7 +152,7 @@ def create_venues():
     created = updated = 0
     for venue_definition in _EMF_VENUES:
         name = venue_definition.name
-        venue = Venue.query.filter_by(name=name).all()
+        venue = db.session.query(Venue).filter_by(name=name).all()
 
         if len(venue) == 1 and venue[0].location is None:
             venue[0].location = venue_definition.location

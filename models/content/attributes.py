@@ -71,6 +71,11 @@ class LightningTalkAttributes(Attributes):
     session: str | None = None
 
 
+@dataclass
+class FilmAttributes(Attributes):
+    classification: str | None = None
+
+
 # Attributes only used by the review process
 # These won't get copied across when creating a schedule item
 

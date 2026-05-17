@@ -42,6 +42,7 @@ from ..user import User
 from . import validate_state_transitions
 from .attributes import (
     Attributes,
+    FilmAttributes,
     InstallationAttributes,
     LightningTalkAttributes,
     PerformanceAttributes,
@@ -230,6 +231,7 @@ ScheduleItemType = Literal[
     "talk",
     "performance",
     "workshop",
+    "film",
     "youthworkshop",
     "installation",
     "lightning",
@@ -467,6 +469,14 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
         attributes_cls=WorkshopAttributes,
         default_max_tickets_per_entry=2,
     ),
+    "film": ScheduleItemInfo(
+        type="film",
+        human_type="film",
+        human_type_a="a film",
+        supports_lottery=False,
+        needs_occurrence=True,
+        attributes_cls=FilmAttributes,
+    ),
     "youthworkshop": ScheduleItemInfo(
         type="youthworkshop",
         human_type="youth workshop",
@@ -561,7 +571,9 @@ class Occurrence(BaseModel):
     def valid_allowed_venues(self) -> list[Venue]:
         if self.schedule_item.official_content:
             return list(
-                db.session.scalars(select(Venue).where(Venue.allowed_types.any_() == self.schedule_item.type))
+                db.session.scalars(
+                    select(Venue).join(Venue.time_blocks).where(TimeBlock.type == self.schedule_item.type)
+                )
             )
         return list(db.session.scalars(select(Venue).where(Venue.allows_attendee_content == True)))
 
@@ -697,4 +709,4 @@ class Occurrence(BaseModel):
 
 validate_state_transitions(Occurrence.state, OCCURRENCE_STATE_TRANSITIONS)
 from .cfp import Proposal
-from .venue import Venue
+from .venue import TimeBlock, Venue

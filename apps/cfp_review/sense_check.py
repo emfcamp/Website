@@ -33,18 +33,19 @@ def not_sensible_reasons(
         reasons["scheduled_without_venue"] = "Scheduled time set, but no venue allocated"
 
     # -- Occurrence is in a venue that is not in the allowed list for that type of content.
-    if occurrence.potential_venue is not None:
-        if occurrence.schedule_item.type not in occurrence.potential_venue.allowed_types:
-            reasons["proposed_venue_illegal"] = (
-                f'{occurrence.schedule_item.type} proposed to be in "{occurrence.potential_venue.name}", '
-                f"which admits content of types: {occurrence.potential_venue.allowed_types}"
-            )
-    if occurrence.scheduled_venue is not None:
-        if occurrence.schedule_item.type not in occurrence.scheduled_venue.allowed_types:
-            reasons["scheduled_venue_illegal"] = (
-                f'{occurrence.schedule_item.type} scheduled to be in "{occurrence.scheduled_venue.name}", '
-                f"which admits content of types: {occurrence.scheduled_venue.allowed_types}"
-            )
+    # FIXME: we need to check TimeBlocks here now.
+    # if occurrence.potential_venue is not None:
+    #    if occurrence.schedule_item.type not in occurrence.potential_venue.allowed_types:
+    #        reasons["proposed_venue_illegal"] = (
+    #            f'{occurrence.schedule_item.type} proposed to be in "{occurrence.potential_venue.name}", '
+    #            f"which admits content of types: {occurrence.potential_venue.allowed_types}"
+    #        )
+    # if occurrence.scheduled_venue is not None:
+    #    if occurrence.schedule_item.type not in occurrence.scheduled_venue.allowed_types:
+    #        reasons["scheduled_venue_illegal"] = (
+    #            f'{occurrence.schedule_item.type} scheduled to be in "{occurrence.scheduled_venue.name}", '
+    #            f"which admits content of types: {occurrence.scheduled_venue.allowed_types}"
+    #        )
 
     # -- Occurrence has allowed time periods that are after 2am or before 9am.
     for n, period in enumerate(occurrence.get_allowed_time_periods()):
