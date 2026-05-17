@@ -32,7 +32,9 @@ As with everywhere on site, [power will be available](/about/power). However, we
 
 ## Accessible toilets/showers
 
-Our two main toilet/shower locations will have fully accessible toilet/shower cabins which can be accessed with a RADAR key. Our composting toilet locations will have accessible plastic toilets with a code lock.
+Our two main toilet/shower locations will have fully accessible toilet/shower cabins which can be accessed with a [RADAR key](https://www.disabilityrightsuk.org/radar-keys). Please talk to the Info and Help team during the event if you require a key.
+
+Our composting toilet locations will have accessible plastic toilets with a code lock.
 
 ## Captions
 
