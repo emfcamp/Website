@@ -15,6 +15,47 @@ body {
   font-family: $body-font-stack;
 }
 
+body::before,
+body::after {
+  display: block;
+  content: "";
+
+  position: fixed;
+  top: 0;
+  width: calc((100vw - 950px) / 2);
+  height: 100%;
+
+  z-index: -50;
+
+  background-color: #0d0e0e;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    image-set(
+      url("../images/brand/2026/tiling.jxl") type("image/jxl"),
+      url("../images/brand/2026/tiling.avif") type("image/avif"),
+      url("../images/brand/2026/tiling.jpg") type("image/jpeg")
+    );
+  background-repeat: no-repeat;
+
+  background-size:
+    auto,
+    100vh 100vh;
+}
+
+body::before {
+  left: 0;
+  background-position:
+    top left,
+    calc(((100vw - 950px) / 2) - 50vh) 0;
+}
+
+body::after {
+  right: 0;
+  background-position:
+    top left,
+    -50vh 0;
+}
+
 html,
 body {
   height: 100%;
@@ -22,7 +63,7 @@ body {
 
 code {
   background: inherit;
-  color: $brand-2024-orange;
+  color: $brand-2026-orange; // ???
   padding: 0;
 }
 
@@ -84,6 +125,18 @@ a:hover {
   }
 }
 
+.brand-2026-rainbow {
+  font-weight: bold;
+  background-image: linear-gradient(
+    90deg,
+    $brand-2026-yellow 0%,
+    $brand-2026-orange 50%,
+    $brand-2026-coral 100%
+  );
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .panel {
   display: block;
 }
@@ -95,6 +148,7 @@ a:hover {
 .panel-default > .panel-heading,
 .panel-default > .panel-footer {
   background-color: $highlight-2-background;
+  border-color: $highlight-2-border;
 }
 
 .panel-default > .panel-heading > * {
@@ -146,7 +200,6 @@ h6 {
 
 #gallery .col-md-3,
 #gallery .col-md-12 {
-  margin-top: -15px;
   padding: 0;
 }
 
@@ -157,7 +210,7 @@ h6 {
 #main-content {
   height: 100%;
   min-height: 100%;
-  padding: 15px;
+  padding: 0 15px 15px 15px;
 }
 
 // Remove the margin from the first header
@@ -246,12 +299,14 @@ div.micro img {
 .help-block {
   font-size: 0.9em;
   margin-bottom: 0px;
-  color: #333;
+  color: color.adjust($highlight-background-text, $lightness: -30%);
 }
 
 legend {
   margin-bottom: 0px;
-  border-bottom: 1px solid #aaa;
+  color: $highlight-background-text;
+  border-bottom: 1px solid
+    color.adjust($highlight-background-text, $lightness: -50%);
 }
 
 .glyphicon.input-group-addon {
@@ -435,7 +490,7 @@ a.collapse-toggle:hover .glyphicon {
   border-radius: $small-border-radius;
   border-left: 0.3em solid #bbb;
   background: $highlight-background;
-  color: #1e1e1e;
+  color: $highlight-background-text;
   overflow: auto;
   clear: both;
 

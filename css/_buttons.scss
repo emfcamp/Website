@@ -2,21 +2,42 @@
 @use "./_variables.scss" as *;
 
 .btn-primary {
-  background-color: color.adjust($brand-2024-blue, $lightness: -20%);
-  border: 1px solid color.adjust($brand-2024-blue, $lightness: -40%);
+  background-color: color.adjust($brand-2026-orange, $lightness: -10%);
+  border: 1px solid color.adjust($brand-2026-orange, $lightness: -40%);
+}
+
+.nav-pills > li.active > a,
+.nav-pills > li.active > a:hover,
+.nav-pills > li.active > a:focus {
+  background-color: color.adjust($brand-2026-orange, $lightness: -10%);
 }
 
 .btn-primary:hover,
 .btn-primary:focus,
 .btn-primary:active,
+.btn-primary:active:hover,
 .btn-primary.active,
+.btn-primary.active:hover,
 .open > .dropdown-toggle.btn-primary {
-  background-color: color.adjust($brand-2024-blue, $lightness: -30%);
-  border: 1px solid color.adjust($brand-2024-blue, $lightness: -50%);
+  background-color: color.adjust($brand-2026-orange, $lightness: -30%);
+  border: 1px solid color.adjust($brand-2026-orange, $lightness: -50%);
+}
+
+.btn-primary[disabled],
+.btn-primary.disabled {
+  &:hover,
+  &:focus,
+  &:active,
+  &:active:hover,
+  &.active {
+    background-color: color.adjust($brand-2026-orange, $lightness: -30%);
+    border: 1px solid color.adjust($brand-2026-orange, $lightness: -50%);
+  }
 }
 
 .btn-default {
   background-color: $form-element;
+  color: $form-element-text;
   border: 1px solid #adadad;
 }
 
@@ -27,6 +48,7 @@
 
 .btn-success {
   background-color: $success-background;
+  color: $success-text;
   border: 1px solid color.adjust($success-background, $lightness: -20%);
 }
 
@@ -53,12 +75,12 @@
   color: $form-element;
 }
 
-.panel .btn,
-.well .btn {
-  color: $form-element;
-}
-
 .panel .btn-default,
 .well .btn-default {
   color: $highlight-background-text;
+  &:active,
+  &:focus,
+  &:hover {
+    color: $highlight-background;
+  }
 }
