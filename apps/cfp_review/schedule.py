@@ -7,7 +7,7 @@ import json
 from collections import Counter
 from http import HTTPStatus
 from io import BytesIO, StringIO
-from typing import get_args
+from typing import Any, get_args
 
 from flask import (
     abort,
@@ -166,9 +166,11 @@ def update_schedule_item(schedule_item_id: int) -> ResponseReturnValue:
 
 @cfp_review.route("/schedule-items-summary")
 @schedule_required
-def schedule_items_summary():
-    counts_by_state = {s: Counter() for s in get_args(ScheduleItemState)}
-    counts_by_type = Counter()
+def schedule_items_summary() -> ResponseReturnValue:
+    counts_by_state: dict[ScheduleItemState, Counter[Any]] = {
+        s: Counter() for s in get_args(ScheduleItemState)
+    }
+    counts_by_type: Counter[ScheduleItemType] = Counter()
 
     for schedule_item in db.session.query(ScheduleItem).filter(ScheduleItem.official_content).all():
         counts_by_type[schedule_item.type] += 1

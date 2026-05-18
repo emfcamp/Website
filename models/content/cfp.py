@@ -232,8 +232,7 @@ class Proposal(BaseModel):
         self.state = "accepted"
 
         if not self.schedule_item:
-            schedule_item = self.create_schedule_item()
-            db.session.add(schedule_item)
+            self.create_schedule_item()
 
         if self.type_info.grants_event_tickets:
             self.user.issue_cfp_voucher()
@@ -250,7 +249,10 @@ class Proposal(BaseModel):
         if self.schedule_item:
             self.schedule_item.cancel()
 
-    def create_schedule_item(self):
+    def create_schedule_item(self) -> ScheduleItem | None:
+        if self.type_info.schedule == False:
+            return None
+
         # Create a schedule item using suitable defaults from the proposal
         schedule_item = ScheduleItem(
             type=self.type,
@@ -272,15 +274,15 @@ class Proposal(BaseModel):
         )
         copy_common_attributes(self.attributes, schedule_item.attributes)
 
-        if schedule_item.type_info.needs_occurrence:
-            schedule_item.occurrences.append(
-                Occurrence(
-                    state="unscheduled",
-                    occurrence_num=1,
-                    video_privacy=schedule_item.default_video_privacy,
-                )
+        schedule_item.occurrences.append(
+            Occurrence(
+                state="unscheduled",
+                occurrence_num=1,
+                video_privacy=schedule_item.default_video_privacy,
             )
-
+        )
+        db.session.add(schedule_item)
+        self.schedule_item = schedule_item
         return schedule_item
 
     @property
@@ -345,11 +347,16 @@ class Proposal(BaseModel):
 @dataclass
 class ProposalInfo:
     type: ProposalType
+    #: Lowercase human-readable name of this type
     human_type: str
     human_type_a: str
+    #: What review method is used for this proposal
     review_type: ReviewType
     attributes_cls: Type[Attributes]  # noqa: UP006
+    #: Whether an accepted proposal grants the submitter a ticket voucher
     grants_event_tickets: bool = False
+    #: Whether a ScheduleItem is created when the proposal is accepted
+    schedule: bool = True
 
 
 # Ordering here currently determines ordering in the admin UI,
@@ -393,6 +400,7 @@ PROPOSAL_INFOS: dict[ProposalType, ProposalInfo] = {
         human_type_a="an installation",
         review_type=ReviewType.manual,
         attributes_cls=ProposalInstallationAttributes,
+        schedule=False,
     ),
 }
 

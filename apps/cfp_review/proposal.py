@@ -248,6 +248,8 @@ def update_proposal_state(proposal_id: int) -> ResponseReturnValue:
     goto_next = False  # Whether to try and send the user to the next proposal
     new_state = form.result()
 
+    old_state = proposal.state
+
     if new_state == "rejected" and form.reject_with_message.data:
         proposal.reject()
         send_email_for_proposal(proposal, reason="rejected")
@@ -265,7 +267,7 @@ def update_proposal_state(proposal_id: int) -> ResponseReturnValue:
             # TODO: work out whether this will ever happen, and stop it
             raise ValueError("Invalid attempt to mark proposal as checked")
 
-    msg = f"Admin state change for proposal {proposal_id}: {proposal.state} -> {new_state}"
+    msg = f"Admin state change for proposal {proposal_id}: {old_state} -> {new_state}"
 
     proposal.state = new_state
     db.session.commit()
@@ -276,25 +278,6 @@ def update_proposal_state(proposal_id: int) -> ResponseReturnValue:
         return flash_commit_and_go(msg, ".proposals")
 
     return flash_commit_and_go(msg, ".proposal", proposal_id=proposal_id)
-
-
-@cfp_review.route("/proposals/<int:proposal_id>/create-schedule-item", methods=["POST"])
-@admin_required
-def create_schedule_item_from_proposal(proposal_id: int) -> ResponseReturnValue:
-    """
-    This is usually done on acceptance, but there might be a reason to pre-populate
-    a schedule with data before we tell the user that their talk has been accepted.
-    """
-    proposal = get_or_404(db, Proposal, proposal_id)
-    if proposal.schedule_item:
-        flash("Proposal already has a schedule item")
-        return redirect(url_for(".proposal", proposal_id=proposal.id))
-
-    schedule_item = proposal.create_schedule_item()
-    db.session.add(schedule_item)
-    db.session.commit()
-
-    return redirect(url_for(".update_schedule_item", schedule_item_id=schedule_item.id))
 
 
 @cfp_review.route("/proposals/<int:proposal_id>/message", methods=["GET", "POST"])

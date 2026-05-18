@@ -438,7 +438,6 @@ class ScheduleItemInfo:
     human_type: str
     human_type_a: str
     supports_lottery: bool
-    needs_occurrence: bool
     attributes_cls: Type[Attributes]  # noqa: UP006
     default_max_tickets_per_entry: int | None = None
 
@@ -450,7 +449,6 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
         human_type="talk",
         human_type_a="a talk",
         supports_lottery=False,
-        needs_occurrence=True,
         attributes_cls=TalkAttributes,
     ),
     "performance": ScheduleItemInfo(
@@ -458,7 +456,6 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
         human_type="performance",
         human_type_a="a performance",
         supports_lottery=False,
-        needs_occurrence=True,
         attributes_cls=PerformanceAttributes,
     ),
     "workshop": ScheduleItemInfo(
@@ -466,7 +463,6 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
         human_type="workshop",
         human_type_a="a workshop",
         supports_lottery=True,
-        needs_occurrence=True,
         attributes_cls=WorkshopAttributes,
         default_max_tickets_per_entry=2,
     ),
@@ -475,7 +471,6 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
         human_type="film",
         human_type_a="a film",
         supports_lottery=False,
-        needs_occurrence=True,
         attributes_cls=FilmAttributes,
     ),
     "youthworkshop": ScheduleItemInfo(
@@ -483,7 +478,6 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
         human_type="youth workshop",
         human_type_a="a youth workshop",
         supports_lottery=True,
-        needs_occurrence=True,
         attributes_cls=YouthWorkshopAttributes,
         default_max_tickets_per_entry=5,
     ),
@@ -492,7 +486,6 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
         human_type="installation",
         human_type_a="an installation",
         supports_lottery=False,
-        needs_occurrence=False,
         attributes_cls=InstallationAttributes,
     ),
     # ScheduleItem types that are only created directly
@@ -501,7 +494,6 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
         human_type="lightning talk",
         human_type_a="a lightning talk",
         supports_lottery=False,
-        needs_occurrence=True,
         attributes_cls=LightningTalkAttributes,
     ),
 }

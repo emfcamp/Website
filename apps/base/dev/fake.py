@@ -202,7 +202,10 @@ class FakeDataGenerator:
 
     def create_schedule_item(
         self, *, official_content: bool = True, user: User | None = None, proposal: Proposal | None = None
-    ) -> ScheduleItem:
+    ) -> ScheduleItem | None:
+        if proposal and proposal.type_info.schedule == False:
+            return None
+
         states = {
             "published": 7,
             "unpublished": 2,
@@ -235,7 +238,7 @@ class FakeDataGenerator:
         schedule_item = ScheduleItem(
             # TODO: weightings for type
             # No lightning talks yet
-            type=random.choice(["talk", "performance", "workshop", "youthworkshop", "installation"]),
+            type=random.choice(["talk", "performance", "workshop", "youthworkshop", "film"]),
             state=random_choice(states),
             user=user,
             proposal=proposal,
@@ -289,9 +292,8 @@ class FakeDataGenerator:
             }
         )
 
-        if schedule_item.type_info.needs_occurrence:
-            for occurrence_num in range(1, occurrence_count):
-                self.create_occurrence(schedule_item, occurrence_num)
+        for occurrence_num in range(1, occurrence_count):
+            self.create_occurrence(schedule_item, occurrence_num)
 
         return schedule_item
 
