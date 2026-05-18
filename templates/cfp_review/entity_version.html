@@ -16,7 +16,7 @@
 
     {% set schedule_item = entity %}
     {% set active='versions-schedule-item' %}
-    {% include "cfp_review/_schedule_item_tabs.html" %}
+    {% include "cfp_review/schedule/_schedule_item_tabs.html" %}
     <h3>
         {{ schedule_item.title }}
         <small>by {{ schedule_item.names }}</small>
@@ -28,7 +28,7 @@
     {% set occurrence = entity %}
     {% set active='versions-occurrence-%s' % occurrence.id %}
     {% set schedule_item = occurrence.schedule_item %}
-    {% include "cfp_review/_schedule_item_tabs.html" %}
+    {% include "cfp_review/schedule/_schedule_item_tabs.html" %}
     <h3>
         Occurrence {{ occurrence.occurrence_num }} of {{ schedule_item.title }}
         <small>by {{ schedule_item.names }}</small>

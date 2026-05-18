@@ -22,7 +22,7 @@
             {% endfor %}
             {% for block in blocks %}
                 <div class="timeblock-block content-type-{{block.block.type}}" style="height:{{block.height}}%; top:{{block.top}}%">
-                    <a href="{{url_for('.timeblock_edit', venue_id=venue.id, time_block_id=block.block.id)}}">{{block.block.type}}</a>
+                    <a href="{{url_for('.timeblock_edit', venue_id=venue.id, time_block_id=block.block.id)}}">{{block.title|capitalize}}</a>
                     {% if block.block.automatic %}
                     <div class="timeblock-icon" title="Automatic scheduler">🤖</div>
                     {% endif %}

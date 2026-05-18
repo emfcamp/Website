@@ -31,7 +31,7 @@ from models.user import User
 
 from ..config import config
 from . import admin_required, cfp_review, get_next_proposal_to
-from .base import _convert_schedule_item, filter_proposal_request
+from .base import filter_proposal_request
 from .email import send_email_for_proposal
 from .forms import (
     UPDATE_PROPOSAL_ATTRIBUTES_FORM_TYPES,
@@ -43,6 +43,7 @@ from .forms import (
     UpdateProposalForm,
     UpdateVotesForm,
 )
+from .schedule import _convert_schedule_item
 
 
 def find_next_proposal_id(prop):

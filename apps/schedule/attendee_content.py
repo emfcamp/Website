@@ -27,7 +27,6 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, NumberRange, Optional
 
-from apps.cfp_review.base import _convert_schedule_item
 from apps.common.fields import HiddenIntegerField
 from main import db, get_or_404
 from models.content import (
@@ -39,6 +38,7 @@ from models.content import (
 )
 from models.user import User
 
+from ..cfp_review.schedule import _convert_schedule_item
 from ..common import feature_flag
 from ..common.forms import Form
 from ..config import config

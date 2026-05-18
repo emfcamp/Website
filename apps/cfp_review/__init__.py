@@ -161,10 +161,20 @@ def cfp_review_variables():
     }
 
 
+def bool_qs(val):
+    # Explicit true/false values are better than the implicit notset=&set=anything that bool does
+    if val in ["True", "1"]:
+        return True
+    if val in ["False", "0"]:
+        return False
+    raise ValueError("Invalid querystring boolean")
+
+
 from . import (
     anonymise,  # noqa: F401
     base,  # noqa: F401
     proposal,  # noqa: F401
     review,  # noqa: F401
+    schedule,  # noqa: F401
     sense_check,  # noqa: F401
 )

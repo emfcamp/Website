@@ -4,7 +4,7 @@
 {% block body %}
 
 {% set active='details' %}
-{% include "cfp_review/_schedule_item_tabs.html" %}
+{% include "cfp_review/schedule/_schedule_item_tabs.html" %}
 
 
 <div class="col-md-12">
@@ -41,8 +41,10 @@
                             <dt>Created</dt>
                             {% set create_txn = schedule_item.versions[0].transaction %}
                             <dd>{{ create_txn.issued_at.strftime("%Y-%m-%d %H:%M") }}</dd>
+                            {% if create_txn.user %}
                             <dt>Created by</dt>
                             <dd><a href="{{ url_for(".cfp_user", user_id=create_txn.user.id) }}">{{ create_txn.user.name }}</a></dd>
+                            {% endif %}
                             <dt>Owned by</dt>
                             <dd><a href="{{ url_for(".cfp_user", user_id=schedule_item.user.id) }}">{{ schedule_item.user.name }}</a></dd>
                             {% if schedule_item.proposal %}

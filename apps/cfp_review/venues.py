@@ -1,3 +1,7 @@
+"""
+Admin views relating to Venues and TimeBlocks.
+"""
+
 from collections import defaultdict
 from datetime import datetime, time, timedelta
 from typing import get_args
@@ -39,8 +43,6 @@ from . import (
     cfp_review,
 )
 
-VENUE_TYPE_CHOICES = [(t.type, t.human_type) for t in SCHEDULE_ITEM_INFOS.values()]
-
 
 class VenueForm(Form):
     name = StringField("Name", [DataRequired()])
@@ -55,8 +57,8 @@ class VenueForm(Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         choices = [("", "")]
-        for v in Village.query.order_by(Village.name).all():
-            choices.append((v.id, v.name))
+        for v in db.session.query(Village).order_by(Village.name).all():
+            choices.append((str(v.id), v.name))
         self.village_id.choices = choices
 
     def populate(self, venue: Venue) -> None:
@@ -198,7 +200,14 @@ def venue_timeblocks(venue_id: int) -> ResponseReturnValue:
             if day_start < b.start <= day_end:
                 height = (min(day_end, b.end) - max(day_start, b.start)).seconds * 100 / (24 * 60 * 60)
                 top = (max(day_start, b.start) - day_start).seconds * 100 / (24 * 60 * 60)
-                time_blocks_by_day[day].append({"height": height, "top": top, "block": b})
+                time_blocks_by_day[day].append(
+                    {
+                        "height": height,
+                        "top": top,
+                        "block": b,
+                        "title": SCHEDULE_ITEM_INFOS[b.type].human_type,
+                    }
+                )
 
     timeblock_hours = [time(i % 24, 0, 0) for i in range(changeover.hour, changeover.hour + 24)]
 
