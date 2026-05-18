@@ -180,11 +180,11 @@ class AttendeeContentForm(Form):
                 (c, _) for c, _ in self.default_video_privacy.choices if c != "review"
             ]
 
-        # Don't allow users to hide or unhide
-        if not schedule_item or schedule_item.state != "hidden":
+        # Don't allow users to cancel or uncancel
+        if not schedule_item or schedule_item.state != "cancelled":
             assert isinstance(self.state.choices, list)
             self.state.choices = [(c, _) for c, _ in self.state.choices if c != "hidden"]
-        elif schedule_item and schedule_item.state == "hidden":
+        elif schedule_item and schedule_item.state == "cancelled":
             assert isinstance(self.state.choices, list)
             self.state.choices = [(c, _) for c, _ in self.state.choices if c == "hidden"]
 

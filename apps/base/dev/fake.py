@@ -205,7 +205,7 @@ class FakeDataGenerator:
         states = {
             "published": 7,
             "unpublished": 2,
-            "hidden": 1,
+            "cancelled": 1,
         }
 
         pronoun_choices = {

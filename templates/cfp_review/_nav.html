@@ -89,7 +89,7 @@
                 <li role="separator" class="divider"></li>
                 {{ menuitem('Published', ".schedule_items", schedule_item_counts['published'], state='published')}}
                 {{ menuitem('Unpublished', ".schedule_items", schedule_item_counts['unpublished'], state='unpublished')}}
-                {{ menuitem('Hidden', ".schedule_items", schedule_item_counts['hidden'], state='hidden')}}
+                {{ menuitem('Cancelled', ".schedule_items", schedule_item_counts['cancelled'], state='hidden')}}
                 <li role="separator" class="divider"></li>
                 {{ menuitem('Summary', ".schedule_items_summary")}}
                 {{ menuitem('Changelog', ".entity_changelog", entity_type="schedule-item" )}}

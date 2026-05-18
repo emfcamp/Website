@@ -227,7 +227,8 @@ class Proposal(BaseModel):
             msg.has_been_read = True
         return len(messages)
 
-    def accept_proposal(self) -> None:
+    def accept(self) -> None:
+        """Accept the proposal, create a ScheduleItem, and issue the user a CfP voucher if needed."""
         self.state = "accepted"
 
         if not self.schedule_item:
@@ -236,6 +237,18 @@ class Proposal(BaseModel):
 
         if self.type_info.grants_event_tickets:
             self.user.issue_cfp_voucher()
+
+    def reject(self) -> None:
+        """Mark the proposal as rejected, and remove from the schedule if present."""
+        self.state = "rejected"
+        if self.schedule_item:
+            self.schedule_item.cancel()
+
+    def withdraw(self) -> None:
+        """Mark the proposal as withdrawn, and remove from the schedule if present."""
+        self.state = "withdrawn"
+        if self.schedule_item:
+            self.schedule_item.cancel()
 
     def create_schedule_item(self):
         # Create a schedule item using suitable defaults from the proposal

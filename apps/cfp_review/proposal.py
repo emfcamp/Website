@@ -249,11 +249,14 @@ def update_proposal_state(proposal_id: int) -> ResponseReturnValue:
     new_state = form.result()
 
     if new_state == "rejected" and form.reject_with_message.data:
-        proposal.rejected_email_sent = True
+        proposal.reject()
         send_email_for_proposal(proposal, reason="rejected")
+        proposal.rejected_email_sent = True
     elif new_state == "accepted":
-        proposal.accept_proposal()
+        proposal.accept()
         send_email_for_proposal(proposal, reason="accepted")
+    elif new_state == "withdrawn":
+        proposal.withdraw()
     elif new_state == "checked":
         goto_next = True
         if proposal.type_info.review_type == "manual":

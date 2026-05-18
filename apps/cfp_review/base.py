@@ -497,7 +497,7 @@ def rank(round_id: int) -> ResponseReturnValue:
 
                 if score >= min_score:
                     count += 1
-                    proposal.accept_proposal()
+                    proposal.accept()
                     proposal_round.outcome = "accepted"
 
                     # NB there is also the 'nobody' email option

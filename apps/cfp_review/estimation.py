@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from datetime import timedelta
 
+import pendulum
+from pendulum import Duration
 from sqlalchemy import select
 
 from main import db
@@ -27,27 +29,40 @@ class CFPEstimate:
     venues: list[Venue]
 
 
-def get_available_proposal_time(type: ScheduleItemType) -> timedelta:
+def get_available_proposal_time(type: ScheduleItemType) -> Duration:
     blocks = db.session.query(TimeBlock).where(TimeBlock.type == type).all()
-    return sum(((block.end - block.start) for block in blocks), timedelta())
+    return sum(
+        ((pendulum.instance(block.end) - pendulum.instance(block.start)) for block in blocks),
+        Duration(),
+    )
 
 
 def get_cfp_estimate(schedule_item_type: ScheduleItemType) -> CFPEstimate:
     """Calculate estimated scheduling capacity statistics for a given proposal type."""
     changeover_time = SLOT_DURATION * EVENT_SPACING[schedule_item_type]
 
-    schedule_items = db.session.query(ScheduleItem).filter(ScheduleItem.type == schedule_item_type).all()
+    schedule_items = (
+        db.session.query(ScheduleItem)
+        .filter(
+            ScheduleItem.type == schedule_item_type,
+            ScheduleItem.official_content,
+            ScheduleItem.type != "cancelled",
+        )
+        .all()
+    )
 
-    allocated_time = timedelta()
+    allocated_time = Duration()
     unknown_durations: int = 0
 
     for schedule_item in schedule_items:
         for occurrence in schedule_item.occurrences:
+            if occurrence.state == "cancelled":
+                continue
             duration = None
             if occurrence.scheduled_duration:
-                duration = timedelta(minutes=occurrence.scheduled_duration)
+                duration = Duration(minutes=occurrence.scheduled_duration)
             elif schedule_item.proposal and schedule_item.proposal.duration in ROUGH_DURATIONS:
-                duration = timedelta(minutes=ROUGH_DURATIONS[schedule_item.proposal.duration])
+                duration = Duration(minutes=ROUGH_DURATIONS[schedule_item.proposal.duration])
             else:
                 unknown_durations += 1
                 continue
@@ -68,7 +83,7 @@ def get_cfp_estimate(schedule_item_type: ScheduleItemType) -> CFPEstimate:
     # Correct for changeover period not being needed at the end of the day
     # This can go negative if there aren't many proposals accepted yet, so clamp to 0
     changeover_correction = changeover_time * num_days * len(available_venues)
-    allocated_time = max(allocated_time - changeover_correction, timedelta(0))
+    allocated_time = max(allocated_time - changeover_correction, Duration())
 
     available_time = get_available_proposal_time(schedule_item_type)
 

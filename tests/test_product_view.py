@@ -43,7 +43,7 @@ def test_product_view_accessible(db, user, monkeypatch):
     )
     db.session.add(proposal)
     db.session.commit()
-    proposal.accept_proposal()
+    proposal.accept()
     db.session.commit()
 
     assert product_view.is_accessible(user), "CfP products should be visible with accepted proposal"

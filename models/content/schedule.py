@@ -235,27 +235,24 @@ ScheduleItemType = Literal[
 ScheduleItemState = Literal[
     "published",
     "unpublished",
-    "hidden",
+    "cancelled",
 ]
 
 
 # scheduled implies scheduled_duration, scheduled_time, and scheduled_venue_id are all set
-OccurrenceState = Literal[
-    "unscheduled",
-    "scheduled",
-]
+OccurrenceState = Literal["unscheduled", "scheduled", "cancelled"]
 
 
 OCCURRENCE_STATE_TRANSITIONS: dict[OccurrenceState, set[OccurrenceState]] = {
-    "unscheduled": {"scheduled"},
-    "scheduled": {"unscheduled"},
+    "unscheduled": {"scheduled", "cancelled"},
+    "scheduled": {"unscheduled", "cancelled"},
 }
 
 
 SCHEDULE_ITEM_STATE_TRANSITIONS: dict[ScheduleItemState, set[ScheduleItemState]] = {
-    "published": {"unpublished", "hidden"},
-    "unpublished": {"published", "hidden"},
-    "hidden": {"published", "unpublished"},
+    "published": {"unpublished", "cancelled"},
+    "unpublished": {"published", "cancelled"},
+    "cancelled": {"published", "unpublished"},
 }
 
 
@@ -326,7 +323,11 @@ class ScheduleItem(BaseModel):
     __versioned__: dict[str, Any] = {"exclude": ["favourited_by", "favourite_count"]}
 
     id: Mapped[int] = mapped_column(primary_key=True)
+
+    #: The type of the ScheduleItem, which controls how it's displayed in the schedule
     type: Mapped[ScheduleItemType]
+
+    #: The state of the ScheduleItem
     state: Mapped[ScheduleItemState] = mapped_column(
         sqlalchemy.Enum(
             *get_args(ScheduleItemState),
@@ -388,6 +389,12 @@ class ScheduleItem(BaseModel):
         .scalar_subquery(),
         deferred=True,
     )
+
+    def cancel(self) -> None:
+        """Mark this ScheduleItem as cancelled, as well as any occurrences."""
+        self.state = "cancelled"
+        for occurrence in self.occurrences:
+            occurrence.cancel()
 
     @property
     def slug(self):
@@ -560,6 +567,10 @@ class Occurrence(BaseModel):
 
     proposal: AssociationProxy[Proposal | None] = association_proxy("schedule_item", "proposal")
     user: AssociationProxy[User] = association_proxy("schedule_item", "user")
+
+    def cancel(self) -> None:
+        """Cancel this occurrence."""
+        self.state = "cancelled"
 
     @property
     def valid_allowed_venues(self) -> list[Venue]:

@@ -416,7 +416,7 @@ def withdraw_proposal(proposal_id: int) -> ResponseReturnValue:
     form = WithdrawalForm()
     if form.validate_on_submit() and form.confirm_withdrawal.data:
         app.logger.info("Proposal %s is being withdrawn.", proposal_id)
-        proposal.state = "withdrawn"
+        proposal.withdraw()
 
         if form.message.data:
             msg = ProposalMessage()
@@ -442,7 +442,7 @@ class FinaliseForm(Form):
         choices=[
             ("published", "Published"),
             ("unpublished", "Unpublished"),
-            ("hidden", "Hidden"),
+            ("cancelled", "Cancelled"),
         ],
     )
 
@@ -506,13 +506,13 @@ class FinaliseForm(Form):
                 (c, _) for c, _ in self.default_video_privacy.choices if c != "review"
             ]
 
-        # Don't allow users to hide or unhide. They'll either be shown
+        # Don't allow users to cancel or uncancel. They'll either be shown
         # publish/unpublish or just hidden with no other options.
-        # TODO: should we actually just hide the field when hidden is set?
-        if schedule_item.state != "hidden":
+        # TODO: should we actually just hide the field when cancelled is set?
+        if schedule_item.state != "cancelled":
             assert isinstance(self.state.choices, list)
             self.state.choices = [(c, _) for c, _ in self.state.choices if c != "hidden"]
-        elif schedule_item.state == "hidden":
+        elif schedule_item.state == "cancelled":
             assert isinstance(self.state.choices, list)
             self.state.choices = [(c, _) for c, _ in self.state.choices if c == "hidden"]
 
@@ -651,8 +651,8 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
         assert not (
             form.default_video_privacy.data == "review" and schedule_item.default_video_privacy != "review"
         )
-        assert not (form.state.data == "hidden" and schedule_item.state != "hidden")
-        assert not (form.state.data != "hidden" and schedule_item.state == "hidden")
+        assert not (form.state.data == "cancelled" and schedule_item.state != "cancelled")
+        assert not (form.state.data != "cancelled" and schedule_item.state == "cancelled")
 
         # For convenience, we ask them to update their participant_count
         # and valid_dbs, but these aren't exposed on the ScheduleItem

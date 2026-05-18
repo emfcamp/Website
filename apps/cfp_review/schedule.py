@@ -170,7 +170,7 @@ def schedule_items_summary():
     counts_by_state = {s: Counter() for s in get_args(ScheduleItemState)}
     counts_by_type = Counter()
 
-    for schedule_item in db.session.query(ScheduleItem).all():
+    for schedule_item in db.session.query(ScheduleItem).filter(ScheduleItem.official_content).all():
         counts_by_type[schedule_item.type] += 1
         counts_by_state[schedule_item.state]["total"] += 1
         counts_by_state[schedule_item.state][schedule_item.type] += 1
