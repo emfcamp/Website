@@ -32,6 +32,10 @@ CfP content, manually-added/booked official content, and attendee content.
 
 Venues
 ------
+Venues are places on site (official or village-run) where content can be scheduled.
 
 .. autoclass:: models.content.venue.Venue
+    :members:
+
+.. autoclass:: models.content.venue.TimeBlock
     :members:
