@@ -28,7 +28,7 @@ class CFPEstimate:
 
 
 def get_available_proposal_time(type: ScheduleItemType) -> timedelta:
-    blocks = db.session.query(TimeBlock).where(TimeBlock.type == type).where(TimeBlock.automatic).all()
+    blocks = db.session.query(TimeBlock).where(TimeBlock.type == type).all()
     return sum(((block.end - block.start) for block in blocks), timedelta())
 
 
@@ -36,11 +36,7 @@ def get_cfp_estimate(schedule_item_type: ScheduleItemType) -> CFPEstimate:
     """Calculate estimated scheduling capacity statistics for a given proposal type."""
     changeover_time = SLOT_DURATION * EVENT_SPACING[schedule_item_type]
 
-    schedule_items = (
-        db.session.query(ScheduleItem)
-        .filter(ScheduleItem.state == "published", ScheduleItem.type == schedule_item_type)
-        .all()
-    )
+    schedule_items = db.session.query(ScheduleItem).filter(ScheduleItem.type == schedule_item_type).all()
 
     allocated_time = timedelta()
     unknown_durations: int = 0
@@ -65,7 +61,6 @@ def get_cfp_estimate(schedule_item_type: ScheduleItemType) -> CFPEstimate:
             select(Venue)
             .join(Venue.time_blocks)
             .where(TimeBlock.type == schedule_item_type)
-            .where(TimeBlock.automatic)
             .group_by(Venue.id)
         )
     )

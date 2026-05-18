@@ -24,6 +24,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload, undefer
 from wtforms import FormField
 
+from apps.cfp_review.estimation import get_cfp_estimate
 from main import db, get_or_404
 from models.content import (
     SCHEDULE_ITEM_INFOS,
@@ -169,15 +170,21 @@ def schedule_items_summary():
     counts_by_state = {s: Counter() for s in get_args(ScheduleItemState)}
     counts_by_type = Counter()
 
-    for schedule_item in ScheduleItem.query.all():
+    for schedule_item in db.session.query(ScheduleItem).all():
         counts_by_type[schedule_item.type] += 1
         counts_by_state[schedule_item.state]["total"] += 1
         counts_by_state[schedule_item.state][schedule_item.type] += 1
 
+    schedule_item_types: list[ScheduleItemType] = ["talk", "workshop", "performance", "film"]
+
+    estimates = {
+        schedule_item_type: get_cfp_estimate(schedule_item_type) for schedule_item_type in schedule_item_types
+    }
     return render_template(
         "cfp_review/schedule/schedule_items_summary.html",
         counts_by_type=counts_by_type,
         counts_by_state=counts_by_state,
+        estimates=estimates,
     )
 
 

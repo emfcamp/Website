@@ -37,6 +37,7 @@ from models.content import (
     Tag,
     Venue,
 )
+from models.content.schedule import ScheduleItemType
 from models.permission import Permission
 from models.purchase import AdmissionTicket
 from models.user import User
@@ -547,8 +548,10 @@ def rank(round_id: int) -> ResponseReturnValue:
         elif form.cancel.data and "min_score" in session:
             del session["min_score"]
 
-    proposal_types: list[ProposalType] = ["talk", "workshop"]
-    estimates = {proposal_type: get_cfp_estimate(proposal_type) for proposal_type in proposal_types}
+    schedule_item_types: list[ScheduleItemType] = ["talk", "workshop"]
+    estimates = {
+        schedule_item_type: get_cfp_estimate(schedule_item_type) for schedule_item_type in schedule_item_types
+    }
 
     # Find proposals where the submitter has already had an accepted proposal
     # or another proposal in this list
@@ -565,7 +568,7 @@ def rank(round_id: int) -> ResponseReturnValue:
         duplicates=duplicates,
         estimates=estimates,
         min_score=session.get("min_score"),
-        proposal_types=proposal_types,
+        proposal_types=schedule_item_types,
     )
 
 

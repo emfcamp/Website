@@ -170,13 +170,7 @@ REMAP_SLOT_PERIODS = {
 
 # Number of slots (in 10min increments) that must be between proposals of this
 # type in the same venue
-EVENT_SPACING = {
-    "talk": 1,
-    "workshop": 3,
-    "performance": 0,
-    "youthworkshop": 2,
-    "installation": 0,
-}
+EVENT_SPACING = {"talk": 1, "workshop": 3, "performance": 0, "youthworkshop": 2, "installation": 0, "film": 2}
 
 # The size of a scheduling slot
 SLOT_DURATION = timedelta(minutes=10)

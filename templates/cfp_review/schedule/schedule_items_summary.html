@@ -21,6 +21,9 @@
 
 {% extends "cfp_review/base.html" %}
 {% block body %}
-  <h3>By State</h3>
-  {{ summary_table(counts_by_state, key="state") }}
+<h3>By State</h3>
+{{ summary_table(counts_by_state, key="state") }}
+<h3>Time estimates</h3>
+{% include "cfp_review/_schedule_time_estimates.html" %}
+
 {% endblock %}
