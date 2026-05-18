@@ -1,5 +1,9 @@
 """Admin views for viewing and editing proposals"""
 
+import csv
+from collections import Counter
+from io import StringIO
+from itertools import chain
 from typing import Any, get_args
 
 from flask import (
@@ -15,13 +19,15 @@ from flask import (
 from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from flask_mailman import EmailMessage
-from sqlalchemy import select
+from sqlalchemy import func, select
 from wtforms import FormField
 
 from main import db, external_url, get_or_404
 from models.content import (
     Proposal,
     ProposalMessage,
+    ProposalState,
+    ProposalTag,
     ProposalType,
     ScheduleItem,
     Tag,
@@ -30,7 +36,7 @@ from models.content.attributes import convert_attributes_between_types
 from models.user import User
 
 from ..config import config
-from . import admin_required, cfp_review, get_next_proposal_to
+from . import admin_required, cfp_review, get_next_proposal_to, schedule_required
 from .base import filter_proposal_request
 from .email import send_email_for_proposal
 from .forms import (
@@ -92,6 +98,54 @@ def flash_commit_and_go(msg: str, next_page: str, proposal_id: int | None = None
     return redirect(url_for(next_page, proposal_id=proposal_id))
 
 
+@cfp_review.route("/proposals")
+@admin_required
+def proposals() -> ResponseReturnValue:
+
+    default_columns = ["ticket", "date", "state", "type", "notice", "duration", "user", "title"]
+    columns = request.args.getlist("cols") or default_columns
+
+    proposals, is_filtered = filter_proposal_request()
+    non_sort_query_string = request.args.to_dict(flat=False)
+
+    non_sort_query_string.pop("sort_by", None)
+    non_sort_query_string.pop("reverse", None)
+
+    tag_counts = dict(
+        db.session.query(Tag.tag, db.func.count(ProposalTag.c.proposal_id))
+        .select_from(Tag)
+        .outerjoin(ProposalTag)
+        .group_by(Tag.tag)
+        .order_by(Tag.tag)
+        .all()
+    )
+    tag_counts = {tag: [0, total_count] for tag, total_count in tag_counts.items()}
+    for proposal in proposals:
+        for tag in proposal.tags:
+            tag_counts[tag][0] += 1
+
+    if request.args.get("format") == "csv":
+        data = [proposal.to_dict() for proposal in proposals]
+        # Don't use a set to ensure uniqueness here because we want to preserve key ordering
+        fields = list(dict.fromkeys(chain.from_iterable(item.keys() for item in data)))
+        buf = StringIO()
+        writer = csv.DictWriter(buf, fieldnames=fields)
+        writer.writeheader()
+        for row in data:
+            writer.writerow(row)
+        return app.response_class(response=buf.getvalue(), status=200, mimetype="text/csv")
+
+    return render_template(
+        "cfp_review/proposal/proposals.html",
+        proposals=proposals,
+        new_qs=non_sort_query_string,
+        is_filtered=is_filtered,
+        total_proposals=db.session.scalar(select(func.count(Proposal.id))),
+        tag_counts=tag_counts,
+        columns=columns,
+    )
+
+
 @cfp_review.route("/proposals/<int:proposal_id>")
 @admin_required
 def proposal(proposal_id: int) -> ResponseReturnValue:
@@ -101,6 +155,36 @@ def proposal(proposal_id: int) -> ResponseReturnValue:
         proposal,
         notes_form=PrivateNotesForm(proposal),
         all_tags=db.session.scalars(select(Tag).order_by(Tag.tag)),
+    )
+
+
+@cfp_review.route("/proposals-summary")
+@schedule_required
+def proposals_summary():
+    counts_by_tag = {t.tag: Counter() for t in db.session.query(Tag).all()}
+    counts_by_tag["untagged"] = Counter()
+
+    counts_by_state = {s: Counter() for s in get_args(ProposalState)}
+    counts_by_type = Counter()
+
+    for proposal in db.session.query(Proposal).all():
+        counts_by_type[proposal.type] += 1
+        counts_by_state[proposal.state]["total"] += 1
+        counts_by_state[proposal.state][proposal.type] += 1
+
+        for tag in proposal.tags:
+            counts_by_tag[tag]["total"] += 1
+            counts_by_tag[tag][proposal.type] += 1
+
+        if not proposal.tags:
+            counts_by_tag["untagged"]["total"] += 1
+            counts_by_tag["untagged"][proposal.type] += 1
+
+    return render_template(
+        "cfp_review/proposal/proposals_summary.html",
+        counts_by_tag=counts_by_tag,
+        counts_by_type=counts_by_type,
+        counts_by_state=counts_by_state,
     )
 
 

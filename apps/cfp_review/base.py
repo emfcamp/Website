@@ -1,9 +1,7 @@
-import csv
 from collections import Counter, defaultdict
 from collections.abc import Callable
 from datetime import timedelta
-from io import StringIO
-from itertools import chain, combinations
+from itertools import combinations
 from typing import Any, Literal, get_args
 
 import dateutil
@@ -17,9 +15,7 @@ from flask import (
     session,
     url_for,
 )
-from flask import (
-    current_app as app,
-)
+from flask import current_app as app
 from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from flask_mailman import EmailMessage
@@ -34,8 +30,6 @@ from models.content import (
     Proposal,
     ProposalMessage,
     ProposalRound,
-    ProposalState,
-    ProposalTag,
     ProposalType,
     ProposalVote,
     Round,
@@ -136,54 +130,6 @@ def filter_proposal_request() -> tuple[list[Proposal], bool]:
     return proposals, is_filtered
 
 
-@cfp_review.route("/proposals")
-@admin_required
-def proposals() -> ResponseReturnValue:
-
-    default_columns = ["ticket", "date", "state", "type", "notice", "duration", "user", "title"]
-    columns = request.args.getlist("cols") or default_columns
-
-    proposals, is_filtered = filter_proposal_request()
-    non_sort_query_string = request.args.to_dict(flat=False)
-
-    non_sort_query_string.pop("sort_by", None)
-    non_sort_query_string.pop("reverse", None)
-
-    tag_counts = dict(
-        db.session.query(Tag.tag, db.func.count(ProposalTag.c.proposal_id))
-        .select_from(Tag)
-        .outerjoin(ProposalTag)
-        .group_by(Tag.tag)
-        .order_by(Tag.tag)
-        .all()
-    )
-    tag_counts = {tag: [0, total_count] for tag, total_count in tag_counts.items()}
-    for proposal in proposals:
-        for tag in proposal.tags:
-            tag_counts[tag][0] += 1
-
-    if request.args.get("format") == "csv":
-        data = [proposal.to_dict() for proposal in proposals]
-        # Don't use a set to ensure uniqueness here because we want to preserve key ordering
-        fields = list(dict.fromkeys(chain.from_iterable(item.keys() for item in data)))
-        buf = StringIO()
-        writer = csv.DictWriter(buf, fieldnames=fields)
-        writer.writeheader()
-        for row in data:
-            writer.writerow(row)
-        return app.response_class(response=buf.getvalue(), status=200, mimetype="text/csv")
-
-    return render_template(
-        "cfp_review/proposals.html",
-        proposals=proposals,
-        new_qs=non_sort_query_string,
-        is_filtered=is_filtered,
-        total_proposals=db.session.scalar(select(func.count(Proposal.id))),
-        tag_counts=tag_counts,
-        columns=columns,
-    )
-
-
 def sort_messages(messages: list[Proposal]) -> None:
     sort_keys: dict[str, Callable[[Proposal], Any]] = {
         "unread": lambda p: (p.get_unread_count(current_user) > 0, p.messages[-1].created),
@@ -248,7 +194,9 @@ def entity_changelog(entity_type: VersionedEntityType) -> ResponseReturnValue:
         abort(404)
 
     size = int(request.args.get("size", "100"))
-    versions = version_cls.query.order_by(version_cls.transaction_id.desc(), version_cls.modified.desc())
+    versions = db.session.query(version_cls).order_by(
+        version_cls.transaction_id.desc(), version_cls.modified.desc()
+    )
     paged_versions = db.paginate(versions, per_page=size, error_out=False)
 
     return render_template(
@@ -828,36 +776,6 @@ def lightning_talks():
         proposals=proposals,
         remaining_lightning_slots=remaining_lightning_slots,
         total_slots=get_total_lightning_talk_slots(),
-    )
-
-
-@cfp_review.route("/proposals-summary")
-@schedule_required
-def proposals_summary():
-    counts_by_tag = {t.tag: Counter() for t in Tag.query.all()}
-    counts_by_tag["untagged"] = Counter()
-
-    counts_by_state = {s: Counter() for s in get_args(ProposalState)}
-    counts_by_type = Counter()
-
-    for proposal in Proposal.query.all():
-        counts_by_type[proposal.type] += 1
-        counts_by_state[proposal.state]["total"] += 1
-        counts_by_state[proposal.state][proposal.type] += 1
-
-        for tag in proposal.tags:
-            counts_by_tag[tag]["total"] += 1
-            counts_by_tag[tag][proposal.type] += 1
-
-        if not proposal.tags:
-            counts_by_tag["untagged"]["total"] += 1
-            counts_by_tag["untagged"][proposal.type] += 1
-
-    return render_template(
-        "cfp_review/proposals_summary.html",
-        counts_by_tag=counts_by_tag,
-        counts_by_type=counts_by_type,
-        counts_by_state=counts_by_state,
     )
 
 
