@@ -36,6 +36,7 @@ from models.content.lottery import (
     LotteryState,
     get_max_rank_for_user,
 )
+from models.content.venue import Venue
 from models.diversity import (
     AGE_CHOICES,
     DISABILITY_CHOICES,
@@ -347,6 +348,12 @@ class FakeDataGenerator:
 
         if random_bool(0.5):
             village.location = fake_location()
+
+        venue = Venue(
+            village=village,
+            name=village.name,
+        )
+        village.venues.append(venue)
 
         db.session.add(village)
 

@@ -13,7 +13,6 @@ from models.content import (
     ScheduleItem,
     ScheduleItemType,
     Venue,
-    get_days_map,
 )
 from models.content.venue import TimeBlock
 
@@ -69,21 +68,26 @@ def get_cfp_estimate(schedule_item_type: ScheduleItemType) -> CFPEstimate:
 
             allocated_time += duration + changeover_time
 
-    num_days = len(get_days_map().items())
-
     available_venues = list(
         db.session.scalars(
             select(Venue)
             .join(Venue.time_blocks)
-            .where(TimeBlock.type == schedule_item_type)
+            .filter(TimeBlock.type == schedule_item_type)
             .group_by(Venue.id)
         )
     )
 
     # Correct for changeover period not being needed at the end of the day
     # This can go negative if there aren't many proposals accepted yet, so clamp to 0
-    changeover_correction = changeover_time * num_days * len(available_venues)
-    allocated_time = max(allocated_time - changeover_correction, Duration())
+    #
+    # FIXME: We now don't know if changeover time is needed at the end of a TimeBlock.
+    # But this is also a pretty small adjustment given that this is a rough calculation.
+    # If we're this close to the wire, we should be running the scheduler to get a better indication.
+    # - Russ
+    #
+    # num_days = len(get_days_map().items())
+    # changeover_correction = changeover_time * num_days * len(available_venues)
+    # allocated_time = max(allocated_time - changeover_correction, Duration())
 
     available_time = get_available_proposal_time(schedule_item_type)
 

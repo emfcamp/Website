@@ -1,4 +1,5 @@
-from datetime import datetime
+from collections.abc import Iterator
+from datetime import date, datetime, timedelta
 from typing import Any
 
 from dateutil.parser import parse
@@ -52,6 +53,12 @@ class EMFConfig:
     @property
     def event_end(self) -> datetime:
         return self.get_date("EVENT_END")
+
+    @property
+    def event_days(self) -> Iterator[date]:
+        """Iterator of a date object for event days"""
+        for day_idx in range((config.event_end - config.event_start).days + 1):
+            yield config.event_start.date() + timedelta(days=day_idx)
 
     def from_email(self, config_name: str) -> str:
         # config_name is e.g. TICKETS_EMAIL

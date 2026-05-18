@@ -148,10 +148,7 @@ class NewTimeBlockForm(TimeBlockForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.days.choices = [
-            (str(i), (config.event_start.date() + timedelta(days=i)).strftime("%a %d %B"))
-            for i in range(0, (config.event_end.date() - config.event_start.date()).days + 1)
-        ]
+        self.days.choices = [(str(i), date.strftime("%a %d %B")) for i, date in enumerate(config.event_days)]
 
 
 @cfp_review.route("/venues/<int:venue_id>/time-blocks", methods=["GET", "POST"])
@@ -159,10 +156,7 @@ class NewTimeBlockForm(TimeBlockForm):
 def venue_timeblocks(venue_id: int) -> ResponseReturnValue:
     venue = get_or_404(db, Venue, venue_id)
 
-    days = [
-        config.event_start.date() + timedelta(days=i)
-        for i in range(0, (config.event_end.date() - config.event_start.date()).days + 1)
-    ]
+    days = list(config.event_days)
 
     new_form = NewTimeBlockForm()
 
