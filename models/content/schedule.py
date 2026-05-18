@@ -43,7 +43,6 @@ from . import validate_state_transitions
 from .attributes import (
     Attributes,
     FilmAttributes,
-    InstallationAttributes,
     LightningTalkAttributes,
     PerformanceAttributes,
     TalkAttributes,
@@ -480,13 +479,6 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
         supports_lottery=True,
         attributes_cls=YouthWorkshopAttributes,
         default_max_tickets_per_entry=5,
-    ),
-    "installation": ScheduleItemInfo(
-        type="installation",
-        human_type="installation",
-        human_type_a="an installation",
-        supports_lottery=False,
-        attributes_cls=InstallationAttributes,
     ),
     # ScheduleItem types that are only created directly
     "lightning": ScheduleItemInfo(

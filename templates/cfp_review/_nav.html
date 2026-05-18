@@ -82,14 +82,13 @@
                 <li role="separator" class="divider"></li>
                 {{ menuitem("Talks", ".schedule_items", type="talk") }}
                 {{ menuitem("Workshops", ".schedule_items", type="workshop") }}
-                {{ menuitem("Installations", ".schedule_items", type="installation") }}
                 {{ menuitem("Performances", ".schedule_items", type="performance") }}
                 {{ menuitem("Youth Workshops", ".schedule_items", type="youthworkshop") }}
                 {{ menuitem("Lightning Talks", ".lightning_talks") }}
                 <li role="separator" class="divider"></li>
                 {{ menuitem('Published', ".schedule_items", schedule_item_counts['published'], state='published')}}
                 {{ menuitem('Unpublished', ".schedule_items", schedule_item_counts['unpublished'], state='unpublished')}}
-                {{ menuitem('Cancelled', ".schedule_items", schedule_item_counts['cancelled'], state='hidden')}}
+                {{ menuitem('Cancelled', ".schedule_items", schedule_item_counts['cancelled'], state='cancelled')}}
                 <li role="separator" class="divider"></li>
                 {{ menuitem('Summary', ".schedule_items_summary")}}
                 {{ menuitem('Changelog', ".entity_changelog", entity_type="schedule-item" )}}
