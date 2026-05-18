@@ -1362,7 +1362,8 @@ def get_diversity_counts(user_list):
 @admin_required
 def speaker_diversity():
     speakers = (
-        User.query.join(User.proposals)
+        db.session.query(User)
+        .join(User.proposals)
         .filter(
             User.proposals.any(
                 Proposal.state.in_(
@@ -1386,7 +1387,11 @@ def speaker_diversity():
     invited_counts.pop("reviewer_tags")
 
     invited_counts["other"]["missing proposal"] = len(
-        [u for u in User.query.all() if len(u.proposals.all()) == 0]
+        [
+            u
+            for u in db.session.query(User).where(User.cfp_invite_reason.is_not(None)).all()
+            if len(u.proposals) == 0
+        ]
     )
 
     return render_template(
