@@ -195,16 +195,17 @@ def update_proposal(proposal_id: int) -> ResponseReturnValue:
 
     Form = get_update_proposal_type_form(proposal.type)
     form = Form(obj=proposal)
-    form.user_will_have_ticket.data = proposal.user.will_have_ticket
 
-    if form.validate_on_submit():
+    if form.validate_on_submit() and form.update.data:
         form.populate_obj(proposal)
         proposal.user.will_have_ticket = form.user_will_have_ticket.data
 
-        if form.update.data:
-            msg = f"Updating proposal {proposal_id}"
-            proposal.state = form.state.data
-            return flash_commit_and_go(msg, ".proposal", proposal_id=proposal_id)
+        msg = f"Updating proposal {proposal_id}"
+        proposal.state = form.state.data
+        return flash_commit_and_go(msg, ".proposal", proposal_id=proposal_id)
+
+    if request.method == "GET":
+        form.user_will_have_ticket.data = proposal.user.will_have_ticket
 
     return render_proposal_template(
         "cfp_review/proposal/edit.html",
