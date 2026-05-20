@@ -160,12 +160,12 @@ def proposal(proposal_id: int) -> ResponseReturnValue:
 
 @cfp_review.route("/proposals-summary")
 @schedule_required
-def proposals_summary():
-    counts_by_tag = {t.tag: Counter() for t in db.session.query(Tag).all()}
+def proposals_summary() -> ResponseReturnValue:
+    counts_by_tag: dict[str, Counter[str]] = {t.tag: Counter() for t in db.session.query(Tag).all()}
     counts_by_tag["untagged"] = Counter()
 
-    counts_by_state = {s: Counter() for s in get_args(ProposalState)}
-    counts_by_type = Counter()
+    counts_by_state: dict[ProposalState, Counter[str]] = {s: Counter() for s in get_args(ProposalState)}
+    counts_by_type: Counter[str] = Counter()
 
     for proposal in db.session.query(Proposal).all():
         counts_by_type[proposal.type] += 1
@@ -283,12 +283,13 @@ def update_proposal_state(proposal_id: int) -> ResponseReturnValue:
 
 @cfp_review.route("/proposals/<int:proposal_id>/message", methods=["GET", "POST"])
 @admin_required
-def message_proposer(proposal_id):
+def message_proposer(proposal_id: int) -> ResponseReturnValue:
     form = SendMessageForm()
     proposal = get_or_404(db, Proposal, proposal_id)
 
     if form.validate_on_submit():
         if form.send.data:
+            assert form.message.data
             msg = ProposalMessage()
             msg.is_to_admin = False
             msg.from_user_id = current_user.id
@@ -334,7 +335,7 @@ def message_proposer(proposal_id):
 
 @cfp_review.route("/proposals/<int:proposal_id>/votes", methods=["GET", "POST"])
 @admin_required
-def proposal_votes(proposal_id):
+def proposal_votes(proposal_id: int) -> ResponseReturnValue:
     form = UpdateVotesForm()
     proposal = get_or_404(db, Proposal, proposal_id)
     all_votes = {v.id: v for v in proposal.votes}
@@ -395,7 +396,7 @@ def proposal_votes(proposal_id):
 
 @cfp_review.route("/proposals/<int:proposal_id>/notes", methods=["POST"])
 @admin_required
-def proposal_notes(proposal_id):
+def proposal_notes(proposal_id: int) -> ResponseReturnValue:
     proposal = get_or_404(db, Proposal, proposal_id)
     form = PrivateNotesForm(proposal)
 

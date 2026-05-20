@@ -76,7 +76,10 @@ def schedule() -> ResponseReturnValue:
             schedule_state_by_type[occurrence.schedule_item.type]["unscheduled"] += 1
 
     potential_schedules = list(
-        db.session.query(PotentialSchedule).order_by(desc(PotentialSchedule.created)).limit(10)
+        db.session.query(PotentialSchedule)
+        .order_by(desc(PotentialSchedule.created))
+        .filter(PotentialSchedule.state.in_(["new", "applied"]))
+        .limit(10)
     )
 
     return render_template(
