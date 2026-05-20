@@ -3,8 +3,18 @@
 {% block body %}
 <h1>
   {{village.name}}
-  {% if show_edit %}
+  {% if user_is_village_admin %}
+  <a href="{{url_for('villages.members', year=event_year, village_id=village.id)}}" class="btn btn-primary btn-lg pull-right">Members</a>
   <a href="{{url_for('villages.edit', year=event_year, village_id=village.id)}}" class="btn btn-primary btn-lg pull-right">Edit</a>
+  <a href="{{url_for('villages.members_leave', year=event_year, village_id=village.id)}}" class="btn btn-danger btn-lg pull-right">Leave</a>
+  {% elif user_is_village_member %}
+  <a href="{{url_for('villages.members_leave', year=event_year, village_id=village.id)}}" class="btn btn-danger btn-lg pull-right">Leave</a>
+  {% elif user_has_requested_join_village %}
+  <a href="{{url_for('villages.members_leave', year=event_year, village_id=village.id)}}" class="btn btn-danger btn-lg pull-right">Cancel join request</a>
+  {% endif %}
+
+  {% if user_can_join_village %}
+    <a href="{{url_for('villages.members_join', year=event_year, village_id=village.id)}}" class="btn btn-success btn-lg pull-right">Join</a>
   {% endif %}
 </h1>
 
