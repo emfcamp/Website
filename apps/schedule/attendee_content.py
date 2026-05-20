@@ -311,17 +311,6 @@ def attendee_content_edit(schedule_item_id: int) -> ResponseReturnValue:
 
         form.populate_obj(schedule_item)
 
-        for occurrence in schedule_item.occurrences:
-            if (
-                occurrence.state == "unscheduled"
-                and occurrence.scheduled_duration
-                and occurrence.scheduled_venue_id
-                and occurrence.scheduled_time
-            ):
-                occurrence.state = "scheduled"
-
-            # The attendee content form doesn't allow unscheduling
-
         conflicts = [c for o in schedule_item.occurrences for c in o.get_conflicting_content()]
         if any(conflicts) and form.acknowledge_conflicts.data is not True:
             return render_template(

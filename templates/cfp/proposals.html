@@ -53,9 +53,9 @@
         {% if proposal.schedule_item.occurrences | length > 1 %}
         <dt>Instance</dt><dd>{{ occurrence.occurrence_num }}</dd>
         {% endif %}
-        {% if occurrence.state == 'scheduled' %}
+        {% if occurrence.scheduled %}
             <dt>Slot length</dt><dd>{{ occurrence.scheduled_duration }} minutes</dd>
-            <dt>Slot time</dt><dd><b><font color="green">{{ occurrence.scheduled_time.strftime('%A at %-I:%M %p') }}</font></b></dd>
+            <dt>Slot time</dt><dd><b><font color="green">{{ occurrence.scheduled_time.strftime('%A %d %B at %H:%M') }}</font></b></dd>
             <dt>Venue</dt><dd>{{ occurrence.scheduled_venue.name }}</dd>
         {% else %}
             <dt>Venue</dt><dd>Not yet scheduled</dd>

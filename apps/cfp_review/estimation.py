@@ -7,8 +7,6 @@ from sqlalchemy import select
 
 from main import db
 from models.content import (
-    EVENT_SPACING,
-    SLOT_DURATION,
     ScheduleItem,
     ScheduleItemType,
     Venue,
@@ -37,8 +35,6 @@ def get_available_proposal_time(type: ScheduleItemType) -> Duration:
 
 def get_cfp_estimate(schedule_item_type: ScheduleItemType) -> CFPEstimate:
     """Calculate estimated scheduling capacity statistics for a given proposal type."""
-    changeover_time = SLOT_DURATION * EVENT_SPACING[schedule_item_type]
-
     schedule_items = (
         db.session.query(ScheduleItem)
         .filter(
@@ -54,16 +50,15 @@ def get_cfp_estimate(schedule_item_type: ScheduleItemType) -> CFPEstimate:
 
     for schedule_item in schedule_items:
         for occurrence in schedule_item.occurrences:
-            if occurrence.state == "cancelled":
+            if occurrence.cancelled:
                 continue
-            duration = None
-            if occurrence.scheduled_duration:
-                duration = Duration(minutes=occurrence.scheduled_duration)
-            else:
+
+            if not occurrence.scheduled_duration:
                 unknown_durations += 1
                 continue
 
-            allocated_time += duration + changeover_time
+            duration = Duration(minutes=occurrence.scheduled_duration)
+            allocated_time += duration + occurrence.changeover_time
 
     available_venues = list(
         db.session.scalars(

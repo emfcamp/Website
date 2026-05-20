@@ -107,11 +107,7 @@ def edit_venue(venue_id: int) -> ResponseReturnValue:
     if form.validate_on_submit():
         if form.delete.data:
             occurrences = list(
-                db.session.scalars(
-                    select(Occurrence)
-                    .where(Occurrence.scheduled_venue_id == venue.id)
-                    .where(Occurrence.state == "scheduled")
-                )
+                db.session.scalars(select(Occurrence).where(Occurrence.scheduled_venue_id == venue.id))
             )
 
             if occurrences:

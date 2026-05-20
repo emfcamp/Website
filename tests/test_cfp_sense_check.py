@@ -44,7 +44,6 @@ def _dedent_periods(periods: str) -> str:
 
 def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
     return Occurrence(
-        state="scheduled",
         schedule_item=ScheduleItem(type="talk"),
         scheduled_duration=25,
         allowed_times=_dedent_periods(allowed_times),
@@ -60,7 +59,6 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
         # Correctly scheduled
         pytest.param(
             Occurrence(
-                state="scheduled",
                 schedule_item=ScheduleItem(type="talk"),
                 scheduled_duration=25,
                 allowed_times="2024-05-30 12:00:00 > 2024-05-30 12:25:00",
@@ -74,7 +72,6 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
         # Not scheduled but accepted
         pytest.param(
             Occurrence(
-                state="unscheduled",
                 schedule_item=ScheduleItem(type="talk"),
             ),
             [],
@@ -84,7 +81,6 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
         # No venue, but has scheduled time
         pytest.param(
             Occurrence(
-                state="unscheduled",
                 schedule_item=ScheduleItem(type="talk"),
                 scheduled_duration=25,
                 allowed_times="2024-05-30 12:00:00 > 2024-05-30 12:25:00",
@@ -97,7 +93,6 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
         # No proposed venue, but has proposed time
         pytest.param(
             Occurrence(
-                state="unscheduled",
                 schedule_item=ScheduleItem(type="talk"),
                 scheduled_duration=25,
                 allowed_times="2024-05-30 12:00:00 > 2024-05-30 12:25:00",
@@ -109,7 +104,6 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
         # Before event
         pytest.param(
             Occurrence(
-                state="scheduled",
                 schedule_item=ScheduleItem(type="talk"),
                 scheduled_duration=180,
                 allowed_times="2024-05-29 12:00:00 > 2024-06-03 12:00:00",
@@ -123,7 +117,6 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
         # After event
         pytest.param(
             Occurrence(
-                state="scheduled",
                 schedule_item=ScheduleItem(type="talk"),
                 scheduled_duration=180,
                 allowed_times="2024-05-29 12:00:00 > 2024-06-03 12:00:00",
@@ -145,7 +138,6 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
         # During event, but between 2am and 9am
         pytest.param(
             Occurrence(
-                state="scheduled",
                 schedule_item=ScheduleItem(type="talk"),
                 scheduled_duration=25,
                 allowed_times="2024-05-29 12:00:00 > 2024-06-03 12:00:00",
@@ -166,7 +158,6 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
         # FIXME: kicked down the road during the TimeBlock refactor
         # pytest.param(
         #    Occurrence(
-        #        state="scheduled",
         #        schedule_item=ScheduleItem(type="talk"),
         #        scheduled_duration=25,
         #        allowed_times="2024-05-30 12:00:00 > 2024-05-30 12:25:00",
@@ -240,7 +231,6 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
         # Overlaps with another schedule item by same user
         pytest.param(
             Occurrence(
-                state="scheduled",
                 schedule_item=ScheduleItem(type="talk"),
                 scheduled_duration=25,
                 allowed_times="2024-05-30 12:00:00 > 2024-05-30 13:30:00",
@@ -250,7 +240,6 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
             [
                 Occurrence(
                     id=100,
-                    state="unscheduled",
                     schedule_item=ScheduleItem(
                         type="talk",
                         title="Conflicted (potential x potential)",
@@ -260,7 +249,6 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
                 ),
                 Occurrence(
                     id=101,
-                    state="scheduled",
                     schedule_item=ScheduleItem(
                         type="talk",
                         title="Conflicted (potential x scheduled)",
@@ -272,7 +260,6 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
                 ),
                 Occurrence(
                     id=102,
-                    state="unscheduled",
                     schedule_item=ScheduleItem(
                         type="talk",
                         title="Conflicted (scheduled x potential)",
@@ -282,7 +269,6 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
                 ),
                 Occurrence(
                     id=103,
-                    state="scheduled",
                     schedule_item=ScheduleItem(
                         type="talk",
                         title="Conflicted (scheduled x scheduled)",

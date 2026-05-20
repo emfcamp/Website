@@ -38,7 +38,7 @@ class Scheduler:
             db.session.scalars(
                 select(Occurrence)
                 .where(
-                    Occurrence.state != "cancelled",
+                    Occurrence.cancelled != True,
                     Occurrence.schedule_item.has(
                         and_(
                             ScheduleItem.type.in_(types),

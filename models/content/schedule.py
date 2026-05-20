@@ -124,17 +124,6 @@ ScheduleItemState = Literal[
     "cancelled",
 ]
 
-
-# scheduled implies scheduled_duration, scheduled_time, and scheduled_venue_id are all set
-OccurrenceState = Literal["unscheduled", "scheduled", "cancelled"]
-
-
-OCCURRENCE_STATE_TRANSITIONS: dict[OccurrenceState, set[OccurrenceState]] = {
-    "unscheduled": {"scheduled", "cancelled"},
-    "scheduled": {"unscheduled", "cancelled"},
-}
-
-
 SCHEDULE_ITEM_STATE_TRANSITIONS: dict[ScheduleItemState, set[ScheduleItemState]] = {
     "published": {"unpublished", "cancelled"},
     "unpublished": {"published", "cancelled"},
@@ -403,13 +392,8 @@ class Occurrence(BaseModel):
     __table_args__ = (UniqueConstraint("schedule_item_id", "occurrence_num"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    state: Mapped[OccurrenceState] = mapped_column(
-        sqlalchemy.Enum(
-            *get_args(OccurrenceState),
-            native_enum=False,
-        ),
-        default="unscheduled",
-    )
+
+    cancelled: Mapped[bool] = mapped_column(default=False)
 
     schedule_item_id: Mapped[int] = mapped_column(ForeignKey("schedule_item.id"))
     occurrence_num: Mapped[int]
@@ -489,7 +473,7 @@ class Occurrence(BaseModel):
 
     def cancel(self) -> None:
         """Cancel this occurrence."""
-        self.state = "cancelled"
+        self.cancelled = True
 
     @property
     def video_privacy(self) -> VideoPrivacy:
@@ -553,14 +537,16 @@ class Occurrence(BaseModel):
         # This is for attendee content, so will only conflict with other attendee
         # content or workshops. Workshops may not have a scheduled time/duration.
         # TODO: what does the last bit above mean? Workshops have a scheduled time.
-        if self.state != "scheduled":
+        if not self.scheduled:
             return []
+
+        assert self.scheduled_time is not None
+        assert self.scheduled_duration is not None
 
         venue_occurrences: list[Occurrence] = list(
             db.session.scalars(
                 select(Occurrence).filter(
                     Occurrence.id != self.id,
-                    Occurrence.state == "scheduled",
                     Occurrence.scheduled_venue_id == self.scheduled_venue_id,
                 )
             )
@@ -568,9 +554,8 @@ class Occurrence(BaseModel):
 
         conflicts = []
         for other in venue_occurrences:
-            # Safe assertions given the check for state == "scheduled":
-            assert self.scheduled_time is not None
-            assert self.scheduled_duration is not None
+            if not other.scheduled:
+                continue
             assert other.scheduled_time is not None
             assert other.scheduled_duration is not None
 
@@ -624,10 +609,9 @@ class Occurrence(BaseModel):
     @property
     def scheduled(self) -> bool:
         """Whether this occurrence has been scheduled"""
-        return self.scheduled_time is not None and self.scheduled_venue is not None
+        return not self.cancelled and self.scheduled_time is not None and self.scheduled_venue is not None
 
 
-validate_state_transitions(Occurrence.state, OCCURRENCE_STATE_TRANSITIONS)
 from .cfp import Proposal
 from .potential_schedule import PotentialScheduleOccurrence
 from .venue import TimeBlock, Venue

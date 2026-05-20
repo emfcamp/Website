@@ -22,7 +22,6 @@ from main import db
 from models.content import (
     PROPOSAL_INFOS,
     PROPOSAL_STATE_TRANSITIONS,
-    OccurrenceState,
     ProposalType,
     ScheduleItemState,
     ScheduleItemType,
@@ -437,7 +436,6 @@ def valid_venue(form, field):
 
 
 class UpdateOccurrenceForm(Form):
-    state = SelectField("State", choices=[(s, s.title()) for s in get_args(OccurrenceState)])
     occurrence_num = IntegerField("Occurrence number")
 
     manually_scheduled = BooleanField("Manually scheduled")
@@ -473,18 +471,6 @@ class UpdateOccurrenceForm(Form):
             raise ValidationError(
                 "Occurrence cannot be set to Scheduled unless duration, scheduled venue and scheduled time are set"
             )
-
-    def validate_scheduled_duration(form, field):
-        if form.state.data == "scheduled" and not field.data:
-            raise ValidationError("Duration cannot be cleared unless state is set to Unscheduled")
-
-    def validate_scheduled_venue_id(form, field):
-        if form.state.data == "scheduled" and not field.data:
-            raise ValidationError("Scheduled venue cannot be cleared unless state is set to Unscheduled")
-
-    def validate_scheduled_time(form, field):
-        if form.state.data == "scheduled" and not field.data:
-            raise ValidationError("Scheduled time cannot be cleared unless state is set to Unscheduled")
 
 
 class LotteryForm(Form):

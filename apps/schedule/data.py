@@ -131,7 +131,7 @@ def _get_schedule_item_dict(filter: ScheduleFilter, schedule_item: ScheduleItem)
 
 
 def _get_occurrence_dict(filter: ScheduleFilter, occurrence: Occurrence) -> OccurrenceDict:
-    assert occurrence.state == "scheduled"
+    assert occurrence.scheduled
 
     # We can make these assertions because state == "scheduled"
     assert occurrence.scheduled_venue is not None
@@ -172,7 +172,7 @@ def get_schedule_item_dicts_flat(
 
     occurrence: Occurrence
     for occurrence in schedule_item.occurrences:
-        if occurrence.state != "scheduled":
+        if not occurrence.scheduled:
             continue
 
         # Safe assertion due to check that state == "scheduled"
@@ -198,7 +198,7 @@ def get_schedule_item_dict_full(filter: ScheduleFilter, schedule_item: ScheduleI
 
     occurrence: Occurrence
     for occurrence in schedule_item.occurrences:
-        if occurrence.state != "scheduled":
+        if not occurrence.scheduled:
             continue
 
         # Safe assertion due to check that state == "scheduled"
@@ -218,9 +218,6 @@ def get_schedule_items(filter: ScheduleFilter) -> list[ScheduleItem]:
         select(ScheduleItem)
         .where(
             ScheduleItem.state == "published",
-            ScheduleItem.occurrences.any(
-                Occurrence.state == "scheduled",
-            ),
         )
         .options(selectinload(ScheduleItem.occurrences))
     )

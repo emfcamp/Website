@@ -670,7 +670,6 @@ def workshop_steward_venue(venue_id: int) -> ResponseReturnValue:
         db.session.scalars(
             select(Occurrence)
             .where(
-                Occurrence.state == "scheduled",
                 Occurrence.scheduled_venue_id == venue_id,
                 Occurrence.scheduled_time > (pendulum.now(event_tz.zone).naive() - timedelta(hours=1)),
                 Occurrence.schedule_item.has(ScheduleItem.official_content == True),

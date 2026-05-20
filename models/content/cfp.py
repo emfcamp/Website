@@ -282,9 +282,8 @@ class Proposal(BaseModel):
         if self.duration:
             duration = ROUGH_DURATIONS.get(self.duration)
 
-        schedule_item.occurrences.append(
-            Occurrence(state="unscheduled", occurrence_num=1, scheduled_duration=duration)
-        )
+        schedule_item.occurrences.append(Occurrence(occurrence_num=1, scheduled_duration=duration))
+
         db.session.add(schedule_item)
         self.schedule_item = schedule_item
         return schedule_item
