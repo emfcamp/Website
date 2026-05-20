@@ -60,7 +60,7 @@
 
 <p class="multiline">{{ (schedule_item.description) | urlize }}</p>
 
-{% if isinstance(schedule_item.attributes, WorkshopAttributes | YouthWorkshopAttributes) %}
+{% if schedule_item.type in ('workshop', 'youthworkshop') %}
   <table class="table">
   <tr>
     <td><b>Attending this {{ schedule_item.human_type }} will cost</b></td>
@@ -96,7 +96,7 @@
 
 {% else %}
 
-  {% if schedule_item.lottery.state in ["complete", "first-come-first-served"] and lottery_entry and lottery_entry.state == "valid-tickets" %}
+  {% if schedule_item.lottery and schedule_item.lottery.state in ["complete", "first-come-first-served"] and lottery_entry and lottery_entry.state == "valid-tickets" %}
     <div class="well">
       You currently have {{ lottery_entry.ticket_count }} codes for this {{ schedule_item.human_type }}.
       When you attend you can either give your name or a code to get in. Your codes are:
@@ -185,7 +185,7 @@
         frameborder="0" allowfullscreen></iframe>
   {% elif occurrence.youtube_url %}
     <iframe src="{{ occurrence.youtube_url | replace('youtube.com/watch?v=', 'youtube.com/embed/') }}"
-        width="100%" height="500px" frameborder="0" 
+        width="100%" height="500px" frameborder="0"
         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
   {% endif %}
   <strong>Video Hosts:</strong>

@@ -3,12 +3,12 @@
   {% if schedule_item.video_privacy == 'none' %}
   <span style="padding-left: 10px;" title="This {{ schedule_item.human_type }} will not be recorded"><img src="{{ static_url_for('static', filename='images/icons/not-recorded.svg') }}" width="24" height="24"></span>
   {% endif %}
-  {% if isinstance(schedule_item.attributes, TalkAttributes | WorkshopAttributes | YouthWorkshopAttributes) %}
+    {% if schedule_item.type in ('talk', 'workshop', 'youthworkshop') %}
     {% if schedule_item.attributes.content_note %}
     <span style="padding-left: 10px;" title="There is a content note on this {{ schedule_item.human_type }}">⚠️</span>
     {% endif %}
   {% endif %}
-  {% if isinstance(schedule_item.attributes, TalkAttributes | WorkshopAttributes) %}
+      {% if schedule_item.type in ('talk', 'workshop') %}
     {% if schedule_item.attributes.family_friendly %}
     <span style="padding-left: 10px;" title="This {{ schedule_item.human_type }} is family friendly">{{ [ "👪","👩‍👧","👩‍👩‍👧","👨‍👦‍👦","👩‍👩‍👧‍👧"] | random }}</span>
     {% endif %}
