@@ -49,7 +49,7 @@ from .forms import (
     UpdateProposalForm,
     UpdateVotesForm,
 )
-from .schedule import _convert_schedule_item
+from .schedule_item import _convert_schedule_item
 
 
 def find_next_proposal_id(prop):

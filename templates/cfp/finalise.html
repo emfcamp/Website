@@ -11,20 +11,16 @@
     <fieldset>
         <legend>Confirm Your Details</legend>
         <p>Please confirm how you would like your name, and those of any
-          collaborators to appear in the schedule. Any names you give here
+          co-presenters, to appear in the schedule. Any names you give here
           are separate to the one attached to your ticket.</p>
         {{ render_field(form.names, 9) }}
         <p>What pronouns should we use? For example 'they/them' or 'she/her'.
           These will be displayed in the schedule and given to heralds to use.</p>
         {{ render_field(form.pronouns, 9) }}
-        <p>If you can supply a telephone number it helps us contact you
+        <p>If you can supply a telephone number, it helps us contact you
           once we're on site. It will be treated with strictest confidence
           and only accessible to those that absolutely need it.</p>
         {{ render_field(form.contact_telephone, 9) }}
-        <p>If you have a custom extension (e.g. DECT) issued for
-          <a href="/about/phones">our on-site phone network</a>, we'll use
-          that as an alternative way to contact you.</p>
-        {{ render_field(form.contact_eventphone, 9) }}
     </fieldset>
 
     <fieldset>
@@ -38,7 +34,7 @@
 
         {% if schedule_item.type in ["talk", "workshop", "youthworkshop"] %}
         <p>Will your {{ schedule_item.human_type }} cover any content that people may want to be warned about?
-           For example, discussions of death, bigotry etc.</p>
+           For example, discussions of death, bigotry, etc.</p>
         {{ render_field(form.attributes.content_note, 9) }}
         {% endif %}
         {% if schedule_item.type in ["talk", "workshop"] %}
@@ -68,68 +64,42 @@
     </fieldset>
 
     <fieldset>
-        <legend>Arrival &amp; Departure</legend>
-        <p>Please let us know when you will be arriving and leaving the festival. We won't schedule you for a time when you are likely to be travelling.</p>
-
-        {{ render_field(form.arrival_period, 9) }}
-        {{ render_field(form.departure_period, 9) }}
-    </fieldset>
-
-    {% if slot_times %}
-    <fieldset>
         <legend>Your Availability</legend>
-        <p>When are you available to deliver your {{ schedule_item.human_type }}? We'll do our best to pick a time that you are comfortable with.</p>
+        <p>When are you available to deliver your {{ schedule_item.human_type }}? We'll do our best to pick a time that suits you.</p>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Day</th>
+                {% for range in time_ranges.range_names %}
+                <th>{{ range }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
 
-          {% if schedule_item.type == 'performance' %}
-            <p>Performances will be scheduled between <strong>8pm and 1:30am</strong> (midnight)
-              every day. There is a 1:30am curfew on amplified music.</p>
-            <table class="table">
-              <thead>
-                <tr><th>Day</th><th>8pm - 10pm</th><th>10pm - 1:30am</th></tr>
-              </thead>
-          {% else %}
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Day</th>
-                  {% for heading in slot_titles %}
-                  <th>{{ heading }}</th>
-                  {% endfor %}
-                </tr>
-              </thead>
-          {% endif %}
-              <tbody>
-                <tr>
-                  <th scope="row">Friday</th>
-                  {% for slot in slot_times %}
-                  <td>{{ day_form_slots['fri'].get(slot, 'n/a') }}</td>
-                  {% endfor %}
-                </tr>
-                <tr>
-                  <th scope="row">Saturday</th>
-                  {% for slot in slot_times %}
-                  <td>{{ day_form_slots['sat'].get(slot, 'n/a') }}</td>
-                  {% endfor %}
-                </tr>
-                <tr>
-                  <th scope="row">Sunday</th>
-                  {% for slot in slot_times %}
-                  <td>{{ day_form_slots['sun'].get(slot, 'n/a') }}</td>
-                  {% endfor %}
-                </tr>
-              </tbody>
-            </table>
+            {% for day in time_ranges.days %}
+            <tr>
+                <th scope="row">{{day}}</th>
+                {% for name in time_ranges.fields[day] %}
+                    <td>
+                        <input name="{{name}}" type="checkbox"
+                            {% if time_ranges.enabled[name] %}
+                            checked="checked"
+                            {% endif %}
+                        >
+                    </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
     </fieldset>
-    {% endif %}
 
     <fieldset>
         <legend>Final Requirements</legend>
         {% if schedule_item.type in ['talk', 'performance'] %}
-        {% if schedule_item.occurrences %}
-        {# The default privacy field probably won't mean much now #}
-        {% else %}
-        {{ render_field(form.default_video_privacy, 7) }}
-        {% endif %}
+        {{ render_field(form.video_privacy, 9) }}
         {% endif %}
 
         {% if schedule_item.type == 'talk' %}
@@ -148,23 +118,10 @@
 
         {% endif %}
 
-        {% if schedule_item.type == 'installation' %}
-          <p>In addition to any requirements (including being under cover, power
-            and water) please let us know if special provisions are needed for
-            moving your installation (e.g. if it is fragile, must be disarmed first).</p>
-        {% else %}
           <div class="col-md-9 col-md-offset-3">
             <small>Any equipment you might need, or other things you need us to provide.</small>
           </div>
-        {% endif %}
         {{ render_field(form.proposal_equipment_required, 9) }}
-
-        <div class="col-md-9 col-md-offset-3">
-          <small>What costs do you need covered?</small>
-        </div>
-        {{ render_field(form.proposal_funding_required, 9) }}
-
-        {{ render_field(form.proposal_additional_info, 9) }}
     </fieldset>
 
     <fieldset>

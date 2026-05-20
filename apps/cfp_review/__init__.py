@@ -176,5 +176,6 @@ from . import (
     proposal,  # noqa: F401
     review,  # noqa: F401
     schedule,  # noqa: F401
+    schedule_item,  # noqa: F401
     sense_check,  # noqa: F401
 )

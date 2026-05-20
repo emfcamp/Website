@@ -1,172 +1,35 @@
-"""
-Admin views relating to ScheduleItems and Occurrences
-"""
+"""Scheduling views"""
 
-import csv
-import json
-from collections import Counter
-from http import HTTPStatus
-from io import BytesIO, StringIO
+from collections import Counter, defaultdict
+from datetime import timedelta
+from itertools import combinations
 from typing import Any, get_args
 
-from flask import (
-    abort,
-    flash,
-    redirect,
-    render_template,
-    request,
-    send_file,
-    url_for,
-)
 from flask import current_app as app
+from flask import flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
-from sqlalchemy import func, select
-from sqlalchemy.orm import selectinload, undefer
-from wtforms import FormField
+from sqlalchemy import and_, select
+from sqlalchemy.orm import joinedload
+from sqlalchemy.sql import desc
 
+from apps.cfp.scheduler import Scheduler
 from apps.cfp_review.estimation import get_cfp_estimate
 from main import db, get_or_404
 from models.content import (
-    SCHEDULE_ITEM_INFOS,
-    Lottery,
     Occurrence,
+    Proposal,
     ScheduleItem,
-    ScheduleItemState,
-    ScheduleItemType,
+    Venue,
 )
-from models.content.attributes import convert_attributes_between_types
-from models.user import User
+from models.content.potential_schedule import PotentialSchedule
+from models.content.schedule import ScheduleItemState, ScheduleItemType
 
-from . import admin_required, bool_qs, cfp_review, schedule_required, sort_schedule_items
-from .forms import (
-    UPDATE_SCHEDULE_ITEM_ATTRIBUTES_FORM_TYPES,
-    ChangeScheduleItemOwner,
-    ConvertScheduleItemForm,
-    CreateOccurrenceForm,
-    LotteryForm,
-    UpdateOccurrenceForm,
-    UpdateScheduleItemForm,
-)
+from . import cfp_review, schedule_required
 
 
-@cfp_review.route("/schedule-items")
-@admin_required
-def schedule_items() -> ResponseReturnValue:
-    schedule_items, is_filtered = filter_schedule_item_request()
-    non_sort_query_string: dict[str, list[str]] = request.args.to_dict(flat=False)
-
-    non_sort_query_string.pop("sort_by", None)
-    non_sort_query_string.pop("reverse", None)
-
-    return render_template(
-        "cfp_review/schedule/schedule_items.html",
-        schedule_items=schedule_items,
-        new_qs=non_sort_query_string,
-        is_filtered=is_filtered,
-        total_schedule_items=db.session.scalar(select(func.count(ScheduleItem.id))),
-    )
-
-
-@cfp_review.route("/schedule-items.<format>")
-@admin_required
-def export_schedule_items(format: str) -> ResponseReturnValue:
-    fields = [
-        "id",
-        "state",
-        "names",
-        "pronouns",
-        "type",
-        "title",
-        "description",
-        "short_description",
-        "duration",
-        "arrival_period",
-        "departure_period",
-        "available_times",
-        "contact_telephone",
-        "contact_eventphone",
-        "official_content",
-        "equipment_required",
-        "funding_required",
-        "notice_required",
-        "additional_info",
-        # FIXME: do we need any of these?
-        # "tags",
-        # "favourite_count",
-    ]
-
-    # Do not call this with untrusted field values
-    def get_field(proposal, field_path):
-        val = proposal
-        for field in field_path.split("."):
-            val = getattr(val, field)
-        return val
-
-    schedule_items, _ = filter_schedule_item_request()
-    if format == "csv":
-        mime = "text/csv"
-        buf = StringIO()
-        w = csv.writer(buf)
-        # Header row
-        w.writerow(fields)
-        for s in schedule_items:
-            cells = []
-            for field in fields:
-                cell = get_field(s, field)
-                cells.append(cell)
-            w.writerow(cells)
-        out = buf.getvalue()
-    elif format == "json":
-        mime = "application/json"
-        out = json.dumps(
-            [{a: get_field(s, a) for a in fields} for s in schedule_items],
-            default=str,
-        )
-    else:
-        abort(HTTPStatus.BAD_REQUEST, "Unsupported export format")
-    return send_file(
-        BytesIO(out.encode()),
-        mime,
-        as_attachment=True,
-        download_name=f"proposals.{format}",
-    )
-
-
-@cfp_review.route("/schedule-items/<int:schedule_item_id>", methods=["GET", "POST"])
-@admin_required
-def update_schedule_item(schedule_item_id: int) -> ResponseReturnValue:
-    schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
-
-    Form = get_update_schedule_item_type_form(schedule_item.type)
-    form = Form(obj=schedule_item)
-
-    if form.validate_on_submit():
-        form.populate_obj(schedule_item)
-
-        if form.update.data:
-            msg = f"Updating schedule item {schedule_item_id}"
-            flash(msg)
-            app.logger.info(msg)
-            db.session.commit()
-
-        return redirect(url_for(".update_schedule_item", schedule_item_id=schedule_item_id))
-
-    if request.method != "POST":
-        form.official_content.data = (schedule_item.official_content and "official") or "attendee"
-
-    occurrence_form = CreateOccurrenceForm()
-
-    return render_template(
-        "cfp_review/schedule/schedule_item.html",
-        schedule_item=schedule_item,
-        form=form,
-        occurrence_form=occurrence_form,
-    )
-
-
-@cfp_review.route("/schedule-items-summary")
+@cfp_review.route("/schedule")
 @schedule_required
-def schedule_items_summary() -> ResponseReturnValue:
+def schedule() -> ResponseReturnValue:
     counts_by_state: dict[ScheduleItemState, Counter[Any]] = {
         s: Counter() for s in get_args(ScheduleItemState)
     }
@@ -182,259 +45,249 @@ def schedule_items_summary() -> ResponseReturnValue:
     estimates = {
         schedule_item_type: get_cfp_estimate(schedule_item_type) for schedule_item_type in schedule_item_types
     }
+
+    schedule_state: Counter[str] = Counter()
+    schedule_state_by_type: dict[ScheduleItemType, Counter[str]] = {
+        s: Counter() for s in get_args(ScheduleItemType)
+    }
+
+    for occurrence in (
+        db.session.query(Occurrence).join(Occurrence.schedule_item).where(ScheduleItem.official_content).all()
+    ):
+        if occurrence.manually_scheduled:
+            if occurrence.scheduled:
+                schedule_state["manual_scheduled"] += 1
+            else:
+                schedule_state["manual_unscheduled"] += 1
+        else:
+            if occurrence.scheduled:
+                schedule_state["auto_scheduled"] += 1
+            else:
+                if len(occurrence.schedule_item.availability) == 0:
+                    schedule_state["auto_missing_availability"] += 1
+                else:
+                    schedule_state["auto_unscheduled"] += 1
+
+        if occurrence.scheduled:
+            schedule_state_by_type[occurrence.schedule_item.type]["scheduled"] += 1
+        elif len(occurrence.schedule_item.availability) == 0:
+            schedule_state_by_type[occurrence.schedule_item.type]["missing_availability"] += 1
+        else:
+            schedule_state_by_type[occurrence.schedule_item.type]["unscheduled"] += 1
+
+    potential_schedules = list(
+        db.session.query(PotentialSchedule).order_by(desc(PotentialSchedule.created)).limit(10)
+    )
+
     return render_template(
-        "cfp_review/schedule/schedule_items_summary.html",
+        "cfp_review/schedule/schedule.html",
         counts_by_type=counts_by_type,
         counts_by_state=counts_by_state,
         estimates=estimates,
+        schedule_state=schedule_state,
+        schedule_state_by_type=schedule_state_by_type,
+        potential_schedules=potential_schedules,
     )
 
 
-@cfp_review.route("/schedule-items/<int:schedule_item_id>/convert", methods=["GET", "POST"])
-@admin_required
-def convert_schedule_item(schedule_item_id: int) -> ResponseReturnValue:
-    schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
+@cfp_review.route("/schedule/run-scheduler", methods=["GET", "POST"])
+@schedule_required
+def run_scheduler():
 
-    if schedule_item.proposal:
-        # We don't want to get into having mismatched proposal/schedule_item types yet
-        flash("The schedule item is associated with a proposal, please convert this instead.")
-        return redirect(url_for(".convert_proposal", proposal_id=schedule_item.proposal_id))
-
-    form = ConvertScheduleItemForm()
-    types = get_args(ScheduleItemType)
-    form.new_type.choices = [(t, t.title()) for t in types if t != schedule_item.type]
-
-    if form.validate_on_submit():
-        new_type = form.new_type.data
-        _convert_schedule_item(schedule_item, new_type)
-
+    if request.method == "POST" and request.form.get("run"):
+        scheduler = Scheduler()
+        # FIXME: maybe configure the content types here
+        result = scheduler.run(["talk", "workshop"])
+        db.session.add(result)
         db.session.commit()
 
-        return redirect(url_for(".update_schedule_item", schedule_item_id=schedule_item.id))
+        return redirect(url_for(".potential_schedule", schedule_id=result.id))
+
+    return render_template("cfp_review/schedule/schedule_run.html")
+
+
+@cfp_review.route("/schedule/potential_schedule/<int:schedule_id>", methods=["GET", "POST"])
+@schedule_required
+def potential_schedule(schedule_id: int) -> ResponseReturnValue:
+    potential_schedule = get_or_404(db, PotentialSchedule, schedule_id)
+
+    if request.method == "POST":
+        if request.form.get("apply") == "true":
+            potential_schedule.apply()
+            flash("Potential schedule applied")
+        if request.form.get("discard") == "true":
+            potential_schedule.state = "discarded"
+
+        db.session.commit()
+        return redirect(url_for(".schedule"))
 
     return render_template(
-        "cfp_review/schedule/convert_schedule_item.html", schedule_item=schedule_item, form=form
+        "cfp_review/schedule/potential_schedule.html", potential_schedule=potential_schedule
     )
 
 
-def _convert_schedule_item(schedule_item: ScheduleItem, new_type: ScheduleItemType) -> None:
-    # This can also be called by attendee content managers
-
-    # People's availability can vary based on type
-    schedule_item.available_times = None
-
-    for occurrence in schedule_item.occurrences:
-        # Fall back to the defaults, as we don't know why this was set
-        occurrence.allowed_venues = []
-
-    old_attributes = schedule_item.attributes
-    schedule_item.type = new_type  # affects type_info
-    new_attributes = schedule_item.type_info.attributes_cls()
-    convert_attributes_between_types(old_attributes, new_attributes)
-    schedule_item.attributes = new_attributes
-
-
-def filter_schedule_item_request() -> tuple[list[ScheduleItem], bool]:
-    schedule_item_query = select(ScheduleItem)
-    is_filtered = False
-
-    bool_names: list[str] = []
-    bool_vals = [request.args.get(n, type=bool_qs) for n in bool_names]
-    bool_dict = {n: v for n, v in zip(bool_names, bool_vals, strict=True) if v is not None}
-    if bool_dict:
-        is_filtered = True
-        schedule_item_query = schedule_item_query.filter_by(**bool_dict)
-
-    types = request.args.getlist("type")
-    if types:
-        is_filtered = True
-        schedule_item_query = schedule_item_query.where(ScheduleItem.type.in_(types))
-
-    states = request.args.getlist("state")
-    if states:
-        is_filtered = True
-        schedule_item_query = schedule_item_query.where(ScheduleItem.state.in_(states))
-
-    official_content = sorted(request.args.getlist("official_content"))
-    if official_content == ["attendee"] or official_content == ["official"]:
-        is_filtered = True
-        official_content_bool = official_content == ["official"]
-        schedule_item_query = schedule_item_query.where(
-            ScheduleItem.official_content == official_content_bool
+@cfp_review.route("/scheduler")
+@schedule_required
+def scheduler() -> ResponseReturnValue:
+    occurrences: list[Occurrence] = list(
+        db.session.scalars(
+            select(Occurrence)
+            .where(Occurrence.scheduled_duration.isnot(None))
+            .where(
+                Occurrence.proposal.has(
+                    and_(
+                        # FIXME: are these needed?
+                        Proposal.state.in_({"accepted", "finalised"}),
+                        Proposal.type.in_({"talk", "workshop", "youthworkshop", "performance"}),
+                    )
+                )
+            )
+            .options(joinedload(Occurrence.schedule_item).joinedload(ScheduleItem.proposal))
         )
-
-    schedule_item_query = schedule_item_query.options(selectinload(ScheduleItem.occurrences)).options(
-        undefer(ScheduleItem.favourite_count)
     )
-    schedule_items = list(db.session.scalars(schedule_item_query))
 
-    sort_schedule_items(schedule_items)
-
-    return schedule_items, is_filtered
-
-
-@cfp_review.route("/schedule-items/<int:schedule_item_id>/occurrences", methods=["POST"])
-@admin_required
-def occurrences(schedule_item_id: int) -> ResponseReturnValue:
-    schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
-
-    form = CreateOccurrenceForm()
-    if form.validate_on_submit():
-        occurrence_num = 1
-        for occurrence in schedule_item.occurrences:
-            if occurrence.occurrence_num == occurrence_num:
-                occurrence_num += 1
-            else:
-                break
-        occurrence = Occurrence(
-            schedule_item=schedule_item,
-            occurrence_num=occurrence_num,
-            state="unscheduled",
-            video_privacy=schedule_item.default_video_privacy,
-        )
-        schedule_item.occurrences.append(occurrence)
-        db.session.add(occurrence)
-        db.session.commit()
-        return redirect(
-            url_for(".update_occurrence", schedule_item_id=schedule_item.id, occurrence_id=occurrence.id)
-        )
-
-    return redirect(url_for(".update_schedule_item", schedule_item_id=schedule_item.id))
-
-
-@cfp_review.route(
-    "/schedule-items/<int:schedule_item_id>/occurrences/<int:occurrence_id>", methods=["GET", "POST"]
-)
-@admin_required
-def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseReturnValue:
-    occurrence: Occurrence | None = db.session.scalar(
-        select(Occurrence)
-        .filter_by(id=occurrence_id, schedule_item_id=schedule_item_id)
-        .options(selectinload(Occurrence.schedule_item))
-    )
-    if not occurrence:
-        abort(404)
-
-    Form = get_update_occurrence_type_form(occurrence.schedule_item.type)
-    form = Form(obj=occurrence)
-
-    valid_allowed_venues = set(occurrence.valid_allowed_venues)
-    # We don't block saving an occurrence if the valid list has changed
-    # allowed_venues is an input into the scheduler, not a constraint on us
-    valid_allowed_venues |= set(occurrence.allowed_venues)
-    if occurrence.potential_venue:
-        valid_allowed_venues.add(occurrence.potential_venue)
-    if occurrence.scheduled_venue:
-        valid_allowed_venues.add(occurrence.scheduled_venue)
-
-    venues_dict = {v.id: v for v in valid_allowed_venues}
-    allowed_venue_choices = [
-        (str(v.id), v.name) for v in sorted(valid_allowed_venues, key=lambda v: v.priority, reverse=True)
+    shown_venues = [
+        {"key": v.id, "label": v.name}
+        for v in db.session.scalars(select(Venue).order_by(Venue.priority.desc()))
     ]
-    form.allowed_venue_ids.choices = allowed_venue_choices
-    form.scheduled_venue_id.choices = [("", "")] + allowed_venue_choices
-    form.potential_venue_id.choices = [("", "")] + allowed_venue_choices
 
-    if form.validate_on_submit():
-        if occurrence.schedule_item.type_info.supports_lottery and not occurrence.lottery:
-            occurrence.lottery = Lottery(
-                occurrence=occurrence,
-            )
-            db.session.add(occurrence.lottery)
+    venues_to_show = request.args.getlist("venue")
+    if venues_to_show:
+        shown_venues = [venue for venue in shown_venues if venue["label"] in venues_to_show]
 
-        form.populate_obj(occurrence)
+    venue_ids = [venue["key"] for venue in shown_venues]
 
-        # FIXME: this is horrible
-        allowed_times = form.allowed_times_str.data
-        assert allowed_times is not None
-        # Apparently this was required for Windows (presumably IE) users
-        # Let's see if it still happens
-        if "\r" in allowed_times:
-            app.logger.warning("Fixing up newlines")
-            allowed_times = allowed_times.replace("\r\n", "\n")
-        allowed_times = allowed_times.strip()
-        if occurrence.get_allowed_time_periods_serialised().strip() != allowed_times:
-            occurrence.allowed_times = allowed_times or None
+    occurrence_data = []
+    for occurrence in occurrences:
+        if occurrence.schedule_item.proposal:
+            speakers = [occurrence.schedule_item.proposal.user.id]
+        else:
+            app.logger.warning(f"Occurrence {occurrence.id} has no associated speakers")
+            speakers = []
 
-        assert form.allowed_venue_ids.data is not None
-        occurrence.allowed_venues = [venues_dict[v] for v in form.allowed_venue_ids.data]
+        # FIXME rename these fields, they're all out of date,
+        # and maybe add some proper typing
+        # See also cfp.scheduler.Scheduler.get_schedule_data
 
-        db.session.commit()
-        return redirect(
-            url_for(".update_occurrence", schedule_item_id=schedule_item_id, occurrence_id=occurrence_id)
-        )
+        export: dict[str, Any] = {
+            "id": occurrence.id,
+            "duration": occurrence.scheduled_duration,
+            "is_potential": False,
+            "is_attendee": not occurrence.schedule_item.official_content,
+            "speakers": speakers,
+            "text": occurrence.schedule_item.title,
+            "valid_venues": [v.id for v in occurrence.allowed_venues or occurrence.valid_allowed_venues],
+            # "valid_time_ranges": [
+            #    {"start": str(p.start), "end": str(p.end)}
+            #    for p in occurrence.get_allowed_time_periods_with_default()
+            # ],
+        }
 
-    if request.method != "POST":
-        form.allowed_times_str.data = occurrence.allowed_times or ""
-        form.allowed_venue_ids.data = [v.id for v in occurrence.valid_allowed_venues]
+        if occurrence.scheduled_venue:
+            export["venue"] = occurrence.scheduled_venue_id
+        if occurrence.potential_venue:
+            export["venue"] = occurrence.potential_venue.id
+            export["is_potential"] = True
 
-        if occurrence.schedule_item.type_info.supports_lottery:
-            form.lottery.max_tickets_per_entry.default = (
-                occurrence.schedule_item.type_info.default_max_tickets_per_entry
-            )
+        if occurrence.scheduled_time:
+            export["start_date"] = occurrence.scheduled_time
+        if occurrence.potential_time:
+            export["start_date"] = occurrence.potential_time
+            export["is_potential"] = True
 
-    return render_template(
-        "cfp_review/schedule/occurrence.html",
-        schedule_item=occurrence.schedule_item,
-        occurrence=occurrence,
-        form=form,
-    )
+        if "start_date" in export:
+            # We filter on Occurrence.scheduled_duration.isnot(None)) above
+            assert occurrence.scheduled_duration is not None
+            export["end_date"] = export["start_date"] + timedelta(minutes=occurrence.scheduled_duration)
+            export["start_date"] = str(export["start_date"])
+            export["end_date"] = str(export["end_date"])
 
+        # We can't show things that are not yet in a slot!
+        # FIXME: Show them somewhere
+        if "venue" not in export or "start_date" not in export:
+            continue
 
-@cfp_review.route("/schedule-items/<int:schedule_item_id>/change-owner", methods=["GET", "POST"])
-@admin_required
-def schedule_item_change_owner(schedule_item_id: int) -> ResponseReturnValue:
-    form = ChangeScheduleItemOwner()
-    schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
+        # Skip this event if we're filtering out the venue it's currently scheduled in
+        if export["venue"] not in venue_ids:
+            continue
 
-    if form.validate_on_submit() and form.submit.data:
-        assert form.user_email.data  # DataRequired
+        occurrence_data.append(export)
 
-        user = form._user
-        if not user:
-            assert form.user_name.data  # validate_user_name
-            user = User(form.user_email.data, form.user_name.data)
-            db.session.add(user)
-
-            msg = f"Created new user {user.email}"
-            app.logger.info(msg)
-            flash(msg)
-
-        schedule_item.user = user
-        db.session.commit()
-
-        msg = f"Transferred ownership of schedule item {schedule_item.id} to {user.name}"
-        app.logger.info(msg)
-        flash(msg)
-
-        return redirect(url_for(".update_schedule_item", schedule_item_id=schedule_item_id))
+    ## FIXME: TimeBlock migration
+    # venue_names_by_type = Venue.emf_venue_names_by_type()
 
     return render_template(
-        "cfp_review/schedule/change_schedule_item_owner.html",
-        form=form,
-        schedule_item=schedule_item,
+        "cfp_review/schedule/scheduler.html",
+        shown_venues=shown_venues,
+        occurrence_data=occurrence_data,
+        default_venues={},
     )
 
 
-def get_update_schedule_item_type_form(schedule_item_type: ScheduleItemType) -> type[UpdateScheduleItemForm]:
-    class UpdateScheduleItemFormWithAttributes(UpdateScheduleItemForm):
-        pass
+# AJAX update endpoint for JS-based scheduler
+# @cfp_review.route("/scheduler-update", methods=["GET", "POST"])
+# @admin_required
+# def scheduler_update() -> ResponseReturnValue:
+#    occurrence = get_or_404(db, Occurrence, int(request.form["id"]))
+#    occurrence.potential_time = dateutil.parser.parse(request.form["time"]).replace(tzinfo=None)
+#    occurrence.potential_venue_id = int(request.form["venue"])
+#
+#    changed = True
+#    if occurrence.potential_time == occurrence.scheduled_time and str(occurrence.potential_venue_id) == str(
+#        occurrence.scheduled_venue_id
+#    ):
+#        occurrence.potential_time = None
+#        occurrence.potential_venue = None
+#        changed = False
+#
+#    db.session.commit()
+#    return jsonify({"changed": changed})
 
-    UpdateScheduleItemFormWithAttributes.attributes = FormField(
-        UPDATE_SCHEDULE_ITEM_ATTRIBUTES_FORM_TYPES[schedule_item_type]
+
+@cfp_review.route("/clashfinder")
+@schedule_required
+def clashfinder() -> ResponseReturnValue:
+    schedule_items = list(
+        db.session.scalars(
+            select(ScheduleItem)
+            .options(joinedload(ScheduleItem.occurrences))
+            .options(joinedload(ScheduleItem.proposal))
+            .options(joinedload(ScheduleItem.favourited_by))
+        ).unique()
     )
 
-    return UpdateScheduleItemFormWithAttributes
+    user_faves: dict[int, list[Occurrence]] = defaultdict(list)
+    for schedule_item in schedule_items:
+        for user in schedule_item.favourited_by:
+            # Don't check state because we want to include potential times/venues
+            user_faves[user.id] += schedule_item.occurrences
 
+    popularity: Counter[tuple[Occurrence, Occurrence]] = Counter()
+    for occurrences in user_faves.values():
+        popularity.update((o1, o2) for o1, o2 in combinations(sorted(occurrences, key=lambda o: o.id), 2))
 
-def get_update_occurrence_type_form(schedule_item_type: ScheduleItemType) -> type[UpdateOccurrenceForm]:
-    type_info = SCHEDULE_ITEM_INFOS[schedule_item_type]
-    if not type_info.supports_lottery:
-        return UpdateOccurrenceForm
+    clashes = []
+    offset = 0
+    for (o1, o2), count in popularity.most_common()[:1000]:
+        offset += 1
+        p1 = o1.schedule_item.proposal
+        p2 = o2.schedule_item.proposal
+        if not p1 or not p2:
+            # TODO: this should be rare, do we flag it up?
+            continue
 
-    class UpdateOccurrenceFormWithLottery(UpdateOccurrenceForm):
-        pass
+        if p1.state not in {"accepted", "finalised"} or p2.state not in {"accepted", "finalised"}:
+            # TODO: this also should be rare, do we flag it up?
+            continue
 
-    UpdateOccurrenceFormWithLottery.lottery = FormField(LotteryForm)
+        if o1.overlaps_with(o2):
+            clashes.append(
+                {
+                    "occurrence_1": o1,
+                    "occurrence_2": o2,
+                    "favourite_count": count,
+                    "number": offset,
+                }
+            )
 
-    return UpdateOccurrenceFormWithLottery
+    return render_template("cfp_review/schedule/clashfinder.html", clashes=clashes)

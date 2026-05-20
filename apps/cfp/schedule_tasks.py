@@ -1,14 +1,10 @@
 """CLI commands for scheduling"""
 
-from typing import Literal
-
 import click
 from flask import current_app as app
-from sqlalchemy import or_, select
 
-from apps.cfp_review.email import send_email_for_proposal
 from main import db
-from models.content import Occurrence, Proposal, ScheduleItem, ScheduleItemType
+from models.content import ScheduleItemType
 
 from . import cfp
 from .scheduler import Scheduler
@@ -23,28 +19,27 @@ def set_rough_durations():
     """
     scheduler = Scheduler()
     scheduler.set_rough_durations()
+    db.session.commit()
 
 
 @cfp.cli.command("schedule")
-@click.option("-p", "--persist", is_flag=True, help="Persist changes rather than doing a dry run")
-@click.option("--ignore_potential", is_flag=True, help="Ignore potential slots when scheduling")
 @click.option("--type", help="Only run the scheduler for the specified type of content.")
-def run_schedule(persist, ignore_potential, type):
+def run_schedule(type: ScheduleItemType | None) -> None:
     """Run the schedule constraint solver. This can take a while."""
     scheduler = Scheduler()
-    if ignore_potential:
-        app.logger.info("Ignoring current potential slots, items without a scheduled slot will move!")
 
     if type:
         app.logger.info(f"Only scheduling {type} proposals.")
-        type = [type]
+        types: list[ScheduleItemType] = [type]
     else:
-        type = ["talk", "workshop", "youthworkshop"]
+        types = ["talk", "workshop", "youthworkshop"]
 
-    scheduler.run(persist, ignore_potential, type)
+    potential_schedule = scheduler.run(types)
+    db.session.add(potential_schedule)
+    db.session.commit()
 
 
-@cfp.cli.command("apply_potential_schedule")
+""" @cfp.cli.command("apply_potential_schedule")
 @click.option("--email/--no-email", default=True, help="Send update emails to proposers")
 @click.option(
     "--type",
@@ -118,3 +113,4 @@ def apply_potential_schedule(email: bool, type: ScheduleItemType | Literal["all"
             send_email_for_proposal(schedule_item.proposal, reason="slot-moved")
 
     db.session.commit()
+ """

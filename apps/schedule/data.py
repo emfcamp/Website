@@ -51,7 +51,7 @@ class ScheduleItemDict(TypedDict):
     description: str
     short_description: str
 
-    default_video_privacy: str
+    video_privacy: str
     is_fave: bool
     official_content: bool
 
@@ -101,7 +101,7 @@ def _get_schedule_item_dict(filter: ScheduleFilter, schedule_item: ScheduleItem)
         title=schedule_item.title,
         description=schedule_item.description or "",
         short_description=schedule_item.short_description or "",
-        default_video_privacy=schedule_item.default_video_privacy,
+        video_privacy=schedule_item.video_privacy,
         is_fave=schedule_item.id in favourites_ids,
         official_content=schedule_item.official_content,
         slug=schedule_item.slug,

@@ -1,6 +1,7 @@
 import logging
 import random
 from collections.abc import Mapping
+from datetime import datetime, time
 from fractions import Fraction
 from typing import TypeVar, get_args
 
@@ -8,12 +9,12 @@ from faker import Faker
 from flask import current_app as app
 from sqlalchemy import select
 
+from apps.config import config
 from main import db
 from models import Currency
 from models.basket import Basket
 from models.content import (
     DURATION_OPTIONS,
-    ROUGH_DURATIONS,
     Occurrence,
     Proposal,
     ProposalType,
@@ -30,12 +31,14 @@ from models.content.attributes import (
     WorkshopAttributes,
     YouthWorkshopAttributes,
 )
+from models.content.cfp import ROUGH_DURATIONS, ProposalState
 from models.content.lottery import (
     Lottery,
     LotteryEntry,
     LotteryState,
     get_max_rank_for_user,
 )
+from models.content.schedule import ScheduleItemAvailability
 from models.content.venue import Venue
 from models.diversity import (
     AGE_CHOICES,
@@ -128,7 +131,7 @@ class FakeDataGenerator:
 
         # We have a fixed set of well-known users, but create more normal users each time
         self.users: list[User] = []
-        while len(self.users) < 120:
+        while len(self.users) < 250:
             email = self.fake.safe_email()
             user = get_user(email)
             if user or any(u for u in self.users if u.email == email):
@@ -140,7 +143,7 @@ class FakeDataGenerator:
             self.users.append(user)
 
     def create_proposal(self, user: User, reviewers: list[User]) -> Proposal:
-        states = {
+        states: dict[ProposalState, float] = {
             "new": 0.05,
             "edit": 0.05,
             "checked": 0.15,
@@ -157,7 +160,7 @@ class FakeDataGenerator:
         proposal = Proposal(
             # TODO: weightings for type
             type=random.choice(get_args(ProposalType)),
-            state=random_choice(states),
+            state="new",
             user=user,
             title=self.fake.sentence(nb_words=6, variable_nb_words=True),
             description=self.fake.text(max_nb_chars=500),
@@ -172,6 +175,8 @@ class FakeDataGenerator:
             # rejected_email_sent
         )
 
+        state = random_choice(states)
+
         if proposal.type not in {"installation"}:
             proposal.duration = random.choice(DURATION_OPTIONS)[0]
 
@@ -184,7 +189,7 @@ class FakeDataGenerator:
             "stale": 0.1,
         }
 
-        if proposal.state in {"anonymised", "reviewed", "accepted"} and proposal.type in {"talk", "workshop"}:
+        if state in {"anonymised", "reviewed", "accepted"} and proposal.type in {"talk", "workshop"}:
             for reviewer in random.sample(reviewers, random.randint(0, len(reviewers))):
                 vote = ProposalVote(reviewer, proposal)
                 vote.state = random_choice(vote_states)
@@ -196,6 +201,19 @@ class FakeDataGenerator:
             proposal.attributes.participant_count = str(random.randint(5, 50))
         elif isinstance(proposal.attributes, ProposalYouthWorkshopAttributes):
             proposal.attributes.participant_count = str(random.randint(5, 50))
+
+        if state in {"accepted", "finalised"}:
+            proposal.accept()
+
+        if state == "finalised" and proposal.schedule_item:
+            proposal.schedule_item.availability = [
+                ScheduleItemAvailability(
+                    start=datetime.combine(day, time(10)), end=datetime.combine(day, time(20))
+                )
+                for day in config.event_days
+            ]
+
+        proposal.state = state
 
         db.session.add(proposal)
         return proposal
@@ -248,10 +266,9 @@ class FakeDataGenerator:
             description=description,
             short_description=self.fake.sentence(nb_words=20, variable_nb_words=True),
             official_content=official_content,
-            default_video_privacy=random_choice({"public": 0.8, "review": 0.1, "none": 0.1}),
+            video_privacy=random_choice({"public": 0.8, "review": 0.1, "none": 0.1}),
             # arrival_period
             # departure_period
-            available_times="fri_10_13,fri_13_16,fri_16_20,sat_10_13,sat_13_16,sat_16_20,sun_10_13,sun_13_16,sun_16_20",
             # contact_telephone
             # contact_eventphone
         )
@@ -284,11 +301,8 @@ class FakeDataGenerator:
         # The overwhelming majority have 1 occurrence
         occurrence_count = random_choice(
             {
-                0: 5,
                 1: 100,
                 2: 10,
-                3: 5,
-                4: 5,
             }
         )
 
@@ -310,7 +324,6 @@ class FakeDataGenerator:
             # potential_venue_id
             # scheduled_time
             # scheduled_venue_id
-            video_privacy=schedule_item.default_video_privacy,
             # c3voc_url
             # youtube_url
             # thumbnail_url
@@ -456,14 +469,7 @@ class FakeDataGenerator:
             # These numbers aren't realistic, we just want some variety
             proposal_count = random_choice({0: 0.25, 1: 0.5, 2: 0.25})
             for _ in range(proposal_count):
-                proposal = self.create_proposal(user, self.reviewers)
-
-                if proposal.state in {"accepted", "finalised"}:
-                    self.create_schedule_item(
-                        official_content=True,
-                        user=proposal.user,
-                        proposal=proposal,
-                    )
+                self.create_proposal(user, self.reviewers)
 
             if random_bool(0.8):
                 self.create_diversity_data(user)
@@ -474,7 +480,7 @@ class FakeDataGenerator:
             if random_bool(0.5):
                 self.create_village(user)
 
-        for _ in range(40):
+        for _ in range(10):
             # Some unparented schedule items, created by the CFP team
             self.create_schedule_item(
                 official_content=True,
@@ -493,4 +499,7 @@ class FakeDataGenerator:
 
         # This does lots of committing, so we do it separately
         for user in self.users:
+            if user.proposals and random_bool(0.8):
+                # Some users with proposals should not have tickets
+                continue
             self.create_admission_tickets_and_commit(user)

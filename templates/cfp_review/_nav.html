@@ -90,7 +90,6 @@
                 {{ menuitem('Unpublished', ".schedule_items", schedule_item_counts['unpublished'], state='unpublished')}}
                 {{ menuitem('Cancelled', ".schedule_items", schedule_item_counts['cancelled'], state='cancelled')}}
                 <li role="separator" class="divider"></li>
-                {{ menuitem('Summary', ".schedule_items_summary")}}
                 {{ menuitem('Changelog', ".entity_changelog", entity_type="schedule-item" )}}
             </ul>
         </li>
@@ -103,7 +102,8 @@
                 Scheduling <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                {{ menuitem("Potential Schedule Changes", ".potential_schedule_changes") }}
+                {{ menuitem('Schedule dashboard', ".schedule")}}
+                <li role="separator" class="divider"></li>
                 {{ menuitem("Schedule Tweaker", ".scheduler", venue=emf_venues) }}
                 {{ menuitem("Clashfinder", ".clashfinder") }}
                 {{ menuitem("Sense Check", ".sense_check") }}

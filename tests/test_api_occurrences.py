@@ -7,13 +7,12 @@ from models.content import Occurrence, ScheduleItem
 def occurrence(db, user):
     occurrence = Occurrence(
         occurrence_num=1,
-        video_privacy="public",
         schedule_item=ScheduleItem(
             type="talk",
             user=user,
             title="Title",
+            video_privacy="public",
             description="Description",
-            default_video_privacy="public",
         ),
     )
 
@@ -41,7 +40,7 @@ def test_denies_request_without_api_key(client, app, occurrence):
     assert rv.status_code == 401
 
 
-def test_can_set_video_urls(client, app, occurrence):
+def test_can_set_video_urls(client, db, app, occurrence):
     app.config.update(
         {
             "VIDEO_API_KEY": "api-key",
@@ -61,7 +60,7 @@ def test_can_set_video_urls(client, app, occurrence):
     )
     assert rv.status_code == 200
 
-    occurrence = Occurrence.query.get(occurrence.id)
+    occurrence = db.session.get(Occurrence, occurrence.id)
     assert occurrence.youtube_url == "https://example.com/youtube.com"
     assert occurrence.thumbnail_url == "https://example.com/thumbnail"
     assert occurrence.c3voc_url == "https://example.com/media.ccc.de"
@@ -89,7 +88,7 @@ def test_clearing_video_url(client, app, db, occurrence):
     )
     assert rv.status_code == 200
 
-    occurrence = Occurrence.query.get(occurrence.id)
+    occurrence = db.session.get(Occurrence, occurrence.id)
     assert occurrence.youtube_url is None
 
 

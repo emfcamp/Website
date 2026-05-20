@@ -3,7 +3,7 @@ import re
 import typing
 from collections import namedtuple
 from dataclasses import dataclass
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta
 from typing import (  # noqa: UP035
     Any,
     Literal,
@@ -13,7 +13,6 @@ from typing import (  # noqa: UP035
 )
 
 import sqlalchemy
-from dateutil.parser import parse as parse_date
 from slugify.slugify import slugify
 from sqlalchemy import (
     JSON,
@@ -56,72 +55,6 @@ if typing.TYPE_CHECKING:
     from ..volunteer.shift import Shift
 
 
-# These are the time periods speakers can select as being available in the form
-# This needs to go very far away
-# This still needs to go very far away, it is a nightmare
-PROPOSAL_TIMESLOTS = {
-    "talk": [
-        "fri_10_13",
-        "fri_13_16",
-        "fri_16_20",
-        "sat_10_13",
-        "sat_13_16",
-        "sat_16_20",
-        "sun_10_13",
-        "sun_13_16",
-        "sun_16_20",
-    ],
-    "workshop": [
-        "fri_10_13",
-        "fri_13_16",
-        "fri_16_20",
-        "fri_20_22",
-        "fri_22_24",
-        "sat_10_13",
-        "sat_13_16",
-        "sat_16_20",
-        "sat_20_22",
-        "sat_22_24",
-        "sun_10_13",
-        "sun_13_16",
-        "sun_16_20",
-    ],
-    "youthworkshop": [
-        "fri_9_13",
-        "fri_13_16",
-        "fri_16_20",
-        "sat_9_13",
-        "sat_13_16",
-        "sat_16_20",
-        "sun_9_13",
-        "sun_13_16",
-        "sun_16_20",
-    ],
-    "performance": [
-        "fri_20_22",
-        "fri_22_24",
-        "sat_20_22",
-        "sat_22_24",
-        "sun_20_22",
-        "sun_22_24",
-    ],
-}
-
-# Causes the scheduler to prefer putting these things in these time ranges,
-# used to pack things into attendee-friendly hours even though speakers are
-# happy to give workshops at midnight. These do not need to overlap with other
-# slot definitions.
-PREFERRED_TIMESLOTS = {
-    "workshop": (
-        "fri_12_18",
-        "sat_12_18",
-        "sun_12_18",
-    )
-}
-
-HARD_START_LIMIT = {"youthworkshop": (9, 30)}
-
-
 # Lengths for talks and workshops as displayed to the user
 DURATION_OPTIONS = [
     ("< 10 mins", "Shorter than 10 minutes"),
@@ -142,31 +75,6 @@ AGE_RANGE_OPTIONS = [
     ("other", "Other"),
 ]
 
-# What we consider these as when scheduling
-ROUGH_DURATIONS = {"> 45 mins": 50, "25-45 mins": 30, "10-25 mins": 20, "< 10 mins": 10}
-
-
-# Because I have excavated this from my memory: This is a horrendous quick hack
-# to allow us to override the timeslot periods that are valid for a proposal
-# type as speakers select them from the list and we don't store actual time
-# values. BUT WE SHOULD.
-REMAP_SLOT_PERIODS = {
-    "talk": {
-        "fri_10_13": ("fri", (11, 0), (13, 00)),  # Talks start at 11 on Friday
-        "sun_16_20": ("sun", (16, 0), (18, 40)),  # Talks end at 6 on Sunday
-    },
-    "youthworkshop": {
-        "fri_16_20": ("fri", (16, 0), (20, 20)),
-        "sat_16_20": ("sat", (16, 0), (20, 20)),
-        "sun_16_20": ("sun", (16, 0), (19, 20)),
-    },
-    "performance": {
-        "fri_22_24": ("fri", (22, 0), (25, 30)),
-        "sat_22_24": ("sat", (22, 0), (25, 30)),
-        "sun_22_24": ("sun", (22, 0), (25, 30)),
-    },
-}
-
 # Number of slots (in 10min increments) that must be between proposals of this
 # type in the same venue
 EVENT_SPACING = {"talk": 1, "workshop": 3, "performance": 0, "youthworkshop": 2, "installation": 0, "film": 2}
@@ -180,28 +88,7 @@ cfp_period = namedtuple("cfp_period", "start end")
 # This is a function rather than a constant so we can lean on the configuration
 # for event start & end times rather than hard coding stuff
 def get_days_map():
-    event_days = [
-        datetime.combine(config.event_start + timedelta(days=day_idx), time.min)
-        for day_idx in range((config.event_end - config.event_start).days + 1)
-    ]
-    return {ed.strftime("%a").lower(): ed for ed in event_days}
-
-
-def timeslot_to_period(slot_string, type=None):
-    start = end = None
-    days_map = get_days_map()
-
-    if type in REMAP_SLOT_PERIODS and slot_string in REMAP_SLOT_PERIODS[type]:
-        day, start_time, end_time = REMAP_SLOT_PERIODS[type][slot_string]
-        start = days_map[day] + timedelta(hours=start_time[0], minutes=start_time[1])
-        end = days_map[day] + timedelta(hours=end_time[0], minutes=end_time[1])
-
-    else:
-        day, start_h, end_h = slot_string.split("_")
-        start = days_map[day] + timedelta(hours=int(start_h))
-        end = days_map[day] + timedelta(hours=int(end_h))
-
-    return cfp_period(start, end)
+    return {ed.strftime("%a").lower(): ed for ed in config.event_days}
 
 
 # Reduces the time periods to the smallest contiguous set we can
@@ -335,9 +222,12 @@ class ScheduleItem(BaseModel):
         default="published",
     )
 
-    # An attendee schedule item has an associated owner who can edit it
-    # (in addition to anyone who's an admin for the scheduled village)
+    #: The user who owns the ScheduleItem.
+    #: An attendee ScheduleItem has an associated owner who can edit it
+    #: (in addition to anyone who's an admin for the scheduled village)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+
+    #: The proposal for this ScheduleItem. May be None in the case of attendee content.
     proposal_id: Mapped[int | None] = mapped_column(ForeignKey("proposal.id"))
 
     # Most of these are optional so that people can fill out data over time
@@ -348,17 +238,16 @@ class ScheduleItem(BaseModel):
     description: Mapped[str | None]
     short_description: Mapped[str | None]
 
+    #: Whether this is official content or attendee content.
     official_content: Mapped[bool] = mapped_column(default=False)
 
-    # Copied to new Occurrences, will usually be confirmed in finalisation
-    default_video_privacy: Mapped[VideoPrivacy]
+    #: Whether this should be recorded
+    video_privacy: Mapped[VideoPrivacy] = mapped_column(default="public")
 
-    arrival_period: Mapped[str | None]
-    departure_period: Mapped[str | None]
-    available_times: Mapped[str | None]
+    #: The speaker's availability to present this item - applies to all occurrences.
+    availability: Mapped[list[ScheduleItemAvailability]] = relationship(back_populates="schedule_item")
 
     contact_telephone: Mapped[str | None]
-    contact_eventphone: Mapped[str | None]
 
     # Used for sorting in the CfP review page
     modified: Mapped[datetime] = mapped_column(default=naive_utcnow, onupdate=naive_utcnow)
@@ -431,13 +320,28 @@ class ScheduleItem(BaseModel):
 validate_state_transitions(ScheduleItem.state, SCHEDULE_ITEM_STATE_TRANSITIONS)
 
 
+class ScheduleItemAvailability(BaseModel):
+    """A time range when a speaker is available to present a ScheduleItem.
+
+    Several of these may be associated with a ScheduleItem.
+    """
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    schedule_item_id: Mapped[int] = mapped_column(ForeignKey("schedule_item.id"))
+    schedule_item: Mapped[ScheduleItem] = relationship(back_populates="availability")
+
+    start: Mapped[datetime]
+    end: Mapped[datetime]
+
+
 @dataclass
 class ScheduleItemInfo:
     type: ScheduleItemType
     human_type: str
     human_type_a: str
-    supports_lottery: bool
     attributes_cls: Type[Attributes]  # noqa: UP006
+    supports_lottery: bool = False
     default_max_tickets_per_entry: int | None = None
 
 
@@ -447,14 +351,12 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
         type="talk",
         human_type="talk",
         human_type_a="a talk",
-        supports_lottery=False,
         attributes_cls=TalkAttributes,
     ),
     "performance": ScheduleItemInfo(
         type="performance",
         human_type="performance",
         human_type_a="a performance",
-        supports_lottery=False,
         attributes_cls=PerformanceAttributes,
     ),
     "workshop": ScheduleItemInfo(
@@ -469,7 +371,6 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
         type="film",
         human_type="film",
         human_type_a="a film",
-        supports_lottery=False,
         attributes_cls=FilmAttributes,
     ),
     "youthworkshop": ScheduleItemInfo(
@@ -485,7 +386,6 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
         type="lightning",
         human_type="lightning talk",
         human_type_a="a lightning talk",
-        supports_lottery=False,
         attributes_cls=LightningTalkAttributes,
     ),
 }
@@ -495,7 +395,8 @@ class Occurrence(BaseModel):
     """
     An occurrence of a ScheduleItem. This indicates when and where a ScheduleItem will occur.
 
-    In some cases (such as workshops), there might be multiple occurrences of a ScheduleItem.
+    In future there may be multiple occurrences of a ScheduleItem, for example if the same workshop is presented twice,
+    however this is not currently guaranteed to work.
     """
 
     __versioned__: dict[str, Any] = {}
@@ -514,18 +415,18 @@ class Occurrence(BaseModel):
     occurrence_num: Mapped[int]
     lottery_id: Mapped[int | None] = mapped_column(ForeignKey("lottery.id"))
 
-    # Prevents the scheduler from trying to move this occurrence
+    #: Prevents the automatic scheduler from trying to move this occurrence
     manually_scheduled: Mapped[bool] = mapped_column(default=False)
 
     scheduled_duration: Mapped[int | None]  # in minutes
-    allowed_times: Mapped[str | None]
-    # allowed_venues has an association table
-    potential_time: Mapped[datetime | None]
-    potential_venue_id: Mapped[int | None] = mapped_column(ForeignKey("venue.id"))
+
     scheduled_time: Mapped[datetime | None]
     scheduled_venue_id: Mapped[int | None] = mapped_column(ForeignKey("venue.id"))
 
-    video_privacy: Mapped[VideoPrivacy]
+    #: Potential timeslots for this occurrence in a proposed schedule.
+    potential_scheduled_slots: Mapped[list[PotentialScheduleOccurrence]] = relationship(
+        back_populates="occurrence"
+    )
 
     c3voc_url: Mapped[str | None]
     youtube_url: Mapped[str | None]
@@ -535,12 +436,11 @@ class Occurrence(BaseModel):
     schedule_item: Mapped[ScheduleItem] = relationship(
         "ScheduleItem", back_populates="occurrences", foreign_keys=[schedule_item_id]
     )
+
+    #: Venues this occurrence is allowed to be scheduled in.
     allowed_venues: Mapped[list[Venue]] = relationship(
         secondary=OccurrenceAllowedVenues,
         back_populates="allowed_occurrences",
-    )
-    potential_venue: Mapped[Venue | None] = relationship(
-        primaryjoin="Venue.id == Occurrence.potential_venue_id"
     )
     scheduled_venue: Mapped[Venue | None] = relationship(
         back_populates="occurrences",
@@ -552,12 +452,62 @@ class Occurrence(BaseModel):
     proposal: AssociationProxy[Proposal | None] = association_proxy("schedule_item", "proposal")
     user: AssociationProxy[User] = association_proxy("schedule_item", "user")
 
+    def is_valid_slot(self, start_time: datetime, venue: Venue, user: User | None = None) -> bool:
+        """Check whether this occurrence can be scheduled in a given start_time and venue.
+
+        For village content, a user object should be passed in.
+        """
+        if not self.schedule_item.official_content:
+            if venue.allows_attendee_content:
+                return True
+            if venue.village and user is not None and user in venue.village.admins():
+                return True
+            return False
+
+        if self.scheduled_duration is None:
+            raise ValueError("Unable to set slot for Occurrence with no duration")
+
+        for time_block in venue.time_blocks:
+            if (
+                start_time >= time_block.start
+                and start_time + timedelta(minutes=self.scheduled_duration) <= time_block.end
+                and self.schedule_item.type == time_block.type
+            ):
+                return True
+
+        return False
+
+    def set_slot(self, start_time: datetime, venue: Venue, user: User | None = None) -> None:
+        """Set the start_time and venue, validating that this is allowed.
+
+        For village content, a user object should be passed in.
+        """
+        if not self.is_valid_slot(start_time, venue, user):
+            raise ValueError("Invalid slot")
+        self.scheduled_time = start_time
+        self.scheduled_venue = venue
+
     def cancel(self) -> None:
         """Cancel this occurrence."""
         self.state = "cancelled"
 
     @property
+    def video_privacy(self) -> VideoPrivacy:
+        # Occurrences can inherit their video privacy from the ScheduleItem.
+        # It's unlikely we'll have multiple occurrences of anything which is recorded anyway.
+        return self.schedule_item.video_privacy
+
+    @property
+    def availability(self) -> list[ScheduleItemAvailability]:
+        """The speaker's availability to present this occurrence.
+
+        Inherited from the ScheduleItem.
+        """
+        return self.schedule_item.availability
+
+    @property
     def valid_allowed_venues(self) -> list[Venue]:
+        """A list of venues this Occurrence is allowed to be scheduled in."""
         if self.schedule_item.official_content:
             return list(
                 db.session.scalars(
@@ -566,71 +516,25 @@ class Occurrence(BaseModel):
             )
         return list(db.session.scalars(select(Venue).where(Venue.allows_attendee_content == True)))
 
-    def fix_hard_time_limits(self, time_periods):
-        # This should be fixed by the string periods being burned and replaced
-        if self.schedule_item.type in HARD_START_LIMIT:
-            trimmed_periods = []
-            for p in time_periods:
-                if (
-                    p.start.hour <= HARD_START_LIMIT[self.schedule_item.type][0]
-                    and p.start.minute < HARD_START_LIMIT[self.schedule_item.type][1]
-                ):
-                    p = cfp_period(
-                        p.start.replace(minute=HARD_START_LIMIT[self.schedule_item.type][1]), p.end
-                    )
-                trimmed_periods.append(p)
-            time_periods = trimmed_periods
-        return time_periods
+    def allowed_times(self, automatic: bool) -> dict[Venue, list[tuple[datetime, datetime]]]:
+        """Return a mapping of Venue -> time range for when this occurrence is allowed to be scheduled.
+        This is the intersection of speaker availability and venue TimeBlocks for this content type.
+        """
+        assert self.schedule_item.official_content
+        result = {}
+        for venue in self.valid_allowed_venues:
+            allowed = []
+            for time_block in venue.time_blocks:
+                if time_block.automatic != automatic:
+                    continue
 
-    def get_allowed_time_periods(self):
-        time_periods = []
-
-        if self.allowed_times:
-            for p in self.allowed_times.split("\n"):
-                if p:
-                    start, end = p.split(" > ")
-                    try:
-                        time_periods.append(cfp_period(parse_date(start.strip()), parse_date(end.strip())))
-                    # If someone has entered garbage, dump the lot
-                    except ValueError:
-                        time_periods = []
-                        break
-
-        # If we've not overridden it, use the user-specified periods
-        if not time_periods and self.schedule_item.available_times:
-            for p in self.schedule_item.available_times.split(","):
-                # Filter out timeslots the user selected that are not valid.
-                # This can happen if a proposal is converted between types, or
-                # if we remove timeslots after the proposal has been finalised.
-                p = p.strip()
-                if p in PROPOSAL_TIMESLOTS[self.schedule_item.type]:
-                    time_periods.append(timeslot_to_period(p, type=self.schedule_item.type))
-
-        time_periods = self.fix_hard_time_limits(time_periods)
-        return make_periods_contiguous(time_periods)
-
-    def get_allowed_time_periods_serialised(self):
-        return "\n".join([f"{v.start} > {v.end}" for v in self.get_allowed_time_periods()])
-
-    def get_allowed_time_periods_with_default(self):
-        allowed_time_periods = self.get_allowed_time_periods()
-        if not allowed_time_periods:
-            allowed_time_periods = [
-                timeslot_to_period(ts, type=self.schedule_item.type)
-                for ts in PROPOSAL_TIMESLOTS[self.schedule_item.type]
-            ]
-
-        allowed_time_periods = self.fix_hard_time_limits(allowed_time_periods)
-        return make_periods_contiguous(allowed_time_periods)
-
-    def get_preferred_time_periods_with_default(self):
-        preferred_time_periods = [
-            timeslot_to_period(ts, type=self.schedule_item.type)
-            for ts in PREFERRED_TIMESLOTS.get(self.schedule_item.type, [])
-        ]
-
-        preferred_time_periods = self.fix_hard_time_limits(preferred_time_periods)
-        return make_periods_contiguous(preferred_time_periods)
+                for availability in self.availability:
+                    if availability.start <= time_block.end and availability.end >= time_block.start:
+                        allowed.append(
+                            (max(availability.start, time_block.start), min(availability.end, time_block.end))
+                        )
+            result[venue] = allowed
+        return result
 
     def overlaps_with(self, other: Self) -> bool:
         this_start = self.potential_time or self.scheduled_time
@@ -677,6 +581,16 @@ class Occurrence(BaseModel):
 
         return conflicts
 
+    @property
+    def changeover_time(self) -> timedelta:
+        return SLOT_DURATION * EVENT_SPACING[self.schedule_item.type]
+
+    @property
+    def potential_slot(self) -> PotentialScheduleOccurrence | None:
+        if len(self.potential_scheduled_slots) > 0:
+            return sorted(list(self.potential_scheduled_slots), reverse=True)[0]
+        return None
+
     # Basically only available if state == "scheduled"
     @property
     def scheduled_end_time(self) -> datetime | None:
@@ -686,16 +600,34 @@ class Occurrence(BaseModel):
             return start + timedelta(minutes=duration)
         return None
 
+    @property
+    def potential_time(self) -> datetime | None:
+        if slot := self.potential_slot:
+            return slot.start_time
+        return None
+
     # Can be accessible before state == "scheduled"
     @property
     def potential_end_time(self) -> datetime | None:
-        start = self.potential_time
-        duration = self.scheduled_duration
-        if start and duration:
-            return start + timedelta(minutes=duration)
+        if slot := self.potential_slot:
+            duration = self.scheduled_duration
+            if duration:
+                return slot.start_time + timedelta(minutes=duration)
         return None
+
+    @property
+    def potential_venue(self) -> Venue | None:
+        if slot := self.potential_slot:
+            return slot.venue
+        return None
+
+    @property
+    def scheduled(self) -> bool:
+        """Whether this occurrence has been scheduled"""
+        return self.scheduled_time is not None and self.scheduled_venue is not None
 
 
 validate_state_transitions(Occurrence.state, OCCURRENCE_STATE_TRANSITIONS)
 from .cfp import Proposal
+from .potential_schedule import PotentialScheduleOccurrence
 from .venue import TimeBlock, Venue

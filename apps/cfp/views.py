@@ -1,4 +1,4 @@
-import collections
+from itertools import islice
 from typing import get_args
 
 from flask import (
@@ -21,21 +21,23 @@ from sqlalchemy.exc import IntegrityError
 from wtforms import BooleanField, FormField, SelectField, StringField, SubmitField, TextAreaField
 from wtforms.validators import URL, DataRequired, ValidationError
 
+from apps.cfp.date import MAIN_CONTENT_START_DAY, availability_time_ranges, content_timestamp
 from main import db, external_url, get_or_404
 from models.content import (
     AGE_RANGE_OPTIONS,
     DURATION_OPTIONS,
     PROPOSAL_INFOS,
-    PROPOSAL_TIMESLOTS,
     Proposal,
     ProposalMessage,
     ProposalType,
     ScheduleItem,
+    ScheduleItemType,
 )
 from models.content.attributes import (
     ProposalWorkshopAttributes,
     ProposalYouthWorkshopAttributes,
 )
+from models.content.schedule import ScheduleItemAvailability
 from models.user import User
 
 from ..common import create_current_user, feature_enabled, feature_flag
@@ -436,23 +438,13 @@ def withdraw_proposal(proposal_id: int) -> ResponseReturnValue:
 
 
 class FinaliseForm(Form):
-    state = SelectField(
-        "State",
-        default="published",
-        choices=[
-            ("published", "Published"),
-            ("unpublished", "Unpublished"),
-            ("cancelled", "Cancelled"),
-        ],
-    )
-
     names = StringField("Names for schedule", [DataRequired()])
     pronouns = StringField("Pronouns")
     title = StringField("Title", [DataRequired()])
     description = TextAreaField("Description", [DataRequired()])
     short_description = StringField("Short description")
 
-    default_video_privacy = SelectField(
+    video_privacy = SelectField(
         "Recording",
         default="public",
         choices=[
@@ -462,98 +454,16 @@ class FinaliseForm(Form):
         ],
     )
 
-    arrival_period = SelectField(
-        "Estimated arrival time",
-        default="fri am",
-        choices=[
-            ("thu pm", "Thursday pm (Only select this if you are arriving early)"),
-            ("fri am", "Friday am"),
-            ("fri pm", "Friday pm"),
-            ("sat am", "Saturday am"),
-            ("sat pm", "Saturday pm"),
-            ("sun am", "Sunday am"),
-            ("sun pm", "Sunday pm"),
-        ],
-    )
-    departure_period = SelectField(
-        "Estimated departure time",
-        default="mon am",
-        choices=[
-            ("fri pm", "Friday pm"),
-            ("sat am", "Saturday am"),
-            ("sat pm", "Saturday pm"),
-            ("sun am", "Sunday am"),
-            ("sun pm", "Sunday pm"),
-            ("mon am", "Monday am"),
-        ],
-    )
-    _available_slots: list[str]
-
     contact_telephone = TelField("Telephone")
-    contact_eventphone = TelField("On-site extension", min_length=3, max_length=5)
 
     # Fields from Proposal that we re-expose for convenience
     proposal_equipment_required = TextAreaField("Equipment Required")
-    proposal_funding_required = TextAreaField("Funding Required")
-    # No notice_required for finalised proposals
-    proposal_additional_info = TextAreaField("Additional Information")
 
     def load_choices(self, schedule_item: ScheduleItem) -> None:
-        if schedule_item.default_video_privacy != "review":
+        if schedule_item.video_privacy != "review":
             # Don't allow users to choose review themselves
-            assert isinstance(self.default_video_privacy.choices, list)
-            self.default_video_privacy.choices = [
-                (c, _) for c, _ in self.default_video_privacy.choices if c != "review"
-            ]
-
-        # Don't allow users to cancel or uncancel. They'll either be shown
-        # publish/unpublish or just hidden with no other options.
-        # TODO: should we actually just hide the field when cancelled is set?
-        if schedule_item.state != "cancelled":
-            assert isinstance(self.state.choices, list)
-            self.state.choices = [(c, _) for c, _ in self.state.choices if c != "hidden"]
-        elif schedule_item.state == "cancelled":
-            assert isinstance(self.state.choices, list)
-            self.state.choices = [(c, _) for c, _ in self.state.choices if c == "hidden"]
-
-    def get_availability_json(self):
-        res = []
-        for field_name in self._available_slots:
-            field = getattr(self, field_name)
-
-            if not field.data:
-                continue
-            res.append(field_name)
-        return ", ".join(res)
-
-    def set_from_availability_json(self, available_times):
-        for field_name in self._available_slots:
-            field = getattr(self, field_name)
-
-            if field_name in available_times:
-                field.data = True
-            else:
-                field.data = False
-
-    def validate_departure_period(form, field):
-        arr_day, arr_time = form.arrival_period.data.split()
-        dep_day, dep_time = form.departure_period.data.split()
-
-        arr_val = {"thu": 0, "fri": 1, "sat": 2, "sun": 3}[arr_day]
-        dep_val = {"thu": 0, "fri": 1, "sat": 2, "sun": 3, "mon": 4}[dep_day]
-
-        # Arrival day is before departure day; we're done here.
-        if arr_val < dep_val:
-            return
-
-        # Arrival day is after departure
-        if arr_val > dep_val:
-            raise ValidationError("Departure must be after arrival")
-
-        # Arrival day is same as departure day (might be 1 day ticket)
-        # so only error in case of time-travel
-        if dep_time == "am" and arr_time == "pm":
-            raise ValidationError("Departure must be after arrival")
+            assert isinstance(self.video_privacy.choices, list)
+            self.video_privacy.choices = [(c, _) for c, _ in self.video_privacy.choices if c != "review"]
 
 
 class FinaliseAttributesForm(Form):
@@ -588,17 +498,11 @@ class FinaliseYouthWorkshopAttributesForm(FinaliseAttributesForm):
     proposal_valid_dbs = BooleanField("I have a valid DBS check")
 
 
-# This feels like something that should be on the proposal, not just finalisation
-class FinaliseInstallationAttributesForm(FinaliseAttributesForm):
-    size = StringField("Size")
-
-
-FINALISE_ATTRIBUTES_FORM_TYPES: dict[ProposalType, type[FinaliseAttributesForm]] = {
+FINALISE_ATTRIBUTES_FORM_TYPES: dict[ScheduleItemType, type[FinaliseAttributesForm]] = {
     "talk": FinaliseTalkAttributesForm,
     "performance": FinalisePerformanceAttributesForm,
     "workshop": FinaliseWorkshopAttributesForm,
     "youthworkshop": FinaliseYouthWorkshopAttributesForm,
-    "installation": FinaliseInstallationAttributesForm,
 }
 
 
@@ -608,12 +512,89 @@ def get_finalise_form(proposal_type: ProposalType) -> type[FinaliseForm]:
 
     FinaliseFormWithAttributes.attributes = FormField(FINALISE_ATTRIBUTES_FORM_TYPES[proposal_type])
 
-    if proposal_type in {"talk", "performance", "workshop", "youthworkshop"}:
-        FinaliseFormWithAttributes._available_slots = PROPOSAL_TIMESLOTS[proposal_type]
-        for timeslot in FinaliseFormWithAttributes._available_slots:
-            setattr(FinaliseFormWithAttributes, timeslot, BooleanField(default=True))
-
     return FinaliseFormWithAttributes
+
+
+class TimeRangesHandler:
+    """Manages the form fields for CfP submitters to submit and modify time ranges, outside of WTForms."""
+
+    # This is more straightforward and self-contained than any approach I managed to achieve with
+    # WTForms but it still seems like a ridiculously large amount of code to handle 9
+    # checkboxes.
+
+    def __init__(self, schedule_item: ScheduleItem):
+        self.schedule_item = schedule_item
+        self._ranges = availability_time_ranges(schedule_item.type)
+        self._days = list(islice(config.event_days, MAIN_CONTENT_START_DAY, None))
+        self._result_lookup = {}
+
+        result = {}
+        for day in self._days:
+            fields = []
+            for start, end in self._ranges:
+                start_dt = content_timestamp(day, start)
+                end_dt = content_timestamp(day, end)
+                field_name = start_dt.strftime("%Y-%m-%d-%H-%M")
+                fields.append(field_name)
+                self._result_lookup[field_name] = (start_dt, end_dt)
+            result[day.strftime("%A %d %B")] = fields
+        self.fields = result
+
+        self.enabled = {}
+        if len(schedule_item.availability) == 0:
+            for name in self._result_lookup:
+                self.enabled[name] = True
+        else:
+            for range in schedule_item.availability:
+                for name, (start_time, end_time) in self._result_lookup.items():
+                    if range.start == start_time and range.end == end_time:
+                        self.enabled[name] = True
+
+    @property
+    def range_names(self) -> list[str]:
+        return [f"{start.strftime('%H:%M')}-{end.strftime('%H:%M')}" for start, end in self._ranges]
+
+    @property
+    def days(self) -> list[str]:
+        return [day.strftime("%A %d %B") for day in self._days]
+
+    def get_results(self):
+        ranges = []
+        for field, (start_dt, end_dt) in self._result_lookup.items():
+            if request.form.get(field):
+                ranges.append((start_dt, end_dt))
+        return ranges
+
+    def validate(self):
+        if len(self.get_results()) == 0:
+            flash("Please provide at least one time range when you are available")
+            return False
+        return True
+
+    def save(self):
+        existing = set((a.start, a.end) for a in self.schedule_item.availability)
+        new = set(self.get_results())
+
+        changed = False
+
+        for start, end in new - existing:
+            self.schedule_item.availability.append(ScheduleItemAvailability(start=start, end=end))
+            changed = True
+
+        for start, end in existing - new:
+            obj = (
+                db.session.query(ScheduleItemAvailability)
+                .filter(
+                    ScheduleItemAvailability.schedule_item == self.schedule_item,
+                    ScheduleItemAvailability.start == start,
+                    ScheduleItemAvailability.end == end,
+                )
+                .one()
+            )
+            db.session.delete(obj)
+            changed = True
+
+        return changed
 
 
 @cfp.route("/cfp/proposals/<int:proposal_id>/finalise", methods=["GET", "POST"])
@@ -637,7 +618,7 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
         app.logger.warning("Attempt to finalise proposal without schedule item")
         abort(404)
 
-    schedule_item: ScheduleItem = proposal.schedule_item
+    schedule_item = proposal.schedule_item
 
     if proposal.state not in {"accepted", "finalised"}:
         return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
@@ -646,13 +627,14 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
     form = Form(obj=schedule_item)
     form.load_choices(schedule_item)
 
-    if form.validate_on_submit():
+    time_ranges = TimeRangesHandler(schedule_item)
+
+    if form.validate_on_submit() and time_ranges.validate():
         # Should be impossible outside of races
-        assert not (
-            form.default_video_privacy.data == "review" and schedule_item.default_video_privacy != "review"
-        )
-        assert not (form.state.data == "cancelled" and schedule_item.state != "cancelled")
-        assert not (form.state.data != "cancelled" and schedule_item.state == "cancelled")
+        assert not (form.video_privacy.data == "review" and schedule_item.video_privacy != "review")
+
+        proposal.equipment_required = form.proposal_equipment_required.data
+        del form.proposal_equipment_required
 
         # For convenience, we ask them to update their participant_count
         # and valid_dbs, but these aren't exposed on the ScheduleItem
@@ -668,13 +650,13 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
             del form.attributes.form.proposal_participant_count
             del form.attributes.form.valid_dbs
 
+        availability_changed = time_ranges.save()
         # Proposers can change their availability after finalisation and are notified of this
         # this in the scheduling emails. We need to know this in order to re-run scheduling.
-        new_availability = form.get_availability_json()
         has_been_through_scheduler = any(
             o.potential_time or o.scheduled_time for o in schedule_item.occurrences
         )
-        if new_availability != schedule_item.available_times and has_been_through_scheduler:
+        if availability_changed and has_been_through_scheduler:
             # TODO: surface this in the admin pages somewhere?
             if channel := app.config.get("MATTERMOST_CFP_CHANNEL"):
                 mattermost_notify(
@@ -682,9 +664,13 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
                     f"🗓️🚨 **ScheduleItem availability changed** for {proposal.human_type}: "
                     f"[{proposal.title}]({external_url('cfp_review.message_proposer', proposal_id=proposal_id)})",
                 )
-        schedule_item.available_times = new_availability
 
         form.populate_obj(schedule_item)
+
+        if schedule_item.state == "unpublished":
+            schedule_item.state = "published"
+
+        proposal.state = "finalised"
 
         db.session.commit()
         app.logger.info("Finalised proposal %s", proposal_id)
@@ -692,20 +678,9 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
 
         return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
 
-    if request.method == "POST":
-        # Don't overwrite user submitted data
-        pass
-
-    else:
-        # Default to publishing the schedule item
-        if schedule_item.state == "unpublished":
-            form.state.data = "published"
-
+    if request.method != "POST":
         # These proxy to the proposal, so it doesn't matter if schedule_item exists
         form.proposal_equipment_required.data = proposal.equipment_required
-        form.proposal_funding_required.data = proposal.funding_required
-        form.proposal_additional_info.data = proposal.additional_info
-
         if isinstance(proposal.attributes, ProposalWorkshopAttributes):
             form.attributes.proposal_participant_count.data = proposal.attributes.participant_count
 
@@ -713,41 +688,11 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
             form.attributes.proposal_participant_count.data = proposal.attributes.participant_count
             form.attributes.proposal_valid_dbs.data = proposal.attributes.valid_dbs
 
-        # Most of the form will have been populated already by Form(schedule_item)
-        if schedule_item.available_times:
-            form.set_from_availability_json(schedule_item.available_times)
-
-    # This just sorts out the headings / columns for the form
-    headings = {}
-    day_form_slots: dict[str, dict[str, Markup]] = collections.defaultdict(dict)
-    for slot in Form._available_slots:
-        day_str, start_str, end_str = slot.split("_")
-        slot_hour_str = f"{start_str}_{end_str}"
-        day_form_slots[day_str][slot_hour_str] = getattr(form, slot)(class_="form-control")
-        headings[int(start_str)] = (int(start_str), int(end_str))
-
-    slot_times = []
-    slot_titles = []
-    for start in sorted(headings.keys()):
-        start, end = headings[start]
-        slot_times.append(f"{start}_{end}")
-
-        start_ampm = end_ampm = "am"
-        if start > 12:
-            start_ampm = "pm"
-            start -= 12
-        if end > 12:
-            end_ampm = "pm"
-            end -= 12
-        slot_titles.append(f"{start}{start_ampm} - {end}{end_ampm}")
-
     return render_template(
         "cfp/finalise.html",
         form=form,
         proposal=proposal,
-        slot_times=slot_times,
-        slot_titles=slot_titles,
-        day_form_slots=day_form_slots,
+        time_ranges=time_ranges,
     )
 
 

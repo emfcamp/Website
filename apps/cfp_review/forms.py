@@ -445,8 +445,6 @@ class UpdateOccurrenceForm(Form):
 
     # allowed_venues is an association so we need to assign Venues
     allowed_venue_ids = SelectMultipleField("Allowed venues", coerce=int)
-    # allowed_times is a horrible mess
-    allowed_times_str = TextAreaField("Allowed time periods")
     scheduled_venue_id = SelectField("Scheduled venue", coerce=coerce_optional(int))
     scheduled_time = DateTimeField("Scheduled time", [Optional(strip_whitespace=True)])
     potential_venue_id = SelectField("Potential venue", coerce=coerce_optional(int))

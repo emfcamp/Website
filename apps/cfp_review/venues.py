@@ -3,7 +3,7 @@ Admin views relating to Venues and TimeBlocks.
 """
 
 from collections import defaultdict
-from datetime import datetime, time, timedelta
+from datetime import time
 from typing import get_args
 
 from flask import (
@@ -36,6 +36,7 @@ from models.content.schedule import ScheduleItemType
 from models.content.venue import TimeBlock
 from models.village import Village
 
+from ..cfp.date import CONTENT_DAY_START, content_days, content_timestamp, timestamp_to_content
 from ..common.forms import Form, coerce_optional
 from ..config import config
 from . import (
@@ -156,7 +157,7 @@ class NewTimeBlockForm(TimeBlockForm):
 def venue_timeblocks(venue_id: int) -> ResponseReturnValue:
     venue = get_or_404(db, Venue, venue_id)
 
-    days = list(config.event_days)
+    days = list(content_days())
 
     new_form = NewTimeBlockForm()
 
@@ -166,14 +167,10 @@ def venue_timeblocks(venue_id: int) -> ResponseReturnValue:
         for day in new_form.days.data:
             time_block = TimeBlock()
 
-            date = days[int(day)]
-            if new_form.start.data.hour < 5 or new_form.start.data.hour > 23:
-                date = days[int(day)] + timedelta(days=1)
-            time_block.start = datetime.combine(date, new_form.start.data)
+            date = days[int(day)][0]
 
-            if new_form.end.data.hour < 5 or new_form.end.data.hour > 23:
-                date = days[int(day)] + timedelta(days=1)
-            time_block.end = datetime.combine(date, new_form.end.data)
+            time_block.start = content_timestamp(date, new_form.start.data)
+            time_block.end = content_timestamp(date, new_form.end.data)
             time_block.type = new_form.type.data
             time_block.automatic = new_form.automatic.data
             venue.time_blocks += [time_block]
@@ -184,12 +181,8 @@ def venue_timeblocks(venue_id: int) -> ResponseReturnValue:
         flash(f"{created} new time block(s) created")
         return redirect(url_for(".venue_timeblocks", venue_id=venue.id))
 
-    changeover = time(5, 0, 0)
-
     time_blocks_by_day = defaultdict(list)
-    for day in days:
-        day_start = datetime.combine(day, changeover)
-        day_end = datetime.combine(day + timedelta(days=1), changeover)
+    for day, (day_start, day_end) in days:
         for b in venue.time_blocks:
             if day_start < b.start <= day_end:
                 height = (min(day_end, b.end) - max(day_start, b.start)).seconds * 100 / (24 * 60 * 60)
@@ -203,15 +196,15 @@ def venue_timeblocks(venue_id: int) -> ResponseReturnValue:
                     }
                 )
 
-    timeblock_hours = [time(i % 24, 0, 0) for i in range(changeover.hour, changeover.hour + 24)]
+    timeblock_hours = [time(i % 24, 0, 0) for i in range(CONTENT_DAY_START.hour, CONTENT_DAY_START.hour + 24)]
 
     return render_template(
         "cfp_review/venues/time_blocks.html",
         venue=venue,
-        days=days,
+        days=[date for date, _ in days],
         new_form=new_form,
         time_blocks_by_day=time_blocks_by_day,
-        day_start=changeover,
+        day_start=CONTENT_DAY_START,
         timeblock_hours=timeblock_hours,
     )
 
@@ -226,14 +219,16 @@ def timeblock_edit(venue_id: int, time_block_id: int) -> ResponseReturnValue:
 
     form = TimeBlockForm(obj=time_block)
 
+    day, _ = timestamp_to_content(time_block.start)
+
     if form.validate_on_submit():
         if form.delete.data:
             db.session.delete(time_block)
             flash("Time block deleted")
         else:
             assert form.start.data and form.end.data
-            time_block.start = datetime.combine(time_block.start, form.start.data)
-            time_block.end = datetime.combine(time_block.end, form.end.data)
+            time_block.start = content_timestamp(day, form.start.data)
+            time_block.end = content_timestamp(day, form.end.data)
             time_block.automatic = form.automatic.data
             time_block.type = form.type.data
             flash("Time block updated")

@@ -123,6 +123,11 @@ ProposalType = Literal[
 ]
 
 
+# Convert approximate durations from the CfP form into exact durations for the scheduler.
+# This is applied to the Occurrences when a proposal is accepted.
+ROUGH_DURATIONS = {"> 45 mins": 50, "25-45 mins": 30, "10-25 mins": 20, "< 10 mins": 10}
+
+
 class Proposal(BaseModel):
     """A proposal for content submitted to us through the Call for Participation.
 
@@ -265,7 +270,6 @@ class Proposal(BaseModel):
             description=self.description,
             # short_description
             official_content=True,
-            default_video_privacy="public",
             # arrival_period
             # departure_period
             # available_times
@@ -274,12 +278,12 @@ class Proposal(BaseModel):
         )
         copy_common_attributes(self.attributes, schedule_item.attributes)
 
+        duration = None
+        if self.duration:
+            duration = ROUGH_DURATIONS.get(self.duration)
+
         schedule_item.occurrences.append(
-            Occurrence(
-                state="unscheduled",
-                occurrence_num=1,
-                video_privacy=schedule_item.default_video_privacy,
-            )
+            Occurrence(state="unscheduled", occurrence_num=1, scheduled_duration=duration)
         )
         db.session.add(schedule_item)
         self.schedule_item = schedule_item
@@ -287,7 +291,8 @@ class Proposal(BaseModel):
 
     @property
     def is_editable(self) -> bool:
-        if self.state in {"new", "edit", "manual-review"}:
+        """Whether this proposal can be edited by the submitter."""
+        if self.state in {"new", "edit"}:
             return True
         return False
 

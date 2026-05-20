@@ -8,12 +8,12 @@ from sqlalchemy import select
 from main import db
 from models.content import (
     EVENT_SPACING,
-    ROUGH_DURATIONS,
     SLOT_DURATION,
     ScheduleItem,
     ScheduleItemType,
     Venue,
 )
+from models.content.cfp import ROUGH_DURATIONS
 from models.content.venue import TimeBlock
 
 
@@ -61,6 +61,8 @@ def get_cfp_estimate(schedule_item_type: ScheduleItemType) -> CFPEstimate:
             if occurrence.scheduled_duration:
                 duration = Duration(minutes=occurrence.scheduled_duration)
             elif schedule_item.proposal and schedule_item.proposal.duration in ROUGH_DURATIONS:
+                # FIXME: Post-2026 all occurrences should have their duration set on creation,
+                # so we shouldn't need to take ROUGH_DURATIONS into account here.
                 duration = Duration(minutes=ROUGH_DURATIONS[schedule_item.proposal.duration])
             else:
                 unknown_durations += 1

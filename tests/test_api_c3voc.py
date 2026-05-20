@@ -8,13 +8,12 @@ from models.content import Occurrence, ScheduleItem
 def occurrence(db, user):
     occurrence = Occurrence(
         occurrence_num=1,
-        video_privacy="public",
         schedule_item=ScheduleItem(
             type="talk",
             user=user,
+            video_privacy="public",
             title="Title",
             description="Description",
-            default_video_privacy="public",
         ),
     )
 

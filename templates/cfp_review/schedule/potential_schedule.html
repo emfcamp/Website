@@ -1,0 +1,113 @@
+{% extends "cfp_review/base.html" %}
+{% block body %}
+<h2>Potential Schedule</h2>
+<div class="col-md-10">
+<div class="panel panel-default">
+    <div class="panel-heading">
+    <h3 class="panel-title">Automatic scheduler stats</h3>
+    </div>
+    <div class="panel-body">
+        <dl class="dl-horizontal">
+            <dt>Date</dt><dd>{{potential_schedule.created}}</dd>
+            <dt>Solution type</dt><dd>{{potential_schedule.scheduler_stats.solution_type}}</dd>
+            <dt>Total items</dt><dd>{{potential_schedule.scheduled_occurrences|length}}</dd>
+            <dt>Variables</dt><dd>{{potential_schedule.scheduler_stats.variables}}</dd>
+            <dt>Solve time</dt><dd>{{potential_schedule.scheduler_stats.timings.solve}} s</dd>
+            <dt>Total time</dt><dd>{{potential_schedule.scheduler_stats.timings.total}} s</dd>
+        </dl>
+    </div>
+</div>
+</div>
+
+<div class="col-md-2">
+<div class="panel panel-default">
+    <div class="panel-heading">
+    <h3 class="panel-title">Actions</h3>
+    </div>
+    <div class="panel-body">
+        <form method="POST">
+            <div class="btn-group btn-group-vertical">
+                {% if potential_schedule.state == 'new' %}
+                <button class="btn btn-primary" name="apply" value="true">Apply schedule</button>
+                <button class="btn btn-danger" name="discard" value="true">Discard</button>
+                {% endif %}
+                <a href="{{url_for('.schedule')}}" class="btn btn-default">Back</a>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+
+<div class="col-md-12">
+<h3>Changes</h3>
+{% if potential_schedule.state != 'new' %}
+    <p>Note that this is showing the difference from the current schedule. If another proposed schedule has been applied, this will be wrong.</p>
+{% endif %}
+<table class="table table-default table-condensed">
+    <tr>
+        <th colspan="4"></th>
+        <th colspan="3">Current slot</th>
+        <th colspan="3">New slot</th>
+    </tr>
+    <tr>
+        <th>
+            Type
+        </th>
+        <th class="">
+            Duration
+        </th>
+        <th>
+            User
+        </th>
+        <th>
+            Title
+        </th>
+        <th>
+            Venue
+        </th>
+        <th colspan="2">
+            Time
+        </th>
+        <th>
+            Venue
+        </th>
+        <th colspan="2">
+            Time
+        </th>
+    </tr>
+{% for potential in potential_schedule.changed_occurrences() %}
+    {% set occurrence = potential.occurrence %}
+    <tr>
+        <td>{{occurrence.schedule_item.human_type | capitalize}}</td>
+        <td>{{occurrence.scheduled_duration or '--'}}</td>
+        <td>
+            <a href="{{ url_for('cfp_review.cfp_user', user_id=occurrence.schedule_item.user.id ) }}">{{ occurrence.schedule_item.user.name }}</a>
+        </td>
+        <td>
+            <a href="{{ url_for('.update_occurrence', schedule_item_id=occurrence.schedule_item.id, occurrence_id=occurrence.id) }}">{{ occurrence.schedule_item.title }}</a>
+        </td>
+        <td style="text-wrap:nowrap">
+            {% if occurrence.scheduled_venue.name %}{{ occurrence.scheduled_venue.name }}{% endif %}
+        </td>
+        <td>
+            {% if occurrence.scheduled_time %}{{ occurrence.scheduled_time.strftime('%A') }}{% endif %}
+        </td>
+        <td>
+            {% if occurrence.scheduled_time %}{{ occurrence.scheduled_time.strftime('%H:%M') }}{% endif %}
+        </td>
+        <td style="text-wrap:nowrap">
+            {{ occurrence.potential_venue.name }}
+        </td>
+        <td>
+            {{ occurrence.potential_time.strftime('%A') }}
+        </td>
+        <td>
+            {{ occurrence.potential_time.strftime('%H:%M') }}
+        </td>
+    </tr>
+{% else %}
+    <tr><td colspan="5" class="text-center">No potential changes found</td></tr>
+{% endfor %}
+</table>
+</div>
+{% endblock %}

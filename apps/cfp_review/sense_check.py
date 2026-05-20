@@ -48,39 +48,40 @@ def not_sensible_reasons(
     #        )
 
     # -- Occurrence has allowed time periods that are after 2am or before 9am.
-    for n, period in enumerate(occurrence.get_allowed_time_periods()):
-        if period.start >= period.end:
-            reasons[f"period_{n}_starts_after_end"] = (
-                f'Allowed time period "{period.start} > {period.end}" starts after it ends.'
-            )
-            continue
+    # FIXME: This needs updating, but also we may have some things scheduled before 9am this time
+    # for n, period in enumerate(occurrence.get_allowed_time_periods()):
+    #    if period.start >= period.end:
+    #        reasons[f"period_{n}_starts_after_end"] = (
+    #            f'Allowed time period "{period.start} > {period.end}" starts after it ends.'
+    #        )
+    #        continue
 
-        period_length = period.end - period.start
-        if period_length.total_seconds() > (60 * 60 * 24 - (9 - 2)):
-            # If the time period is greater than 24-(9-2) hours, then by necessity it overlaps a 2am-9am quiet period.
-            reasons[f"period_{n}_too_long"] = (
-                f'Allowed time period "{period.start} > {period.end}" overlaps 2am-9am quiet period (time period too long)'
-            )
-        elif period.start.hour >= 2 and period.start.hour < 9:
-            # Start time lies within quiet period
-            reasons[f"period_{n}_starts_in_quiet"] = (
-                f'Allowed time period "{period.start} > {period.end}" overlaps 2am-9am quiet period (start is between 2am and 9am)'
-            )
-        elif period.end.hour >= 2 and period.end.hour < 9:
-            # End time lies within quiet period
-            reasons[f"period_{n}_ends_in_quiet"] = (
-                f'Allowed time period "{period.start} > {period.end}" overlaps 2am-9am quiet period (end is between 2am and 9am)'
-            )
-        elif period.start.hour < 2 and period.end.hour >= 9:
-            # Start time before quiet period, end time after quiet period
-            reasons[f"period_{n}_same_day_subsumes_quiet"] = (
-                f'Allowed time period "{period.start} > {period.end}" overlaps 2am-9am quiet period (starts before 2am and ends after 9am)'
-            )
-        elif period.start.hour > period.end.hour and period.end.hour >= 9:
-            # If the start hour is after the end hour, then they must be on different days.
-            reasons[f"period_{n}_different_day_subsumes_quiet"] = (
-                f'Allowed time period "{period.start} > {period.end}" overlaps 2am-9am quiet period (starts on previous day and ends after 9am)'
-            )
+    #    period_length = period.end - period.start
+    #    if period_length.total_seconds() > (60 * 60 * 24 - (9 - 2)):
+    #        # If the time period is greater than 24-(9-2) hours, then by necessity it overlaps a 2am-9am quiet period.
+    #        reasons[f"period_{n}_too_long"] = (
+    #            f'Allowed time period "{period.start} > {period.end}" overlaps 2am-9am quiet period (time period too long)'
+    #        )
+    #    elif period.start.hour >= 2 and period.start.hour < 9:
+    #        # Start time lies within quiet period
+    #        reasons[f"period_{n}_starts_in_quiet"] = (
+    #            f'Allowed time period "{period.start} > {period.end}" overlaps 2am-9am quiet period (start is between 2am and 9am)'
+    #        )
+    #    elif period.end.hour >= 2 and period.end.hour < 9:
+    #        # End time lies within quiet period
+    #        reasons[f"period_{n}_ends_in_quiet"] = (
+    #            f'Allowed time period "{period.start} > {period.end}" overlaps 2am-9am quiet period (end is between 2am and 9am)'
+    #        )
+    #    elif period.start.hour < 2 and period.end.hour >= 9:
+    #        # Start time before quiet period, end time after quiet period
+    #        reasons[f"period_{n}_same_day_subsumes_quiet"] = (
+    #            f'Allowed time period "{period.start} > {period.end}" overlaps 2am-9am quiet period (starts before 2am and ends after 9am)'
+    #        )
+    #    elif period.start.hour > period.end.hour and period.end.hour >= 9:
+    #        # If the start hour is after the end hour, then they must be on different days.
+    #        reasons[f"period_{n}_different_day_subsumes_quiet"] = (
+    #            f'Allowed time period "{period.start} > {period.end}" overlaps 2am-9am quiet period (starts on previous day and ends after 9am)'
+    #        )
 
     # Assumption: EVENT_START and EVENT_END are the right day (Wednesday and Sunday).
     human_format = "%a %d, %H:%M (%Y-%m-%d %H:%M:%S)"

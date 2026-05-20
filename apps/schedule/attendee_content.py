@@ -38,7 +38,7 @@ from models.content import (
 )
 from models.user import User
 
-from ..cfp_review.schedule import _convert_schedule_item
+from ..cfp_review.schedule_item import _convert_schedule_item
 from ..common import feature_flag
 from ..common.forms import Form
 from ..config import config
@@ -173,7 +173,7 @@ class AttendeeContentForm(Form):
     occurrences = FieldList(FormField(OccurrenceForm))
 
     def load_choices(self, schedule_item: ScheduleItem | None = None) -> None:
-        if not schedule_item or schedule_item.default_video_privacy != "review":
+        if not schedule_item or schedule_item.video_privacy != "review":
             # Don't allow users to choose review themselves
             assert isinstance(self.default_video_privacy.choices, list)
             self.default_video_privacy.choices = [
