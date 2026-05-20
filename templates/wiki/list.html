@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Wiki{% endblock %}
+{% block body %}
+<h2>
+  Wiki
+  {% if current_user.is_authenticated and current_user.has_permission('wiki') %}
+  <a href="{{ url_for('wiki.new_page') }}" class="btn btn-primary btn-lg pull-right">New page</a>
+  {% endif %}
+</h2>
+
+<p>Collaboratively maintained pages for attendees. Anyone with a login can edit these pages.</p>
+
+{% if pages %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Last updated</th>
+      {% if current_user.is_authenticated and current_user.has_permission('admin') %}<th>By</th>{% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for page in pages %}
+    {% set v = latest_versions[page.id] %}
+    <tr>
+      <td><a href="{{ url_for('wiki.view', slug=page.slug) }}">{{ page.title }}</a></td>
+      <td>{{ v.transaction.issued_at.strftime('%Y-%m-%d %H:%M') if v else '—' }}</td>
+      {% if current_user.is_authenticated and current_user.has_permission('admin') %}
+      <td>{{ v.transaction.user.name if v and v.transaction.user else '—' }}</td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No wiki pages yet.</p>
+{% endif %}
+{% endblock %}
