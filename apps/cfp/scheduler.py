@@ -10,12 +10,10 @@ from sqlalchemy.orm import joinedload
 from main import db
 from models.content import (
     Occurrence,
-    Proposal,
     ScheduleItem,
     ScheduleItemType,
     Venue,
 )
-from models.content.cfp import ROUGH_DURATIONS
 from models.content.potential_schedule import PotentialSchedule, PotentialScheduleOccurrence
 from models.content.schedule import SLOT_DURATION
 
@@ -33,57 +31,6 @@ class Scheduler:
     def __init__(self):
         self.occurrences = {}
         self.venues = {}
-
-    def set_rough_durations(self):
-        """
-        Use the Proposal.duration field to set Occurrence.scheduled_duration
-        """
-        # FIXME: this is now done at time of ScheduleItem creation, and this code is only needed to
-        # migrate existing 2026 content. Delete after 2026.
-        proposals = list(
-            db.session.scalars(
-                select(Proposal).where(
-                    Proposal.type.in_({"talk", "workshop", "youthworkshop", "performance"}),
-                    Proposal.state.in_({"accepted", "finalised"}),
-                )
-            )
-        )
-
-        for proposal in proposals:
-            schedule_item = proposal.schedule_item
-            if not schedule_item:
-                continue
-
-            if not schedule_item.occurrences:
-                app.logger.warning(f"Schedule item {schedule_item.id} has no occurrences, ignoring")
-                continue
-
-            if not schedule_item.official_content:
-                app.logger.warning(f"Schedule item {schedule_item.id} is not official, ignoring")
-                continue
-
-            scheduled_duration = None
-            try:
-                if proposal.duration:
-                    scheduled_duration = ROUGH_DURATIONS[proposal.duration]
-            except KeyError:
-                app.logger.warning(
-                    f"Invalid proposal duration {repr(proposal.duration)} for {proposal}, ignoring"
-                )
-
-            if scheduled_duration is None:
-                continue
-
-            for occurrence in schedule_item.occurrences:
-                if occurrence.scheduled_duration is None:
-                    occurrence.scheduled_duration = scheduled_duration
-
-                    app.logger.info(
-                        f"""Set duration for occurrence {occurrence.occurrence_num} of {schedule_item.human_type}"""
-                        f"""{schedule_item.id} "{schedule_item.title}" to {scheduled_duration}"""
-                    )
-
-        db.session.commit()
 
     def get_schedulable_occurrences(self, types: list[ScheduleItemType]) -> list[Occurrence]:
         """Fetch a list of Occurrences that the automatic scheduler should consider"""
