@@ -11,6 +11,7 @@ from wtforms import (
     ValidationError,
     fields,
 )
+from wtforms.form import BaseForm
 from wtforms.widgets import CheckboxInput, HiddenInput, ListWidget
 from wtforms.widgets.core import html_params
 
@@ -22,11 +23,13 @@ class EmailField(fields.EmailField):
     You don't need to provide additional validators to this field.
     """
 
-    def pre_validate(self, form):
+    def pre_validate(self, form: BaseForm) -> None:
+        if not self.data:
+            return
         try:
             result = validate_email(self.data)
             # Replace data with normalised version of email
-            self.data = result["email"]
+            self.data = result.normalized
         except EmailNotValidError as e:
             raise ValidationError(str(e)) from e
 
@@ -58,16 +61,19 @@ class TelField(fields.TelField):
         self.max_length = kwargs.pop("max_length", 20)
         super().__init__(*args, **kwargs)
 
-    def pre_validate(form, field):
-        if re.search(r"^\s*$", form.data):
+    def pre_validate(self, form: BaseForm) -> None:
+        if self.data is None:
+            return
+
+        if re.search(r"^\s*$", self.data):
             # Allow empty field or only whitespace in field, this can be handled by Required()
             return
 
-        if not re.search(r"^\+?[0-9 \-]+$", form.data):
+        if not re.search(r"^\+?[0-9 \-]+$", self.data):
             raise ValidationError("A telephone number may only contain numbers, spaces or dashes.")
 
-        if not form.min_length <= len(form.data) <= form.max_length:
-            raise ValidationError(f"Must be between {form.min_length} and {form.max_length} digits.")
+        if not self.min_length <= len(self.data) <= self.max_length:
+            raise ValidationError(f"Must be between {self.min_length} and {self.max_length} digits.")
 
 
 class JSONField(StringField):
