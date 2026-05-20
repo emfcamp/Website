@@ -1,7 +1,7 @@
 @use "./_variables.scss" as *;
 
 footer {
-  background: url("../images/brand/2024/header-2.png") left bottom/60%;
+  background: $brand-2026-tiling 0 -630px / 100%;
   overflow: hidden;
   padding: 10px 15px 0px 15px;
   border-top: 1px solid #272827;
