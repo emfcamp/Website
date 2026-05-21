@@ -395,7 +395,7 @@ PROPOSAL_INFOS: dict[ProposalType, ProposalInfo] = {
         human_type_a="a youth workshop",
         review_type=ReviewType.manual,
         attributes_cls=ProposalYouthWorkshopAttributes,
-        grants_event_tickets=True,
+        grants_event_tickets=False,
     ),
     "installation": ProposalInfo(
         # Installations might not have durations or Occurrences
