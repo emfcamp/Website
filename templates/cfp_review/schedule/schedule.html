@@ -3,16 +3,16 @@
   <tr>
     <th>State</th>
     <th>Total</th>
-    {% for type_info in SCHEDULE_ITEM_INFOS.values() %}
+    {% for type_info in schedule_item_types %}
       <th>{{ type_info.human_type | capitalize }}</th>
     {% endfor %}
   </tr>
-  {% for (value, counts_by_type) in counts.items() | sort(attribute=0) %}
+  {% for (state, counts_by_type) in counts.items() | sort(attribute=0) %}
     <tr>
-    <th scope="row"><a href="{{url_for('.schedule_items', official_content='official', **{key: value})}}">{{ value }}</a></td>
+    <th scope="row"><a href="{{url_for('.schedule_items', official_content='official', **{key: value})}}">{{ state|capitalize }}</a></td>
       <th scope="row">{{ counts_by_type["total"] }}</th>
       {% for type in schedule_item_types %}
-        <td><a href="{{url_for('.schedule_items', type=type, official_content='official', **{key: value})}}">{{ counts_by_type[type] }}</a></td>
+        <td><a href="{{url_for('.schedule_items', type=type.type, official_content='official', **{key: value})}}">{{ counts_by_type[type.type] }}</a></td>
       {% endfor %}
     </tr>
   {% endfor %}
@@ -84,10 +84,11 @@
                 <th>Unscheduled</th>
             </thead>
             <tbody>
-                {% for type, counts in schedule_state_by_type.items() %}
+                {% for type in schedule_item_types %}
+                {% set counts = schedule_state_by_type[type.type] %}
                 {% if counts.scheduled + counts.missing_availability + counts.unscheduled > 0 %}
                     <tr>
-                        <th><a href="{{url_for('.schedule_items', official_content='official', type=type)}}">{{type}}</a></th>
+                        <th><a href="{{url_for('.schedule_items', official_content='official', type=type.type)}}">{{type.human_type|capitalize}}</a></th>
                         <td>{{counts.scheduled}}</td><td>{{counts.missing_availability}}</td><td>{{counts.unscheduled}}</td>
                     </tr>
                 {% endif %}
@@ -116,7 +117,7 @@
             <tbody>
                 {% for potential in potential_schedules %}
                     <tr>
-                        <td>{{potential.created}}</td>
+                        <td>{{potential.created.strftime("%Y-%m-%d %H:%M")}}</td>
                         <td>{{potential.state}}</td>
                         <td>{{potential.scheduled_occurrences|length}}</td>
                         <td>

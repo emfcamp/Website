@@ -1,24 +1,28 @@
+<p>If there are missing occurrences or durations, this will be an under-estimate of the total duration.<p>
 <table class="table table-condensed table-striped">
     <thead>
     <tr>
         <th>Type</th>
-        <th>Total accepted</th>
-        <th>Missing durations</th>
+        <th>Missing occurrence</th>
+        <th>Missing duration</th>
+        <th>Occurrences</th>
         <th>Available</th>
         <th>Accepted</th>
         <th>Remaining</th>
-        <th>Available venues</th>
+        <th>Venues</th>
     </tr>
     </thead>
     <tbody>
     {% for type, estimate in estimates.items() %}
     <tr>
-        <th>{{type}}</th>
-        <td><a href="{{url_for('cfp_review.schedule_items', official_content='official', type=type)}}">
-                {{estimate.schedule_item_count}}
-            </a>
-        </td>
-        <td>{{estimate.unknown_durations}}</td>
+        <th style="white-space:nowrap"><a href="{{url_for('cfp_review.schedule_items', official_content='official', type=type)}}">{{estimate.schedule_item_info.human_type|capitalize}}</a></th>
+        <td><a href="{{url_for('cfp_review.schedule_items', official_content='official', type=type, no_occurrence=True)}}">
+            {{estimate.missing_occurrences}}
+        </a></td>
+        <td><a href="{{url_for('cfp_review.schedule_items', official_content='official', type=type, no_duration=True)}}">
+            {{estimate.unknown_durations}}
+        </a></td>
+        <td>{{estimate.occurrence_count}}</td>
         <td style="white-space:nowrap">{{estimate.available_time.total_hours()|round(1)}} hours</td>
         <td style="white-space:nowrap">{{estimate.allocated_time.total_hours()|round(1)}} hours</td>
         <td style="white-space:nowrap">{{estimate.remaining_time.total_hours()|round(1)}} hours

@@ -1,5 +1,6 @@
 {% extends "cfp_review/base.html" %}
 {% block title %}Schedule Items{% endblock %}
+{% block page_class%}container-wide{% endblock %}
 {% block body %}
 <div class="btn-group pull-right dropdown">
   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -51,6 +52,9 @@
             Scheduled
         </th>
         <th>
+            Occurrences
+        </th>
+        <th>
             <a href="{{ url_for('.schedule_items', sort_by='favourites', reverse=qs_reverse_new, **new_qs) }}">#Favs</a>
         </th>
         <th>
@@ -67,6 +71,7 @@
         <td>{% if schedule_item.official_content %}Official{% else %}Attendee{% endif %}</td>
         <td>{% if schedule_item.availability|length > 0 %}✔️{% endif %}</td>
         <td>{% if schedule_item.occurrences|length > 0 and schedule_item.occurrences[0].scheduled %}✔️{% endif %}</td>
+        <td>{{schedule_item.occurrences|length}}</td>
         <td>{{ schedule_item.favourite_count }}</td>
         <td>{{ schedule_item.names }}</td>
         <td>

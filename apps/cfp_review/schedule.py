@@ -22,7 +22,7 @@ from models.content import (
     Venue,
 )
 from models.content.potential_schedule import PotentialSchedule
-from models.content.schedule import ScheduleItemState, ScheduleItemType
+from models.content.schedule import SCHEDULE_ITEM_INFOS, ScheduleItemInfo, ScheduleItemState, ScheduleItemType
 
 from . import cfp_review, schedule_required
 
@@ -40,10 +40,11 @@ def schedule() -> ResponseReturnValue:
         counts_by_state[schedule_item.state]["total"] += 1
         counts_by_state[schedule_item.state][schedule_item.type] += 1
 
-    schedule_item_types: list[ScheduleItemType] = ["talk", "workshop", "performance", "film"]
+    schedule_item_types: list[ScheduleItemInfo] = [i for i in SCHEDULE_ITEM_INFOS.values()]
 
     estimates = {
-        schedule_item_type: get_cfp_estimate(schedule_item_type) for schedule_item_type in schedule_item_types
+        schedule_item_type.type: get_cfp_estimate(schedule_item_type.type)
+        for schedule_item_type in schedule_item_types
     }
 
     schedule_state: Counter[str] = Counter()
@@ -90,6 +91,7 @@ def schedule() -> ResponseReturnValue:
         schedule_state=schedule_state,
         schedule_state_by_type=schedule_state_by_type,
         potential_schedules=potential_schedules,
+        schedule_item_types=schedule_item_types,
     )
 
 

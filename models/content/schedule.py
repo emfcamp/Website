@@ -402,9 +402,9 @@ class Occurrence(BaseModel):
     #: Prevents the automatic scheduler from trying to move this occurrence
     manually_scheduled: Mapped[bool] = mapped_column(default=False)
 
-    scheduled_duration: Mapped[int | None]  # in minutes
+    scheduled_duration: Mapped[int | None] = mapped_column()  # in minutes
 
-    scheduled_time: Mapped[datetime | None]
+    scheduled_time: Mapped[datetime | None] = mapped_column()
     scheduled_venue_id: Mapped[int | None] = mapped_column(ForeignKey("venue.id"))
 
     #: Potential timeslots for this occurrence in a proposed schedule.
@@ -609,7 +609,12 @@ class Occurrence(BaseModel):
     @property
     def scheduled(self) -> bool:
         """Whether this occurrence has been scheduled"""
-        return not self.cancelled and self.scheduled_time is not None and self.scheduled_venue is not None
+        return (
+            not self.cancelled
+            and self.scheduled_time is not None
+            and self.scheduled_venue is not None
+            and self.scheduled_duration is not None
+        )
 
 
 from .cfp import Proposal

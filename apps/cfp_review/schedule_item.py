@@ -75,8 +75,22 @@ def filter_schedule_item_request() -> tuple[list[ScheduleItem], bool]:
             ScheduleItem.official_content == official_content_bool
         )
 
-    schedule_item_query = schedule_item_query.options(selectinload(ScheduleItem.occurrences)).options(
-        undefer(ScheduleItem.favourite_count)
+    no_occurrence = request.args.get("no_occurrence", type=bool_qs)
+    if no_occurrence:
+        is_filtered = True
+        schedule_item_query = schedule_item_query.filter(~ScheduleItem.occurrences.any())
+
+    no_duration = request.args.get("no_duration", type=bool_qs)
+    if no_duration:
+        is_filtered = True
+        schedule_item_query = schedule_item_query.join(ScheduleItem.occurrences).filter(
+            Occurrence.scheduled_duration.is_(None)
+        )
+
+    schedule_item_query = (
+        schedule_item_query.group_by(ScheduleItem.id)
+        .options(selectinload(ScheduleItem.occurrences))
+        .options(undefer(ScheduleItem.favourite_count))
     )
     schedule_items = list(db.session.scalars(schedule_item_query))
 

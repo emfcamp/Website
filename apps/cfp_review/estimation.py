@@ -11,13 +11,15 @@ from models.content import (
     ScheduleItemType,
     Venue,
 )
+from models.content.schedule import SCHEDULE_ITEM_INFOS, ScheduleItemInfo
 from models.content.venue import TimeBlock
 
 
 @dataclass
 class CFPEstimate:
-    schedule_item_type: ScheduleItemType
-    schedule_item_count: int
+    schedule_item_info: ScheduleItemInfo
+    occurrence_count: int
+    missing_occurrences: int
     available_time: timedelta
     allocated_time: timedelta
     remaining_time: timedelta
@@ -48,10 +50,18 @@ def get_cfp_estimate(schedule_item_type: ScheduleItemType) -> CFPEstimate:
     allocated_time = Duration()
     unknown_durations: int = 0
 
+    missing_occurrences = 0
+    occurrence_count = 0
+
     for schedule_item in schedule_items:
+        if len(schedule_item.occurrences) == 0:
+            missing_occurrences += 1
+
         for occurrence in schedule_item.occurrences:
             if occurrence.cancelled:
                 continue
+
+            occurrence_count += 1
 
             if not occurrence.scheduled_duration:
                 unknown_durations += 1
@@ -84,8 +94,9 @@ def get_cfp_estimate(schedule_item_type: ScheduleItemType) -> CFPEstimate:
     available_time = get_available_proposal_time(schedule_item_type)
 
     return CFPEstimate(
-        schedule_item_type=schedule_item_type,
-        schedule_item_count=len(schedule_items),
+        schedule_item_info=SCHEDULE_ITEM_INFOS[schedule_item_type],
+        occurrence_count=occurrence_count,
+        missing_occurrences=missing_occurrences,
         available_time=available_time,
         allocated_time=allocated_time,
         remaining_time=available_time - allocated_time,
