@@ -394,7 +394,6 @@ def render_trusted_markdown(markdown_src: str) -> Markup:
         markdown(
             markdown_src,
             extensions=[
-                "markdown.extensions.nl2br",
                 "markdown.extensions.admonition",
                 "markdown.extensions.toc",
             ],
