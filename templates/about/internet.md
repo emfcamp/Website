@@ -1,8 +1,10 @@
-## title: Internet
+title: Internet
+
+--
 
 # Internet
 
-As usual, the EMF Network team will be aiming to provide fast wired and wireless networking across the field.
+As usual, the EMF Network Operations Centre will be aiming to provide fast wired and wireless networking across the field.
 
 ## Wireless
 
