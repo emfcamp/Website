@@ -26,7 +26,7 @@ By default, wireless devices are firewalled from the Internet, but inbound conne
 
 In case you need additional information for that connection:
 
-- Certificate: ‘Use system certificates’ or explicitly select (after installation) [ISRG Root X1](https://letsencrypt.org/certs/isrgrootx1.pem) certificate.
+- Certificate: ‘Use system certificates’ or explicitly select (after installation) [ISRG Root X2](https://letsencrypt.org/certificates/#root-cas:~:text=revoked%2C%20expired-,ISRG%20Root%20X2,-Subject%3A%20O) certificate.
 - Domain: radius.emf.camp
 
 It's fine to select ‘Do not validate’ for the **Online Certificate status** and leave the **Anonymous identity** blank.
