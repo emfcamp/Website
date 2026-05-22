@@ -42,7 +42,7 @@ There will be a refrigerator in the [volunteer dining area](/about/volunteering#
 
 * Medicines
 * Medically necessary cooling packs
-* Milk for infants
+* Formula/breast milk for infants
 
 All items must be clearly labelled with a name and contact details (e.g. email, mobile number, [local extension](/about/phones)).
 
