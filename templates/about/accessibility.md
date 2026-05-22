@@ -40,12 +40,16 @@ Our composting toilet locations will have accessible plastic toilets with a code
 
 There will be a refrigerator in the [volunteer dining area](/about/volunteering#volunteer-kitchen) and a freezer in the Info tent, in which we can store the following items for you:
 
-* Medicines
-* Medically necessary cooling packs
-* Formula/breast milk for infants
+- Medicines
+- Medically necessary cooling packs
+- Formula/breast milk for infants
 
 All items must be clearly labelled with a name and contact details (e.g. email, mobile number, [local extension](/about/phones)).
 
 ## Captions
 
 We will be providing live captions for talks in the main venues (stages A, B and C). These will be displayed in the venue on monitors to the side of the stage, as well as available via a web browser on personal devices on-site.
+
+## Gender & Equality Act
+
+EMF is a trans-inclusive event and we have absolutely no interest in policing your gender. All toilets and showers at the event have individual, gender-neutral, lockable cubicles. There are no "single-sex" spaces (under the Equality Act definition) at EMF. We [do not tolerate](/code-of-conduct) transphobia.
