@@ -36,6 +36,16 @@ Our two main toilet/shower locations will have fully accessible toilet/shower ca
 
 Our composting toilet locations will have accessible plastic toilets with a code lock.
 
+## Cold/frozen storage
+
+There will be a refrigerator in the [volunteer dining area](/about/volunteering#volunteer-kitchen) and a freezer in the Info tent, in which we can store the following items for you:
+
+* Medicines
+* Medically necessary cooling packs
+* Milk for infants
+
+All items must be clearly labelled with a name and contact details (e.g. email, mobile number, [local extension](/about/phones)).
+
 ## Captions
 
 We will be providing live captions for talks in the main venues (stages A, B and C). These will be displayed in the venue on monitors to the side of the stage, as well as available via a web browser on personal devices on-site.
