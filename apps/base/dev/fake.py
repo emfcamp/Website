@@ -314,7 +314,6 @@ class FakeDataGenerator:
     def create_occurrence(self, schedule_item: ScheduleItem, occurrence_num: int) -> Occurrence:
         # TODO: implement scheduling?
         occurrence = Occurrence(
-            state="unscheduled",
             schedule_item=schedule_item,
             occurrence_num=occurrence_num,
             manually_scheduled=random_bool(0.9),
