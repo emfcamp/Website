@@ -1,4 +1,4 @@
-from datetime import date, datetime, time, timedelta
+from datetime import datetime, time, timedelta
 from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey, select
@@ -66,16 +66,20 @@ def buildup_start() -> datetime:
     return datetime.combine(config.event_start.date() - timedelta(days=8), time(hour=0))
 
 
-def buildup_end() -> date:
+def buildup_end() -> datetime:
     # End of day 0
     return datetime.combine(config.event_start.date() - timedelta(days=1), time(hour=22))
 
 
-def teardown_start() -> date:
+def teardown_start() -> datetime:
     # We start considering teardown from "midday" on day 5
     return datetime.combine(config.event_end.date() + timedelta(days=1), time(hour=12))
 
 
-def teardown_end() -> date:
+def teardown_end() -> datetime:
     # After PM on day 8
     return datetime.combine(config.event_end.date() + timedelta(days=4), time(hour=22))
+
+
+def date_requires_registration(date: datetime) -> bool:
+    return date <= buildup_end() or date >= teardown_start()
