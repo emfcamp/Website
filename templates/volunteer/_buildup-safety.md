@@ -63,6 +63,11 @@ steel-toed boots are strongly recommended.
 We don't mind people drinking alcohol on site outside of the core working hours. You must leave at least 8 hours between
 drinking alcohol and driving any vehicles on site.
 
+## Emergencies
+
+In case of a medical issue, a first aid kit is available in HQ. A contact phone for calling 999 is also available in HQ.
+Later during buildup, dedicated first-aiders will be available.
+
 ## Many thanks
 
 Thanks again for volunteering at EMF, and we look forward to seeing you in the field!

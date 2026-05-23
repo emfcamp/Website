@@ -85,7 +85,9 @@
             {% endif %}
             {% endcall %}
             {{ render_field(buildup_form.departure_date, horizontal=9) }}
-            {{ render_field(buildup_form.emergency_contact, horizontal=9) }}
+            {% call render_field(buildup_form.emergency_contact, horizontal=9) %}
+            Ideally a name and phone number.
+            {% endcall %}
             {{ render_checkbox(buildup_form.health_and_safety_briefing, horizontal=9) }}
 
             {{ buildup_form.save(class_="btn btn-primary debounce pull-right") }}
