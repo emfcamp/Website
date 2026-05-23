@@ -1,11 +1,11 @@
 import enum
 from collections.abc import Sequence
-from datetime import datetime
+from datetime import date, datetime
 from typing import TYPE_CHECKING, Self
 
 import pytz
 from pendulum import interval
-from sqlalchemy import ForeignKey, func, select, text
+from sqlalchemy import ForeignKey, desc, func, select, text
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, column_property, mapped_column, relationship
 
@@ -205,17 +205,29 @@ class Shift(BaseModel):
         return cls.query.order_by(Shift.start, Shift.venue_id).all()
 
     @classmethod
-    def get_all_for_day(cls, day: str) -> Sequence[Self]:
+    def get_all_for_day(cls, day: date) -> Sequence[Self]:
         """Return all shifts for the requested day."""
         return (
             db.session.execute(
                 select(cls)
-                .where(text("lower(to_char(start, 'Dy'))=:day").bindparams(day=day.lower()))
+                .where(text("to_char(start, 'YYYY-MM-DD')=:day").bindparams(day=day.strftime("%Y-%m-%d")))
                 .order_by(Shift.start, Shift.venue_id)
             )
             .scalars()
             .all()
         )
+
+    @classmethod
+    def earliest_and_latest_in_range(
+        cls, start: datetime, end: datetime
+    ) -> tuple[datetime | None, datetime | None]:
+        """Return the earliest and latest shift available to a volunteer."""
+
+        query = select(cls.start).where((cls.start >= start) & (cls.end <= end))
+        first = db.session.execute(query.order_by(cls.start)).scalar()
+        last = db.session.execute(query.order_by(desc(cls.end))).scalar()
+
+        return (first, last)
 
     @classmethod
     def generate_for(

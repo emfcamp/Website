@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import datetime
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from flask_login import UserMixin
@@ -6,7 +7,10 @@ from sqlalchemy import ARRAY, Column, ForeignKey, Integer, String, Table, select
 from sqlalchemy.ext.mutable import Mutable, MutableSet
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from apps.config import config
 from main import db
+from models.volunteer import buildup
+from models.volunteer.buildup import BuildupVolunteer
 
 from .. import BaseModel
 from .shift import ShiftEntry, ShiftEntryState
@@ -158,6 +162,18 @@ class Volunteer(BaseModel, UserMixin):
     @property
     def is_volunteer_admin(self) -> bool:
         return bool(self.volunteer_admin_roles or self.administered_teams)
+
+    @property
+    def registered_for_buildup(self) -> bool:
+        return BuildupVolunteer.get_for_user(self.user) is not None
+
+    @property
+    def permitted_shift_times(self) -> tuple[datetime, datetime]:
+        """Returns the earliest and latest time at which this volunteer can take a shift."""
+        if self.registered_for_buildup:
+            return (buildup.buildup_start(), buildup.teardown_end())
+
+        return (config.event_start, config.event_end)
 
 
 """

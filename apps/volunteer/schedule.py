@@ -1,6 +1,6 @@
 from collections import defaultdict
+from datetime import datetime, timedelta
 
-import pendulum
 from flask import (
     Response,
     abort,
@@ -63,13 +63,22 @@ def redirect_next_or_schedule(message: str | None = None) -> ResponseReturnValue
 @feature_flag("VOLUNTEERS_SCHEDULE")
 @v_user_required
 def schedule():
-    if naive_utcnow() < config.event_start:
-        default_day = "wed"
-    elif naive_utcnow() > config.event_end:
-        default_day = "mon"
+    current_volunteer = Volunteer.get_for_user(current_user)
+    earliest, latest = Shift.earliest_and_latest_in_range(*current_volunteer.permitted_shift_times)
+    dates = [earliest.date() + timedelta(days=i) for i in range((latest.date() - earliest.date()).days + 1)]
+
+    if naive_utcnow().date() < dates[0]:
+        default_day = dates[0]
+    elif naive_utcnow().date() > dates[1]:
+        default_day = dates[1]
     else:
-        default_day = pendulum.now().strftime("%a").lower()
-    active_day = request.args.get("day", default=default_day)
+        default_day = datetime.now().date()
+
+    requested_date = request.args.get("day", default=None)
+    if requested_date:
+        active_day = datetime.fromisoformat(requested_date).date()
+    else:
+        active_day = default_day
 
     shifts = Shift.get_all_for_day(active_day)
 
@@ -97,8 +106,10 @@ def schedule():
         roles=roles,
         venues=venues,
         all_shifts=by_time,
+        dates=dates,
         active_day=active_day,
         untrained_roles=untrained_roles,
+        buildup_volunteer=current_volunteer.registered_for_buildup,
         token=token,
     )
 
