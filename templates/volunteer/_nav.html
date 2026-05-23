@@ -9,7 +9,7 @@
 </li>
 {% endmacro %}
 {% if current_user.is_authenticated and current_user.has_permission('volunteer:user') %}
-    <ul class="nav nav-pills">
+    <ul class="nav nav-tabs">
         {{ menuitem('Account', '.account') }}
         {{ menuitem('Roles', '.choose_role') }}
         {% if feature_enabled('VOLUNTEERS_SCHEDULE') %}
@@ -17,8 +17,8 @@
         {% endif %}
         {{ menuitem('Bar Training', '.bar_training') }}
         {{ menuitem('Handbook', '.info') }}
-        {% if current_user.has_permission('volunteer:buildup') %}
-            {{ menuitem('Buildup/Teardown Registration', '.buildup_amend')}}
+        {% if current_user.buildup_volunteer %}
+            {{ menuitem('Buildup/Teardown', '.buildup_amend')}}
         {% endif %}
         {% if current_user.has_permission('volunteer:admin') or current_user.has_permission('volunteer:manager') or current_user.is_volunteer_admin %}
             {{ menuitem('Role Admin', '.role_admin_index')}}
@@ -26,6 +26,5 @@
         {% if current_user.has_permission('volunteer:admin') %}
             {{ menuitem('Admin', 'volunteer_admin.index') }}
         {% endif %}
-        {{ menuitem("Log Out", "users.logout") }}
     </ul>
 {% endif %}

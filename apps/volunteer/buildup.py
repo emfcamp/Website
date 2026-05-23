@@ -11,15 +11,15 @@ from flask import (
 from flask import (
     current_app as app,
 )
+from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 from sqlalchemy import select
-from werkzeug.wrappers.response import Response
 from wtforms import BooleanField, DateTimeLocalField, StringField, SubmitField
 from wtforms.validators import DataRequired, InputRequired
 
 from apps.common import get_next_url
 from main import db
-from models.volunteer.buildup import BuildupSignupKey, BuildupVolunteer, buildup_start, teardown_end
+from models.volunteer.buildup import BuildupSignupKey, BuildupVolunteer, teardown_end
 from models.volunteer.volunteer import Volunteer as VolunteerUser
 
 from ..common import create_current_user
@@ -52,13 +52,13 @@ class BuildupSignUpForm(Form):
     )
 
     health_and_safety_briefing = BooleanField(
-        "I have read and agree to follow the rules in the Safety on Site briefing above",
+        "I have read and agree to follow the site rules",
         [
             DataRequired(),
         ],
     )
 
-    save = SubmitField("Confirm buildup/teardown attendance")
+    save = SubmitField("Submit")
 
     def validate(self, *args, **kwargs):
         rv = super().validate(*args, **kwargs)
@@ -85,7 +85,11 @@ def update_buildup_volunteer_from_form(buv: BuildupVolunteer, form: BuildupSignU
     return buv
 
 
-def _buildup_register(show_form_on_success: bool = False, key: BuildupSignupKey | None = None) -> str | None:
+def _buildup_register(
+    show_form_on_success: bool = False,
+    key: BuildupSignupKey | None = None,
+    arrival_date: datetime | None = None,
+) -> ResponseReturnValue | None:
     volunteer = current_user.is_authenticated and VolunteerUser.get_for_user(current_user)
     passed_validation = request.method == "POST"
     volunteer_form = VolunteerSignUpForm(prefix="v", obj=volunteer)
@@ -118,6 +122,17 @@ def _buildup_register(show_form_on_success: bool = False, key: BuildupSignupKey 
     # Now the buildup form
     buv = current_user.is_authenticated and BuildupVolunteer.get_for_user(current_user)
     buildup_form = BuildupSignUpForm(prefix="b", obj=buv)
+
+    if buv and buv.signup_key:
+        key = buv.signup_key
+
+    if key:
+        buildup_form.arrival_date.render_kw = {"min": key.min_arrival_date, "max": teardown_end()}
+        buildup_form.departure_date.render_kw = {"min": key.min_arrival_date, "max": teardown_end()}
+
+    if arrival_date:
+        buildup_form.arrival_date.data = arrival_date
+
     if buv and buv.acked_health_and_safety_briefing_at:
         buildup_form.health_and_safety_briefing.data = True
     if buildup_form.validate_on_submit():
@@ -127,13 +142,10 @@ def _buildup_register(show_form_on_success: bool = False, key: BuildupSignupKey 
             db.session.add(buv)
         else:
             new_buv = BuildupVolunteer()
+            new_buv.signup_key = key
             new_buv.user_id = current_user.id
-            if key:
-                new_buv.team_name = key.team_name
             new_buv = update_buildup_volunteer_from_form(new_buv, buildup_form)
             db.session.add(new_buv)
-
-        current_user.grant_permission("volunteer:buildup")
     else:
         passed_validation = False
 
@@ -144,8 +156,9 @@ def _buildup_register(show_form_on_success: bool = False, key: BuildupSignupKey 
 
         if not show_form_on_success:
             return None
-    else:
-        db.session.rollback()
+        return redirect(url_for(".buildup_amend"))
+
+    db.session.rollback()
 
     return render_template(
         "volunteer/buildup-sign-up.html",
@@ -153,8 +166,6 @@ def _buildup_register(show_form_on_success: bool = False, key: BuildupSignupKey 
         volunteer=volunteer,
         volunteer_form=volunteer_form,
         buildup_form=buildup_form,
-        buildup_start=buildup_start(),
-        teardown_end=teardown_end(),
     )
 
 
@@ -166,7 +177,7 @@ def buildup_arrived(secret):
 
     buv = BuildupVolunteer.get_for_user(current_user)
     if not buv:
-        if response := _buildup_register():
+        if response := _buildup_register(arrival_date=datetime.now()):
             return response
         # OK, they're registered now.
         buv = BuildupVolunteer.get_for_user(current_user)
@@ -176,26 +187,25 @@ def buildup_arrived(secret):
         db.session.add(buv)
         db.session.commit()
 
-    return render_template(
-        "volunteer/buildup-arrived.html",
-        user=current_user,
-        is_buildup=datetime.now() < buildup_start(),
-        buildup_signal_group=app.config.get("BUILDUP_SIGNAL_GROUP"),
-    )
+        flash("You're now marked as arrived - welcome to EMF!")
+
+    return redirect(url_for(".buildup_amend"))
 
 
 @volunteer.route("buildup", methods=["GET", "POST"])
 @login_required
-def buildup_amend():
+def buildup_amend() -> ResponseReturnValue:
     buv = BuildupVolunteer.get_for_user(current_user)
-    if not buv and not current_user.has_permission("volunteer:buildup"):
+    if not buv and not current_user.buildup_volunteer:
         return abort(404)
 
-    return _buildup_register(show_form_on_success=True)
+    response = _buildup_register(show_form_on_success=True)
+    assert response is not None
+    return response
 
 
 @volunteer.route("buildup/register/<token>", methods=["GET", "POST"])
-def buildup_register(token: str) -> Response | str:
+def buildup_register(token: str) -> ResponseReturnValue:
     key = db.session.execute(
         select(BuildupSignupKey).where(BuildupSignupKey.token == token)
     ).scalar_one_or_none()

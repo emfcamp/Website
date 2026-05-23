@@ -17,6 +17,7 @@ from models.purchase import Purchase
 from models.site_state import get_site_state
 
 from ..common.forms import DiversityForm
+from ..config import config
 from . import users
 
 
@@ -88,7 +89,9 @@ def account() -> ResponseReturnValue:
     except Exception:
         app.logger.exception("Error fetching blog posts")
 
-    return render_template("account/main.html", blog_posts=blog_posts)
+    return render_template(
+        "account/main.html", blog_posts=blog_posts, now=datetime.now(), event_start=config.event_start
+    )
 
 
 @users.route("/account/details", methods=["GET", "POST"])

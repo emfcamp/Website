@@ -29,6 +29,8 @@ class BuildupSignupKey(BaseModel):
     token: Mapped[str] = mapped_column(primary_key=True)
     team_name: Mapped[str]
 
+    min_arrival_date: Mapped[datetime]
+
 
 class BuildupVolunteer(BaseModel):
     __table_name__ = "buildup_volunteer"
@@ -39,7 +41,10 @@ class BuildupVolunteer(BaseModel):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     user: Mapped[User] = relationship(back_populates="buildup_volunteer", foreign_keys=[user_id])
 
-    team_name: Mapped[str] = mapped_column(default="")
+    signup_key_token: Mapped[int | None] = mapped_column(ForeignKey("buildup_signup_key.token"))
+
+    #: The signup key used to register for buildup. This can be None if the user was auto-registered on arrival.
+    signup_key: Mapped[BuildupSignupKey | None] = relationship()
 
     arrival_date: Mapped[datetime]
     departure_date: Mapped[datetime]
@@ -47,7 +52,9 @@ class BuildupVolunteer(BaseModel):
     emergency_contact: Mapped[str] = mapped_column(default="")
 
     acked_health_and_safety_briefing_at: Mapped[datetime | None]
+
     recorded_on_site: Mapped[datetime | None]
+    left_site: Mapped[datetime | None]
 
     @classmethod
     def get_for_user(cls, user: User) -> BuildupVolunteer | None:

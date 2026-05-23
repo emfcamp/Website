@@ -1,9 +1,13 @@
+import random
 from typing import ClassVar
 
 from dateutil.rrule import DAILY, rrule
 from flask_admin import expose
+from flask_admin.form import Field
+from wtforms import StringField
+from wtforms.fields.datetime import DateTimeLocalField
 
-from main import db
+from main import db, external_url
 from models.volunteer.buildup import (
     BuildupSignupKey,
     BuildupVolunteer,
@@ -16,15 +20,37 @@ from models.volunteer.buildup import (
 from ..flask_admin_base import VolunteerBaseView, VolunteerModelView
 from . import volunteer_admin
 
+TOKEN_ALPHABET = "abcdefghijkmnpqrstuvwxyz23456789"
+
 
 class BuildupSignupKeyModelView(VolunteerModelView):
-    column_filters: ClassVar[list[str]] = ["team_name"]
-    form_columns: ClassVar[list[str]] = ["token", "team_name"]
+    column_filters = ("team_name",)
+    form_columns = ("token", "team_name", "min_arrival_date")
+    form_overrides: ClassVar[dict[str, type[Field]] | None] = {"min_arrival_date": DateTimeLocalField}
+
+    def create_form(self, obj=None):
+        form = super().create_form(obj=obj)
+
+        if not form.token.data:
+            form.token.data = "".join(random.choices(TOKEN_ALPHABET, k=12))
+
+        if not form.min_arrival_date.data:
+            form.min_arrival_date.data = buildup_start()
+
+        return form
+
+    def get_edit_form(self):
+        form = super().get_edit_form()
+        form.url = StringField("URL", render_kw={"readonly": True})
+        return form
 
     def edit_form(self, obj=None):
         form = super().edit_form(obj=obj)
+
+        form.url.data = external_url("volunteer.buildup_register", token=form.token.data)
         if not form.token.render_kw:
             form.token.render_kw = {}
+
         form.token.render_kw["readonly"] = True
         return form
 
@@ -35,7 +61,7 @@ volunteer_admin.add_view(
 
 
 class BuildupVolunteerModelView(VolunteerModelView):
-    form_excluded_columns: ClassVar[list[str]] = ["versions"]
+    form_excluded_columns = ("versions",)
 
     def _modify_widget_args(self, form, obj=None, create=False):
         if not form.arrival_date.render_kw:

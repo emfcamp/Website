@@ -5,6 +5,36 @@
 {% include "account/_nav.html" %}
 {% set owned_tickets = current_user.get_owned_tickets(True, type="admission_ticket")|list %}
 <div class="panel-grid">
+    {% set bv = current_user.buildup_volunteer %}
+    {% if bv and event_start > now %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+        <h3 class="panel-title">Buildup</h3>
+        </div>
+        <div class="panel-body">
+            <p>Welcome to EMF!</p>
+            {% if not bv.recorded_on_site %}
+            <p>You're scheduled to arrive on site on
+                <strong>{{bv.arrival_date.strftime("%A %B %d at %H:%M")}}</strong>.
+                If your plans have changed, please <a href="{{ url_for("volunteer.buildup_amend") }}">update your details</a>.
+            </p>
+            {% endif %}
+        </div>
+        <div class="panel-footer">
+            <div class="btn-group">
+                {% if not bv.recorded_on_site %}
+                <a class="btn btn-primary" href="{{ url_for("volunteer.buildup_amend") }}">Update details</a>
+                {% elif config['BUILDUP_SIGNAL_GROUP'] %}
+                    <a class="btn btn-primary" href="{{config['BUILDUP_SIGNAL_GROUP']}}" target="_blank">Buildup chat (Signal)</a>
+                {% endif %}
+                {% if config['BUILDUP_ALERTS_GROUP'] %}
+                    <a class="btn btn-primary" href="{{config['BUILDUP_ALERTS_GROUP']}}" target="_blank">Buildup alerts (Signal)</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
   <div class="panel panel-default">
       <div class="panel-heading">
         <h3 class="panel-title">Villages</h3>
@@ -42,9 +72,8 @@
       <div class="panel-body">
         {% set proposal_count = current_user.proposals | length %}
         {% if not feature_enabled('CFP_CLOSED') %}
-          <p>Our Call for Participation is open!<br>
-          We're looking for talks, workshops, or performances at EMF {{event_year}}.
-          </p>
+          <p>Our Call for Participation is open!</p>
+          <p>We're looking for talks, workshops, or performances at EMF {{event_year}}.</p>
         {% endif %}
         {% if proposal_count %}
           <p>You've already submitted {{ proposal_count }} {{ 'proposal' if proposal_count == 1 else 'proposals' }}.</p>
