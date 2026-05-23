@@ -205,6 +205,7 @@ def buildup_amend() -> ResponseReturnValue:
 
 
 @volunteer.route("buildup/register/<token>", methods=["GET", "POST"])
+@login_required
 def buildup_register(token: str) -> ResponseReturnValue:
     key = db.session.execute(
         select(BuildupSignupKey).where(BuildupSignupKey.token == token)
@@ -212,7 +213,7 @@ def buildup_register(token: str) -> ResponseReturnValue:
     if not key:
         abort(404)
 
-    if current_user.is_authenticated and BuildupVolunteer.get_for_user(current_user):
+    if BuildupVolunteer.get_for_user(current_user):
         return redirect(url_for(".buildup_amend"))
 
     if response := _buildup_register(key=key):
