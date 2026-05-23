@@ -1,4 +1,4 @@
-During buildup and teardown, EMF is a construction site, and we are legally responsibility for your safety.
+During buildup and teardown, EMF is a construction site, and we are legally responsible for your safety.
 While you're on site, we expect you to follow the [code of conduct](/code-of-conduct) and these
 safety rules. If you don't, we may have to ask you to leave the site.
 

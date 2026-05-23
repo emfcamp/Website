@@ -81,7 +81,7 @@
             {% call render_field(buildup_form.arrival_date, horizontal=9) %}
             {% if buildup_form.arrival_date.render_kw['min'] %}
             Your team has asked that you arrive on site <strong>after
-                {{buildup_form.arrival_date.render_kw['min'].strftime("%A %B %d at %H:%M")}}</strong>.
+                {{buildup_form.arrival_date.render_kw['min'].strftime("%A %d %B at %H:%M")}}</strong>.
             {% endif %}
             {% endcall %}
             {{ render_field(buildup_form.departure_date, horizontal=9) }}

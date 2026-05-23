@@ -15,7 +15,7 @@
             <p>Welcome to EMF!</p>
             {% if not bv.recorded_on_site %}
             <p>You're scheduled to arrive on site on
-                <strong>{{bv.arrival_date.strftime("%A %B %d at %H:%M")}}</strong>.
+                <strong>{{bv.arrival_date.strftime("%A %d %B at %H:%M")}}</strong>.
                 If your plans have changed, please <a href="{{ url_for("volunteer.buildup_amend") }}">update your details</a>.
             </p>
             {% endif %}
