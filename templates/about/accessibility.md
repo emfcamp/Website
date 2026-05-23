@@ -52,4 +52,6 @@ We will be providing live captions for talks in the main venues (stages A, B and
 
 ## Gender & Equality Act
 
-EMF is a trans-inclusive event and we have absolutely no interest in policing your gender. All toilets and showers at the event have individual, gender-neutral, lockable cubicles. There are no "single-sex" spaces (under the Equality Act definition) at EMF. We [do not tolerate](/code-of-conduct) transphobia.
+EMF is a trans-inclusive event and we have absolutely no interest in policing your gender. All toilet and shower cubicles at the event are gender-neutral, with separate urinals which can be used by whoever needs them. There are no "single-sex" spaces (under the Equality Act definition) at EMF.
+
+We [do not tolerate](/code-of-conduct) transphobia.
