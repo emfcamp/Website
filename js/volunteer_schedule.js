@@ -77,8 +77,7 @@ function shouldDisplayNode(node_data, filters, node) {
 
   // Now run through the other filters and see if there's any other reasons to
   // filter out a shift. This is done by collecting a list of keys because it
-  // makes debugging easier (you can just console.log(filter_reasons, node_data)
-  // to get a view of why a shift isn't showing).
+  // makes debugging easier (they're attached to the node as data-filter-reasons).
   let filter_reasons = [];
   if (!filters["role_ids"].includes(node_data["role_id"])) {
     filter_reasons.push("role_id");
@@ -123,8 +122,17 @@ function colourise_row(node, node_data) {
   }
 }
 
+function updateRoleList(role_ids) {
+  let roleNames = role_ids
+    .map((id) => document.getElementById(`role-${id}-label`).textContent.trim())
+    .join(", ");
+  document.getElementById("role-list").textContent = roleNames;
+}
+
 function updateRowDisplay() {
   let filters = getFilters();
+
+  updateRoleList(filters.role_ids);
 
   // Hackery to do row spans.
   let currentHour = "null";
@@ -169,11 +177,6 @@ function updateRowDisplay() {
 
 function init_volunteer_schedule() {
   loadFilters();
-  document.getElementById("filters").style.display = "";
-  document.getElementById("filters-toggle").addEventListener("click", () => {
-    $("#filters-body").toggle();
-  });
-
   ["show_past", "show_signed_up_only", "hide_full", "is_understaffed"].forEach(
     (id) => {
       document.getElementById(id).addEventListener("change", () => {
@@ -183,12 +186,19 @@ function init_volunteer_schedule() {
     },
   );
 
-  document.querySelectorAll("input[data-role-id]").forEach((node) =>
+  ["filters", "roles"].forEach((panel) => {
+    document.getElementById(panel).style.display = "";
+    document.getElementById(`${panel}-toggle`).addEventListener("click", () => {
+      $(`#${panel}-body`).toggle();
+    });
+  });
+
+  document.querySelectorAll("input[data-role-id]").forEach((node) => {
     node.addEventListener("change", () => {
       saveFilters();
       updateRowDisplay();
-    }),
-  );
+    });
+  });
 
   document.getElementById("select-all-roles").addEventListener("click", () => {
     document
@@ -211,8 +221,8 @@ function init_volunteer_schedule() {
         .querySelectorAll("input[data-role-id]")
         .forEach(
           (checkbox) =>
-          (checkbox.checked =
-            checkbox.getAttribute("data-interested") == "True"),
+            (checkbox.checked =
+              checkbox.getAttribute("data-interested") == "True"),
         );
       saveFilters();
       updateRowDisplay();
@@ -224,8 +234,8 @@ function init_volunteer_schedule() {
         .querySelectorAll("input[data-role-id]")
         .forEach(
           (checkbox) =>
-          (checkbox.checked =
-            checkbox.getAttribute("data-trained") == "True"),
+            (checkbox.checked =
+              checkbox.getAttribute("data-trained") == "True"),
         );
       saveFilters();
       updateRowDisplay();

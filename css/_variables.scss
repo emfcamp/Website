@@ -54,6 +54,7 @@ $form-element-text: #d5d6da;
 /* Alert/button element colours */
 
 $success-background: $brand-2026-green;
+$success-border: color.adjust($success-background, $lightness: -15%);
 $success-text: #000;
 
 $info-background: $brand-2026-mid-blue;
