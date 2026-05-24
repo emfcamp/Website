@@ -13,6 +13,39 @@
   }
 }
 
+#roles {
+  .toggle {
+    font-weight: bold;
+  }
+  .role-selector {
+    display: inline-block;
+
+    input {
+      position: absolute;
+      opacity: 0;
+    }
+
+    label {
+      padding: 2px 8px;
+      font-weight: normal;
+      border: 1px solid $highlight-2-border;
+      border-radius: 5px;
+    }
+  }
+
+  input[type="checkbox"]:not(:checked) + label {
+    background-color: $main-background-text;
+    color: $main-background;
+    border-color: $main-background;
+  }
+
+  input[type="checkbox"]:checked + label {
+    color: $success-text;
+    background-color: $success-background;
+    border-color: $success-border;
+  }
+}
+
 table.shifts-table {
 
   tr,
