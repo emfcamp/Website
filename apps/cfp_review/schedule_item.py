@@ -182,7 +182,15 @@ def export_schedule_items(format: str) -> ResponseReturnValue:
     )
 
 
-@cfp_review.route("/schedule-items/<int:schedule_item_id>", methods=["GET", "POST"])
+@cfp_review.route("/schedule-items/<int:schedule_item_id>")
+@admin_required
+def schedule_item(schedule_item_id: int) -> ResponseReturnValue:
+    schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
+
+    return render_template("cfp_review/schedule_item/schedule_item.html", schedule_item=schedule_item)
+
+
+@cfp_review.route("/schedule-items/<int:schedule_item_id>/edit", methods=["GET", "POST"])
 @admin_required
 def update_schedule_item(schedule_item_id: int) -> ResponseReturnValue:
     schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
@@ -207,7 +215,7 @@ def update_schedule_item(schedule_item_id: int) -> ResponseReturnValue:
     occurrence_form = CreateOccurrenceForm()
 
     return render_template(
-        "cfp_review/schedule_item/schedule_item.html",
+        "cfp_review/schedule_item/schedule_item_edit.html",
         schedule_item=schedule_item,
         form=form,
         occurrence_form=occurrence_form,
@@ -274,8 +282,6 @@ def occurrences(schedule_item_id: int) -> ResponseReturnValue:
         occurrence = Occurrence(
             schedule_item=schedule_item,
             occurrence_num=occurrence_num,
-            state="unscheduled",
-            video_privacy=schedule_item.video_privacy,
         )
         schedule_item.occurrences.append(occurrence)
         db.session.add(occurrence)
@@ -307,8 +313,6 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseRetu
     # We don't block saving an occurrence if the valid list has changed
     # allowed_venues is an input into the scheduler, not a constraint on us
     valid_allowed_venues |= set(occurrence.allowed_venues)
-    if occurrence.potential_venue:
-        valid_allowed_venues.add(occurrence.potential_venue)
     if occurrence.scheduled_venue:
         valid_allowed_venues.add(occurrence.scheduled_venue)
 
@@ -318,7 +322,6 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseRetu
     ]
     form.allowed_venue_ids.choices = allowed_venue_choices
     form.scheduled_venue_id.choices = [("", "")] + allowed_venue_choices
-    form.potential_venue_id.choices = [("", "")] + allowed_venue_choices
 
     if form.validate_on_submit():
         if occurrence.schedule_item.type_info.supports_lottery and not occurrence.lottery:

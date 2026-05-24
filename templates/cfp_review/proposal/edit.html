@@ -6,7 +6,7 @@
 {% if proposal.schedule_item %}
 <div class="alert alert-warning">
     <p>This proposal has an associated schedule item. Editing details below will only update the proposal.</p>
-    <p><a class="btn btn-success" href="{{ url_for("cfp_review.update_schedule_item", schedule_item_id=proposal.schedule_item.id) }}">View schedule item</a></p>
+    <p><a class="btn btn-success" href="{{ url_for("cfp_review.schedule_item", schedule_item_id=proposal.schedule_item.id) }}">View schedule item</a></p>
     {% if not proposal.is_editable %}
     <p>The proposer will only be able to edit schedule item fields, they will not be able to edit their proposal.</p>
     {% endif %}

@@ -445,17 +445,6 @@ class UpdateOccurrenceForm(Form):
     allowed_venue_ids = SelectMultipleField("Allowed venues", coerce=int)
     scheduled_venue_id = SelectField("Scheduled venue", coerce=coerce_optional(int))
     scheduled_time = DateTimeField("Scheduled time", [Optional(strip_whitespace=True)])
-    potential_venue_id = SelectField("Potential venue", coerce=coerce_optional(int))
-    potential_time = DateTimeField("Potential time", [Optional(strip_whitespace=True)])
-
-    video_privacy = SelectField(
-        "Recording",
-        choices=[
-            ("public", "Stream and record"),
-            ("review", "Do not stream, and do not publish until reviewed"),
-            ("none", "Do not stream or record"),
-        ],
-    )
 
     c3voc_url = StringField("C3VOC video URL")
     youtube_url = StringField("YouTube URL")
