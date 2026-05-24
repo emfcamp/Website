@@ -105,7 +105,12 @@ class BuildupVolunteerBreakdownView(VolunteerBaseView):
     def index(self):
         days_data = []
         is_just_after_event = False
-        for dt in rrule(DAILY, dtstart=buildup_start(), until=teardown_end(), byhour=[6, 18]):
+        earliest_buildup = db.session.query(BuildupVolunteer).order_by(BuildupVolunteer.arrival_date).first()
+        if earliest_buildup is None:
+            start = buildup_start()
+        else:
+            start = earliest_buildup.arrival_date
+        for dt in rrule(DAILY, dtstart=start, until=teardown_end(), byhour=[6, 18]):
             if buildup_end() <= dt <= teardown_start():
                 is_just_after_event = True
                 continue
