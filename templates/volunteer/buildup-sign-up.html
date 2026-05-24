@@ -85,6 +85,9 @@
             {% endif %}
             {% endcall %}
             {{ render_field(buildup_form.departure_date, horizontal=9) }}
+            {% call render_field(buildup_form.vehicle_registration, horizontal=9) %}
+            If you're arriving in a vehicle and know its registration number, please let us know.
+            {% endcall %}
             {% call render_field(buildup_form.emergency_contact, horizontal=9) %}
             Ideally a name and phone number.
             {% endcall %}

@@ -50,6 +50,7 @@ class BuildupVolunteer(BaseModel):
     departure_date: Mapped[datetime]
 
     emergency_contact: Mapped[str] = mapped_column(default="")
+    vehicle_registration: Mapped[str | None]
 
     acked_health_and_safety_briefing_at: Mapped[datetime | None]
 

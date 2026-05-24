@@ -51,6 +51,8 @@ class BuildupSignUpForm(Form):
         ],
     )
 
+    vehicle_registration = StringField("Vehicle registration")
+
     health_and_safety_briefing = BooleanField(
         "I have read and agree to follow the site rules",
         [
@@ -80,6 +82,8 @@ def update_buildup_volunteer_from_form(buv: BuildupVolunteer, form: BuildupSignU
         buv.departure_date = form.departure_date.data
     if form.emergency_contact.data:
         buv.emergency_contact = form.emergency_contact.data
+    if form.vehicle_registration.data:
+        buv.vehicle_registration = form.vehicle_registration.data
     if form.health_and_safety_briefing.data:
         buv.acked_health_and_safety_briefing_at = datetime.now()
     return buv
