@@ -13,13 +13,15 @@
   }
 }
 
-table.shifts-table tr,
-table.shifts-table th,
-table.shifts-table td {
-  // !important because I'm a terrible (and very lazy) person
-  border-color: #4a4a4a !important;
-  vertical-align: middle !important;
-}
+table.shifts-table {
+
+  tr,
+  th,
+  td {
+    // !important because I'm a terrible (and very lazy) person
+    border-color: #4a4a4a !important;
+    vertical-align: middle !important;
+  }
 
   td.hidden,
   td.mobile-only {
@@ -42,12 +44,12 @@ table.shifts-table td {
 
     &.staffing-icon-understaffed {
       background-color: $danger-background;
-      mask-image: url('../images/icons/alert-circle.svg');
+      mask-image: url("../images/icons/alert-circle.svg");
     }
 
     &.staffing-icon-staffed {
       background-color: $success-background;
-      mask-image: url('../images/icons/check-circle.svg');
+      mask-image: url("../images/icons/check-circle.svg");
     }
   }
 }
