@@ -18,14 +18,38 @@ table.shifts-table th,
 table.shifts-table td {
   // !important because I'm a terrible (and very lazy) person
   border-color: #4a4a4a !important;
+  vertical-align: middle !important;
 }
 
-table.shifts-table tbody td.hidden {
-  display: none;
-}
+  td.hidden,
+  td.mobile-only {
+    display: none;
+  }
 
-table.shifts-table tbody td.mobile-only {
-  display: none;
+  td.button {
+    padding: 5px;
+  }
+
+  tr td.staffing .staffing-icon {
+    display: inline-block;
+    height: 1.5em;
+    width: 1.5em;
+    margin-top: -0.2em;
+    vertical-align: middle;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+
+    &.staffing-icon-understaffed {
+      background-color: $danger-background;
+      mask-image: url('../images/icons/alert-circle.svg');
+    }
+
+    &.staffing-icon-staffed {
+      background-color: $success-background;
+      mask-image: url('../images/icons/check-circle.svg');
+    }
+  }
 }
 
 .role-admin-shift {
