@@ -2,15 +2,20 @@ During buildup and teardown, EMF is a construction site, and we are legally resp
 While you're on site, we expect you to follow the [code of conduct](/code-of-conduct) and these
 safety rules. If you don't, we may have to ask you to leave the site.
 
-## Working hours
+## General Information
 
 Our core working hours during buildup are **09:00 to 20:00**. If you're coming to help with general buildup
-tasks, we expect you to be **available and ready to work** during these hours.
+tasks, we expect you to be awake, fed, and ready to work during these hours.
 
 We know these hours are long, but we have to make the most of the daylight. We will give you plenty of breaks, and if we're
 making good progress we will finish early - we don't want to over-work you!
 
 If you're coming to help a specific team, they may operate different hours, but if you're short of work, you should expect to help out elsewhere on site.
+
+### Quiet hours
+
+The crew camp site and surrounding area should be silent between **23:00 and 07:00**. You should expect to be woken up
+by vehicle movements from 07:00, particularly on weekdays, as this is when deliveries start to arrive.
 
 ### Daily meeting
 
