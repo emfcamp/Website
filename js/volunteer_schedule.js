@@ -1,5 +1,5 @@
 const { verified } = require("@primer/octicons");
-const filterStorageKey = "volunteer-filters:v3";
+const filterStorageKey = "volunteer-filters:v4";
 
 function saveFilters() {
   localStorage.setItem(filterStorageKey, JSON.stringify(getFilters()));
@@ -16,10 +16,9 @@ function loadFilters() {
     savedFilters = JSON.stringify({
       role_ids: interestedRoles,
       show_past: false,
-      signed_up: false,
+      signed_up: true,
       hide_full: true,
       hide_staffed: true,
-      colourful_mode: false,
     });
   }
 
@@ -31,7 +30,6 @@ function loadFilters() {
   document.getElementById("show_signed_up_only").checked = filters.signed_up;
   document.getElementById("hide_full").checked = filters.hide_full;
   document.getElementById("is_understaffed").checked = filters.hide_staffed;
-  document.getElementById("colourful_mode").checked = filters.colourful_mode;
   updateRowDisplay();
 }
 
@@ -44,7 +42,6 @@ function getFilters() {
     signed_up: document.getElementById("show_signed_up_only").checked,
     hide_full: document.getElementById("hide_full").checked,
     hide_staffed: document.getElementById("is_understaffed").checked,
-    colourful_mode: document.getElementById("colourful_mode").checked,
   };
   return filters;
 }
@@ -109,28 +106,21 @@ function spanStartTimeCell(firstNodeOfHour, rowCount) {
   }
 }
 
+/* rowClass and colourise_row are kept despite colourful mode being removed
+   because we plan to use row colourisation for other purposes soon. */
 function rowClass(node_data) {
-  if (node_data.current_staff < node_data.min_staff) {
-    return "danger";
-  }
-
-  if (node_data.current_staff == node_data.max_staff) {
-    return "info";
-  }
-
-  return "warning";
+  return "";
 }
 
-function colourise_row(node, node_data, colourful_mode) {
+function colourise_row(node, node_data) {
   ["danger", "warning", "info"].forEach((className) =>
     node.classList.remove(className),
   );
 
-  if (!colourful_mode) {
-    return;
+  let row_class = rowClass(node_data);
+  if (row_class != "") {
+    node.classList.add(rowClass(node_data));
   }
-
-  node.classList.add(rowClass(node_data));
 }
 
 function updateRowDisplay() {
@@ -162,7 +152,7 @@ function updateRowDisplay() {
         node.querySelector(".start_time").classList.add("hidden");
       }
 
-      colourise_row(node, node_data, filters.colourful_mode);
+      colourise_row(node, node_data);
 
       rowCount += 1;
 
