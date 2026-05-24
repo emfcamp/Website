@@ -67,7 +67,7 @@ If you have no other choice (for running experiments and such), please be nice a
 - 2.4GHz: use channels 1, 5, 9 or 13 @ 20 MHz. Disable 802.11b.
 - 5GHz: use channels 36 or 140 @ 20 MHz.
 - Use a minimum data and beacon rate of 12 Mbit/s. Beacon interval 100 ms or higher.
-- Only broadcast one SSID. SSID spamming is is very antisocial.
+- Only broadcast one SSID. SSID spamming is very antisocial.
 - Do not prefix your broadcasted SSID with “emf”. Do not use other well-known SSIDs.
 - Do not use high-gain antennas.
 - Limit your transmit power as much as possible, for example to 6 dBm or 4 mW.
