@@ -65,6 +65,8 @@ def redirect_next_or_schedule(message: str | None = None) -> ResponseReturnValue
 def schedule():
     current_volunteer = Volunteer.get_for_user(current_user)
     earliest, latest = Shift.earliest_and_latest_in_range(*current_volunteer.permitted_shift_times)
+    if earliest is None or latest is None:
+        abort(404)
     dates = [earliest.date() + timedelta(days=i) for i in range((latest.date() - earliest.date()).days + 1)]
 
     if naive_utcnow().date() < dates[0]:
