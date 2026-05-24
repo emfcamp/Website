@@ -63,7 +63,7 @@ function getNodeData(node) {
   };
 }
 
-function shouldDisplayNode(node_data, filters) {
+function shouldDisplayNode(node_data, filters, node) {
   // If the signed up shifts filter is active, or we're not set to show shifts
   // in the past then those take precedence over all others and we short
   // circuit everything else.
@@ -91,6 +91,11 @@ function shouldDisplayNode(node_data, filters) {
   }
   if (filters["hide_staffed"] && node_data["staffed"]) {
     filter_reasons.push("staffed");
+  }
+  if (filter_reasons.length > 0) {
+    node.setAttribute("data-filter-reasons", filter_reasons.join(","));
+  } else {
+    node.setAttribute("data-filter-reasons", "");
   }
 
   return filter_reasons.length === 0;
@@ -142,7 +147,7 @@ function updateRowDisplay() {
   rows.forEach((node, idx) => {
     let node_data = getNodeData(node);
 
-    if (shouldDisplayNode(node_data, filters)) {
+    if (shouldDisplayNode(node_data, filters, node)) {
       if (node.getAttribute("data-shift-start") != currentHour) {
         // When we transition to a new hour we calculate how many rows
         // are shown for that hour, and span the first start time cell
@@ -179,18 +184,14 @@ function init_volunteer_schedule() {
     $("#filters-body").toggle();
   });
 
-  [
-    "show_past",
-    "show_signed_up_only",
-    "hide_full",
-    "is_understaffed",
-    "colourful_mode",
-  ].forEach((id) => {
-    document.getElementById(id).addEventListener("change", () => {
-      saveFilters();
-      updateRowDisplay();
-    });
-  });
+  ["show_past", "show_signed_up_only", "hide_full", "is_understaffed"].forEach(
+    (id) => {
+      document.getElementById(id).addEventListener("change", () => {
+        saveFilters();
+        updateRowDisplay();
+      });
+    },
+  );
 
   document.querySelectorAll("input[data-role-id]").forEach((node) =>
     node.addEventListener("change", () => {
@@ -220,8 +221,8 @@ function init_volunteer_schedule() {
         .querySelectorAll("input[data-role-id]")
         .forEach(
           (checkbox) =>
-            (checkbox.checked =
-              checkbox.getAttribute("data-interested") == "True"),
+          (checkbox.checked =
+            checkbox.getAttribute("data-interested") == "True"),
         );
       saveFilters();
       updateRowDisplay();
@@ -233,8 +234,8 @@ function init_volunteer_schedule() {
         .querySelectorAll("input[data-role-id]")
         .forEach(
           (checkbox) =>
-            (checkbox.checked =
-              checkbox.getAttribute("data-trained") == "True"),
+          (checkbox.checked =
+            checkbox.getAttribute("data-trained") == "True"),
         );
       saveFilters();
       updateRowDisplay();
