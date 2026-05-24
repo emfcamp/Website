@@ -63,7 +63,7 @@ class VolunteerUserModelView(VolunteerModelView):
 
         # Turn off autoflush for the query so we don't insert first
         with db.session.no_autoflush:
-            volunteer = Volunteer.query.filter_by(volunteer_email=email).first()
+            volunteer = db.session.query(Volunteer).filter_by(volunteer_email=email).first()
             user = User.get_by_email(email)
 
         # If the user doesn't exist go and create one
@@ -82,4 +82,4 @@ class VolunteerUserModelView(VolunteerModelView):
 
 
 # Add menu item Volunteers
-volunteer_admin.add_view(VolunteerUserModelView(Volunteer, db.session, name="Volunteers"))
+volunteer_admin.add_view(VolunteerUserModelView(Volunteer, db, name="Volunteers"))

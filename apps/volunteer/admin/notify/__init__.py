@@ -8,6 +8,7 @@ from flask import (
     session,
     url_for,
 )
+from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
@@ -20,6 +21,7 @@ from apps.common.email import (
 from apps.common.forms import Form
 from apps.volunteer.admin import volunteer_admin
 from apps.volunteer.notify import enqueue_trusted_notify, preview_trusted_notify
+from main import db
 from models.volunteer import Volunteer
 
 notify = Blueprint("volunteer_admin_notify", __name__)
@@ -57,14 +59,14 @@ class EmailComposeForm(Form):
 
 
 @notify.route("/", methods=["GET", "POST"])
-def main():
+def main() -> ResponseReturnValue:
     if not session.get("recipients"):
         flash(
             "No volunteers selected to notify. Please select from list of volunteers or use defined filters."
         )
         return redirect(url_for("volunteer_admin_volunteer.index_view"))
 
-    volunteers = Volunteer.query.filter(Volunteer.id.in_(session["recipients"]))
+    volunteers = db.session.query(Volunteer).filter(Volunteer.id.in_(session["recipients"]))
 
     form = EmailComposeForm()
     if form.validate_on_submit():

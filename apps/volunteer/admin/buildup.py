@@ -56,7 +56,7 @@ class BuildupSignupKeyModelView(VolunteerModelView):
 
 
 volunteer_admin.add_view(
-    BuildupSignupKeyModelView(BuildupSignupKey, db.session, name="Signup keys", category="Buildup")
+    BuildupSignupKeyModelView(BuildupSignupKey, db, name="Signup keys", category="Buildup")
 )
 
 
@@ -96,7 +96,7 @@ class BuildupVolunteerModelView(VolunteerModelView):
 
 
 volunteer_admin.add_view(
-    BuildupVolunteerModelView(BuildupVolunteer, db.session, name="Volunteers", category="Buildup")
+    BuildupVolunteerModelView(BuildupVolunteer, db, name="Volunteers", category="Buildup")
 )
 
 
@@ -114,10 +114,12 @@ class BuildupVolunteerBreakdownView(VolunteerBaseView):
             if buildup_end() <= dt <= teardown_start():
                 is_just_after_event = True
                 continue
-            predicted_volunteers = BuildupVolunteer.query.filter(
+            predicted_volunteers = db.session.query(BuildupVolunteer).filter(
                 (BuildupVolunteer.arrival_date <= dt) & (BuildupVolunteer.departure_date >= dt)
             )
-            arrived_volunteers = BuildupVolunteer.query.filter(BuildupVolunteer.recorded_on_site <= dt)
+            arrived_volunteers = db.session.query(BuildupVolunteer).filter(
+                BuildupVolunteer.recorded_on_site <= dt
+            )
             date_str = dt.date().strftime("%a %d-%b")
             am_or_pm = "AM" if dt.time().hour < 12 else "PM"
             days_data.append(
