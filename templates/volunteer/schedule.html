@@ -6,11 +6,12 @@
         <a href="{{ url_for('.schedule', day=day) }}" aria-controls="{{ day }}" role="tab">{{ full_day }}</a>
     </li>
 {% endmacro %}
-{% if buildup_volunteer %}
-    {% set date_format = "%a %d" %}
-{% else %}
-    {% set date_format = "%A" %}
-{% endif %}
+{% macro staffing_icon(shift) %}
+    {% set icon = "staffed" if shift.current_count >= shift.min_needed else "understaffed" %}
+    <span class="staffing-icon staffing-icon-{{ icon }}"></span>
+{% endmacro %}
+
+{% set date_format = "%a %d" if buildup_volunteer else "%A" %}
 
 {% block title %}
     Volunteer Schedule
@@ -90,7 +91,10 @@
                                 </td>
                                 <td class="venue"><a href="{{ shift.venue.mapref }}">{{ shift.venue.name }}</a></td>
                                 <td class="role">{{ shift.role.name }}</td>
-                                <td class="staffing">{{ shift.current_count }}/{{ shift.max_needed }}</td>
+                                <td class="staffing">
+                                    {{ staffing_icon(shift) }}
+                                    {{ shift.current_count }}/{{ shift.max_needed }}
+                                </td>
                                 <td class="button">
                                         {%- if shift.is_user_shift -%}
                                             <form method="post" action="{{ url_for('.shift_cancel', shift_id=shift.id, next=url_for('.schedule', day=active_day)) }}">
