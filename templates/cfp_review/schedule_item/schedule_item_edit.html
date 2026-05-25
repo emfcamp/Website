@@ -46,7 +46,7 @@
                             {{ render_dl_field(form.description, rows=4) }}
                             {{ render_dl_field(form.short_description) }}
 
-                            {{ render_dl_field(form.default_video_privacy) }}
+                            {{ render_dl_field(form.video_privacy) }}
                         </dl>
                     </div>
                 </div>
@@ -63,30 +63,11 @@
                 <div id="attributesPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="attributesPanelHeading">
                     <div class="panel-body">
                         <dl class="dl-horizontal">
-                            {% if schedule_item.type == 'talk' %}
-                                {{ render_dl_field(form.attributes.content_note) }}
-                                {{ render_dl_field(form.attributes.needs_laptop) }}
-                                {{ render_dl_field(form.attributes.family_friendly) }}
-
-                            {% elif schedule_item.type == 'performance' %}
-                                <div>There are no attributes for the type performance</div>
-
-                            {% elif schedule_item.type == 'workshop' or schedule_item.type == 'youthworkshop' %}
-                                {{ render_dl_field(form.attributes.participant_cost) }}
-                                {{ render_dl_field(form.attributes.participant_equipment) }}
-                                {{ render_dl_field(form.attributes.age_range) }}
-                                {% if schedule_item.type == 'workshop' %}
-                                    {{ render_dl_field(form.attributes.family_friendly) }}
-                                {% endif %}
-
-                            {% elif schedule_item.type == 'installation' %}
-                                {{ render_dl_field(form.attributes.size) }}
-
-                            {% elif schedule_item.type == "lightning" %}
-                                {{ render_dl_field(form.attributes.session) }}
-                                {{ render_dl_field(form.attributes.slide_link) }}
-
-                            {% endif %}
+                            {% for field in form.attributes %}
+                                {{ render_dl_field(field) }}
+                            {% else %}
+                                <p>There are no attributes for this type</p>
+                            {% endfor %}
                         </dl>
                     </div>
                 </div>
@@ -103,12 +84,7 @@
                 <div id="schedulingUserPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="schedulingUserPanelHeading">
                     <div class="panel-body">
                         <dl class="dl-horizontal">
-                            {{ render_dl_field(form.arrival_period) }}
-                            {{ render_dl_field(form.departure_period) }}
-                            {{ render_dl_field(form.available_times, readonly=True) }}
-
                             {{ render_dl_field(form.contact_telephone) }}
-                            {{ render_dl_field(form.contact_eventphone) }}
                         </dl>
                     </div>
                 </div>

@@ -19,6 +19,7 @@ from flask import (
 )
 from flask import current_app as app
 from flask.typing import ResponseReturnValue
+from flask_login import current_user
 from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload, undefer
 from wtforms import FormField
@@ -41,6 +42,7 @@ from .forms import (
     ConvertScheduleItemForm,
     CreateOccurrenceForm,
     LotteryForm,
+    ScheduleItemForm,
     UpdateOccurrenceForm,
     UpdateScheduleItemForm,
 )
@@ -413,3 +415,40 @@ def get_update_occurrence_type_form(schedule_item_type: ScheduleItemType) -> typ
     UpdateOccurrenceFormWithLottery.lottery = FormField(LotteryForm)
 
     return UpdateOccurrenceFormWithLottery
+
+
+@cfp_review.route("/schedule-items/new", methods=["GET"])
+@admin_required
+def schedule_item_create() -> ResponseReturnValue:
+    """Create a schedule item. This is used for items scheduled directly by the content team, such as films and music."""
+
+    return render_template("cfp_review/schedule_item/create_select.html")
+
+
+@cfp_review.route("/schedule-items/new/<string:type>", methods=["GET", "POST"])
+@admin_required
+def schedule_item_create_type(type: ScheduleItemType) -> ResponseReturnValue:
+    """Create a schedule item. This is used for items scheduled directly by the content team, such as films and music."""
+
+    AttributesForm = UPDATE_SCHEDULE_ITEM_ATTRIBUTES_FORM_TYPES[type]
+
+    class CreateForm(ScheduleItemForm):
+        attributes = FormField(AttributesForm)
+
+    form = CreateForm()
+
+    if form.validate_on_submit():
+        si = ScheduleItem(type=type, user=current_user)
+        form.populate_obj(si)
+        si.occurrences = [Occurrence(occurrence_num=1)]
+        db.session.add(si)
+
+        db.session.commit()
+
+        return redirect(url_for(".schedule_item", schedule_item_id=si.id))
+
+    return render_template(
+        "cfp_review/schedule_item/create.html",
+        form=form,
+        type=SCHEDULE_ITEM_INFOS[type],
+    )

@@ -32,9 +32,11 @@
 {% endif %}
 
 <div class="form-group {%- if field.errors %} has-error {%- endif %}">
+    {% if not field.widget.input_type == 'submit' %}
     <label for="{{ field.name }}" class="{% if horizontal -%} col-sm-{{labelw}} {% endif -%} control-label">
         {{ field.label.text }}
     </label>
+    {% endif %}
     <div class="{% if horizontal -%} col-sm-{{fieldw}} {% endif -%} controls">
         {{ field(class_='form-control', **kwargs)|safe }}
         {% if field.errors %}

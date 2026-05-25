@@ -157,7 +157,7 @@ class ConvertProposalForm(Form):
     convert = SubmitField("Convert")
 
 
-class UpdateScheduleItemForm(Form):
+class ScheduleItemForm(Form):
     state = SelectField("State", choices=[(s, s.title()) for s in get_args(ScheduleItemState)])
 
     # Allow blank values so an item can be published without doxxing
@@ -173,7 +173,7 @@ class UpdateScheduleItemForm(Form):
         coerce=lambda v: v == "official",
     )
 
-    default_video_privacy = SelectField(
+    video_privacy = SelectField(
         "Recording",
         choices=[
             ("public", "Stream and record"),
@@ -183,13 +183,10 @@ class UpdateScheduleItemForm(Form):
         default="public",
     )
 
-    arrival_period = StringField("Arrival time")
-    departure_period = StringField("Departure time")
-    available_times = StringField("Available times")
-
     contact_telephone = StringField("Telephone")
-    contact_eventphone = StringField("On-site extension")
 
+
+class UpdateScheduleItemForm(ScheduleItemForm):
     update = SubmitField("Update")
 
 
@@ -237,13 +234,13 @@ class UpdateScheduleItemYouthWorkshopAttributesForm(UpdateAttributesForm):
     content_note = StringField("Content note")
 
 
-class UpdateScheduleItemInstallationAttributesForm(UpdateAttributesForm):
-    size = StringField("Size", [DataRequired()])
-
-
 class UpdateScheduleItemLightningTalkAttributesForm(UpdateAttributesForm):
     session = StringField("Day")
     slide_link = StringField("Link")
+
+
+class UpdateScheduleItemFilmForm(UpdateAttributesForm):
+    classification = StringField("Classification")
 
 
 # And now the additional Proposal-only fields.
@@ -264,7 +261,8 @@ class UpdateProposalYouthWorkshopAttributesForm(UpdateScheduleItemYouthWorkshopA
     valid_dbs = BooleanField("Has a valid DBS check")
 
 
-class UpdateProposalInstallationAttributesForm(UpdateScheduleItemInstallationAttributesForm):
+class UpdateProposalInstallationAttributesForm(UpdateAttributesForm):
+    size = StringField("Size", [DataRequired()])
     grant_requested = StringField("Installation Grant Requested")
 
 
@@ -284,8 +282,8 @@ UPDATE_SCHEDULE_ITEM_ATTRIBUTES_FORM_TYPES: dict[ScheduleItemType, type[UpdateAt
     "workshop": UpdateScheduleItemWorkshopAttributesForm,
     "youthworkshop": UpdateScheduleItemYouthWorkshopAttributesForm,
     "performance": UpdateScheduleItemPerformanceAttributesForm,
-    "installation": UpdateScheduleItemInstallationAttributesForm,
     "lightning": UpdateScheduleItemLightningTalkAttributesForm,
+    "film": UpdateScheduleItemFilmForm,
 }
 
 
@@ -452,14 +450,6 @@ class UpdateOccurrenceForm(Form):
     video_recording_lost = BooleanField("Video recording lost")
 
     update = SubmitField("Update")
-
-    def validate_state(form, field):
-        if field.data == "scheduled":
-            if form.scheduled_duration.data and form.scheduled_venue_id.data and form.scheduled_time.data:
-                return
-            raise ValidationError(
-                "Occurrence cannot be set to Scheduled unless duration, scheduled venue and scheduled time are set"
-            )
 
 
 class LotteryForm(Form):

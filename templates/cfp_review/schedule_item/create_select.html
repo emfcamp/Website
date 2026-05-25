@@ -1,0 +1,15 @@
+{% extends "cfp_review/base.html" %}
+{% block title %}Create schedule item{% endblock %}
+{% block body %}
+<h2>Create schedule item</h2>
+<p>Please select a schedule item type to create:</p>
+
+<div class="col-md-4">
+<div class="btn-group btn-group-vertical">
+    {% for info in SCHEDULE_ITEM_INFOS.values() %}
+    <a class="btn btn-default" href="{{url_for('.schedule_item_create_type', type=info.type)}}">{{info.human_type|capitalize}}</a>
+    {% endfor %}
+</div>
+</div>
+
+{% endblock %}
