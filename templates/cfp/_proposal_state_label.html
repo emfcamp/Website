@@ -1,0 +1,27 @@
+{% macro proposal_state_label(proposal) %}
+
+    {% if proposal.state == 'new' %}
+        Open for edits
+    {% elif proposal.state == 'edit' %}
+        Update required (please check your <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">messages</a>)
+    {% elif proposal.state == 'checked' %}
+        Awaiting anonymisation
+    {% elif proposal.state == 'rejected' %}
+        Rejected, please check your <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">messages</a>
+    {% elif proposal.state == 'cancelled' %}
+        Cancelled
+    {% elif proposal.state in ('anonymised', 'conduct-blocked') %}
+        Awaiting review
+    {% elif proposal.state == 'reviewed' %}
+        Awaiting the next round
+    {% elif proposal.state == 'accepted' %}
+        Accepted
+    {% elif proposal.state == 'finalised' %}
+        Accepted and ready
+    {% elif proposal.state == 'withdrawn' %}
+        You withdrew this proposal.
+    {% elif proposal.state == 'manual-review' %}
+        Manual review
+    {% endif %}
+
+{% endmacro %}

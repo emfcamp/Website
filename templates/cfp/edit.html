@@ -1,3 +1,5 @@
+{% from "cfp/_proposal_state_label.html" import proposal_state_label %}
+
 {% extends "base.html" %}
 {% block title %}Edit Proposal - {{ proposal.title }}{% endblock %}
 {% block body %}
@@ -57,7 +59,7 @@
         {% else %}
         <dt>Title</dt><dd>{{ proposal.title }}</dd>
         <dt>Submitted</dt><dd>{{ proposal.created.strftime('%d %B') }}</dd>
-        <dt>Status</dt><dd>{{ proposal.state|capitalize }}</dd>
+        <dt>Status</dt><dd>{{ proposal_state_label(proposal) }}</dd>
         <dt>Description</dt><dd class="multiline">{{ proposal.description | urlize }}</dd>
         <dt>Short description</dt><dd>{{ proposal.short_description }}</dd>
         {% endif %}
