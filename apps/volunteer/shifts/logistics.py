@@ -13,7 +13,7 @@ logistics_shifts = {
         ]
     },
     "vehicle-gate-escort": {
-        "vehicle-gate-y": [
+        "vehicle-gate-south": [
             {
                 "first": edt(d, "09:00:00"),
                 "final": edt(d, "19:00:00"),
