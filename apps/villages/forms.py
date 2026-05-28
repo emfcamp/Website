@@ -75,6 +75,14 @@ class VillageForm(Form):
         field.data = (field.data or "").strip()
 
 
+class VillageDescriptionForm(Form):
+    long_description = TextAreaField("Long Description", [Optional()])
+    submit = SubmitField("Submit")
+
+    def populate(self, village: Village) -> None:
+        self.long_description.data = village.long_description
+
+
 class DeleteVillageForm(Form):
     submit = SubmitField("Delete")
 
