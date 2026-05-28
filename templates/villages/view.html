@@ -1,3 +1,4 @@
+{% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block title %}Village: {{village.name}}{% endblock %}
 {% block body %}
@@ -23,11 +24,33 @@
 <p>{{village.description}}</p>
 {% endif %}
 
-{% if village_long_description_html %}
-{# This is render-blocking, but we want the listener ready for the iframe.
-   Better to delay first render than to have a two-way handshake that flashes. #}
-<script src="{{static_url_for('static', filename="js/sandboxed-iframe-parent.js")}}"></script>
-<p>{{village_long_description_html}}</p>
+{% if edit_desc_form %}
+<div class="well">
+  <form method="post" class="form-horizontal village-form" role="form">
+    {{ edit_desc_form.hidden_tag() }}
+    <fieldset>
+      {% call render_field(edit_desc_form.long_description,
+            placeholder="A longer description of your village using Markdown. Project details etc.") %}
+        <a href="https://www.markdown-cheatsheet.com">Standard Markdown</a> supported <em>apart from</em> images.
+      {% endcall %}
+    </fieldset>
+    <fieldset>
+      <div class="form-actions">
+        <button type="submit" name="Update" class="btn btn-primary btn-lg pull-right debounce">Update</button>
+        <a class="btn btn-default btn-lg pull-right" href="{{ url_for('.view', village_id=village.id, year=year) }}">Back</a>
+      </div>
+    </fieldset>
+  </form>
+</div>
+{% elif village_long_description_html %}
+  {% if user_is_village_admin %}
+  <a class="pull-right" href="{{ url_for('.editdesc', village_id=village.id, year=year) }}">Edit</a>
+  {% endif %}
+
+  {# This is render-blocking, but we want the listener ready for the iframe.
+    Better to delay first render than to have a two-way handshake that flashes. #}
+  <script src="{{static_url_for('static', filename="js/sandboxed-iframe-parent.js")}}"></script>
+  <p>{{village_long_description_html}}</p>
 {% endif %}
 
 <div>

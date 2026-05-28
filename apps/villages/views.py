@@ -20,6 +20,7 @@ from .forms import (
     JoinVillageForm,
     LeaveVillageForm,
     PromoteVillageMemberForm,
+    VillageDescriptionForm,
     VillageForm,
 )
 
@@ -89,24 +90,31 @@ def main(year: int) -> ResponseReturnValue:
 @villages.route("/<int:year>/<int:village_id>")
 def view(year: int, village_id: int) -> ResponseReturnValue:
     village = load_village(year, village_id)
+
+    return view_or_editdesc(village)
+
+
+def view_or_editdesc(
+    village: Village, edit_desc_form: VillageDescriptionForm | None = None
+) -> ResponseReturnValue:
     user_is_village_admin = (
         current_user.is_authenticated
         and current_user.village is not None
-        and current_user.village.id == village_id
+        and current_user.village.id == village.id
         and current_user.village_membership.admin
     )
 
     user_is_village_member = (
         current_user.is_authenticated
         and current_user.village is not None
-        and current_user.village.id == village_id
+        and current_user.village.id == village.id
         and not current_user.village_membership.admin
     )
 
     user_has_requested_join_village = (
         current_user.is_authenticated
         and current_user.village_join_request is not None
-        and current_user.village_join_request.village.id == village_id
+        and current_user.village_join_request.village.id == village.id
     )
 
     user_can_join_village = (
@@ -126,6 +134,7 @@ def view(year: int, village_id: int) -> ResponseReturnValue:
         village_long_description_html=(
             render_markdown(village.long_description) if village.long_description else None
         ),
+        edit_desc_form=edit_desc_form,
     )
 
 
@@ -175,6 +184,26 @@ def edit(year: int, village_id: int) -> ResponseReturnValue:
             return redirect(url_for(".view", year=year, village_id=village_id))
 
     return render_template("villages/edit.html", form=form, village=village)
+
+
+# An extra edit page which makes inline editing of the long_description look better
+@villages.route("/<int:year>/<int:village_id>/editdesc", methods=["GET", "POST"])
+@login_required
+def editdesc(year: int, village_id: int) -> ResponseReturnValue:
+    village = load_village(year, village_id, require_admin=True)
+
+    form = VillageDescriptionForm()
+    if request.method == "GET":
+        form.populate(village)
+
+    if form.validate_on_submit():
+        # Just update the long_description
+        village.long_description = form.long_description.data
+        db.session.commit()
+        flash("Your village's long description has been updated.")
+        return redirect(url_for(".view", year=year, village_id=village_id))
+
+    return view_or_editdesc(village, form)
 
 
 # View (and manage) village members.
