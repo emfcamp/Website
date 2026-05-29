@@ -391,8 +391,8 @@ PROPOSAL_INFOS: dict[ProposalType, ProposalInfo] = {
     ),
     "youthworkshop": ProposalInfo(
         type="youthworkshop",
-        human_type="youth workshop",
-        human_type_a="a youth workshop",
+        human_type="family workshop",
+        human_type_a="a family workshop",
         review_type=ReviewType.manual,
         attributes_cls=ProposalYouthWorkshopAttributes,
         grants_event_tickets=False,
