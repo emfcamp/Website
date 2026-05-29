@@ -69,17 +69,6 @@ class OccurrenceForm(Form):
     scheduled_time_time = TimeField("Start time", [DataRequired()])
     scheduled_venue_id = SelectField("Venue", [DataRequired()], coerce=int)
 
-    # Attendees cannot set review themselves but we don't overwrite it if it's already set.
-    video_privacy = SelectField(
-        "Recording",
-        default="public",
-        choices=[
-            ("public", "Stream and record"),
-            ("review", "Do not stream, and do not publish until reviewed"),
-            ("none", "Do not stream or record"),
-        ],
-    )
-
     def day_choices(self):
         d = config.event_start.date()
         end_date = config.event_end.date()
@@ -92,11 +81,6 @@ class OccurrenceForm(Form):
         return choices
 
     def load_choices(self, user: User, occurrence: Occurrence | None = None) -> None:
-        if not occurrence or occurrence.video_privacy != "review":
-            # Don't allow users to choose review themselves
-            assert isinstance(self.video_privacy.choices, list)
-            self.video_privacy.choices = [(c, _) for c, _ in self.video_privacy.choices if c != "review"]
-
         self.scheduled_time_day.choices = self.day_choices()
         self.scheduled_venue_id.choices = [(v.id, v.name) for v in venues_for_user(user)]
 
@@ -238,13 +222,13 @@ def attendee_content() -> ResponseReturnValue:
 
         schedule_item = ScheduleItem(
             type=schedule_item_type,
+            state="published",
             user=current_user,
             official_content=False,
         )
 
         occurrence = Occurrence(
             occurrence_num=1,
-            state="scheduled",
             schedule_item=schedule_item,
         )
 
