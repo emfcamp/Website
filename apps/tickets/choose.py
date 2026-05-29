@@ -147,7 +147,9 @@ def main(flow="main"):
                 field.errors = []
 
     form.currency_code.data = get_user_currency()
-    return render_template("tickets/choose.html", form=form, flow=flow, view=view, available=available)
+    return render_template(
+        "tickets/choose.html", form=form, flow=flow, view=view, available=available, voucher=voucher
+    )
 
 
 def products_for_view(product_view: ProductView) -> Sequence[Product]:
