@@ -73,7 +73,11 @@ Buy Items
         <span class="price">{{ f._tier.get_price(user_currency) | price }}</span>
     </td>
     <td>
-        {% if available and f._any %}
+        {% if available and f._user_limit_reached %}
+        {{ f.hidden_tag() }}
+        <div class="help-block">You have already bought the maximum amount</div>
+        </div>
+        {% elif available and f._any %}
         {{ f.hidden_tag() }}
         <div class="controls">{{ f.amount(class_="amount")|safe }}
         {% if f.amount.errors %}
@@ -83,7 +87,7 @@ Buy Items
         {% endif %}
         </div>
         {% elif available %}
-        <span class="sold-out">sold out</span>
+        <span class="sold-out">Sold out</span>
         {% endif %}
     </td>
 </tr>

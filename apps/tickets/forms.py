@@ -90,7 +90,8 @@ class TicketAmountsForm(Form):
 
             # If they've already got reserved tickets, they can keep them
             # because they've been reserved in the database
-            user_limit = max(tier.user_limit(), basket.get(tier, 0))
+            user_specific_limit = tier.user_limit(current_user)
+            user_limit = max(user_specific_limit, basket.get(tier, 0))
 
             # If a voucher is being used, limit the number of adult tickets by however
             # many remain on the voucher
@@ -104,6 +105,8 @@ class TicketAmountsForm(Form):
             values = range(user_limit + 1)
             f.form.amount.values = values
             f._any = any(values)  # type: ignore[attr-defined]
+            f._user_limit_reached = user_specific_limit == 0 and tier.user_limit() > 0  # type: ignore[attr-defined]
+
         return capacity_available
 
     def add_to_basket(form, basket):
