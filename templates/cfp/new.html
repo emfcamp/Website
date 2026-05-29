@@ -153,16 +153,6 @@
         {% endcall %}
 
         <div class="col-md-9 col-sm-offset-3">
-          {% if proposal_type == 'youthworkshop' %}
-          <label class="checkbox">
-            {{ form.attributes.valid_dbs() }}
-            I have a valid <a href="https://www.gov.uk/government/organisations/disclosure-and-barring-service/about#dbs-checks" target="_blank">DBS check</a>
-          </label>
-          <small>This is not a requirement but please let us know if you have one</small>
-          {% endif %}
-        </div>
-
-        <div class="col-md-9 col-sm-offset-3">
         <label class="checkbox">
           {{ form.needs_help() }}
           I'd like advice or help with this proposal
