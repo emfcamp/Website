@@ -12,14 +12,12 @@
         {%- if current_user.is_authenticated %} or associated with your account{% endif %},
         and the items you're trying to purchase require an admission ticket.</p>
 
-    <p>Please add an admission ticket to your basket to continue.
+    <p>Please <a href="{{url_for('tickets.main')}}">add an admission ticket</a> to your basket to continue.
         {% if current_user.is_anonymous %}
         If you have already purchased an admission ticket, please
         <a href="{{ url_for('users.login', next=url_for("tickets.pay", flow=flow)) }}">log in</a>.
         {% endif %}
         If someone else has purchased your admission ticket for you, ask them to transfer it to you.</p>
-
-    <a class="btn btn-default" href="{{url_for('tickets.main', flow=flow)}}">Change tickets</a>
 </div>
 {% endif %}
 
