@@ -384,7 +384,7 @@ def expire_reserved():
         purchase.cancel()
 
     # Purchases reserved by admins
-    admin_reservation_grace_period = timedelta(days=3)
+    admin_reservation_grace_period = timedelta(days=7)
 
     purchases = Purchase.query.filter(
         Purchase.state == "admin-reserved",
