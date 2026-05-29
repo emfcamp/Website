@@ -431,7 +431,11 @@ class FakeDataGenerator:
         for _ in range(0, payment_count):
             basket = Basket(user, currency)
             pt = db.session.execute(select(PriceTier).where(PriceTier.name == "full-std")).scalar_one()
-            basket[pt] = random.randint(1, 4)
+            available = pt.user_limit(user)
+            if available == 0:
+                break
+
+            basket[pt] = min(random.randint(1, 4), available)
 
             if random_bool(0.2):
                 pt = db.session.execute(select(PriceTier).where(PriceTier.name == "parking")).scalar_one()

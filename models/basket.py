@@ -230,7 +230,7 @@ class Basket(MutableMapping[PriceTier, int]):
                 issue_count = line.count - len(line.purchases)
                 if issue_count > 0:
                     # user_limit takes into account existing purchases
-                    if issue_count > line.tier.user_limit():
+                    if issue_count > line.tier.user_limit(self.user):
                         raise CapacityException(f"Insufficient capacity for tier {line.tier}.")
 
                     line.tier.issue_instances(issue_count)

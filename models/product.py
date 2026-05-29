@@ -31,6 +31,7 @@ if TYPE_CHECKING:
     from .arrivals import ArrivalsViewProduct
     from .basket import Basket
     from .payment import Payment
+    from .user import User
 
 __all__ = [
     "MultipleLoadedResultsFound",
@@ -467,15 +468,26 @@ class PriceTier(BaseModel, CapacityMixin):
         prices = [p for p in self.prices if p.currency == currency]
         return one_or_none(prices)
 
-    def user_limit(self) -> int:
+    def user_limit(self, user: User | None = None) -> int:
         if self.has_expired():
             return 0
 
         remaining = self.get_total_remaining_capacity()
         if isinstance(remaining, UnlimitedType):
-            return self.personal_limit
+            limit = self.personal_limit
+        else:
+            limit = min(self.personal_limit, remaining)
 
-        return min(self.personal_limit, remaining)
+        if user is not None and not user.is_anonymous:
+            already_purchased = db.session.execute(
+                select(func.count(Purchase.id))
+                .where(Purchase.price_tier_id == self.id)
+                .where(Purchase.purchaser_id == user.id)
+                .where(Purchase.state.in_(["paid", "payment-pending"]))
+            ).scalar_one()
+            limit = max(0, limit - already_purchased)
+
+        return limit
 
     def __repr__(self):
         return f"<PriceTier {self.name}>"
@@ -766,6 +778,3 @@ class ProductViewProduct(BaseModel):
 
     def __repr__(self):
         return f"<ProductViewProduct: view {self.view_id}, product {self.product_id}, order {self.order}>"
-
-
-from .user import User
