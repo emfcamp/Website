@@ -15,6 +15,7 @@ from flask import (
 from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from flask_mailman import EmailMessage
+from markupsafe import Markup
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
@@ -216,13 +217,24 @@ def handle_ticket_selection(
     voucher = Voucher.get_by_code(basket.voucher)
     if voucher and not voucher.check_capacity(basket):
         basket.save_to_session()
+
         if voucher.is_used:
-            flash("Your voucher has been used by someone else.")
+            flash(
+                Markup(
+                    f"""Your voucher has been used by someone else. """
+                    f"""To clear your voucher, <a href="{url_for(".tickets_voucher_clear", flow=flow)}">click here</a>."""
+                )
+            )
+
         else:
             flash(
-                f"You can only purchase {voucher.tickets_remaining} adult "
-                "tickets with this voucher. Please select fewer tickets."
+                Markup(
+                    f"""You can only purchase {voucher.tickets_remaining} adult """
+                    f"""tickets with this voucher. Please select fewer tickets, """
+                    f"""or <a href="{url_for(".tickets_voucher_clear", flow=flow)}">click here</a> to clear your voucher."""
+                )
             )
+
         return redirect(url_for("tickets.main", flow=flow))
 
     app.logger.info("Saving basket %s", basket)
@@ -329,11 +341,12 @@ def tickets_clear(flow: str | None = None) -> ResponseReturnValue:
 
 
 @tickets.route("/tickets/voucher/clear")
-def tickets_voucher_clear():
+@tickets.route("/tickets/voucher/<flow>/clear")
+def tickets_voucher_clear(flow: str | None = None) -> ResponseReturnValue:
     if "ticket_voucher" in session:
         del session["ticket_voucher"]
 
-    return redirect(url_for("tickets.main"))
+    return redirect(url_for("tickets.main", flow=flow))
 
 
 @tickets.route("/tickets/voucher/")

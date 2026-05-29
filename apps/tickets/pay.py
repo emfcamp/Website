@@ -210,7 +210,11 @@ def start_payment(form: TicketPaymentForm, basket: Basket, flow: str) -> Respons
         # Voucher has been used since we last checked it at the "choose" stage.
         app.logger.exception("Voucher used at payment stage")
         flash(
-            "The voucher you've used does not allow you to buy this many adult tickets. Please choose fewer tickets."
+            Markup(
+                f"""The voucher you've used does not allow you to buy this """
+                f"""many adult tickets. Please choose fewer tickets, or """
+                f"""<a href="{url_for(".tickets_voucher_clear", flow=flow)}">click here</a> to clear your voucher."""
+            )
         )
         db.session.rollback()
         return redirect(url_for("tickets.main", flow=flow))
