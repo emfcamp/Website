@@ -215,7 +215,7 @@ def handle_ticket_selection(
 
     # Ensure this purchase is valid for this voucher.
     voucher = Voucher.get_by_code(basket.voucher)
-    if voucher and not voucher.check_capacity(basket):
+    if voucher and voucher.view == view and not voucher.check_capacity(basket):
         basket.save_to_session()
 
         if voucher.is_used:
