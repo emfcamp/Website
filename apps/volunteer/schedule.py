@@ -1,4 +1,5 @@
 from collections import defaultdict
+from collections.abc import Sequence
 from datetime import datetime, timedelta
 
 from flask import (
@@ -17,6 +18,7 @@ from flask_login import current_user
 from icalendar import Calendar, Event
 from sqlalchemy.orm import joinedload
 
+from apps.users.calendar import CalendarEntry, fetch_events
 from main import db, get_or_404
 from models import naive_utcnow
 from models.user import User, generate_api_token
@@ -44,6 +46,22 @@ def _get_roles_with_user_data(user):
         res.append(to_add)
 
     return res
+
+
+def _get_conflict_type(shift: Shift, calendar: Sequence[CalendarEntry]) -> str | None:
+    """Get the highest priority conflict type for a shift if any exist."""
+    conflicts = [event for event in calendar if event.overlaps_with(shift.start, shift.end)]
+    if len(conflicts) == 0:
+        return None
+
+    conflict_types = [c.type for c in conflicts]
+    if "volunteer_shift" in conflict_types:
+        return "volunteer_shift"
+
+    if "owned_content" in conflict_types:
+        return "owned_content"
+
+    return conflict_types[0]
 
 
 def redirect_next_or_schedule(message: str | None = None) -> ResponseReturnValue:
@@ -83,13 +101,18 @@ def schedule():
         active_day = default_day
 
     shifts = Shift.get_all_for_day(active_day)
+    if len(shifts) == 0:
+        # If there's no shifts nothing can conflict, so don't bother looking.
+        user_calendar = []
+    else:
+        user_calendar = fetch_events(current_user, shifts[0].start, shifts[-1].end)
 
     by_time = defaultdict(lambda: [])
 
     for s in shifts:
         hour_key = s.start.strftime("%H:%M")
-
         to_add = s.to_localtime_dict()
+        to_add["conflicts_with"] = _get_conflict_type(s, user_calendar) or ""
         to_add["sign_up_url"] = url_for(".shift", shift_id=to_add["id"])
         to_add["is_user_shift"] = current_user in s.volunteers
         by_time[hour_key].append(to_add)

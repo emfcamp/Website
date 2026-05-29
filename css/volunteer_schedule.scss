@@ -47,7 +47,6 @@
 }
 
 table.shifts-table {
-
   tr,
   th,
   td {
@@ -76,14 +75,80 @@ table.shifts-table {
     mask-position: center;
 
     &.staffing-icon-understaffed {
-      background-color: $danger-background;
+      background-color: $brand-2026-coral;
       mask-image: url("../images/icons/alert-circle.svg");
     }
 
     &.staffing-icon-staffed {
-      background-color: $success-background;
+      background-color: $brand-2026-green;
       mask-image: url("../images/icons/check-circle.svg");
     }
+  }
+
+  td.conflicts {
+    text-align: center;
+    vertical-align: middle;
+
+    &::after {
+      content: "";
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      border-radius: 50%;
+    }
+  }
+
+  tr[data-signed-up="True"] td.conflicts::after {
+    background-color: $brand-2026-light-blue;
+  }
+
+  tr[data-conflicts-with="volunteer_shift"][data-signed-up="False"]
+    td.conflicts::after {
+    background-color: $brand-2026-coral;
+  }
+
+  tr[data-conflicts-with="owned_content"][data-signed-up="False"]
+    td.conflicts::after,
+  tr[data-conflicts-with="favourited_content"][data-signed-up="False"]
+    td.conflicts::after {
+    background-color: $brand-2026-yellow;
+  }
+}
+
+ul.key {
+  list-style: none;
+  padding-left: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+  }
+
+  #key-shift-signed-up::before {
+    background-color: $brand-2026-light-blue;
+  }
+
+  #key-shift-conflict::before {
+    background-color: $brand-2026-coral;
+  }
+
+  #key-content-conflict::before {
+    background-color: $brand-2026-yellow;
+  }
+
+  #key-no-conflicts::before {
+    background-color: $highlight-background;
   }
 }
 
@@ -204,6 +269,28 @@ table.shifts-table {
         td.staffing:before {
           content: "Signed up";
         }
+
+        td.conflicts {
+          display: block;
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          padding: 0;
+          width: auto;
+
+          &:before {
+            display: none;
+          }
+        }
+
+        td.start_time:not(.hidden) ~ td.conflicts {
+          // Push below the start_time header: padding-top (5px) + 1.2em font + padding-bottom (5px) + card top padding (5px)
+          top: calc(1.2em + 25px);
+        }
+      }
+
+      tr {
+        position: relative;
       }
     }
   }
