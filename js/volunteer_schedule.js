@@ -57,6 +57,7 @@ function getNodeData(node) {
     min_staff: parseInt(node.getAttribute("data-min-staff")),
     max_staff: parseInt(node.getAttribute("data-max-staff")),
     current_staff: parseInt(node.getAttribute("data-current-staff")),
+    conflicts_with: node.getAttribute("data-conflicts-with"),
   };
 }
 
@@ -105,23 +106,6 @@ function spanStartTimeCell(firstNodeOfHour, rowCount) {
   }
 }
 
-/* rowClass and colourise_row are kept despite colourful mode being removed
-   because we plan to use row colourisation for other purposes soon. */
-function rowClass(node_data) {
-  return "";
-}
-
-function colourise_row(node, node_data) {
-  ["danger", "warning", "info"].forEach((className) =>
-    node.classList.remove(className),
-  );
-
-  let row_class = rowClass(node_data);
-  if (row_class != "") {
-    node.classList.add(rowClass(node_data));
-  }
-}
-
 function updateRoleList(role_ids) {
   let roleNames = role_ids
     .map((id) => document.getElementById(`role-${id}-label`).textContent.trim())
@@ -159,8 +143,6 @@ function updateRowDisplay() {
         // Otherwise we hide the start time cell.
         node.querySelector(".start_time").classList.add("hidden");
       }
-
-      colourise_row(node, node_data);
 
       rowCount += 1;
 
