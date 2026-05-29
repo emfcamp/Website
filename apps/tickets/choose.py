@@ -45,6 +45,8 @@ def main(flow="main"):
     allowing us to have different categories of items on sale, for example tickets
     on one page, and t-shirts on a separate page.
     """
+    # NB. Some of this logic appears in templates which link to this view for certain flows.
+
     # Fetch the ProductView and determine if this user is allowed to view it.
     view = get_product_view(flow)
 

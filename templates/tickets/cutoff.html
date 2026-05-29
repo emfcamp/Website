@@ -4,7 +4,7 @@
     <div class="well">
         {% if SALES_STATE == 'sales-ended' %}
             <p class="emphasis">We're sorry, ticket sales for Electromagnetic Field {{ event_year }} have now ended.</p>
-            <p>There are no tickets for sale on at the gate, so please do not travel to EMF
+            <p>There are no tickets for sale at the gate, so please do not travel to EMF
             if you haven't got a ticket.</p>
             <p>For updates on future EMF events, please follow us on
                 <a href="https://social.emfcamp.org/@emf">the Fediverse</a> or
@@ -16,9 +16,17 @@
         <p>There may be a small number of returned tickets available before the event. For updates on these,
             please follow us on <a href="https://social.emfcamp.org/@emf">the Fediverse</a>.</p>
         {% endif %}
-        {% if SALES_STATE != 'sales-ended' %}
-        <p>If you have a ticket to EMF you can still 
-            <a href="{{ url_for('tickets.main', flow='other') }}">order parking tickets</a>.</p>
+        {% if SALES_STATE != 'sales-ended' or SITE_STATE == 'event' %}
+        {#
+        We can sell parking tickets until sales end
+        but badges even after sales end as long as the event is still on
+        #}
+        <p>If you have a ticket to EMF you can still
+            {% if SALES_STATE != 'sales-ended' %}
+            <a href="{{ url_for('tickets.main', flow='other') }}">order parking tickets</a> or
+            {% endif %}
+            <a href="{{ url_for('tickets.main', flow='badge') }}">order a badge</a>.
+        </p>
         {% endif %}
     </div>
 {% endblock %}
