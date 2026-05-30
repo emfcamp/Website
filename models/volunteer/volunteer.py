@@ -65,7 +65,7 @@ class Volunteer(BaseModel, UserMixin):
     nickname: Mapped[str | None]
     banned: Mapped[bool] = mapped_column(default=False)
     volunteer_phone: Mapped[str | None]
-    volunteer_email: Mapped[str | None]
+    volunteer_email: Mapped[str]
     over_18: Mapped[bool] = mapped_column(default=False)
     allergies: Mapped[set[str]] = mapped_column(MutableSetAsList.as_mutable(ARRAY(String)), default=set())
     allergies_other: Mapped[str] = mapped_column(default="")

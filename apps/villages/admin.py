@@ -11,17 +11,20 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from wtforms.widgets import TextArea
 
+from apps.admin.email import get_email_reason, get_users
 from main import db
 from models.user import User
 from models.village import Village, VillageMember
 
 from ..common import require_permission
 from ..common.email import (
-    enqueue_trusted_emails,
+    enqueue_emails,
     format_trusted_html_email,
+    format_trusted_plaintext_email,
     preview_trusted_email,
 )
 from ..common.forms import Form
+from ..config import config
 from . import villages
 from .forms import AdminVillageForm, DeleteVillageForm
 
@@ -166,15 +169,19 @@ def admin_village_admins(village_id: int) -> ResponseReturnValue:
 @villages.route("/admin/email-owners", methods=["GET", "POST"])
 @village_admin_required
 def admin_email_owners() -> ResponseReturnValue:
+    # This function is almost identical to apps.admin.email.email, consider updating there too
     form = EmailComposeForm()
     if form.validate_on_submit():
-        users = User.query.join(User.village_membership).filter(VillageMember.admin).distinct()
+        users: list[User] = get_users("villages")
+
+        reason = get_email_reason("villages")
+
         if form.preview.data is True:
             return render_template(
                 "villages/admin/email.html",
-                html=format_trusted_html_email(form.text.data, form.subject.data),
+                html=format_trusted_html_email(form.text.data, form.subject.data, reason=reason),
                 form=form,
-                count=users.count(),
+                count=len(users),
             )
 
         if form.send_preview.data is True:
@@ -183,14 +190,31 @@ def admin_email_owners() -> ResponseReturnValue:
             flash(f"Email preview sent to {form.send_preview_address.data}")
             return render_template(
                 "villages/admin/email.html",
-                html=format_trusted_html_email(form.text.data, form.subject.data),
+                html=format_trusted_html_email(
+                    form.text.data,
+                    form.subject.data,
+                    reason=reason,
+                ),
                 form=form,
-                count=users.count(),
+                count=len(users),
             )
 
         if form.send.data is True:
-            enqueue_trusted_emails(users, form.subject.data, form.text.data)
-            flash(f"Email queued for sending to {users.count()} users")
+            assert form.text.data  # DataRequired()
+            assert form.subject.data  # DataRequired()
+            body: str = form.text.data
+            subject: str = form.subject.data
+            enqueue_emails(
+                users=users,
+                from_email=config.from_email("CONTACT_EMAIL"),
+                subject=subject,
+                text_body=format_trusted_plaintext_email(body),
+                html_body=format_trusted_html_email(body, subject),
+                priority=2,
+                bulk=True,
+            )
+            db.session.commit()
+            flash(f"Email queued for sending to {len(users)} users")
             return redirect(url_for(".admin_email_owners"))
 
     return render_template("villages/admin/email.html", form=form)

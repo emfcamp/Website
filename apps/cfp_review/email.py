@@ -6,8 +6,8 @@ from flask import (
     current_app as app,
 )
 from flask import render_template
-from flask_mailman import EmailMessage
 
+from apps.common.email import enqueue_emails
 from models.content import Proposal
 
 from ..config import config
@@ -75,12 +75,16 @@ def send_email_for_proposal(proposal: Proposal, reason: ProposalEmailReason) -> 
 
     app.logger.info("Sending %s email for proposal %s", reason, proposal.id)
 
-    msg = EmailMessage(subject, from_email=from_email_, to=[proposal.user.email])
-    msg.body = render_template(
+    text_body = render_template(
         template,
         user=proposal.user,
         proposal=proposal,
         reserve_ticket_link=app.config["RESERVE_LIST_TICKET_LINK"],
     )
 
-    msg.send()
+    enqueue_emails(
+        users=[proposal.user],
+        from_email=from_email_,
+        subject=subject,
+        text_body=text_body,
+    )
