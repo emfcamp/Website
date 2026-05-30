@@ -1,3 +1,4 @@
+{# This file is almost identical to templates/admin/email.html, consider updating there too #}
 {% extends "villages/admin/base.html" %}
 {% block title %}Compose email{% endblock %}
 {% block body %}
@@ -24,9 +25,8 @@
 
     {{ form.preview(class_="btn btn-success pull-right") }}
     {% if html %}
-    {{ form.send(class_="btn btn-danger pull-right") }}
-    <p>Preview Email Address: {{ form.send_preview_address(cols=30) }} {{ form.send_preview(class_="btn btn-success") }}
-    </p>
+        {{ form.send(class_="btn btn-danger pull-right") }}
+        <p>Preview Email Address: {{ form.send_preview_address(cols=30) }} {{ form.send_preview(class_="btn btn-success") }}</p>
     {% endif %}
 </form>
 {% endblock %}
