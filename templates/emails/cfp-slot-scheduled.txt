@@ -13,7 +13,7 @@ You have a {{ occurrence.scheduled_duration }} minute slot in {{ occurrence.sche
 {% else %}
 You have been allocated slots at the following times:
 {% for occurrence in schedule_item.occurrences %}
-  {% if occurrence.state == "scheduled" %}
+  {% if occurrence.scheduled %}
   {{ occurrence.occurrence_num }}: {{ occurrence.scheduled_duration }} minute slot in {{ occurrence.scheduled_venue.name }} on {{ occurrence.scheduled_time.strftime('%A at %-I:%M %p') }}
   {% else %}
   {{ occurrence.occurrence_num }}: Not scheduled yet

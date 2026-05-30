@@ -90,7 +90,6 @@ def email_check():
                 Proposal.schedule_item.has(
                     ScheduleItem.state != "hidden",
                     ScheduleItem.occurrences.any(
-                        # TODO: is this actually a secret extra Occurrence.state?
                         Occurrence.scheduled_duration.isnot(None),
                     ),
                 )

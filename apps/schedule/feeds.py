@@ -96,7 +96,7 @@ def schedule_frab_xml(year):
             .where(
                 ScheduleItem.state == "published",
                 ScheduleItem.occurrences.any(
-                    Occurrence.state == "scheduled",
+                    Occurrence.scheduled_time.isnot(None),
                 ),
             )
             .order_by(Occurrence.scheduled_time)
@@ -126,7 +126,7 @@ def schedule_frab_json(year):
             .where(
                 ScheduleItem.state == "published",
                 ScheduleItem.occurrences.any(
-                    Occurrence.state == "scheduled",
+                    Occurrence.scheduled_time.isnot(None),
                 ),
             )
             .order_by(Occurrence.scheduled_time)

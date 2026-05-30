@@ -100,11 +100,9 @@ class FrabExporter:
         for schedule_item in self.schedule_items:
             sid = _get_schedule_item_dict(filter, schedule_item)
             for occurrence in schedule_item.occurrences:
-                if occurrence.state != "scheduled":
+                if not occurrence.scheduled:
                     continue
-
-                # Safe assertion due to check that state == "scheduled"
-                assert occurrence.scheduled_venue is not None
+                assert occurrence.scheduled_venue
 
                 if self.filter.official_venues_only and occurrence.scheduled_venue.allows_attendee_content:
                     continue

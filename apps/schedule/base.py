@@ -505,7 +505,6 @@ def herald_venue(venue_name):
             select(Occurrence)
             .where(Occurrence.scheduled_venue == venue)
             .where(Occurrence.schedule_item.has(ScheduleItem.state == "published"))
-            .where(Occurrence.state == "scheduled")
             .where(Occurrence.scheduled_time > pendulum.now(event_tz))
             .order_by(Occurrence.scheduled_time)
             .limit(2)
@@ -598,7 +597,6 @@ def greenroom():
     upcoming = list(
         db.session.scalars(
             select(Occurrence)
-            .where(Occurrence.state == "scheduled")
             .where(
                 Occurrence.schedule_item.has(
                     ScheduleItem.type.in_({"talk", "workshop", "youthworkshop", "performance"}),

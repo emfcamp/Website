@@ -25,7 +25,7 @@
       <td>
   {% endif %}
 
-  {% if occurrence.state == "scheduled" %}
+  {% if occurrence.scheduled %}
   <p><strong>{{ occurrence.scheduled_time.strftime('%A from %-I:%M %p') }}</strong> - <strong>{{ occurrence.end_date.strftime('%-I:%M %p') }}</strong>
     {% if feature_enabled('SCHEDULE') and occurrence.scheduled_venue.map_link %}
     in <strong><a href="{{ occurrence.scheduled_venue.map_link }}" target="_blank">{{ schedule_item.scheduled_venue.name }}</a></strong>
@@ -122,7 +122,7 @@
   {% for occurrence_form in schedule_item.occurrence_forms %}
     {% set occurrence = occurrences_dict[occurrence_form.occurrence_id.data] %}
 
-    {% if feature_enabled('SCHEDULE') and occurrence.state == "scheduled" %}
+    {% if feature_enabled('SCHEDULE') and occurrence.scheduled %}
     <a href="{{ occurrence.scheduled_venue.map_link }}" target="_blank" class="btn btn-primary">📍&nbsp;Map</a>
     {% endif %}
 
