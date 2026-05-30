@@ -266,9 +266,7 @@ def create_app(dev_server=False, config_override=None):
             max_age = app.config.get("HSTS_MAX_AGE", 3600 * 24 * 30 * 6)
             response.headers["Strict-Transport-Security"] = f"max-age={max_age}"
 
-        response.headers["X-Frame-Options"] = "deny"
         response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
 
