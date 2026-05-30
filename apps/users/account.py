@@ -76,13 +76,6 @@ def account() -> ResponseReturnValue:
     if get_site_state() == "cancelled":
         return redirect(url_for(".cancellation_refund"))
 
-    if not current_user.diversity:
-        flash(
-            "Please check that your user details are correct. "
-            "We'd also appreciate it if you could fill in our diversity survey."
-        )
-        return redirect(url_for(".details"))
-
     blog_posts = []
     try:
         blog_posts = fetch_blog_posts()
