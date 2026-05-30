@@ -55,6 +55,9 @@
 </ul>
 
 <b>Village join requests:</b>
+{% if not village.users_who_requested_joining() %}
+<i>None</i>
+{% else %}
 <ul>
     {% for user in village.users_who_requested_joining() %}
         <li>
@@ -70,6 +73,7 @@
         </li>
     {% endfor %}
 </ul>
+{% endif %}
 
 <form method="POST">
     {{ form.hidden_tag() }}
