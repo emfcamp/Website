@@ -286,6 +286,7 @@ def create_app(dev_server=False, config_override=None):
                 "https://www.youtube.com",
                 "https://archive.org",
             ],
+            "frame-ancestors": "none",
         }
 
         # Fixups for flask-admin which includes lots of nasty inline JS
