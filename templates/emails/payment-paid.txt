@@ -7,9 +7,9 @@ We've just received confirmation that your payment for {{ payment.amount | price
 {% if feature_enabled('ISSUE_TICKETS') -%}
 {% include 'emails/receipt-blurb.txt' %}
 {% elif SITE_STATE != 'after-event' %}
-You can view your purchases and download the invoice here:
+You can view your purchases and download the receipt here:
 
-  {{ url_for('users.account', _external=True) }}
+  {{ url_for('users.purchases', _external=True) }}
 
 {% if payment.purchases | selectattr("is_ticket") | list | count > 0 %}
 We'll send your e-tickets to this address nearer the event.
