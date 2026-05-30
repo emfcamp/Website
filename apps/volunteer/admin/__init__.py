@@ -1,3 +1,4 @@
+from flask import g
 from flask_admin import Admin
 from flask_admin.theme import Bootstrap4Theme
 
@@ -10,6 +11,7 @@ volunteer_admin = Admin(
     theme=Bootstrap4Theme(
         base_template="volunteer/admin/flask-admin-base.html",
     ),
+    csp_nonce_generator=lambda: g.csp_nonce,
 )
 volunteer_admin.endpoint_prefix = "volunteer_admin"
 
