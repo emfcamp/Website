@@ -145,7 +145,7 @@ class ProposalStateForm(Form):
 
     def result(self) -> ProposalState:
         for field in self._allowed_fields:
-            if getattr(self, field).data:
+            if getattr(self, field) and getattr(self, field).data:
                 for k, v in STATE_FIELDS.items():
                     if field in v:
                         return k
