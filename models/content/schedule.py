@@ -576,7 +576,6 @@ class Occurrence(BaseModel):
             return sorted(list(self.potential_scheduled_slots), reverse=True)[0]
         return None
 
-    # Basically only available if state == "scheduled"
     @property
     def scheduled_end_time(self) -> datetime | None:
         start = self.scheduled_time
@@ -591,7 +590,6 @@ class Occurrence(BaseModel):
             return slot.start_time
         return None
 
-    # Can be accessible before state == "scheduled"
     @property
     def potential_end_time(self) -> datetime | None:
         if slot := self.potential_slot:
