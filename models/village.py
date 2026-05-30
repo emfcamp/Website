@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import to_shape
@@ -152,6 +152,7 @@ class VillageMember(BaseModel):
 
 class VillageJoinRequest(BaseModel):
     __tablename__ = "village_join_request"
+    __versioned__: dict[str, Any] = {}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     # We only allow one village membership or request per user. TODO: make this the primary key
