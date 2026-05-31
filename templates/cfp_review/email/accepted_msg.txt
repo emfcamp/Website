@@ -9,6 +9,9 @@ We'll be in contact shortly to check how you'd like it to be listed in the sched
 You can buy your reserved tickets here{% if user.cfp_voucher.expiry %} before {{ user.cfp_voucher.expiry.strftime('%Y-%m-%d') }}{% endif %}:
 
   {{ external_url('tickets.main', flow='speakers') }}
+
+For more information about the event, please see this update on the blog: https://blog.emfcamp.org/2026/04/27/ticketholder-update/
+
 {%- elif user.cfp_voucher.tickets_remaining == 1 %}
 
 You already have a ticket to EMF but if you would like to buy another{% if user.cfp_voucher.expiry %} before {{ user.cfp_voucher.expiry.strftime('%Y-%m-%d') }}{% endif %} you can do so here:
