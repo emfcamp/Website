@@ -7,7 +7,8 @@ from flask_restful import Resource
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import Point
 
-from main import db
+from apps.config import config
+from main import db, external_url
 from models.content import Venue
 from models.user import User
 from models.village import Village, VillageMember
@@ -18,7 +19,8 @@ from . import api
 class VillageResponse(TypedDict):
     id: int
     name: str
-    url: str | None
+    url: str
+    external_url: str | None
     description: str | None
     location: dict[str, Any] | None
 
@@ -27,7 +29,8 @@ def render_village(village: Village) -> VillageResponse:
     return {
         "id": village.id,
         "name": village.name,
-        "url": village.url,
+        "url": external_url("villages.view", year=config.event_year, village_id=village.id),
+        "external_url": village.url,
         "description": village.description,
         "location": to_shape(village.location).__geo_interface__ if village.location else None,
     }
@@ -38,11 +41,7 @@ class VillagesMap(Resource):
     def get(self):
         features = []
         for obj in Village.query.filter(Village.location.isnot(None)):
-            data = obj.__geo_interface__
-            if data["properties"].get("description") is not None:
-                desc = data["properties"]["description"]
-                data["properties"]["description"] = (desc[:230] + "...") if len(desc) > 230 else desc
-            features.append(data)
+            features.append(render_village(obj))
         return {"type": "FeatureCollection", "features": features}
 
 
