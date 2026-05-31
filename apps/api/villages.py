@@ -41,7 +41,11 @@ class VillagesMap(Resource):
     def get(self):
         features = []
         for obj in Village.query.filter(Village.location.isnot(None)):
-            features.append(render_village(obj))
+            data = obj.__geo_interface__
+            if data["properties"].get("description") is not None:
+                desc = data["properties"]["description"]
+                data["properties"]["description"] = (desc[:230] + "...") if len(desc) > 230 else desc
+            features.append(data)
         return {"type": "FeatureCollection", "features": features}
 
 

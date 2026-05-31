@@ -6,7 +6,8 @@ from sqlalchemy import ForeignKey, Index, select
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from main import db
+from apps.config import config
+from main import db, external_url
 from models.user import User
 
 from . import BaseModel
@@ -79,7 +80,8 @@ class Village(BaseModel):
                 "id": self.id,
                 "name": self.name,
                 "description": self.description,
-                "url": self.url,
+                "url": external_url("villages.view", year=config.event_year, village_id=self.id),
+                "external_url": self.url,
             },
             "geometry": location.__geo_interface__,
         }
