@@ -164,10 +164,6 @@ def generate_api_token(key, uid):
     return generate_unlimited_hmac("api-", key, uid)
 
 
-def generate_bar_training_token(key, uid):
-    return generate_unlimited_hmac("bar-training-", key, uid)
-
-
 def generate_checkin_code(key, uid, version=1):
     return generate_unlimited_short_hmac("checkin-", key, uid, version=version)
 
@@ -182,10 +178,6 @@ def verify_signup_code(key, current_timestamp, code):
 
 def verify_api_token(key, uid):
     return verify_unlimited_hmac("api-", key, uid)
-
-
-def verify_bar_training_token(key, uid):
-    return verify_unlimited_hmac("bar-training-", key, uid)
 
 
 def verify_checkin_code(key, uid):
@@ -393,10 +385,6 @@ class User(BaseModel, UserMixin):
     def checkin_code(self):
         return generate_checkin_code(app.config["SECRET_KEY"], self.id)
 
-    @property
-    def bar_training_token(self):
-        return generate_bar_training_token(app.config["SECRET_KEY"], self.id)
-
     def has_permission(self, name: str, cascade: bool = True) -> bool:
         if cascade:
             if name != "admin" and self.has_permission("admin"):
@@ -500,14 +488,6 @@ class User(BaseModel, UserMixin):
         if uid is None:
             # FIXME: raise an exception instead of returning None
             return None
-        return db.session.get_one(User, uid)
-
-    @classmethod
-    def get_by_bar_training_token(cls, code: str) -> User:
-        uid = verify_bar_training_token(app.config["SECRET_KEY"], code)
-        if uid is None:
-            raise ValueError("Invalid token")
-
         return db.session.get_one(User, uid)
 
     def adult_tickets_held(self, voucher: bool = False) -> int:
