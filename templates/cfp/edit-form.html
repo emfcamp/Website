@@ -54,12 +54,6 @@
     {{ render_field(form.additional_info, 9) }}
 
     <div class="col-md-9 col-sm-offset-3 {% if proposal.state != 'new' -%} hidden {%- endif %}">
-      {% if proposal.type == 'youthworkshop' %}
-      <label class="checkbox">
-        {{ form.attributes.valid_dbs() }}
-        I have a valid <a href="https://www.gov.uk/government/organisations/disclosure-and-barring-service/about#dbs-checks" target="_blank">DBS check</a>
-      </label>
-      {% endif %}
       <label class="checkbox">
         {{ form.needs_help() }}
         I'd like help with preparing this proposal.

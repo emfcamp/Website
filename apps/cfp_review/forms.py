@@ -258,7 +258,6 @@ class UpdateProposalWorkshopAttributesForm(UpdateScheduleItemWorkshopAttributesF
 
 class UpdateProposalYouthWorkshopAttributesForm(UpdateScheduleItemYouthWorkshopAttributesForm):
     participant_count = StringField("Attendees", [DataRequired()])
-    valid_dbs = BooleanField("Has a valid DBS check")
 
 
 class UpdateProposalInstallationAttributesForm(UpdateAttributesForm):

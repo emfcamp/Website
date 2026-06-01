@@ -90,8 +90,6 @@
                                 {{ render_dl_field(form.attributes.age_range) }}
                                 {% if proposal.type == 'workshop' %}
                                     {{ render_dl_field(form.attributes.family_friendly) }}
-                                {% elif proposal.type == 'youthworkshop' %}
-                                    {{ render_dl_field(form.attributes.valid_dbs) }}
                                 {% endif %}
 
                             {% elif proposal.type == 'installation' %}

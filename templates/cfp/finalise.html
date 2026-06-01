@@ -53,11 +53,6 @@
         {{ render_field(form.attributes.participant_equipment, 9) }}
         {% endif %}
 
-        {% if schedule_item.type in ['youthworkshop'] %}
-        <div class="col-md-9 col-md-offset-3"><small>I have a valid <a href="https://www.gov.uk/government/organisations/disclosure-and-barring-service/about#dbs-checks" target="_blank">DBS check</a>.</small></div>
-        {{ render_field(form.attributes.proposal_valid_dbs, 9) }}
-        {% endif %}
-
         {% if schedule_item.type in ['installation'] %}
         {{ render_field(form.attributes.size, 9) }}
         {% endif %}

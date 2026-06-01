@@ -129,10 +129,6 @@
           <dt>Notice Required</dt><dd>{{ proposal.notice_required }}</dd>
           <dt>Attendees</dt><dd>{{ proposal.attributes.participant_count }}</dd>
           <dt>Cost per attendee</dt><dd>{{ proposal.attributes.participant_cost }}</dd>
-          {% if proposal.type in ["youthworkshop"] %}
-          <dt>Valid DBS check</dt><dd>{{ proposal.valid_dbs and "Yes" or "No" }}</dd>
-          {% endif %}
-          <dt>Cost per attendee</dt><dd>{{ proposal.attributes.participant_cost }}</dd>
           <dt>Participant equipment</dt><dd>{{ proposal.attributes.participant_equipment }}</dd>
           <dt>Age range</dt><dd>{{ proposal.attributes.age_range }}</dd>
         {% elif proposal.type in ['installation'] %}

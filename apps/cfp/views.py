@@ -118,7 +118,6 @@ class YouthWorkshopAttributesForm(AttributesForm):
     age_range = StringField("Age range")
     participant_cost = StringField("Cost per attendee")
     participant_equipment = StringField("Attendee equipment")
-    valid_dbs = BooleanField("I have a valid DBS check")
 
 
 class InstallationAttributesForm(AttributesForm):
@@ -495,7 +494,6 @@ class FinaliseYouthWorkshopAttributesForm(FinaliseAttributesForm):
     participant_equipment = StringField("Attendee equipment")
     content_note = TextAreaField("Content note")
     proposal_participant_count = StringField("Attendees")
-    proposal_valid_dbs = BooleanField("I have a valid DBS check")
 
 
 FINALISE_ATTRIBUTES_FORM_TYPES: dict[ScheduleItemType, type[FinaliseAttributesForm]] = {
@@ -636,19 +634,12 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
         proposal.equipment_required = form.proposal_equipment_required.data
         del form.proposal_equipment_required
 
-        # For convenience, we ask them to update their participant_count
-        # and valid_dbs, but these aren't exposed on the ScheduleItem
-        if isinstance(proposal.attributes, ProposalWorkshopAttributes):
+        # For convenience, we ask them to update their participant_count,
+        # but this isn't exposed on the ScheduleItem
+        if isinstance(proposal.attributes, ProposalWorkshopAttributes | ProposalYouthWorkshopAttributes):
             proposal.attributes.participant_count = form.attributes.proposal_participant_count.data
             # Now delete this, or populate_obj will try to add it
             del form.attributes.form.proposal_participant_count
-
-        elif isinstance(proposal.attributes, ProposalYouthWorkshopAttributes):
-            proposal.attributes.participant_count = form.attributes.proposal_participant_count.data
-            proposal.attributes.valid_dbs = form.attributes.proposal_valid_dbs.data
-            # Now delete these, or populate_obj will try to add them
-            del form.attributes.form.proposal_participant_count
-            del form.attributes.form.valid_dbs
 
         availability_changed = time_ranges.save()
         # Proposers can change their availability after finalisation and are notified of this
@@ -681,12 +672,8 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
     if request.method != "POST":
         # These proxy to the proposal, so it doesn't matter if schedule_item exists
         form.proposal_equipment_required.data = proposal.equipment_required
-        if isinstance(proposal.attributes, ProposalWorkshopAttributes):
+        if isinstance(proposal.attributes, ProposalWorkshopAttributes | ProposalYouthWorkshopAttributes):
             form.attributes.proposal_participant_count.data = proposal.attributes.participant_count
-
-        elif isinstance(proposal.attributes, ProposalYouthWorkshopAttributes):
-            form.attributes.proposal_participant_count.data = proposal.attributes.participant_count
-            form.attributes.proposal_valid_dbs.data = proposal.attributes.valid_dbs
 
     return render_template(
         "cfp/finalise.html",

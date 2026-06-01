@@ -98,7 +98,6 @@ class ProposalWorkshopAttributes(WorkshopAttributes):
 @dataclass
 class ProposalYouthWorkshopAttributes(YouthWorkshopAttributes):
     participant_count: str | None = None
-    valid_dbs: bool | None = None
 
 
 @dataclass
@@ -162,7 +161,7 @@ def convert_attributes_between_types(old_attributes: Attributes, new_attributes:
             "participant_cost",
             "participant_equipment",
         ]
-        # family_friendly and valid_dbs can't be copied
+        # family_friendly can't be copied
 
     for a in attributes_to_copy:
         if hasattr(old_attributes, a):
