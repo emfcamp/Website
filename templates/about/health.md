@@ -61,7 +61,7 @@ Never get so intoxicated that you can't take care of yourself. Our [code of cond
 Camping gas accidents can cause serious burns. Never change gas canisters in or near a tent and make sure the canister is threaded properly before lighting.
 
 ## Hearing damage
-Exposure to loud music can cause damage to your hearing &mdash; we provide free earplugs at the Info desk and at Null Sector. Please use them if you don't have your own!
+Exposure to loud music can cause damage to your hearing &mdash; we provide free earplugs at the Info desk and at NullSector. Please use them if you don't have your own!
 
 ## Tick bites
 EMF is held in a deer park, which increases the risk of tick bites, although in our experience this is rare.

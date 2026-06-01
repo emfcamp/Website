@@ -42,6 +42,6 @@ Both bars are entirely run by EMF volunteers, and any surplus is reinvested back
 Our pub, the Robot Arms, is northwest of Stage B. It sells a wide selection of soft drinks, wine, cider, spirits, and beer. We also have chilled tap water available for you to fill your own bottles.
 
 ### Cybar
-The solarpunks have taken over Null Sector’s Cybar and are now serving draught beers, soft drinks and even water we think they tapped from an underground pipe.
+The solarpunks have taken over NullSector’s Cybar and are now serving draught beers, soft drinks and even water we think they tapped from an underground pipe.
 
 #}
