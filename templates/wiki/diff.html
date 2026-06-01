@@ -23,13 +23,17 @@
     <dd>
       Version #{{ from_txn }}
       &mdash; {{ from_ver.transaction.issued_at.strftime('%Y-%m-%d %H:%M') }}
+      {% if current_user.is_authenticated and current_user.has_permission('admin') %}
       {% if from_ver.transaction.user %}by {{ from_ver.transaction.user.name }}{% endif %}
+      {% endif %}
     </dd>
     <dt>To</dt>
     <dd>
       Version #{{ to_txn }}
       &mdash; {{ to_ver.transaction.issued_at.strftime('%Y-%m-%d %H:%M') }}
+      {% if current_user.is_authenticated and current_user.has_permission('admin') %}
       {% if to_ver.transaction.user %}by {{ to_ver.transaction.user.name }}{% endif %}
+      {% endif %}
     </dd>
   </dl>
 </div>

@@ -1,14 +1,14 @@
 """add wiki_page table
 
 Revision ID: 3b07c4eea8ea
-Revises: f361662d6dee
+Revises: f94c14a1ee29
 Create Date: 2026-05-06 18:04:36.747725
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '3b07c4eea8ea'
-down_revision = 'f361662d6dee'
+down_revision = 'f94c14a1ee29'
 
 from alembic import op
 import sqlalchemy as sa

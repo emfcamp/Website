@@ -13,7 +13,9 @@ class WikiPageForm(Form):
     submit = SubmitField("Save")
 
 
-class CreateWikiPageForm(WikiPageForm):
+class CreateWikiPageForm(Form):
+    title = StringField("Title", [InputRequired(), Length(1, 200)])
+    content = TextAreaField("Content", [Optional()])
     slug = StringField(
         "URL slug",
         [
@@ -28,5 +30,8 @@ class CreateWikiPageForm(WikiPageForm):
     submit = SubmitField("Create page")
 
     def validate_slug(self, field: StringField) -> None:
-        if field.data is not None and WikiPage.get_by_slug(field.data):
+        assert field.data is not None
+        if field.data == "new":
+            raise ValidationError("A wiki page cannot be called new.")
+        if WikiPage.get_by_slug(field.data):
             raise ValidationError("A wiki page with this slug already exists.")

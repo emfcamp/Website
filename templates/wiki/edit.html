@@ -26,7 +26,7 @@
 <div class="well">
   <form method="post" class="form-horizontal" role="form">
     {{ form.hidden_tag() }}
-    {{ form.version_token() }}
+    {% if not creating %}{{ form.version_token() }}{% endif %}
 
     <fieldset>
       {% if creating %}

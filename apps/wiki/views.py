@@ -43,6 +43,7 @@ def list_pages() -> ResponseReturnValue:
     return render_template("wiki/list.html", pages=pages, latest_versions=latest_versions)
 
 
+# If you change this route, update CreateWikiPageForm.validate_slug
 @wiki.route("/new", methods=["GET", "POST"])
 @require_permission("wiki")
 def new_page() -> ResponseReturnValue:
@@ -92,9 +93,9 @@ def edit(slug: str) -> ResponseReturnValue:
         form.version_token.data = _current_version_token(page)
         return render_template("wiki/edit.html", form=form, page=page, creating=False)
 
-    # Non-admins cannot change the title; fill it in so validation passes
+    # Non-admins cannot change the title
     if not current_user.has_permission("admin"):
-        form.title.data = page.title
+        del form.title
 
     if not form.validate_on_submit():
         return render_template("wiki/edit.html", form=form, page=page, creating=False)
@@ -127,8 +128,9 @@ def edit(slug: str) -> ResponseReturnValue:
 
         if not has_conflict:
             # Clean 3-way merge — save automatically
-            assert form.title.data is not None
-            page.title = form.title.data
+            if current_user.has_permission("admin"):
+                assert form.title.data is not None
+                page.title = form.title.data
             page.content = "".join(merged_lines)
             db.session.commit()
             flash("Page saved (your changes were automatically merged with a concurrent edit).")
@@ -145,8 +147,8 @@ def edit(slug: str) -> ResponseReturnValue:
             conflict=True,
         )
 
-    assert form.title.data is not None
     if current_user.has_permission("admin"):
+        assert form.title.data is not None
         page.title = form.title.data
     page.content = form.content.data or ""
     db.session.commit()
