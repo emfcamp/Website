@@ -1,8 +1,9 @@
 {% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 
-{% block title %}{% if creating %}New Wiki Page{% elif page %}Edit: {{ page.title }} — Wiki{% else %}Edit — Wiki{% endif %}{% endblock %}
+{% block title %}{% if creating %}New Wiki Page{% elif page %}Edit: {{ page.title }} - Wiki{% else %}Edit - Wiki{% endif %}{% endblock %}
 
+{% block body_class %}wiki{% endblock %}
 {% block body %}
 
 {% if creating %}

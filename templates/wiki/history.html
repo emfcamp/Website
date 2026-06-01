@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-{% block title %}History: {{ page.title }} — Wiki{% endblock %}
+{% block title %}History: {{ page.title }} - Wiki{% endblock %}
+
+{% block body_class %}wiki{% endblock %}
 {% block body %}
 <h2>
   History: <a href="{{ url_for('wiki.view', slug=page.slug) }}">{{ page.title }}</a>
