@@ -323,6 +323,7 @@ class Proposal(BaseModel):
     def to_dict(self) -> dict[str, Any]:
         """JSON-compatible dict representation for CSV export."""
         data = {
+            "id": self.id,
             "type": self.type,
             "state": self.state,
             "proposer_name": self.user.name,
@@ -335,6 +336,7 @@ class Proposal(BaseModel):
             "funding_required": self.funding_required,
             "notice_required": self.notice_required,
             "additional_info": self.additional_info,
+            "has_ticket": self.user.check_will_have_ticket(),
             "needs_money": self.needs_money,
             "one_day": self.one_day,
             "private_notes": self.private_notes,
