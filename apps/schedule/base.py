@@ -25,7 +25,6 @@ from models.admin_message import AdminMessage
 from models.content import (
     SCHEDULE_ITEM_INFOS,
     Occurrence,
-    Proposal,
     ScheduleItem,
     ScheduleItemType,
     Venue,
@@ -131,7 +130,7 @@ def add_favourite():
         abort(401)
 
     proposal_id = int(request.form["fave"])
-    proposal = get_or_404(db, Proposal, proposal_id)
+    proposal = get_or_404(db, ScheduleItem, proposal_id)
     if proposal in current_user.favourites:
         current_user.favourites.remove(proposal)
     else:
@@ -146,7 +145,7 @@ def add_favourite():
 def favourites() -> ResponseReturnValue:
     if (request.method == "POST") and current_user.is_authenticated:
         proposal_id = int(request.form["fave"])
-        proposal = get_or_404(db, Proposal, proposal_id)
+        proposal = get_or_404(db, ScheduleItem, proposal_id)
         if proposal in current_user.favourites:
             current_user.favourites.remove(proposal)
         else:
