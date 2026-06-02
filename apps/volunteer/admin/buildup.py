@@ -4,6 +4,7 @@ from typing import ClassVar
 from dateutil.rrule import DAILY, rrule
 from flask_admin import expose
 from flask_admin.form import Field
+from flask_login import current_user
 from wtforms import StringField
 from wtforms.fields.datetime import DateTimeLocalField
 
@@ -61,7 +62,27 @@ volunteer_admin.add_view(
 
 
 class BuildupVolunteerModelView(VolunteerModelView):
-    form_excluded_columns = ("versions",)
+    form_excluded_columns = ("versions", "emergency_contact")
+    can_view_details = True
+    details_modal = True
+    column_list = (
+        "user.volunteer.nickname",
+        "arrival_date",
+        "departure_date",
+        "vehicle_registration",
+        "acked_health_and_safety_briefing_at",
+        "recorded_on_site",
+        "left_site",
+    )
+    column_labels: ClassVar[dict[str, str]] = {
+        "user.volunteer.nickname": "Name",
+        "arrival_date": "Arrival",
+        "departure_date": "Departure",
+        "vehicle_registration": "Vehicle Reg",
+        "acked_health_and_safety_briefing_at": "Registered at",
+        "recorded_on_site": "On site",
+        "left_site": "Left site",
+    }
 
     def _modify_widget_args(self, form, obj=None, create=False):
         if not form.arrival_date.render_kw:
@@ -93,6 +114,15 @@ class BuildupVolunteerModelView(VolunteerModelView):
 
     def edit_form(self, obj=None):
         return self._modify_widget_args(super().edit_form(obj))
+
+    def render(self, *args, **kwargs):
+        if details_columns := kwargs.pop("details_columns", None):
+            if not current_user.has_permission("volunteer:admin_view_emergency_contact"):
+                details_columns = [
+                    (cid, cname) for cid, cname in details_columns if cid != "emergency_contact"
+                ]
+            kwargs["details_columns"] = details_columns
+        return super().render(*args, **kwargs)
 
 
 volunteer_admin.add_view(
