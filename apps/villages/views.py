@@ -74,7 +74,7 @@ def main(year: int) -> ResponseReturnValue:
     if year != config.event_year:
         abort(404)
 
-    villages = list(db.session.execute(select(Village)).scalars().all())
+    villages = list(db.session.scalars(select(Village).order_by(Village.name)))
     any_village_located = any(v.location is not None for v in villages)
     return render_template(
         "villages/villages.html",
@@ -84,8 +84,12 @@ def main(year: int) -> ResponseReturnValue:
 
 
 @villages.route("/<int:year>/<int:village_id>")
-def view(year: int, village_id: int) -> ResponseReturnValue:
+@villages.route("/<int:year>/<int:village_id>-<slug>")
+def view(year: int, village_id: int, slug: str | None = None) -> ResponseReturnValue:
     village = load_village(year, village_id)
+
+    if slug != village.slug:
+        return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
 
     return view_or_editdesc(village)
 

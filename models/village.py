@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Any
 
 from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import to_shape
+from slugify import slugify
 from sqlalchemy import ForeignKey, Index, select
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -99,6 +100,10 @@ class Village(BaseModel):
             return None
         lat, lon = self.latlon
         return f"https://map.emfcamp.org/#18.5/{lat}/{lon}/m={lat},{lon}"
+
+    @property
+    def slug(self) -> str:
+        return slugify(self.name)
 
     @classmethod
     def get_export_data(cls):
