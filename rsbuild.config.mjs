@@ -72,7 +72,7 @@ export default defineConfig({
     source: {
         entry: {
             "main.js": "./js/main.js",
-            "line_up.js": "./js/line-up.js",
+            "line-up.js": "./js/line-up.js",
             "schedule.js": "./js/schedule.js",
             "volunteer_schedule.js": "./js/volunteer_schedule.js",
             "lottery.js": "./js/lottery.js",

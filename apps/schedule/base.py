@@ -25,7 +25,6 @@ from models.admin_message import AdminMessage
 from models.content import (
     SCHEDULE_ITEM_INFOS,
     Occurrence,
-    Proposal,
     ScheduleItem,
     ScheduleItemType,
     Venue,
@@ -130,30 +129,30 @@ def add_favourite():
     if not current_user.is_authenticated:
         abort(401)
 
-    proposal_id = int(request.form["fave"])
-    proposal = get_or_404(db, Proposal, proposal_id)
-    if proposal in current_user.favourites:
-        current_user.favourites.remove(proposal)
+    schedule_item_id = int(request.form["fave"])
+    schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
+    if schedule_item in current_user.favourites:
+        current_user.favourites.remove(schedule_item)
     else:
-        current_user.favourites.append(proposal)
+        current_user.favourites.append(schedule_item)
 
     db.session.commit()
-    return redirect(url_for(".main_year", year=config.event_year) + f"#proposal-{proposal.id}")
+    return redirect(url_for(".main_year", year=config.event_year) + f"#schedule-item-{schedule_item.id}")
 
 
 @schedule.route("/favourites", methods=["GET", "POST"])
 @feature_flag("LINE_UP")
 def favourites() -> ResponseReturnValue:
     if (request.method == "POST") and current_user.is_authenticated:
-        proposal_id = int(request.form["fave"])
-        proposal = get_or_404(db, Proposal, proposal_id)
-        if proposal in current_user.favourites:
-            current_user.favourites.remove(proposal)
+        schedule_item_id = int(request.form["fave"])
+        schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
+        if schedule_item in current_user.favourites:
+            current_user.favourites.remove(schedule_item)
         else:
-            current_user.favourites.append(proposal)
+            current_user.favourites.append(schedule_item)
 
         db.session.commit()
-        return redirect(url_for(".favourites") + f"#proposal-{proposal.id}")
+        return redirect(url_for(".favourites") + f"#schedule-item-{schedule_item.id}")
 
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for(".favourites")))

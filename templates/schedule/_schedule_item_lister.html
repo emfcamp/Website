@@ -11,7 +11,7 @@
             <div>
                 {% for schedule_item in grouped_schedule_items[type_info.type] %}
                 <a href="{{ url_for('.item', year=event_year, schedule_item_id=schedule_item.id, slug=schedule_item.slug) }}"
-                   class="event schedule-item" id="schedule_item-{{ schedule_item.id }}">
+                   class="event schedule-item" id="schedule-item-{{ schedule_item.id }}">
                 <div class="row">
                     <div class="col-xs-10">
                         <div>
