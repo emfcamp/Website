@@ -54,3 +54,7 @@
     color: $main-background;
   }
 }
+
+.nav-tabs > li.active > a {
+  background-color: $main-background-text;
+}
