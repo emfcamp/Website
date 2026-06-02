@@ -67,6 +67,7 @@ def create_perms():
         "cfp_schedule",
         "villages",
         "volunteer:admin",
+        "volunteer:admin_view_emergency_contact",
         "volunteer:manager",
     ):
         if not Permission.query.filter_by(name=permission).first():
