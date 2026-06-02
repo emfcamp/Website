@@ -9,7 +9,7 @@
   /* Contains header, body, footer. Use grid to pin the footer to the bottom of the page. */
   display: grid;
   grid-template-rows: auto 1fr auto;
-  height: 100vh;
+  min-height: 100vh;
 
   background-color: $main-background;
 
