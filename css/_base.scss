@@ -8,6 +8,10 @@
 @use "./_variables.scss" as *;
 @use "./_non_prod_banner.scss" as *;
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   font-size: 16px;
   color: $main-background-text;
