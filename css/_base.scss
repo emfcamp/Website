@@ -9,29 +9,23 @@
 @use "./_non_prod_banner.scss" as *;
 
 html {
-  scrollbar-gutter: stable;
+  max-height: 100dvh;
+  max-width: 100dvw;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 body {
   font-size: 16px;
+  background-color: transparent;
   color: $main-background-text;
-  background-color: $body-background;
   font-family: $body-font-stack;
+  overflow: auto;
 }
 
-body::before,
-body::after {
-  display: block;
-  content: "";
-
-  position: fixed;
-  top: 0;
-  width: calc((100vw - 950px) / 2);
-  height: 100%;
-
-  z-index: -50;
-
-  background-color: #0d0e0e;
+html,
+body::before {
+  background-color: $body-background;
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
     image-set(
@@ -47,20 +41,28 @@ body::after {
 }
 
 body::before {
+  display: block;
+  content: "";
+
+  position: fixed;
+  top: 0;
+  width: calc((100vw - 950px) / 2);
+  height: 100%;
+
+  z-index: -1;
+
   left: 0;
   background-position:
     top left,
     calc(((100vw - 950px) / 2) - 50vh) 0;
 }
 
-body::after {
-  right: 0;
+html {
   background-position:
     top left,
-    -50vh 0;
+    calc((50vw + 950px / 2) - 50vh) 0;
 }
 
-html,
 body {
   height: 100%;
 }
@@ -361,6 +363,12 @@ td.checkbox-cell label {
   bottom: 0;
   margin: 0;
   padding: 8px;
+}
+
+@media (min-width: $main-content-width + 28px) {
+  body {
+    scrollbar-gutter: stable both-edges;
+  }
 }
 
 @media (min-width: 768px) {
