@@ -23,7 +23,7 @@ $desaturated-yellow: color.adjust($brand-2026-yellow, $lightness: -10%);
 $body-background: #000000;
 $body-background-shadow: #060606;
 
-$main-background: #050706;
+$main-background: #0f0f0f;
 $main-background-text: #dcdcdc;
 $main-background-header: #ffffff;
 
@@ -33,7 +33,7 @@ $main-link: $main-background-text;
 $main-link-hover: $brand-2026-orange;
 
 /* Styles for "highlight" elements (wells and panels) */
-$highlight-background: #1a1a1a;
+$highlight-background: #343434;
 $highlight-background-text: #dcdcdc;
 
 $highlight-2-background: $brand-2026-dark-blue;
