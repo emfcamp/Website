@@ -5,7 +5,7 @@ In order to ensure you have the knowlege required to serve alcohol safely and in
 
 Once you have completed the training you will be able to sign up for bar shifts in the volunteer schedule.
 
-After you compelte the mandatory training on the legal aspects of working on a bar, there is additional training available on how to use the tills, and serve drinks available online as well:
+After you complete the mandatory training on the legal aspects of working on a bar, there is additional training available on how to use the tills, and serve drinks available online as well:
 
 <a href="/volunteer/bar-training/guide" class="btn btn-primary btn-lg">Additional training on tills and serving drinks</a>
 
