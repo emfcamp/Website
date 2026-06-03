@@ -18,7 +18,7 @@ If this isn't suitable, please get in touch with us immediately.
 {% endif -%}
 
 {% if schedule_item.type in ["talk"] %}
-Please note that we don't do on-stage Q&A - we recommend you ask the audience to meet you elsewhere after your talk.
+Please note that we don't do on-stage Q&A - we recommend you ask the audience to meet you elsewhere after your talk. We have a Q&A tent available which you can use.
 
 {% endif -%}
 We need you to finalise the details for your {{ schedule_item.human_type }} on our website. Most importantly, you should tell us when you're available so that we don't schedule you for a time when you're not around.
@@ -39,7 +39,7 @@ To summarise, we need you to:
 * Let us know if your slot lengths aren't suitable{% if schedule_item.type == 'workshop' %}, or if you need a longer set-up time{% endif %}
 {% endif -%}
 * Fill in the form with your availability so we can schedule your {{ schedule_item.human_type }}
-* Write a great description of your {{ schedule_item.human_type }} we can publish in the schedule
+* Make sure the description of your {{ schedule_item.human_type }} is suitable for publishing in the schedule
 
 Looking forward to seeing you in the field,
 
