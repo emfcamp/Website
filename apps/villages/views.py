@@ -2,7 +2,7 @@ from flask import abort, flash, redirect, render_template, request, url_for
 from flask import current_app as app
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
-from sqlalchemy import exists, select
+from sqlalchemy import exists, func, select
 
 from main import db
 from models.content import Venue
@@ -83,7 +83,7 @@ def main(year: int) -> ResponseReturnValue:
     if year != config.event_year:
         abort(404)
 
-    villages = list(db.session.scalars(select(Village).order_by(Village.name)))
+    villages = list(db.session.scalars(select(Village).order_by(func.lower(Village.name))))
     any_village_located = any(v.location is not None for v in villages)
     return render_template(
         "villages/villages.html",
