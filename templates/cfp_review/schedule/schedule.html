@@ -23,6 +23,7 @@
 {% block title%}Schedule Dashboard{% endblock %}
 {% block body %}
 <h2>Schedule Dashboard</h2>
+<p>Please refrain from pressing any buttons on this page unless you're absolutely sure you know what you're doing.</p>
 <div class="col-md-12">
 <div class="panel panel-default">
     <div class="panel-heading">
@@ -95,6 +96,20 @@
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+</div>
+</div>
+
+<div class="col-md-6">
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Finalisation</h3>
+    </div>
+    <div class="panel-body">
+        <p>There are {{to_finalise}} schedule items awaiting finalisation.</p>
+        <div class="btn-group">
+            <a class="btn btn-primary" href="{{url_for('.send_finalise')}}">Send finalise reminder</a>
+        </div>
     </div>
 </div>
 </div>

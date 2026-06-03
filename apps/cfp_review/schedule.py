@@ -13,6 +13,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import desc
 
 from apps.cfp.scheduler import Scheduler
+from apps.cfp_review.email import send_email_for_proposal
 from apps.cfp_review.estimation import get_cfp_estimate
 from main import db, get_or_404
 from models.content import (
@@ -83,6 +84,8 @@ def schedule() -> ResponseReturnValue:
         .limit(10)
     )
 
+    to_finalise = len(scheduleitems_to_finalise())
+
     return render_template(
         "cfp_review/schedule/schedule.html",
         counts_by_type=counts_by_type,
@@ -92,6 +95,7 @@ def schedule() -> ResponseReturnValue:
         schedule_state_by_type=schedule_state_by_type,
         potential_schedules=potential_schedules,
         schedule_item_types=schedule_item_types,
+        to_finalise=to_finalise,
     )
 
 
@@ -296,3 +300,30 @@ def clashfinder() -> ResponseReturnValue:
             )
 
     return render_template("cfp_review/schedule/clashfinder.html", clashes=clashes)
+
+
+def scheduleitems_to_finalise():
+    return [
+        si
+        for si in db.session.query(ScheduleItem).where(
+            ScheduleItem.has_availability != True, ScheduleItem.proposal_id.is_not(None)
+        )
+        if len(si.occurrences) > 0 and si.occurrences[0].scheduled_duration is not None
+    ]
+
+
+@cfp_review.route("/send_finalise", methods=["GET", "POST"])
+@schedule_required
+def send_finalise() -> ResponseReturnValue:
+    items = scheduleitems_to_finalise()
+
+    if request.method == "POST" and request.form.get("send"):
+        for item in items:
+            assert item.proposal
+            send_email_for_proposal(item.proposal, reason="please-finalise")
+
+        db.session.commit()
+        flash("Schedule email sent")
+        return redirect(url_for(".schedule"))
+
+    return render_template("cfp_review/schedule/finalise.html", items=items)

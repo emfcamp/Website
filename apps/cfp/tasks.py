@@ -3,16 +3,12 @@ from csv import DictReader
 import click
 from faker import Faker
 from flask import current_app as app
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 
 from apps.cfp_review.email import send_email_for_proposal
 from main import db
 from models.content import (
     DEFAULT_TAGS,
-    Occurrence,
     Proposal,
-    ScheduleItem,
     Tag,
 )
 from models.content.attributes import (
@@ -77,49 +73,6 @@ def csv_import(csv_file, state):
         count += 1
 
     app.logger.info(f"Imported {count} proposals")
-
-
-@cfp.cli.command("email_check")
-def email_check():
-    """Email speakers about their scheduled duration"""
-    proposals = list(
-        db.session.scalars(
-            select(Proposal)
-            .where(Proposal.state == "accepted")
-            .where(
-                Proposal.schedule_item.has(
-                    ScheduleItem.state != "hidden",
-                    ScheduleItem.occurrences.any(
-                        Occurrence.scheduled_duration.isnot(None),
-                    ),
-                )
-            )
-            .where(Proposal.type.in_({"talk", "workshop", "youthworkshop", "performance"}))
-            .options(selectinload(Proposal.schedule_item).selectinload(ScheduleItem.occurrences))
-        )
-    )
-
-    for proposal in proposals:
-        send_email_for_proposal(proposal, reason="check-scheduled-duration")
-
-
-@cfp.cli.command("email_finalise")
-def email_finalise():
-    """Email speakers about finalising their talk"""
-    proposals = (
-        Proposal.query.filter(Proposal.state.in_(["accepted"]))
-        .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]))
-        .all()
-    )
-
-    for proposal in proposals:
-        if not any(o.scheduled_duration for o in proposal.schedule_item.occurrences):
-            app.logger.info(
-                f"SKIPPING proposal {proposal.id} due to lack of a scheduled duration. Set a duration!"
-            )
-            continue
-
-        send_email_for_proposal(proposal, reason="please-finalise")
 
 
 @cfp.cli.command("email_reserve")

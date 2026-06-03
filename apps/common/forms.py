@@ -17,7 +17,7 @@ from models.diversity import (
     SEXUALITY_CHOICES,
     UserDiversity,
 )
-from models.purchase import AdmissionTicket
+from models.purchase import AdmissionTicket, Purchase
 
 from .fields import HiddenIntegerField, MultiCheckboxField
 
@@ -143,7 +143,9 @@ class RefundPurchaseForm(Form):
     refund = BooleanField("Refund purchase", default=True)
 
 
-def update_refund_purchase_form_details(f, purchase, ignore_event_refund_state=False):
+def update_refund_purchase_form_details(
+    f: RefundPurchaseForm, purchase: Purchase, ignore_event_refund_state: bool = False
+) -> None:
     f._purchase = purchase
     f.refund.label.text = f"{f._purchase.id} - {f._purchase.product.display_name}"
 

@@ -1,0 +1,29 @@
+{% extends "cfp_review/base.html" %}
+{% block title%}Finalise{% endblock %}
+{% block body %}
+<h2>Finalise</h2>
+<div class="well">
+<p>This process will send an email to all the proposals below, asking them to finalise their
+    availability and confirm their talk description. Once this is complete, their schedule item
+    will be published.
+</p>
+<p>Finalise emails are only sent to proposals which have at least one occurrence with a duration.</p>
+<p><strong>This process does not check when submitters were last sent a finalise email.
+It is your responsibility to make sure we're not spamming people too much.
+</strong></p>
+<form method="post">
+    <button name="send" value="true" class="btn btn-danger">Send emails</button>
+</form>
+</div>
+
+<table class="table table-default table-condensed">
+{% for item in items %}
+<tr>
+    <td>{{item.user.name}}</td>
+    <td>{{item.type}}</td>
+    <td>{{item.title}}</td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}

@@ -187,6 +187,21 @@ FavouriteScheduleItem = Table(
 )
 
 
+class ScheduleItemAvailability(BaseModel):
+    """A time range when a speaker is available to present a ScheduleItem.
+
+    Several of these may be associated with a ScheduleItem.
+    """
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    schedule_item_id: Mapped[int] = mapped_column(ForeignKey("schedule_item.id"))
+    schedule_item: Mapped[ScheduleItem] = relationship(back_populates="availability")
+
+    start: Mapped[datetime]
+    end: Mapped[datetime]
+
+
 class ScheduleItem(BaseModel):
     """An item of content in the schedule.
 
@@ -267,6 +282,13 @@ class ScheduleItem(BaseModel):
         deferred=True,
     )
 
+    has_availability = column_property(
+        select(func.count(ScheduleItemAvailability.id) > 0)
+        .where(ScheduleItemAvailability.schedule_item_id == id)
+        .scalar_subquery(),
+        deferred=True,
+    )
+
     def cancel(self) -> None:
         """Mark this ScheduleItem as cancelled, as well as any occurrences."""
         self.state = "cancelled"
@@ -307,21 +329,6 @@ class ScheduleItem(BaseModel):
 
 
 validate_state_transitions(ScheduleItem.state, SCHEDULE_ITEM_STATE_TRANSITIONS)
-
-
-class ScheduleItemAvailability(BaseModel):
-    """A time range when a speaker is available to present a ScheduleItem.
-
-    Several of these may be associated with a ScheduleItem.
-    """
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-
-    schedule_item_id: Mapped[int] = mapped_column(ForeignKey("schedule_item.id"))
-    schedule_item: Mapped[ScheduleItem] = relationship(back_populates="availability")
-
-    start: Mapped[datetime]
-    end: Mapped[datetime]
 
 
 @dataclass
