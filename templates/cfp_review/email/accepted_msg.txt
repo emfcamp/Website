@@ -10,7 +10,7 @@ You can buy your reserved tickets here{% if user.cfp_voucher.expiry %} before {{
 
   {{ external_url('tickets.main', flow='speakers') }}
 
-For more information about the event, please see this update on the blog: https://blog.emfcamp.org/2026/04/27/ticketholder-update/
+For more updates about the event, please visit our blog: https://blog.emfcamp.org
 
 {%- elif user.cfp_voucher.tickets_remaining == 1 %}
 
