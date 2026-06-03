@@ -78,7 +78,7 @@ a {
   text-decoration: underline;
 }
 
-a:hover {
+a:hover, a:focus {
   color: $main-link-hover;
 }
 
