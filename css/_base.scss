@@ -646,3 +646,10 @@ a.collapse-toggle:hover .glyphicon {
     padding: 0;
   }
 }
+
+@media screen and (max-width: 767px) {
+  .table-responsive {
+    // Please stop making the whole page scroll, that's literally the whole point.
+    max-width: calc(100vw - 50px);
+  }
+}
