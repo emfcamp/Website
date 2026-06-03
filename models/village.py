@@ -103,7 +103,17 @@ class Village(BaseModel):
 
     @property
     def slug(self) -> str:
-        return slugify(self.name)
+        replacements = [
+            ["'", ""],
+        ]
+        return slugify(
+            self.name,
+            replacements=replacements,
+            entities=False,
+            decimal=False,
+            hexadecimal=False,
+            allow_unicode=True,
+        )
 
     @classmethod
     def get_export_data(cls):

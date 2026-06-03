@@ -84,11 +84,12 @@ def main(year: int) -> ResponseReturnValue:
 
 
 @villages.route("/<int:year>/<int:village_id>")
+@villages.route("/<int:year>/<int:village_id>-")
 @villages.route("/<int:year>/<int:village_id>-<slug>")
 def view(year: int, village_id: int, slug: str | None = None) -> ResponseReturnValue:
     village = load_village(year, village_id)
 
-    if slug != village.slug:
+    if village.slug and slug != village.slug:
         return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
 
     return view_or_editdesc(village)
