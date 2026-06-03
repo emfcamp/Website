@@ -31,6 +31,7 @@ from sqlalchemy.orm import (
     column_property,
     mapped_column,
     relationship,
+    validates,
 )
 
 from apps.config import config
@@ -442,6 +443,20 @@ class Occurrence(BaseModel):
 
     proposal: AssociationProxy[Proposal | None] = association_proxy("schedule_item", "proposal")
     user: AssociationProxy[User] = association_proxy("schedule_item", "user")
+
+    @validates("scheduled_duration")
+    def validate_scheduled_duration(self, key: str, value: int | None) -> int | None:
+        """SQLAlchemy validator to ensure duration is a multiple of the slot duration."""
+        if value is None:
+            return value
+
+        duration_minutes = SLOT_DURATION.total_seconds() / 60
+
+        if value % duration_minutes != 0:
+            raise ValueError(
+                f"Scheduled duration ({value} minutes) is not a multiple of slot duration ({duration_minutes} minutes)"
+            )
+        return value
 
     def is_valid_slot(self, start_time: datetime, venue: Venue, user: User | None = None) -> bool:
         """Check whether this occurrence can be scheduled in a given start_time and venue.

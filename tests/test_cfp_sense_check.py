@@ -45,7 +45,7 @@ def _dedent_periods(periods: str) -> str:
 def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
     return Occurrence(
         schedule_item=ScheduleItem(type="talk"),
-        scheduled_duration=25,
+        scheduled_duration=20,
         allowed_times=_dedent_periods(allowed_times),
         scheduled_time=parse("2024-05-30 12:00:00"),
         scheduled_venue=VENUE_TALK,
@@ -60,7 +60,7 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
         pytest.param(
             Occurrence(
                 schedule_item=ScheduleItem(type="talk"),
-                scheduled_duration=25,
+                scheduled_duration=20,
                 allowed_times="2024-05-30 12:00:00 > 2024-05-30 12:25:00",
                 scheduled_time=parse("2024-05-30 12:00:00"),
                 scheduled_venue=VENUE_TALK,
@@ -82,7 +82,7 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
         pytest.param(
             Occurrence(
                 schedule_item=ScheduleItem(type="talk"),
-                scheduled_duration=25,
+                scheduled_duration=20,
                 allowed_times="2024-05-30 12:00:00 > 2024-05-30 12:25:00",
                 scheduled_time=parse("2024-05-30 12:00:00"),
             ),
@@ -94,7 +94,7 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
         pytest.param(
             Occurrence(
                 schedule_item=ScheduleItem(type="talk"),
-                scheduled_duration=25,
+                scheduled_duration=20,
                 allowed_times="2024-05-30 12:00:00 > 2024-05-30 12:25:00",
             ),
             [],
@@ -139,7 +139,7 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
         pytest.param(
             Occurrence(
                 schedule_item=ScheduleItem(type="talk"),
-                scheduled_duration=25,
+                scheduled_duration=20,
                 allowed_times="2024-05-29 12:00:00 > 2024-06-03 12:00:00",
                 scheduled_time=parse("2024-06-01 04:00:00"),  # 2 hours after 2am
                 scheduled_venue=VENUE_TALK,
@@ -159,7 +159,7 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
         # pytest.param(
         #    Occurrence(
         #        schedule_item=ScheduleItem(type="talk"),
-        #        scheduled_duration=25,
+        #        scheduled_duration=20,
         #        allowed_times="2024-05-30 12:00:00 > 2024-05-30 12:25:00",
         #        potential_time=parse("2024-05-30 12:00:00"),
         #        potential_venue=VENUE_WORKSHOP,
@@ -232,7 +232,7 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
         pytest.param(
             Occurrence(
                 schedule_item=ScheduleItem(type="talk"),
-                scheduled_duration=25,
+                scheduled_duration=20,
                 allowed_times="2024-05-30 12:00:00 > 2024-05-30 13:30:00",
                 scheduled_time=parse("2024-05-30 12:00:00"),
                 scheduled_venue=VENUE_TALK,
@@ -244,7 +244,7 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
                         type="talk",
                         title="Conflicted (potential x potential)",
                     ),
-                    scheduled_duration=25,
+                    scheduled_duration=20,
                     allowed_times="2024-05-30 12:00:00 > 2024-05-30 13:30:00",
                 ),
                 Occurrence(
@@ -253,7 +253,7 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
                         type="talk",
                         title="Conflicted (potential x scheduled)",
                     ),
-                    scheduled_duration=25,
+                    scheduled_duration=20,
                     allowed_times="2024-05-30 12:00:00 > 2024-05-30 13:30:00",
                     scheduled_time=parse("2024-05-30 13:00:00"),
                     scheduled_venue=VENUE_TALK,
@@ -264,7 +264,7 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
                         type="talk",
                         title="Conflicted (scheduled x potential)",
                     ),
-                    scheduled_duration=25,
+                    scheduled_duration=20,
                     allowed_times="2024-05-30 12:00:00 > 2024-05-30 13:30:00",
                 ),
                 Occurrence(
@@ -273,7 +273,7 @@ def _talk_occurrence_with_allowed_times(allowed_times: str) -> Occurrence:
                         type="talk",
                         title="Conflicted (scheduled x scheduled)",
                     ),
-                    scheduled_duration=25,
+                    scheduled_duration=20,
                     allowed_times="2024-05-30 12:00:00 > 2024-05-30 13:30:00",
                 ),
             ],
