@@ -1,0 +1,18 @@
+{% set active = 'emails' %}
+{% extends "admin/users/_base.html" %}
+{% block title %}User {{user.name}} Emails{% endblock %}
+{% block user_body %}
+<h3>Emails sent</h3>
+{% for job in jobs %}
+<div class="well">
+    <h4>{{job.job.subject}}</h4>
+    <p>From: {{job.job.from_email}}</p>
+    <p>Date: {{job.job.created}}</p>
+<pre>
+{{job.job.text_body| wordwrap(78)}}
+</pre>
+</div>
+{% endfor %}
+
+
+{% endblock %}

@@ -1,6 +1,6 @@
 {% from "_formhelpers.html" import render_field %}
-{% extends "admin/base.html" %}
-
+{% set active = 'main' %}
+{% extends "admin/users/_base.html" %}
 {% macro tickets_table(tickets, show_owner=False) %}
 <table class="table table-condensed">
     <tr>
@@ -50,8 +50,7 @@
 </table>
 {% endmacro %}
 
-{% block title %}User {{user.name}}{% endblock %}
-{% block body %}
+{% block user_body %}
 <h2>User Details</h2>
 
 <table class="table table-condensed">

@@ -2,6 +2,7 @@ import time
 
 from flask import current_app as app
 from flask import flash, redirect, render_template, request, url_for
+from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from flask_mailman import EmailMessage
 from sqlalchemy import func, or_
@@ -9,7 +10,7 @@ from sqlalchemy_continuum.utils import version_class
 from wtforms import BooleanField, SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired, Optional, ValidationError
 
-from main import db
+from main import db, get_or_404
 from models.permission import Permission
 from models.user import User, generate_signup_code
 from models.village import Village, VillageMember
@@ -225,6 +226,17 @@ def user(user_id):
         form=form,
         permissions=permissions,
         versions=versions,
+    )
+
+
+@admin.route("/users/<int:user_id>/emails", methods=["GET", "POST"])
+def user_emails_sent(user_id: int) -> ResponseReturnValue:
+    user = get_or_404(db, User, user_id)
+
+    return render_template(
+        "admin/users/user_emails.html",
+        user=user,
+        jobs=sorted(user.email_job_recipients, key=lambda jr: jr.job.created, reverse=True),
     )
 
 
