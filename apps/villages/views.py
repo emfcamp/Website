@@ -30,7 +30,14 @@ def register() -> ResponseReturnValue:
 
     if current_user.village:
         # non-admin member of an existing village, view it instead.
-        return redirect(url_for(".view", year=config.event_year, village_id=current_user.village.id))
+        return redirect(
+            url_for(
+                ".view",
+                year=config.event_year,
+                village_id=current_user.village.id,
+                slug=current_user.village.slug,
+            )
+        )
 
     if not current_user.has_admission_ticket:
         flash("You can't create a village without a ticket to EMF")
@@ -59,7 +66,9 @@ def register() -> ResponseReturnValue:
             db.session.commit()
 
             flash("Your village registration has been received, thanks! You can edit it below.")
-            return redirect(url_for(".view", year=config.event_year, village_id=village.id))
+            return redirect(
+                url_for(".view", year=config.event_year, village_id=village.id, slug=village.slug)
+            )
 
     return render_template("villages/register.html", form=form)
 
@@ -165,7 +174,7 @@ def edit(year: int, village_id: int) -> ResponseReturnValue:
             form.populate_obj(village)
             db.session.commit()
             flash("Your village registration has been updated.")
-            return redirect(url_for(".view", year=year, village_id=village_id))
+            return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
 
     return render_template("villages/edit.html", form=form, village=village)
 
@@ -185,7 +194,7 @@ def editdesc(year: int, village_id: int) -> ResponseReturnValue:
         village.long_description = form.long_description.data
         db.session.commit()
         flash("Your village's long description has been updated.")
-        return redirect(url_for(".view", year=year, village_id=village_id))
+        return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
 
     return view_or_editdesc(village, form)
 
@@ -276,11 +285,11 @@ def members_join(year: int, village_id: int) -> ResponseReturnValue:
 
     if current_user.village:
         flash(f"Already a member of village {current_user.village.name}")
-        return redirect(url_for(".view", year=year, village_id=village_id))
+        return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
 
     if not current_user.has_admission_ticket:
         flash("You can't join a village without a ticket to EMF")
-        return redirect(url_for(".view", year=year, village_id=village_id))
+        return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
 
     form = JoinVillageForm()
 
@@ -290,7 +299,7 @@ def members_join(year: int, village_id: int) -> ResponseReturnValue:
 
         flash(f"You've requested to join village {village.name}")
 
-        return redirect(url_for(".view", year=year, village_id=village_id))
+        return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
     return render_template("villages/members_join.html", form=form, year=year, village=village)
 
 
@@ -311,7 +320,7 @@ def members_leave(year: int, village_id: int) -> ResponseReturnValue:
 
     if not (requested_to_join_correct_village or member_of_correct_village):
         flash(f"Not a member of village {current_user.village.name}")
-        return redirect(url_for(".view", year=year, village_id=village_id))
+        return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
 
     can_leave = False
     delete_village = False
@@ -352,7 +361,7 @@ def members_leave(year: int, village_id: int) -> ResponseReturnValue:
             flash(f"You've left village {village.name}")
 
             db.session.commit()
-            return redirect(url_for(".view", year=year, village_id=village_id))
+            return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
 
     return render_template(
         "villages/members_leave.html",

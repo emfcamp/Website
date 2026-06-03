@@ -19,7 +19,7 @@ If you have a ticket, you can <a href="{{url_for('users.login', next=url_for('.r
   {% if current_user.is_authenticated and current_user.village %}
   <li class="village-table-village">
     <h4 class="village-table-title">
-      <a href="{{ url_for('villages.view', year=event_year, village_id=current_user.village.id) }}">
+      <a href="{{ url_for('villages.view', year=event_year, village_id=current_user.village.id, slug=current_user.village.slug) }}">
       {{- current_user.village.name -}}
       </a>
       <span class="badge bg-primary">Your Village</span>
@@ -41,7 +41,7 @@ If you have a ticket, you can <a href="{{url_for('users.login', next=url_for('.r
   {% if not (current_user.is_authenticated and current_user.village and village.id == current_user.village.id) %}
   <li class="village-table-village">
     <h4 class="village-table-title">
-      <a href="{{ url_for('villages.view', year=event_year, village_id=village.id) }}">
+      <a href="{{ url_for('villages.view', year=event_year, village_id=village.id, slug=village.slug) }}">
       {{- village.name -}}
       </a>
     </h4>

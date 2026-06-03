@@ -10,7 +10,7 @@
     {{ form.hidden_tag() }}
 
     {{ form.submit(class_="btn btn-danger") }}
-    <a class="btn btn-default" href="{{ url_for('.view', village_id=village.id, year=year) }}">Back</a>
+    <a class="btn btn-default" href="{{ url_for('.view', village_id=village.id, year=year, slug=village.slug) }}">Back</a>
 </form>
 
 {% elif can_leave %}
@@ -20,7 +20,7 @@
     {{ form.hidden_tag() }}
 
     {{ form.submit(class_="btn btn-danger") }}
-    <a class="btn btn-default" href="{{ url_for('.view', village_id=village.id, year=year) }}">Back</a>
+    <a class="btn btn-default" href="{{ url_for('.view', village_id=village.id, year=year, slug=village.slug) }}">Back</a>
 </form>
 {% else %}
 <p>You are the last admin and there are other members, you must promote someone else to admin (on the <a href="{{ url_for('.members', village_id=village.id, year=year) }}">members page</a>) before you can leave</p>

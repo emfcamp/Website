@@ -37,7 +37,7 @@
     <fieldset>
       <div class="form-actions">
         <button type="submit" name="Update" class="btn btn-primary btn-lg pull-right debounce">Update</button>
-        <a class="btn btn-default btn-lg pull-right" href="{{ url_for('.view', village_id=village.id, year=year) }}">Back</a>
+        <a class="btn btn-default btn-lg pull-right" href="{{ url_for('.view', village_id=village.id, year=year, slug=village.slug) }}">Back</a>
       </div>
     </fieldset>
   </form>
