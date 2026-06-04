@@ -58,10 +58,10 @@
             <a href="{{ url_for('.schedule_items', sort_by='favourites', reverse=qs_reverse_new, **new_qs) }}">#Favs</a>
         </th>
         <th>
-            <a href="{{ url_for('.proposals', sort_by='names', reverse=qs_reverse_new, **new_qs) }}">Names</a>
+            <a href="{{ url_for('.schedule_items', sort_by='names', reverse=qs_reverse_new, **new_qs) }}">Names</a>
         </th>
         <th>
-            <a href="{{ url_for('.proposals', sort_by='title', reverse=qs_reverse_new, **new_qs) }}">Title</a>
+            <a href="{{ url_for('.schedule_items', sort_by='title', reverse=qs_reverse_new, **new_qs) }}">Title</a>
         </th>
     </tr>
 {% for schedule_item in schedule_items %}
