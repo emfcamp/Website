@@ -49,12 +49,7 @@ from .historic import historic_talk_data, item_historic, talks_historic
 
 # This controls both which types show on lineup and favourites,
 # and in which order they are presented.
-LINEUP_TYPE_ORDER: list[ScheduleItemType] = [
-    "talk",
-    "workshop",
-    "youthworkshop",
-    "performance",
-]
+LINEUP_TYPE_ORDER: list[ScheduleItemType] = ["talk", "workshop", "youthworkshop", "performance", "film"]
 
 
 @schedule.route("/schedule/")
