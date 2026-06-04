@@ -77,7 +77,7 @@ def send_email(conn: Any, rec: EmailJobRecipient) -> int:
         assert rec.user.volunteer
         recipient = rec.user.volunteer.volunteer_email
     else:
-        recipient = rec.user
+        recipient = rec.user.email
 
     sent_count: int = mail.send_mail(
         subject=rec.job.subject,
