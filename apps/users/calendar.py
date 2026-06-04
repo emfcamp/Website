@@ -52,6 +52,7 @@ class VolunteerShiftCalendarEntry(CalendarEntry):
     def __init__(self, shift_entry: ShiftEntry):
         self.shit_entry = shift_entry
         self.shift = shift_entry.shift
+        self.title = self.shift.role.name
         self.start_time = self.shift.start
         self.end_time = self.shift.end
         self.venue_name = self.shift.venue.name
@@ -67,6 +68,7 @@ class OccurrenceCalendarEntry(CalendarEntry):
             raise ValueError("Only scheduled content can result in calendar entries.")
 
         self.occurrence = occurrence
+        self.title = occurrence.schedule_item.title
         self.start_time = occurrence.scheduled_time  # type: ignore
         self.end_time = occurrence.scheduled_end_time  # type: ignore
         self.venue_name = occurrence.scheduled_venue.name

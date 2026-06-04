@@ -1,0 +1,29 @@
+.calendar {
+  width: 100%;
+
+  th,
+  td {
+    padding: 4px 8px;
+
+    &:first-child {
+      padding-left: 0;
+    }
+    &:last-child {
+      padding-right: 0;
+    }
+  }
+
+  th.time,
+  td.time,
+  th.type,
+  td.type,
+  th.location,
+  td.location {
+    white-space: nowrap;
+  }
+
+  th.event,
+  td.event {
+    width: 100%;
+  }
+}
