@@ -75,7 +75,6 @@ class Venue(BaseModel):
             "properties": {
                 "id": self.id,
                 "name": self.name,
-                "type": self.type,
             },
             "geometry": location.__geo_interface__,
         }

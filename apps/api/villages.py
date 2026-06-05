@@ -42,8 +42,9 @@ class VillagesMap(Resource):
     @cross_origin()
     def get(self):
         features = []
-        for obj in Village.query.filter(Village.location.isnot(None)):
+        for obj in db.session.query(Village).filter(Village.location.isnot(None)):
             data = obj.__geo_interface__
+            assert data
             if data["properties"].get("description") is not None:
                 desc = data["properties"]["description"]
                 data["properties"]["description"] = (desc[:230] + "...") if len(desc) > 230 else desc
@@ -54,7 +55,7 @@ class VillagesMap(Resource):
 class Villages(Resource):
     def get(self):
         result = []
-        for village in Village.query.all():
+        for village in db.session.query(Village).all():
             result.append(render_village(village))
         return result
 
@@ -64,7 +65,7 @@ class MyVillages(Resource):
         if not current_user.is_authenticated:
             return abort(404)
 
-        my_villages = Village.query.join(VillageMember)
+        my_villages = db.session.query(Village).join(VillageMember)
         if (not current_user.has_permission("villages")) or request.args.get("all") != "true":
             my_villages = my_villages.filter(
                 (VillageMember.user == current_user) & (VillageMember.admin.is_(True))
@@ -81,7 +82,7 @@ class MyVillages(Resource):
 
 class VillageResource(Resource):
     def get(self, id):
-        village = Village.query.get(id)
+        village = db.session.query(Village).get(id)
         if not village:
             return {"error": "Not found"}, 404
         return render_village(village)
@@ -89,12 +90,13 @@ class VillageResource(Resource):
     def post(self, id):
         # Used to update village location from the map.
         # This only updates location for the moment.
-        obj = Village.query.get(id)
+        obj = db.session.query(Village).get(id)
         if not obj:
             return abort(404)
 
         village_admins = (
-            User.query.join(VillageMember)
+            db.session.query(User)
+            .join(VillageMember)
             .filter(VillageMember.village_id == obj.id, VillageMember.admin.is_(True))
             .all()
         )
@@ -116,7 +118,7 @@ class VenuesMap(Resource):
     @cross_origin()
     def get(self):
         features = []
-        for obj in Venue.query.filter(Venue.location.isnot(None)):
+        for obj in db.session.query(Venue).filter(Venue.location.isnot(None)):
             features.append(obj.__geo_interface__)
         return {"type": "FeatureCollection", "features": features}
 
