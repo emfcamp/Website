@@ -23,6 +23,7 @@ class VillageResponse(TypedDict):
     external_url: str | None
     description: str | None
     location: dict[str, Any] | None
+    num_members: int
 
 
 def render_village(village: Village) -> VillageResponse:
@@ -33,6 +34,7 @@ def render_village(village: Village) -> VillageResponse:
         "external_url": village.url,
         "description": village.description,
         "location": to_shape(village.location).__geo_interface__ if village.location else None,
+        "num_members": len(village.village_memberships),
     }
 
 

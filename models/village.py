@@ -83,6 +83,7 @@ class Village(BaseModel):
                 "description": self.description,
                 "url": external_url("villages.view", year=config.event_year, village_id=self.id),
                 "external_url": self.url,
+                "num_members": len(self.village_memberships),
             },
             "geometry": location.__geo_interface__,
         }
