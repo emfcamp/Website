@@ -1,5 +1,5 @@
 const { verified } = require("@primer/octicons");
-const filterStorageKey = "volunteer-filters:v4";
+const filterStorageKey = "volunteer-filters:v5";
 
 function saveFilters() {
   localStorage.setItem(filterStorageKey, JSON.stringify(getFilters()));
@@ -19,6 +19,7 @@ function loadFilters() {
       signed_up: true,
       hide_full: true,
       hide_staffed: true,
+      hide_conflicting: true,
     });
   }
 
@@ -30,6 +31,8 @@ function loadFilters() {
   document.getElementById("show_signed_up_only").checked = filters.signed_up;
   document.getElementById("hide_full").checked = filters.hide_full;
   document.getElementById("is_understaffed").checked = filters.hide_staffed;
+  document.getElementById("hide_conflicting").checked =
+    filters.hide_conflicting;
   updateRowDisplay();
 }
 
@@ -42,6 +45,7 @@ function getFilters() {
     signed_up: document.getElementById("show_signed_up_only").checked,
     hide_full: document.getElementById("hide_full").checked,
     hide_staffed: document.getElementById("is_understaffed").checked,
+    hide_conflicting: document.getElementById("hide_conflicting").checked,
   };
   return filters;
 }
@@ -88,6 +92,12 @@ function shouldDisplayNode(node_data, filters, node) {
   }
   if (filters["hide_staffed"] && node_data["staffed"]) {
     filter_reasons.push("staffed");
+  }
+  if (
+    filters["hide_conflicting"] &&
+    node_data["conflicts_with"] == "volunteer_shift"
+  ) {
+    filter_reasons.push("conflicting");
   }
   if (filter_reasons.length > 0) {
     node.setAttribute("data-filter-reasons", filter_reasons.join(","));
@@ -159,14 +169,18 @@ function updateRowDisplay() {
 
 function init_volunteer_schedule() {
   loadFilters();
-  ["show_past", "show_signed_up_only", "hide_full", "is_understaffed"].forEach(
-    (id) => {
-      document.getElementById(id).addEventListener("change", () => {
-        saveFilters();
-        updateRowDisplay();
-      });
-    },
-  );
+  [
+    "show_past",
+    "show_signed_up_only",
+    "hide_full",
+    "is_understaffed",
+    "hide_conflicting",
+  ].forEach((id) => {
+    document.getElementById(id).addEventListener("change", () => {
+      saveFilters();
+      updateRowDisplay();
+    });
+  });
 
   ["filters", "roles"].forEach((panel) => {
     document.getElementById(panel).style.display = "";
