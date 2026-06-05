@@ -65,23 +65,30 @@ table.shifts-table {
   }
 
   tr td.staffing .staffing-icon {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     height: 1.5em;
     width: 1.5em;
     margin-top: -0.2em;
     vertical-align: middle;
-    mask-size: contain;
-    mask-repeat: no-repeat;
-    mask-position: center;
+    border-radius: 50%;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: white;
 
     &.staffing-icon-understaffed {
       background-color: $brand-2026-coral;
-      mask-image: url("../images/icons/alert-circle.svg");
+      &::after {
+        content: "!";
+      }
     }
 
     &.staffing-icon-staffed {
       background-color: $brand-2026-green;
-      mask-image: url("../images/icons/check-circle.svg");
+      &::after {
+        content: "✓";
+      }
     }
   }
 
@@ -127,11 +134,16 @@ ul.key {
 
     &::before {
       content: "";
-      display: inline-block;
-      width: 1em;
-      height: 1em;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.5em;
+      height: 1.5em;
       border-radius: 50%;
       flex-shrink: 0;
+      font-size: 0.85em;
+      font-weight: bold;
+      color: white;
     }
   }
 
@@ -149,6 +161,16 @@ ul.key {
 
   #key-no-conflicts::before {
     background-color: $highlight-background;
+  }
+
+  #key-understaffed::before {
+    content: "!";
+    background-color: $brand-2026-coral;
+  }
+
+  #key-staffed::before {
+    content: "✓";
+    background-color: $brand-2026-green;
   }
 }
 
