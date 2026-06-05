@@ -250,7 +250,7 @@ function init_volunteer_schedule() {
     msgEl.innerHTML = "";
     details.forEach((conflict) => {
       const p = document.createElement("p");
-      const title = conflict.title || conflict.human_type;
+      const title = conflict.title;
       p.textContent = `Conflicts with ${conflict.human_type.toLowerCase()}: ${title} (${time(conflict.start_time)}–${time(conflict.end_time)})`;
       msgEl.appendChild(p);
     });
