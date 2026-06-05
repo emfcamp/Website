@@ -14,7 +14,7 @@ from models.purchase import Purchase, PurchaseTransfer
 
 from ..config import config
 
-RECEIPT_TYPES = ["admissions", "parking", "campervan", "merchandise", "hire"]
+RECEIPT_TYPES = ["admissions", "parking", "campervan", "merchandise", "rental"]
 
 
 def render_receipt(user, png=False, pdf=False):
@@ -33,7 +33,7 @@ def render_receipt(user, png=False, pdf=False):
     campervan_tickets = purchases.filter(ProductGroup.type == "campervan").all()
 
     merch = purchases.filter(ProductGroup.type == "merchandise").all()
-    hires = purchases.filter(ProductGroup.type == "hire").all()
+    hires = purchases.filter(ProductGroup.type == "rental").all()
 
     transferred_tickets = (
         user.transfers_from.join(Purchase)

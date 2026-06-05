@@ -10,7 +10,7 @@ from . import admin
 
 def get_hires():
     purchases = (
-        ProductGroup.query.filter_by(type="hire")
+        ProductGroup.query.filter_by(type="rental")
         .join(Product)
         .join(Purchase)
         .join(Purchase.owner)
