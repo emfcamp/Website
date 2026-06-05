@@ -1,4 +1,5 @@
 from collections import defaultdict
+from collections.abc import Sequence
 from datetime import datetime, timedelta
 
 from flask import (
@@ -17,6 +18,7 @@ from flask_login import current_user
 from icalendar import Calendar, Event
 from sqlalchemy.orm import joinedload
 
+from apps.users.calendar import CalendarEntry, fetch_events
 from main import db, get_or_404
 from models import naive_utcnow
 from models.user import User, generate_api_token
@@ -44,6 +46,24 @@ def _get_roles_with_user_data(user):
         res.append(to_add)
 
     return res
+
+
+def _get_conflicts(shift: Shift, calendar: Sequence[CalendarEntry]) -> tuple[str, list[dict]]:
+    """Return (primary_conflict_type, conflict_details) for a shift.
+
+    primary_conflict_type is the highest-priority conflict type (for CSS), or ""
+    if there are no conflicts. conflict_details is a list of dicts describing
+    each conflicting event.
+    """
+    conflicts = sorted(
+        [event for event in calendar if event.overlaps_with(shift.start, shift.end)],
+        key=lambda c: c.conflict_priority,
+    )
+    if not conflicts:
+        return "", []
+
+    details = [c.to_dict() for c in conflicts]
+    return conflicts[0].type, details
 
 
 def redirect_next_or_schedule(message: str | None = None) -> ResponseReturnValue:
@@ -83,13 +103,18 @@ def schedule():
         active_day = default_day
 
     shifts = Shift.get_all_for_day(active_day)
+    if len(shifts) == 0:
+        # If there's no shifts nothing can conflict, so don't bother looking.
+        user_calendar = []
+    else:
+        user_calendar = fetch_events(current_user, shifts[0].start, shifts[-1].end)
 
     by_time = defaultdict(lambda: [])
 
     for s in shifts:
         hour_key = s.start.strftime("%H:%M")
-
         to_add = s.to_localtime_dict()
+        to_add["conflicts_with"], to_add["conflicts_detail"] = _get_conflicts(s, user_calendar)
         to_add["sign_up_url"] = url_for(".shift", shift_id=to_add["id"])
         to_add["is_user_shift"] = current_user in s.volunteers
         by_time[hour_key].append(to_add)

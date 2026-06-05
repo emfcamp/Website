@@ -1,5 +1,5 @@
 const { verified } = require("@primer/octicons");
-const filterStorageKey = "volunteer-filters:v3";
+const filterStorageKey = "volunteer-filters:v4";
 
 function saveFilters() {
   localStorage.setItem(filterStorageKey, JSON.stringify(getFilters()));
@@ -16,10 +16,9 @@ function loadFilters() {
     savedFilters = JSON.stringify({
       role_ids: interestedRoles,
       show_past: false,
-      signed_up: false,
+      signed_up: true,
       hide_full: true,
       hide_staffed: true,
-      colourful_mode: false,
     });
   }
 
@@ -31,7 +30,6 @@ function loadFilters() {
   document.getElementById("show_signed_up_only").checked = filters.signed_up;
   document.getElementById("hide_full").checked = filters.hide_full;
   document.getElementById("is_understaffed").checked = filters.hide_staffed;
-  document.getElementById("colourful_mode").checked = filters.colourful_mode;
   updateRowDisplay();
 }
 
@@ -44,7 +42,6 @@ function getFilters() {
     signed_up: document.getElementById("show_signed_up_only").checked,
     hide_full: document.getElementById("hide_full").checked,
     hide_staffed: document.getElementById("is_understaffed").checked,
-    colourful_mode: document.getElementById("colourful_mode").checked,
   };
   return filters;
 }
@@ -60,10 +57,11 @@ function getNodeData(node) {
     min_staff: parseInt(node.getAttribute("data-min-staff")),
     max_staff: parseInt(node.getAttribute("data-max-staff")),
     current_staff: parseInt(node.getAttribute("data-current-staff")),
+    conflicts_with: node.getAttribute("data-conflicts-with"),
   };
 }
 
-function shouldDisplayNode(node_data, filters) {
+function shouldDisplayNode(node_data, filters, node) {
   // If the signed up shifts filter is active, or we're not set to show shifts
   // in the past then those take precedence over all others and we short
   // circuit everything else.
@@ -80,8 +78,7 @@ function shouldDisplayNode(node_data, filters) {
 
   // Now run through the other filters and see if there's any other reasons to
   // filter out a shift. This is done by collecting a list of keys because it
-  // makes debugging easier (you can just console.log(filter_reasons, node_data)
-  // to get a view of why a shift isn't showing).
+  // makes debugging easier (they're attached to the node as data-filter-reasons).
   let filter_reasons = [];
   if (!filters["role_ids"].includes(node_data["role_id"])) {
     filter_reasons.push("role_id");
@@ -91,6 +88,11 @@ function shouldDisplayNode(node_data, filters) {
   }
   if (filters["hide_staffed"] && node_data["staffed"]) {
     filter_reasons.push("staffed");
+  }
+  if (filter_reasons.length > 0) {
+    node.setAttribute("data-filter-reasons", filter_reasons.join(","));
+  } else {
+    node.setAttribute("data-filter-reasons", "");
   }
 
   return filter_reasons.length === 0;
@@ -104,32 +106,17 @@ function spanStartTimeCell(firstNodeOfHour, rowCount) {
   }
 }
 
-function rowClass(node_data) {
-  if (node_data.current_staff < node_data.min_staff) {
-    return "danger";
-  }
-
-  if (node_data.current_staff == node_data.max_staff) {
-    return "info";
-  }
-
-  return "warning";
-}
-
-function colourise_row(node, node_data, colourful_mode) {
-  ["danger", "warning", "info"].forEach((className) =>
-    node.classList.remove(className),
-  );
-
-  if (!colourful_mode) {
-    return;
-  }
-
-  node.classList.add(rowClass(node_data));
+function updateRoleList(role_ids) {
+  let roleNames = role_ids
+    .map((id) => document.getElementById(`role-${id}-label`).textContent.trim())
+    .join(", ");
+  document.getElementById("role-list").textContent = roleNames;
 }
 
 function updateRowDisplay() {
   let filters = getFilters();
+
+  updateRoleList(filters.role_ids);
 
   // Hackery to do row spans.
   let currentHour = "null";
@@ -142,7 +129,7 @@ function updateRowDisplay() {
   rows.forEach((node, idx) => {
     let node_data = getNodeData(node);
 
-    if (shouldDisplayNode(node_data, filters)) {
+    if (shouldDisplayNode(node_data, filters, node)) {
       if (node.getAttribute("data-shift-start") != currentHour) {
         // When we transition to a new hour we calculate how many rows
         // are shown for that hour, and span the first start time cell
@@ -156,8 +143,6 @@ function updateRowDisplay() {
         // Otherwise we hide the start time cell.
         node.querySelector(".start_time").classList.add("hidden");
       }
-
-      colourise_row(node, node_data, filters.colourful_mode);
 
       rowCount += 1;
 
@@ -174,30 +159,28 @@ function updateRowDisplay() {
 
 function init_volunteer_schedule() {
   loadFilters();
-  document.getElementById("filters").style.display = "";
-  document.getElementById("filters-toggle").addEventListener("click", () => {
-    $("#filters-body").toggle();
+  ["show_past", "show_signed_up_only", "hide_full", "is_understaffed"].forEach(
+    (id) => {
+      document.getElementById(id).addEventListener("change", () => {
+        saveFilters();
+        updateRowDisplay();
+      });
+    },
+  );
+
+  ["filters", "roles"].forEach((panel) => {
+    document.getElementById(panel).style.display = "";
+    document.getElementById(`${panel}-toggle`).addEventListener("click", () => {
+      $(`#${panel}-body`).toggle();
+    });
   });
 
-  [
-    "show_past",
-    "show_signed_up_only",
-    "hide_full",
-    "is_understaffed",
-    "colourful_mode",
-  ].forEach((id) => {
-    document.getElementById(id).addEventListener("change", () => {
+  document.querySelectorAll("input[data-role-id]").forEach((node) => {
+    node.addEventListener("change", () => {
       saveFilters();
       updateRowDisplay();
     });
   });
-
-  document.querySelectorAll("input[data-role-id]").forEach((node) =>
-    node.addEventListener("change", () => {
-      saveFilters();
-      updateRowDisplay();
-    }),
-  );
 
   document.getElementById("select-all-roles").addEventListener("click", () => {
     document
@@ -241,6 +224,35 @@ function init_volunteer_schedule() {
     });
   document.getElementById("select-day").addEventListener("change", (ev) => {
     document.location.replace(ev.target.value);
+  });
+
+  function showConflictModal(details) {
+    const time = (iso) =>
+      new Date(iso).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    const msgEl = document.getElementById("conflict-modal-message");
+    msgEl.innerHTML = "";
+    details.forEach((conflict) => {
+      const p = document.createElement("p");
+      const title = conflict.title || conflict.human_type;
+      p.textContent = `Conflicts with ${conflict.human_type.toLowerCase()}: ${title} (${time(conflict.start_time)}–${time(conflict.end_time)})`;
+      msgEl.appendChild(p);
+    });
+    $("#conflict-modal").modal("show");
+  }
+
+  document.querySelectorAll("td.conflicts").forEach((cell) => {
+    const row = cell.closest("tr");
+    if (!row.getAttribute("data-conflicts-with")) return;
+    cell.style.cursor = "pointer";
+    cell.addEventListener("click", () => {
+      const details = JSON.parse(
+        row.getAttribute("data-conflicts-detail") || "[]",
+      );
+      showConflictModal(details);
+    });
   });
 }
 

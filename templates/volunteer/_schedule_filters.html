@@ -1,4 +1,36 @@
 {# Filter form on /volunteer/schedule #}
+<div class="panel panel-default" id="roles" style="display: none">
+    <div class="panel-heading" id="roles-toggle">
+        <h2 class="panel-title">
+            <span class="title"><strong>Roles:</strong> <span id="role-list"></span></span>
+             | <span class="toggle"><a href="#">Edit</a></span>
+        </h2>
+    </div>
+    <div class="panel-body" id="roles-body" style="display: none">
+        {% for r in roles %}
+            <div class="role-selector">
+                <input
+                    type="checkbox"
+                    class="role"
+                    id="role-{{r.id}}"
+                    data-role-id="{{ r.id }}"
+                    data-trained="{{ r.is_trained }}"
+                    data-interested="{{ r.is_interested }}"
+                />
+                <label for="role-{{r.id}}" id="role-{{r.id}}-label">{{ r.name }}</label>
+            </div>
+        {% endfor %}
+        <hr />
+        <p>
+            <strong>Select:</strong>
+            <a class="checkbox-filter" href="#" id="select-all-roles">All</a>
+            <a class="checkbox-filter" href="#" id="select-no-roles">None</a>
+            <a class="checkbox-filter" href="#" id="select-interested-roles">Roles I'm interested in</a>
+            <a class="checkbox-filter" href="#" id="select-trained-roles">Roles I'm trained for</a>
+        </p>
+    </div>
+</div>
+
 <div class="panel panel-default" id="filters" style="display: none">
     <div class="panel-heading" id="filters-toggle">
         <h2 class="panel-title">
@@ -7,27 +39,6 @@
         </h2>
     </div>
     <div class="panel-body" id="filters-body" style="display: none">
-        <div class="form-group form-inline">
-            <h3>Roles</h3>
-            <p>
-                <a class="checkbox-filter" href="#" id="select-all-roles">Select all</a>
-                <a class="checkbox-filter" href="#" id="select-no-roles">Select none</a>
-                <a class="checkbox-filter" href="#" id="select-interested-roles">Select roles I'm interested in</a>
-                <a class="checkbox-filter" href="#" id="select-trained-roles">Select roles I'm trained for</a>
-            </p>
-            {% for r in roles %}
-                <label class="checkbox">
-                    <input
-                        type="checkbox"
-                        {% if r.is_interested %}checked{% endif %}
-                        data-role-id="{{ r.id }}"
-                        data-trained="{{ r.is_trained }}"
-                        data-interested="{{ r.is_interested }}"
-                    />
-                    {{ r.name }}
-                </label>
-            {% endfor %}
-        </div>
         <div class="form-group form-inline">
             <h3>Filters</h3>
             <label class="checkbox">
@@ -59,84 +70,6 @@
                 />
                 Hide sufficiently staffed shifts
             </label>
-            <label class="checkbox">
-                <input
-                    type="checkbox"
-                    id="colourful_mode"
-                />
-                Colourful mode
-            </label>
         </div>
     </div>
 </div>
-    <!--
-    <fieldset class="form-horizontal col-sm-4">
-        <div class="form-group">
-            <div class="checkbox">
-                <label>
-                    <input id="is_trained" type="checkbox" class="role-filter">
-                    I am trained for
-                </label>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="checkbox">
-                <label>
-                    <input id="is_interested" type="checkbox" class="role-filter">
-                    I am interested in
-                </label>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="checkbox">
-                <label>
-                    <input id="show_past" type="checkbox" class="shift-filter">
-                    Show finished shifts
-                </label>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="checkbox">
-                <label>
-                    <input id="show_signed_up_only" type="checkbox" class="shift-filter">
-                    I'm signed up for
-                </label>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="checkbox">
-                <label>
-                    <input id="hide_full" type="checkbox" class="shift-filter">
-                    Hide full shifts
-                </label>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="checkbox">
-                <label>
-                    <input id="is_understaffed" type="checkbox" class="shift-filter">
-                    Only understaffed shifts
-                </label>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="checkbox">
-                <label>
-                    <input id="colourful_mode" type="checkbox" class="shift-filter">
-                    Colourful Mode
-                </label>
-            </div>
-        </div>
-    </div>
-</div>
-<form class="row">
-    <fieldset class="form-horizontal col-sm-8">
-    <fieldset class="form-horizontal col-sm-12">
-        <div class="form-group">
-            <div class="btn-group">
-                <a id="clear-btn" class="btn btn-default">Clear</a>
-            </div>
-        </div>
-    </fieldset>
-</form>
--->

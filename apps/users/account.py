@@ -11,6 +11,7 @@ from flask_login import current_user, login_required
 from wtforms import BooleanField, StringField, SubmitField
 from wtforms.validators import DataRequired
 
+from apps.users.calendar import fetch_events
 from main import db
 from models.payment import Payment
 from models.purchase import Purchase
@@ -82,8 +83,14 @@ def account() -> ResponseReturnValue:
     except Exception:
         app.logger.exception("Error fetching blog posts")
 
+    calendar = fetch_events(current_user, datetime.now(), config.event_end + timedelta(days=14))
+
     return render_template(
-        "account/main.html", blog_posts=blog_posts, now=datetime.now(), event_start=config.event_start
+        "account/main.html",
+        blog_posts=blog_posts,
+        calendar=calendar,
+        now=datetime.now(),
+        event_start=config.event_start,
     )
 
 

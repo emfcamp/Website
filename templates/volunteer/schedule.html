@@ -6,11 +6,12 @@
         <a href="{{ url_for('.schedule', day=day) }}" aria-controls="{{ day }}" role="tab">{{ full_day }}</a>
     </li>
 {% endmacro %}
-{% if buildup_volunteer %}
-    {% set date_format = "%a %d" %}
-{% else %}
-    {% set date_format = "%A" %}
-{% endif %}
+{% macro staffing_icon(shift) %}
+    {% set icon = "staffed" if shift.current_count >= shift.min_needed else "understaffed" %}
+    <span class="staffing-icon staffing-icon-{{ icon }}"></span>
+{% endmacro %}
+
+{% set date_format = "%a %d" if buildup_volunteer else "%A" %}
 
 {% block title %}
     Volunteer Schedule
@@ -23,10 +24,10 @@
         </div>
     </noscript>
 
-    <h2>Pick your shifts</h2>
-    <p>Select a day to sign up for shifts. You can also <a href="{{ url_for('.choose_role') }}">change which roles you're interested in</a>.</p>
+    <h2 class="sr-only">Pick your shifts</h2>
+    {# <p>Select a day to sign up for shifts. You can also <a href="{{ url_for('.choose_role') }}">change which roles you're interested in</a>.</p>
 
-    <p>You can get a list of all your shifts as an <a href="{{ url_for('.schedule_ical', token=token) }}">iCal feed</a>.</p>
+    <p>You can get a list of all your shifts as an <a href="{{ url_for('.schedule_ical', token=token) }}">iCal feed</a>.</p> #}
 
     {% if untrained_roles %}
         <div class="alert alert-danger">
@@ -60,6 +61,7 @@
                 <thead><tr>
                     <th>Starts</th>
                     <th>Ends</th>
+                    <th></th>
                     <th>Venue</th>
                     <th>Role</th>
                     <th>People</th>
@@ -68,7 +70,7 @@
                 <tbody id="tbody-{{ active_day }}">
                     {% for hour in all_shifts | sort %}
                         {% for shift in all_shifts[hour] %}
-                            <tr id="shift-{{ shift.id }}" data-role-id="{{ shift.role.id }}" data-shift-start="{{ hour }}" data-shift-end="{{ shift.end }}" data-staffed="{{ shift.current_count >= shift.min_needed }}" data-full="{{ shift.current_count >= shift.max_needed }}" data-signed-up="{{ shift.is_user_shift }}" data-min-staff="{{ shift.min_needed }}" data-max-staff="{{ shift.max_needed }}" data-current-staff="{{ shift.current_count }}">
+                            <tr id="shift-{{ shift.id }}" data-role-id="{{ shift.role.id }}" data-shift-start="{{ hour }}" data-shift-end="{{ shift.end }}" data-staffed="{{ shift.current_count >= shift.min_needed }}" data-full="{{ shift.current_count >= shift.max_needed }}" data-signed-up="{{ shift.is_user_shift }}" data-min-staff="{{ shift.min_needed }}" data-max-staff="{{ shift.max_needed }}" data-current-staff="{{ shift.current_count }}" data-conflicts-with="{{ shift.conflicts_with }}" data-conflicts-detail="{{ shift.conflicts_detail | tojson | forceescape }}">
                                 {% if loop.first %}
                                     <td class="start_time" rowspan="{{ all_shifts[hour] | length }}">{{ hour }}</td>
                                 {% else %}
@@ -88,15 +90,19 @@
                                         {{ hour }}{% if shift.end %} to {{ shift.end_time }}{% endif %}
                                     {% endif %}
                                 </td>
+                                <td class="conflicts"></td>
                                 <td class="venue"><a href="{{ shift.venue.mapref }}">{{ shift.venue.name }}</a></td>
                                 <td class="role">{{ shift.role.name }}</td>
-                                <td class="staffing">{{ shift.current_count }}/{{ shift.max_needed }}</td>
+                                <td class="staffing">
+                                    {{ staffing_icon(shift) }}
+                                    {{ shift.current_count }}/{{ shift.max_needed }}
+                                </td>
                                 <td class="button">
                                         {%- if shift.is_user_shift -%}
                                             <form method="post" action="{{ url_for('.shift_cancel', shift_id=shift.id, next=url_for('.schedule', day=active_day)) }}">
                                                 <button class="btn btn-block btn-danger">Cancel</button>
                                             </form>
-                                        {%- else -%}
+                                        {%- elif shift.conflicts_with != "volunteer_shift"  -%}
                                             <form method="post" action="{{ url_for('.shift_sign_up', shift_id=shift.id, next=url_for('.schedule', day=active_day)) }}">
                                                 <button class="btn btn-block btn-success">Sign Up</button>
                                             </form>
@@ -110,7 +116,30 @@
             </table>
         </div>
     </div>
+    <h3>Key to background colours</h3>
+    <ul class="key">
+        <li id="key-no-conflicts">A shift with no schedule conflicts</li>
+        <li id="key-shift-signed-up">A shift you're signed up for</li>
+        <li id="key-shift-conflict">Conflicts with a shift you're signed up for</li>
+        <li id="key-content-conflict">Conflicts with content you're presenting or have favourited</li>
+    </ul>
 {% endblock %}
 {% block foot %}
+    <div class="modal fade" id="conflict-modal" tabindex="-1" role="dialog" aria-labelledby="conflict-modal-label">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="conflict-modal-label">Schedule Conflict</h4>
+                </div>
+                <div class="modal-body">
+                    <p id="conflict-modal-message"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="{{ static_url_for('static', filename='js/volunteer_schedule.js') }}"></script>
 {% endblock %}

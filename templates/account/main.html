@@ -5,6 +5,41 @@
 {% include "account/_nav.html" %}
 {% set owned_tickets = current_user.get_owned_tickets(True, type="admission_ticket")|list %}
 <div class="panel-grid">
+    <div class="panel panel-default panel-full-width">
+        <div class="panel-heading">
+            <h3 class="panel-title">Calendar</h3>
+        </div>
+        <div class="panel-body">
+            <table class="calendar">
+              <thead>
+                <tr>
+                  <th clas="day">Day</th>
+                  <th class="time">Time</th>
+                  <th class="type">Type</th>
+                  <th class="location">Location</th>
+                  <th class="event">Event</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% set ns = namespace(current_day="") %}
+                {% for event in calendar %}
+                    {% set event_day = event.start_time.strftime("%A") %}
+                    {% set new_day = event_day != ns.current_day %}
+                    {% if new_day %}
+                      {% set ns.current_day = event_day %}
+                    {% endif%}
+                    <tr class="calendar-{{ calendar.type }}">
+                      <td clas="day">{{ ns.current_day if new_day else "" }}</td>
+                      <td class="time">{{ event.start_time.strftime("%H:%M") }}-{{ event.end_time.strftime("%H:%M") }}</td>
+                      <td class="type">{{ event.human_type }}</td>
+                      <td class="location"><a href="{{ event.venue_mapref }}">{{ event.venue_name }}</a></td>
+                      <td class="event">{{ event.title }}</td>
+                    </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+        </div>
+    </div>
     {% set bv = current_user.buildup_volunteer %}
     {% if bv and event_start > now %}
     <div class="panel panel-default">

@@ -13,19 +13,143 @@
   }
 }
 
-table.shifts-table tr,
-table.shifts-table th,
-table.shifts-table td {
-  // !important because I'm a terrible (and very lazy) person
-  border-color: #4a4a4a !important;
+#roles {
+  .toggle {
+    font-weight: bold;
+  }
+  .role-selector {
+    display: inline-block;
+
+    input {
+      position: absolute;
+      opacity: 0;
+    }
+
+    label {
+      padding: 2px 8px;
+      font-weight: normal;
+      border: 1px solid $highlight-2-border;
+      border-radius: 5px;
+    }
+  }
+
+  input[type="checkbox"]:not(:checked) + label {
+    background-color: $main-background-text;
+    color: $main-background;
+    border-color: $main-background;
+  }
+
+  input[type="checkbox"]:checked + label {
+    color: $success-text;
+    background-color: $success-background;
+    border-color: $success-border;
+  }
 }
 
-table.shifts-table tbody td.hidden {
-  display: none;
+table.shifts-table {
+  tr,
+  th,
+  td {
+    // !important because I'm a terrible (and very lazy) person
+    border-color: #4a4a4a !important;
+    vertical-align: middle !important;
+  }
+
+  td.hidden,
+  td.mobile-only {
+    display: none;
+  }
+
+  td.button {
+    padding: 5px;
+  }
+
+  tr td.staffing .staffing-icon {
+    display: inline-block;
+    height: 1.5em;
+    width: 1.5em;
+    margin-top: -0.2em;
+    vertical-align: middle;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+
+    &.staffing-icon-understaffed {
+      background-color: $brand-2026-coral;
+      mask-image: url("../images/icons/alert-circle.svg");
+    }
+
+    &.staffing-icon-staffed {
+      background-color: $brand-2026-green;
+      mask-image: url("../images/icons/check-circle.svg");
+    }
+  }
+
+  td.conflicts {
+    text-align: center;
+    vertical-align: middle;
+
+    &::after {
+      content: "";
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      border-radius: 50%;
+    }
+  }
+
+  tr[data-signed-up="True"] td.conflicts::after {
+    background-color: $brand-2026-light-blue;
+  }
+
+  tr[data-conflicts-with="volunteer_shift"][data-signed-up="False"]
+    td.conflicts::after {
+    background-color: $brand-2026-coral;
+  }
+
+  tr[data-conflicts-with="owned_content"][data-signed-up="False"]
+    td.conflicts::after,
+  tr[data-conflicts-with="favourited_content"][data-signed-up="False"]
+    td.conflicts::after {
+    background-color: $brand-2026-yellow;
+  }
 }
 
-table.shifts-table tbody td.mobile-only {
-  display: none;
+ul.key {
+  list-style: none;
+  padding-left: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+  }
+
+  #key-shift-signed-up::before {
+    background-color: $brand-2026-light-blue;
+  }
+
+  #key-shift-conflict::before {
+    background-color: $brand-2026-coral;
+  }
+
+  #key-content-conflict::before {
+    background-color: $brand-2026-yellow;
+  }
+
+  #key-no-conflicts::before {
+    background-color: $highlight-background;
+  }
 }
 
 .role-admin-shift {
@@ -145,6 +269,28 @@ table.shifts-table tbody td.mobile-only {
         td.staffing:before {
           content: "Signed up";
         }
+
+        td.conflicts {
+          display: block;
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          padding: 0;
+          width: auto;
+
+          &:before {
+            display: none;
+          }
+        }
+
+        td.start_time:not(.hidden) ~ td.conflicts {
+          // Push below the start_time header: padding-top (5px) + 1.2em font + padding-bottom (5px) + card top padding (5px)
+          top: calc(1.2em + 25px);
+        }
+      }
+
+      tr {
+        position: relative;
       }
     }
   }
