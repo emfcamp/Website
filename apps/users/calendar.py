@@ -21,14 +21,18 @@ class CalendarEntry:
     end_time: datetime
     venue_name: str | None
     venue_mapref: str | None
+    human_type: str = "Event"
+    conflict_priority: int = 99
 
     def overlaps_with(self, start_time: datetime, end_time: datetime) -> bool:
         """Does any part of this calendar entry occur between start_time and end_time?"""
         return self.start_time < end_time and self.end_time > start_time
 
-    def to_dict(self) -> dict[str, str | None]:
+    def to_dict(self) -> dict[str, str | int | None]:
         return {
             "type": self.type,
+            "human_type": self.human_type,
+            "conflict_priority": self.conflict_priority,
             "start_time": pytz.timezone("Europe/London")
             .localize(self.start_time)
             .strftime("%Y-%m-%dT%H:%M:00"),
@@ -40,6 +44,8 @@ class CalendarEntry:
 
 class VolunteerShiftCalendarEntry(CalendarEntry):
     type: Literal["volunteer_shift"] = "volunteer_shift"
+    human_type = "Volunteer Shift"
+    conflict_priority: int = 0
     shift: Shift
     shift_entry: ShiftEntry
 
@@ -69,10 +75,14 @@ class OccurrenceCalendarEntry(CalendarEntry):
 
 class FavouritedScheduleItemCalendarEntry(OccurrenceCalendarEntry):
     type: Literal["favourited_content"] = "favourited_content"
+    human_type = "Favourite"
+    conflict_priority: int = 2
 
 
 class OwnedScheduleItemCalendarEntry(OccurrenceCalendarEntry):
     type: Literal["owned_content"] = "owned_content"
+    human_type = "Your Content"
+    conflict_priority: int = 1
 
 
 def _occurrences_with_parent(
