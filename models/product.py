@@ -99,7 +99,7 @@ PRODUCT_GROUP_TYPES = [
     ProductGroupType("campervan", "Campervan Ticket", Ticket),
     ProductGroupType("parking", "Parking", Ticket),
     ProductGroupType("merchandise", "Merchandise", Purchase),
-    ProductGroupType("rental", "Rental", Purchase),
+    ProductGroupType("hire", "Hire", Purchase),
     ProductGroupType("sponsorship", "Sponsorship", Purchase),
 ]
 PRODUCT_GROUP_TYPES_DICT = {t.slug: t for t in PRODUCT_GROUP_TYPES}
