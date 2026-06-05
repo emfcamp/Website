@@ -19,8 +19,8 @@
 {% endif %}
 </div>
 
-{% if not proposal.schedule_item %}
 <div class="row">
+{% if not proposal.schedule_item %}
     <div class="col-md-8">
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -148,6 +148,7 @@
         </div>
     </div>
     {% endif %}
+{% endif %}
     <div class="col-md-12">
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -167,5 +168,4 @@
         </div>
     </div>
 </div>
-{% endif %}
 {% endblock %}
