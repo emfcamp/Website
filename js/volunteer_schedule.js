@@ -225,6 +225,35 @@ function init_volunteer_schedule() {
   document.getElementById("select-day").addEventListener("change", (ev) => {
     document.location.replace(ev.target.value);
   });
+
+  function showConflictModal(details) {
+    const time = (iso) =>
+      new Date(iso).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    const msgEl = document.getElementById("conflict-modal-message");
+    msgEl.innerHTML = "";
+    details.forEach((conflict) => {
+      const p = document.createElement("p");
+      const title = conflict.title || conflict.human_type;
+      p.textContent = `Conflicts with ${conflict.human_type.toLowerCase()}: ${title} (${time(conflict.start_time)}–${time(conflict.end_time)})`;
+      msgEl.appendChild(p);
+    });
+    $("#conflict-modal").modal("show");
+  }
+
+  document.querySelectorAll("td.conflicts").forEach((cell) => {
+    const row = cell.closest("tr");
+    if (!row.getAttribute("data-conflicts-with")) return;
+    cell.style.cursor = "pointer";
+    cell.addEventListener("click", () => {
+      const details = JSON.parse(
+        row.getAttribute("data-conflicts-detail") || "[]",
+      );
+      showConflictModal(details);
+    });
+  });
 }
 
 init_volunteer_schedule();

@@ -70,7 +70,7 @@
                 <tbody id="tbody-{{ active_day }}">
                     {% for hour in all_shifts | sort %}
                         {% for shift in all_shifts[hour] %}
-                            <tr id="shift-{{ shift.id }}" data-role-id="{{ shift.role.id }}" data-shift-start="{{ hour }}" data-shift-end="{{ shift.end }}" data-staffed="{{ shift.current_count >= shift.min_needed }}" data-full="{{ shift.current_count >= shift.max_needed }}" data-signed-up="{{ shift.is_user_shift }}" data-min-staff="{{ shift.min_needed }}" data-max-staff="{{ shift.max_needed }}" data-current-staff="{{ shift.current_count }}" data-conflicts-with="{{ shift.conflicts_with }}">
+                            <tr id="shift-{{ shift.id }}" data-role-id="{{ shift.role.id }}" data-shift-start="{{ hour }}" data-shift-end="{{ shift.end }}" data-staffed="{{ shift.current_count >= shift.min_needed }}" data-full="{{ shift.current_count >= shift.max_needed }}" data-signed-up="{{ shift.is_user_shift }}" data-min-staff="{{ shift.min_needed }}" data-max-staff="{{ shift.max_needed }}" data-current-staff="{{ shift.current_count }}" data-conflicts-with="{{ shift.conflicts_with }}" data-conflicts-detail="{{ shift.conflicts_detail | tojson | forceescape }}">
                                 {% if loop.first %}
                                     <td class="start_time" rowspan="{{ all_shifts[hour] | length }}">{{ hour }}</td>
                                 {% else %}
@@ -125,5 +125,21 @@
     </ul>
 {% endblock %}
 {% block foot %}
+    <div class="modal fade" id="conflict-modal" tabindex="-1" role="dialog" aria-labelledby="conflict-modal-label">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="conflict-modal-label">Schedule Conflict</h4>
+                </div>
+                <div class="modal-body">
+                    <p id="conflict-modal-message"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="{{ static_url_for('static', filename='js/volunteer_schedule.js') }}"></script>
 {% endblock %}

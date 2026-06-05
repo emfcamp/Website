@@ -48,20 +48,22 @@ def _get_roles_with_user_data(user):
     return res
 
 
-def _get_conflict_type(shift: Shift, calendar: Sequence[CalendarEntry]) -> str | None:
-    """Get the highest priority conflict type for a shift if any exist."""
-    conflicts = [event for event in calendar if event.overlaps_with(shift.start, shift.end)]
-    if len(conflicts) == 0:
-        return None
+def _get_conflicts(shift: Shift, calendar: Sequence[CalendarEntry]) -> tuple[str, list[dict]]:
+    """Return (primary_conflict_type, conflict_details) for a shift.
 
-    conflict_types = [c.type for c in conflicts]
-    if "volunteer_shift" in conflict_types:
-        return "volunteer_shift"
+    primary_conflict_type is the highest-priority conflict type (for CSS), or ""
+    if there are no conflicts. conflict_details is a list of dicts describing
+    each conflicting event.
+    """
+    conflicts = sorted(
+        [event for event in calendar if event.overlaps_with(shift.start, shift.end)],
+        key=lambda c: c.conflict_priority,
+    )
+    if not conflicts:
+        return "", []
 
-    if "owned_content" in conflict_types:
-        return "owned_content"
-
-    return conflict_types[0]
+    details = [c.to_dict() for c in conflicts]
+    return conflicts[0].type, details
 
 
 def redirect_next_or_schedule(message: str | None = None) -> ResponseReturnValue:
@@ -112,7 +114,7 @@ def schedule():
     for s in shifts:
         hour_key = s.start.strftime("%H:%M")
         to_add = s.to_localtime_dict()
-        to_add["conflicts_with"] = _get_conflict_type(s, user_calendar) or ""
+        to_add["conflicts_with"], to_add["conflicts_detail"] = _get_conflicts(s, user_calendar)
         to_add["sign_up_url"] = url_for(".shift", shift_id=to_add["id"])
         to_add["is_user_shift"] = current_user in s.volunteers
         by_time[hour_key].append(to_add)
