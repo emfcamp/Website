@@ -68,7 +68,7 @@ class Village(BaseModel):
         return f"<Village '{self.name}' (id: {self.id})>"
 
     @property
-    def __geo_interface__(self) -> dict | None:
+    def __geo_interface__(self) -> dict[str, Any] | None:
         """GeoJSON-like representation of the object for the map."""
         if not self.location:
             return None
