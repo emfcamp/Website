@@ -18,7 +18,7 @@ from flask_login import current_user
 from icalendar import Calendar, Event
 from sqlalchemy.orm import joinedload
 
-from apps.users.calendar import CalendarEntry, fetch_events
+from apps.users.calendar import CalendarDict, CalendarEntry, fetch_events
 from main import db, get_or_404
 from models import naive_utcnow
 from models.user import User, generate_api_token
@@ -48,7 +48,7 @@ def _get_roles_with_user_data(user):
     return res
 
 
-def _get_conflicts(shift: Shift, calendar: Sequence[CalendarEntry]) -> tuple[str, list[dict]]:
+def _get_conflicts(shift: Shift, calendar: Sequence[CalendarEntry]) -> tuple[str, list[CalendarDict]]:
     """Return (primary_conflict_type, conflict_details) for a shift.
 
     primary_conflict_type is the highest-priority conflict type (for CSS), or ""
