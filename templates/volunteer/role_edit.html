@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% from "_formhelpers.html" import render_field %}
+
+{% block title %}
+    Edit {{ role.name }}
+{% endblock %}
+
+{% block body %}
+{% include "volunteer/_nav.html" %}
+
+    <h2>{{ role.name }}</h2>
+    <div class="well">
+        <form class="form-horizontal" method="post">
+            <fieldset>
+                {{ form.hidden_tag() }}
+                {{ render_field(form.name, horizontal=9) }}
+                {{ render_field(form.full_description_md, horizontal=9) }}
+                {{ render_field(form.role_notes, horizontal=9) }}
+                {{ render_field(form.instructions_url, horizontal=9) }}
+                {{ form.save(class_="btn btn-primary debounce pull-right") }}
+            </fieldset>
+        </form>
+    </div>
+
+{% endblock body %}

@@ -94,6 +94,12 @@ class Role(BaseModel):
             return Markup(markdown(content, extensions=["markdown.extensions.nl2br"]))
         return ""
 
+    @property
+    def formatted_role_notes(self) -> Markup | None:
+        if self.role_notes:
+            return Markup(markdown(self.role_notes, extensions=["markdown.extensions.nl2br"]))
+        return None
+
     @classmethod
     def get_by_name(cls, name):
         return cls.query.filter_by(name=name).one_or_none()
