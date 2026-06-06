@@ -21,7 +21,9 @@
   {% include "volunteer/_nav.html" %}
   <h2>{{ role }} Admin</h2>
   <div>
-    <a href="{{ url_for('.role_volunteers', role_id=role.id) }}" class="btn btn-primary">All Volunteers</a> <a href="{{ url_for('.train_users', role_id=role.id) }}") }}" class="btn btn-primary">Training</a>
+    <a href="{{ url_for('.role_volunteers', role_id=role.id) }}" class="btn btn-primary">All Volunteers</a>
+    <a href="{{ url_for('.train_users', role_id=role.id) }}") }}" class="btn btn-primary">Training</a>
+    <a href="{{ url_for('.role_edit', role_id=role.id) }}") }}" class="btn btn-primary">Edit Role</a>
   </div>
   <h3>Volunteers on Shift</h3>
   <div class="role-admin-shift well content-well">

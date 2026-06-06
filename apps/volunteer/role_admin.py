@@ -16,7 +16,11 @@ from flask import (
 from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from sqlalchemy import select
+from wtforms import StringField, SubmitField
+from wtforms.validators import URL, InputRequired, Optional
+from wtforms.widgets import TextArea
 
+from apps.common.forms import Form
 from apps.volunteer import v_user_required, volunteer
 from main import db, get_or_404
 from models.user import User
@@ -27,6 +31,28 @@ from models.volunteer.shift import (
     ShiftEntryState,
     ShiftEntryStateException,
 )
+
+
+class RoleForm(Form):
+    name = StringField("Role Name", [InputRequired()])
+    full_description_md = StringField(
+        "Description (supprts markdownn)",
+        [InputRequired()],
+        widget=TextArea(),
+        description="Displayed in the main role list when signing up.",
+    )
+    role_notes = StringField(
+        "Role notes (supports markdown)",
+        [Optional(), InputRequired()],
+        widget=TextArea(),
+        description="Displayed to volunteers when they check in for a shift.",
+    )
+    instructions_url = StringField(
+        "Instructions URL",
+        [Optional(), URL()],
+        description="A link to external instructions. Won't be displayed if role_notes are provided.",
+    )
+    save = SubmitField("Update")
 
 
 @volunteer.route("/role-admin", methods=["GET"])
@@ -116,6 +142,23 @@ def role_admin(role_id):
         offset=offset,
         limit=limit,
     )
+
+
+@volunteer.route("role/<int:role_id>/edit", methods=["GET", "POST"])
+@role_admin_required
+def role_edit(role_id: int) -> ResponseReturnValue:
+    """Allows editing details of a role."""
+    role = get_or_404(db, Role, role_id)
+    form = RoleForm(request.form, obj=role)
+
+    if request.method == "POST" and form.validate():
+        form.populate_obj(role)
+        db.session.add(role)
+        db.session.commit()
+        flash("Role details have been updated.")
+        return redirect(url_for(".role_admin", role_id=role_id))
+
+    return render_template("volunteer/role_edit.html", role=role, form=form)
 
 
 @volunteer.route("role/<int:role_id>/set-state/<int:shift_id>/<int:user_id>", methods=["POST"])

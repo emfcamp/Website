@@ -324,7 +324,12 @@ def self_checkin(venue_id: int) -> ResponseReturnValue:
     # Segment into shifts that can be checked into and shifts that can't yet.
     open_shift_entries: list[ShiftEntry] = []
     upcoming_shift_entries: list[ShiftEntry] = []
+    checked_in_shift_entries: list[ShiftEntry] = []
+
     for entry in shift_entries:
+        if entry.state == ShiftEntryState.ARRIVED:
+            checked_in_shift_entries.append(entry)
+
         if entry.shift.start <= now + timedelta(minutes=15):
             open_shift_entries.append(entry)
         else:
@@ -335,6 +340,7 @@ def self_checkin(venue_id: int) -> ResponseReturnValue:
         venue=venue,
         open_shift_entries=open_shift_entries,
         upcoming_shift_entries=upcoming_shift_entries,
+        checked_in_shift_entries=checked_in_shift_entries,
         now=now,
     )
 
