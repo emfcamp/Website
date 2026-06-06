@@ -337,6 +337,7 @@ class Proposal(BaseModel):
             "notice_required": self.notice_required,
             "additional_info": self.additional_info,
             "has_ticket": self.user.check_will_have_ticket(),
+            "has_cfp_voucher": self.user.cfp_voucher_code is not None,
             "needs_money": self.needs_money,
             "one_day": self.one_day,
             "private_notes": self.private_notes,
