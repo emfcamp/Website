@@ -315,6 +315,12 @@ ul.key {
         position: relative;
       }
     }
+
+    &.checkin {
+      td.start_time {
+        display: none !important;
+      }
+    }
   }
 
   .role-admin-shift {
