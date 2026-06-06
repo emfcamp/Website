@@ -37,10 +37,6 @@ footer .share {
 }
 
 @media (max-width: $header-collapse-width) {
-  footer {
-    height: auto;
-  }
-
   #bottom-menu-container ul.menu li {
     margin-bottom: 0.25em;
     font-size: 14px;

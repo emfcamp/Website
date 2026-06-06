@@ -24,8 +24,11 @@
   @media (max-width: $main-content-width + 14) {
     width: 100%;
     min-width: $min-width;
-    margin: 0 0 0 0;
-    padding: 0 0 0 0;
+
+    // Header is taken out of the grid in mobile-view.
+    grid-template-rows: 1fr auto;
+    margin: -$mobile-header-height 0 0 0;
+    padding: $mobile-header-height 0 0 0;
   }
 }
 
@@ -36,10 +39,6 @@
   @media (max-width: $main-content-width) {
     flex-flow: column;
   }
-}
-
-.main-row {
-  flex-grow: 1;
 }
 
 .emf-col {

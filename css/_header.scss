@@ -100,13 +100,11 @@ ul.menu a {
 
 // Mobile layout - menu is hidden behind a button.
 @media (max-width: $header-collapse-width) {
-  $header-height: 56px;
-
   // Fixed header, visible on scroll
   header {
     position: fixed;
     padding: 3px 10px;
-    height: $header-height;
+    height: $mobile-header-height;
     top: 0;
     z-index: 1000;
     width: 100%;
@@ -115,7 +113,7 @@ ul.menu a {
   }
 
   body {
-    margin-top: $header-height;
+    margin-top: $mobile-header-height;
   }
 
   #main-logo {
@@ -157,7 +155,7 @@ ul.menu a {
     float: none;
     position: fixed;
     right: 0px;
-    top: $header-height;
+    top: $mobile-header-height;
     height: 100%;
     z-index: 1000;
     padding: 5px 8px;
