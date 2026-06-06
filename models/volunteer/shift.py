@@ -1,6 +1,6 @@
 import enum
 from collections.abc import Sequence
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import TYPE_CHECKING, Self
 
 import pytz
@@ -91,6 +91,25 @@ class ShiftEntry(BaseModel):
 
     def valid_states(self) -> list[ShiftEntryState]:
         return SHIFT_ENTRY_STATES[self.state]
+
+    def eligible_for_checkin_at(self, now: datetime) -> bool:
+        """Checks if we can transition to ARRIVED and the shift starts in 15 minutes or less from now."""
+        return ShiftEntryState.ARRIVED in self.valid_states() and self.shift.start >= now - timedelta(
+            minutes=15
+        )
+
+    def eligible_for_checkout_at(self, now: datetime) -> bool:
+        """Checks if we can transition to a checked out state."""
+        return (
+            ShiftEntryState.ABANDONED in self.valid_states()
+            or ShiftEntryState.COMPLETED in self.valid_states()
+        )
+
+    def eligible_for_completion_at(self, now: datetime) -> bool:
+        """Checks if we can transition to COMPLETED and a sufficient portion of the shift has passed."""
+        return ShiftEntryState.COMPLETED in self.valid_states() and self.shift.end <= now + timedelta(
+            minutes=15
+        )
 
 
 class Shift(BaseModel):

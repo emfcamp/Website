@@ -16,14 +16,15 @@ from flask import current_app as app
 from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from icalendar import Calendar, Event
-from sqlalchemy.orm import joinedload
+from sqlalchemy import select
+from sqlalchemy.orm import joinedload, with_parent
 
 from apps.users.calendar import CalendarDict, CalendarEntry, fetch_events
 from main import db, get_or_404
 from models import naive_utcnow
 from models.user import User, generate_api_token
 from models.volunteer.role import Role
-from models.volunteer.shift import Shift, ShiftEntry
+from models.volunteer.shift import Shift, ShiftEntry, ShiftEntryState
 from models.volunteer.venue import VolunteerVenue
 from models.volunteer.volunteer import Volunteer
 
@@ -241,6 +242,149 @@ def shift_cancel(shift_id):
         db.session.commit()
 
     return redirect_next_or_schedule(f"{shift.role.name} shift cancelled")
+
+
+def _get_shift_entry_for_user(shift_id: int, user: User) -> ShiftEntry:
+    """Gets a ShiftEntry and ensures it belongs to a specific user."""
+    shift_entry = db.session.execute(
+        select(ShiftEntry)
+        .where(ShiftEntry.user_id == user.id)
+        .where(ShiftEntry.shift_id == shift_id)
+        .join(ShiftEntry.shift)
+    ).scalar_one_or_none()
+    if shift_entry is None:
+        raise abort(404)
+
+    return shift_entry
+
+
+@volunteer.route("/set-time", methods=["GET"])
+@v_admin_required
+def set_time() -> ResponseReturnValue:
+    """Sets `now` in the session to the value of request.args["now"].
+
+    If the arg isn't set deletes the value from the session and reverts to using
+    realtime. Intended purely for testing purposes.
+    """
+    if not config.get("DEBUG"):
+        # We only allow mocking the time in debug mode because it could be used to
+        # bypass time checks on volunteer checkin.
+        abort(404)
+
+    provided_time = request.args.get("now", None)
+    if provided_time:
+        session["now"] = provided_time
+    else:
+        del session["now"]
+
+    return redirect_next_or_schedule(f"Time set to {provided_time}")
+
+
+def _now() -> datetime:
+    """Allow setting a time as 'now', falling back to datetime.now()."""
+    injected_time = session.get("now", None)
+    if not config.get("DEBUG") or not injected_time:
+        return datetime.now()
+
+    return datetime.strptime(injected_time, "%Y-%m-%dT%H:%M:%S")
+
+
+@volunteer.route("/self-checkin/venue/<venue_id>", methods=["GET"])
+@feature_flag("VOLUNTEERS_SCHEDULE")
+@v_user_required
+def self_checkin(venue_id: int) -> ResponseReturnValue:
+    """Allow a user to check themselves into a shift at a specific venue.
+
+    Intended to be accessed via QR codes in those venues. When loaded we'll check
+    whether the user has a scheduled shift in this venue either starting within
+    the next 15 minutes or currently in progress and if so allow them to mark
+    themselves as arrived.
+
+    If they're already marked as arrived then they'll be able to mark themselves
+    as either abandoning the shift, or if we're within 15 minutes or shift end
+    that they've completed the shift.
+    """
+
+    now = _now()
+    venue = get_or_404(db, VolunteerVenue, venue_id)
+    shift_entries = (
+        db.session.execute(
+            select(ShiftEntry)
+            .where(with_parent(current_user, User.shift_entries))
+            .join(ShiftEntry.shift)
+            .where(ShiftEntry.state.not_in([ShiftEntryState.COMPLETED, ShiftEntryState.ABANDONED]))
+            .where(Shift.venue == venue)
+            .where(Shift.end >= now - timedelta(hours=2))
+            .order_by(Shift.start)
+        )
+        .scalars()
+        .all()
+    )
+
+    # Segment into shifts that can be checked into and shifts that can't yet.
+    open_shift_entries: list[ShiftEntry] = []
+    upcoming_shift_entries: list[ShiftEntry] = []
+    for entry in shift_entries:
+        if entry.shift.start <= now + timedelta(minutes=15):
+            open_shift_entries.append(entry)
+        else:
+            upcoming_shift_entries.append(entry)
+
+    return render_template(
+        "volunteer/self_checkin.html",
+        venue=venue,
+        open_shift_entries=open_shift_entries,
+        upcoming_shift_entries=upcoming_shift_entries,
+        now=now,
+    )
+
+
+@volunteer.route("/self-checkin/arrived", methods=["POST"])
+@feature_flag("VOLUNTEERS_SCHEDULE")
+@v_user_required
+def self_checkin_arrived() -> ResponseReturnValue:
+    shift_entry_id = int(request.form["shift_id"])
+    shift_entry = _get_shift_entry_for_user(shift_entry_id, current_user)
+    if not shift_entry.eligible_for_checkin_at(_now()):
+        return redirect_next_or_schedule("Unexpected volunteer in bagging area.")
+
+    shift_entry.set_state(ShiftEntryState.ARRIVED)
+    db.session.add(shift_entry)
+    db.session.commit()
+
+    return redirect_next_or_schedule("You're checked in.")
+
+
+@volunteer.route("/self-checkin/complete", methods=["POST"])
+@feature_flag("VOLUNTEERS_SCHEDULE")
+@v_user_required
+def self_checkin_complete() -> ResponseReturnValue:
+    shift_entry_id = int(request.form["shift_id"])
+    shift_entry = _get_shift_entry_for_user(shift_entry_id, current_user)
+    if not shift_entry.eligible_for_completion_at(_now()):
+        return redirect_next_or_schedule("Unexpected volunteer in bagging area.")
+
+    shift_entry.set_state(ShiftEntryState.COMPLETED)
+    db.session.add(shift_entry)
+    db.session.commit()
+
+    return redirect_next_or_schedule("Thanks for volunteering!")
+
+
+@volunteer.route("/self-checkin/abandon", methods=["POST"])
+@feature_flag("VOLUNTEERS_SCHEDULE")
+@v_user_required
+def self_checkin_abandon() -> ResponseReturnValue:
+    shift_entry_id = int(request.form["shift_id"])
+    shift_entry = _get_shift_entry_for_user(shift_entry_id, current_user)
+    if not shift_entry.eligible_for_checkout_at(_now()):
+        return redirect_next_or_schedule("Unexpected volunteer in bagging area.")
+
+    shift_entry.set_state(ShiftEntryState.ABANDONED)
+    db.session.add(shift_entry)
+    db.session.commit()
+
+    return redirect_next_or_schedule("You've checked out.")
 
 
 @volunteer.route("/shift/<shift_id>/contact", methods=["GET"])

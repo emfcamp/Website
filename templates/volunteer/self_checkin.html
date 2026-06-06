@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}
+    Volunteer Self Checkin
+{% endblock %}
+{% block body %}
+{% include "volunteer/_nav.html" %}
+
+<h2>Volunteer Check-in - {{ venue.name }}</h2>
+{% if not open_shift_entries and not upcoming_shift_entries %}
+    <div class="alert alert-danger">
+        <h3>No shifts</h3>
+        <p>You've got no shifts scheduled in this location. Are you in the right place?</p>
+        <p>You can check your <a href="{{ url_for('.schedule') }}">volunteer schedule</a> for more details.</p>
+    </div>
+{% endif %}
+
+{% for entry in checked_in_shift_entries %}
+    {% if entry.shift.role.role_notes %}
+        <div class="alert alert-success">
+            <h3>{{ entry.shift.role.name }} guidance</h3>
+            {{ entry.shift.role.formatted_role_notes }}
+        </div>
+    {% elif entry.shift.role.instructions_url %}
+        <h3>{{ entry.shift.role.name }} guidance</h3>
+        <p>Please see the <a href="{{ entry.shift.role.instructions_url }}">documentation here</a>.</p>
+    {% endif %}
+{% endfor %}
+
+{% if open_shift_entries %}
+    <h3>Open shifts</h3>
+    <p>Click the relevant button to check in or out of these active shifts.</p>
+    <table class="table table-bordered responsive-table shifts-table checkin">
+        <thead><tr>
+            <th>Starts</th>
+            <th>Ends</th>
+            <th>Role</th>
+            <th></th>
+        </tr></thead>
+        <tbody id="tbody-{{ active_day }}">
+            {% for shift_entry in open_shift_entries %}
+                {% set shift = shift_entry.shift %}
+                <tr id="shift-{{ shift_entry.id }}">
+                    <td class="start_time">{{ shift.start.strftime("%H:%M") }}</td>
+                    <td class="end_time">{{ shift.end.strftime("%H:%M") }}</td>
+                    <td class="time mobile-only">
+                        {{ shift.start.strftime("%H:%M") }}{% if shift.end %} to {{ shift.end.strftime("%H:%M") }}{% endif %}
+                    </td>
+                    <td class="role">{{ shift.role.name }}</td>
+                    <td class="button">
+                        {% if shift_entry.eligible_for_checkin_at(now) %}
+                            <form method="post" action="{{ url_for('.self_checkin_arrived', next=url_for('.self_checkin', venue_id=venue.id)) }}">
+                                <input type="hidden" name="shift_id" value="{{ shift.id }}">
+                                <button class="btn btn-block btn-success">Check in</button>
+                            </form>
+                        {% elif shift_entry.eligible_for_checkout_at(now) %}
+                            <form method="post" action="{{ url_for('.self_checkin_abandon', next=url_for('.self_checkin', venue_id=venue.id)) }}">
+                                <input type="hidden" name="shift_id" value="{{ shift.id }}">
+                                <button class="btn btn-block btn-danger">Mark Abandoned</button>
+                            </form>
+                            {% if shift_entry.eligible_for_completion_at(now) %}
+                                <form method="post" action="{{ url_for('.self_checkin_complete', next=url_for('.self_checkin', venue_id=venue.id)) }}">
+                                    <input type="hidden" name="shift_id" value="{{ shift.id }}">
+                                    <button class="btn btn-block btn-success">Mark Completed</button>
+                                </form>
+                            {% endif %}
+                        {% else %}
+                            {{ shift_entry.state }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% if upcoming_shift_entries %}
+    <h3>Upcoming shifts</h3>
+    <p>You can't check in for these shifts yet, shifts are available for self check-in from 15 minutes before their start time.</p>
+    <table class="table table-bordered responsive-table shifts-table">
+        <thead><tr>
+            <th>Starts</th>
+            <th>Ends</th>
+            <th>Role</th>
+        </tr></thead>
+        <tbody id="tbody-{{ active_day }}">
+            {% for shift_entry in upcoming_shift_entries %}
+                {% set shift = shift_entry.shift %}
+                <tr id="shift-{{ shift_entry.id }}">
+                    <td class="start_time">{{ shift.start.strftime("%H:%M") }}</td>
+                    <td class="end_time">{{ shift.end.strftime("%H:%M") }}</td>
+                    <td class="time mobile-only">
+                        {{ shift.start.strftime("%H:%M") }}{% if shift.end %} to {{ shift.end.strftime("%H:%M") }}{% endif %}
+                    </td>
+                    <td class="role">{{ shift.role.name }}</td>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+{% endblock %}
