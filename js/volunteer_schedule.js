@@ -243,8 +243,7 @@ function init_volunteer_schedule() {
   function showConflictModal(details) {
     const time = (iso) =>
       new Date(iso).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
+        timeStyle: "short",
       });
     const msgEl = document.getElementById("conflict-modal-message");
     msgEl.innerHTML = "";
@@ -259,13 +258,22 @@ function init_volunteer_schedule() {
 
   document.querySelectorAll("td.conflicts").forEach((cell) => {
     const row = cell.closest("tr");
-    if (!row.getAttribute("data-conflicts-with")) return;
+    if (
+      !row.getAttribute("data-conflicts-with") ||
+      row.getAttribute("data-signed-up") == "True"
+    )
+      return;
+
     cell.style.cursor = "pointer";
+
     cell.addEventListener("click", () => {
       const details = JSON.parse(
         row.getAttribute("data-conflicts-detail") || "[]",
       );
-      showConflictModal(details);
+
+      if (row.getAttribute("data-signed-up") != "True") {
+        showConflictModal(details);
+      }
     });
   });
 }
