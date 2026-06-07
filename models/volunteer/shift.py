@@ -1,6 +1,7 @@
 import enum
 from collections.abc import Sequence
 from datetime import date, datetime, time, timedelta
+from decimal import Decimal
 from math import ceil, floor
 from typing import TYPE_CHECKING, Self, TypedDict
 
@@ -155,6 +156,7 @@ class ShiftTemplate(BaseModel):
     changeover_time: Mapped[int] = mapped_column(default=15)
     min_needed: Mapped[int] = mapped_column(default=0)
     max_needed: Mapped[int] = mapped_column(default=0)
+    multiplier: Mapped[Decimal] = mapped_column(default=1)
     notes: Mapped[str] = mapped_column(default="")
 
     role: Mapped[Role] = relationship("Role", back_populates="shift_templates")
@@ -253,6 +255,7 @@ class ShiftTemplate(BaseModel):
                 venue=self.venue,
                 min_needed=self.min_needed,
                 max_needed=self.max_needed,
+                multiplier=self.multiplier,
                 start=(shift_start - timedelta(minutes=self.changeover_time))
                 .astimezone(pytz.utc)
                 .replace(tzinfo=None),
@@ -290,6 +293,10 @@ class Shift(BaseModel):
     min_needed: Mapped[int] = mapped_column(default=0)
     #: Maximum number of volunteers required for the shift
     max_needed: Mapped[int] = mapped_column(default=0)
+    #: Used to weight a shift's contribution towards voucher requirements,
+    #: either to accuont for shorter than usual shifts or to incentivise people
+    #: taking anti-social shits.
+    multiplier: Mapped[Decimal] = mapped_column(default=1)
 
     #: Role that this shift is filling
     role: Mapped[Role] = relationship(back_populates="shifts")
@@ -386,6 +393,7 @@ class Shift(BaseModel):
             "start_time": self.local_start.strftime("%H:%M"),
             "end": self.local_end.strftime("%Y-%m-%dT%H:%M:00"),
             "end_time": self.local_end.strftime("%H:%M"),
+            "multiplier": self.multiplier,
             "min_needed": self.min_needed,
             "max_needed": self.max_needed,
             "role": self.role.to_dict(),

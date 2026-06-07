@@ -46,13 +46,28 @@
   }
 }
 
+.shift-multiplier {
+  display: inline-block;
+  padding: 0.25em 0.5em;
+  border-radius: 0.5em;
+  line-height: 1em;
+  color: $success-text;
+  background-color: $brand-2026-green;
+  vertical-align: middle;
+}
+
 table.shifts-table {
-  tr,
-  th,
-  td {
-    // !important because I'm a terrible (and very lazy) person
-    border-color: #4a4a4a !important;
-    vertical-align: middle !important;
+  tbody,
+  thead,
+  tfoot {
+    tr,
+    th,
+    td {
+      // !important because I'm a terrible (and very lazy) person
+      border-color: #4a4a4a;
+      vertical-align: middle;
+      padding: 10px 15px 10px;
+    }
   }
 
   td.hidden,
@@ -102,6 +117,7 @@ table.shifts-table {
       width: 1em;
       height: 1em;
       border-radius: 50%;
+      vertical-align: middle;
     }
   }
 
@@ -125,51 +141,45 @@ table.shifts-table {
 ul.key {
   list-style: none;
   padding-left: 0;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: center;
+  row-gap: 4px;
+  column-gap: 8px;
 
   li {
-    display: flex;
+    display: contents;
+  }
+
+  .key-icon {
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
-
-    &::before {
-      content: "";
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 1.5em;
-      height: 1.5em;
-      border-radius: 50%;
-      flex-shrink: 0;
-      font-size: 0.85em;
-      font-weight: bold;
-      color: white;
-    }
+    justify-content: center;
+    justify-self: center;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: white;
   }
 
-  #key-shift-signed-up::before {
-    background-color: $brand-2026-light-blue;
-  }
-
-  #key-shift-conflict::before {
-    background-color: $brand-2026-coral;
-  }
-
-  #key-content-conflict::before {
-    background-color: $brand-2026-yellow;
-  }
-
-  #key-no-conflicts::before {
+  #key-no-conflicts .key-icon {
     background-color: $highlight-background;
   }
-
-  #key-understaffed::before {
-    content: "!";
+  #key-shift-signed-up .key-icon {
+    background-color: $brand-2026-light-blue;
+  }
+  #key-shift-conflict .key-icon {
     background-color: $brand-2026-coral;
   }
-
-  #key-staffed::before {
-    content: "✓";
+  #key-content-conflict .key-icon {
+    background-color: $brand-2026-yellow;
+  }
+  #key-understaffed .key-icon {
+    background-color: $brand-2026-coral;
+  }
+  #key-staffed .key-icon {
     background-color: $brand-2026-green;
   }
 }
