@@ -87,7 +87,11 @@
                                         {{ hour }}{% if shift.end %} to {{ shift.end_time }}{% endif %}
                                     {% endif %}
                                 </td>
-                                <td class="conflicts" {% if shift.is_user_shift %}title="You're signed up for this shift"{% endif %}></td>
+                                <td class="conflicts" {% if shift.is_user_shift %}title="You're signed up for this shift"{% endif %}>
+                                    {% if shift.multiplier != 1 %}
+                                        <span class="shift-multiplier">{{ shift.multiplier.normalize() }}x</span>
+                                    {% endif %}
+                                </td>
                                 <td class="venue"><a href="{{ shift.venue.mapref }}">{{ shift.venue.name }}</a></td>
                                 <td class="role">
                                     {{ shift.role.name }}
@@ -122,12 +126,13 @@
     </div>
     <h3>Key</h3>
     <ul class="key">
-        <li id="key-no-conflicts">A shift with no schedule conflicts</li>
-        <li id="key-shift-signed-up">A shift you're signed up for</li>
-        <li id="key-shift-conflict">Conflicts with a shift you're signed up for</li>
-        <li id="key-content-conflict">Conflicts with content you're presenting or have favourited</li>
-        <li id="key-understaffed">Not enough people signed up</li>
-        <li id="key-staffed">Fully staffed</li>
+        <li id="key-no-conflicts"><span class="key-icon"></span>A shift with no schedule conflicts</li>
+        <li id="key-shift-signed-up"><span class="key-icon"></span>A shift you're signed up for</li>
+        <li id="key-shift-conflict"><span class="key-icon"></span>Conflicts with a shift you're signed up for</li>
+        <li id="key-content-conflict"><span class="key-icon"></span>Conflicts with content you're presenting or have favourited</li>
+        <li id="key-understaffed"><span class="key-icon">!</span>Not enough people signed up</li>
+        <li id="key-staffed"><span class="key-icon">✓</span>Fully staffed</li>
+        <li id="key-multiplier"><span class="shift-multiplier">2×</span>A shift that counts more or less towards voucher requirements</li>
     </ul>
 {% endblock %}
 {% block foot %}

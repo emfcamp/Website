@@ -37,18 +37,25 @@ EMF Volunteer Role Admin
         </div>
         <div class="col-sm-7">
             <div class="row">
-                <div class="col-xs-6 form-group">
+                <div class="col-xs-4 form-group">
                     <label>Duration</label>
                     <div class="input-group">
                         {{ form.duration(class="form-control") }}
                         <span class="input-group-addon">min</span>
                     </div>
                 </div>
-                <div class="col-xs-6 form-group">
+                <div class="col-xs-4 form-group">
                     <label>Changeover</label>
                     <div class="input-group">
                         {{ form.changeover_time(class="form-control") }}
                         <span class="input-group-addon">min</span>
+                    </div>
+                </div>
+                <div class="col-xs-4 form-group">
+                    <label>Multiplier</label>
+                    <div class="input-group">
+                        {{ form.multiplier(class="form-control") }}
+                        <span class="input-group-addon">×</span>
                     </div>
                 </div>
             </div>

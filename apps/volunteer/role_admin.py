@@ -1,5 +1,6 @@
 import re
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 from decorator import decorator
 from flask import (
@@ -18,6 +19,7 @@ from flask_login import current_user
 from sqlalchemy import select
 from wtforms.fields import (
     BooleanField,
+    DecimalField,
     IntegerField,
     SelectField,
     StringField,
@@ -81,6 +83,11 @@ class ShiftTemplateForm(Form):
         "Max Volunteers",
         [InputRequired()],
         description="The maximum number of volunteers you can make use of.",
+    )
+    multiplier = DecimalField(
+        "Multiplier",
+        [InputRequired()],
+        description="Weight this shift to count more or less towards ticket vouchers.",
     )
     notes = TextAreaField(
         "Notes", [Optional()], description="Any notes you want on this template, not visible to attendees."
@@ -362,6 +369,7 @@ def update_shift(role_id: int, shift_id: int) -> ResponseReturnValue:
     shift.min_needed = int(request.form["min_needed"])
     shift.max_needed = int(request.form["max_needed"])
     shift.notes = request.form["notes"] if len(request.form["notes"].strip()) > 0 else None
+    shift.multiplier = Decimal(request.form["multiplier"])
     db.session.add(shift)
     db.session.commit()
 

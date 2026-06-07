@@ -69,7 +69,12 @@
   <h3>Upcoming Shifts</h3>
   {% for shift in shifts %}
     <div class="role-admin-shift well content-well">
-      <h4 id="shift-{{ shift.id }}">{{ shift.local_start.strftime("%a %H:%M") }} - {{ shift.local_end.strftime("%H:%M") }} - {{ shift.venue.name }}</h4>
+      <h4 id="shift-{{ shift.id }}">
+        {{ shift.start.strftime("%a %H:%M") }} - {{ shift.end.strftime("%H:%M") }} - {{shift.venue.name }}
+        {% if shift.multiplier != 1 %}
+            {{ shift.multiplier }}×
+        {% endif %}
+      </h4>
       <form method="post" class="shift-editor" id="shift-editor-{{ shift.id }}" action="/volunteer/role/{{ shift.role_id }}/{{ shift.id }}">
         <div class="form-group">
           <label class="control-label" for="min_needed">Minimum Volunteers</label>
@@ -78,6 +83,10 @@
         <div class="form-group">
           <label class="control-label" for="max_needed">Maximum Volunteers</label>
           <input name="max_needed" type="number" class="form-control" value="{{ shift.max_needed }}">
+        </div>
+        <div class="form-group">
+        <label for="multiplier" class="control-label">Multiplier</label>
+        <input type="number" step="0.01" name="multiplier" class="form-control" value="{{ shift.multiplier }}">
         </div>
         <div class="form-group">
           <label class="control-label" for="notes">Notes</label>
