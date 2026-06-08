@@ -5,7 +5,7 @@ from ..config import config
 event_days = {"wed": 0, "weds": 0, "thu": 1, "thur": 1, "thurs": 1, "fri": 2, "sat": 3, "sun": 4, "mon": 5}
 
 
-def edt(day, time):
+def edt(day: str | int, time: str) -> str:
     if isinstance(day, str):
         day = event_days[day.lower()]
     # EVENT_START is day 1

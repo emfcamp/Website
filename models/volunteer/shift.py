@@ -225,11 +225,21 @@ class Shift(BaseModel):
 
     @classmethod
     def get_all_for_day(cls, day: date) -> Sequence[Self]:
-        """Return all shifts for the requested day."""
+        """Return all shifts for the requested day.
+
+        For the purposes of shifts we consider a day to run from 04:00-03:59 so
+        that late night shifts get shown in the context of the day leading up to
+        them.
+        """
+        next_day = day + timedelta(days=1)
+        start = event_tz.localize(datetime.strptime(f"{day} 03:59:00", "%Y-%m-%d %H:%M:%S"))
+        end = event_tz.localize(datetime.strptime(f"{next_day} 04:00:00", "%Y-%m-%d %H:%M:%S"))
+
         return (
             db.session.execute(
                 select(cls)
-                .where(text("to_char(start, 'YYYY-MM-DD')=:day").bindparams(day=day.strftime("%Y-%m-%d")))
+                .where(Shift.start >= start)
+                .where(Shift.end <= end)
                 .order_by(Shift.start, Shift.venue_id)
             )
             .scalars()
