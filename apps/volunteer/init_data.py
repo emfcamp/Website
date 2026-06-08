@@ -8,7 +8,7 @@ from yaml import safe_load
 from apps.volunteer.shift_list import get_shift_list
 from main import db
 from models.volunteer.role import Role, Team
-from models.volunteer.shift import Shift
+from models.volunteer.shift import Shift, event_tz
 from models.volunteer.venue import VolunteerVenue
 
 
@@ -51,8 +51,8 @@ def shifts():
                 shifts = Shift.generate_for(
                     role=role,
                     venue=venue,
-                    first=parse(shift_range["first"]),
-                    final=parse(shift_range["final"]),
+                    first=parse(shift_range["first"], tz=event_tz),
+                    final=parse(shift_range["final"], tz=event_tz),
                     min=shift_range["min"],
                     max=shift_range["max"],
                     base_duration=shift_range.get("base_duration", 120),

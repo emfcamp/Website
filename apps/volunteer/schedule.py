@@ -1,6 +1,6 @@
 from collections import defaultdict
 from collections.abc import Sequence
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from flask import (
     Response,
@@ -21,7 +21,6 @@ from sqlalchemy.orm import joinedload, with_parent
 
 from apps.users.calendar import CalendarDict, CalendarEntry, fetch_events
 from main import db, get_or_404
-from models import naive_utcnow
 from models.user import User, generate_api_token
 from models.volunteer.role import Role
 from models.volunteer.shift import Shift, ShiftEntry, ShiftEntryState
@@ -106,6 +105,25 @@ def public_dashboard():
     )
 
 
+def _active_day(permitted: list[date]) -> date:
+    now = datetime.now(event_tz)
+    day = now.date()
+
+    # Days outside of the permitted range are clamped to that range.
+    if day < permitted[0]:
+        return permitted[0]
+
+    if day > permitted[1]:
+        return permitted[1]
+
+    # We're at a festival. If its before 4am it's not tomorrow yet, show what
+    # is technically the previous day.
+    if now.hour < 4:
+        return day - timedelta(days=1)
+
+    return day
+
+
 @volunteer.route("/schedule")
 @feature_flag("VOLUNTEERS_SCHEDULE")
 @v_user_required
@@ -116,18 +134,11 @@ def schedule():
         abort(404)
     dates = [earliest.date() + timedelta(days=i) for i in range((latest.date() - earliest.date()).days + 1)]
 
-    if naive_utcnow().date() < dates[0]:
-        default_day = dates[0]
-    elif naive_utcnow().date() > dates[1]:
-        default_day = dates[1]
-    else:
-        default_day = datetime.now().date()
-
     requested_date = request.args.get("day", default=None)
     if requested_date:
         active_day = datetime.fromisoformat(requested_date).date()
     else:
-        active_day = default_day
+        active_day = _active_day(dates)
 
     shifts = Shift.get_all_for_day(active_day)
     if len(shifts) == 0:
