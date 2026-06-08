@@ -2,49 +2,96 @@ from ..event_date import edt
 
 entrance_shifts = {
     "entrance-steward": {
+        "live-in-vehicle-checkin": [
+            {
+                "first": edt(0, "12:00:00"),
+                "final": edt(0, "18:00:00"),
+                "min": 2,
+                "max": 2,
+            },
+            {
+                "first": edt(1, "08:00:00"),
+                "final": edt(1, "18:00:00"),
+                "min": 2,
+                "max": 2,
+            },
+            {
+                "first": edt(2, "08:00:00"),
+                "final": edt(2, "18:00:00"),
+                "min": 2,
+                "max": 2,
+            },
+        ],
         "entrance-tent": [
             {
-                "first": edt("thur", "09:00:00"),
-                "final": edt("thur", "11:00:00"),
+                "note": "A shift",
+                "first": edt(1, "08:00:00"),
+                "final": edt(1, "16:00:00"),
                 "min": 3,
-                "max": 5,
-            },
-            {
-                "first": edt("thur", "11:00:00"),
-                "final": edt("thur", "17:00:00"),
-                "min": 5,
-                "max": 7,
-            },
-            {
-                "first": edt("thur", "17:00:00"),
-                "final": edt("thur", "19:00:00"),
-                "min": 2,
                 "max": 3,
             },
             {
-                "first": edt("fri", "09:00:00"),
-                "final": edt("fri", "19:00:00"),
-                "min": 2,
-                "max": 4,
+                "note": "B shift",
+                "first": edt(1, "09:00:00"),
+                "final": edt(1, "17:00:00"),
+                "min": 3,
+                "max": 3,
             },
-        ]
-        + [
             {
-                "first": edt(d, "19:00:00"),
-                "final": edt(d, "23:00:00"),
-                "min": 1,
+                "note": "Evening shift",
+                "first": edt(1, "17:00:00"),
+                "final": edt(2, "03:00:00"),
+                "min": 2,
                 "max": 2,
-            }
-            for d in ["thur", "fri"]
-        ]
-        + [
+            },
             {
-                "first": edt(d, "09:00:00"),
-                "final": edt(d, "21:00:00"),
-                "min": 1,
+                "note": "A shift",
+                "first": edt(2, "08:00:00"),
+                "final": edt(2, "16:00:00"),
+                "min": 3,
+                "max": 3,
+            },
+            {
+                "note": "B shift",
+                "first": edt(2, "09:00:00"),
+                "final": edt(2, "17:00:00"),
+                "min": 3,
+                "max": 3,
+            },
+            {
+                "note": "Evening shift",
+                "first": edt(2, "17:00:00"),
+                "final": edt(3, "03:00:00"),
+                "min": 2,
                 "max": 2,
-            }
-            for d in ["sat", "sun"]
-        ]
+            },
+            {
+                "note": "A shift",
+                "first": edt(3, "08:00:00"),
+                "final": edt(3, "16:00:00"),
+                "min": 2,
+                "max": 2,
+            },
+            {
+                "note": "B shift",
+                "first": edt(3, "09:00:00"),
+                "final": edt(3, "15:00:00"),
+                "min": 3,
+                "max": 3,
+            },
+            {
+                "note": "Evening shift",
+                "first": edt(3, "16:00:00"),
+                "final": edt(4, "00:00:00"),
+                "min": 2,
+                "max": 2,
+            },
+            {
+                "first": edt(4, "08:00:00"),
+                "final": edt(5, "00:00:00"),
+                "min": 2,
+                "max": 2,
+            },
+        ],
     },
 }
