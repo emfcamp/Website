@@ -1,8 +1,8 @@
 from ..event_date import edt
 
-youth_workshop_shifts = {
-    "youth-workshop-helper": {
-        "youth-workshop": [
+family_workshop_shifts = {
+    "family-workshop-helper": {
+        "family-workshop": [
             {"first": edt(t[0], t[1]), "final": edt(t[0], t[2]), "min": 2, "max": 2, "base_duration": t[3]}
             for t in [
                 ("fri", "14:00:00", "15:00:00", 60),

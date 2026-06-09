@@ -372,8 +372,8 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
     ),
     "youthworkshop": ScheduleItemInfo(
         type="youthworkshop",
-        human_type="youth workshop",
-        human_type_a="a youth workshop",
+        human_type="family workshop",
+        human_type_a="a family workshop",
         supports_lottery=True,
         attributes_cls=YouthWorkshopAttributes,
         default_max_tickets_per_entry=5,

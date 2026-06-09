@@ -56,7 +56,7 @@ def historic_talk_data(year):
 
     stage_events = []
     workshop_events = []
-    youth_events = []
+    family_events = []
     film_events = []
     music_events = []
     performance_events = []
@@ -88,7 +88,7 @@ def historic_talk_data(year):
         elif event["type"] == "workshop":
             events_list = workshop_events
         elif event["type"] == "youthworkshop":
-            events_list = youth_events
+            events_list = family_events
         else:
             continue
 
@@ -102,7 +102,7 @@ def historic_talk_data(year):
 
     stage_events.sort(key=sort_key)
     workshop_events.sort(key=sort_key)
-    youth_events.sort(key=sort_key)
+    family_events.sort(key=sort_key)
     film_events.sort(key=sort_key)
     music_events.sort(key=sort_key)
     performance_events.sort(key=sort_key)
@@ -113,8 +113,12 @@ def historic_talk_data(year):
         {"name": "Workshops", "events": workshop_events},
     ]
 
-    if len(youth_events) > 0:
-        venues.append({"name": "Youth Workshops", "events": youth_events})
+    if len(family_events) > 0:
+        if year < 2026:
+            name = "Youth Workshops"
+        else:
+            name = "Family Workshops"
+        venues.append({"name": name, "events": family_events})
 
     if len(music_events) > 0:
         venues.append({"name": "Music", "events": music_events})

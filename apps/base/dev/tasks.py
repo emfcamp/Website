@@ -160,7 +160,7 @@ _EMF_VENUES = [
         timeblocks={"workshop": (time(10), time(18))},
     ),
     VenueDefinition(
-        name="Youth Workshop",
+        name="Family Workshop",
         priority=92,
         latlon=(52.04117, -2.37771),
         allows_attendee_content=False,

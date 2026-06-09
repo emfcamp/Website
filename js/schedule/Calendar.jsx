@@ -160,7 +160,7 @@ function Event({ event, toggleFavourite, authenticated }) {
 
   function humanTypeName(type) {
     if (type == "youthworkshop") {
-      return "Youth Workshop";
+      return "Family Workshop";
     }
 
     return type.charAt(0).toUpperCase() + type.slice(1);

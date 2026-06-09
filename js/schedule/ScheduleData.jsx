@@ -205,7 +205,7 @@ class ScheduleData {
       (e.type === "talk" || e.type === "performance");
 
     if (e.type === "youthworkshop") {
-      e.humanReadableType = "Youth Workshop";
+      e.humanReadableType = "Family Workshop";
     } else {
       e.humanReadableType = e.type.charAt(0).toUpperCase() + e.type.slice(1);
     }

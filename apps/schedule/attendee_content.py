@@ -108,7 +108,7 @@ class AttendeeContentForm(Form):
             ("talk", "Talk"),
             ("performance", "Performance"),
             ("workshop", "Workshop"),
-            ("youthworkshop", "Youth Workshop"),
+            ("youthworkshop", "Family Workshop"),
         ],
     )
     # Attendees cannot hide or unhide schedule items but we still show the details

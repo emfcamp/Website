@@ -15,7 +15,7 @@ def get_shift_list():
     from .shifts.phone import phone_shifts
     from .shifts.shop import shop_shifts
     from .shifts.talks import talks_shifts
-    from .shifts.youth_workshops import youth_workshop_shifts
+    from .shifts.family_workshops import family_workshop_shifts
 
     shift_list = arcade_shifts
     shift_list.update(badge_shifts)
@@ -30,6 +30,6 @@ def get_shift_list():
     shift_list.update(phone_shifts)
     shift_list.update(shop_shifts)
     shift_list.update(talks_shifts)
-    shift_list.update(youth_workshop_shifts)
+    shift_list.update(family_workshop_shifts)
 
     return shift_list

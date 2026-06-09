@@ -698,7 +698,7 @@ def workshop_steward_occurrence(occurrence_id):
 
     # Require that the user has the appropriate role & only show the attendee list the hour before
     if occurrence.schedule_item.type == "youthworkshop":
-        if "Youth Workshop Helper" not in user_role_names:
+        if "Family Workshop Helper" not in user_role_names:
             abort(401)
 
     elif occurrence.schedule_item.type == "workshop":
