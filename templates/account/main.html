@@ -70,13 +70,17 @@
   </div>
 
   {% if feature_enabled('CFP') %}
+  {% set cfp_basically_closed = feature_enabled('CFP_CLOSED') or feature_enabled('CFP_TALKS_CLOSED') or feature_enabled('CFP_WORKSHOPS_CLOSED') or feature_enabled('CFP_PERFORMANCES_CLOSED') %}
+  {% set proposal_count = current_user.proposals | length %}
+  {% if cfp_basically_closed and proposal_count == 0 %}
+    {# Hide the CfP panel #}
+  {% else %}
     <div class="panel panel-default">
       <div class="panel-heading">
         <h3 class="panel-title">Call for Participation</h3>
       </div>
       <div class="panel-body">
-        {% set proposal_count = current_user.proposals | length %}
-        {% if not feature_enabled('CFP_CLOSED') %}
+        {% if not cfp_basically_closed %}
           <p>Our Call for Participation is open!</p>
           <p>We're looking for talks, workshops, or performances at EMF {{event_year}}.</p>
         {% endif %}
@@ -85,7 +89,7 @@
         {% endif %}
       </div>
       <div class="panel-footer">
-        {% if not feature_enabled('CFP_CLOSED') %}
+        {% if not cfp_basically_closed %}
           <a class="btn btn-primary" href="{{url_for('cfp.main')}}">Submit {{ 'another' if proposal_count else 'a' }} proposal</a>
         {% endif %}
         {% if proposal_count %}
@@ -93,6 +97,7 @@
         {% endif %}
       </div>
     </div>
+  {% endif %}
   {% endif %}
 
   {% if feature_enabled('ATTENDEE_CONTENT') %}
