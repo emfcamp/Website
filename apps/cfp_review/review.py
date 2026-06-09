@@ -29,7 +29,7 @@ def _split_by_review_count(proposals: list[Proposal], well_reviewed_threshold: i
     under = []
     over = []
     for p in proposals:
-        if len([v for v in p.votes if v.state != "blocked"]) >= well_reviewed_threshold:
+        if len([v for v in p.votes if v.state == "voted"]) >= well_reviewed_threshold:
             over.append(p)
         else:
             under.append(p)
