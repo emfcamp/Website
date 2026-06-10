@@ -6,7 +6,7 @@ The Phone Team provides a comprehensive phone service at EMF, with several diffe
 
 Our phones network allows EMF attendees to call each other in the field, dial interesting services posted around the field and more.
 
-Follow us on the Fediverse at [@phones.emfcamp.org](https://social.emfcamp.org/@phones) for updates!
+Follow us on the Fediverse at [@phones@emfcamp.org](https://social.emfcamp.org/@phones) for updates!
 
 ## Ahead of the event
 
@@ -92,7 +92,7 @@ NOTE:
 _If you had a Permanent Number Reserved in the Eventphone system and used this on DECT at EMF2024 then we have kept your reservation, please email [poc@emfcamp.org](mailto:poc@emfcamp.org) once you have created an account in our system for us to transfer it over to you._
 #}
 
-**Numbers are a finite rescource**, we have ~3500 attendees and ~8000 numbers. Please don't register excessive amounts of numbers that you don't intend to use.
+**Numbers are a finite resource**, we have ~3500 attendees and ~8000 numbers. Please don't register excessive amounts of numbers that you don't intend to use.
 
 If you have a use-case that could need a lot of numbers, please come and speak to us and we'll see what we can do!
 
