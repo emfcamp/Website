@@ -32,7 +32,7 @@
         <div class="col-md-9 col-md-offset-3"><small>A shorter description for limited-length displays. Ideally less than 20 words.</small></div>
         {{ render_field(form.short_description, 9) }}
 
-        {% if schedule_item.type in ["talk", "workshop", "youthworkshop"] %}
+        {% if schedule_item.type in ["talk", "workshop", "familyworkshop"] %}
         <p>Will your {{ schedule_item.human_type }} cover any content that people may want to be warned about?
            For example, discussions of death, bigotry, etc.</p>
         {{ render_field(form.attributes.content_note, 9) }}
@@ -42,7 +42,7 @@
         {{ render_field(form.attributes.family_friendly, 9) }}
         {% endif %}
 
-        {% if schedule_item.type in ["workshop", "youthworkshop"] %}
+        {% if schedule_item.type in ["workshop", "familyworkshop"] %}
         <div class="col-md-9 col-md-offset-3"><small>Number of attendees this workshop can accept (this will not be published).</small></div>
         {{ render_field(form.attributes.proposal_participant_count, 9) }}
         <div class="col-md-9 col-md-offset-3"><small>Please give the cost in pounds (£) per attendee, with any options.</small></div>
@@ -105,7 +105,7 @@
         {% elif schedule_item.type == 'performance' %}
         {# no attributes #}
 
-        {% elif schedule_item.type in ['workshop', 'youthworkshop'] %}
+        {% elif schedule_item.type in ['workshop', 'familyworkshop'] %}
         {# all attributes above #}
 
         {% elif schedule_item.type == 'installation' %}

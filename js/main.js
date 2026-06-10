@@ -112,7 +112,7 @@ $(() => {
   function displayWorkshopFieldsIfRequired() {
     let value = $("#user_content_form #type").val();
 
-    if (value == "workshop" || value == "youthworkshop") {
+    if (value == "workshop" || value == "familyworkshop") {
       $(".workshop-fields").show();
     } else {
       $(".workshop-fields").hide();

@@ -165,7 +165,7 @@ _EMF_VENUES = [
         latlon=(52.04117, -2.37771),
         allows_attendee_content=False,
         capacity=30,
-        timeblocks={"youthworkshop": (time(10), time(18))},
+        timeblocks={"familyworkshop": (time(10), time(18))},
     ),
     VenueDefinition(
         name="Main Bar",

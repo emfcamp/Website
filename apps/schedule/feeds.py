@@ -30,7 +30,7 @@ from .historic import feed_historic
 
 def _format_event_description(flat_sid: ScheduleItemDict) -> str:
     description = flat_sid["description"] if flat_sid["description"] else ""
-    if flat_sid["type"] in ["workshop", "youthworkshop"]:
+    if flat_sid["type"] in ["workshop", "familyworkshop"]:
         # Safe assertions because we add them in _get_schedule_item_dict
         assert "cost" in flat_sid
         assert "equipment" in flat_sid

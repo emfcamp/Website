@@ -18,12 +18,12 @@
       {{ render_field(form.duration, 9) }}
       {{ render_field(form.notice_required, 9) }}
 
-    {% elif proposal.type in ('workshop', 'youthworkshop') %}
+    {% elif proposal.type in ('workshop', 'familyworkshop') %}
       {{ render_field(form.equipment_required, 9) }}
       {{ render_field(form.duration, 9) }}
       {{ render_field(form.notice_required, 9) }}
 
-      {% if proposal.type != 'youthworkshop' %}
+      {% if proposal.type != 'familyworkshop' %}
       {# FIXME: do we not care about youth workshop size? #}
       {% call render_field(form.attributes.participant_count, 9) %}
           Our workshop tents can accommodate 10-50 attendees per session.

@@ -52,7 +52,7 @@ class WorkshopAttributes(Attributes):
 
 
 @dataclass
-class YouthWorkshopAttributes(Attributes):
+class FamilyWorkshopAttributes(Attributes):
     age_range: str | None = None
     participant_cost: str | None = None
     participant_equipment: str | None = None
@@ -96,7 +96,7 @@ class ProposalWorkshopAttributes(WorkshopAttributes):
 
 
 @dataclass
-class ProposalYouthWorkshopAttributes(YouthWorkshopAttributes):
+class ProposalFamilyWorkshopAttributes(FamilyWorkshopAttributes):
     participant_count: str | None = None
 
 
@@ -152,8 +152,8 @@ def convert_attributes_between_types(old_attributes: Attributes, new_attributes:
     attributes_to_copy = [
         "family_friendly",
     ]
-    if isinstance(old_attributes, WorkshopAttributes | YouthWorkshopAttributes) and isinstance(
-        new_attributes, WorkshopAttributes | YouthWorkshopAttributes
+    if isinstance(old_attributes, WorkshopAttributes | FamilyWorkshopAttributes) and isinstance(
+        new_attributes, WorkshopAttributes | FamilyWorkshopAttributes
     ):
         attributes_to_copy += [
             "participant_count",

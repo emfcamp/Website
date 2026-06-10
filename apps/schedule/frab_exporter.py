@@ -24,7 +24,7 @@ TRACK_COLOURS = {
     "talk": "#FB0558",
     "performance": "#2EADD9",
     "workshop": "#F9E200",
-    "youthworkshop": "#FF8101",
+    "familyworkshop": "#FF8101",
     "lightning": "#FC0220",
 }
 

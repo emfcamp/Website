@@ -57,7 +57,7 @@ class Scheduler:
 
     def get_schedule_problem(self, types: list[ScheduleItemType] | None = None) -> SchedulingProblem:
         if types is None:
-            types = ["talk", "workshop", "youthworkshop"]
+            types = ["talk", "workshop", "familyworkshop"]
         occurrences = self.get_schedulable_occurrences(types)
 
         occurrences_by_type: dict[ScheduleItemType, list[Occurrence]] = defaultdict(list)

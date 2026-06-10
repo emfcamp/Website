@@ -22,14 +22,14 @@ from models.content import (
     ScheduleItem,
 )
 from models.content.attributes import (
+    FamilyWorkshopAttributes,
     InstallationAttributes,
     LightningTalkAttributes,
     PerformanceAttributes,
+    ProposalFamilyWorkshopAttributes,
     ProposalWorkshopAttributes,
-    ProposalYouthWorkshopAttributes,
     TalkAttributes,
     WorkshopAttributes,
-    YouthWorkshopAttributes,
 )
 from models.content.cfp import ROUGH_DURATIONS, ProposalState
 from models.content.lottery import (
@@ -199,7 +199,7 @@ class FakeDataGenerator:
 
         if isinstance(proposal.attributes, ProposalWorkshopAttributes):
             proposal.attributes.participant_count = str(random.randint(5, 50))
-        elif isinstance(proposal.attributes, ProposalYouthWorkshopAttributes):
+        elif isinstance(proposal.attributes, ProposalFamilyWorkshopAttributes):
             proposal.attributes.participant_count = str(random.randint(5, 50))
 
         if state in {"accepted", "finalised"}:
@@ -256,7 +256,7 @@ class FakeDataGenerator:
         schedule_item = ScheduleItem(
             # TODO: weightings for type
             # No lightning talks yet
-            type=random.choice(["talk", "performance", "workshop", "youthworkshop", "film"]),
+            type=random.choice(["talk", "performance", "workshop", "familyworkshop", "film"]),
             state=random_choice(states),
             user=user,
             proposal=proposal,
@@ -281,7 +281,7 @@ class FakeDataGenerator:
         elif isinstance(schedule_item.attributes, PerformanceAttributes):
             pass
 
-        elif isinstance(schedule_item.attributes, WorkshopAttributes | YouthWorkshopAttributes):
+        elif isinstance(schedule_item.attributes, WorkshopAttributes | FamilyWorkshopAttributes):
             schedule_item.attributes.age_range = self.fake.text(max_nb_chars=20)
             schedule_item.attributes.participant_cost = self.fake.text(max_nb_chars=10)
             schedule_item.attributes.participant_equipment = self.fake.text(max_nb_chars=50)

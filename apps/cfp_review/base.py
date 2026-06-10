@@ -365,6 +365,7 @@ def vote_summary() -> ResponseReturnValue:
 @admin_required
 def close_round(proposal_type: ProposalType) -> ResponseReturnValue:
     if proposal_type not in get_args(ProposalType):
+        # FIXME: this should check .review_type
         flash("Can only close rounds for talks or workshops")
         return redirect(url_for(".proposals"))
     form = CloseRoundForm()

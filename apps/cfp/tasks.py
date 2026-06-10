@@ -80,7 +80,7 @@ def email_reserve():
     """Email speakers about reserve list"""
     proposals = (
         Proposal.query.filter(Proposal.state.in_(["reviewed"]))
-        .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop"]))
+        .filter(Proposal.type.in_(["talk", "workshop", "familyworkshop"]))
         .all()
     )
 

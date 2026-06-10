@@ -15,9 +15,9 @@ from apps.common import tidy_workshop_cost
 from main import db, external_url
 from models.content import Occurrence, ScheduleItem
 from models.content.attributes import (
+    FamilyWorkshopAttributes,
     TalkAttributes,
     WorkshopAttributes,
-    YouthWorkshopAttributes,
 )
 from models.user import User
 
@@ -113,7 +113,7 @@ def _get_schedule_item_dict(filter: ScheduleFilter, schedule_item: ScheduleItem)
         ),
         occurrences=[],
     )
-    if isinstance(schedule_item.attributes, WorkshopAttributes | YouthWorkshopAttributes):
+    if isinstance(schedule_item.attributes, WorkshopAttributes | FamilyWorkshopAttributes):
         # FIXME: should these be renamed? Should we just dump the attributes dict?
         sid["cost"] = tidy_workshop_cost(schedule_item.attributes.participant_cost or "")
         sid["equipment"] = (schedule_item.attributes.participant_equipment or "").strip()
@@ -123,7 +123,7 @@ def _get_schedule_item_dict(filter: ScheduleFilter, schedule_item: ScheduleItem)
     if isinstance(schedule_item.attributes, TalkAttributes | WorkshopAttributes):
         sid["family_friendly"] = schedule_item.attributes.family_friendly
 
-    if isinstance(schedule_item.attributes, TalkAttributes | WorkshopAttributes | YouthWorkshopAttributes):
+    if isinstance(schedule_item.attributes, TalkAttributes | WorkshopAttributes | FamilyWorkshopAttributes):
         sid["content_note"] = schedule_item.attributes.content_note
 
     # Occurrences will be added by either get_schedule_item_dicts_flat or get_schedule_item_dict_full

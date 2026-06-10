@@ -147,7 +147,7 @@ def scheduler() -> ResponseReturnValue:
                     and_(
                         # FIXME: are these needed?
                         Proposal.state.in_({"accepted", "finalised"}),
-                        Proposal.type.in_({"talk", "workshop", "youthworkshop", "performance"}),
+                        Proposal.type.in_({"talk", "workshop", "familyworkshop", "performance"}),
                     )
                 )
             )

@@ -89,6 +89,8 @@ def historic_talk_data(year):
             events_list = workshop_events
         elif event["type"] == "youthworkshop":
             events_list = family_events
+        elif event["type"] == "familyworkshop":
+            events_list = family_events
         else:
             continue
 

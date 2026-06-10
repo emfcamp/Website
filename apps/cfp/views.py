@@ -34,8 +34,8 @@ from models.content import (
     ScheduleItemType,
 )
 from models.content.attributes import (
+    ProposalFamilyWorkshopAttributes,
     ProposalWorkshopAttributes,
-    ProposalYouthWorkshopAttributes,
 )
 from models.content.schedule import ScheduleItemAvailability
 from models.user import User
@@ -113,7 +113,7 @@ class WorkshopAttributesForm(AttributesForm):
     participant_equipment = StringField("Attendee equipment")
 
 
-class YouthWorkshopAttributesForm(AttributesForm):
+class FamilyWorkshopAttributesForm(AttributesForm):
     participant_count = StringField("Attendees", [DataRequired()])
     age_range = StringField("Age range")
     participant_cost = StringField("Cost per attendee")
@@ -145,7 +145,7 @@ class InstallationAttributesForm(AttributesForm):
 ATTRIBUTES_FORM_TYPES: dict[ProposalType, type[AttributesForm]] = {
     "talk": TalkAttributesForm,
     "workshop": WorkshopAttributesForm,
-    "youthworkshop": YouthWorkshopAttributesForm,
+    "familyworkshop": FamilyWorkshopAttributesForm,
     "performance": PerformanceAttributesForm,
     "installation": InstallationAttributesForm,
 }
@@ -165,7 +165,7 @@ def get_proposal_type_form(proposal_type: ProposalType) -> type[ProposalForm]:
         ProposalFormWithAttributes.duration = SelectField(
             "Duration", default="25-45 mins", choices=DURATION_OPTIONS
         )
-    elif proposal_type in {"workshop", "youthworkshop"}:
+    elif proposal_type in {"workshop", "familyworkshop"}:
         ProposalFormWithAttributes.duration = StringField("Duration", [DataRequired()])
 
     ProposalFormWithAttributes.type_info = PROPOSAL_INFOS[proposal_type]
@@ -226,6 +226,13 @@ def main() -> ResponseReturnValue:
         ignore_closed=ignore_closed,
         lightning_talks_closed=lightning_talks_closed,
     )
+
+
+# TODO: remove this after 2026
+@cfp.route("/cfp/youthworkshop", methods=["GET"])
+@feature_flag("CFP")
+def create_youthworkshop_proposal_redirect() -> ResponseReturnValue:
+    return redirect(url_for(".create_proposal", proposal_type="familyworkshop"))
 
 
 @cfp.route("/cfp/<string:proposal_type>", methods=["GET", "POST"])
@@ -296,7 +303,7 @@ def create_proposal(proposal_type: ProposalType = "talk") -> ResponseReturnValue
             type=proposal_type,
             user=current_user,
         )
-        if proposal_type in {"talk", "performance", "workshop", "youthworkshop"}:
+        if proposal_type in {"talk", "performance", "workshop", "familyworkshop"}:
             proposal.duration = form.duration.data
         else:
             proposal.duration = None
@@ -385,7 +392,7 @@ def edit_proposal(proposal_id: int) -> ResponseReturnValue:
 
         app.logger.info("Proposal %s edited", proposal.id)
 
-        if proposal.type in {"talk", "performance", "workshop", "youthworkshop"}:
+        if proposal.type in {"talk", "performance", "workshop", "familyworkshop"}:
             proposal.duration = form.duration.data
         elif proposal.type in {"installation"}:
             # Installations don't currently have a duration
@@ -488,7 +495,7 @@ class FinaliseWorkshopAttributesForm(FinaliseAttributesForm):
     proposal_participant_count = StringField("Attendees")
 
 
-class FinaliseYouthWorkshopAttributesForm(FinaliseAttributesForm):
+class FinaliseFamilyWorkshopAttributesForm(FinaliseAttributesForm):
     age_range = StringField("Age range")
     participant_cost = StringField("Cost per attendee")
     participant_equipment = StringField("Attendee equipment")
@@ -500,7 +507,7 @@ FINALISE_ATTRIBUTES_FORM_TYPES: dict[ScheduleItemType, type[FinaliseAttributesFo
     "talk": FinaliseTalkAttributesForm,
     "performance": FinalisePerformanceAttributesForm,
     "workshop": FinaliseWorkshopAttributesForm,
-    "youthworkshop": FinaliseYouthWorkshopAttributesForm,
+    "familyworkshop": FinaliseFamilyWorkshopAttributesForm,
 }
 
 
@@ -636,7 +643,7 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
 
         # For convenience, we ask them to update their participant_count,
         # but this isn't exposed on the ScheduleItem
-        if isinstance(proposal.attributes, ProposalWorkshopAttributes | ProposalYouthWorkshopAttributes):
+        if isinstance(proposal.attributes, ProposalWorkshopAttributes | ProposalFamilyWorkshopAttributes):
             proposal.attributes.participant_count = form.attributes.proposal_participant_count.data
             # Now delete this, or populate_obj will try to add it
             del form.attributes.form.proposal_participant_count
@@ -672,7 +679,7 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
     if request.method != "POST":
         # These proxy to the proposal, so it doesn't matter if schedule_item exists
         form.proposal_equipment_required.data = proposal.equipment_required
-        if isinstance(proposal.attributes, ProposalWorkshopAttributes | ProposalYouthWorkshopAttributes):
+        if isinstance(proposal.attributes, ProposalWorkshopAttributes | ProposalFamilyWorkshopAttributes):
             form.attributes.proposal_participant_count.data = proposal.attributes.participant_count
 
     return render_template(

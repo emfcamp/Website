@@ -124,7 +124,7 @@
         {% if proposal.type in ['talk', 'performance'] %}
           <dt>Duration</dt><dd>{{ proposal.duration }}</dd>
           <dt>Notice Required</dt><dd>{{ proposal.notice_required }}</dd>
-        {% elif proposal.type in ['workshop', 'youthworkshop'] %}
+        {% elif proposal.type in ['workshop', 'familyworkshop'] %}
           <dt>Duration</dt><dd>{{ proposal.duration }}</dd>
           <dt>Notice Required</dt><dd>{{ proposal.notice_required }}</dd>
           <dt>Attendees</dt><dd>{{ proposal.attributes.participant_count }}</dd>

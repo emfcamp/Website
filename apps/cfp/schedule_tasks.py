@@ -20,7 +20,7 @@ def run_schedule(type: ScheduleItemType | None) -> None:
         app.logger.info(f"Only scheduling {type} proposals.")
         types: list[ScheduleItemType] = [type]
     else:
-        types = ["talk", "workshop", "youthworkshop"]
+        types = ["talk", "workshop", "familyworkshop"]
 
     potential_schedule = scheduler.run(types)
     db.session.add(potential_schedule)

@@ -159,7 +159,7 @@ function Event({ event, toggleFavourite, authenticated }) {
   let [expanded, setExpanded] = useState(false);
 
   function humanTypeName(type) {
-    if (type == "youthworkshop") {
+    if (type == "familyworkshop") {
       return "Family Workshop";
     }
 

@@ -53,7 +53,7 @@
             </div>
           </div>
         {% else %}
-          {% call render_field(form.name, horizontal=9, placeholder="Your name" + (' (or pseudonym)' if proposal_type != 'youthworkshop' else '')) %}If your proposal is accepted, you can edit your name before it's publicly shown as part of the schedule.{% endcall %}
+          {% call render_field(form.name, horizontal=9, placeholder="Your name" + (' (or pseudonym)' if proposal_type != 'familyworkshop' else '')) %}If your proposal is accepted, you can edit your name before it's publicly shown as part of the schedule.{% endcall %}
         {% endif %}
         {% if current_user.is_anonymous %}
         {{ render_field(form.email, horizontal=9, placeholder="Your email address") }}
@@ -101,12 +101,12 @@
          <legend>More details</legend>
          <p>We'll use these details to help us schedule your {{ form.type_info.human_type }}.</p>
       {# NB this excludes installations, which have a separate section #}
-      {% if proposal_type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
+      {% if proposal_type in ('talk', 'performance', 'workshop', 'familyworkshop') %}
         {% call render_field(form.equipment_required, horizontal=9,
                              placeholder="Additional equipment you need us to provide") %}
           {% if proposal_type in ('talk', 'performance') %}
             We'll provide a sound system and projector or screen.
-          {% elif proposal_type in ('workshop', 'youthworkshop') %}
+          {% elif proposal_type in ('workshop', 'familyworkshop') %}
             The tent will have a projector and sound system. Please let us know if you need any other equipment
             you will not be able to easily bring yourself, such as soldering irons.
           {% endif %}
@@ -118,7 +118,7 @@
         If accepted, how much notice do you need? We'll try and give you as much time as we can.
       {% endcall %}
 
-      {% if proposal_type in ('workshop', 'youthworkshop') %}
+      {% if proposal_type in ('workshop', 'familyworkshop') %}
         <legend>Attendees</legend>
 
           <p>Our workshop tents will be set up with chairs and tables for 30 people per session.
@@ -164,7 +164,7 @@
           given talks
           {% elif proposal_type in ["performance"] %}
           performed
-          {% elif proposal_type in ["workshop", "youthworkshop"] %}
+          {% elif proposal_type in ["workshop", "familyworkshop"] %}
           given a workshop
           {% elif proposal_type in ["installation"] %}
           made an installation
@@ -189,7 +189,7 @@
         <p>
           We {% if proposal_type in ['installation'] %} also {% endif %} have some budget to
           subsidise travel within the UK for those who could not otherwise afford it.
-          {% if proposal_type in ('workshop', 'youthworkshop') %}
+          {% if proposal_type in ('workshop', 'familyworkshop') %}
           We also have some funds available for up-front costs for
           workshops, for example, to build kits for attendees.
           {% endif %}

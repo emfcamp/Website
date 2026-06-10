@@ -60,7 +60,7 @@
 
 <p class="multiline">{{ (schedule_item.description) | urlize }}</p>
 
-{% if schedule_item.type in ('workshop', 'youthworkshop') %}
+{% if schedule_item.type in ('workshop', 'familyworkshop') %}
   <table class="table">
   <tr>
     <td><b>Attending this {{ schedule_item.human_type }} will cost</b></td>

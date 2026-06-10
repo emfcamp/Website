@@ -31,11 +31,11 @@ from .. import BaseModel, export_attr_counts, export_attr_edits, export_interval
 from ..user import User
 from .attributes import (
     Attributes,
+    ProposalFamilyWorkshopAttributes,
     ProposalInstallationAttributes,
     ProposalPerformanceAttributes,
     ProposalTalkAttributes,
     ProposalWorkshopAttributes,
-    ProposalYouthWorkshopAttributes,
     attributes_proxy,
     copy_common_attributes,
 )
@@ -118,7 +118,7 @@ ProposalType = Literal[
     "talk",
     "performance",
     "workshop",
-    "youthworkshop",
+    "familyworkshop",
     "installation",
 ]
 
@@ -392,12 +392,12 @@ PROPOSAL_INFOS: dict[ProposalType, ProposalInfo] = {
         attributes_cls=ProposalWorkshopAttributes,
         grants_event_tickets=True,
     ),
-    "youthworkshop": ProposalInfo(
-        type="youthworkshop",
+    "familyworkshop": ProposalInfo(
+        type="familyworkshop",
         human_type="family workshop",
         human_type_a="a family workshop",
         review_type=ReviewType.manual,
-        attributes_cls=ProposalYouthWorkshopAttributes,
+        attributes_cls=ProposalFamilyWorkshopAttributes,
         grants_event_tickets=False,
     ),
     "installation": ProposalInfo(

@@ -49,7 +49,7 @@ from .historic import historic_talk_data, item_historic, talks_historic
 
 # This controls both which types show on lineup and favourites,
 # and in which order they are presented.
-LINEUP_TYPE_ORDER: list[ScheduleItemType] = ["talk", "workshop", "youthworkshop", "performance", "film"]
+LINEUP_TYPE_ORDER: list[ScheduleItemType] = ["talk", "workshop", "familyworkshop", "performance", "film"]
 
 
 @schedule.route("/schedule/")
@@ -224,8 +224,9 @@ def item_current(year: int, schedule_item_id: int, slug: str | None = None) -> R
                 if lottery_entry.state == "valid-tickets":
                     occurrence_form.enter_lottery.label.text = "Update ticket count"
 
-            if schedule_item.type == "youthworkshop":
+            if schedule_item.type == "familyworkshop":
                 # FIXME: is this because we don't count adults for these events?
+                # Not important for 2026 as we won't be doing family workshops by lottery
                 occurrence_form.ticket_count.label.text = "How many under-12 tickets?"
 
             max_tickets = occurrence.lottery.max_tickets_per_entry
@@ -593,7 +594,7 @@ def greenroom():
             select(Occurrence)
             .where(
                 Occurrence.schedule_item.has(
-                    ScheduleItem.type.in_({"talk", "workshop", "youthworkshop", "performance"}),
+                    ScheduleItem.type.in_({"talk", "workshop", "familyworkshop", "performance"}),
                 )
             )
             .where(Occurrence.scheduled_time > pendulum.now(event_tz))
@@ -642,14 +643,14 @@ def workshop_steward_main():
         select(Venue).join(Venue.time_blocks).where(TimeBlock.type == "workshop")
     )
 
-    youthworkshop_venues = db.session.scalars(
-        select(Venue).join(Venue.time_blocks).where(TimeBlock.type == "youthworkshop")
+    familyworkshop_venues = db.session.scalars(
+        select(Venue).join(Venue.time_blocks).where(TimeBlock.type == "familyworkshop")
     )
 
     return render_template(
         "schedule/workshop-steward/main.html",
         workshop_venues=workshop_venues,
-        youthworkshop_venues=youthworkshop_venues,
+        familyworkshop_venues=familyworkshop_venues,
     )
 
 
@@ -697,7 +698,7 @@ def workshop_steward_occurrence(occurrence_id):
     user_role_names = {r.name for r in current_user.volunteer.interested_roles}
 
     # Require that the user has the appropriate role & only show the attendee list the hour before
-    if occurrence.schedule_item.type == "youthworkshop":
+    if occurrence.schedule_item.type == "familyworkshop":
         if "Family Workshop Helper" not in user_role_names:
             abort(401)
 

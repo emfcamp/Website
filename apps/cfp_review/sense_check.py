@@ -157,7 +157,7 @@ def not_sensible_reasons(
 def sense_check():
     types_to_show = request.args.getlist("type")
     if not types_to_show:
-        types_to_show = ["talk", "workshop", "youthworkshop", "performance"]
+        types_to_show = ["talk", "workshop", "familyworkshop", "performance"]
 
     def validate_types(types: list[str]) -> TypeGuard[list[ScheduleItemType]]:
         invalid_types = {t for t in types_to_show if t not in get_args(ScheduleItemType)}
@@ -180,7 +180,7 @@ def sense_check():
 
     occurrences = get_occurrences_for_types(types_to_show)
     # FIXME: why is this not all types?
-    occurrences_for_overlap = get_occurrences_for_types(["talk", "workshop", "youthworkshop", "performance"])
+    occurrences_for_overlap = get_occurrences_for_types(["talk", "workshop", "familyworkshop", "performance"])
 
     occurrences_by_speaker = defaultdict(set)
     for occurrence in occurrences_for_overlap:

@@ -227,7 +227,7 @@ class UpdateScheduleItemWorkshopAttributesForm(UpdateAttributesForm):
     family_friendly = BooleanField("Family Friendly")
 
 
-class UpdateScheduleItemYouthWorkshopAttributesForm(UpdateAttributesForm):
+class UpdateScheduleItemFamilyWorkshopAttributesForm(UpdateAttributesForm):
     age_range = StringField("Age range")
     participant_cost = StringField("Cost per attendee")
     participant_equipment = StringField("Attendee equipment")
@@ -256,7 +256,7 @@ class UpdateProposalWorkshopAttributesForm(UpdateScheduleItemWorkshopAttributesF
     participant_count = StringField("Attendees", [DataRequired()])
 
 
-class UpdateProposalYouthWorkshopAttributesForm(UpdateScheduleItemYouthWorkshopAttributesForm):
+class UpdateProposalFamilyWorkshopAttributesForm(UpdateScheduleItemFamilyWorkshopAttributesForm):
     participant_count = StringField("Attendees", [DataRequired()])
 
 
@@ -271,7 +271,7 @@ class UpdateProposalInstallationAttributesForm(UpdateAttributesForm):
 UPDATE_PROPOSAL_ATTRIBUTES_FORM_TYPES: dict[ProposalType, type[UpdateAttributesForm]] = {
     "talk": UpdateProposalTalkAttributesForm,
     "workshop": UpdateProposalWorkshopAttributesForm,
-    "youthworkshop": UpdateProposalYouthWorkshopAttributesForm,
+    "familyworkshop": UpdateProposalFamilyWorkshopAttributesForm,
     "performance": UpdateProposalPerformanceAttributesForm,
     "installation": UpdateProposalInstallationAttributesForm,
 }
@@ -279,7 +279,7 @@ UPDATE_PROPOSAL_ATTRIBUTES_FORM_TYPES: dict[ProposalType, type[UpdateAttributesF
 UPDATE_SCHEDULE_ITEM_ATTRIBUTES_FORM_TYPES: dict[ScheduleItemType, type[UpdateAttributesForm]] = {
     "talk": UpdateScheduleItemTalkAttributesForm,
     "workshop": UpdateScheduleItemWorkshopAttributesForm,
-    "youthworkshop": UpdateScheduleItemYouthWorkshopAttributesForm,
+    "familyworkshop": UpdateScheduleItemFamilyWorkshopAttributesForm,
     "performance": UpdateScheduleItemPerformanceAttributesForm,
     "lightning": UpdateScheduleItemLightningTalkAttributesForm,
     "film": UpdateScheduleItemFilmForm,

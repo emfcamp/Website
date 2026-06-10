@@ -7,6 +7,7 @@ def get_shift_list():
     from .shifts.bands import bands_shifts
     from .shifts.bar import bar_shifts
     from .shifts.entrance import entrance_shifts
+    from .shifts.family_workshops import family_workshop_shifts
     from .shifts.info_volunteer import info_vol_shifts
     from .shifts.kitchen import kitchen_shifts
     from .shifts.logistics import logistics_shifts
@@ -15,7 +16,6 @@ def get_shift_list():
     from .shifts.phone import phone_shifts
     from .shifts.shop import shop_shifts
     from .shifts.talks import talks_shifts
-    from .shifts.family_workshops import family_workshop_shifts
 
     shift_list = arcade_shifts
     shift_list.update(badge_shifts)

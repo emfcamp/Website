@@ -24,20 +24,20 @@ var workshops = Sortable.create(
   },
 );
 
-var youthworkshops = Sortable.create(
-  document.getElementById("lottery-entries-youthworkshops"),
+var familyworkshops = Sortable.create(
+  document.getElementById("lottery-entries-familyworkshops"),
   {
     ghostClass: "sortable-ghost-class",
     onEnd: async (event) => {
       const response = await fetch(
-        `/api/schedule/lottery/youthworkshop/preferences`,
+        `/api/schedule/lottery/familyworkshop/preferences`,
         {
           method: "POST",
           credentials: "include",
           headers: {
             "Content-Type": "application/json; charset=utf-8",
           },
-          body: JSON.stringify(youthworkshops.toArray()),
+          body: JSON.stringify(familyworkshops.toArray()),
         },
       );
 

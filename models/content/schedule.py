@@ -42,12 +42,12 @@ from ..user import User
 from . import validate_state_transitions
 from .attributes import (
     Attributes,
+    FamilyWorkshopAttributes,
     FilmAttributes,
     LightningTalkAttributes,
     PerformanceAttributes,
     TalkAttributes,
     WorkshopAttributes,
-    YouthWorkshopAttributes,
     attributes_proxy,
 )
 from .lottery import Lottery
@@ -78,7 +78,14 @@ AGE_RANGE_OPTIONS = [
 
 # Number of slots (in 10min increments) that must be between proposals of this
 # type in the same venue
-EVENT_SPACING = {"talk": 1, "workshop": 3, "performance": 0, "youthworkshop": 2, "installation": 0, "film": 2}
+EVENT_SPACING = {
+    "talk": 1,
+    "workshop": 3,
+    "performance": 0,
+    "familyworkshop": 2,
+    "installation": 0,
+    "film": 2,
+}
 
 # The size of a scheduling slot
 SLOT_DURATION = timedelta(minutes=10)
@@ -113,7 +120,7 @@ ScheduleItemType = Literal[
     "performance",
     "workshop",
     "film",
-    "youthworkshop",
+    "familyworkshop",
     "installation",
     "lightning",
 ]
@@ -370,12 +377,12 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
         human_type_a="a film",
         attributes_cls=FilmAttributes,
     ),
-    "youthworkshop": ScheduleItemInfo(
-        type="youthworkshop",
+    "familyworkshop": ScheduleItemInfo(
+        type="familyworkshop",
         human_type="family workshop",
         human_type_a="a family workshop",
         supports_lottery=True,
-        attributes_cls=YouthWorkshopAttributes,
+        attributes_cls=FamilyWorkshopAttributes,
         default_max_tickets_per_entry=5,
     ),
     # ScheduleItem types that are only created directly
