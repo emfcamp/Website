@@ -444,7 +444,7 @@ def render_untrusted_markdown(markdown_text: str) -> Markup:
         markdown(markdown_text, extensions=extensions),
         tags=(nh3.ALLOWED_TAGS - {"img"}),
         link_rel="noopener nofollow",
-    )
+    ).replace("<table>", '<table class="table">')
     inner_html = render_template("sandboxed-iframe.html", body=Markup(content_html))
     iframe_html = f'<iframe sandbox="allow-scripts allow-top-navigation-by-user-activation" class="embedded-content" srcdoc="{html.escape(inner_html, True)}"></iframe>'
     return Markup(iframe_html)
