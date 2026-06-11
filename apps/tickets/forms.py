@@ -113,7 +113,7 @@ class TicketAmountsForm(Form):
         """Add selected tickets to the provided basket."""
         for f in form.tiers:
             pt = f._tier
-            if f.amount.data != basket.get(pt, 0):
+            if f.amount.data is not None and f.amount.data != basket.get(pt, 0):
                 app.logger.info("Adding %s %s tickets to basket", f.amount.data, pt.name)
                 basket[pt] = f.amount.data
 
