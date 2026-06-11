@@ -82,7 +82,6 @@ Buy Items
     </td>
     <td>
         {% if available and f._user_limit_reached %}
-        {{ f.hidden_tag() }}
         <div class="help-block">You have already bought the maximum amount</div>
         </div>
         {% elif available and f._any %}
