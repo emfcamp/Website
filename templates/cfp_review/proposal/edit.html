@@ -21,6 +21,13 @@
                 </div>
                 <div id="basicsPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="basicsPanelHeading">
                     <div class="panel-body">
+                        <div class="alert alert-warning">
+                            <p>
+                                In normal circumstances you should not need to change the <strong>proposal state</strong> through this form.
+                                The recommended actions for this proposal are available through the buttons at the bottom of this page.
+                                The state should only be overridden through this form in exceptional circumstances.
+                            </p>
+                        </div>
                         <dl class="dl-horizontal">
                             {{ render_dl_field(form.state) }}
                             {{ render_dl_field(form.title) }}

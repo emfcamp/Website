@@ -6,12 +6,18 @@
 <div class="col-md-12">
 {% if proposal.state == 'new' %}
 <div class="alert alert-warning">
-    <p>You have the ability to mark this proposal as checked, which will send it to anonymisation. Please do so, but only if:</p>
+    <p>You have the ability to mark this proposal as checked, which will send it to
+        <strong>{% if proposal.type_info.review_type == "anonymous" %}anonymisation{% else %}manual review{% endif %}</strong>.
+        Please do so, but only if:
+    </p>
     <ul>
         <li>You have knowledge of the list of banned speakers and can confirm the submitter is not banned from speaking.</li>
         <li>The description is not obviously incomplete.</li>
         <li>The description is superficially valid for the category it is submitted in.</li>
     </ul>
+    <p>If you don't have access to the list of banned speakers, <strong>please wait for this proposal to be checked by the conduct team</strong>
+        before proceeding.
+    </p>
 </div>
 {% endif %}
 {% if proposal.schedule_item %}
