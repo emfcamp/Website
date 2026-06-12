@@ -253,10 +253,6 @@ def convert_schedule_item(schedule_item_id: int) -> ResponseReturnValue:
 
 def _convert_schedule_item(schedule_item: ScheduleItem, new_type: ScheduleItemType) -> None:
     # This can also be called by attendee content managers
-
-    # People's availability can vary based on type
-    schedule_item.availability = []
-
     for occurrence in schedule_item.occurrences:
         # Fall back to the defaults, as we don't know why this was set
         occurrence.allowed_venues = []
