@@ -6,7 +6,7 @@ scheduling, village registration, and more.
 
 ## Get Involved
 
-If you want to get involved, the best way is to join us on IRC, on #emfcamp-web on irc.libera.chat.
+If you want to get involved, the best way is to join us on IRC in #emfcamp-web on irc.libera.chat, or [on Matrix in #website:emfcamp.org](https://matrix.to/#/#website:emfcamp.org?via=emfcamp.org).
 
 Join with IRCCloud: <a href="https://www.irccloud.com/invite?channel=%23emfcamp-web&amp;hostname=irc.libera.chat&amp;port=6697&amp;ssl=1" target="_blank"><img src="https://www.irccloud.com/invite-svg?channel=%23emfcamp-web&amp;hostname=irc.libera.chat&amp;port=6697&amp;ssl=1" height="18"></a>
 
