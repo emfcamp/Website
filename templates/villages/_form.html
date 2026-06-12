@@ -31,6 +31,12 @@
       {{ render_field(form.structures, horizontal=9) }}
     </fieldset>
     <fieldset>
+      <legend>Membership</legend>
+      <p>By default, any attendee can request to join your village, and village admins
+        approve or reject those requests. You can mark your village as private, disabling join requests.</p>
+      {{ render_checkbox(form.private, horizontal=9) }}
+    </fieldset>
+    <fieldset>
       <legend>Power</legend>
       <p>Power at EMF is normally provided as 16A single-phase "ceeform" connectors. If your village requires more
       than a 16A single-phase supply, let us know your requirements and we'll try to accommodate.
