@@ -67,10 +67,14 @@ but badges even after sales end as long as the event is still on
     {% endif %}
 
     {% if SALES_STATE != 'sales-ended' %}
-    <a href="{{ url_for('tickets.main', flow='other') }}" class="btn btn-default">Buy a parking ticket</a>
+    <a href="{{ url_for('tickets.main', flow='other') }}" class="btn btn-primary">Buy a parking ticket</a>
+
+    <a href="{{ url_for('tickets.main', flow='club-mate') }}" class="btn btn-primary">Pre-order Club-Mate</a>
+
+    <a href="{{ url_for('tickets.main', flow='sponsor') }}" class="btn btn-primary">Sponsor EMF</a>
     {% endif %}
 
-    <a href="{{ url_for('tickets.main', flow='badge') }}" class="btn btn-default">Buy a badge</a>
+    <a href="{{ url_for('tickets.main', flow='badge') }}" class="btn btn-primary">Buy a badge</a>
 </div>
 {% endif %}
 <div class="clearfix"></div>
