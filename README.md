@@ -10,6 +10,8 @@ If you want to get involved, the best way is to join us on IRC in #emfcamp-web o
 
 Join with IRCCloud: <a href="https://www.irccloud.com/invite?channel=%23emfcamp-web&amp;hostname=irc.libera.chat&amp;port=6697&amp;ssl=1" target="_blank"><img src="https://www.irccloud.com/invite-svg?channel=%23emfcamp-web&amp;hostname=irc.libera.chat&amp;port=6697&amp;ssl=1" height="18"></a>
 
+Join on Matrix: [#website:emfcamp.org](https://matrix.to/#/#website:emfcamp.org)
+
 ## Documentation
 
 Please see our [developer documentation](https://emfcamp.github.io/Website/).
@@ -19,4 +21,5 @@ Please see our [developer documentation](https://emfcamp.github.io/Website/).
 This project is licensed under AGPL-3.0. See [LICENSE](LICENSE).
 
 ### Third-Party Code
+
 - **Admonition Styles and Icons**: Based on BookStack wiki (MIT Licensed)
