@@ -129,6 +129,7 @@ def view_or_editdesc(
 
     user_can_join_village = (
         current_user.is_authenticated
+        and not village.private
         and current_user.village is None
         and current_user.village_join_request is None
         and current_user.has_admission_ticket
@@ -282,6 +283,10 @@ def members_join(year: int, village_id: int) -> ResponseReturnValue:
 
     if not village:
         abort(404)
+
+    if village.private:
+        flash(f"{village.name} is a private village and is not accepting requests to join")
+        return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
 
     if current_user.village:
         flash(f"Already a member of village {current_user.village.name}")
