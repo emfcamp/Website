@@ -457,6 +457,10 @@ class Occurrence(BaseModel):
         if value is None:
             return value
 
+        if not self.schedule_item.official_content:
+            # Attendee content does not need to conform to the slot duration.
+            return value
+
         duration_minutes = SLOT_DURATION.total_seconds() / 60
 
         if value % duration_minutes != 0:
@@ -534,6 +538,8 @@ class Occurrence(BaseModel):
         This is the intersection of speaker availability and venue TimeBlocks for this content type.
         """
         assert self.schedule_item.official_content
+        assert len(self.availability) > 0
+
         result = {}
         for venue in self.valid_allowed_venues:
             allowed = []
