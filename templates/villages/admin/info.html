@@ -1,5 +1,5 @@
 {% extends "villages/admin/base.html" %}
-{% from "_formhelpers.html" import render_field  %}
+{% from "_formhelpers.html" import render_field, render_checkbox  %}
 {% block title %}Village Info: {{village.name}}{% endblock %}
 {% block body %}
 <h3>Village Info: {{village.name}}</h3>
@@ -89,6 +89,7 @@
     {{ render_field(form.power_requirements) }}
     {{ render_field(form.noise) }}
     {{ render_field(form.structures) }}
+    {{ render_checkbox(form.private) }}
 
     {{ form.submit(class_="btn btn-success") }}
     <a class="btn btn-danger" href="{{ url_for('.delete', village_id=village.id) }}">Delete</a>
