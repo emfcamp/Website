@@ -34,6 +34,8 @@ class Village(BaseModel):
     long_description: Mapped[str | None]
     url: Mapped[str | None]
     location: Mapped[WKBElement | None] = mapped_column(Geometry("POINT", srid=4326, spatial_index=False))
+    # Private villages are invite-only: users can't request to join them
+    private: Mapped[bool] = mapped_column(default=False, server_default="false")
 
     village_memberships: Mapped[list[VillageMember]] = relationship(
         back_populates="village", cascade="all, delete-orphan"
