@@ -1,6 +1,14 @@
 from geoalchemy2.shape import from_shape, to_shape
 from shapely import Point
-from wtforms import FloatField, IntegerField, SelectField, StringField, SubmitField, TextAreaField
+from wtforms import (
+    BooleanField,
+    FloatField,
+    IntegerField,
+    SelectField,
+    StringField,
+    SubmitField,
+    TextAreaField,
+)
 from wtforms.validators import URL, InputRequired, Length, Optional
 
 from models import Village
@@ -39,6 +47,8 @@ class VillageForm(Form):
 
     structures = TextAreaField("Large structures", [Optional()])
 
+    private = BooleanField("Private village", [Optional()])
+
     submit = SubmitField("Submit")
 
     def populate(self, village: Village) -> None:
@@ -46,6 +56,7 @@ class VillageForm(Form):
         self.description.data = village.description
         self.long_description.data = village.long_description
         self.url.data = village.url
+        self.private.data = village.private
 
         requirements = village.requirements
         if requirements is not None:
@@ -61,6 +72,7 @@ class VillageForm(Form):
         village.description = self.description.data
         village.long_description = self.long_description.data
         village.url = self.url.data
+        village.private = self.private.data or False
 
         if village.requirements is None:
             village.requirements = VillageRequirements()
