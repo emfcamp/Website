@@ -79,6 +79,32 @@ def redirect_next_or_schedule(message: str | None = None) -> ResponseReturnValue
     return redirect(next)
 
 
+@volunteer.route("/public-dashboard")
+@feature_flag("VOLUNTEERS_SCHEDULE")
+def public_dashboard():
+    days = int(request.args.get("days", 1))
+    refresh = int(request.args.get("refresh", 0))
+    now = datetime.now()
+    shifts = (
+        db.session.query(Shift)
+        .where(
+            Shift.end > datetime.now(),
+            Shift.current_count < Shift.max_needed,
+            Shift.start < now + timedelta(days=days),
+        )
+        .order_by(Shift.start, Shift.venue_id)
+        .all()
+    )
+
+    return render_template(
+        "volunteer/public_dashboard.html",
+        shifts=shifts,
+        now=now,
+        soon=now + timedelta(hours=1),
+        refresh=refresh,
+    )
+
+
 @volunteer.route("/schedule")
 @feature_flag("VOLUNTEERS_SCHEDULE")
 @v_user_required

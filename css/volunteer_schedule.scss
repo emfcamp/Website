@@ -332,3 +332,34 @@ ul.key {
     }
   }
 }
+
+.volunteer-dashboard {
+  h1,
+  h2,
+  h3 {
+    text-align: center;
+  }
+
+  .volunteer-dashboard-card {
+    margin: 0 0 1em 1em;
+    padding: 1em;
+    border: 1px solid $brand-2026-orange;
+
+    &.upcoming {
+      background-color: $warning-background;
+      color: $warning-text;
+    }
+
+    &.now {
+      border: 1px solid $brand-2026-coral;
+      background-color: $danger-background;
+      color: $danger-text;
+    }
+
+    h2,
+    h3 {
+      margin: 0;
+      padding: 0.2em;
+    }
+  }
+}
