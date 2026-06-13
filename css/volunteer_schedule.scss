@@ -335,8 +335,8 @@ ul.key {
 
 .volunteer-dashboard {
   h1,
-  h2,
-  h3 {
+  h2 {
+    margin: 1em 0 1em 0;
     text-align: center;
   }
 
@@ -344,6 +344,12 @@ ul.key {
     margin: 0 0 1em 1em;
     padding: 1em;
     border: 1px solid $brand-2026-orange;
+    font-size: 1.5em;
+
+    &.min_reached,
+    &.min_reached h2 {
+      color: #999999 !important;
+    }
 
     &.upcoming {
       background-color: $warning-background;
@@ -356,10 +362,19 @@ ul.key {
       color: $danger-text;
     }
 
-    h2,
-    h3 {
+    h2 {
+      padding: 0;
+      margin: 0 0 0.5em 0;
+      font-size: 1.5em;
+    }
+
+    p {
       margin: 0;
-      padding: 0.2em;
+      padding: 0;
+    }
+
+    p.volunteer-num {
+      text-align: right;
     }
   }
 }
