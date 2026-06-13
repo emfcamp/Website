@@ -457,7 +457,8 @@ class Occurrence(BaseModel):
         if value is None:
             return value
 
-        if not self.schedule_item.official_content:
+        # When creating an occurrence the schedule_item isn't available so we can't run this check here
+        if not self.schedule_item or not self.schedule_item.official_content:
             # Attendee content does not need to conform to the slot duration.
             return value
 
