@@ -99,6 +99,10 @@ class Scheduler:
 
                 speakers = {occurrence.schedule_item.user.id}
 
+                if not occurrence.availability:
+                    app.logger.warning(f"Skipping scheduling occurrence {occurrence} - no availability.")
+                    continue
+
                 # Mapping of venues to allowed time ranges
                 allowed_times = occurrence.allowed_times(True)
                 allowed_venues = set(v.id for v in allowed_times)
