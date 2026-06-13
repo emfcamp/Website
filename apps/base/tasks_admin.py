@@ -36,9 +36,11 @@ def periodic(force):
 def make_admin(user_id, email):
     """Make a user in the DB an admin"""
     if email:
-        user = User(email, "Initial Admin User")
-        db.session.add(user)
-        db.session.commit()
+        user = User.get_by_email(email)
+        if not user:
+            user = User(email, "Initial Admin User")
+            db.session.add(user)
+            db.session.commit()
     elif user_id:
         user = User.query.get(user_id)
     else:
