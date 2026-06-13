@@ -36,7 +36,7 @@
             <th>Role</th>
             <th></th>
         </tr></thead>
-        <tbody id="tbody-{{ active_day }}">
+        <tbody>
             {% for shift_entry in open_shift_entries %}
                 {% set shift = shift_entry.shift %}
                 <tr id="shift-{{ shift_entry.id }}">
@@ -92,7 +92,6 @@
                         {{ shift.start.strftime("%H:%M") }}{% if shift.end %} to {{ shift.end.strftime("%H:%M") }}{% endif %}
                     </td>
                     <td class="role">{{ shift.role.name }}</td>
-                    </td>
                 </tr>
             {% endfor %}
         </tbody>

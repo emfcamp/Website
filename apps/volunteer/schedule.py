@@ -301,7 +301,7 @@ def self_checkin(venue_id: int) -> ResponseReturnValue:
     themselves as arrived.
 
     If they're already marked as arrived then they'll be able to mark themselves
-    as either abandoning the shift, or if we're within 15 minutes or shift end
+    as either abandoning the shift, or if we're within 15 minutes of shift end
     that they've completed the shift.
     """
 
@@ -355,7 +355,6 @@ def self_checkin_arrived() -> ResponseReturnValue:
         return redirect_next_or_schedule("Unexpected volunteer in bagging area.")
 
     shift_entry.set_state(ShiftEntryState.ARRIVED)
-    db.session.add(shift_entry)
     db.session.commit()
 
     return redirect_next_or_schedule("You're checked in.")
@@ -371,7 +370,6 @@ def self_checkin_complete() -> ResponseReturnValue:
         return redirect_next_or_schedule("Unexpected volunteer in bagging area.")
 
     shift_entry.set_state(ShiftEntryState.COMPLETED)
-    db.session.add(shift_entry)
     db.session.commit()
 
     return redirect_next_or_schedule("Thanks for volunteering!")
@@ -387,7 +385,6 @@ def self_checkin_abandon() -> ResponseReturnValue:
         return redirect_next_or_schedule("Unexpected volunteer in bagging area.")
 
     shift_entry.set_state(ShiftEntryState.ABANDONED)
-    db.session.add(shift_entry)
     db.session.commit()
 
     return redirect_next_or_schedule("You've checked out.")

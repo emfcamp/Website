@@ -36,7 +36,7 @@ from models.volunteer.shift import (
 class RoleForm(Form):
     name = StringField("Role Name", [InputRequired()])
     full_description_md = StringField(
-        "Description (supprts markdownn)",
+        "Description (supports markdown)",
         [InputRequired()],
         widget=TextArea(),
         description="Displayed in the main role list when signing up.",
