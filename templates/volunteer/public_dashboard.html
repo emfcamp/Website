@@ -22,16 +22,20 @@
   </div>
 </header>
 <div class="volunteer-dashboard">
-    <h1>Public Volunteer Dashboard</h1>
+    <h1>Register yourself as a volunteer at {{ external_url('.sign_up') }}</h1>
     <div class="row">
     {% for shift in shifts %}
         <div class="col-xs-3">
-            <div class="volunteer-dashboard-card {% if shift.start <= now %}now{% elif shift.start <= soon %}upcoming{% endif %}">
-                <h2>{{ shift.venue.name }}</h2>
-                <h3>{{ shift.role.name }}</h3>
-                <p>{{ shift.start.strftime("%H:%M") }} to {{ shift.end.strftime("%H:%M") }}<br>{{ shift.max_needed - shift.current_count }} needed</p>
+            <div class="volunteer-dashboard-card {% if shift.min_needed > 0 and shift.min_needed <= shift.current_count %}min_reached{% else %}{% if shift.start <= now %}now{% elif shift.start <= soon %}upcoming{% endif %}{% endif %}">
+                <h2>{{ shift.role.name }}</h2>
+                <p class="shift-time">{{ shift.start.strftime("%H:%M") }} to {{ shift.end.strftime("%H:%M") }}</p>
+                <p class="volunteer-num">{{ shift.max_needed - shift.current_count }}/{{ shift.max_needed }} needed</p>
             </div>
         </div>
+        {% if loop.index % 4 == 0 %}
+    </div>
+    <div class="row">
+        {%  endif %}
     {% endfor %}
     </div>
 </div>
