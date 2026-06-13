@@ -312,7 +312,6 @@ def self_checkin(venue_id: int) -> ResponseReturnValue:
             select(ShiftEntry)
             .where(with_parent(current_user, User.shift_entries))
             .join(ShiftEntry.shift)
-            .where(ShiftEntry.state.not_in([ShiftEntryState.COMPLETED, ShiftEntryState.ABANDONED]))
             .where(Shift.venue == venue)
             .where(Shift.end >= now - timedelta(hours=2))
             .order_by(Shift.start)
@@ -322,25 +321,34 @@ def self_checkin(venue_id: int) -> ResponseReturnValue:
     )
 
     # Segment into shifts that can be checked into and shifts that can't yet.
+    checked_in_roles_with_notes: list[Role] = []
     open_shift_entries: list[ShiftEntry] = []
     upcoming_shift_entries: list[ShiftEntry] = []
-    checked_in_shift_entries: list[ShiftEntry] = []
+    previous_shift_entries: list[ShiftEntry] = []
 
     for entry in shift_entries:
         if entry.state == ShiftEntryState.ARRIVED:
-            checked_in_shift_entries.append(entry)
-
-        if entry.shift.start <= now + timedelta(minutes=15):
             open_shift_entries.append(entry)
+            role = entry.shift.role
+            if role.role_notes or role.instructions_url:
+                checked_in_roles_with_notes.append(role)
+
+        elif entry.state == ShiftEntryState.SIGNED_UP:
+            if entry.shift.start <= now + timedelta(minutes=15):
+                open_shift_entries.append(entry)
+            else:
+                upcoming_shift_entries.append(entry)
+
         else:
-            upcoming_shift_entries.append(entry)
+            previous_shift_entries.append(entry)
 
     return render_template(
         "volunteer/self_checkin.html",
         venue=venue,
+        checked_in_roles_with_notes=checked_in_roles_with_notes,
         open_shift_entries=open_shift_entries,
         upcoming_shift_entries=upcoming_shift_entries,
-        checked_in_shift_entries=checked_in_shift_entries,
+        previous_shift_entries=previous_shift_entries,
         now=now,
     )
 
