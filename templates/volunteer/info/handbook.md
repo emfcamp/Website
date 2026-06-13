@@ -42,6 +42,18 @@ can be found in all structures, or you can use a DECT phone if you have one.
 | Event Operations | 1000 | Any non-emergencies not covered above |
 | Duty Site Manager | 1010 | Emergencies |
 
+## Things to recognise
+
+The following passes identify members of the event organising team (often referred
+to as "orga"), if in doubt you can ask people carrying them for guidance, and instructions from them should generally be followed.
+
+TODO: Flesh this out once we know what these things look like.
+
+- Site Manager pass
+- Team lead pass
+- SIA license
+- Orga wristband (are these considered relevant, or just for food purposes?)
+
 ## Emergencies & Vulnerable People
 
 In case of emergency or being informed of vulnerable people (particularly lost
