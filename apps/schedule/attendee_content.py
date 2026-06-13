@@ -104,12 +104,7 @@ class AttendeeContentForm(Form):
     type = SelectField(
         "Type of content",
         default="workshop",
-        choices=[
-            ("talk", "Talk"),
-            ("performance", "Performance"),
-            ("workshop", "Workshop"),
-            ("familyworkshop", "Family Workshop"),
-        ],
+        choices=[("talk", "Talk"), ("performance", "Performance"), ("workshop", "Workshop")],
     )
     # Attendees cannot hide or unhide schedule items but we still show the details
     state = SelectField(
@@ -335,6 +330,8 @@ def attendee_content_delete(schedule_item_id):
     form = DeleteAttendeeContentForm()
 
     if form.validate_on_submit():
+        for occurrence in schedule_item.occurrences:
+            db.session.delete(occurrence)
         db.session.delete(schedule_item)
         db.session.commit()
 
