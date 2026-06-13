@@ -418,11 +418,8 @@ def render_trusted_markdown(markdown_src: str) -> Markup:
     return Markup(
         markdown(
             markdown_src,
-            extensions=[
-                "markdown.extensions.admonition",
-                "markdown.extensions.toc",
-            ],
-        )
+            extensions=["markdown.extensions.admonition", "markdown.extensions.toc", "tables"],
+        ).replace("<table>", '<table class="table">')
     )
 
 
