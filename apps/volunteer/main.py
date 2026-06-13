@@ -29,7 +29,7 @@ def main():
 
     volunteer = Volunteer.get_for_user(current_user)
     if volunteer is None:
-        return redirect(url_for(".info"))
+        return redirect(url_for(".handbook"))
 
     if feature_enabled("VOLUNTEERS_SCHEDULE") and volunteer.interested_roles.count() > 0:
         return redirect(url_for(".schedule"))
@@ -49,6 +49,20 @@ def info():
         # Rather than 404ing, point at the misc 'volunteering' page instead.
         return redirect(url_for("base.page", page_name="volunteering"))
     return render_template_markdown("volunteer/info/index.md", page_name="index")
+
+
+@volunteer.route("/handbook/")
+def handbook():
+    if not feature_enabled("VOLUNTEERS_SIGNUP"):
+        # Rather than 404ing, point at the misc 'volunteering' page instead.
+        return redirect(url_for("base.page", page_name="volunteering"))
+    return render_template_markdown("volunteer/info/handbook.md", page_name="handbook")
+
+
+@volunteer.route("/handbook/<page_name>")
+@feature_flag("VOLUNTEERS_SIGNUP")
+def handbook_page(page_name: str) -> ResponseReturnValue:
+    return render_template_markdown(f"volunteer/info/{page_name}.md", page_name=page_name)
 
 
 @volunteer.route("/init-shifts")

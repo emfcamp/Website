@@ -17,14 +17,6 @@ Volunteering is a great way to get to know new people, learn a new skill, and ma
 
 Finally, anyone who does at least one volunteer shift will receive a voucher to purchase a guaranteed ticket for the next EMF.
 
-## The Golden Rules
-
-**Don’t overcommit yourself.**
-
-**Tell us if you can’t get something done.**
-
-Nobody will criticise you if you can't do something, and telling us quickly means we can handle the situation.
-
 ## How to Volunteer
 
 Click the button below to register as a volunteer, which will allow you to choose which roles you're interested in, and then select shifts at a convenient time for you. You can also opt in to receiving a notification if we're having difficulty filling shifts for those roles, which would be greatly appreciated. There's no obligation to take those shifts.
@@ -33,30 +25,4 @@ Click the button below to register as a volunteer, which will allow you to choos
 
 ## Queries
 
-If you have any queries about volunteering (or issues during a shift) you can get in touch with the volunteer desk by emailing [volunteer@emfcamp.org](mailto:volunteer@emfcamp.org), calling 1009 on the internal EMF phone system, or stopping by the desk in the [Info tent](https://map.emfcamp.org/#21.46/52.0416706/-2.3770618).
-
-<!-- TODO: Move these somewhere else -->
-# Important numbers
-
-The festival runs an internal phone system - [this guide explains the types of phone it works with and how to use it](/about/phones) if you bring one with you. The [internal directory](https://phones.emfcamp.org) covers most numbers but you should also receive a contacts sticker as part of your training.
-
-Please avoid contacting HQ or the duty Site Manager except for [genuine emergencies](/volunteer/info/emergency) (e.g. fire where fire shouldn't be) where a member of staff or other team isn't available to help.
-
-<dl class="dl-horizontal">
-  <dt>Volunteer desk</dt><dd>1009</dd>
-  <dt>Infodesk <br />(switchboard)</dt><dd>1001</dd>
-  <dt>Conduct</dt><dd>1234</dd>
-  <dt>First Aid Tent</dt><dd>1090</dd>
-  <dt>EMERGENCY <br />First Aid</dt><dd>1099</dd>
-  <dt>Site Manager</dt><dd>1010</dd>
-  <dt>HQ</dt><dd>1011</dd>
-</dl>
-
-If you're just using your usual mobile and SIM card, you'll only be able to call external numbers and you may find reception poor. Smart phones with WiFi calling may get better coverage that way. The on-site team will be able to get emergency help to someone more quickly than by calling 999.
-
-<dl class="dl-horizontal">
-  <dt>Conduct</dt><dd>0333 112 2944</dd>
-  <dt>Medical Emergency</dt><dd>(tbc)</dd>
-</dl>
-
-<a href="{{ url_for('base.page', page_name='volunteering') }}">About volunteering (orga-side)</a>
+If you have any queries about volunteering (or issues during a shift) you can get in touch with the volunteer desk by emailing [volunteer@emfcamp.org](mailto:volunteer@emfcamp.org), calling 1009 on the internal EMF phone system, or stopping by the desk in the [Info tent](https://map.emfcamp.org/#18.03/52.041758/-2.377148/m=52.042051,-2.377119).
