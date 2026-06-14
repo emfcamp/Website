@@ -32,7 +32,7 @@ from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import Response
 from yaml import safe_load as parse_yaml
 
-from main import db, external_url
+from main import db, external_url, webcal_url
 from models import Currency, User, naive_utcnow
 from models.basket import Basket
 from models.capacity import UnlimitedType
@@ -126,6 +126,7 @@ def load_utility_functions(app_obj):
             REFUND_STATE=REFUND_STATE,
             CURRENCY_SYMBOLS=CURRENCY_SYMBOLS,
             external_url=external_url,
+            webcal_url=webcal_url,
             feature_enabled=feature_enabled,
             get_user_currency=get_user_currency,
             year=naive_utcnow().year,
