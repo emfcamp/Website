@@ -5,7 +5,7 @@
 <h2>Favourites</h2>
 
 <p>You can <a href="{{ webcal_url('.favourites_ical', token=token) }}">subscribe to this list in your calendar</a>
-   so it stays up to date, download it as an <a href="{{ url_for('.favourites_ical') }}?token={{ token }}">iCal feed</a>,
+   so it stays up to date, download it as an <a href="{{ url_for('.favourites_ical') }}?token={{ token }}">iCal file</a>,
    or get a <a href="{{ url_for('.favourites_json') }}?token={{ token }}">json feed</a> for your giant robot.
 </p>
 {% if not feature_enabled('SCHEDULE') %}
