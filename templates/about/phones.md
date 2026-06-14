@@ -14,7 +14,7 @@ If you want to take part in our phone network, we highly suggest picking up a DE
 
 Here are some of our suggestions:
 
-<table class="phones-dect-models">
+<table class="table phones-dect-models">
   <thead>
     <tr>
       <td>Model</td>
@@ -40,12 +40,6 @@ Here are some of our suggestions:
 </table>
 
 <style>
-table.phones-dect-models {
-  margin-bottom: 1em;
-}
-table.phones-dect-models td {
-  padding: 4px;
-}
 table.phones-dect-models tbody tr td:nth-child(4) {
   font-size: 14px;
 }
@@ -54,6 +48,44 @@ table.phones-dect-models tbody tr td:nth-child(4) {
 If you already have a DECT phone, feel free to bring it along! You can also check our [DECT compatibility list](https://phones.emfcamp.org/help/dect-compatibility), generally Gigaset and Mitel handsets tend to be good options.
 
 There may also be some DECT phones available to buy at the shop during the event.
+
+## During the event
+
+Be aware that mobile phone coverage on the site can be patchy, being in the middle of a field!
+
+We have many public phones located around the site on posts which anyone can use to dial other EMF extension numbers from our <a href="https://phones.emfcamp.org/phonebook">phonebook</a> (external calls are not permitted), or which you might see posted around the site!
+
+Every EMF extension also has its very own real phone number you can call from a regular phone!
+
+<div class="well dial-in">
+  <div class="dial-in-number">0114 501 <span class="extn">XXXX</span></div>
+  <p>Replace <span class="extn">XXXX</span> with the 4-digit extension you want to call</p>
+  <p>If your extension isn't 4-digits, use <span class="extn">0000</span> and you will be prompted to enter it</p>
+</div>
+
+You can configure if you want people to be able to use dial-in for your extension from the number management page.
+
+<style>
+.dial-in {
+  display: inline-block;
+}
+.dial-in .dial-in-number {
+  font-size: 32px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 0.25em;
+}
+.dial-in p {
+  margin: 0.25em 0 0;
+}
+.dial-in .extn {
+  color: #f77f02;
+}
+.dial-in .dial-in-number .extn {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+</style>
 
 ## Registering a number
 
