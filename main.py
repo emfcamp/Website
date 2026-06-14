@@ -419,3 +419,11 @@ def external_url(endpoint: str, **values: Any) -> str:
     you're probably doing something wrong.
     """
     return url_for(endpoint, _external=True, **values)
+
+
+def webcal_url(endpoint: str, **values: Any) -> str:
+    """Generate an absolute URL with the webcal:// scheme, so calendar
+    clients subscribe to the feed rather than downloading it once.
+    """
+    _, _, rest = external_url(endpoint, **values).partition("://")
+    return f"webcal://{rest}"
