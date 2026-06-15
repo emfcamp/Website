@@ -303,7 +303,7 @@ def attendee_content_edit(schedule_item_id: int) -> ResponseReturnValue:
 
         return redirect(url_for("schedule.attendee_content"))
 
-    # form.day.data = schedule_item.scheduled_time.strftime("%Y-%m-%d")
+    # form.day.data = occurrence.scheduled_time.strftime("%Y-%m-%d")
     return render_template(
         "schedule/attendee_content/edit.html",
         schedule_item=schedule_item,

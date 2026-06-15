@@ -37,6 +37,7 @@
     </tr>
   </thead>
   <tbody>
+    {# FIXME occurrence #}
     {% for schedule_item in upcoming %}
       <tr>
         <td>{{ schedule_item.scheduled_time.strftime("%a %H:%M") }}</td>
