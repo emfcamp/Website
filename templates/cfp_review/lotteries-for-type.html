@@ -1,0 +1,45 @@
+{% extends "cfp_review/base.html" %}
+{% block body %}
+
+<h2>Lotteries for {{ schedule_item_type }}</h2>
+
+<p>
+  Running lotteries cannot be undone, and will result in emails being sent with results.
+  Only lotteries with state "allow-entry" will be included.
+</p>
+<form method="POST" action="{{ url_for(".run_lottery", schedule_item_type=schedule_item_type) }}">
+<p>
+{{ form.confirm(class_="btn btn-danger") }}
+</p>
+</form>
+
+<table class="table table-condensed table-striped">
+    <thead>
+        <tr>
+            <th>State</th>
+            <th>Title</th>
+            <th>Occurrence</th>
+            <th>Max workshop tickets</th>
+            <th>Available lottery tickets</th>
+            <th>Lottery tickets requested</th>
+            <th>Workshop tickets issued</th>
+            <th>Lottery/workshop tickets cancelled</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for lottery in lotteries %}
+            <tr>
+                <td>{{ lottery.state }}</td>
+                <td><a href="{{ url_for('.update_occurrence', schedule_item_id=lottery.occurrence.schedule_item_id, occurrence_id=lottery.occurrence.id) }}">{{ lottery.occurrence.schedule_item.title }}</a></td>
+                <td>{{ lottery.occurrence.occurrence_num }}</td>
+                <td>{{ lottery.total_tickets }}</td>
+                <td>{{ lottery.get_lottery_capacity() }}</td>
+                <td>{{ lottery.sum_tickets_in_state("entered") }}</td>
+                <td>{{ lottery.sum_tickets_in_state("ticket") }}</td>
+                <td>{{ lottery.sum_tickets_in_state("cancelled") }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

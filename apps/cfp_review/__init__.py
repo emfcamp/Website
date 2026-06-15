@@ -173,6 +173,7 @@ def bool_qs(val):
 from . import (
     anonymise,  # noqa: F401
     base,  # noqa: F401
+    lottery,  # noqa: F401
     proposal,  # noqa: F401
     review,  # noqa: F401
     schedule,  # noqa: F401

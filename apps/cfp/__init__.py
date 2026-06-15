@@ -6,4 +6,3 @@ cfp = Blueprint("cfp", __name__)
 
 from . import views  # noqa
 from . import tasks  # noqa
-from . import lottery_tasks  # noqa: F401

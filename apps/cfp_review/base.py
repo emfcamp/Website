@@ -778,11 +778,4 @@ def issue_cfp_voucher(user_id: int) -> ResponseReturnValue:
     return redirect(url_for(".cfp_user", user_id=user_id))
 
 
-@cfp_review.route("/lottery")
-@admin_required
-def lottery():
-    ticketed_occurrences = list(db.session.scalars(select(Occurrence).filter_by(uses_lottery=True)))
-    return render_template("cfp_review/lottery.html", ticketed_proposals=ticketed_occurrences)
-
-
 from . import venues  # noqa

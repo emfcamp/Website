@@ -1,6 +1,6 @@
 {% extends "emails/base.txt" %}
 {% block body %}
-Hi {{ user.name }},
+Hi {{ entry.user.name }},
 
 Good news! You've won a spot in the {{ entry.lottery.schedule_item.human_type }} '{{ entry.lottery.schedule_item.title }}'.
 

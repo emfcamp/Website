@@ -351,6 +351,12 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseRetu
     form.allowed_venue_ids.choices = allowed_venue_choices
     form.scheduled_venue_id.choices = [("", "")] + allowed_venue_choices
 
+    if occurrence.lottery:
+        if occurrence.lottery.state == "completed":
+            form.lottery.state.choices = [(c, _) for c, _ in form.lottery.state.choices if c == "completed"]
+        else:
+            form.lottery.state.choices = [(c, _) for c, _ in form.lottery.state.choices if c != "completed"]
+
     if form.validate_on_submit():
         if occurrence.schedule_item.type_info.supports_lottery and not occurrence.lottery:
             occurrence.lottery = Lottery(
