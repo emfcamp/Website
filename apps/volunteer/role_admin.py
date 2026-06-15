@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timedelta
 from itertools import groupby
 
@@ -19,7 +20,11 @@ from sqlalchemy import select
 from wtforms import StringField, SubmitField
 from wtforms.validators import URL, InputRequired, Optional
 from wtforms.widgets import TextArea
+from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TimeField
+from wtforms.validators import InputRequired, Optional
 
+from apps.common.forms import Form
+from apps.common.fields import HiddenIntegerField
 from apps.common.forms import Form
 from apps.volunteer import v_user_required, volunteer
 from main import db, get_or_404
@@ -30,7 +35,53 @@ from models.volunteer.shift import (
     ShiftEntry,
     ShiftEntryState,
     ShiftEntryStateException,
+    ShiftTemplate,
 )
+from models.volunteer.venue import VolunteerVenue
+
+
+class ShiftTemplateForm(Form):
+    id = HiddenIntegerField("ID", [Optional()])
+    event_day = IntegerField(
+        "Day",
+        [InputRequired()],
+        description="The event day for this block (-1, 0, 1, etc)",
+    )
+    start_time = TimeField(
+        "Start Time",
+        [InputRequired()],
+        description="The time at which the first shift of the block should start. This will have the changeover time subtracted from it to allow volunteers to arrive and be briefed.",
+    )
+    end_time = TimeField(
+        "End Time",
+        [InputRequired()],
+        description="The time at which the last shift of the block should end.",
+    )
+    venue_id = SelectField(
+        "Venue", [InputRequired()], coerce=int, description="The venue volunteers should attend."
+    )
+    duration = IntegerField(
+        "Duration",
+        [InputRequired()],
+        description="The length of each shift, in minutes. Please speak to the volunteer team if you need this to be significantly more or less than two hours.",
+    )
+    changeover_time = IntegerField(
+        "Changeover Time",
+        [InputRequired()],
+        description="The overlap between shifts, in minutes, to allow handover between volunteers.",
+    )
+    min_needed = IntegerField(
+        "Min Volunteers", [InputRequired()], description="The minimum number of volunteers required."
+    )
+    max_needed = IntegerField(
+        "Max Volunteers",
+        [InputRequired()],
+        description="The maximum number of volunteers you can make use of.",
+    )
+    notes = StringField(
+        "Notes", [Optional()], description="Any notes you want on this template, not visible to attendees."
+    )
+    delete = BooleanField("Delete")
 
 
 class RoleForm(Form):
@@ -159,6 +210,81 @@ def role_edit(role_id: int) -> ResponseReturnValue:
         return redirect(url_for(".role_admin", role_id=role_id))
 
     return render_template("volunteer/role_edit.html", role=role, form=form)
+
+
+def _form(template: ShiftTemplate, venue_choices: list[tuple[int, str]]) -> ShiftTemplateForm:
+    form = ShiftTemplateForm(obj=template, prefix=f"template-{template.id}")
+    form.venue_id.choices = venue_choices
+    return form
+
+
+def _new_form(venue_choices: list[tuple[int, str]], index: int | None = None) -> ShiftTemplateForm:
+    prefix = "template-new" if index is None else f"template-new-{index}"
+    form = ShiftTemplateForm(prefix=prefix)
+    form.venue_id.choices = venue_choices
+    return form
+
+
+def _submitted_new_forms(venue_choices: list[tuple[int, str]]) -> list[ShiftTemplateForm]:
+    indices = sorted(
+        int(m.group(1)) for key in request.form if (m := re.match(r"^template-new-(\d+)-event_day$", key))
+    )
+    return [_new_form(venue_choices, i) for i in indices]
+
+
+def _venue_choices() -> list[tuple[int, str]]:
+    return [
+        (row.id, row.name)
+        for row in db.session.execute(
+            select(VolunteerVenue.id, VolunteerVenue.name).order_by(VolunteerVenue.name)
+        ).all()
+    ]
+
+
+@volunteer.route("role/<int:role_id>/admin/shift_templates", methods=["GET", "POST"])
+@role_admin_required
+def role_shift_templates(role_id: int):
+    role = get_or_404(db, Role, role_id)
+    templates = role.shift_templates
+    venue_choices = _venue_choices()
+
+    forms = [_form(template, venue_choices) for template in templates]
+    new_forms = _submitted_new_forms(venue_choices) if request.method == "POST" else []
+    template_form = _new_form(venue_choices)  # blank form for the <template> element
+
+    if request.method == "POST":
+        to_delete = [(f, t) for f, t in zip(forms, templates, strict=True) if f.delete.data]
+        to_update = [(f, t) for f, t in zip(forms, templates, strict=True) if not f.delete.data]
+
+        valid = [f.validate() for f, _ in to_update] + [f.validate() for f in new_forms]
+
+        if all(valid):
+            for form, template in to_update:
+                form.populate_obj(template)
+                template.regenerate_shifts()
+
+            for _, template in to_delete:
+                db.session.delete(template)
+
+            for new_form in new_forms:
+                new_template = ShiftTemplate(role_id=role_id)
+                new_form.populate_obj(new_template)
+                db.session.add(new_template)
+                db.session.flush()  # assign PK before regenerate_shifts uses it
+                new_template.regenerate_shifts()
+
+            db.session.commit()
+            flash("Shift templates updated.")
+            return redirect(url_for(".role_shift_templates", role_id=role_id))
+
+    return render_template(
+        "volunteer/role_admin_shift_templates.html",
+        role=role,
+        forms=forms,
+        templates=templates,
+        new_forms=new_forms,
+        template_form=template_form,
+    )
 
 
 @volunteer.route("role/<int:role_id>/set-state/<int:shift_id>/<int:user_id>", methods=["POST"])
