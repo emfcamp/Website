@@ -24,6 +24,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload, undefer
 from wtforms import FormField
 
+from apps.cfp.views import TimeRangesHandler
 from main import db, get_or_404
 from models.content import (
     SCHEDULE_ITEM_INFOS,
@@ -43,6 +44,7 @@ from .forms import (
     CreateOccurrenceForm,
     LotteryForm,
     ScheduleItemForm,
+    UpdateAvailabilityForm,
     UpdateOccurrenceForm,
     UpdateScheduleItemForm,
 )
@@ -221,6 +223,34 @@ def update_schedule_item(schedule_item_id: int) -> ResponseReturnValue:
         schedule_item=schedule_item,
         form=form,
         occurrence_form=occurrence_form,
+    )
+
+
+@cfp_review.route("/schedule-items/<int:schedule_item_id>/availability", methods=["GET", "POST"])
+@admin_required
+def schedule_item_availability(schedule_item_id: int) -> ResponseReturnValue:
+    schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
+
+    form = UpdateAvailabilityForm()
+    time_ranges = TimeRangesHandler(schedule_item)
+
+    if form.validate_on_submit() and time_ranges.validate():
+        availability_changed = time_ranges.save()
+        has_been_through_scheduler = any(
+            o.potential_time or o.scheduled_time for o in schedule_item.occurrences
+        )
+        if availability_changed and has_been_through_scheduler:
+            flash("You need to run the scheduler again to take account of availability changes")
+
+        db.session.commit()
+
+        return redirect(url_for(".schedule_item_availability", schedule_item_id=schedule_item_id))
+
+    return render_template(
+        "cfp_review/schedule_item/availability.html",
+        schedule_item=schedule_item,
+        form=form,
+        time_ranges=time_ranges,
     )
 
 

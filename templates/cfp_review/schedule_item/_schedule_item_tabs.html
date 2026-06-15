@@ -9,6 +9,11 @@
             Edit
         </a>
     </li>
+    <li role="presentation" {% if active == 'availability' %} class="active" {% endif %}>
+        <a href="{{ url_for('.schedule_item_availability', schedule_item_id=schedule_item.id, **full_qs) }}">
+            Availability
+        </a>
+    </li>
     {% for occurrence in schedule_item.occurrences %}
     <li role="presentation" {% if active == 'occurrence-%s' % occurrence.id %} class="active" {% endif %}>
         <a href="{{ url_for('.update_occurrence', schedule_item_id=schedule_item.id, occurrence_id=occurrence.id, **full_qs) }}">

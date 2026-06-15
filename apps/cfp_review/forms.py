@@ -194,6 +194,10 @@ class ConvertScheduleItemForm(Form):
     convert = SubmitField("Convert")
 
 
+class UpdateAvailabilityForm(Form):
+    update = SubmitField("Update")
+
+
 # The forms below should match the Attribute subclasses in the model.
 # TODO: maybe we could replace this all with some generic fields and type annotation.
 class UpdateAttributesForm(Form):

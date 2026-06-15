@@ -1,0 +1,86 @@
+{% from "_formhelpers.html" import render_field, render_dl_field, render_radio_field %}
+{% set active='availability' %}
+{% extends "cfp_review/schedule_item/_base.html" %}
+{% block title %}{{ schedule_item.title }}{% endblock %}
+{% block schedule_item_body %}
+<form method="post" action="{{ url_for('.schedule_item_availability', schedule_item_id=schedule_item.id) }}" class="shrink">
+    {{ form.hidden_tag() }}
+    <div class="col-md-8">
+        <div class="panel-group" id="formAccordion" role="tablist" aria-multiselectable="true">
+
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="availabilityPanelHeading">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" href="#availabilityPanel" aria-expanded="true" aria-controls="availabilityPanel">
+                            Availability
+                        </a>
+                    </h4>
+                </div>
+
+                <div id="availabilityPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="availabilityPanelHeading">
+                    <div class="panel-body">
+                        <fieldset>
+                            {% if not schedule_item.availability %}
+                            <p>You can manually provide availability information to allow this to be scheduled.</p>
+                            {% endif %}
+
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    {% for range in time_ranges.range_names %}
+                                    <th>{{ range }}</th>
+                                    {% endfor %}
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                {% for day in time_ranges.days %}
+                                <tr>
+                                    <th scope="row">{{day}}</th>
+                                    {% for name in time_ranges.fields[day] %}
+                                        <td>
+                                            <input name="{{name}}" type="checkbox"
+                                                {% if time_ranges.enabled[name] %}
+                                                checked="checked"
+                                                {% endif %}
+                                            >
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+
+                                </tbody>
+                            </table>
+                        </fieldset>
+
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        {{ form.update(class_="btn btn-primary debounce", tabindex=1) }}
+    </div>
+</form>
+<form method="post" action="{{ url_for('.occurrences', schedule_item_id=schedule_item.id) }}">
+    <div class="col-md-4 col-xs-12" role="group">
+        <h4>Schedule item actions</h4>
+        <div class="btn-group-vertical" role="group">
+            {% if next_id %}
+                <a href="{{ url_for('.update_schedule_item', schedule_item_id=next_id, **full_qs) }}"
+                    class="btn btn-default">
+                    Next schedule item
+                </a>
+            {% else %}
+                <a href="{{ url_for('.schedule_items', **full_qs) }}"
+                    class="btn btn-default">
+                    All schedule items
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</form>
+
+{% endblock %}
