@@ -367,7 +367,6 @@ def lotteries() -> ResponseReturnValue:
             .where(Lottery.state == "allow-entry")
             .options(
                 selectinload(Lottery.occurrence),
-                selectinload(Occurrence.schedule_item),
             )
         )
     )

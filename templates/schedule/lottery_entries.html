@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% from "_formhelpers.html" import render_field %}
 {% from "schedule/_faves.html" import favourite_icons %}
-{% from "schedule/_proposal_icons.html" import proposal_icons %}
 
 {% macro display_entry(entry, is_draggable=False) %}
 <div class=" panel {% if is_draggable %}list-group-item draggable-panel{% endif %}" data-id="{{ entry.id }}">
