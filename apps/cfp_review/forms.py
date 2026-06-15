@@ -28,6 +28,7 @@ from models.content import (
     Venue,
 )
 from models.content.cfp import Proposal, ProposalState
+from models.content.schedule import SLOT_DURATION
 from models.user import User
 
 from ..admin.users import NewUserForm
@@ -452,6 +453,12 @@ class UpdateOccurrenceForm(Form):
     video_recording_lost = BooleanField("Video recording lost")
 
     update = SubmitField("Update")
+
+    def validate_scheduled_duration(form, field):
+        duration_minutes = SLOT_DURATION.total_seconds() / 60
+
+        if field.data % duration_minutes != 0:
+            raise ValidationError(f"Must be a multiple of {duration_minutes} minutes")
 
 
 class LotteryForm(Form):
