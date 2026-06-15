@@ -5,18 +5,21 @@ A village is a group of friends, like-minded people, colleagues or even families
 
 <a href="/villages/{{ event_year }}" class="btn btn-primary">View the villages for {{ event_year }}</a>
 
-If there is a village based around something you are interested in, then you should definitely visit that village during the event to see what's going on. Or you could even join that village to help make more things go on. If there's not a village based around your interests, then you can start your own village and others will probably join you.
+If there is a village based around something you are interested in, then you should definitely visit that village during the event to see what's going on. Or you could even join that village to help make more things go on (see below). If there's not a village based around your interests, then you can start your own village and others will probably join you.
 
 There is no requirement to be part of a village, so if you'd rather camp on your own and just visit some villages this is fine.
 
-If you're planning to bring something especially big or in need of lots of power to your village, please let us know beforehand so we can provide you with what you need.
+## Join a Village
+If you’d like to join an existing village, you can request to join some villages by finding them in the list and clicking the “Request to Join” button. This will send that village’s admin(s) your email address so they can pass on details if they’re happy for you to join. (Villages are under no obligation to take on members, and if there is no ‘Request to Join’ button it means the village is private).
 
 ## Register a Village
 By registering your village, you'll be making the Village People aware of the fact you plan to arrive, and how much space you're likely to need, and you'll allow us to get in touch to discuss how we can support your plans and activities at the event.
 
 <a href="/villages/register" class="btn btn-primary">Register your village</a>
 
-The name of your village will be shown on the [list of villages](/villages), and your 'Long Description' can be used to populate the page with text and links (using Markdown formatting). It's up to you how much information you include here, and if you'd prefer to just be a group of friends, you can keep it brief. If you'd like people to be able to contact you and join your village or come and visit to participate in activities you're running, you can include contact details, links to external websites and information about your planned activities there. (We're no longer using a Wiki for villages info, so this will now be the main place to share details.)
+The name of your village will be shown on the [list of villages](/villages), and your 'Long Description' can be used to populate the page with text and links (using Markdown formatting). It's up to you how much information you include here, and if you'd prefer to just be a group of friends, you can keep it brief. If you'd like people to come and visit to participate in activities you're running, you can include information about your planned activities and links to external websites there. (We're no longer using a Wiki for villages info, so this will now be the main place to share details.)
+
+Village admins can also use the 'Edit' page to see the details of people who've requested to join their village, and if desired, promote them to Admin status so they can also edit the village info, and add village content to the schedule. You can also set your village to Private, which means the "Request to Join" button will be hidden. You should make it clear in your village decription whether or not you're happy for people to come and join you.
 
 ## What can we do as a village?
 Villages are great as you can share ideas, equipment and space! The sharing doesn’t stop there - it lets you share resources too. You can come up with a cooking and cleaning rota as a group to reduce waste, make the camp cheaper and interrupt your day with a change of activity. Some people spend all their time cooking for others!
@@ -35,7 +38,7 @@ More generally, villages run all kinds of content - technical presentations or l
 
 A selection of villages will be workshop villages, and will run and host workshops that any attendee can propose via the CfP alongside content organised by members of the village. These have already been selected and designated, and all Workshop Village content will be listed in the main programme.
 
-If you have any questions about workshop villages or hosting content, you can [email the Village People](mailto:villages@emfcamp.org).
+If you're planning to bring something especially big or in need of lots of power to your village, please let us know beforehand so we can provide you with what you need.If you have any questions about workshop villages or hosting content, you can [email the Village People](mailto:villages@emfcamp.org).
 
 ## The Village People
 The Village People are available to support making things happen in your village. If you have a cool idea, but need help with planning or logistics of doing things on site, please contact us beforehand. The earlier you let us know your plans, the better we can help you. You can contact us by [emailing villages@emfcamp.org](mailto:villages@emfcamp.org) and we will be very happy to discuss anything you might come up with!
