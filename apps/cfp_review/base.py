@@ -477,9 +477,13 @@ def rank(round_id: int) -> ResponseReturnValue:
             count = 0
             round.minimum_score = min_score
             for proposal, score in scored_proposals:
-                # We often bounce some things to manual review so skip them
-                if proposal.state == "manual-review":
+                # If the proposal is no longer in anonymised state we shouldn't
+                # touch it, because we've probably rejected, pulled, or
+                # accepted it during round close review. If we don't do this
+                # then we can set accepted talks back to anonymised.
+                if proposal.state != "anonymised":
                     continue
+
                 proposal_round = (
                     db.session.query(ProposalRound)
                     .where(
@@ -505,7 +509,6 @@ def rank(round_id: int) -> ResponseReturnValue:
                         send_email_for_proposal(proposal, reason="accepted")
 
                 else:
-                    proposal.state = "anonymised"
                     proposal_round.outcome = "still-considering"
                     if (
                         form.confirm_type.data == "accepted_unaccepted"
