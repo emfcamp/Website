@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any
 
 from flask import current_app as app
-from pendulum import parse
+from sqlalchemy import delete, select
 from yaml import safe_load
 
 from apps.config import config
@@ -32,17 +32,18 @@ def load_yaml_config() -> None:
         db.session.add(venue)
 
 
-def seed_shift_templates():
+def create_shift_templates() -> None:
     """Turns seed data from app/volunteer/shifts/*.py into ShiftTemplates.
 
-    This is intended to be a one time migration, once this migration has been performed
-    in production this code can be deleted and future seeding driven from post-event
-    exports to ensure we reflect the final configuration. Also to be deleted are:
+    After this event we should update this to work off an export of the final 2026
+    shift templates rather than having to update all the seeds. Once that has been done
+    the following can be deleted:
 
     - apps/volunteer/shifts/
     - apps/volunteer/event_date.py
     """
     load_yaml_config()
+
     shift_list = get_shift_list()
     for shift_role in shift_list:
         role = Role.get_by_slug(shift_role)
@@ -64,6 +65,9 @@ def seed_shift_templates():
                 # Day 0 is the day before event_start.
                 event_day = delta.days + 1
 
+                app.logger.info(
+                    f"ShiftTemplate: {role.slug}/{venue.slug}/day-{event_day}/{first.time().isoformat()}-{final.time().isoformat()}"
+                )
                 template = ShiftTemplate(
                     role_id=role.id,
                     venue_id=venue.id,
@@ -81,39 +85,15 @@ def seed_shift_templates():
     db.session.commit()
 
 
-def shifts():
-    load_yaml_config()
-    shift_list = get_shift_list()
+def shifts() -> None:
+    create_shift_templates()
 
-    for shift_role in shift_list:
-        role = Role.get_by_slug(shift_role)
-        if role is None:
-            app.logger.error(f"Unknown role: {shift_role}")
-            continue
-
-        if role.shifts:
-            app.logger.info(f"Skipping making shifts for role: {role.name}")
-            continue
-
-        for shift_venue in shift_list[shift_role]:
-            venue = VolunteerVenue.get_by_slug(shift_venue)
-            if venue is None:
-                app.logger.error(f"Unknown venue: {shift_venue}")
-                continue
-
-            for shift_range in shift_list[shift_role][shift_venue]:
-                shifts = Shift.generate_for(
-                    role=role,
-                    venue=venue,
-                    first=parse(shift_range["first"], tz=event_tz),
-                    final=parse(shift_range["final"], tz=event_tz),
-                    min=shift_range["min"],
-                    max=shift_range["max"],
-                    base_duration=shift_range.get("base_duration", 120),
-                    changeover=shift_range.get("changeover", 15),
-                )
-                for s in shifts:
-                    db.session.add(s)
+    db.session.execute(delete(Shift))
+    for template in db.session.execute(select(ShiftTemplate)).scalars():
+        app.logger.info(
+            f"Shifts: {template.role.slug}/{template.venue.slug}/day-{template.event_day}/{template.start_time.isoformat()}-{template.end_time.isoformat()}"
+        )
+        db.session.add_all(template.build_shifts())
 
     db.session.commit()
 

@@ -4,18 +4,16 @@ from datetime import date, datetime, time, timedelta
 from typing import TYPE_CHECKING, Self, TypedDict
 
 import pytz
-from pendulum import interval
-from sqlalchemy import ForeignKey, desc, func, select
+from sqlalchemy import ForeignKey, delete, desc, func, select
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, column_property, mapped_column, relationship
 
+from apps.config import config
 from main import db
 
 from .. import BaseModel
 
 if TYPE_CHECKING:
-    from pendulum import DateTime
-
     from ..content.schedule import Occurrence
     from ..user import User
     from .role import Role
@@ -184,6 +182,53 @@ class ShiftTemplate(BaseModel):
             "tables": ["volunteer_shift_template"],
         }
 
+    @property
+    def start_date(self) -> date:
+        return config.event_start.date() + timedelta(days=self.event_day - 1)
+
+    @property
+    def start_datetime(self) -> datetime:
+        return datetime.combine(self.start_date, self.start_time, event_tz)
+
+    @property
+    def end_date(self) -> date:
+        return self.start_date if self.start_time < self.end_time else self.start_date + timedelta(days=1)
+
+    @property
+    def end_datetime(self) -> datetime:
+        return datetime.combine(self.end_date, self.end_time, event_tz)
+
+    @property
+    def shift_start_times(self) -> list[datetime]:
+        final_shift_start = self.end_datetime - timedelta(minutes=self.duration)
+
+        shift_starts = []
+        time = self.start_datetime
+        while time < final_shift_start:
+            shift_starts.append(time)
+            time = time + timedelta(minutes=self.duration)
+        shift_starts.append(final_shift_start)
+
+        return shift_starts
+
+    def build_shifts(self) -> list[Shift]:
+        return [
+            Shift(
+                generated_from=self,
+                role=self.role,
+                venue=self.venue,
+                min_needed=self.min_needed,
+                max_needed=self.max_needed,
+                start=shift_start - timedelta(minutes=self.changeover_time),
+                end=shift_start + timedelta(minutes=self.duration),
+            )
+            for shift_start in self.shift_start_times
+        ]
+
+    def regenerate_shifts(self) -> None:
+        db.session.execute(delete(Shift).where(Shift.shift_template_id == self.id))
+        db.session.add_all(self.build_shifts())
+
     def __repr__(self) -> str:
         return f"<ShiftTemplate(id={self.id})>"
 
@@ -338,63 +383,6 @@ class Shift(BaseModel):
         last = db.session.execute(query.order_by(desc(cls.end))).scalar()
 
         return (first, last)
-
-    @classmethod
-    def generate_for(
-        cls,
-        role: Role,
-        venue: VolunteerVenue,
-        first: DateTime,
-        final: DateTime,
-        min: int,
-        max: int,
-        base_duration: int = 120,
-        changeover: int = 15,
-    ) -> list[Shift]:
-        """Build Shift records between start and end times.
-
-        Args:
-            first: an ISO8601 datetime indicating the start of the first shift
-
-            final: an ISO8601 datetime indicating the end of the last shift
-
-            min: is the minimum number of people needed to staff these shifts and still
-            get the job done.
-
-            max: is the maximum number of people who can practically staff these
-            shifts and having something to do.
-
-            base_duration: is how long we want a shift to be. The last shift of the
-            day may be slightly shorter.
-
-            changeover: indicates the time in minutes to overlap two shifts, allowing
-            some time for volunteers to handover between each other. Shifts will start
-            `changeover` minutes before the configured start time.
-        """
-
-        def start(t):
-            return t.subtract(minutes=changeover)
-
-        def end(t):
-            return t.add(minutes=base_duration)
-
-        final_start = final.subtract(minutes=base_duration)
-
-        initial_start_times = list(
-            interval(first.naive(), final_start.naive()).range("minutes", base_duration)
-        )
-
-        return [
-            Shift(
-                role=role,
-                venue=venue,
-                min_needed=min,
-                max_needed=max,
-                start=start(t),
-                end=end(t),
-            )
-            for t in initial_start_times
-        ]
 
 
 """
