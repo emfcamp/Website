@@ -38,7 +38,7 @@ More generally, villages run all kinds of content - technical presentations or l
 
 A selection of villages will be workshop villages, and will run and host workshops that any attendee can propose via the CfP alongside content organised by members of the village. These have already been selected and designated, and all Workshop Village content will be listed in the main programme.
 
-If you're planning to bring something especially big or in need of lots of power to your village, please let us know beforehand so we can provide you with what you need.If you have any questions about workshop villages or hosting content, you can [email the Village People](mailto:villages@emfcamp.org).
+If you're planning to bring something especially big or in need of lots of power to your village, please let us know beforehand so we can provide you with what you need. If you have any questions about workshop villages or hosting content, you can [email the Village People](mailto:villages@emfcamp.org).
 
 ## The Village People
 The Village People are available to support making things happen in your village. If you have a cool idea, but need help with planning or logistics of doing things on site, please contact us beforehand. The earlier you let us know your plans, the better we can help you. You can contact us by [emailing villages@emfcamp.org](mailto:villages@emfcamp.org) and we will be very happy to discuss anything you might come up with!
