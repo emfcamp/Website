@@ -13,7 +13,7 @@ from .. import BaseModel
 from .volunteer import VolunteerRoleInterest, VolunteerRoleTraining
 
 if TYPE_CHECKING:
-    from .shift import Shift
+    from .shift import Shift, ShiftTemplate
     from .volunteer import Volunteer
 
 __all__ = [
@@ -56,6 +56,10 @@ class Role(BaseModel):
     admins: Mapped[list[RoleAdmin]] = relationship(back_populates="role", cascade="all, delete-orphan")
     #: Shifts
     shifts: Mapped[list[Shift]] = relationship(back_populates="role", cascade="all, delete-orphan")
+    #: Shift templates used to generate the full shift schedule for this role
+    shift_templates: Mapped[list[ShiftTemplate]] = relationship(
+        back_populates="role", cascade="all, delete-orphan"
+    )
 
     #: Volunteers who are interested in this role
     interested_volunteers: Mapped[list[Volunteer]] = relationship(

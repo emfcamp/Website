@@ -1,11 +1,11 @@
 import enum
 from collections.abc import Sequence
-from datetime import date, datetime, timedelta
-from typing import TYPE_CHECKING, Self
+from datetime import date, datetime, time, timedelta
+from typing import TYPE_CHECKING, Self, TypedDict
 
 import pytz
 from pendulum import interval
-from sqlalchemy import ForeignKey, desc, func, select, text
+from sqlalchemy import ForeignKey, desc, func, select
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, column_property, mapped_column, relationship
 
@@ -26,6 +26,7 @@ __all__ = [
     "ShiftEntry",
     "ShiftEntryState",
     "ShiftEntryStateException",
+    "ShiftTemplate",
 ]
 
 event_tz = pytz.timezone("Europe/London")
@@ -112,6 +113,81 @@ class ShiftEntry(BaseModel):
         )
 
 
+class ShiftTemplateExport(TypedDict):
+    role_slug: str
+    venue_slug: str
+    event_day: int
+    start_time: str
+    end_time: str
+    duration: int
+    changeover_time: int
+    min_needed: int
+    max_needed: int
+    notes: str
+
+
+class ShiftTemplate(BaseModel):
+    """Configuration for creating a block of Shift instances.
+
+    When setting up the volunteer system for a new event we start with a collecion
+    of ShiftTemplates for each role and venue. These are then used to generate
+    a number of concrete Shift instances of the correct duration to fill the specified
+    period for the template.
+
+    A given role/venue combination may make use of multiple ShiftTemplate instances
+    to cover the various staffing levels and periods required.
+
+    Warning: ShiftTemplates will destroy all resulting Shift instances when deleted
+    or when shifts are regenerated. This is not a safe operation to perform once
+    volunteers have started signing up for shifts. When working via the web interface
+    doing so will be prevented but if you're on a console you should be aware of this.
+    """
+
+    __tablename__ = "volunteer_shift_template"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    role_id: Mapped[int] = mapped_column(ForeignKey("volunteer_role.id", ondelete="CASCADE"))
+    venue_id: Mapped[int] = mapped_column(ForeignKey("volunteer_venue.id", ondelete="CASCADE"))
+    event_day: Mapped[int] = mapped_column()
+    start_time: Mapped[time] = mapped_column()
+    end_time: Mapped[time] = mapped_column()
+    duration: Mapped[int] = mapped_column(default=120)
+    changeover_time: Mapped[int] = mapped_column(default=15)
+    min_needed: Mapped[int] = mapped_column(default=0)
+    max_needed: Mapped[int] = mapped_column(default=0)
+    notes: Mapped[str] = mapped_column(default="")
+
+    role: Mapped[Role] = relationship("Role", back_populates="shift_templates")
+    venue: Mapped[VolunteerVenue] = relationship("VolunteerVenue")
+    shifts: Mapped[list[Shift]] = relationship(
+        "Shift", back_populates="generated_from", cascade="all, delete-orphan"
+    )
+
+    @classmethod
+    def get_export_data(cls) -> dict[str, list[ShiftTemplateExport | str]]:
+        return {
+            "public": [
+                {
+                    "role_slug": template.role.slug,
+                    "venue_slug": template.venue.slug,
+                    "event_day": template.event_day,
+                    "start_time": template.start_time.toisoformat(),
+                    "end_time": template.finish_time.toisoformat(),
+                    "duration": template.duration,
+                    "changeover_time": template.changeover_time,
+                    "min_needed": template.min_needed,
+                    "max_needed": template.max_needed,
+                    "notes": template.notes,
+                }
+                for template in cls.query.all()  # type: ignore
+            ],
+            "tables": ["volunteer_shift_template"],
+        }
+
+    def __repr__(self) -> str:
+        return f"<ShiftTemplate(id={self.id})>"
+
+
 class Shift(BaseModel):
     """An available shift for one or more volunteers to perform."""
 
@@ -119,8 +195,11 @@ class Shift(BaseModel):
     __versioned__: dict[str, str] = {}
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    role_id: Mapped[int] = mapped_column(ForeignKey("volunteer_role.id"))
-    venue_id: Mapped[int] = mapped_column(ForeignKey("volunteer_venue.id"))
+    role_id: Mapped[int] = mapped_column(ForeignKey("volunteer_role.id", ondelete="CASCADE"))
+    venue_id: Mapped[int] = mapped_column(ForeignKey("volunteer_venue.id", ondelete="CASCADE"))
+    shift_template_id: Mapped[int | None] = mapped_column(
+        ForeignKey("volunteer_shift_template.id", ondelete="CASCADE")
+    )
 
     occurrence_id: Mapped[int | None] = mapped_column(ForeignKey("occurrence.id"))
     start: Mapped[datetime] = mapped_column()
@@ -139,6 +218,8 @@ class Shift(BaseModel):
     occurrence: Mapped[Occurrence] = relationship(back_populates="shifts")
     #: Entries (volunteers) for this shift
     entries: Mapped[list[ShiftEntry]] = relationship(back_populates="shift")
+    #: The ShiftTemplate that resulted in this shift
+    generated_from: Mapped[ShiftTemplate | None] = relationship(back_populates="shifts")
 
     current_count = column_property(
         select(func.count(ShiftEntry.shift_id))
