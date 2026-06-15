@@ -737,7 +737,7 @@ def reviewer_diversity():
 @admin_required
 def cfp_user(user_id: int) -> ResponseReturnValue:
     user = db.get_or_404(User, user_id)
-    if not user.proposals:
+    if not user.proposals and not user.schedule_items:
         abort(404)
     return render_template(
         "cfp_review/cfp_user.html",
