@@ -25,15 +25,19 @@
   </div>
   {% endif %}
 
+  {% if feature_enabled("WORKSHOP_LOTTERY") %}
   <p>
     Workshops that require you to sign up for a ticket will be allocated via
     <a href="{{ url_for('.about_lotteries') }}" title="About ticket lotteries">a lottery</a>.
   </p>
+  {% endif %}
 
   {% if current_user.is_authenticated %}
     <p>
       <strong><a class="btn btn-lg btn-primary" href="{{ url_for('.favourites') }}">View your favourites</a></strong>
+      {% if feature_enabled("WORKSHOP_LOTTERY") %}
       <strong><a class="btn btn-lg btn-primary" href="{{ url_for('.lotteries') }}">View your lottery entries</a></strong>
+      {% endif %}
     </p>
   {% endif %}
 </div>

@@ -119,7 +119,13 @@
 
   </form>
 
-  {% for occurrence_form in schedule_item.occurrence_forms %}
+  {% if occurrence_forms and feature_enabled("WORKSHOP_LOTTERY") %}
+  <div class="panel panel-default">
+  <div class="panel-heading">
+      <h3 class="panel-title">Lottery</h3>
+  </div>
+  <div class="panel-body">
+  {% for occurrence_form in occurrence_forms.values() %}
     {% set occurrence = occurrences_dict[occurrence_form.occurrence_id.data] %}
 
     {% if feature_enabled('SCHEDULE') and occurrence.scheduled %}
@@ -130,7 +136,7 @@
       <form method="post" class="form-inline">
       {{ occurrence_form.hidden_tag() }}
 
-      <div class="pull-right">
+      <div>
         {% set lottery = occurrence.lottery %}
         {% if not lottery %}
           <p>This {{ schedule_item.human_type }} does not require a lottery ticket.</p>
@@ -162,15 +168,18 @@
       </div>
       </form>
 
-      <div class="pull-right">
+      <p>
         <small>
           You can see your other lottery tickets
           {% if lottery.state == "allow-entry" %}(and rank your preferences){% endif %}
           by going to the <a href="{{ url_for('.lotteries') }}">lotteries page</a>
         </small>
-      </div>
+      </p>
     {% endif %}
   {% endfor %}
+  </div>
+  </div>
+  {% endif %}
 
 {% endif %}
 <p>&nbsp;</p>

@@ -319,7 +319,7 @@ def item_current(year: int, schedule_item_id: int, slug: str | None = None) -> R
 
 @schedule.route("/schedule/lottery/about")
 def about_lotteries():
-    return render_template("schedule/lotteries_about.html")
+    return render_template("schedule/about_lotteries.html")
 
 
 class SingleLotteryEntry(Form):
@@ -332,6 +332,7 @@ class LotteryEntriesForm(Form):
 
 
 @schedule.route("/schedule/lottery", methods=["GET", "POST"])
+@feature_flag("WORKSHOP_LOTTERY")
 def lotteries() -> ResponseReturnValue:
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for("schedule.lotteries")))
@@ -378,6 +379,7 @@ def lotteries() -> ResponseReturnValue:
 
 
 @schedule.route("/api/schedule/lottery/<int:entry_id>/cancel", methods=["POST"])
+@feature_flag("WORKSHOP_LOTTERY")
 def cancel_lottery_entry(entry_id: int) -> ResponseReturnValue:
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for("schedule.lottery_entries")))
