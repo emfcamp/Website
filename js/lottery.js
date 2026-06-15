@@ -1,47 +1,29 @@
 import Sortable from "sortablejs/modular/sortable.core.esm.js";
 
-// FIXME: make this generic by type
+const types = ["workshop", "familyworkshop"];
 
-var workshops = Sortable.create(
-  document.getElementById("lottery-entries-workshops"),
-  {
+for (const type of types) {
+  console.log(type);
+  const block = document.getElementById(`lottery-entries-${type}`);
+  console.log(block);
+  if (!block) continue;
+
+  const sortable = Sortable.create(block, {
     ghostClass: "sortable-ghost-class",
     onEnd: async (event) => {
       const response = await fetch(
-        `/api/schedule/lottery/workshop/preferences`,
+        `/api/schedule/lottery/${type}/preferences`,
         {
           method: "POST",
           credentials: "include",
           headers: {
             "Content-Type": "application/json; charset=utf-8",
           },
-          body: JSON.stringify(workshops.toArray()),
+          body: JSON.stringify(sortable.toArray()),
         },
       );
 
       const result = await response.json();
     },
-  },
-);
-
-var familyworkshops = Sortable.create(
-  document.getElementById("lottery-entries-familyworkshops"),
-  {
-    ghostClass: "sortable-ghost-class",
-    onEnd: async (event) => {
-      const response = await fetch(
-        `/api/schedule/lottery/familyworkshop/preferences`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json; charset=utf-8",
-          },
-          body: JSON.stringify(familyworkshops.toArray()),
-        },
-      );
-
-      const result = await response.json();
-    },
-  },
-);
+  });
+}

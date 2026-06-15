@@ -13,41 +13,86 @@
   </small>
 </h2>
 
-{% if schedule_item.occurrences | length > 1 %}
-<h3>{{ schedule_item.occurrences | length }} occurrences</h3>
-{% endif %}
-
 {% for occurrence in schedule_item.occurrences %}
-  {% if schedule_item.occurrences | length > 1 %}
-  <table class="table">
-    <tr>
-      <td>{{ occurrence.occurrence_num }}</td>
-      <td>
-  {% endif %}
-
-  {% if occurrence.scheduled %}
-  <p><strong>{{ occurrence.scheduled_time.strftime('%A from %-I:%M %p') }}</strong> - <strong>{{ occurrence.end_date.strftime('%-I:%M %p') }}</strong>
-    {% if feature_enabled('SCHEDULE') and occurrence.scheduled_venue.map_link %}
-    in <strong><a href="{{ occurrence.scheduled_venue.map_link }}" target="_blank">{{ schedule_item.scheduled_venue.name }}</a></strong>
-    {% else %}
-    in <strong>{{ schedule_item.scheduled_venue.name }}</strong>
-    {% endif %}
-  </p>
-  {% else %}
-  <p>Currently unscheduled</p>
-  {% endif %}
-
-  {% if occurrence.video_recording_lost %}
-    <div class="alert alert-warning">
-    The video recording for this {{ schedule_item.human_type }} was unfortunately lost due to technical issues.
+  <div class="panel panel-default">
+    {% if schedule_item.occurrences | length > 1 %}
+    <div class="panel-heading">
+       <h3 class="panel-title">Occurrence {{ occurrence.occurrence_num }}</h3>
     </div>
-  {% endif %}
+    {% endif %}
 
-  {% if schedule_item.occurrences | length > 1 %}
-      </td>
-    </tr>
-  </table>
-  {% endif %}
+    <div class="panel-body">
+
+      {% if occurrence.scheduled %}
+      <div class="pull-right">
+      <a href="{{ occurrence.scheduled_venue.map_link }}" target="_blank" class="btn btn-primary">📍&nbsp;Map</a>
+      </div>
+
+      <p>
+        <strong>{{ occurrence.scheduled_time.strftime('%A from %-I:%M %p') }}</strong>
+        -
+        <strong>{{ occurrence.scheduled_end_time.strftime('%-I:%M %p') }}</strong>
+        {% if occurrence.scheduled_venue.map_link %}
+          in
+          <strong><a href="{{ occurrence.scheduled_venue.map_link }}" target="_blank">
+            {{ occurrence.scheduled_venue.name }}
+          </a></strong>
+        {% else %}
+          in <strong>{{ occurrence.scheduled_venue.name }}</strong>
+        {% endif %}
+      </p>
+
+      {% else %}
+
+      <p>Currently unscheduled</p>
+
+      {% endif %}
+
+      {% if schedule_item.type_info.supports_lottery and feature_enabled("WORKSHOP_LOTTERY") %}
+        {% set occurrence_form = occurrence_forms[occurrence.id] %}
+        <form method="post" class="form-inline">
+        {{ occurrence_form.hidden_tag() }}
+
+        {% set lottery = occurrence.lottery %}
+        {% if not lottery %}
+          <p>This {{ schedule_item.human_type }} does not require a lottery ticket.</p>
+
+        {% elif lottery.state == "allow-entry" %}
+          {% if lottery.get_lottery_capacity() > 0 %}
+            {{ occurrence_form.ticket_count.label() }}
+            {{ occurrence_form.ticket_count(class_="form-control") }}
+            {{ occurrence_form.enter_lottery(class_="btn btn-primary") }}
+          {% else %}
+            <p>This {{ schedule_item.human_type }} does not have any tickets available via lottery.</p>
+          {% endif %}
+
+        {% elif lottery.state == "first-come-first-served" %}:
+          {% if lottery.get_all_ticket_capacity() > 0 %}
+            {{ occurrence_form.ticket_count.label() }}
+            {{ occurrence_form.ticket_count(class_="form-control") }}
+            {{ occurrence_form.get_ticket(class_="btn btn-primary") }}
+          {% else %}
+            <p>This {{ schedule_item.human_type }} is now full. If any tickets become available they will be visible here.</p>
+          {% endif %}
+
+        {% elif lottery.state == "complete" %}
+          {# FIXME add info about held tickets here #}
+          {# It's presumably a reference to Lottery.reserved_tickets, and not related to the first-come-first-served functionality? #}
+          <p>The lottery for this {{ schedule_item.human_type }} is currently closed. A small number of tickets will be available first-come, first-served on the day.</p>
+
+        {% endif %}
+        </form>
+      {% endif %}
+
+      {% if occurrence.video_recording_lost %}
+      <div class="alert alert-warning">
+      The video recording for this {{ schedule_item.human_type }} was unfortunately lost due to technical issues.
+      </div>
+      {% endif %}
+
+    </div>
+
+  </div>
 
 {% endfor %}
 
@@ -119,68 +164,6 @@
 
   </form>
 
-  {% if occurrence_forms and feature_enabled("WORKSHOP_LOTTERY") %}
-  <div class="panel panel-default">
-  <div class="panel-heading">
-      <h3 class="panel-title">Lottery</h3>
-  </div>
-  <div class="panel-body">
-  {% for occurrence_form in occurrence_forms.values() %}
-    {% set occurrence = occurrences_dict[occurrence_form.occurrence_id.data] %}
-
-    {% if feature_enabled('SCHEDULE') and occurrence.scheduled %}
-    <a href="{{ occurrence.scheduled_venue.map_link }}" target="_blank" class="btn btn-primary">📍&nbsp;Map</a>
-    {% endif %}
-
-    {% if schedule_item.type_info.supports_lottery %}
-      <form method="post" class="form-inline">
-      {{ occurrence_form.hidden_tag() }}
-
-      <div>
-        {% set lottery = occurrence.lottery %}
-        {% if not lottery %}
-          <p>This {{ schedule_item.human_type }} does not require a lottery ticket.</p>
-
-        {% elif lottery.state == "allow-entry" %}
-          {% if lottery.get_lottery_capacity() > 0 %}
-            {{ occurrence_form.ticket_count.label() }}
-            {{ occurrence_form.ticket_count(class_="form-control") }}
-            {{ occurrence_form.enter_lottery(class_="btn btn-primary") }}
-          {% else %}
-            <p>This {{ schedule_item.human_type }} does not have any tickets available via lottery.</p>
-          {% endif %}
-
-        {% elif lottery.state == "first-come-first-served" %}:
-          {% if lottery.get_all_ticket_capacity() > 0 %}
-            {{ occurrence_form.ticket_count.label() }}
-            {{ occurrence_form.ticket_count(class_="form-control") }}
-            {{ occurrence_form.get_ticket(class_="btn btn-primary") }}
-          {% else %}
-            <p>This {{ schedule_item.human_type }} is now full. If any tickets become available they will be visible here.</p>
-          {% endif %}
-
-        {% elif lottery.state == "complete" %}
-          {# FIXME add info about held tickets here #}
-          {# It's presumably a reference to Lottery.reserved_tickets, and not related to the first-come-first-served functionality? #}
-          <p>The lottery for this {{ schedule_item.human_type }} is currently closed. A small number of tickets will be available first-come, first-served on the day.</p>
-
-        {% endif %}
-      </div>
-      </form>
-
-      <p>
-        <small>
-          You can see your other lottery tickets
-          {% if lottery.state == "allow-entry" %}(and rank your preferences){% endif %}
-          by going to the <a href="{{ url_for('.lotteries') }}">lotteries page</a>
-        </small>
-      </p>
-    {% endif %}
-  {% endfor %}
-  </div>
-  </div>
-  {% endif %}
-
 {% endif %}
 <p>&nbsp;</p>
 
@@ -221,6 +204,11 @@
     <li>
       <a href="{{ url_for('.favourites') }}">Favourites</a>
     </li>
+    {% if feature_enabled("WORKSHOP_LOTTERY") %}
+    <li>
+      <a href="{{ url_for('.lotteries') }}">Lottery</a>
+    </li>
+    {% endif %}
   {% endif %}
 </ul>
 {% endblock %}

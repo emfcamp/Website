@@ -216,7 +216,8 @@ def item_current(year: int, schedule_item_id: int, slug: str | None = None) -> R
         if schedule_item.type_info.supports_lottery and occurrence.lottery:
             lottery_entry = current_user.get_lottery_entry_for_occurrence(occurrence)
             if lottery_entry:
-                occurrence_form.ticket_count.data = lottery_entry.ticket_count
+                if request.method != "POST":
+                    occurrence_form.ticket_count.data = lottery_entry.ticket_count
                 if lottery_entry.state == "cancelled":
                     occurrence_form.enter_lottery.label.text = "Re-enter lottery"
                 else:
@@ -257,7 +258,7 @@ def item_current(year: int, schedule_item_id: int, slug: str | None = None) -> R
             db.session.commit()
             if msg:
                 flash(msg)
-            return redirect(url_for(".lotteries"))
+            return redirect(url_for(".item", year=year, schedule_item_id=schedule_item_id, slug=slug))
 
     elif occurrence_id := request.form.get("occurrence_id"):
         occurrence = occurrences_dict[int(occurrence_id)]
@@ -304,7 +305,7 @@ def item_current(year: int, schedule_item_id: int, slug: str | None = None) -> R
             db.session.commit()
             if msg:
                 flash(msg)
-            return redirect(url_for(".lotteries"))
+            return redirect(url_for(".item", year=year, schedule_item_id=schedule_item_id, slug=slug))
 
     return render_template(
         "schedule/item.html",
@@ -337,7 +338,7 @@ def lotteries() -> ResponseReturnValue:
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for("schedule.lotteries")))
 
-    user_entries = sorted(current_user.lottery_entries, key=lambda t: t.rank or 0)
+    user_entries = sorted(current_user.lottery_entries, key=lambda e: e.rank or 0)
 
     form = LotteryEntriesForm()
 
@@ -348,7 +349,7 @@ def lotteries() -> ResponseReturnValue:
                     if lottery_entry.id == entry_form.entry_id.data:
                         lottery_entry.cancel()
                         db.session.commit()
-                        return redirect(url_for(".lottery_entries"))
+                        return redirect(url_for(".lotteries"))
 
         abort(400)
 
@@ -360,14 +361,14 @@ def lotteries() -> ResponseReturnValue:
         form.entries.append_entry()
         form.entries[-1].entry_id.data = lottery_entry.id
         lottery_entry._form = form.entries[-1]
-        entries_dict[lottery_entry.state][lottery_entry.schedule_item.type].append(lottery_entry)
+        entries_dict[lottery_entry.state][lottery_entry.lottery.schedule_item.type].append(lottery_entry)
 
     lotteries: list[Lottery] = list(
         db.session.scalars(
             select(Lottery)
             .where(Lottery.state == "allow-entry")
             .options(
-                selectinload(Lottery.occurrence),
+                selectinload(Lottery.occurrence).selectinload(Occurrence.schedule_item),
             )
         )
     )
