@@ -46,7 +46,6 @@ class UpdateProposalForm(Form):
             "Review": [
                 ("anonymised", "Anonymised"),
                 ("anon-blocked", "Can't anonymise"),
-                ("reviewed", "Reviewed"),
             ],
             "Final": [
                 ("accepted", "Accepted"),

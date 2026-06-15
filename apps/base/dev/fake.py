@@ -151,7 +151,6 @@ class FakeDataGenerator:
             "anonymised": 0.1,
             "anon-blocked": 0.05,
             "manual-review": 0.05,
-            "reviewed": 0.2,
             "accepted": 0.1,
             "finalised": 0.3,
             "withdrawn": 0.05,
@@ -189,7 +188,7 @@ class FakeDataGenerator:
             "stale": 0.1,
         }
 
-        if state in {"anonymised", "reviewed", "accepted"} and proposal.type in {"talk", "workshop"}:
+        if state in {"anonymised", "accepted"} and proposal.type in {"talk", "workshop"}:
             for reviewer in random.sample(reviewers, random.randint(0, len(reviewers))):
                 vote = ProposalVote(reviewer, proposal)
                 vote.state = random_choice(vote_states)

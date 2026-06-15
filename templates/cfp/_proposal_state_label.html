@@ -12,8 +12,6 @@
         Cancelled
     {% elif proposal.state in ('anonymised', 'conduct-blocked') %}
         Awaiting review
-    {% elif proposal.state == 'reviewed' %}
-        Awaiting the next round
     {% elif proposal.state == 'accepted' %}
         Accepted
     {% elif proposal.state == 'finalised' %}
