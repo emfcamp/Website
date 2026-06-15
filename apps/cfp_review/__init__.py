@@ -58,7 +58,7 @@ def before_request() -> ResponseReturnValue | None:
 def sort_proposals(proposals: list[Proposal]) -> list[Proposal]:
     sort_keys: dict[str, Callable[[Proposal], Any]] = {
         "ticket": lambda p: (len(p.user.owned_tickets) > 0, p.title.lower()),
-        "date": lambda p: (p.modified, p.title.lower()),
+        "date": lambda p: (p.created, p.title.lower()),
         "state": lambda p: (p.state, p.modified, p.title.lower()),
         "type": lambda p: (p.type, p.title.lower()),
         "notice": lambda p: (p.notice_required or "", p.title.lower()),

@@ -105,7 +105,7 @@
             {% if proposal.user.check_will_have_ticket() %}Yes{% endif %}
         {%- endcall %}
         {% call cell("date", True) -%}
-            {{proposal.modified.strftime("%d/%m")}}
+            {{proposal.created.strftime("%d/%m")}}
         {%- endcall %}
         {% call cell("state", True) -%}
             {{proposal_state(proposal)}}
