@@ -43,7 +43,7 @@
             <a href="{{ url_for('.schedule_items', sort_by='type', reverse=qs_reverse_new, **new_qs) }}">Type</a>
         </th>
         <th>
-            <a href="{{ url_for('.schedule_items', sort_by='official_content', reverse=qs_reverse_new, **new_qs) }}">Official</a>
+            Source
         </th>
         <th>
             Availability
@@ -68,7 +68,15 @@
     <tr class="{{- loop.cycle('odd', 'even') -}}">
         <td>{{ schedule_item.state | capitalize }}</td>
         <td>{{ schedule_item.human_type | capitalize }}</td>
-        <td>{% if schedule_item.official_content %}Official{% else %}Attendee{% endif %}</td>
+        <td>
+            {% if schedule_item.proposal %}
+                <a href="{{url_for('.proposal', proposal_id=schedule_item.proposal.id) }}">CfP</a>
+            {% elif schedule_item.official_content %}
+                Manual
+            {% else %}
+                Attendee
+            {% endif %}
+        </td>
         <td>{% if schedule_item.availability|length > 0 %}✔️{% endif %}</td>
         <td>{% if schedule_item.occurrences|length > 0 and schedule_item.occurrences[0].scheduled %}✔️{% endif %}</td>
         <td>{{schedule_item.occurrences|length}}</td>
