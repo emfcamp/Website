@@ -1,47 +1,62 @@
-import os
-from typing import Optional
+"""The base app is responsible for everything on the website which isn't handled by other apps.
 
+This includes the front page and all the info pages.
+"""
+
+import os
+
+import requests
 from flask import (
-    render_template,
-    redirect,
-    request,
-    flash,
     Blueprint,
-    url_for,
-    send_from_directory,
     abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    url_for,
+)
+from flask import (
     current_app as app,
 )
+from flask.typing import ResponseReturnValue
+from flask_cors import cross_origin
 from flask_login import current_user
-import requests
+from sqlalchemy import select
 
-from main import cache
-from models.product import Price, Product, ProductView, ProductViewProduct, PriceTier
+from main import cache, db
+from models import Currency
+from models.product import Price, PriceTier, Product, ProductView, ProductViewProduct
 from models.site_state import get_site_state
-
 
 base = Blueprint("base", __name__, cli_group=None)
 
 
 @cache.cached(timeout=60, key_prefix="get_full_price")
-def get_full_price() -> Optional[Price]:
+def get_full_price() -> Price | None:
     full = (
-        ProductView.query.filter_by(name="main")
-        .join(ProductViewProduct, Product, PriceTier)
-        .filter_by(active=True)
-        .order_by(ProductViewProduct.order)
-        .with_entities(PriceTier)
+        db.session.execute(
+            select(ProductView)
+            .where(ProductView.name == "main")
+            .join(ProductViewProduct)
+            .join(Product)
+            .join(PriceTier)
+            .filter_by(active=True)
+            .order_by(ProductViewProduct.order)
+            .with_only_columns(PriceTier)
+        )
+        .scalars()
         .first()
     )
 
     if full is not None:
-        return full.get_price("GBP")
+        return full.get_price(Currency.GBP)
 
     return None
 
 
 @base.route("/")
-def main():
+def main() -> ResponseReturnValue:
     state = get_site_state()
     if app.config.get("DEBUG"):
         state = request.args.get("site_state", state)
@@ -54,11 +69,11 @@ def main():
     ):
         return redirect(url_for("users.account"))
 
-    return render_template("home/%s.html" % state, full_price=get_full_price())
+    return render_template(f"home/{state}.html", full_price=get_full_price())
 
 
 @base.route("/", methods=["POST"])
-def main_post():
+def main_post() -> ResponseReturnValue:
     honeypot_field = request.form.get("name")
     email = request.form.get("email", "").strip()
     list = request.form.get("list")
@@ -70,7 +85,7 @@ def main_post():
         return redirect(url_for(".main"))
 
     if honeypot_field != "":
-        app.logger.warn(
+        app.logger.warning(
             "Mailing list honeypot field failed for %s (IP %s)",
             email,
             request.remote_addr,
@@ -84,7 +99,7 @@ def main_post():
     )
 
     if response.status_code != 200:
-        app.logger.warn(
+        app.logger.warning(
             "Unable to subscribe to mailing list (HTTP %s): %s",
             response.status_code,
             response.text,
@@ -100,7 +115,7 @@ def main_post():
 
 
 @base.route("/favicon.ico")
-def favicon():
+def favicon() -> ResponseReturnValue:
     return send_from_directory(
         os.path.join(app.root_path, "static/images"),
         "favicon.ico",
@@ -109,96 +124,85 @@ def favicon():
 
 
 @base.route("/404")
-def raise_404():
+def raise_404() -> ResponseReturnValue:
     abort(404)
 
 
 @base.route("/500")
-def raise_500():
+def raise_500() -> ResponseReturnValue:
     abort(500)
 
 
 @base.route("/network")
-def network():
+def network() -> ResponseReturnValue:
     return redirect("/about/internet")
 
 
 @base.route("/phones")
-def phones():
+def phones() -> ResponseReturnValue:
     return redirect("/about/phones")
 
 
 @base.route("/feedback")
-def feedback():
+def feedback() -> ResponseReturnValue:
     return render_template("feedback.html")
 
 
 @base.route("/sponsors")
-def sponsors():
+def sponsors() -> ResponseReturnValue:
     # return abort(404)
     return render_template("sponsors/sponsors.html")
 
 
 @base.route("/sponsor")
-def sponsor():
+def sponsor() -> ResponseReturnValue:
     return render_template("sponsors/sponsor.html")
 
 
 @base.route("/badge")
-def badge():
+def badge() -> ResponseReturnValue:
     return redirect("https://tildagon.badge.emfcamp.org/")
 
 
-@base.route("/code-of-conduct")
-def code_of_conduct():
-    return render_template("code-of-conduct.html")
-
-
 @base.route("/googlec108e6ab4f75019d.html")
-def google_verification_russ():
+def google_verification_russ() -> ResponseReturnValue:
     return "google-site-verification: googlec108e6ab4f75019d.html"
 
 
 @base.route("/google3189d9169f2faf7f.html")
-def google_verification_mark():
+def google_verification_mark() -> ResponseReturnValue:
     return "google-site-verification: google3189d9169f2faf7f.html"
 
 
 @base.route("/.well-known/security.txt")
-def security_txt():
+def security_txt() -> ResponseReturnValue:
     return """Contact: security@emfcamp.org\n"""
 
 
 @base.route("/.well-known/matrix/server")
-def matrix_server():
+def matrix_server() -> ResponseReturnValue:
     return {"m.server": "matrix.emfcamp.org:443"}
 
 
 @base.route("/.well-known/matrix/client")
-def matrix_client():
+@cross_origin(methods=["GET"])
+def matrix_client() -> ResponseReturnValue:
     return {"m.homeserver": {"base_url": "https://matrix.emfcamp.org"}}
 
 
 @base.route("/subscribe")
-def subscribe():
+def subscribe() -> ResponseReturnValue:
     return render_template("subscribe.html")
 
 
 @base.route("/emp")
-def emp():
+def emp() -> ResponseReturnValue:
     return render_template("emp.html")
 
 
 @base.route("/deliveries")
-def deliveries():
+def deliveries() -> ResponseReturnValue:
     return redirect("/static/deliveries.pdf")
-
-
-@base.route("/orga-links")
-def orga_links():
-    return redirect(
-        "https://docs.google.com/document/d/1AAkzW2J1keCYZj1vDaEWcmVNLIbUTHoqh1zCaZUgNHk/edit?usp=sharing"
-    )
 
 
 from . import redirects  # noqa
@@ -212,3 +216,5 @@ from . import tasks_banking  # noqa
 from . import tasks_export  # noqa
 from . import tasks_videos  # noqa
 from . import dev  # noqa
+from . import code_of_conduct  # noqa
+from . import postmark  # noqa

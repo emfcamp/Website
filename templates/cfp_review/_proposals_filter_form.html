@@ -1,11 +1,11 @@
-{# Filter form on /cfp-review/proposals #}
-<form method="get" class="row">
-    <fieldset class="form-horizontal col-md-6">
+{# Filter form on /admin/cfp-review/proposals #}
+<div class="row">
+    <fieldset class="form-horizontal col-md-10">
         <div class="form-group">
             <label for="state" class="col-sm-2">State</label>
             <div class="col-sm-10">
                 <select id="state" name="state" multiple class="form-control">
-                    {% for state in ordered_states %}
+                    {% for state in proposal_states %}
                         <option value="{{state}}"
                             {%-if state in request.args.getlist('state') %}
                                 selected
@@ -19,12 +19,12 @@
             <label for="type" class="col-sm-2">Type</label>
             <div class="col-sm-10">
                 <select id="type" name="type" multiple class="form-control">
-                    {% for cfp_type, human_type in cfp_types.items() %}
-                        <option value="{{ cfp_type }}"
-                            {%-if cfp_type in request.args.getlist('type') %}
+                    {% for type_info in PROPOSAL_INFOS.values() %}
+                        <option value="{{ type_info.type }}"
+                            {%-if type_info.type in request.args.getlist('type') %}
                                 selected
                             {%-endif %}
-                        >{{ human_type }}</option>
+                        >{{ type_info.human_type }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -52,7 +52,7 @@
             </div>
         </div>
     </fieldset>
-    <fieldset class="form-horizontal col-md-6">
+    <fieldset class="form-horizontal col-md-2">
         <div class="form-group">
             <div class="checkbox">
                 <label>
@@ -66,7 +66,7 @@
             <div class="checkbox">
                 <label>
                     <input name="needs_help" id="needs_help" type="checkbox" value="True"
-                           {%- if request.args.get('needs_help', False) %}checked{% endif %}>
+                            {%- if request.args.get('needs_help', False) %}checked{% endif %}>
                     Needs Help
                 </label>
             </div>
@@ -75,7 +75,7 @@
             <div class="checkbox">
                 <label>
                     <input name="needs_money" id="needs_money" type="checkbox" value="True"
-                           {%- if request.args.get('needs_money', False) %}checked{% endif %}>
+                            {%- if request.args.get('needs_money', False) %}checked{% endif %}>
                     Needs Money
                 </label>
             </div>
@@ -83,29 +83,19 @@
         <div class="form-group">
             <div class="checkbox">
                 <label>
-                    <input name="show_user_scheduled" id="show_user_scheduled" type="checkbox" value="True"
-                           {%- if request.args.get('show_user_scheduled', False) %}checked{% endif %}>
-                    Attendee Scheduled Content
-                </label>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="checkbox">
-                <label>
-                    <input name="hide_from_schedule" id="hide_from_schedule" type="checkbox" value="True"
-                           {%- if request.args.get('hide_from_schedule', False) %}checked{% endif %}>
-		    Hidden from Schedule
+                    <input name="has_notes" id="has_notes" type="checkbox" value="True"
+                            {%- if request.args.get('has_notes', False) %}checked{% endif %}>
+                    Has notes
                 </label>
             </div>
         </div>
     </fieldset>
-    <fieldset class="form-horizontal col-md-6">
-        <div class="form-group">
-            <div class="btn-group">
-                <button class="btn btn-primary">Apply</button>
-                <a href="{{url_for('.proposals')}}" class="btn btn-default">Clear</a>
-            </div>
+</div>
+<div class="row">
+    <fieldset class="form-horizontal col-md-12">
+        <div class="btn-group pull-right">
+            <button class="btn btn-primary">Apply</button>
+            <a href="{{url_for('.proposals')}}" class="btn btn-default">Clear</a>
         </div>
     </fieldset>
-</form>
-
+</div>

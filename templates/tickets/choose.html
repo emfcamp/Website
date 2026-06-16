@@ -26,14 +26,22 @@ Buy Items
 <div class="well pull-right">
     <label>Select your currency:</label>
     <div class="btn-group">
-        {% for c in CURRENCIES %}
+        {% for code, symbol in CURRENCY_SYMBOLS.items() %}
         <!-- IE8+ -->
-        <button type="submit" class="btn btn-primary {% if user_currency == c.code -%} active {%- endif %}" name="set_currency" value="{{ c.code }}" data-toggle="button">{{ c.symbol }}</button>
+        <button type="submit" class="btn btn-primary {% if user_currency == code -%} active {%- endif %}" name="set_currency" value="{{ code }}" data-toggle="button">{{ symbol }}</button>
         {% endfor %}
     </div>
 </div>
 
 <div class="clearfix"></div>
+
+{% if voucher %}
+<div class="well">
+    <p>Your voucher allows you to buy <strong>{{voucher.tickets_remaining}}</strong> adult tickets, and you have
+        <strong>{{voucher.purchases_remaining}}</strong> purchase{% if voucher.purchases_remaining > 1 %}s{%endif %} remaining. To clear your voucher, please <a href="{{ url_for(".tickets_voucher_clear", flow=flow) }}">click here</a>.
+    </p>
+</div>
+{% endif %}
 
 <table class="table products">
 
@@ -70,10 +78,13 @@ Buy Items
         {% if f._tier.parent.description %}<p class="description">{{ f._tier.parent.description }}</p>{% endif %}
     </td>
     <td>
-        <span class="price">{{ f._tier.get_price(user_currency) | price(user_currency) }}</span>
+        <span class="price">{{ f._tier.get_price(user_currency) | price }}</span>
     </td>
     <td>
-        {% if available and f._any %}
+        {% if available and f._user_limit_reached %}
+        <div class="help-block">You have already bought the maximum amount</div>
+        </div>
+        {% elif available and f._any %}
         {{ f.hidden_tag() }}
         <div class="controls">{{ f.amount(class_="amount")|safe }}
         {% if f.amount.errors %}
@@ -83,7 +94,7 @@ Buy Items
         {% endif %}
         </div>
         {% elif available %}
-        <span class="sold-out">sold out</span>
+        <span class="sold-out">Sold out</span>
         {% endif %}
     </td>
 </tr>

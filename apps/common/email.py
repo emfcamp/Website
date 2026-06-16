@@ -1,13 +1,15 @@
-from css_inline import CSSInliner
 import markdown
-from flask import render_template, url_for
-from markupsafe import Markup
+from css_inline import CSSInliner
 from flask import current_app as app
+from flask import render_template, url_for
 from jinja2.sandbox import ImmutableSandboxedEnvironment
+from markupsafe import Markup
 
-from models import event_year
-from models.email import EmailJob, EmailJobRecipient
 from main import db, mail
+from models.email import EmailJob, EmailJobRecipient
+from models.user import User
+
+from ..config import config as app_config
 
 
 def create_sandbox_env():
@@ -96,9 +98,7 @@ def format_trusted_html_email(markdown_text, subject, reason=None, **kwargs):
     markdown_html = Markup(markdown.markdown(markdown_text, extensions=extensions))
 
     if not reason:
-        reason = (
-            f"You're receiving this email because you have a ticket for Electromagnetic Field {event_year()}."
-        )
+        reason = f"You're receiving this email because you have a ticket for Electromagnetic Field {app_config.event_year}."
 
     inliner = CSSInliner()
     return inliner.inline(
@@ -124,32 +124,38 @@ def format_trusted_plaintext_email(markdown_text, **kwargs):
 def preview_trusted_email(preview_address, subject, body):
     subject = "[PREVIEW] " + subject
     formatted_plaintext = format_trusted_plaintext_email(body)
+    # FIXME: add reason?
     formatted_html = format_trusted_html_email(body, subject)
 
     mail.send_mail(
         subject=subject,
         message=formatted_plaintext,
-        from_email=from_email("CONTACT_EMAIL"),
-        recipient_list=[preview_address],
         html_message=formatted_html,
+        from_email=app_config.from_email("CONTACT_EMAIL"),
+        recipient_list=[preview_address],
     )
 
 
-def enqueue_trusted_emails(users, subject, body, **kwargs):
+def enqueue_emails(
+    users: list[User],
+    from_email: str,
+    subject: str,
+    text_body: str,
+    html_body: Markup | None = None,
+    priority: int = 1,
+    bulk: bool = False,
+    volunteer: bool = False,
+) -> None:
     """Queue an email for sending by the background email worker."""
     job = EmailJob(
-        subject,
-        format_trusted_plaintext_email(body, **kwargs),
-        format_trusted_html_email(body, subject, **kwargs),
+        priority=priority,
+        bulk=bulk,
+        volunteer=volunteer,
+        from_email=from_email,
+        subject=subject,
+        text_body=text_body,
+        html_body=html_body,
     )
     db.session.add(job)
-
     for user in users:
-        db.session.add(EmailJobRecipient(job, user))
-
-    db.session.commit()
-
-
-def from_email(name):
-    email = app.config[name][1]
-    return f"Electromagnetic Field <{email}>"
+        db.session.add(EmailJobRecipient(job=job, user=user))

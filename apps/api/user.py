@@ -1,6 +1,8 @@
 from flask_login import current_user
 from flask_restful import Resource, abort
+
 from models.user import User
+
 from . import api
 
 

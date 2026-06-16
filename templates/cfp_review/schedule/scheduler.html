@@ -1,0 +1,242 @@
+{% extends "cfp_review/base.html" %}
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dhtmlxscheduler_flat.css' ) }}">
+  <style type="text/css" media="screen">
+  </style>
+  <style type="text/css">
+    .potential div {
+        color: #000000!important;
+        background-color: #ff944d!important;
+    }
+    .attendee div {
+        color: #000000!important;
+        background-color: #e34646!important;
+    }
+    .dhx_scale_hour {
+        height: 131px !important;
+    }
+  </style>
+{% endblock %}
+{% block body %}
+
+<p>
+  Show Venues:
+  <a href="{{ url_for('cfp_review.scheduler') }}">All</a> /
+  <a href="{{ url_for('cfp_review.scheduler', venue=emf_venues) }}">EMF Venues</a> /
+  {% for type, stages in default_venues.items() %}
+    {% if stages %}
+    <a href="{{ url_for('cfp_review.scheduler', venue=stages) }}">{{ type|capitalize }}</a>
+      {% if not loop.last %}/{% endif %}
+    {% endif %}
+  {% endfor %}
+</p>
+
+<div id="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
+    <div class="dhx_cal_navline">
+        <div class="dhx_cal_prev_button">&nbsp;</div>
+        <div class="dhx_cal_next_button">&nbsp;</div>
+        <div class="dhx_cal_today_button"></div>
+        <div class="dhx_cal_date"></div>
+        <div class="dhx_cal_tab" name="emf_day_tab" id="emf_day_tab"></div>
+        <div class="dhx_cal_tab" name="emf_weekend_tab" id="emf_weekend_tab"></div>
+    </div>
+    <div class="dhx_cal_header"></div>
+    <div class="dhx_multi_day"><div class="dhx_multi_day_icon"></div></div>
+    <div class="dhx_cal_data"></div>
+</div>
+
+{% endblock %}
+{% block foot %}
+  <script src="{{ url_for('static', filename='dhtmlx_scheduler.js') }}"></script>
+  <script src="{{ url_for('static', filename='dhtmlxscheduler_all_timed.js') }}"></script>
+  <script nonce="{{csp_nonce}}">
+var emf_scheduler = {};
+(function(){
+  'use strict';
+  var scheduleData = {{ occurrence_data | tojson }},
+    venues = {{ shown_venues | tojson }},
+    is_anonymous = {% if current_user.is_anonymous -%} true {%- else -%} false {%- endif %},
+    // THE MONTH ON THESE DATE OBJECTS IS OFFSET BY MINUS ONE
+    // WHAT THE FUCK
+    // HEY THE END DAY NEEDS TO BE +1 TOO (as not included)
+    // WHAT THE FUCK
+    start_date = new Date(2024, 4, 31),
+    end_date = new Date(2024, 5, 3),
+    venue_dict = {},
+    day_format = "%D, %j",   // e.g. Friday, 5th
+    day_formatter = scheduler.date.date_to_str(day_format),
+    time_formatter = scheduler.date.date_to_str("%H:%i"), // e.g. 22:33
+    debounce = false;
+
+
+  // Easily retrieve venue name from its ID
+  for(var i = 0; i<venues.length; i++){
+    venue_dict[venues[i].key] = venues[i].label;
+  }
+
+  /*
+   * Required config
+   */
+  // Make sure dates are parsed correctly
+  scheduler.config.api_date = "%Y-%m-%d %H:%i:%s";
+  scheduler.config.xml_date = "%Y-%m-%d %H:%i:%s";
+
+  scheduler.config.multi_day = true;
+  scheduler.config.all_timed = true;
+
+  /*
+   * Views
+   */
+  // Configure venues view
+  scheduler.locale.labels.emf_day_tab = "Day"
+  scheduler.locale.labels.section_custom="Section";
+  scheduler.createUnitsView({
+    name: "emf_day",
+    property: "venue",
+    list: venues,
+    size: 5,
+    step: 3,
+  });
+
+  scheduler.locale.labels.emf_weekend_tab = "Weekend"
+  scheduler.createUnitsView({
+    name:"emf_weekend",
+    property:"venue",
+    list:venues,
+    days: 3,
+  });
+
+  scheduler.config.separate_short_events = true;
+
+  // Make sure in weekend view you can't scroll away
+  scheduler.date.add_emf_weekend = function (date,inc) {
+    return scheduler.date.add(start_date, venues.length*3 ,"day");
+  };
+
+  scheduler.date.get_emf_weekend_end = function (date) {
+    return scheduler.date.add(start_date, venues.length*3 ,"day");
+  };
+
+  scheduler.date.get_emf_weekend_start = function (date) {
+    return start_date;
+  };
+
+  scheduler._click.dhx_cal_tab = function () {
+    // Override the view toggle so that it always locks weekend view to
+    // Friday
+    var name = this.getAttribute("name"),
+      mode = name.substring(0, name.search("_tab")),
+      date = (mode === "emf_weekend" ) ? start_date : scheduler._date;
+    scheduler.setCurrentView(date, mode);
+  }
+
+  scheduler._click.dhx_second_scale_bar = function () {
+    scheduler.setCurrentView(date, 'emf_day');
+  }
+
+  // There'll be no events outside the weekend so lock the view to it
+  scheduler.config.limit_view = true;
+  scheduler.config.limit_start = start_date;
+  scheduler.config.limit_end  = end_date;
+
+  /*
+   * Make it read-only
+   */
+  // This is read only so block all modifications
+  scheduler.config.details_on_dblclick = true;
+  scheduler.config.dblclick_create = false;
+
+  /*
+   * Styles
+   */
+  // Set the date format
+  scheduler.config.default_date = day_format;
+  // Make it show 10 min slots
+  scheduler.config.scroll_hour = 9;
+  scheduler.config.hour_size_px = 132;
+  scheduler.config.separate_short_events = true;
+
+  var get_ele = function (id) { return document.getElementById(id); }
+
+  function size_scheduler(){
+    var view_height = window.innerHeight||document.documentElement.clientHeight,
+      header_offset = get_ele('navbar').offsetTop,
+      header_height = get_ele('navbar').offsetHeight + header_offset,
+      schedule_height = view_height - header_height,
+      schedule = get_ele('scheduler_here');
+    schedule.style.height = schedule_height + 'px';
+  }
+
+  scheduler.attachEvent("onDblClick",function (id){
+    window.open('{{ url_for("cfp_review.proposals") }}/' + id);
+    return false;// block further actions
+  });
+
+  scheduler.templates.event_class=function(start,end,event){
+    var res = [];
+    if (event.is_attendee) {
+      res.push('attendee');
+    } else if (event.is_potential) {
+      res.push('potential');
+    }
+    return res.join(' ');
+  }
+
+  scheduler.attachEvent("onBeforeEventChanged", function(ev, e, is_new, original) {
+    var offset = ev.start_date.getMinutes() % 10
+    if (offset) {
+      ev.start_date.setMinutes(ev.start_date.getMinutes() - offset)
+      ev.end_date.setMinutes(ev.end_date.getMinutes() - offset)
+    }
+
+    var range_valid = false;
+    for (let range of ev.valid_time_ranges) {
+      var start = new Date(range.start)
+      var end = new Date(range.end)
+
+      if (ev.start_date >= start && ev.end_date <= end) {
+        range_valid = true;
+      }
+    }
+
+    if (ev.valid_venues.indexOf(ev.venue) == -1) {
+      range_valid = false;
+    }
+
+    if (range_valid == true) {
+      var isoDate = new Date(ev.start_date.getTime() - (ev.start_date.getTimezoneOffset() * 60000)).toISOString();
+      jQuery.ajax({
+        url: "{{ url_for("cfp_review.scheduler_update") }}",
+        type: "POST",
+        data: {
+          id: ev.id,
+          time: isoDate,
+          venue: ev.venue
+        },
+        success: function (result) {
+          if (result.changed) {
+            ev.is_potential = true;
+          } else {
+            ev.is_potential = false;
+          }
+        },
+        error: function (result) {
+          range_valid = false;
+        },
+        async: false
+      });
+    } else {
+      alert("Invalid new time or venue, not updating!");
+    }
+
+    return range_valid;
+  });
+
+  scheduler.attachEvent("onSchedulerReady", size_scheduler);
+  window.onresize = size_scheduler;
+
+  scheduler.init('scheduler_here', start_date, "emf_weekend");
+  scheduler.parse(scheduleData, 'json');
+})();
+  </script>
+{% endblock %}

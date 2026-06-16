@@ -1,43 +1,45 @@
-from datetime import datetime, timedelta
-
-from . import admin
+from datetime import timedelta
+from typing import assert_never
 
 from flask import (
-    render_template,
-    redirect,
-    request,
-    flash,
-    url_for,
     abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask import (
     current_app as app,
 )
 from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from flask_mailman import EmailMessage
-
-from wtforms import SubmitField, FieldList, FormField
-
 from sqlalchemy.sql.functions import func
+from wtforms import FieldList, FormField, SubmitField
 
-from main import db, get_stripe_client
+from main import db, get_or_404, get_stripe_client
+from models import Currency, naive_utcnow
 from models.payment import (
-    Payment,
-    RefundRequest,
     BankPayment,
     BankRefund,
-    StripeRefund,
+    Payment,
+    RefundRequest,
     StateException,
+    StripeRefund,
 )
-from models.purchase import Purchase
 from models.product import Price
-from ..common.email import from_email
+from models.purchase import Purchase
+
 from ..common.forms import Form, RefundPurchaseForm, update_refund_purchase_form_details
+from ..config import config
 from ..payments.stripe import (
-    StripeUpdateUnexpected,
     StripeUpdateConflict,
-    stripe_update_payment,
+    StripeUpdateUnexpected,
     stripe_payment_refunded,
+    stripe_update_payment,
 )
+from . import admin
 
 
 @admin.route("/payments")
@@ -59,7 +61,7 @@ def expiring():
         BankPayment.query.join(Purchase)
         .filter(
             BankPayment.state == "inprogress",
-            BankPayment.expires < datetime.utcnow() + timedelta(days=3),
+            BankPayment.expires < naive_utcnow() + timedelta(days=3),
         )
         .with_entities(BankPayment, func.count(Purchase.id).label("purchase_count"))
         .group_by(BankPayment)
@@ -72,7 +74,7 @@ def expiring():
 
 @admin.route("/payment/<int:payment_id>")
 def payment(payment_id):
-    payment = Payment.query.get_or_404(payment_id)
+    payment = get_or_404(db, Payment, payment_id)
 
     return render_template("admin/payments/payment.html", payment=payment)
 
@@ -82,8 +84,8 @@ class ResetExpiryForm(Form):
 
 
 @admin.route("/payment/<int:payment_id>/reset-expiry", methods=["GET", "POST"])
-def reset_expiry(payment_id):
-    payment = BankPayment.query.get_or_404(payment_id)
+def reset_expiry(payment_id: int) -> ResponseReturnValue:
+    payment = get_or_404(db, BankPayment, payment_id)
 
     form = ResetExpiryForm()
     if form.validate_on_submit():
@@ -96,17 +98,23 @@ def reset_expiry(payment_id):
 
             payment.lock()
 
-            if payment.currency == "GBP":
-                days = app.config.get("EXPIRY_DAYS_TRANSFER")
-            elif payment.currency == "EUR":
-                days = app.config.get("EXPIRY_DAYS_TRANSFER_EURO")
+            match payment.currency:
+                case Currency.GBP:
+                    days = app.config.get("EXPIRY_DAYS_TRANSFER")
+                case Currency.EUR:
+                    days = app.config.get("EXPIRY_DAYS_TRANSFER_EURO")
+                case _:
+                    assert_never(payment.currency)
 
-            payment.expires = datetime.utcnow() + timedelta(days=days)
+            if not isinstance(days, int):
+                raise Exception("EXPIRY_DAYS_TRANSFER(_EURO) not an int")
+
+            payment.expires = naive_utcnow() + timedelta(days=days)
             db.session.commit()
 
-            app.logger.info("Reset expiry by %s days", days)
+            app.logger.info("Reset expiry to %s days from now", days)
 
-            flash("Expiry reset for payment %s" % payment.id)
+            flash(f"Expiry reset for payment {payment.id}")
             return redirect(url_for("admin.expiring"))
 
     return render_template("admin/payments/payment-reset-expiry.html", payment=payment, form=form)
@@ -118,7 +126,7 @@ class SendReminderForm(Form):
 
 @admin.route("/payment/<int:payment_id>/reminder", methods=["GET", "POST"])
 def send_reminder(payment_id):
-    payment = BankPayment.query.get_or_404(payment_id)
+    payment = get_or_404(db, BankPayment, payment_id)
 
     form = SendReminderForm()
     if form.validate_on_submit():
@@ -135,12 +143,12 @@ def send_reminder(payment_id):
 
             if payment.reminder_sent_at:
                 app.logger.error("Reminder for payment %s already sent", payment.id)
-                flash("Cannot send duplicate reminder email for payment %s" % payment.id)
+                flash(f"Cannot send duplicate reminder email for payment {payment.id}")
                 return redirect(url_for("admin.expiring"))
 
             msg = EmailMessage(
                 "Electromagnetic Field: Your tickets will expire in five days",
-                from_email=from_email("TICKETS_EMAIL"),
+                from_email=config.from_email("TICKETS_EMAIL"),
                 to=[payment.user.email],
             )
             msg.body = render_template(
@@ -150,10 +158,10 @@ def send_reminder(payment_id):
             )
             msg.send()
 
-            payment.reminder_sent_at = datetime.utcnow()
+            payment.reminder_sent_at = naive_utcnow()
             db.session.commit()
 
-            flash("Reminder email for payment %s sent" % payment.id)
+            flash(f"Reminder email for payment {payment.id} sent")
             return redirect(url_for("admin.expiring"))
 
     return render_template(
@@ -170,7 +178,7 @@ class UpdatePaymentForm(Form):
 
 @admin.route("/payment/<int:payment_id>/update", methods=["GET", "POST"])
 def update_payment(payment_id):
-    payment = Payment.query.get_or_404(payment_id)
+    payment = get_or_404(db, Payment, payment_id)
 
     if payment.provider not in {"stripe"}:
         abort(404)
@@ -191,11 +199,11 @@ def update_payment(payment_id):
                 try:
                     stripe_update_payment(stripe_client, payment)
                 except StripeUpdateConflict as e:
-                    app.logger.warn(f"StripeUpdateConflict updating payment: {e}")
+                    app.logger.warning(f"StripeUpdateConflict updating payment: {e}")
                     flash("Unable to update due to a status conflict")
                     return redirect(url_for("admin.update_payment", payment_id=payment.id))
                 except StripeUpdateUnexpected as e:
-                    app.logger.warn(f"StripeUpdateUnexpected updating payment: {e}")
+                    app.logger.warning(f"StripeUpdateUnexpected updating payment: {e}")
                     flash("Unable to update due to an unexpected response from Stripe")
                     return redirect(url_for("admin.update_payment", payment_id=payment.id))
 
@@ -211,11 +219,11 @@ class CancelPaymentForm(Form):
 
 @admin.route("/payment/<int:payment_id>/cancel", methods=["GET", "POST"])
 def cancel_payment(payment_id):
-    payment = Payment.query.get_or_404(payment_id)
+    payment = get_or_404(db, Payment, payment_id)
 
     if payment.provider == "stripe":
-        msg = "Cannot cancel stripe payment (id: %s)." % payment_id
-        app.logger.warn(msg)
+        msg = f"Cannot cancel stripe payment (id: {payment_id})."
+        app.logger.warning(msg)
         flash(msg)
         return redirect(url_for("admin.payments"))
 
@@ -229,14 +237,14 @@ def cancel_payment(payment_id):
             try:
                 payment.cancel()
             except StateException as e:
-                msg = "Could not cancel payment %s: %s" % (payment_id, e)
-                app.logger.warn(msg)
+                msg = f"Could not cancel payment {payment_id}: {e}"
+                app.logger.warning(msg)
                 flash(msg)
                 return redirect(url_for("admin.payments"))
 
             db.session.commit()
 
-            flash("Payment %s cancelled" % payment.id)
+            flash(f"Payment {payment.id} cancelled")
             return redirect(url_for("admin.expiring"))
 
     return render_template("admin/payments/payment-cancel.html", payment=payment, form=form)
@@ -303,7 +311,7 @@ class DeleteRefundRequestForm(Form):
 def delete_refund_request(req_id):
     """Delete a refund request. This can only be called if the payment is in the
     refund-requested state, or if it's "refunded" but with a 100% donation."""
-    req = RefundRequest.query.get_or_404(req_id)
+    req = get_or_404(db, RefundRequest, req_id)
 
     # TODO: this does not handle partial refunds!
     # It can also fail if there's insufficient capacity to return the ticket state.
@@ -343,10 +351,10 @@ def manual_refund(payment_id):
 
     # TODO: this is old! We should move manual refund handling to the other refund endpoint for consistency.
 
-    payment = Payment.query.get_or_404(payment_id)
+    payment = get_or_404(db, Payment, payment_id)
 
     if payment.refund_requests:
-        app.logger.warn("Showing refund requests for payment %s", payment.id)
+        app.logger.warning("Showing refund requests for payment %s", payment.id)
 
     form = ManualRefundForm()
     if form.validate_on_submit():
@@ -359,13 +367,13 @@ def manual_refund(payment_id):
                 payment.manual_refund()
 
             except StateException as e:
-                app.logger.warn("Could not refund payment %s: %s", payment_id, e)
+                app.logger.warning("Could not refund payment %s: %s", payment_id, e)
                 flash("Could not refund payment due to a state error")
                 return redirect(url_for("admin.payments"))
 
             db.session.commit()
 
-            flash("Payment {} refunded".format(payment.id))
+            flash(f"Payment {payment.id} refunded")
             return redirect(url_for("admin.payments"))
 
     return render_template("admin/payments/manual-refund.html", payment=payment, form=form)
@@ -382,7 +390,7 @@ def refund(payment_id):
     # TODO: This is all old and needs fixing
     # For partial refunds, we need to let *users* select which tickets they want to refund (see ticket #900)
     # Refund business logic needs moving to apps.payments.refund module, some is already there.
-    payment = Payment.query.get_or_404(payment_id)
+    payment = get_or_404(db, Payment, payment_id)
 
     if not payment.is_refundable(ignore_event_refund_state=True):
         app.logger.warning(
@@ -509,7 +517,7 @@ def refund(payment_id):
                 refund.refundid = stripe_refund.id
                 if stripe_refund.status not in ("pending", "succeeded"):
                     # Should never happen according to the docs
-                    app.logger.warn(
+                    app.logger.warning(
                         "Refund status is %s, not pending or succeeded",
                         stripe_refund.status,
                     )
@@ -525,7 +533,7 @@ def refund(payment_id):
 
             msg = EmailMessage(
                 "Your refund from Electromagnetic Field has been processed",
-                from_email=from_email("TICKETS_EMAIL"),
+                from_email=config.from_email("TICKETS_EMAIL"),
                 to=[payment.user.email],
             )
 
@@ -540,7 +548,7 @@ def refund(payment_id):
             msg.send()
 
             app.logger.info("Payment %s refund complete for a total of %s", payment.id, total)
-            flash("Refund for %s %s complete" % (total, payment.currency))
+            flash(f"Refund for {total} {payment.currency} complete")
 
         return redirect(url_for(".refunds"))
 
@@ -563,16 +571,19 @@ class ChangeCurrencyForm(Form):
     change = SubmitField("Change Currency")
 
 
-@admin.route("/payment/<int:payment_id>/change_currency", methods=["GET", "POST"])
+@admin.route("/payment/<int:payment_id>/change-currency", methods=["GET", "POST"])
 def change_currency(payment_id):
-    payment = Payment.query.get_or_404(payment_id)
+    payment = get_or_404(db, Payment, payment_id)
     if not (payment.state == "new" or (payment.provider == "banktransfer" and payment.state == "inprogress")):
         return abort(400)
 
-    if payment.currency == "GBP":
-        new_currency = "EUR"
-    else:
-        new_currency = "GBP"
+    match payment.currency:
+        case Currency.GBP:
+            new_currency = Currency.EUR
+        case Currency.EUR:
+            new_currency = Currency.GBP
+        case _:
+            assert_never(payment.currency)
 
     form = ChangeCurrencyForm(request.form)
     if form.validate_on_submit():
@@ -594,7 +605,7 @@ class CancelPurchaseForm(Form):
 
 
 @admin.route(
-    "/payment/<int:payment_id>/cancel_purchase/<int:purchase_id>",
+    "/payment/<int:payment_id>/cancel-purchase/<int:purchase_id>",
     methods=["GET", "POST"],
 )
 def cancel_purchase(payment_id: int, purchase_id: int) -> ResponseReturnValue:
@@ -602,8 +613,8 @@ def cancel_purchase(payment_id: int, purchase_id: int) -> ResponseReturnValue:
 
     This is used when the purchaser changes their mind before they've sent us the money.
     """
-    payment: Payment = Payment.query.get_or_404(payment_id)
-    purchase: Purchase = Purchase.query.get_or_404(purchase_id)
+    payment = get_or_404(db, Payment, payment_id)
+    purchase = get_or_404(db, Purchase, purchase_id)
 
     if purchase.payment != payment:
         return abort(400)
@@ -620,17 +631,19 @@ def cancel_purchase(payment_id: int, purchase_id: int) -> ResponseReturnValue:
             try:
                 purchase.cancel()
             except StateException as e:
-                msg = "Could not cancel purchase %s: %s" % (purchase_id, e)
-                app.logger.warn(msg)
+                msg = f"Could not cancel purchase {purchase_id}: {e}"
+                app.logger.warning(msg)
                 flash(msg)
                 return redirect(url_for("admin.payment", payment_id=payment.id))
 
             purchase.payment_id = None
-            payment.amount -= purchase.price_tier.get_price(payment.currency).value
+            price = purchase.price_tier.get_price(payment.currency)
+            assert price is not None
+            payment.amount -= price.value
 
             db.session.commit()
 
-            flash("Purchase %s cancelled" % purchase.id)
+            flash(f"Purchase {purchase.id} cancelled")
             return redirect(url_for("admin.payment", payment_id=payment.id))
 
     return render_template(

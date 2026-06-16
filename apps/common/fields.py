@@ -1,36 +1,37 @@
 import json
+import re
 
-from markupsafe import Markup
+from email_validator import EmailNotValidError, validate_email
+from markupsafe import Markup, escape
 from wtforms import (
     IntegerField,
     SelectField,
     SelectMultipleField,
     StringField,
     ValidationError,
+    fields,
 )
-from wtforms.widgets import Input, HiddenInput, CheckboxInput, ListWidget
-from wtforms.widgets.html5 import EmailInput
+from wtforms.form import BaseForm
+from wtforms.widgets import CheckboxInput, HiddenInput, ListWidget
 from wtforms.widgets.core import html_params
-from email_validator import validate_email, EmailNotValidError
-import re
 
 
-class EmailField(StringField):
+class EmailField(fields.EmailField):
     """HTML5 email field using the email_validator package to perform
     enhanced email validation.
 
     You don't need to provide additional validators to this field.
     """
 
-    widget = EmailInput()
-
-    def pre_validate(self, form):
+    def pre_validate(self, form: BaseForm) -> None:
+        if not self.data:
+            return
         try:
             result = validate_email(self.data)
             # Replace data with normalised version of email
-            self.data = result["email"]
+            self.data = result.normalized
         except EmailNotValidError as e:
-            raise ValidationError(str(e))
+            raise ValidationError(str(e)) from e
 
 
 class IntegerSelectField(SelectField):
@@ -38,7 +39,7 @@ class IntegerSelectField(SelectField):
         kwargs["coerce"] = int
         self.fmt = kwargs.pop("fmt", str)
         self.values = kwargs.pop("values", [])
-        SelectField.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def values(self):
@@ -54,28 +55,25 @@ class HiddenIntegerField(IntegerField):
     widget = HiddenInput()
 
 
-class TelInput(Input):
-    input_type = "tel"
-
-
-class TelField(StringField):
-    widget = TelInput()
-
+class TelField(fields.TelField):
     def __init__(self, *args, **kwargs):
         self.min_length = kwargs.pop("min_length", 8)
         self.max_length = kwargs.pop("max_length", 20)
-        StringField.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
-    def pre_validate(form, field):
-        if re.search(r"^\s*$", form.data):
+    def pre_validate(self, form: BaseForm) -> None:
+        if self.data is None:
+            return
+
+        if re.search(r"^\s*$", self.data):
             # Allow empty field or only whitespace in field, this can be handled by Required()
             return
 
-        if not re.search(r"^\+?[0-9 \-]+$", form.data):
+        if not re.search(r"^\+?[0-9 \-]+$", self.data):
             raise ValidationError("A telephone number may only contain numbers, spaces or dashes.")
 
-        if not form.min_length <= len(form.data) <= form.max_length:
-            raise ValidationError(f"Must be between {form.min_length} and {form.max_length} digits.")
+        if not self.min_length <= len(self.data) <= self.max_length:
+            raise ValidationError(f"Must be between {self.min_length} and {self.max_length} digits.")
 
 
 class JSONField(StringField):
@@ -86,8 +84,8 @@ class JSONField(StringField):
         if valuelist and valuelist[0] != "":
             try:
                 self.data = json.loads(valuelist[0])
-            except ValueError:
-                raise ValueError("This field contains invalid JSON")
+            except ValueError as e:
+                raise ValueError("This field contains invalid JSON") from e
         else:
             self.data = {}
 
@@ -96,11 +94,11 @@ class JSONField(StringField):
         if self.data:
             try:
                 json.dumps(self.data)
-            except TypeError:
-                raise ValueError("This field contains invalid JSON")
+            except TypeError as e:
+                raise ValueError("This field contains invalid JSON") from e
 
 
-class StaticWidget(object):
+class StaticWidget:
     """
     Render a Bootstrap ``form-control-static`` div.
 
@@ -110,11 +108,11 @@ class StaticWidget(object):
     def __call__(self, field, **kwargs):
         kwargs.setdefault("id", field.id)
         if "class_" in kwargs:
-            kwargs["class_"] = "form-control-static %s" % kwargs["class_"]
+            kwargs["class_"] = "form-control-static {}".format(kwargs["class_"])
         else:
             kwargs["class_"] = "form-control-static"
 
-        return Markup("<div %s>%s</div>" % (html_params(**kwargs), field._value()))
+        return Markup(f"<div {html_params(**kwargs)}>{escape(field._value())}</div>")
 
 
 class StaticField(StringField):

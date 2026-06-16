@@ -1,8 +1,8 @@
 from ..event_date import edt
 
 parking_shifts = {
-    "Car Parking": {
-        "Car Park": [
+    "car-parking": {
+        "car-park": [
             {
                 "first": edt(d, "08:00:00"),
                 "final": edt(d, "20:00:00"),

@@ -1,37 +1,69 @@
 @use "./_variables.scss" as *;
 
 header {
-  background: url('../images/brand/2024/header-2.png') left top/60%;
+  background-image: url("../images/brand/2026/header.jpg");
   background-color: $main-background;
   padding: 10px 15px 0px 15px;
+  background-position: top right;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  display: grid;
+  align-items: center;
+  grid-template-areas:
+    "logo text navbutton"
+    "nav nav nav";
 }
 
 #main-logo {
-  display: block;
-  float: left;
   margin-bottom: 0;
-  margin-top: 7px;
+  margin-right: 24px;
   text-decoration: none;
   font-family: $header-font-stack;
-  font-size: 36px;
+  font-size: 30px;
   color: $main-background-header;
+  grid-area: logo;
+
+  display: grid;
+  grid-template-columns: max-content auto;
+  grid-template-areas:
+    "logo line1"
+    "logo line2";
+
+  img {
+    grid-area: logo;
+  }
+  .logo-line {
+    line-height: 34px;
+  }
+  .logo-line1 {
+    grid-area: line1;
+    align-self: end;
+  }
+  .logo-line2 {
+    grid-area: line2;
+    align-self: start;
+  }
 }
 
 #logomark {
-  width: 40px;
-  margin-top: -7px;
+  height: 120px;
+  width: 48px;
+  margin-right: 12px;
 }
 
-header #header-text {
-  float: right;
-  text-align: right;
-  font-size: 1.5em;
-  margin-top: 25px;
+#header-text {
+  grid-area: text;
+  font-size: 1.2em;
+  justify-items: center;
+
+  .header-date {
+    color: $brand-2026-orange;
+  }
 }
 
-header #menu-container {
-  clear: both;
-  float:right;
+#menu-container {
+  grid-area: nav;
 }
 
 header #menu-button {
@@ -53,8 +85,8 @@ ul.menu {
   letter-spacing: 0.5px;
 }
 
-ul.menu li{
-  display:inline-block;
+ul.menu li {
+  display: inline-block;
   padding-left: 1.5em;
 }
 
@@ -67,48 +99,55 @@ ul.menu a {
 }
 
 // Mobile layout - menu is hidden behind a button.
-@media(max-width: $header-collapse-width) {
-  $header-height: 56px;
-
+@media (max-width: $header-collapse-width) {
   // Fixed header, visible on scroll
   header {
     position: fixed;
     padding: 3px 10px;
-    height: $header-height;
+    height: $mobile-header-height;
     top: 0;
     z-index: 1000;
     width: 100%;
+
+    grid-template-areas: "logo navbutton";
   }
 
   body {
-    margin-top: $header-height;
+    margin-top: $mobile-header-height;
   }
 
   #main-logo {
-    font-size: 25px;
-    margin-top: 4px;
+    display: block;
+
+    .logo-line {
+      font-size: 20px;
+      line-height: 20px;
+      vertical-align: middle;
+    }
+    .logo-line2 {
+      margin-left: -4px;
+    }
   }
-  
+
   #logomark {
-    width: 16px !important;
-    height: auto !important;
-    margin-top: -4px;
+    width: 20px;
+    height: auto;
+    margin-right: 0;
   }
 
   header #menu-button {
     appearance: none;
-    border: none; 
+    border: none;
     background-color: #333;
     margin-right: 0px;
     margin-top: 5px;
     padding-top: 7px;
-    border-radius: 2px;
-    float: right;
+    border-radius: $small-border-radius;
     display: block;
   }
 
   header #header-text {
-    display:none;
+    display: none;
   }
 
   header #menu-container {
@@ -116,7 +155,7 @@ ul.menu a {
     float: none;
     position: fixed;
     right: 0px;
-    top: $header-height;
+    top: $mobile-header-height;
     height: 100%;
     z-index: 1000;
     padding: 5px 8px;
@@ -137,7 +176,7 @@ ul.menu a {
   }
 }
 
-@media(min-width: ($header-collapse-width + 1)) {
+@media (min-width: ($header-collapse-width + 1)) {
   // Override visibility in case menu was hidden in mobile layout
   // and window was subsequently resized.
   header #menu-container {
@@ -158,10 +197,12 @@ ul.menu a {
   h1 a[href]:after {
     content: none !important;
   }
+
   #logo {
     height: 0;
   }
+
   #logo:after {
-    content: url('../images/logo-black-text.svg');
+    content: url("../images/logo-black-text.svg");
   }
 }

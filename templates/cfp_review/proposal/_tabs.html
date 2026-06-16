@@ -1,0 +1,29 @@
+<ul class="nav nav-tabs">
+    <li role="presentation" {% if active == 'main' %} class="active" {% endif %}>
+        <a href="{{ url_for('.proposal', proposal_id=proposal.id, **full_qs) }}">
+            Main
+        </a>
+    </li>
+    <li role="presentation" {% if active == 'edit' %} class="active" {% endif %}>
+        <a href="{{ url_for('.update_proposal', proposal_id=proposal.id, **full_qs) }}">
+            Edit
+        </a>
+    </li>
+    <li role="presentation" {% if active == 'messages' %} class="active" {% endif %}>
+        <a href="{{ url_for('.message_proposer', proposal_id=proposal.id, **full_qs) }}">
+            Messages ({{ proposal.get_unread_count(current_user) }}/{{ proposal.messages | length }})
+        </a>
+    </li>
+    {% if proposal.type_info.review_type == "anonymous" %}
+    <li role="presentation" {% if active == 'votes' %} class="active" {% endif %}>
+        <a href="{{ url_for('.proposal_votes', proposal_id=proposal.id, **full_qs) }}">
+            Votes/Reviewer Notes ({{ proposal.get_unread_vote_note_count() }}/{{ proposal.votes | length }})
+        </a>
+    </li>
+    {% endif %}
+    <li role="presentation" {% if active == 'versions-proposal' %} class="active" {% endif %}>
+        <a href="{{ url_for('.entity_latest_version', entity_type='proposal', entity_id=proposal.id, **full_qs) }}">
+            History ({{proposal.versions.count()}})
+        </a>
+    </li>
+</ul>

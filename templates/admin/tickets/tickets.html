@@ -16,18 +16,18 @@
 <tbody>
 {% for ticket in tickets %}
   <tr>
-    <td><a href="{{ url_for('.user', user_id=ticket.owner.id) }}">{{ ticket.owner.name }}</a></td>
+    <td><a href="{{ url_for('admin.user', user_id=ticket.owner.id) }}">{{ ticket.owner.name }}</a></td>
     <td>{{ ticket.owner.email }}</td>
-    <td><a href="{{ url_for('.product_details', product_id=ticket.product.id) }}">{{ ticket.product.name }}</a></td>
+    <td><a href="{{ url_for('admin.products.product_details', product_id=ticket.product.id) }}">{{ ticket.product.name }}</a></td>
     {% if ticket.payment %}
-    <td><a href="{{ url_for('.payment', payment_id=ticket.payment.id) }}">{{ ticket.payment.name }} {{ ticket.payment.id }}</a></td>
+    <td><a href="{{ url_for('admin.payment', payment_id=ticket.payment.id) }}">{{ ticket.payment.name }} {{ ticket.payment.id }}</a></td>
     {% elif ticket.transfers %}
     <td>Transferred</td>
     {% else %}
     <td></td>
     {% endif %}
     <td>
-    <a class="btn btn-default" href="{{ url_for('.view_ticket', ticket_id=ticket.id) }}">View</a>
+    <a class="btn btn-default" href="{{ url_for('admin.view_ticket', ticket_id=ticket.id) }}">View</a>
     </td>
   </tr>
 {% endfor %}

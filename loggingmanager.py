@@ -1,12 +1,13 @@
-""" A middleware to export user IDs for logging.
+"""A middleware to export user IDs for logging.
 
-    Werkzeug logs the request after the Flask app context has ended
-    so we use Werkzeug's Local object to pass the user ID into the
-    logging formatter.
+Werkzeug logs the request after the Flask app context has ended
+so we use Werkzeug's Local object to pass the user ID into the
+logging formatter.
 """
 
 import logging
 import os
+
 from werkzeug.local import Local, LocalManager
 
 local = Local()

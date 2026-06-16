@@ -1,25 +1,41 @@
-from flask_wtf import FlaskForm
+from collections.abc import Callable
+from typing import TypeVar
 
-from wtforms import SelectField, BooleanField, ValidationError
+from flask_wtf import FlaskForm
+from sqlalchemy import select
+from wtforms import BooleanField, SelectField, ValidationError
 from wtforms.validators import InputRequired
 
-from models.diversity import UserDiversity
-from models.cfp_tag import Tag
-from models.purchase import AdmissionTicket
-
-from .fields import HiddenIntegerField, MultiCheckboxField
+from main import db
+from models.content import DEFAULT_TAGS, Tag
 from models.diversity import (
-    guess_age,
-    guess_ethnicity,
-    guess_gender,
     AGE_CHOICES,
     DISABILITY_CHOICES,
     ETHNICITY_CHOICES,
     GENDER_CHOICES,
     OPT_OUT,
     SEXUALITY_CHOICES,
+    UserDiversity,
 )
-from models.cfp_tag import DEFAULT_TAGS
+from models.purchase import AdmissionTicket, Purchase
+
+from .fields import HiddenIntegerField, MultiCheckboxField
+
+TCoerce = TypeVar("TCoerce")
+
+
+def coerce_optional[TCoerce](coerce: Callable[[str], TCoerce]) -> Callable[[str], TCoerce | None]:
+    """
+    Coerce to a type but treat an empty string as None.
+    Useful for the coerce argument in SelectFields.
+    """
+
+    def _inner(value: str) -> TCoerce | None:
+        if value == "":
+            return None
+        return coerce(value)
+
+    return _inner
 
 
 class Form(FlaskForm):
@@ -72,19 +88,22 @@ class DiversityForm(Form):
         user.diversity.disability = self.disability.data
 
         if self.cfp_tags_required:
+            tags = [
+                self.cfp_tag_0.data,
+                self.cfp_tag_1.data,
+                self.cfp_tag_2.data,
+            ]
             user.cfp_reviewer_tags = [
-                Tag.get_by_value(self.cfp_tag_0.data),
-                Tag.get_by_value(self.cfp_tag_1.data),
-                Tag.get_by_value(self.cfp_tag_2.data),
+                db.session.scalars(select(Tag).filter_by(tag=tag)).one_or_none() for tag in tags
             ]
 
         return user
 
     def set_from_user(self, user):
         if user.diversity:
-            self.age.data = guess_age(user.diversity.age)
-            self.gender.data = guess_gender(user.diversity.gender)
-            self.ethnicity.data = guess_ethnicity(user.diversity.ethnicity)
+            self.age.data = user.diversity.age
+            self.gender.data = user.diversity.gender
+            self.ethnicity.data = user.diversity.ethnicity
             self.sexuality.data = user.diversity.sexuality
             self.disability.data = user.diversity.disability
 
@@ -98,7 +117,7 @@ class DiversityForm(Form):
     def validate_disability(form, field):
         if len(field.data) > 1 and "none" in field.data:
             raise ValidationError("Cannot select 'no disability' and a disability")
-        elif len(field.data) > 1 and "" in field.data:
+        if len(field.data) > 1 and "" in field.data:
             raise ValidationError("Cannot select 'prefer not to say' and a disability")
 
     def validate(self, extra_validators=None):
@@ -124,12 +143,11 @@ class RefundPurchaseForm(Form):
     refund = BooleanField("Refund purchase", default=True)
 
 
-def update_refund_purchase_form_details(f, purchase, ignore_event_refund_state=False):
+def update_refund_purchase_form_details(
+    f: RefundPurchaseForm, purchase: Purchase, ignore_event_refund_state: bool = False
+) -> None:
     f._purchase = purchase
-    f.refund.label.text = "%s - %s" % (
-        f._purchase.id,
-        f._purchase.product.display_name,
-    )
+    f.refund.label.text = f"{f._purchase.id} - {f._purchase.product.display_name}"
 
     f.refund.data = False
 

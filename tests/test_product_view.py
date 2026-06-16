@@ -1,7 +1,8 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
+from models import naive_utcnow
+from models.content import Proposal
 from models.product import VOUCHER_GRACE_PERIOD, ProductView, Voucher
-from models.cfp import TalkProposal
 
 
 def test_product_view_accessible(db, user, monkeypatch):
@@ -23,20 +24,26 @@ def test_product_view_accessible(db, user, monkeypatch):
         "Product should be inaccessible with incorrect voucher"
     )
 
-    product_view = ProductView(name="cfp", cfp_accepted_only=True, type="ticket")
+    # This has to be called 'speakers'
+    product_view = ProductView.get_by_name("speakers")
+    if not product_view:
+        product_view = ProductView(name="speakers", cfp_accepted_only=True, type="ticket")
     assert not product_view.is_accessible(user), (
         "CfP products should not be visible without accepted proposal"
     )
+    db.session.add(product_view)
+    db.session.commit()
 
-    proposal = TalkProposal()
-    proposal.title = "title"
-    proposal.description = "description"
-    proposal.requirements = "requirements"
-    proposal.user = user
+    proposal = Proposal(
+        type="talk",
+        title="title",
+        description="description",
+        equipment_required="equipment_required",
+        user=user,
+    )
     db.session.add(proposal)
     db.session.commit()
-    proposal.set_state("accepted")
-    db.session.add(proposal)
+    proposal.accept()
     db.session.commit()
 
     assert product_view.is_accessible(user), "CfP products should be visible with accepted proposal"
@@ -51,14 +58,14 @@ def test_product_view_accessible_voucher_expiry(db, user, monkeypatch):
         Voucher(
             view=product_view,
             code=EXPIRED_YESTERDAY,
-            expiry=datetime.utcnow() - timedelta(days=1) - VOUCHER_GRACE_PERIOD,
+            expiry=naive_utcnow() - timedelta(days=1) - VOUCHER_GRACE_PERIOD,
         )
     )
     db.session.add(
         Voucher(
             view=product_view,
             code=EXPIRES_TOMORROW,
-            expiry=datetime.utcnow() + timedelta(days=1),
+            expiry=naive_utcnow() + timedelta(days=1),
         )
     )
     db.session.commit()

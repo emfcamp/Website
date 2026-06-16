@@ -1,13 +1,13 @@
-import re
-
 from collections import defaultdict
-from typing import Pattern
 
-from flask import current_app as app
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from main import db
+from models.user import User
+
 from . import BaseModel
 
+__all__ = ["UserDiversity"]
 
 OPT_OUT = [
     ("", "Prefer not to say"),
@@ -16,8 +16,20 @@ OPT_OUT = [
 GENDER_VALUES = ("female", "male", "non-binary", "other")
 GENDER_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in GENDER_VALUES])
 
-ETHNICITY_VALUES = ("asian", "black", "mixed", "white", "other")
-ETHNICITY_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in ETHNICITY_VALUES])
+# These choices are derived from the top-level categories in the Ethnicity Harmonised Standard
+# so the numbers can easily be compared to the UK census.
+# https://analysisfunction.civilservice.gov.uk/policy-store/ethnicity-harmonised-standard/
+#
+# We don't collect the more granular categories here, to minimise data collected.
+ETHNICITY_CHOICES = [
+    ("", "Prefer not to say"),
+    ("white", "White"),
+    ("mixed", "Mixed/multiple ethnic groups"),
+    ("asian", "Asian"),
+    ("black", "Black/African/Caribbean"),
+    ("arab", "Arab"),
+    ("other", "Other ethnic group"),
+]
 
 AGE_VALUES = ("0-15", "16-25", "26-35", "36-45", "46-55", "56-65", "66+")
 AGE_CHOICES = tuple(OPT_OUT + [(v, v) for v in AGE_VALUES])
@@ -45,64 +57,16 @@ DISABILITY_CHOICES = tuple(
 )
 
 
-# FIXME these are matchers for transition from freetext diversity form -> select boxes
-# This should be deleted for 2026
-
-
-def guess_age(age_str: str) -> str:
-    if age_str in AGE_VALUES:
-        return age_str
-    try:
-        age = int(age_str)
-    except ValueError:  # Can't parse as an int so reset
-        return ""
-
-    if age > 66:
-        return "66+"
-
-    for age_range in AGE_VALUES:
-        if age_range == "66+":
-            continue
-        low_val, high_val = age_range.split("-")
-
-        if int(low_val) <= age <= int(high_val):
-            return age_range
-
-    return ""
-
-
-def __guess_value(match_str: str, matchers_dict: dict[str, Pattern]) -> str:
-    match_str = match_str.lower().strip()
-    for key, matcher in matchers_dict.items():
-        if matcher.fullmatch(match_str):
-            return key
-
-    return ""
-
-
-def guess_gender(gender_str: str) -> str:
-    gender_matchers = app.config.get("GENDER_MATCHERS", {})
-    gender_re_matchers = {k: re.compile(v, re.I) for k, v in gender_matchers.items()}
-    return __guess_value(gender_str, gender_re_matchers)
-
-
-def guess_ethnicity(ethnicity_str: str) -> str:
-    ethnicity_matchers = app.config.get("ETHNICITY_MATCHERS", {})
-    ethnicity_re_matchers = {k: re.compile(v, re.I) for k, v in ethnicity_matchers.items()}
-    return __guess_value(ethnicity_str, ethnicity_re_matchers)
-
-
-# End of stuff to delete for 2026
-
-
 class UserDiversity(BaseModel):
     __tablename__ = "diversity"
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True)
-    age = db.Column(db.String)
-    gender = db.Column(db.String)
-    ethnicity = db.Column(db.String)
-    disability = db.Column(db.String)
-    sexuality = db.Column(db.String)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
+    age: Mapped[str | None]
+    gender: Mapped[str | None]
+    ethnicity: Mapped[str | None]
+    disability: Mapped[str | None]
+    sexuality: Mapped[str | None]
+
+    user: Mapped[User] = relationship(back_populates="diversity")
 
     @classmethod
     def get_export_data(cls):
@@ -153,9 +117,9 @@ class UserDiversity(BaseModel):
 
         for row in cls.query:
             parsed_values = {
-                "ages": guess_age(row.age),
-                "genders": guess_gender(row.gender),
-                "ethnicities": guess_ethnicity(row.ethnicity),
+                "ages": row.age,
+                "genders": row.gender,
+                "ethnicities": row.ethnicity,
                 "sexualities": row.sexuality or "",
                 "disabilities": row.disability or "",
             }
@@ -163,16 +127,17 @@ class UserDiversity(BaseModel):
             update_diversity_dict(data["totals"], parsed_values)
 
             user = row.user
-            if user.has_proposals:
+            if user.proposals:
                 update_diversity_dict(data["submitted_a_proposal"], parsed_values)
 
-            if user.is_cfp_accepted:
+            # FIXME: this isn't just speakers
+            if user.has_accepted_proposal:
                 update_diversity_dict(data["speakers"], parsed_values)
 
-            if user.is_cfp_accepted and user.is_invited_speaker:
+            if user.has_accepted_proposal and user.is_invited_speaker:
                 update_diversity_dict(data["invited_speakers"], parsed_values)
 
-            if user.is_cfp_accepted and not user.is_invited_speaker:
+            if user.has_accepted_proposal and not user.is_invited_speaker:
                 update_diversity_dict(data["non-invited_speakers"], parsed_values)
 
             if user.has_permission("cfp_reviewer", cascade=False):

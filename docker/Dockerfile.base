@@ -1,9 +1,10 @@
 # Base Dockerfile
-# 
+#
 # This image is used as a base image for both production and development builds.
 # It's built separately to speed up build times.
 
-FROM python:3.13-slim-bookworm
+# To upgrade python, see https://emfcamp.github.io/Website/development/upgrading-python.html
+FROM python:3.14-slim-trixie
 
 WORKDIR /app
 COPY pyproject.toml uv.lock /app/
@@ -18,15 +19,14 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libxml2-dev libxslt1-dev libffi-dev git glpk-utils \
     postgresql-client make build-essential libpq-dev \
-    libzbar0 coinor-cbc curl && \
+    libzbar0 curl less && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install uv && \
     uv sync --no-dev --no-managed-python
 
-RUN uv run playwright install-deps && \
+RUN uv run --no-dev playwright install-deps && \
     rm -rf /var/lib/apt/lists/*
 
-RUN uv run playwright install chromium && \
+RUN uv run --no-dev playwright install chromium && \
     rm -rf /var/lib/apt/lists/*
-

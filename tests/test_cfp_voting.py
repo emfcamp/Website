@@ -1,12 +1,13 @@
 import pytest
 from hypothesis import given
-from hypothesis.strategies import integers, lists, data
+from hypothesis.strategies import data, integers, lists
+
 from apps.cfp_review.majority_judgement import (
-    get_floor_median,
-    calculate_score,
-    calculate_normalised_score,
-    calculate_max_normalised_score,
     MajorityJudgementException,
+    calculate_max_normalised_score,
+    calculate_normalised_score,
+    calculate_score,
+    get_floor_median,
 )
 
 
@@ -16,14 +17,14 @@ def test_get_floor_median():
     assert get_floor_median([1, 2, 3]) == 2
     assert get_floor_median([1, 2, 3, 4]) == 2
     assert get_floor_median([1, 2, 3, 4, 5]) == 3
-    with pytest.raises(Exception):
+    with pytest.raises(Exception):  # noqa: B017
         get_floor_median([])
 
 
 @given(lists(integers(), min_size=1))
 def test_get_floor_median_2(values):
     result = get_floor_median(values)
-    assert type(result) == int
+    assert type(result) is int
 
 
 def test_calculate_score():

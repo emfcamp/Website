@@ -1,60 +1,72 @@
-@use 'sass:color';
+@use "sass:color";
 // Maximum content width
-$main-content-width: 		950px;
+$main-content-width: 950px;
 // Minimum content width: horizontal scrolling below this.
-$min-width:                     380px;
+$min-width: 380px;
 
 // Width at which header menu is hidden.
-$header-collapse-width:         500px;
+$header-collapse-width: 500px;
+$mobile-header-height: 56px;
 
-$header-font-stack:             "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
-$body-font-stack:               "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$header-font-stack: "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$body-font-stack: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-$brand-2024-pale-green:         #AFC944;
-$brand-2024-mid-green:          #528329;
-$brand-2024-dark-green:         #213018;
-$brand-2024-yellow:             #F9E200;
-$brand-2024-orange:             #F77F02;
-$brand-2024-pink:               #F55089;
-$brand-2024-blue:               #2EADD9;
+$brand-2026-orange: #f77f02;
+$brand-2026-coral: #f5515e;
+$brand-2026-yellow: #f9e200;
+$brand-2026-green: #2ae28c;
+$brand-2026-light-blue: #2eadd9;
+$brand-2026-mid-blue: #005d96;
+$brand-2026-dark-blue: #000730;
 
-$desaturated-yellow:            color.adjust($brand-2024-yellow, $lightness: -10%);
+$desaturated-yellow: color.adjust($brand-2026-yellow, $lightness: -10%);
 
-$body-background:               #272827;
-$body-background-shadow:        #060606;
+$body-background: #0d0e0e;
+$body-background-shadow: #060606;
 
-$main-background:               $brand-2024-dark-green;
-$main-background-text:          #d8d8d8;
-$main-background-header:        #ffffff;
+$main-background: #0f0f0f;
+$main-background-text: #dcdcdc;
+$main-background-header: #ffffff;
 
-$content-well-background:       $brand-2024-mid-green;
+$content-well-background: $brand-2026-mid-blue;
 
-$main-link:                     $main-background-text;
-$main-link-hover:               $brand-2024-blue;
+$main-link: $main-background-text;
+$main-link-hover: $brand-2026-orange;
 
 /* Styles for "highlight" elements (wells and panels) */
-$highlight-background:          #cfccc0;
-$highlight-background-text:     #1e1e1e;
-$highlight-background-link:     #171123;
+$highlight-background: #343434;
+$highlight-background-text: #dcdcdc;
 
-$highlight-2-background:        #d6c8a0;
-$highlight-2-border:            #bfaa7f;
-$highlight-2-background-hover:  $desaturated-yellow;
+$highlight-2-background: $brand-2026-dark-blue;
+$highlight-2-border: $brand-2026-mid-blue;
+$highlight-2-background-hover: $brand-2026-mid-blue;
+$highlight-2-text: #dcdcdc;
 
-$highlight-3-background:        $brand-2024-pale-green;
-$highlight-3-border:            $brand-2024-mid-green;
-$highlight-3-background-hover:  $desaturated-yellow;
+$highlight-3-background: $brand-2026-light-blue;
+$highlight-3-border: $brand-2026-mid-blue;
+$highlight-3-background-hover: $desaturated-yellow;
 
-$schedule-text:                 #d5d6da;
-$schedule-block:                $brand-2024-mid-green;
+$schedule-text: #d5d6da;
+$schedule-block: $brand-2026-mid-blue;
 
-$form-element:                  color.adjust($brand-2024-yellow, $lightness: +45%);
+$form-element: #272727;
+$form-element-text: #dcdcdc;
 
-/* Alert elements */
+/* Alert/button element colours */
 
-$alert-info-background:         color.adjust($brand-2024-blue, $lightness: +20%);
-$alert-info-border:             $brand-2024-blue;
+$success-background: $brand-2026-green;
+$success-border: color.adjust($success-background, $lightness: -15%);
+$success-text: #000;
 
-$alert-warning-background:      color.adjust($brand-2024-orange, $lightness: +20%);
-$alert-warning-border:          $brand-2024-orange;
-$alert-warning-text:            #1e1e1e;
+$info-background: $brand-2026-mid-blue;
+$info-text: #fff;
+
+$warning-background: color.adjust($brand-2026-orange, $lightness: -20%);
+$warning-text: #fff;
+
+$danger-background: color.adjust($brand-2026-coral, $lightness: -40%);
+$danger-text: #fff;
+
+/* Borders */
+
+$small-border-radius: 3px;

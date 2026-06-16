@@ -5,11 +5,10 @@
 {% set nav_active = 'product_views' %}
 {% block body %}
 <ol class="breadcrumb">
-  <li><a href="{{url_for('.product_views')}}">Product Views</a></li>
-  <li><a href="{{url_for('.product_view', view_id=view.id)}}">Product View "{{ view.name }}"</a></li>
+  <li><a href="{{url_for('admin.product_views.product_views_main')}}">Product Views</a></li>
+  <li><a href="{{url_for('admin.product_views.product_views_main', view_id=view.id)}}">Product View "{{ view.name }}"</a></li>
   <li class="active">Vouchers</li>
 </ol>
-{% if view.vouchers_only %}
 <form method="get" class="form-inline">
   <div class="checkbox">
     <label>
@@ -41,9 +40,9 @@
   {% for vchr in vouchers %}
     <tr>
       {# FIXME add a "copy URL" link? #}
-      <td><a href="{{url_for('.product_view_voucher_detail', view_id=view.id, voucher_code=vchr.code)}}">{{ vchr.code }}</a></td>
+      <td><a href="{{url_for('admin.product_views.product_view_voucher_detail', view_id=view.id, voucher_code=vchr.code)}}">{{ vchr.code }}</a></td>
       <td>{% if vchr.email %}{{ vchr.email }}{% endif %}</td>
-      <td>{{ vchr.expiry.date() }}</td>
+      <td>{% if vchr.expiry %}{{ vchr.expiry.date() }}{% else %}Never{% endif %}</td>
       <td>{{ vchr.purchases_remaining }}</td>
       <td>{{ vchr.tickets_remaining }}</td>
       <td>{% if vchr.is_used %}<strong>Yes</strong>{% else %}No{% endif %}</td>
@@ -52,7 +51,8 @@
   {% endfor %}
 </table>
 
-<a href="{{ url_for('.product_view_add_voucher', view_id=view.id) }}" class="btn btn-default">Create custom voucher code</a>
-<a href="{{ url_for('.product_view_bulk_add_vouchers_by_email', view_id=view.id) }}" class="btn btn-default">Email Vouchers</a>
+{% if view.vouchers_only %}
+<a href="{{ url_for('admin.product_views.product_view_add_voucher', view_id=view.id) }}" class="btn btn-default">Create custom voucher code</a>
+<a href="{{ url_for('admin.product_views.product_view_bulk_add_vouchers_by_email', view_id=view.id) }}" class="btn btn-default">Email Vouchers</a>
 {% endif %}
 {% endblock %}

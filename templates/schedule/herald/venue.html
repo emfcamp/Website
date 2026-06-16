@@ -1,20 +1,21 @@
 {% from "_formhelpers.html" import render_field %}
-{% macro render_proposal(title, form, proposal) %}
-  <h2>{{ title }}: <a href="{{ url_for('schedule.item', year=year, proposal_id=proposal.id) }}">{{ proposal.published_title or proposal.title }}</a></h2>
+{% macro render_occurrence(heading, form, occurrence) %}
+{% set schedule_item = occurrence.schedule_item %}
+  <h2>{{ heading }}: <a href="{{ url_for('schedule.item', year=year, schedule_item_id=schedule_item.id) }}">{{ schedule_item.title }}</a></h2>
   <div>
-    {% if proposal.user_scheduled %}
-      An attendee {{proposal.human_type}} by
+    {% if schedule_item.official_content %}
+      {{ schedule_item.human_type_a | capitalize }} by
     {% else %}
-      A {{proposal.human_type}} by
+      An attendee {{schedule_item.human_type}} by
     {% endif %}
-    {{ proposal.published_names or proposal.user.name }}{% if proposal.published_pronouns %} ({{proposal.published_pronouns}}){% endif %}
+    {{ schedule_item.names }}{% if schedule_item.pronouns %} ({{schedule_item.pronouns}}){% endif %}
   </div>
 
   <p></p>
-  <div class="col-sm-12">{{ proposal.published_description or proposal.description }}</div>
+  <div class="col-sm-12">{{ schedule_item.description }}</div>
 
   <div>&nbsp;</div>
-  <div>{{ proposal.scheduled_time.strftime("%A %H:%M") }} for {{ proposal.scheduled_duration }} minutes</div>
+  <div>{{ occurrence.scheduled_time.strftime("%A %H:%M") }} for {{ occurrence.scheduled_duration }} minutes</div>
 
   <div>&nbsp;</div>
   <div class="col-sm-6 col-sm-offset-6">
@@ -31,12 +32,12 @@
   <form method="post">
     {{ form.hidden_tag() }}
     {% if now %}
-    {{ render_proposal("Now", form.now, now) }}
+    {{ render_schedule_item("Now", form.now, now) }}
     <p>&nbsp;</p>
     {% endif %}
 
     {% if next %}
-    {{ render_proposal("Next", form.next, next) }}
+    {{ render_schedule_item("Next", form.next, next) }}
     <p>&nbsp;</p>
     {% endif %}
 

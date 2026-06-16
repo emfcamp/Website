@@ -1,125 +1,137 @@
 from collections import defaultdict
-from dateutil import parser
-from flask import current_app as app
+from datetime import timedelta
+from itertools import chain
 
-from slotmachine import SlotMachine
+from flask import current_app as app
+from slotmachine import SchedulingProblem, SchedulingSolution, SlotMachine, Talk
+from sqlalchemy import and_, select
+from sqlalchemy.orm import joinedload
 
 from main import db
-from models.cfp import (
-    Proposal,
+from models.content import (
+    Occurrence,
+    ScheduleItem,
+    ScheduleItemType,
     Venue,
-    ROUGH_LENGTHS,
-    EVENT_SPACING,
 )
+from models.content.potential_schedule import PotentialSchedule, PotentialScheduleOccurrence
+from models.content.schedule import SLOT_DURATION
 
 
-class Scheduler(object):
+def total_minutes(delta: timedelta) -> int:
+    return int(delta.total_seconds() / 60)
+
+
+class Scheduler:
     """Automatic Scheduler
 
     This class handles scheduling operations by using the SlotMachine constraint solving scheduler.
     """
 
-    def set_rough_durations(self):
-        proposals = (
-            Proposal.query.filter_by(scheduled_duration=None)
-            .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]))
-            .filter(Proposal.is_accepted)
-            .all()
-        )
+    def __init__(self):
+        self.occurrences = {}
+        self.venues = {}
 
-        for proposal in proposals:
-            try:
-                proposal.scheduled_duration = ROUGH_LENGTHS[proposal.length]
-            except KeyError:
-                app.logger.warn(f"Invalid proposal length {repr(proposal.length)} for {proposal}, ignoring")
-                continue
-
-            app.logger.info(
-                'Set duration for talk "%s" (%s) to %s'
-                % (proposal.title, proposal.id, proposal.scheduled_duration)
+    def get_schedulable_occurrences(self, types: list[ScheduleItemType]) -> list[Occurrence]:
+        """Fetch a list of Occurrences that the automatic scheduler should consider"""
+        return list(
+            db.session.scalars(
+                select(Occurrence)
+                .where(
+                    Occurrence.cancelled != True,
+                    Occurrence.schedule_item.has(
+                        and_(
+                            ScheduleItem.type.in_(types),
+                            # We only check this here so things should work if we decide to extend it to attendee content
+                            ScheduleItem.official_content,
+                        )
+                    ),
+                    Occurrence.scheduled_duration.isnot(None),
+                    # Used when we manually schedule things into slots and we want the scheduler to ignore them
+                    Occurrence.manually_scheduled.isnot(True),
+                )
+                .options(joinedload(Occurrence.schedule_item).joinedload(ScheduleItem.proposal))
+                .order_by(ScheduleItem.favourite_count.desc())
             )
-
-        db.session.commit()
-
-    def get_scheduler_data(self, ignore_potential, type=["talk", "workshop", "youthworkshop"]):
-        proposals = (
-            Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
-            .filter(Proposal.is_accepted)
-            .filter(Proposal.type.in_(type))
-            .filter(Proposal.user_scheduled.is_(False))  # NOTE: This ignores all village-scheduled content
-            .filter(
-                Proposal.manually_scheduled.isnot(True)
-            )  # Used when we manually schedule things into slots and we want the scheduler to ignore them
-            .order_by(Proposal.favourite_count.desc())
-            .all()
         )
 
-        proposals_by_type = defaultdict(list)
-        for proposal in proposals:
-            proposals_by_type[proposal.type].append(proposal)
+    def get_schedule_problem(self, types: list[ScheduleItemType] | None = None) -> SchedulingProblem:
+        if types is None:
+            types = ["talk", "workshop", "familyworkshop"]
+        occurrences = self.get_schedulable_occurrences(types)
 
-        capacity_by_type = defaultdict(dict)
-        for venue in Venue.query.all():
-            for type in venue.default_for_types:
-                capacity_by_type[type][venue.id] = venue.capacity
+        occurrences_by_type: dict[ScheduleItemType, list[Occurrence]] = defaultdict(list)
+        for occurrence in occurrences:
+            occurrences_by_type[occurrence.schedule_item.type].append(occurrence)
 
-        proposal_data = []
-        for type, proposals in proposals_by_type.items():
+        capacity_by_type: dict[ScheduleItemType, dict[int, int]] = defaultdict(dict)
+        venues: list[Venue] = list(db.session.scalars(select(Venue)))
+        for venue in venues:
+            self.venues[venue.id] = venue
+            for block in venue.time_blocks:
+                if not venue.capacity:
+                    raise Exception(f"Official venue has no capacity defined: {venue}")
+                capacity_by_type[block.type][venue.id] = venue.capacity or 0
+
+        scheduler_talks = []
+        for type, occurrences in occurrences_by_type.items():
             # We assign the largest venues as being preferred for the most popular talks
-            # Proposals are already sorted into popularity, so we just shift through the list
+            # Occurrences are already sorted into popularity, so we just shift through the list
             # of venues in order of size, equally split
             ordered_venues = sorted(
                 capacity_by_type[type],
                 key=lambda k: capacity_by_type[type][k],
                 reverse=True,
             )
-            split_count = int(len(proposals_by_type[type]) / len(capacity_by_type[type]))
+            split_count = int(len(occurrences_by_type[type]) / len(capacity_by_type[type]))
 
             count = 0
-            for proposal in proposals:
-                preferred_venues = []
+            for occurrence in occurrences:
+                assert occurrence.scheduled_duration
+
+                # Save the occurrence by ID so we can quickly look it up from the result
+                self.occurrences[occurrence.id] = occurrence
+
+                preferred_venues = set()
                 if ordered_venues:
-                    preferred_venues = [ordered_venues[0]]
+                    # This supports a list, but we only want one for now
+                    preferred_venues = {ordered_venues[0]}
 
-                # This is a terrible hack and needs removing
-                # If a talk is allowed to happen outside main content hours,
-                # don't require it to be spaced from other things - we often
-                # have talks and related performances back-to-back
-                spacing_slots = EVENT_SPACING.get(proposal.type, 1)
-                if proposal.type == "talk":
-                    for p in proposal.get_allowed_time_periods_with_default():
-                        if p.start.hour < 9 or p.start.hour >= 20:
-                            spacing_slots = 0
+                speakers = {occurrence.schedule_item.user.id}
 
-                export = {
-                    "id": proposal.id,
-                    "duration": proposal.scheduled_duration,
-                    "speakers": [proposal.user.id],
-                    "title": proposal.title,
-                    "valid_venues": [v.id for v in proposal.get_allowed_venues()],
-                    "preferred_venues": preferred_venues,  # This supports a list, but we only want one for now
-                    "time_ranges": [
-                        {"start": str(p.start), "end": str(p.end)}
-                        for p in proposal.get_allowed_time_periods_with_default()
-                    ],
-                    "preferred_time_ranges": [
-                        {"start": str(p.start), "end": str(p.end)}
-                        for p in proposal.get_preferred_time_periods_with_default()
-                    ],
-                    "spacing_slots": spacing_slots,
-                }
+                if not occurrence.availability:
+                    app.logger.warning(f"Skipping scheduling occurrence {occurrence} - no availability.")
+                    continue
 
-                if proposal.scheduled_venue:
-                    export["venue"] = proposal.scheduled_venue.id
-                if not ignore_potential and proposal.potential_venue:
-                    export["venue"] = proposal.potential_venue.id
+                # Mapping of venues to allowed time ranges
+                allowed_times = occurrence.allowed_times(True)
+                allowed_venues = set(v.id for v in allowed_times)
 
-                if proposal.scheduled_time:
-                    export["time"] = str(proposal.scheduled_time)
-                if not ignore_potential and proposal.potential_time:
-                    export["time"] = str(proposal.potential_time)
+                # FIXME: SlotMachine doesn't support per-venue allowed time ranges yet, it will soon.
+                # This will emit an inaccurate scheduling problem until fixed!
+                allowed_time_ranges = list(chain.from_iterable(allowed_times.values()))
 
-                proposal_data.append(export)
+                if len(allowed_time_ranges) == 0:
+                    app.logger.warning(f"Skipping scheduling occurrence {occurrence} - no allowed times.")
+                    continue
+
+                talk = Talk(
+                    id=occurrence.id,
+                    duration=occurrence.scheduled_duration,
+                    speakers=speakers,
+                    allowed_venues=allowed_venues,
+                    allowed_times=allowed_time_ranges,
+                    preferred_venues=preferred_venues,
+                    minutes_after=total_minutes(occurrence.changeover_time),
+                )
+
+                if occurrence.scheduled_venue:
+                    talk.venue = occurrence.scheduled_venue.id
+
+                if occurrence.scheduled_time:
+                    talk.start_time = occurrence.scheduled_time
+
+                scheduler_talks.append(talk)
 
                 # Shift to the next venue when we hit the division
                 if count > split_count:
@@ -128,79 +140,33 @@ class Scheduler(object):
                 else:
                     count += 1
 
-        return proposal_data
+        return SchedulingProblem(talks=scheduler_talks, slot_duration=total_minutes(SLOT_DURATION))
 
-    def handle_schedule_change(self, proposal, venue, time, ignore_potential=False):
-        # If the existing proposal is identical to the scheduled, clear proposed
-        if (
-            str(proposal.scheduled_venue) == str(proposal.potential_venue)
-            and proposal.scheduled_time == proposal.potential_time
-        ):
-            proposal.potential_venue = None
-            proposal.potential_time = None
+    def generate_potential_schedule(self, solution: SchedulingSolution) -> PotentialSchedule:
+        potential_schedule = PotentialSchedule()
 
-        if not ignore_potential:
-            previous_venue = proposal.potential_venue or proposal.scheduled_venue
-            previous_time = proposal.potential_time or proposal.scheduled_time
-        else:
-            previous_venue = proposal.scheduled_venue
-            previous_time = proposal.scheduled_time
+        potential_schedule.scheduler_stats = {
+            "solution_type": solution.solution_type,
+            "timings": {name: td.total_seconds() for name, td in solution.timings.items()},
+            "variables": solution.variables,
+        }
 
-        previous_venue_name = None
-        if previous_venue:
-            previous_venue_name = previous_venue.name
-
-        parsed_time = parser.parse(time)
-
-        # Nothing changed
-        if str(venue) == str(previous_venue) and parsed_time == previous_time:
-            return False
-
-        proposal.potential_venue = venue
-        proposal.potential_time = parsed_time
-
-        app.logger.info(
-            'Moved "%s": "%s" at "%s" -> "%s" at "%s"'
-            % (
-                proposal.title,
-                previous_venue_name,
-                previous_time,
-                proposal.potential_venue.name,
-                proposal.potential_time,
+        potential_schedule.scheduled_occurrences = [
+            PotentialScheduleOccurrence(
+                occurrence=self.occurrences[talk.id],
+                start_time=talk.start_time,
+                venue=self.venues[talk.venue],
             )
-        )
+            for talk in solution.talks
+        ]
+        return potential_schedule
 
-        return True
+    def run(self, types: list[ScheduleItemType]) -> PotentialSchedule:
+        problem = self.get_schedule_problem(types)
+        if len(problem.talks) == 0:
+            raise Exception("No talks to schedule")
 
-    def apply_changes(self, schedule, ignore_potential=False):
-        changes = False
-        for event in schedule:
-            if "time" not in event or not event["time"]:
-                continue
-            if "venue" not in event or not event["venue"]:
-                continue
+        sm = SlotMachine(problem)
+        solution = sm.solve()
 
-            proposal = Proposal.query.filter_by(id=event["id"]).one()
-            venue = Venue.query.get(event["venue"])
-            changes |= self.handle_schedule_change(proposal, venue, event["time"], ignore_potential)
-
-        if not changes:
-            app.logger.info("No schedule changes generated")
-
-    def run(self, persist, ignore_potential, type):
-        self.set_rough_durations()
-
-        sm = SlotMachine()
-        data = self.get_scheduler_data(ignore_potential, type)
-        if len(data) == 0:
-            app.logger.error("No talks to schedule!")
-            return
-
-        new_schedule = sm.schedule(data)
-        self.apply_changes(new_schedule, ignore_potential)
-
-        if persist:
-            db.session.commit()
-        else:
-            app.logger.info("DRY RUN: Pass the `-p` flag to persist these changes")
-            db.session.rollback()
+        return self.generate_potential_schedule(solution)

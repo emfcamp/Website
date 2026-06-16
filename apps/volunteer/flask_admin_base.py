@@ -1,7 +1,7 @@
 from flask import abort
-from flask_login import current_user
-from flask_admin import BaseView, AdminIndexView
+from flask_admin import AdminIndexView, BaseView
 from flask_admin.contrib.sqla import ModelView
+from flask_login import current_user
 
 
 # Flask-Admin requires these methods to be overridden, but doesn't let you set a base meta
@@ -27,7 +27,7 @@ class FlaskVolunteerAdminAppMixin:
             self.endpoint = admin.endpoint_prefix
         else:
             self.url = self._get_view_url(admin, self.url)
-            self.endpoint = "{}_{}".format(admin.endpoint_prefix, self.endpoint)
+            self.endpoint = f"{admin.endpoint_prefix}_{self.endpoint}"
         return super().create_blueprint(admin)
 
 
@@ -37,7 +37,7 @@ class VolunteerBaseView(FlaskVolunteerAdminAppMixin, BaseView):
 
 class VolunteerAdminIndexView(FlaskVolunteerAdminAppMixin, AdminIndexView):
     # Yes this is should use url_for, but apparently this code's on the way out
-    extra_css = ["/static/css/flask-admin.css"]
+    extra_css = ("/static/css/flask-admin.css",)
 
     def is_visible(self):
         return False

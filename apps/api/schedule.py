@@ -1,16 +1,20 @@
-from hmac import compare_digest
 from functools import wraps
+from hmac import compare_digest
+from typing import ClassVar, cast
 
-from flask import request, current_app as app
+from flask import current_app as app
+from flask import request
+from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from flask_restful import Resource, abort
+from sqlalchemy import select
 
-from . import api
-from main import db
-from models import event_year
-from models.cfp import Proposal
+from main import db, get_or_404
 from models.admin_message import AdminMessage
-from models.event_tickets import EventTicket
+from models.content import SCHEDULE_ITEM_INFOS, LotteryEntry, Occurrence, ScheduleItem, ScheduleItemType
+
+from ..config import config
+from . import api
 
 
 def _require_video_api_key(func):
@@ -32,13 +36,13 @@ def _require_video_api_key(func):
     return wrapper
 
 
-class ProposalResource(Resource):
-    method_decorators = {"patch": [_require_video_api_key]}
+class OccurrenceResource(Resource):
+    method_decorators: ClassVar = {"patch": [_require_video_api_key]}
 
-    def patch(self, proposal_id):
+    def patch(self, occurrence_id: int) -> ResponseReturnValue:
         if not request.is_json:
             abort(415)
-        proposal = Proposal.query.get_or_404(proposal_id)
+        occurrence: Occurrence = get_or_404(db, Occurrence, occurrence_id)
 
         payload = request.get_json()
         if not payload:
@@ -55,38 +59,37 @@ class ProposalResource(Resource):
 
         for attribute in ALLOWED_ATTRIBUTES:
             if attribute in payload:
-                setattr(proposal, attribute, payload[attribute])
+                setattr(occurrence, attribute, payload[attribute])
 
-        db.session.add(proposal)
         db.session.commit()
 
         return {
-            "id": proposal.id,
-            "slug": proposal.slug,
-            "youtube_url": proposal.youtube_url,
-            "thumbnail_url": proposal.thumbnail_url,
-            "c3voc_url": proposal.c3voc_url,
-            "video_recording_lost": proposal.video_recording_lost,
+            "id": occurrence.id,
+            "slug": f"{occurrence.schedule_item.id}-{occurrence.occurrence_num}-{occurrence.schedule_item.slug}",
+            "youtube_url": occurrence.youtube_url,
+            "thumbnail_url": occurrence.thumbnail_url,
+            "c3voc_url": occurrence.c3voc_url,
+            "video_recording_lost": occurrence.video_recording_lost,
         }
 
 
-class FavouriteProposal(Resource):
-    def get(self, proposal_id):
+class FavouriteScheduleItem(Resource):
+    def get(self, schedule_item_id: int) -> ResponseReturnValue:
         if not current_user.is_authenticated:
             abort(401)
 
-        proposal = Proposal.query.get_or_404(proposal_id)
-        current_state = proposal in current_user.favourites
+        schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
+        current_state = schedule_item in current_user.favourites
 
         return {"is_favourite": current_state}
 
-    def put(self, proposal_id):
+    def put(self, schedule_item_id: int) -> ResponseReturnValue:
         """Put with no data to toggle"""
         if not current_user.is_authenticated:
             abort(401)
 
-        proposal = Proposal.query.get_or_404(proposal_id)
-        current_state = proposal in current_user.favourites
+        schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
+        current_state = schedule_item in current_user.favourites
 
         data = request.get_json()
         if data.get("state") is not None:
@@ -95,9 +98,9 @@ class FavouriteProposal(Resource):
             new_state = not current_state
 
         if new_state and not current_state:
-            current_user.favourites.append(proposal)
+            current_user.favourites.append(schedule_item)
         elif current_state and not new_state:
-            current_user.favourites.remove(proposal)
+            current_user.favourites.remove(schedule_item)
 
         db.session.commit()
 
@@ -105,8 +108,11 @@ class FavouriteProposal(Resource):
 
 
 class UpdateLotteryPreferences(Resource):
-    def post(self, proposal_type):
-        if proposal_type not in ["workshop", "youthworkshop"]:
+    def post(self, schedule_item_type: str) -> ResponseReturnValue:
+        if schedule_item_type not in SCHEDULE_ITEM_INFOS:
+            abort(400)
+        schedule_item_type = cast(ScheduleItemType, schedule_item_type)
+        if not SCHEDULE_ITEM_INFOS[schedule_item_type].supports_lottery:
             abort(400)
 
         if not current_user.is_authenticated:
@@ -114,32 +120,40 @@ class UpdateLotteryPreferences(Resource):
 
         new_order = [int(i) for i in request.get_json()]
 
-        current_tickets = {
-            t.id: t
-            for t in EventTicket.query.filter_by(state="entered-lottery", user_id=current_user.id).all()
-            if t.proposal.type == proposal_type
+        current_entries: dict[int, LotteryEntry] = {
+            e.id: e
+            for e in db.session.scalars(
+                select(LotteryEntry)
+                .where(LotteryEntry.state == "entered")
+                .where(LotteryEntry.user == current_user)
+                .where(
+                    LotteryEntry.occurrence.has(
+                        Occurrence.schedule_item.has(ScheduleItem.type == schedule_item_type)
+                    )
+                )
+            )
         }
 
-        if len(current_tickets) != len(new_order):
-            # the ticket lists don't match
+        if len(current_entries) != len(new_order):
+            # the entry list has changed
             abort(400)
 
-        for new_rank, t_id in enumerate(new_order):
-            ticket = current_tickets[t_id]
-            ticket.rank = new_rank
+        for new_rank, e_id in enumerate(new_order):
+            entry = current_entries[e_id]
+            entry.rank = new_rank
 
         db.session.commit()
 
-        res = sorted(current_tickets.values(), key=lambda t: t.rank)
+        # return the current version of the preference list
+        # FIXME: is defaulting to 0 correct?
+        sorted_entries = sorted(current_entries.values(), key=lambda e: e.rank or 0)
+        return [e.id for e in sorted_entries]
 
-        # return the curret version of the preference list
-        return [t.id for t in res]
 
+class OccurrenceC3VOCPublishingWebhook(Resource):
+    method_decorators: ClassVar = {"post": [_require_video_api_key]}
 
-class ProposalC3VOCPublishingWebhook(Resource):
-    method_decorators = {"post": [_require_video_api_key]}
-
-    def post(self):
+    def post(self) -> ResponseReturnValue:
         if not request.is_json:
             abort(415)
 
@@ -147,7 +161,7 @@ class ProposalC3VOCPublishingWebhook(Resource):
 
         try:
             conference = payload["fahrplan"]["conference"]
-            proposal_id = payload["fahrplan"]["id"]
+            occurrence_id = payload["fahrplan"]["id"]
 
             if not payload["is_master"]:
                 # c3voc *should* only send us information about the master
@@ -155,31 +169,31 @@ class ProposalC3VOCPublishingWebhook(Resource):
                 # accidentially delete video information from the database.
                 abort(403, message="The request referenced a non-master video edit, and has been denied.")
 
-            if conference != f"emf{event_year()}":
+            if conference != f"emf{config.event_year}":
                 abort(
                     422,
                     message="The request did not reference the current event year, and has not been processed.",
                 )
 
-            proposal = Proposal.query.get_or_404(proposal_id)
+            occurrence: Occurrence = get_or_404(db, Occurrence, occurrence_id)
 
             if payload["voctoweb"]["enabled"]:
                 if payload["voctoweb"]["frontend_url"]:
                     c3voc_url = payload["voctoweb"]["frontend_url"]
                     if not c3voc_url.startswith("https://media.ccc.de/"):
                         abort(406, message="voctoweb frontend_url must start with https://media.ccc.de/")
-                    app.logger.info(f"C3VOC webhook set c3voc_url for {proposal.id=} to {c3voc_url}")
-                    proposal.c3voc_url = c3voc_url
-                    proposal.video_recording_lost = False
+                    app.logger.info(f"C3VOC webhook set c3voc_url for {occurrence.id=} to {c3voc_url}")
+                    occurrence.c3voc_url = c3voc_url
+                    occurrence.video_recording_lost = False
                 else:
                     # This allows c3voc to notify us if videos got depublished
                     # as well. We do not explicitely set 'video_recording_lost'
                     # here because the video might only need fixing audio or
                     # such.
                     app.logger.warning(
-                        f"C3VOC webhook cleared c3voc_url for {proposal.id=}, was {proposal.c3voc_url}"
+                        f"C3VOC webhook cleared c3voc_url for {occurrence.id=}, was {occurrence.c3voc_url}"
                     )
-                    proposal.c3voc_url = None
+                    occurrence.c3voc_url = None
 
                 if payload["voctoweb"]["thumb_path"]:
                     path = payload["voctoweb"]["thumb_path"]
@@ -190,13 +204,13 @@ class ProposalC3VOCPublishingWebhook(Resource):
                             406,
                             message="voctoweb thumb_path must start with https:// or /static.media.ccc.de",
                         )
-                    app.logger.info(f"C3VOC webhook set thumbnail_url for {proposal.id=} to {path}")
-                    proposal.thumbnail_url = path
+                    app.logger.info(f"C3VOC webhook set thumbnail_url for {occurrence.id=} to {path}")
+                    occurrence.thumbnail_url = path
                 else:
                     app.logger.warning(
-                        f"C3VOC webhook cleared thumbnail_url for {proposal.id=}, was {proposal.thumbnail_url}"
+                        f"C3VOC webhook cleared thumbnail_url for {occurrence.id=}, was {occurrence.thumbnail_url}"
                     )
-                    proposal.thumbnail_url = None
+                    occurrence.thumbnail_url = None
 
             if payload["youtube"]["enabled"]:
                 if payload["youtube"]["urls"]:
@@ -204,29 +218,30 @@ class ProposalC3VOCPublishingWebhook(Resource):
                     youtube_url = payload["youtube"]["urls"][0]
                     if not youtube_url.startswith("https://www.youtube.com/watch"):
                         abort(406, message="youtube url must start with https://www.youtube.com/watch")
-                    if not proposal.youtube_url:
+                    if not occurrence.youtube_url:
                         # c3voc will send us a list, even though we only have one
                         # video.
-                        app.logger.info(f"C3VOC webhook set youtube_url for {proposal.id=} to {youtube_url}")
-                        proposal.youtube_url = youtube_url
-                        proposal.video_recording_lost = False
-                    elif proposal.youtube_url not in payload["youtube"]["urls"]:
+                        app.logger.info(
+                            f"C3VOC webhook set youtube_url for {occurrence.id=} to {youtube_url}"
+                        )
+                        occurrence.youtube_url = youtube_url
+                        occurrence.video_recording_lost = False
+                    elif occurrence.youtube_url not in payload["youtube"]["urls"]:
                         # c3voc sent us some urls, but none of them are matching
                         # the url we have in our database.
                         app.logger.warning(
                             "C3VOC webhook sent youtube urls update without referencing the previously stored value. Ignoring."
                         )
                         app.logger.debug(
-                            f"{proposal.id=} {payload['youtube']['urls']=} {proposal.youtube_url=}"
+                            f"{occurrence.id=} {payload['youtube']['urls']=} {occurrence.youtube_url=}"
                         )
                 else:
                     # see comment at c3voc_url above
                     app.logger.warning(
-                        f"C3VOC webhook cleared youtube_url for {proposal.id=}, was {proposal.youtube_url}"
+                        f"C3VOC webhook cleared youtube_url for {occurrence.id=}, was {occurrence.youtube_url}"
                     )
-                    proposal.youtube_url = None
+                    occurrence.youtube_url = None
 
-            db.session.add(proposal)
             db.session.commit()
         except KeyError as e:
             abort(400, message=f"Missing required field: {e}")
@@ -239,15 +254,15 @@ def renderScheduleMessage(message):
 
 
 class ScheduleMessage(Resource):
-    def get(self):
+    def get(self) -> ResponseReturnValue:
         records = AdminMessage.get_visible_messages()
         messages = list(map(renderScheduleMessage, records))
 
         return messages
 
 
-api.add_resource(ProposalResource, "/proposal/<int:proposal_id>")
-api.add_resource(FavouriteProposal, "/proposal/<int:proposal_id>/favourite")
-api.add_resource(ScheduleMessage, "/schedule_messages")
-api.add_resource(UpdateLotteryPreferences, "/schedule/tickets/<proposal_type>/preferences")
-api.add_resource(ProposalC3VOCPublishingWebhook, "/proposal/c3voc-publishing-webhook")
+api.add_resource(OccurrenceResource, "/occurrence/<int:occurrence_id>")
+api.add_resource(FavouriteScheduleItem, "/schedule-item/<int:schedule_item_id>/favourite")
+api.add_resource(ScheduleMessage, "/schedule-messages")
+api.add_resource(UpdateLotteryPreferences, "/schedule/lottery/<schedule_item_type>/preferences")
+api.add_resource(OccurrenceC3VOCPublishingWebhook, "/occurrence/c3voc-publishing-webhook")

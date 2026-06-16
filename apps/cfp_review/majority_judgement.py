@@ -35,7 +35,7 @@ def get_floor_median(values):
     """
     if len(values) == 1:
         return values[0]
-    elif len(values) == 0:
+    if len(values) == 0:
         raise Exception("Cannot find median of empty list")
     median_index = int((len(values) - 0.5) // 2)
     return values[median_index]
@@ -66,7 +66,7 @@ def calculate_score(score_list, base=3):
         score = get_floor_median(score_list)
         if not (0 <= score < base):
             raise MajorityJudgementException(
-                ("Incorrectly set base. Got %s, expected 0 <= values < %s") % (score, base)
+                f"Incorrectly set base. Got {score}, expected 0 <= values < {base}"
             )
         res.append(str(score))
         score_list.remove(score)
@@ -102,13 +102,13 @@ def calculate_normalised_score(score_list, max_score_length, default_vote=1, bas
     """
     if not (0 <= default_vote < base):
         raise MajorityJudgementException(
-            "Incorrectly set default, must be between 0 and %s (inclusive)." % (base - 1)
+            f"Incorrectly set default, must be between 0 and {base - 1} (inclusive)."
         )
 
     score_list = list(score_list)[:]
     list_len = len(score_list)
     if list_len > max_score_length:
-        raise MajorityJudgementException("Score list is too long, must be less than %s." % max_score_length)
+        raise MajorityJudgementException(f"Score list is too long, must be less than {max_score_length}.")
 
     # If required pad the list
     if list_len < max_score_length:

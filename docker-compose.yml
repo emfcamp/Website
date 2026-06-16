@@ -18,6 +18,7 @@ services:
       COLORIZE_LOGS: always
       PYTHONUNBUFFERED: 1
       IRCCAT: fakeirccat:12345
+      NO_DEV_DATA: ${NO_DEV_DATA:-}
 
   rsbuild:
     build:

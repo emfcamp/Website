@@ -20,7 +20,7 @@
         </div>
     </div>
 </nav>
-<div class="container">
+<div class="{% block page_class%}container{% endblock %}">
     <div class="row">
         <div class="col-md-11">
         {% for (category, message) in get_flashed_messages(with_categories=true) -%}
@@ -63,4 +63,5 @@ $(() => {
   });
 });
 </script>
+{% block script_extra %}{% endblock %}
 {% endblock %}

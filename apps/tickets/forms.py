@@ -1,26 +1,25 @@
-import typing
-
-from flask import render_template_string, url_for, current_app as app
-from markupsafe import Markup
+from flask import current_app as app
+from flask import render_template_string, url_for
 from flask_login import current_user
-from wtforms.validators import DataRequired, InputRequired, Optional, ValidationError
+from markupsafe import Markup
 from wtforms import (
-    SubmitField,
-    StringField,
+    BooleanField,
     FieldList,
     FormField,
     HiddenField,
-    BooleanField,
+    StringField,
+    SubmitField,
 )
+from wtforms.validators import DataRequired, InputRequired, Optional, ValidationError
+
+from models import Currency
 from models.basket import Basket
-from models.product import PriceTier, ProductViewProduct, Voucher
-
-from models.user import User
 from models.payment import BankPayment, StripePayment
+from models.product import PriceTier, Product, Voucher
+from models.user import User
 
+from ..common.fields import EmailField, HiddenIntegerField, IntegerSelectField
 from ..common.forms import Form
-from ..common.fields import IntegerSelectField, HiddenIntegerField, EmailField
-from ..common import CURRENCY_SYMBOLS
 
 
 class TicketAmountForm(Form):
@@ -38,11 +37,11 @@ class TicketAmountsForm(Form):
     currency_code = HiddenField("Currency")
     set_currency = StringField("Set Currency", [Optional()])
 
-    def __init__(self, products: list[ProductViewProduct]):
+    def __init__(self, products: list[Product]):
         self._tiers = self._get_price_tiers(products)
         super().__init__()
 
-    def _get_price_tiers(_self, products: list[ProductViewProduct]) -> dict[int, PriceTier]:
+    def _get_price_tiers(_self, products: list[Product]) -> dict[int, PriceTier]:
         """Get the price tiers we want to show in this form"""
         # Order of tiers is important, but dict is ordered these days
         tiers = {}
@@ -73,25 +72,30 @@ class TicketAmountsForm(Form):
 
             f.amount.data = basket.get(tier, 0)
 
-    def ensure_capacity(form, basket: Basket, voucher: typing.Optional[Voucher]):
+    def ensure_capacity(form, basket: Basket, voucher: Voucher | None) -> bool:
         """
         This function updates the products on the form based on the current capacity
         so it will fail to validate if the requested ticket capacity is now unavailable.
         """
+
+        # FIXME: We're storing data in random attributes of the FormField object here,
+        # which the typechecker doesn't really like.
+
         # Whether submitted or not, update the allowed amounts before validating
         capacity_available = True
         for f in form.tiers:
             pt_id = f.tier_id.data
             tier = form._tiers[pt_id]
-            f._tier = tier
+            f._tier = tier  # type: ignore[attr-defined]
 
             # If they've already got reserved tickets, they can keep them
             # because they've been reserved in the database
-            user_limit = max(tier.user_limit(), basket.get(tier, 0))
+            user_specific_limit = tier.user_limit(current_user)
+            user_limit = max(user_specific_limit, basket.get(tier, 0))
 
             # If a voucher is being used, limit the number of adult tickets by however
             # many remain on the voucher
-            if voucher and tier.parent.is_adult_ticket:
+            if voucher and tier.parent.is_adult_ticket():
                 user_limit = min(user_limit, voucher.tickets_remaining)
 
             if f.amount.data and f.amount.data > user_limit:
@@ -99,21 +103,25 @@ class TicketAmountsForm(Form):
                 capacity_available = False
 
             values = range(user_limit + 1)
-            f.amount.values = values
-            f._any = any(values)
+            f.form.amount.values = values
+            f._any = any(values)  # type: ignore[attr-defined]
+            f._user_limit_reached = user_specific_limit == 0 and tier.user_limit() > 0  # type: ignore[attr-defined]
+
         return capacity_available
 
     def add_to_basket(form, basket):
         """Add selected tickets to the provided basket."""
         for f in form.tiers:
             pt = f._tier
-            if f.amount.data != basket.get(pt, 0):
+            if f.amount.data is not None and f.amount.data != basket.get(pt, 0):
                 app.logger.info("Adding %s %s tickets to basket", f.amount.data, pt.name)
                 basket[pt] = f.amount.data
 
     def validate_set_currency(form, field):
-        if field.data not in CURRENCY_SYMBOLS:
-            raise ValidationError("Invalid currency %s" % field.data)
+        try:
+            Currency(field.data)
+        except ValueError as e:
+            raise ValidationError(f"Invalid currency {field.data}") from e
 
 
 class TicketTransferForm(Form):
@@ -134,7 +142,7 @@ class TicketPaymentForm(Form):
     basket_total = HiddenField("basket total")
 
     banktransfer = SubmitField("Pay by Bank Transfer")
-    stripe = SubmitField("Pay by card")
+    stripe = SubmitField("Pay")
 
     def validate_email(form, field):
         if current_user.is_anonymous and User.does_user_exist(field.data):

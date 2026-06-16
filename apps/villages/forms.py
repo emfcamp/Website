@@ -1,20 +1,30 @@
+from geoalchemy2.shape import from_shape, to_shape
+from shapely import Point
 from wtforms import (
-    SubmitField,
-    StringField,
-    SelectField,
-    TextAreaField,
+    BooleanField,
+    FloatField,
     IntegerField,
+    SelectField,
+    StringField,
+    SubmitField,
+    TextAreaField,
 )
-from wtforms.validators import Optional, Length, URL
-from geoalchemy2.shape import to_shape
+from wtforms.validators import URL, InputRequired, Length, Optional
 
-from ..common.forms import Form
 from models import Village
+from models.village import VillageRequirements
+
+from ..common.fields import (
+    EmailField,
+    HiddenIntegerField,
+)
+from ..common.forms import Form
 
 
 class VillageForm(Form):
-    name = StringField("Village Name", [Length(2, 25)])
+    name = StringField("Village Name", [Length(2, 50)])
     description = TextAreaField("Description", [Optional()])
+    long_description = TextAreaField("Long Description", [Optional()])
     url = StringField("URL", [URL(), Optional()])
 
     num_attendees = IntegerField("Number of People", [Optional()])
@@ -37,24 +47,35 @@ class VillageForm(Form):
 
     structures = TextAreaField("Large structures", [Optional()])
 
+    private = BooleanField("Private village", [Optional()])
+
     submit = SubmitField("Submit")
 
     def populate(self, village: Village) -> None:
         self.name.data = village.name
         self.description.data = village.description
+        self.long_description.data = village.long_description
         self.url.data = village.url
+        self.private.data = village.private
 
         requirements = village.requirements
-        self.num_attendees.data = requirements.num_attendees
-        self.size_sqm.data = requirements.size_sqm
-        self.power_requirements.data = requirements.power_requirements
-        self.noise.data = requirements.noise
-        self.structures.data = requirements.structures
+        if requirements is not None:
+            self.num_attendees.data = requirements.num_attendees
+            self.size_sqm.data = requirements.size_sqm
+            self.power_requirements.data = requirements.power_requirements
+            self.noise.data = requirements.noise
+            self.structures.data = requirements.structures
 
     def populate_obj(self, village: Village) -> None:
+        assert self.name.data is not None
         village.name = self.name.data
         village.description = self.description.data
+        village.long_description = self.long_description.data
         village.url = self.url.data
+        village.private = self.private.data or False
+
+        if village.requirements is None:
+            village.requirements = VillageRequirements()
 
         village.requirements.num_attendees = self.num_attendees.data
         village.requirements.size_sqm = self.size_sqm.data
@@ -66,31 +87,80 @@ class VillageForm(Form):
         field.data = (field.data or "").strip()
 
 
+class VillageDescriptionForm(Form):
+    long_description = TextAreaField("Long Description", [Optional()])
+    submit = SubmitField("Submit")
+
+    def populate(self, village: Village) -> None:
+        self.long_description.data = village.long_description
+
+
+class DeleteVillageForm(Form):
+    submit = SubmitField("Delete")
+
+
 class AdminVillageForm(VillageForm):
-    latlon = StringField("Location", [Optional()])
+    location_lat = FloatField("Latitude", [Optional()])
+    location_lon = FloatField("Longitude", [Optional()])
 
     def populate(self, village: Village) -> None:
         super().populate(village)
 
         if village.location is None:
-            self.latlon.data = ""
+            self.location_lat.data = None
+            self.location_lon.data = None
         else:
             latlon = to_shape(village.location)
-            self.latlon.data = "{}, {}".format(latlon.x, latlon.y)
+            self.location_lat.data = latlon.y
+            self.location_lon.data = latlon.x
 
     def populate_obj(self, village: Village) -> None:
-        village.name = self.name.data
-        village.description = self.description.data
-        village.url = self.url.data
-        if self.latlon.data:
-            latlon = self.latlon.data.split(",")
-            location = f"POINT({latlon[0]} {latlon[1]})"
-        else:
-            location = None
-        village.location = location
+        super().populate_obj(village)
 
-        village.requirements.num_attendees = self.num_attendees.data
-        village.requirements.size_sqm = self.size_sqm.data
-        village.requirements.power_requirements = self.power_requirements.data
-        village.requirements.noise = self.noise.data
-        village.requirements.structures = self.structures.data
+        if self.location_lat.data is not None and self.location_lon.data is not None:
+            village.location = from_shape(Point(self.location_lon.data, self.location_lat.data))
+        else:
+            village.location = None
+
+
+class JoinVillageForm(Form):
+    submit = SubmitField("Join")
+
+
+class LeaveVillageForm(Form):
+    submit = SubmitField("Leave")
+
+
+class RemoveVillageAdminForm(Form):
+    submit = SubmitField("Remove")
+    user_id = HiddenIntegerField("user_id", [InputRequired()])
+
+
+class DemoteVillageAdminForm(Form):
+    submit = SubmitField("Demote")
+    user_id = HiddenIntegerField("user_id", [InputRequired()])
+
+
+class AddVillageAdminForm(Form):
+    submit = SubmitField("Add")
+    user_email = EmailField("Email address", [InputRequired()])
+
+
+class RemoveVillageMemberForm(Form):
+    submit = SubmitField("Remove")
+    user_id = HiddenIntegerField("user_id", [InputRequired()])
+
+
+class PromoteVillageMemberForm(Form):
+    submit = SubmitField("Promote")
+    user_id = HiddenIntegerField("user_id", [InputRequired()])
+
+
+class AcceptVillageMemberForm(Form):
+    submit = SubmitField("Accept")
+    user_id = HiddenIntegerField("user_id", [InputRequired()])
+
+
+class AddVillageMemberForm(Form):
+    submit = SubmitField("Add")
+    user_email = EmailField("Email address", [InputRequired()])

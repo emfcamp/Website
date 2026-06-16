@@ -1,5 +1,6 @@
+{% from "_formhelpers.html" import render_field, render_checkbox %}
 <div class="well">
-  <form method="post" class="form-horizontal" role="form">
+  <form method="post" class="form-horizontal village-form" role="form">
     {{ form.hidden_tag() }}
     <fieldset>
       <legend>Basic Details</legend>
@@ -8,7 +9,11 @@
       {{ render_field(form.name, horizontal=9, placeholder="My Village") }}
       {{ render_field(form.url, horizontal=9, placeholder="") }}
       {{ render_field(form.description, horizontal=9,
-            placeholder="A description of your village. Who are you, what cool things will you be doing?") }}
+            placeholder="A short description of your village. Who are you, what cool things will you be doing?") }}
+      {% call render_field(form.long_description, horizontal=9,
+            placeholder="A longer description of your village using Markdown. Project details etc.") %}
+        <a href="https://www.markdown-cheatsheet.com">Standard Markdown</a> supported <em>apart from</em> images.
+      {% endcall %}
     </fieldset>
     <fieldset>
       <legend>Requirements</legend>
@@ -25,6 +30,12 @@
       <p>If you're bringing any tents or other structures which are larger than 25m<sup>2</sup> in area, or taller than 4m high, we need to know about these for fire safety reasons. Please let us know the size and type of these.</p>
       <p>We may ask you to provide us with a plan of your village before you can bring these.</p>
       {{ render_field(form.structures, horizontal=9) }}
+    </fieldset>
+    <fieldset>
+      <legend>Membership</legend>
+      <p>By default, any attendee can request to join your village, and village admins
+        approve or reject those requests. You can mark your village as private, disabling join requests.</p>
+      {{ render_checkbox(form.private, horizontal=9) }}
     </fieldset>
     <fieldset>
       <legend>Power</legend>

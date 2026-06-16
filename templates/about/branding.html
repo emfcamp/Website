@@ -48,90 +48,106 @@ which is available under an open license. Specifically we use:</p>
 held and read, such as booklets, pamphlets, cards, and so on. Make sure you think about the viewing
 distance for other objects. If in doubt, go large and clear.</p>
 
-<h2>EMF 2024 style</h2>
-
-<p>For general inspiration, please check out the <a href="{{url_for('static', filename='2024/theme-guide.pdf')}}">theme guide</a>.</p>
+<h2>EMF 2026 style</h2>
 
 <h3>Colour scheme</h3>
 <table class="table">
     <thead>
-        <tr><th></th></td><th>Name</th><th>Hex</th><th>RGB</th><th>CMYK</th><th>RAL</th></tr>
+        <tr><th></th></td><th>Name</th><th>Hex</th><th>RGB</th><th>CMYK</th><th>Use</th></tr>
     </thead>
     <tbody>
         <tr>
-            <td style="background-color: #AFC944"></td>
-            <td>Pale Green</td>
-            <td>#AFC944</td>
-            <td>175, 201, 68</td>
-            <td>C36M5Y93K0</td>
-            <td>120 80 60</td>
+            <td style="background-color: #F77F02"></td>
+            <td>Orange</td>
+            <td>#F77F02</td>
+            <td>247, 127, 2</td>
+            <td>C0M58Y98K0</td>
+            <td>Primary colour</td>
         </tr>
         <tr>
-            <td style="background-color: #528329"></td>
-            <td>Mid Green</td>
-            <td>#528329</td>
-            <td>82, 131, 41</td>
-            <td>C72M28Y100K12</td>
-            <td>6018</td>    
-        </tr>
-        <tr>
-            <td style="background-color: #213018"></td>
-            <td>Dark Green</td>
-            <td>#213018</td>
-            <td>33, 48, 24</td>
-            <td>C74M53Y84K67</td>
-            <td>6009</td>
+            <td style="background-color: #F5515E"></td>
+            <td>Coral</td>
+            <td>#F5515E</td>
+            <td>245, 81, 94</td>
+            <td>C0M80Y49K0</td>
+            <td></td>    
         </tr>
         <tr>
             <td style="background-color: #F9E200"></td>
             <td>Yellow</td>
             <td>#F9E200</td>
             <td>249, 226, 0</td>
-            <td>C5M5Y100K0</td>
-            <td>1026</td>
+            <td>C0M0Y91K0</td>
+            <td></td>    
         </tr>
         <tr>
-            <td style="background-color: #F77F02"></td>
-            <td>Orange</td>
-            <td>#F77F02</td>
-            <td>246, 127, 2</td>
-            <td>C0M62Y100K0</td>
-            <td>2007</td>
-        </tr>
-        <tr>
-            <td style="background-color: #F55089"></td>
-            <td>Pink</td>
-            <td>#F55089</td>
-            <td>245, 80, 137</td>
-            <td>C0M84Y17K0</td>
-            <td>4010</td>
+            <td style="background-color: #2AE28C"></td>
+            <td>Green</td>
+            <td>#2AE28C</td>
+            <td>42, 226, 140</td>
+            <td>C68M0Y68K0</td>
+            <td>Secondary colour</td>    
         </tr>
         <tr>
             <td style="background-color: #2EADD9"></td>
-            <td>Blue</td>
+            <td>Light Blue</td>
             <td>#2EADD9</td>
             <td>46, 173, 217</td>
-            <td>C70M13Y6K0</td>
-            <td>5012</td>
+            <td>C69M4Y6K0</td>
+            <td></td>    
+        </tr>
+        <tr>
+            <td style="background-color: #005D96"></td>
+            <td>Mid Blue</td>
+            <td>#005D96</td>
+            <td>0, 93, 150</td>
+            <td>C95M58Y13K0</td>
+            <td></td>    
+        </tr>
+        <tr>
+            <td style="background-color: #000730"></td>
+            <td>Dark Blue</td>
+            <td>#000730</td>
+            <td>0, 7, 48</td>
+            <td>C100M91Y0K66</td>
+            <td></td>    
         </tr>
     </tbody>
 </table>
 
 <h3>Logos</h3>
+{#
+    'emf2026-logo-black-gradient', // contrast too poor to use
+    'emf2026-logo-text-black-gradient', // contrast too poor to use
+#}
 {% set logo_files = [
-    'emf2024-logo-text-light',
-    'emf2024-logo-text-dark',
-    'emf2024-logo-light',
-    'emf2024-logo-dark',
+    ('emf2026-logo-black', 3, '#fff'),
+    ('emf2026-logo-orange', 3, '#fff'),
+    ('emf2026-logo-white', 3, '#000'),
+    ('emf2026-logo-white-gradient', 3, '#000'),
+
+    ('emf2026-logo-text-black', 6, '#fff'),
+    ('emf2026-logo-text-black-orange', 6, '#fff'),
+    ('emf2026-logo-text-white', 6, '#000'),
+    ('emf2026-logo-text-white-gradient', 6, '#000'),
+    ('emf2026-logo-text-white-orange', 6, '#000'),
+
 ]%}
 
-{% for logo in logo_files %}
-    {% set url = url_for('static', filename='images/brand/2024/' ~ logo) %}
-    <div class="col-md-6">
-    <img src="{{url ~ '.svg'}}" style="max-width: 100%; max-height: 200px; background-color: #aaa;">
+{% for logo, width, bg in logo_files %}
+    {% set url = url_for('static', filename='images/brand/2026/' ~ logo) %}
+    <div class="col-md-{{width}}">
+    <img src="{{url ~ '.svg'}}" style="max-width: 100%; max-height: 200px; background-color: {{bg}};">
     <p><a href="{{url ~ '.svg'}}" target="_blank">svg</a> | <a href="{{url ~ '.png'}}" target="_blank">png</a></p>
     </div>
 {% endfor %}
+
+<h3 style="clear:both">2026 Gradient accessibility</h3>
+<p>The gradient version of the logo should be used against a black/dark
+background, as the yellow end of the gradient does not have enough contrast
+against white/light backgrounds.</p>
+<p>If you still wish to have a pop of colour in our logo, we recommend using the
+orange version on any background.</p>
 
 <h2>Credits and history</h2>
 

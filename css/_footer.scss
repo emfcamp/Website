@@ -1,55 +1,44 @@
 @use "./_variables.scss" as *;
 
 footer {
-  background: url('../images/brand/2024/header-2.png') left bottom/60%;
+  background-image: url("../images/brand/2026/footer.jpg");
+  background-color: $main-background;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: bottom right;
+
   overflow: hidden;
-  padding: 10px 15px 0px 15px;
+  padding: 10px 15px 0 15px;
   border-top: 1px solid #272827;
+  height: 139px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  #credits {
+    font-size: 0.75em;
+  }
+  .share {
+    margin-bottom: 10px;
+  }
 }
 
-footer #credits {
-  font-size: 0.75em;
-  float: right;
-  clear: both;
-  margin-top: 5px;
-  padding-right:15px;
-}
-
-#bottom-menu-container {
+#bottom-menu-container,
+footer .share {
   font-family: $header-font-stack;
   width: 100%;
 }
 
-#bottom-menu-container .menu {
-  float: left;
-}
-
-#bottom-menu-container ul.menu li{
-  display:inline-block;
+#bottom-menu-container ul.menu li {
+  display: inline-block;
   padding-left: 0;
   padding-right: 1em;
 }
 
-
-#bottom-menu-container .share {
-  float: right;
-}
-
-@media(max-width: $header-collapse-width) {
-  footer {
-    position: initial;
-    bottom: initial;
-    right: initial;
-  }
-
-  #bottom-menu-container .menu {
-    float: none;
-    clear: both
-  }
-
+@media (max-width: $header-collapse-width) {
   #bottom-menu-container ul.menu li {
     margin-bottom: 0.25em;
     font-size: 14px;
   }
 }
-

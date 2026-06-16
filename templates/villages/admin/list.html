@@ -14,7 +14,7 @@
     {% for village in villages %}
       <tr>
         <td><a href="{{url_for('.admin_village', village_id=village.id)}}">{{ village.name }}</a></td>
-        <td>{{ village.requirements.num_attendees }}</td>
+        <td>{{ village.requirements.num_attendees or "" }}</td>
         <td>{% if village.requirements.size_sqm %}{{village.requirements.size_sqm}}m<sup>2</sup>{% endif %}</td>
       </tr>
     {% endfor %}

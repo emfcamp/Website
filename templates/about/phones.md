@@ -2,136 +2,184 @@ title: Phones
 ---
 # Phones
 
-The Phone Team (aka POC) provides a comprehensive phone service at EMF.
+The Phone Team provides a comprehensive phone service at EMF, with several different ways to connnect!
+
+Our phones network allows EMF attendees to call each other in the field, dial interesting services posted around the field and more.
+
+Follow us on the Fediverse at [@phones@emfcamp.org](https://social.emfcamp.org/@phones) for updates!
+
+## Ahead of the event
+
+If you want to take part in our phone network, we highly suggest picking up a DECT phone (like a landline phone you might have at home)!
+
+Here are some of our suggestions:
+
+<table class="table phones-dect-models">
+  <thead>
+    <tr>
+      <td>Model</td>
+      <td>Price</td>
+      <td>Buy</td>
+      <td>Notes</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Gigaset C570A</strong></td>
+      <td>£20 on Amazon</td>
+      <td><a href="https://www.amazon.co.uk/Gigaset-Premium-Cordless-Additional-C570H/dp/B07CSRDTFZ">amazon.co.uk</a></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><strong>Gigaset Life H (E794)</strong></td>
+      <td>£20 on Amazon</td>
+      <td><a href="https://www.amazon.co.uk/Gigaset-Life-announcement-Bluetooth-adjustment/dp/B0B7NR8L51">amazon.co.uk</a></td>
+      <td>(known to be compatible with Bluetooth hearing aids)</td>
+    </tr>
+  </tbody>
+</table>
+
+<style>
+table.phones-dect-models tbody tr td:nth-child(4) {
+  font-size: 14px;
+}
+</style>
+
+If you already have a DECT phone, feel free to bring it along! You can also check our [DECT compatibility list](https://phones.emfcamp.org/help/dect-compatibility), generally Gigaset and Mitel handsets tend to be good options.
+
+There may also be some DECT phones available to buy at the shop during the event.
+
+## During the event
+
+Be aware that mobile phone coverage on the site can be patchy, being in the middle of a field!
+
+We have many public phones located around the site on posts which anyone can use to dial other EMF extension numbers from our <a href="https://phones.emfcamp.org/phonebook">phonebook</a> (external calls are not permitted), or which you might see posted around the site!
+
+Every EMF extension also has its very own real phone number you can call from a regular phone!
+
+<div class="well dial-in">
+  <div class="dial-in-number">0114 501 <span class="extn">XXXX</span></div>
+  <p>Replace <span class="extn">XXXX</span> with the 4-digit extension you want to call</p>
+  <p>If your extension isn't 4-digits, use <span class="extn">0000</span> and you will be prompted to enter it</p>
+</div>
+
+You can configure if you want people to be able to use dial-in for your extension from the number management page.
+
+<style>
+.dial-in {
+  display: inline-block;
+}
+.dial-in .dial-in-number {
+  font-size: 32px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 0.25em;
+}
+.dial-in p {
+  margin: 0.25em 0 0;
+}
+.dial-in .extn {
+  color: #f77f02;
+}
+.dial-in .dial-in-number .extn {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+</style>
+
+## Registering a number
+
+!!! warning ""
+    phones.emfcamp.org isn't quite ready for the public yet, but watch out for an upcoming announcement very soon!
+
+Closer to the event start date, we will publish instructions here about registering a personal extension number you can use during the event.
+
+<a href="https://phones.emfcamp.org" class="btn btn-primary">Register a number</a>
 
 ## Getting Started
 
-You can pick a 4-digit extension number to use, and call anyone on site via it. Create your number in the  [Electromagnetic Phonebook](https://phones.emfcamp.org)
+You can pick a 4-digit extension number to use, and call anyone on site via it. Create your number in the Electromagnetic Phonebook at [phones.emfcamp.org](https://phones.emfcamp.org)
 
-Firstly you will need to register an account with a username, email & password. We send an email validation message from [poc@emfcamp.org](mailto:poc@emfcamp.org) so make sure you’ve clicked that before you can login.
+Firstly you will need to register an account by selecting Login, then Register. (Don't select the 'Login with Orga SSO' option as this is for EMF organisers.)
+
+We will send a confirmation email from [phones@emfcamp.org](mailto:phones@emfcamp.org) you can use to validate your account.
 
 ### Registering a Number
 
-Once logged in click Add a Number in the top menu bar.
+Once logged in, to register a number go to 'Your numbers' and select 'New number', you'll then have a few options:
 
-This will then show you the Create Number form
+- **Number**: This is where you pick your phone number! You can click 'View all available numbers' to see a grid of which numbers are available for selection.
+- **Name**: A description of what this number is for, such as your name. This will appear in the phonebook if you choose, and as your caller ID.
+- **Service**: The type of device you'd like to use your number with.
+- **Extension type**: What category of number is this, a personal number, a number for a village, etc.
+- **Visibility**: Do you want your number to be listed in the public phonebook?
 
+Once you're happy, press 'Register number' and you'll be shown setup instructions to connect your number.
 
-* **Event** will be EMF2024 (only option)
-* **Type of Service **allows you to select what sort of device you want to use this number with, see the section below for more details.
-* **Number** should be your desired 4 digit number in the range 2000-8999 or 9200-9899, some numbers may already be taken even if they do not show up in the phonebook.
-* **Description** is a free text label for how you want your entry to appear in the phonebook.
-* **Public Phonebook** allows you to choose if you want to be in the public listing or not, if not only the Phone Team can see your entry.
-* The final field will vary depending on Type of Service, usually you can leave this as it is auto-populated and not editable, you don’t need to make a note of this information you can view it later.
+For more information on how to connect your number, see the Types of Service section below.
 
-Click Submit and your number will be created.
-
+{#
 NOTE:
 
-_If you had a Permanent Number Reserved in the Eventphone system and used this on DECT at EMF2022 then we have kept your reservation, please email [poc@emfcamp.org](mailto:poc@emfcamp.org) once you have created an account in our system for us to transfer it over to you._
+_If you had a Permanent Number Reserved in the Eventphone system and used this on DECT at EMF2024 then we have kept your reservation, please email [poc@emfcamp.org](mailto:poc@emfcamp.org) once you have created an account in our system for us to transfer it over to you._
+#}
 
-**Numbers are a finite rescource**, we have ~3000 attendees and ~7700 numbers, please do not register excessive amounts of numbers that you don't need, we may remove numbers or accounts that are felt to be abusing the system.
-If you have a use-case that needs a lot of numbers come and talk to the Phone Team.
+**Numbers are a finite resource**, we have ~3500 attendees and ~8000 numbers. Please don't register excessive amounts of numbers that you don't intend to use.
 
+If you have a use-case that could need a lot of numbers, please come and speak to us and we'll see what we can do!
 
 ### Managing your Numbers
 
-The My Numbers link will show you the numbers under your account,
+The 'Your numbers' page will show you all the numbers you have assigned to your account, as well as details about them.
 
-Next to each number is 3 buttons.
-
-**Details** will show you how to use that number with specific instructions for the Type of Service you are using.
-
-**Modify** lets you amend the Description in the phonebook, change the visibility in the phonebook and set a Fallback Number.
-
-The **Fallback Number** is a number that will be called if the main number doesn’t answer the call within 30sec or is unavailable. 
-
+You can edit them, or click 'Setup' to see information on how to get your phone connected again.
 
 ## Types of Service
 
-
 ### DECT 
 
-There's site-wide DECT phone coverage
+We will have a DECT (Digital Enhanced Cordless Telecommunications) network on-site, as described.
 
-You can bring your own DECT telephone and join the network, enabling you to call other EMF participants and interactive services for free.
-
-If you're buying a DECT phone and don't know what to get, buy pretty much any Gigaset DECT handset, for example:
-
-- Gigaset A170, £18 on Amazon [https://amzn.eu/d/5bMa7ic](https://amzn.eu/d/5bMa7ic)
-- Gigaset Life A, ~£60 on Amazon [https://amzn.eu/d/4GuVoMu](https://amzn.eu/d/4GuVoMu) (Known to be compatible with Bluetooth Hearing Aids from Phonak, Unitron and Hansaton)
-
-If you've got one already, feel free to bring it. Use Eventphones [DECT Phone Compatibility List](https://eventphone.de/doku/dect_phone_compatibility_list) to find out if your phone is likely compatible.
-
-
-### POTS (Plain old telephone service)
+### POTS (Plain Old Telephone Service)
 
 There will be a site-wide analog POTS network allowing you to connect a traditional analog phone to a phone line, with support for modems and fax machines.
 
-For more information see [docs.cutel.net](https://docs.cutel.net)
-
+For more information see [docs.cutel.net](https://docs.cutel.net/events/emf26/).
 
 ### Cellular
 
-We intend to have a GSM (2G) phone network on site. More details to come closer to the event. ( [https://gsm.emf.camp/](https://gsm.emf.camp/) )
+We intend to have a GSM (2G) and LTE (4G) phone network on site, you can get a SIM card from us to connect into the rest of our phones network from your mobile phone.
 
+More details to come closer to the event at [gsm.emf.camp](https://gsm.emf.camp/).
 
 ### SIP 
 
-You can use SIP devices or a SIP VoIP app on your phone once you've registered an extension number. The credentials will be shown in the Phonebook app.
+You can use SIP-capable phones, or a SIP VoIP app on your phone to connect into the phones network once you've registered a number.
 
-We would prefer it if people didn’t connect SIP servers to the network eg asterisk as this can expose our network to a large amount of SPAM/fraud, if you want to do this please talk to the phone team.
+You can find the SIP credentials in the portal at [phones.emfcamp.org](https://phones.emfcamp.org).
 
+If you wish to connect a SIP server to the network, we would generally prefer you do so with caution or let us know - as this can expose our network to a large amount of spam or fraud if incorrectly configured, which is easily done.
 
-### Group
+### Group call
 
-A group number will forward incoming calls to up to 10 other numbers, see the section on Group calling for more specific details.
+You can create a group call extension, which will forward incoming calls to a group of other numbers.
 
+### Application
 
-### Apps 
+We have limited support for programmable numbers this year, if you have a specific request - please speak to us soon so we can see what we can do for you!
 
-You can register a number as an app and this will point it at our [Jambonz](https://jambonz.org) instance, Jambonz is an open source programmable communications platform, much like Twilio or Infobip.
-
-You will need to host your code somewhere that Jambonz can send a webhook to in order to control what the app does, for more information see the [EMF Developer Docs](https://developer.emfcamp.org)
-
-
-## Groups
-
-Group numbers have some specific rules and behaviours.
-
-The maximum number of phones that can be under a group is 10
-
-Some Types of Service are not group capable and you won’t be able to add these, for example Apps and Groups (you can’t put a Group in a Group)
-
-There are 2 ways to join/leave a group, via the web interface or by dialling 910, see the Group details page in the Phonebook for more info.
-
-If adding to the group via the web interface you can choose if the member should be rung immediately (0 sec) or after 20 seconds. So creating a 2 stage group. After 20sec all the original 0sec members will still be called too. \
-A group cannot have only 20sec members in it.
-
-If a group has no 0sec members then the call will try the Fallback number (if set) or it will play an announcement.
-
+Alternatively, you can use the SIP number type hooked up to your own SIP server if you would like to implement something more advanced.
 
 ## External Calls
 
-We do not allow attendees to make external calls from the site phone system, if you need to make a call either use your mobile or come to the Info Desk.
-
+We do not allow attendees to make external calls from the on-site phone system. If you need to make a call, either use your mobile or come to the Info Desk.
 
 ### Mobile Coverage
 
 Mobile coverage on site from the public networks is poor, we recommend using WiFi Calling if your handset and network support it.
 
-
 ### WiFi Calling
 
 We have done some work on the WiFi network to enable access for WiFi calling to UK providers, previously this hasn't worked with the IP ranges we use, but we have now solved this. WiFi calling should just work normally, as it does at home, from any of the camp WiFi networks.
 
-If WiFi calling doesn’t work for you on our network (and it normally does at home) please come by the Phone Team tent near admin.
-
-
-## Test Numbers
-
-90201 - Speaks the caller's assigned number
-
-90202 - More detailed tests, Echo, DTMF, Audio etc. mostly for phone geeks
-
-90210 - For the 90’s kids!
+If WiFi calling doesn’t work for you on our network, and it normally does at home, please come by the Phone Team tent.

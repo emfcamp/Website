@@ -1,0 +1,1411 @@
+{
+  "Badge": {
+    "capacity_max": null,
+    "children": {},
+    "products": [
+      {
+        "capacity_max": 1900,
+        "description": "One badge without a battery",
+        "display_name": "Tildagon",
+        "name": "badge",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "badge",
+            "personal_limit": 4,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 1000
+              },
+              {
+                "currency": "EUR",
+                "price_int": 1170
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 1900,
+        "description": "If you have a TiLDA badge battery from EMF 2016 or EMF 2018 (not EMF 2022), it will work with Tildagon.",
+        "display_name": "Tildagon battery",
+        "name": "badge-battery",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "badge-battery",
+            "personal_limit": 4,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 300
+              },
+              {
+                "currency": "EUR",
+                "price_int": 350
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "Merchandise": {
+    "capacity_max": null,
+    "children": {},
+    "products": [
+      {
+        "capacity_max": 30,
+        "description": "",
+        "display_name": "Unisex T-shirt (small)",
+        "name": "tshirt-unisex-small",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-unisex-small",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 1200
+              },
+              {
+                "currency": "EUR",
+                "price_int": 1400
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 110,
+        "description": "",
+        "display_name": "Unisex T-shirt (medium)",
+        "name": "tshirt-unisex-med",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-unisex-med",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 1200
+              },
+              {
+                "currency": "EUR",
+                "price_int": 1400
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 150,
+        "description": "",
+        "display_name": "Unisex T-shirt (large)",
+        "name": "tshirt-unisex-large",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-unisex-large",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 1200
+              },
+              {
+                "currency": "EUR",
+                "price_int": 1400
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 110,
+        "description": "",
+        "display_name": "Unisex T-shirt (XL)",
+        "name": "tshirt-unisex-xl",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-unisex-xl",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 1200
+              },
+              {
+                "currency": "EUR",
+                "price_int": 1400
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 60,
+        "description": "",
+        "display_name": "Unisex T-shirt (2XL)",
+        "name": "tshirt-unisex-2xl",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-unisex-2xl",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 1200
+              },
+              {
+                "currency": "EUR",
+                "price_int": 1400
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 30,
+        "description": "",
+        "display_name": "Unisex T-shirt (3XL)",
+        "name": "tshirt-unisex-3xl",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-unisex-3xl",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 1200
+              },
+              {
+                "currency": "EUR",
+                "price_int": 1400
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 20,
+        "description": "",
+        "display_name": "Unisex T-shirt (4XL)",
+        "name": "tshirt-unisex-4xl",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-unisex-4xl",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 1200
+              },
+              {
+                "currency": "EUR",
+                "price_int": 1400
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 20,
+        "description": "",
+        "display_name": "Unisex T-shirt (5XL)",
+        "name": "tshirt-unisex-5xl",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-unisex-5xl",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 1200
+              },
+              {
+                "currency": "EUR",
+                "price_int": 1400
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 10,
+        "description": "",
+        "display_name": "Womens T-shirt (small)",
+        "name": "tshirt-womens-s",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-womens-s",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 1200
+              },
+              {
+                "currency": "EUR",
+                "price_int": 1400
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 50,
+        "description": "",
+        "display_name": "Womens T-shirt (medium)",
+        "name": "tshirt-womens-m",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-womens-m",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 1200
+              },
+              {
+                "currency": "EUR",
+                "price_int": 1400
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 30,
+        "description": "",
+        "display_name": "Womens T-shirt (large)",
+        "name": "tshirt-womens-l",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-womens-l",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 1200
+              },
+              {
+                "currency": "EUR",
+                "price_int": 1400
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 10,
+        "description": "",
+        "display_name": "Womens T-shirt (XL)",
+        "name": "tshirt-womens-xl",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-womens-xl",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 1200
+              },
+              {
+                "currency": "EUR",
+                "price_int": 1400
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 20,
+        "description": "",
+        "display_name": "Womens T-shirt (2XL)",
+        "name": "tshirt-womens-2xl",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-womens-2xl",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 1200
+              },
+              {
+                "currency": "EUR",
+                "price_int": 1400
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 10,
+        "description": "",
+        "display_name": "Kids T-shirt (age 3-4)",
+        "name": "tshirt-kids-3-4",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-kids-3-4",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 600
+              },
+              {
+                "currency": "EUR",
+                "price_int": 700
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 10,
+        "description": "",
+        "display_name": "Kids T-shirt (age 5-6)",
+        "name": "tshirt-kids-5-6",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-kids-5-6",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 600
+              },
+              {
+                "currency": "EUR",
+                "price_int": 700
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 10,
+        "description": "",
+        "display_name": "Kids T-shirt (age 7-8)",
+        "name": "tshirt-kids-7-8",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-kids-7-8",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 600
+              },
+              {
+                "currency": "EUR",
+                "price_int": 700
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 10,
+        "description": "",
+        "display_name": "Kids T-shirt (age 9-11)",
+        "name": "tshirt-kids-9-11",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-kids-9-11",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 600
+              },
+              {
+                "currency": "EUR",
+                "price_int": 700
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 10,
+        "description": null,
+        "display_name": "Kids T-shirt (age 12-13)",
+        "name": "tshirt-kids-12-13",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tshirt-kids-12-13",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 600
+              },
+              {
+                "currency": "EUR",
+                "price_int": 700
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "Parking": {
+    "capacity_max": null,
+    "children": {},
+    "products": [
+      {
+        "capacity_max": null,
+        "description": "We're trying to keep cars to a minimum. Please take public transport or car-share if you can. Parking tickets will be available to purchase up to one week before the event, so you don't have to buy one now.",
+        "display_name": "Parking ticket",
+        "name": "parking",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "parking",
+            "personal_limit": 5,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 2000
+              },
+              {
+                "currency": "EUR",
+                "price_int": 2300
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": null,
+        "description": null,
+        "display_name": "Parking ticket (complimentary)",
+        "name": "parking-complimentary",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "parking-complimentary",
+            "personal_limit": 1,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 0
+              },
+              {
+                "currency": "EUR",
+                "price_int": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "admissions": {
+    "capacity_max": 3250,
+    "children": {
+      "Carer": {
+        "capacity_max": 21,
+        "children": {},
+        "products": [
+          {
+            "capacity_max": null,
+            "description": null,
+            "display_name": "Adult Ticket (carer)",
+            "name": "full-carer",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "full-carer",
+                "personal_limit": 2,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 0
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 0
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "Discounted": {
+        "capacity_max": 23,
+        "children": {},
+        "products": [
+          {
+            "capacity_max": 25,
+            "description": "Adult ticket with a 50% discount if you are unable to afford the full price.",
+            "display_name": "Adult ticket (50% discount)",
+            "name": "full-discount-50",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "full-discount-50",
+                "personal_limit": 2,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 9000
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 10500
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "capacity_max": 25,
+            "description": "Adult ticket with a 80% discount if you are unable to afford any others.",
+            "display_name": "Adult ticket (80% discount)",
+            "name": "full-discount-80",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "full-discount-80",
+                "personal_limit": 2,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 3600
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 4200
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "Discounted Day": {
+        "capacity_max": 0,
+        "children": {},
+        "products": []
+      },
+      "General": {
+        "capacity_max": 2911,
+        "children": {},
+        "products": [
+          {
+            "capacity_max": null,
+            "description": "",
+            "display_name": "Adult ticket",
+            "name": "full",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "full",
+                "personal_limit": 10,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 18000
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 21000
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "capacity_max": null,
+            "description": "Support this non-profit event by paying a little more. All money will go towards making EMF more awesome.",
+            "display_name": "Adult ticket (supporter)",
+            "name": "full-s",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "full-s",
+                "personal_limit": 10,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 20000
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 23000
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "capacity_max": null,
+            "description": "Support this non-profit event by paying a bit more. All money will go towards making EMF more awesome.",
+            "display_name": "Adult ticket (gold supporter)",
+            "name": "full-sg",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "full-sg",
+                "personal_limit": 10,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 23000
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 27000
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "capacity_max": null,
+            "description": "Pay for two tickets - we'll try and use the extra money to fund someone who wouldn't otherwise be able to afford a ticket to EMF.",
+            "display_name": "Adult ticket (platinum supporter)",
+            "name": "full-bogo",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "full-bogo",
+                "personal_limit": 10,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 36000
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 42000
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "capacity_max": null,
+            "description": "For people born after May 29, 2006. Under-16s must be accompanied by an adult.",
+            "display_name": "Under-18 ticket",
+            "name": "u18",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "u18",
+                "personal_limit": 10,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 5500
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 6500
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "capacity_max": null,
+            "description": "For people born after May 29, 2012.",
+            "display_name": "Under-12 ticket",
+            "name": "u12",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "u12",
+                "personal_limit": 5,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 0
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 0
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "capacity_max": null,
+            "description": null,
+            "display_name": "Adult ticket (kitchen volunteer)",
+            "name": "full-kitchen",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "full-kitchen",
+                "personal_limit": 1,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 0
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 0
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "Reserved": {
+        "capacity_max": 5,
+        "children": {},
+        "products": [
+          {
+            "capacity_max": null,
+            "description": null,
+            "display_name": "Adult ticket",
+            "name": "full-reserved",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "full-reserved",
+                "personal_limit": 2,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 18000
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 21000
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "Speakers": {
+        "capacity_max": 189,
+        "children": {},
+        "products": [
+          {
+            "capacity_max": null,
+            "description": "A ticket to EMF, with 33% speaker discount.",
+            "display_name": "Adult ticket (speaker)",
+            "name": "full-speaker",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "full-speaker",
+                "personal_limit": 1,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 12000
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 14000
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "capacity_max": null,
+            "description": "A full-price ticket for a guest.",
+            "display_name": "Adult ticket (speaker guest)",
+            "name": "full-speaker-plusone",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "full-speaker-plusone",
+                "personal_limit": 1,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 18000
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 21000
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "capacity_max": null,
+            "description": "",
+            "display_name": "Adult Ticket (speaker complimentary)",
+            "name": "full-speaker-complimentary",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "full-speaker-complimentary",
+                "personal_limit": 4,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 0
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 0
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "capacity_max": null,
+            "description": "A free day ticket to EMF for speakers.",
+            "display_name": "Day Ticket (Speaker)",
+            "name": "day-speaker",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "day-speaker",
+                "personal_limit": 4,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 0
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 0
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "capacity_max": null,
+            "description": "",
+            "display_name": "Under-18 ticket (speaker complimentary)",
+            "name": "u18-speaker-free",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "u18-speaker-free",
+                "personal_limit": 2,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 0
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 0
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "capacity_max": null,
+            "description": null,
+            "display_name": "Under-12 ticket (speaker)",
+            "name": "u12-speaker",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "u12-speaker",
+                "personal_limit": 4,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 0
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 0
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "Sponsors": {
+        "capacity_max": 41,
+        "children": {},
+        "products": [
+          {
+            "capacity_max": null,
+            "description": "",
+            "display_name": "Adult ticket (sponsor)",
+            "name": "full-sponsor",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "full-sponsor",
+                "personal_limit": 20,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 0
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 0
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "capacity_max": null,
+            "description": "",
+            "display_name": "Under-12 ticket (sponsor complimentary)",
+            "name": "u12-sponsor",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "u12-sponsor",
+                "personal_limit": 5,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 0
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 0
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "Suppliers": {
+        "capacity_max": 60,
+        "children": {},
+        "products": [
+          {
+            "capacity_max": null,
+            "description": "",
+            "display_name": "Adult ticket (supplier)",
+            "name": "full-supplier",
+            "price_tiers": [
+              {
+                "active": true,
+                "capacity_max": null,
+                "name": "full-supplier",
+                "personal_limit": 20,
+                "prices": [
+                  {
+                    "currency": "GBP",
+                    "price_int": 0
+                  },
+                  {
+                    "currency": "EUR",
+                    "price_int": 0
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "products": []
+  },
+  "campervan": {
+    "capacity_max": 195,
+    "children": {},
+    "products": [
+      {
+        "capacity_max": 184,
+        "description": "For caravans, camper vans, and car tents. If you bring a caravan or car tent, you won't need a separate parking ticket for the towing car. Maximum length 8m.\r\n\r\nThese will be available to purchase at least until March 1, 2024 - availability after that may be limited.",
+        "display_name": "Live-in vehicle ticket",
+        "name": "campervan",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "campervan",
+            "personal_limit": 2,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 5000
+              },
+              {
+                "currency": "EUR",
+                "price_int": 5800
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": null,
+        "description": null,
+        "display_name": "Live-in vehicle ticket (complimentary)",
+        "name": "campervan-complimentary",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "campervan-complimentary",
+            "personal_limit": 1,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 0
+              },
+              {
+                "currency": "EUR",
+                "price_int": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": null,
+        "description": "For caravans, camper vans, and car tents. If you bring a caravan or car tent, you won't need a separate parking ticket for the towing car. Maximum length 8m.",
+        "display_name": "Live-in vehicle ticket",
+        "name": "campervan-late",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "campervan-late",
+            "personal_limit": 1,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 5000
+              },
+              {
+                "currency": "EUR",
+                "price_int": 5800
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "hire": {
+    "capacity_max": null,
+    "children": {},
+    "products": [
+      {
+        "capacity_max": 2,
+        "description": "Standard 5x5m clearspan marquee",
+        "display_name": "5x5m Marquee",
+        "name": "tent-5x5",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tent-5x5",
+            "personal_limit": 1,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 63000
+              },
+              {
+                "currency": "EUR",
+                "price_int": 73700
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 1,
+        "description": "Standard 6x6m clearspan marquee",
+        "display_name": "6x6m Marquee",
+        "name": "tent-6x6",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "tent-6x6",
+            "personal_limit": 1,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 69600
+              },
+              {
+                "currency": "EUR",
+                "price_int": 81500
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 3,
+        "description": "A 6x6m marquee with a pointed roof. These are similar to the 6x6m clearspan but cheaper because we got a good deal on them.",
+        "display_name": "6x6m \"Pagoda\" Marquee",
+        "name": "pagoda-6x6",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "pagoda-6x6",
+            "personal_limit": 1,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 54600
+              },
+              {
+                "currency": "EUR",
+                "price_int": 63900
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 1,
+        "description": "Plastic interlocking flooring for 5x5m marquee",
+        "display_name": "Flooring for 5x5m marquee",
+        "name": "flooring-5x5",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "flooring-5x5",
+            "personal_limit": 1,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 13500
+              },
+              {
+                "currency": "EUR",
+                "price_int": 15800
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 1,
+        "description": "Plastic interlocking flooring for 6x6m marquee (clearspan or pagoda)",
+        "display_name": "Flooring for 6x6m marquee",
+        "name": "flooring-6x6",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "flooring-6x6",
+            "personal_limit": 1,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 19400
+              },
+              {
+                "currency": "EUR",
+                "price_int": 22700
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 265,
+        "description": "Black plastic folding chair",
+        "display_name": "Chair",
+        "name": "chair",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "chair",
+            "personal_limit": 100,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 200
+              },
+              {
+                "currency": "EUR",
+                "price_int": 235
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": 91,
+        "description": "Wooden trestle table",
+        "display_name": "Table",
+        "name": "table",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "table",
+            "personal_limit": 30,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 500
+              },
+              {
+                "currency": "EUR",
+                "price_int": 590
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "sponsor": {
+    "capacity_max": null,
+    "children": {},
+    "products": [
+      {
+        "capacity_max": null,
+        "description": "",
+        "display_name": "\u00a31000 sponsorship",
+        "name": "sponsor-1k",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "sponsor-1k",
+            "personal_limit": 5,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 100000
+              },
+              {
+                "currency": "EUR",
+                "price_int": 120000
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": null,
+        "description": "",
+        "display_name": "\u00a3500 sponsorship",
+        "name": "sponsor-500",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "sponsor-500",
+            "personal_limit": 5,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 50000
+              },
+              {
+                "currency": "EUR",
+                "price_int": 58000
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "capacity_max": null,
+        "description": null,
+        "display_name": "\u00a3250 sponsorship",
+        "name": "sponsor-250",
+        "price_tiers": [
+          {
+            "active": true,
+            "capacity_max": null,
+            "name": "sponsor-250",
+            "personal_limit": 10,
+            "prices": [
+              {
+                "currency": "GBP",
+                "price_int": 25000
+              },
+              {
+                "currency": "EUR",
+                "price_int": 29500
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

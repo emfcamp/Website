@@ -1,100 +1,97 @@
 import "jquery-highlight";
-import DataTable from 'datatables.net-bs';
+import DataTable from "datatables.net-bs";
 
 let EMF = {};
 
 EMF.search_count = 0;
 EMF.search_count_received = 0;
-EMF.search_arrivals = function() {
-    var query = $('#query').val();
-    if ($.trim(query).length <= 1) {
-        return;
-    }
-    EMF.search_count++;
+EMF.search_arrivals = function () {
+  var query = $("#query").val();
+  if ($.trim(query).length <= 1) {
+    return;
+  }
+  EMF.search_count++;
 
-    var data = $.post(EMF.search_url, { q: query, n: EMF.search_count })
-        .done(EMF.search_arrivals_done)
-        .fail(EMF.search_arrivals_fail);
-
+  var data = $.post(EMF.search_url, { q: query, n: EMF.search_count })
+    .done(EMF.search_arrivals_done)
+    .fail(EMF.search_arrivals_fail);
 };
-EMF.search_arrivals_fail = function(jqXHR) {
-    var data = jqXHR.responseJSON;
-    $('#error-text').text(data.error);
-    $('#error-description').text(data.description);
-    $('#error').show();
-    $('#purchases').hide();
-};
-
-EMF.search_arrivals_done = function(data) {
-    var search_count = Number(data.n);
-    if (search_count < EMF.search_count_received) return;
-    EMF.search_count_received = search_count;
-
-    $('#error').hide();
-
-    if (data.location) {
-        $('#query').val('');
-        window.location = data.location;
-        return;
-    }
-
-    if (EMF.purchases_data == undefined) {
-        EMF.purchases_data = new DataTable('#purchases-data', {
-            columns: [
-                { data: 'name' },
-                { data: 'email' },
-            ],
-            createdRow: function(row, data, index) {
-                if (data.purchases == 0) {
-                    $(row).addClass('no-purchases');
-                } else if (data.completes == data.purchases) {
-                    $(row).addClass('complete');
-                } else if (data.completes > 0) {
-                    $(row).addClass('partial');
-                } else {
-                    $(row).addClass('has-purchases');
-                }
-                var link = $('<a>').attr('href', data.url);
-                $('td', row).wrapInner(link);
-            },
-            bFilter: false,
-            bLengthChange: false,
-            bSort: false,
-            bPaginate: false,
-            bAutoWidth: false,
-            searchHighlight: true
-        });
-    }
-    EMF.purchases_data.clear();
-    EMF.purchases_data.settings()[0].oPreviousSearch.sSearch = $('#query').val();
-    EMF.purchases_data.rows.add(data.users).draw();
+EMF.search_arrivals_fail = function (jqXHR) {
+  var data = jqXHR.responseJSON;
+  $("#error-text").text(data.error);
+  $("#error-description").text(data.description);
+  $("#error").show();
+  $("#purchases").hide();
 };
 
-EMF.cancel_return = function(e) {
-    if (e.keyCode == 13) {
-        e.cancelBubble = true;
-        return false;
-    }
+EMF.search_arrivals_done = function (data) {
+  var search_count = Number(data.n);
+  if (search_count < EMF.search_count_received) return;
+  EMF.search_count_received = search_count;
+
+  $("#error").hide();
+
+  if (data.location) {
+    $("#query").val("");
+    window.location = data.location;
+    return;
+  }
+
+  if (EMF.purchases_data == undefined) {
+    EMF.purchases_data = new DataTable("#purchases-data", {
+      columns: [{ data: "name" }, { data: "email" }],
+      createdRow: function (row, data, index) {
+        if (data.purchases == 0) {
+          $(row).addClass("no-purchases");
+        } else if (data.completes == data.purchases) {
+          $(row).addClass("complete");
+        } else if (data.completes > 0) {
+          $(row).addClass("partial");
+        } else {
+          $(row).addClass("has-purchases");
+        }
+        var link = $("<a>").attr("href", data.url);
+        $("td", row).wrapInner(link);
+      },
+      bFilter: false,
+      bLengthChange: false,
+      bSort: false,
+      bPaginate: false,
+      bAutoWidth: false,
+      searchHighlight: true,
+    });
+  }
+  EMF.purchases_data.clear();
+  EMF.purchases_data.settings()[0].oPreviousSearch.sSearch = $("#query").val();
+  EMF.purchases_data.rows.add(data.users).draw();
+};
+
+EMF.cancel_return = function (e) {
+  if (e.keyCode == 13) {
+    e.cancelBubble = true;
+    return false;
+  }
 };
 EMF.search_timer = null;
-EMF.delay_search_arrivals = function() {
-    if (EMF.timer) {
-        clearTimeout(EMF.timer);
-        EMF.timer = null;
-    }
-    EMF.timer = setTimeout(function() {
-        EMF.search_timer = null;
-        EMF.search_arrivals();
-    }, 250);
+EMF.delay_search_arrivals = function () {
+  if (EMF.timer) {
+    clearTimeout(EMF.timer);
+    EMF.timer = null;
+  }
+  EMF.timer = setTimeout(function () {
+    EMF.search_timer = null;
+    EMF.search_arrivals();
+  }, 250);
 };
-$(function() {
-    const configEl = document.querySelector('#arrivals-config');
-    if (!configEl) return;
-    const config = JSON.parse(configEl.textContent);
-    EMF.arrivalsMode = config.arrivalsMode;
-    EMF.search_url = config.searchURL;
+$(function () {
+  const configEl = document.querySelector("#arrivals-config");
+  if (!configEl) return;
+  const config = JSON.parse(configEl.textContent);
+  EMF.arrivalsMode = config.arrivalsMode;
+  EMF.search_url = config.searchURL;
 
-    $('#query').on('change keyup', EMF.delay_search_arrivals)
-               .on('keydown', EMF.cancel_return)
-               .focus();
+  $("#query")
+    .on("change keyup", EMF.delay_search_arrivals)
+    .on("keydown", EMF.cancel_return)
+    .focus();
 });

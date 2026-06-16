@@ -1,8 +1,8 @@
 from ..event_date import edt
 
 shop_shifts = {
-    "Shop Helper": {
-        "Shop": [
+    "shop-helper": {
+        "shop": [
             {
                 "first": edt(d, "10:00:00"),
                 "final": edt(d, "16:00:00"),

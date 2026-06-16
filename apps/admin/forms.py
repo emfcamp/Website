@@ -1,33 +1,36 @@
 from datetime import datetime, timedelta
-from wtforms.validators import Optional, DataRequired, InputRequired, ValidationError
-from wtforms.widgets import TextArea
+
 from wtforms import (
-    SubmitField,
-    StringField,
-    SelectField,
-    IntegerField,
+    BooleanField,
+    DateField,
     DecimalField,
+    Field,
     FieldList,
     FormField,
     HiddenField,
-    BooleanField,
+    IntegerField,
+    SelectField,
+    StringField,
+    SubmitField,
     TextAreaField,
 )
-from wtforms.fields.html5 import DateField
+from wtforms.validators import DataRequired, InputRequired, Optional, ValidationError
+from wtforms.widgets import TextArea
 from wtforms_sqlalchemy.fields import QuerySelectField
 
-from models.permission import Permission
-from models.product import ProductGroup, PRODUCT_GROUP_TYPES
+from models import Currency
 from models.basket import Basket
+from models.permission import Permission
+from models.product import PRODUCT_GROUP_TYPES, ProductGroup
 
 from ..common import CURRENCY_SYMBOLS
-from ..common.forms import Form
 from ..common.fields import (
-    IntegerSelectField,
-    HiddenIntegerField,
-    JSONField,
     EmailField,
+    HiddenIntegerField,
+    IntegerSelectField,
+    JSONField,
 )
+from ..common.forms import Form
 
 
 class ProductForm(Form):
@@ -199,6 +202,8 @@ class BulkVoucherEmailForm(Form):
 
 You can now buy your Electromagnetic Field ticket through [this link]({{voucher_url}}).
 
+This voucher allows you to buy {{num_tickets}} adult tickets, and as many child tickets as you need.
+
 You are guaranteed these tickets until {{expiry}}, so please make sure you use your voucher before then.
 
 Love,
@@ -242,7 +247,7 @@ class TicketAmountForm(Form):
 class IssueTicketsForm(Form):
     price_tiers = FieldList(FormField(TicketAmountForm))
     allocate = SubmitField("Allocate tickets")
-    currency = HiddenField("Currency", default="GBP")
+    currency: Field = HiddenField("Currency", default=Currency.GBP)
 
     def validate_price_tiers(self, field):
         if not any(f.amount.data for f in field):
@@ -271,7 +276,9 @@ class IssueTicketsForm(Form):
 
 
 class ReserveTicketsForm(IssueTicketsForm):
-    currency = SelectField("Currency", choices=[(None, "")] + list(CURRENCY_SYMBOLS.items()), default="GBP")
+    currency = SelectField(
+        "Currency", choices=[(None, "")] + list(CURRENCY_SYMBOLS.items()), default=Currency.GBP
+    )
 
 
 class ReserveTicketsNewUserForm(ReserveTicketsForm):

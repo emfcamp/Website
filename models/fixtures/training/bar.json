@@ -14,7 +14,7 @@
       "content": "models/fixtures/training/bar-training-alcohol.md",
       "questions": [
         {
-          "question": "At what percentage of abv is a drink legally classed as alcohol?",
+          "question": "At what ABV percentage is a drink legally classed as alcohol?",
           "answers": [
             {
               "answer": "More than 0.1%",
@@ -156,6 +156,10 @@
               "correct": true
             },
             {
+              "answer": "Digital ID card",
+              "correct": false
+            },
+            {
               "answer": "Police authority stamp",
               "correct": false
             }
@@ -236,12 +240,53 @@
     {
       "page": 6,
       "content": "models/fixtures/training/bar-training-safety.md",
-      "questions": []
+      "questions": [
+        {
+          "question": "Where should you hold a cup?",
+          "answers": [
+            {
+              "answer": "From the rim.",
+              "correct": false
+            },
+            {
+              "answer": "You shouldn't touch the cup at all.",
+              "correct": false
+            },
+            {
+              "answer": "From the bottom.",
+              "correct": true
+            }
+          ]
+        }
+      ]
     },
     {
       "page": 7,
       "content": "models/fixtures/training/bar-training-weights-and-measures.md",
       "questions": []
+    },
+    {
+      "page": 8,
+      "content": "models/fixtures/training/bar-training-ask-for-angela.md",
+      "questions": [
+        {
+          "question": "What code word might a customer use when asking for help in a situation where they feel unsafe?",
+          "answers": [
+            {
+              "answer": "Where are the toilets?",
+              "correct": false
+            },
+            {
+              "answer": "Can I speak to Angela?",
+              "correct": true
+            },
+            {
+              "answer": "Do you know where Kerry is?",
+              "correct": false
+            }
+          ]
+        }
+      ]
     }
   ]
 }

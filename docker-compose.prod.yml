@@ -23,8 +23,8 @@ services:
 
   postgres:
     restart: unless-stopped
-    image: 'postgis/postgis:16-3.4-alpine'
-    volumes: 
+    image: "postgis/postgis:16-3.4-alpine"
+    volumes:
       - /var/lib/emfweb-postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: postgres
@@ -33,7 +33,7 @@ services:
 
   postgres-exporter:
     restart: unless-stopped
-    image: 'wrouesnel/postgres_exporter:v0.8.0'
+    image: "wrouesnel/postgres_exporter:v0.8.0"
     environment:
       DATA_SOURCE_NAME: "postgresql://postgres:postgres@postgres:5432/emf_site?sslmode=disable"
     networks:
@@ -43,14 +43,14 @@ services:
 
   memcached:
     restart: unless-stopped
-    image: 'memcached:1.6.13-alpine'
+    image: "memcached:1.6.13-alpine"
     networks:
       - emfweb
     command: memcached -m 64
 
   memcached-exporter:
     restart: unless-stopped
-    image: 'prom/memcached-exporter:v0.9.0'
+    image: "prom/memcached-exporter:v0.9.0"
     depends_on:
       - memcached
     networks:
@@ -65,11 +65,11 @@ services:
     labels:
       com.centurylinklabs.watchtower.enable: true
     ports:
-      - "127.0.0.1:8080:80" 
+      - "127.0.0.1:8080:80"
 
   watchtower:
     restart: unless-stopped
-    image: "containrrr/watchtower"
+    image: "nickfedor/watchtower:1.14"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --interval 30 --label-enable

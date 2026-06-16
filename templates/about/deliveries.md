@@ -4,7 +4,8 @@ title: Deliveries
 
 If you want to get items delivered to the event while you're here, the Logistics team offer a *best-effort* delivery receiving service for anything coming by post or delivery service (e.g. Amazon packages).
 
-*Note: This is for personal and village deliveries only. If you need something delivered for an EMF team or if it's larger than a pallet, please contact the Logistics team at <logistics@emfcamp.org> or DECT 1030 for instructions.*
+!!! info "This is for personal and village deliveries only"
+    If you need something delivered for an EMF team or if it's larger than a pallet, please contact the Logistics team at <logistics@emfcamp.org> or DECT 1030 for instructions.
 
 To make sure your item gets to you, you need to do three things:
 
@@ -25,7 +26,7 @@ EMF Electromagnetic Field 2024
 Eastnor Deer Park
 Access from A438
 Eastnor, LEDBURY HR8 1RQ
-Phone: 07441 101723
+Phone: [07441 101723](tel:07441101723)
 
 It's important you get all of this in; if the service you're using doesn't have that many address lines, combine some (the name/village name line and the Deer Park/A438 lines could be combined).
 

@@ -1,19 +1,28 @@
-from models import event_year
-from . import admin
-from flask import render_template, redirect, flash, url_for
-from wtforms import SubmitField, StringField, SelectField
+from typing import Literal
+
+from flask import flash, redirect, render_template, url_for
+from flask.typing import ResponseReturnValue
+from sqlalchemy import select
+from wtforms import SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired
 from wtforms.widgets import TextArea
-from models.user import User
-from models.cfp import Proposal
+
+from main import db
+from models.content import Proposal
 from models.payment import Payment
+from models.purchase import Purchase
+from models.user import User
 from models.village import VillageMember
-from ..common.forms import Form
+
 from ..common.email import (
+    enqueue_emails,
     format_trusted_html_email,
-    enqueue_trusted_emails,
+    format_trusted_plaintext_email,
     preview_trusted_email,
 )
+from ..common.forms import Form
+from ..config import config
+from . import admin
 
 
 class EmailComposeForm(Form):
@@ -35,52 +44,51 @@ class EmailComposeForm(Form):
     send = SubmitField("Send Email")
 
 
-def get_users(dest: str) -> list[User]:
-    query = User.query
+def get_users(dest: Literal["ticket", "cfp", "purchasers", "villages"]) -> list[User]:
+    query = select(User)
     if dest == "ticket":
         query = (
             query.join(User.owned_purchases)
-            .filter_by(type="admission_ticket", is_paid_for=True)
+            .where(Purchase.type == "admission_ticket", Purchase.is_paid_for == True)
             .group_by(User.id)
         )
     elif dest == "purchasers":
-        query = query.join(User.payments).filter(Payment.state == "paid")
+        query = query.join(User.payments).where(Payment.state == "paid")
     elif dest == "cfp":
-        query = query.join(User.proposals).filter(Proposal.is_accepted)
+        query = query.join(User.proposals).where(Proposal.state.in_({"accepted", "finalised"}))
     elif dest == "villages":
-        query = query.join(User.village_membership).filter(VillageMember.admin)
+        query = query.join(User.village_membership).where(VillageMember.admin == True)
     else:
-        raise ValueError("Invalid email destination set: %s" % dest)
+        raise ValueError(f"Invalid email destination set: {dest}")
 
-    return query.distinct().all()
+    return list(db.session.scalars(query.distinct()).unique())
 
 
 def get_email_reason(dest: str) -> str:
-    event = f"Electromagnetic Field {event_year()}"
+    event = f"Electromagnetic Field {config.event_year}"
     if dest == "ticket":
         return f"You're receiving this email because you have a ticket for {event}."
-    elif dest == "purchasers":
+    if dest == "purchasers":
         return f"You're receiving this email because you made a payment to {event}."
-    elif dest == "cfp":
+    if dest == "cfp":
         return f"You're receiving this email because you have an accepted proposal in the {event} Call for Participation."
-    elif dest == "villages":
+    if dest == "villages":
         return f"You're receiving this email because you have registered a village for {event}."
-    elif dest == "ticket_and_cfp":
+    if dest == "ticket_and_cfp":
         return (
             f"You're receiving this email because you have a ticket or a talk/workshop accepted for {event}."
         )
-    else:
-        raise ValueError("Invalid email destination set: %s" % dest)
+    raise ValueError(f"Invalid email destination set: {dest}")
 
 
 @admin.route("/email", methods=["GET", "POST"])
-def email():
+def email() -> ResponseReturnValue:
+    # This function is almost identical to apps.villages.admin.admin_email_owners, consider updating there too
     form = EmailComposeForm()
     if form.validate_on_submit():
+        users: list[User]
         if form.destination.data == "ticket_and_cfp":
-            users = set()
-            users.update(get_users("ticket"))
-            users.update(get_users("cfp"))
+            users = list(set(get_users("ticket")) | set(get_users("cfp")))
         else:
             users = get_users(form.destination.data)
 
@@ -97,7 +105,7 @@ def email():
         if form.send_preview.data is True:
             preview_trusted_email(form.send_preview_address.data, form.subject.data, form.text.data)
 
-            flash("Email preview sent to %s" % form.send_preview_address.data)
+            flash(f"Email preview sent to {form.send_preview_address.data}")
             return render_template(
                 "admin/email.html",
                 html=format_trusted_html_email(
@@ -110,13 +118,21 @@ def email():
             )
 
         if form.send.data is True:
-            enqueue_trusted_emails(
-                users,
-                form.subject.data,
-                form.text.data,
-                reason=reason,
+            assert form.text.data  # DataRequired()
+            assert form.subject.data  # DataRequired()
+            body: str = form.text.data
+            subject: str = form.subject.data
+            enqueue_emails(
+                users=users,
+                from_email=config.from_email("CONTACT_EMAIL"),
+                subject=subject,
+                text_body=format_trusted_plaintext_email(body),
+                html_body=format_trusted_html_email(body, subject, reason=reason),
+                priority=2,
+                bulk=True,
             )
-            flash("Email queued for sending to %s users" % len(users))
+            db.session.commit()
+            flash(f"Email queued for sending to {len(users)} users")
             return redirect(url_for(".email"))
 
     return render_template("admin/email.html", form=form)

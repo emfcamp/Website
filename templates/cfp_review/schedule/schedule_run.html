@@ -1,0 +1,13 @@
+{% extends "cfp_review/base.html" %}
+{% block title%}Run Scheduler{% endblock %}
+{% block body %}
+<h2>Run scheduler</h2>
+<div class="alert alert-info">
+    <p>Please confirm you'd like to run the automatic scheduler.</p>
+    <p>This will create a provisional schedule which you can then review before applying, or discard.</p>
+    <p>The scheduler may take a little while to run, but it's limited to 30 seconds.</p>
+</div>
+<form method="POST">
+    <button name="run" value="1" class="btn btn-primary">Run scheduler</button>
+</form>
+{% endblock %}

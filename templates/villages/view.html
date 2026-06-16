@@ -1,0 +1,72 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block title %}Village: {{village.name}}{% endblock %}
+{% block body %}
+<h1>
+  {{village.name}}
+  {% if user_is_village_admin %}
+  <a href="{{url_for('villages.members', year=event_year, village_id=village.id)}}" class="btn btn-primary btn-lg pull-right">Members</a>
+  <a href="{{url_for('villages.edit', year=event_year, village_id=village.id)}}" class="btn btn-primary btn-lg pull-right">Edit</a>
+  <a href="{{url_for('villages.members_leave', year=event_year, village_id=village.id)}}" class="btn btn-danger btn-lg pull-right">Leave</a>
+  {% elif user_is_village_member %}
+  <a href="{{url_for('villages.members_leave', year=event_year, village_id=village.id)}}" class="btn btn-danger btn-lg pull-right">Leave</a>
+  {% elif user_has_requested_join_village %}
+  <a href="{{url_for('villages.members_leave', year=event_year, village_id=village.id)}}" class="btn btn-danger btn-lg pull-right">Cancel join request</a>
+  {% endif %}
+
+  {% if user_can_join_village %}
+    <a href="{{url_for('villages.members_join', year=event_year, village_id=village.id)}}" class="btn btn-success btn-lg pull-right">Request to join</a>
+  {% endif %}
+</h1>
+
+{% if village.description %}
+{# TODO: now that we have long_description_html, this should ideally be H2. But in 2026 people have already put long things here #}
+<p>{{village.description}}</p>
+{% endif %}
+
+{% if edit_desc_form %}
+<div class="well">
+  <form method="post" class="form-horizontal village-form" role="form">
+    {{ edit_desc_form.hidden_tag() }}
+    <fieldset>
+      {% call render_field(edit_desc_form.long_description,
+            placeholder="A longer description of your village using Markdown. Project details etc.") %}
+        <a href="https://www.markdown-cheatsheet.com">Standard Markdown</a> supported <em>apart from</em> images.
+      {% endcall %}
+    </fieldset>
+    <fieldset>
+      <div class="form-actions">
+        <button type="submit" name="Update" class="btn btn-primary btn-lg pull-right debounce">Update</button>
+        <a class="btn btn-default btn-lg pull-right" href="{{ url_for('.view', village_id=village.id, year=year, slug=village.slug) }}">Back</a>
+      </div>
+    </fieldset>
+  </form>
+</div>
+{% elif village_long_description_html %}
+  {% if user_is_village_admin %}
+  <a class="pull-right" href="{{ url_for('.editdesc', village_id=village.id, year=year) }}">Edit</a>
+  {% endif %}
+
+  {# This is render-blocking, but we want the listener ready for the iframe.
+    Better to delay first render than to have a two-way handshake that flashes. #}
+  <script src="{{static_url_for('static', filename="js/sandboxed-iframe-parent.js")}}"></script>
+  <p>{{village_long_description_html}}</p>
+{% endif %}
+
+<div>
+  <a href="{{url_for('villages.main', year=event_year)}}" class="btn btn-default pull-right">View all villages</a>
+  {# TODO: embed a map somehow? #}
+  {% if village.map_link %}
+  <a href="{{ village.map_link }}" class="btn btn-default" target="_blank">📍&nbsp;View on map</a>
+  {% endif %}
+  {% if village.url %}
+  <a href="{{ village.url }}" class="btn btn-default" rel="nofollow" target="_blank">More about this village</a>
+  {% endif %}
+</div>
+
+<p style="margin-top: 30px">
+  <em>Content and external links on this page are provided by attendees and are not the responsibility of EMF.</em>
+</p>
+
+{# TODO: Can we show what's on at the village venues here? #}
+{% endblock %}

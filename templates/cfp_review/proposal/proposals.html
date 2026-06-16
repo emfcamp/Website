@@ -1,0 +1,136 @@
+{% from "cfp_review/_components.html" import proposal_state %}
+{% extends "cfp_review/base.html" %}
+{% block title %}Proposals{% endblock %}
+{% block page_class%}container-wide{% endblock %}
+
+{% if not request.args.get('reverse') %}
+    {% set qs_reverse_new=True %}
+{% else %}
+    {% set qs_reverse_new=None %}
+{% endif %}
+
+{% set col_descriptions = {
+    "ticket": "Ticket?",
+    "date": "Date",
+    "state": "State",
+    "type": "Type",
+    "notice": "Notice",
+    "duration": "Duration",
+    "user": "User",
+    "title": "Title",
+    "notes": "Private notes"
+}
+%}
+
+{% macro header(name) -%}
+    {%- if name in columns -%}
+    <th>
+        <a href="{{ url_for('.proposals', sort_by=name, reverse=qs_reverse_new, **new_qs) }}">{{col_descriptions[name]}}</a>
+    </th>
+    {%- endif -%}
+{%- endmacro %}
+{% macro cell(name, no_wrap=False) -%}
+    {%- if name in columns -%}
+        <td {% if no_wrap %}style="text-wrap:nowrap;"{% endif %}>{{caller()}}</td>
+    {%- endif -%}
+{%- endmacro %}
+
+{% block body %}
+<h2>Proposals</h2>
+
+<form method="get">
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a role="button" data-toggle="collapse" data-target="#searchPanel"
+                aria-controls="searchPanel" aria-expanded="true">
+                Filter <small>(showing {{ proposals | count }}/{{ total_proposals }})</small>
+            </a>
+        </h4>
+    </div>
+    <div class="panel-body collapse
+    {%- if is_filtered %}in{% endif %}
+        " id="searchPanel">
+        {% include "cfp_review/_proposals_filter_form.html" %}
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a role="button" data-toggle="collapse" data-target="#colsPanel"
+                aria-controls="colsPanel" aria-expanded="true">
+                Columns
+            </a>
+        </h4>
+    </div>
+    <div class="panel-body collapse" id="colsPanel">
+        {% for (id, name) in col_descriptions.items() %}
+            <div class="form-group">
+                <label>{{name}} <input type="checkbox" id="{{id}}" name="cols" value="{{id}}"
+                    {% if id in columns %}checked="checked"{% endif %}
+                /></label>
+            </div>
+        {% endfor %}
+        <fieldset class="form-horizontal col-md-12">
+            <div class="form-group pull-right">
+                <div class="btn-group">
+                    <button class="btn btn-primary">Apply</button>
+                    <a href="{{url_for('.proposals')}}" class="btn btn-default">Reset</a>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+</div>
+</form>
+
+
+<div class="btn-group pull-right">
+    <a role="button" class="btn btn-default" href="{{ url_for('.message_batch', **request.args) }}">
+        Message all {{ proposals | count }} proposals
+    </a>
+    <a class="btn btn-default" href="{{url_for('.proposals', format='csv', **request.args)}}" target="_blank">
+        Export CSV
+    </a>
+</div>
+<table class="table table-condensed">
+    <tr>
+        {% for name in col_descriptions %}
+            {{header(name)}}
+        {% endfor %}
+    </tr>
+{% for proposal in proposals %}
+    <tr class="{{- loop.cycle('odd', 'even') -}}">
+        {% call cell("ticket", True) -%}
+            {% if proposal.user.check_will_have_ticket() %}Yes{% endif %}
+        {%- endcall %}
+        {% call cell("date", True) -%}
+            {{proposal.created.strftime("%d/%m")}}
+        {%- endcall %}
+        {% call cell("state", True) -%}
+            {{proposal_state(proposal)}}
+        {%- endcall %}
+        {% call cell("type", True) -%}
+            {{proposal.human_type | capitalize}}
+        {%- endcall %}
+        {% call cell("notice", True) -%}
+            {{proposal.notice_required or ''}}
+        {%- endcall %}
+        {% call cell("duration", True) -%}
+            {{(proposal.duration or '')|truncate(20)}}
+        {%- endcall %}
+        {% call cell("user") -%}
+            <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id ) }}">{{ proposal.user.name }}</a>
+        {%- endcall %}
+        {% call cell("title") -%}
+            <a href="{{ url_for('.proposal', proposal_id=proposal.id, **full_qs) }}">{{ proposal.title }}</a>
+        {%- endcall %}
+        {% call cell("notes") -%}
+            {{proposal.private_notes or ''}}
+        {%- endcall %}
+    </tr>
+{% else %}
+    <tr><td colspan="5" class="text-center">No proposals found</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

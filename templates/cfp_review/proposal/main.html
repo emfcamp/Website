@@ -1,0 +1,177 @@
+{% from "_formhelpers.html" import render_field %}
+{% from "cfp_review/_components.html" import proposal_state %}
+{% set active = "main" %}
+{% extends "cfp_review/proposal/base.html" %}
+{% block proposal_body %}
+<div class="col-md-12">
+{% if proposal.state == 'new' %}
+<div class="alert alert-warning">
+    <p>You have the ability to mark this proposal as checked, which will send it to
+        <strong>{% if proposal.type_info.review_type == "anonymous" %}anonymisation{% else %}manual review{% endif %}</strong>.
+        Please do so, but only if:
+    </p>
+    <ul>
+        <li>You have knowledge of the list of banned speakers and can confirm the submitter is not banned from speaking.</li>
+        <li>The description is not obviously incomplete.</li>
+        <li>The description is superficially valid for the category it is submitted in.</li>
+    </ul>
+    <p>If you don't have access to the list of banned speakers, <strong>please wait for this proposal to be checked by the conduct team</strong>
+        before proceeding.
+    </p>
+</div>
+{% endif %}
+{% if proposal.schedule_item %}
+    {% include "cfp_review/proposal/_schedule_item_warning.html" %}
+{% endif %}
+</div>
+
+<div class="row">
+{% if not proposal.schedule_item %}
+    <div class="col-md-8">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Description</h4>
+            </div>
+            <div class="panel-body large">
+                {{proposal.description|pretty_text}}
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Requirements</h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed">
+                    {% if proposal.duration %}
+                    <tr><th>Duration</th><td>{{proposal.duration}}</td></tr>
+                    {% endif %}
+                    <tr><th>Needs help</th><td>{{proposal.needs_help|yesno}}</td></tr>
+                    {% if proposal.equipment_required %}
+                    <tr><th>Equipment</th><td>{{ proposal.equipment_required or '' }}</td></tr>
+                    {% endif %}
+                    {% if proposal.funding_required %}
+                    <tr><th>Funding</th><td>{{proposal.funding_required or ''}}</td></tr>
+                    {% endif %}
+                    {% if proposal.notice_required %}
+                    <tr><th>Notice</th><td>{{proposal.notice_required or ''}}</td></tr>
+                    {% endif %}
+                    {% if proposal.additional_info %}
+                    <tr><th>Additional info</th><td>{{proposal.additional_info or ''}}</td></tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+        {% if proposal.attributes|length > 0 %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Attributes</h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed">
+                    {% for (name, value) in proposal.attributes %}
+                        <tr><th>{{name}}</th><td>{{value}}</td></tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Details</h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed">
+                    <tr><th>State</th><td>{{proposal_state(proposal)}}</td></tr>
+                    <tr><th>Submitted</th><td>{{ proposal.created.strftime("%Y-%m-%d %H:%M") }}</td></tr>
+                    <tr><th>Submitter</th><td><a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id) }}">{{proposal.user.name}}</a></td></tr>
+                    <tr><th>Email</th><td>{{proposal.user.email}}</td></tr>
+                    <tr><th>Has ticket?</th><td>{{ proposal.user.check_will_have_ticket()|yesno }}</td></tr>
+                    <tr><th>Voucher sent?</th><td>{{ proposal.user.cfp_voucher|yesno }}
+                        {% if not proposal.user.cfp_voucher %}(<a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id) }}">send voucher</a>){%endif %}
+                    </td></tr>
+                    {% if proposal.anonymiser_id %}
+                    <tr><th>Anonymised by</th><td>{{ proposal.anonymiser.name }}</td></tr>
+                    {% endif %}
+                </table>
+                {% if proposal.state not in ['new', 'rejected'] %}
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('.convert_proposal', proposal_id=proposal.id) }}"
+                            class="btn btn-default">
+                        Change type
+                    </a>
+                    <a href="{{ url_for('.proposal_change_owner', proposal_id=proposal.id) }}"
+                            class="btn btn-default">
+                        Change owner
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Tags</h3>
+            </div>
+            <div class="panel-body">
+            <form method="POST" action="{{url_for('.proposal_tags', proposal_id=proposal.id)}}">
+                <ul>
+                    {% for tag in proposal._tags %}
+                        <li>{{tag.tag}} <button class="btn btn-tiny" name="delete" value="{{tag.id}}">x</button></li>
+                    {% endfor %}
+                </ul>
+                <select name="id">
+                    {% for tag in all_tags %}
+                    <option value="{{tag.id}}">{{tag.tag}}</option>
+                    {% endfor %}
+                </select>
+                <button name="add" value="true">+</button>
+            </form>
+            </div>
+        </div>
+    </div>
+    {% if proposal.type_info.review_type == "anonymous" %}
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Anonymous review</h3>
+            </div>
+            <div class="panel-body">
+                <p><strong>{{proposal.votes|count}}</strong> votes received.</p>
+                {% if proposal.proposal_rounds %}
+                    <p>Considered in {{proposal.proposal_rounds|count}} round{% if proposal.proposal_rounds|count > 1 %}s{%endif%}:</p>
+                    <table class="table table-condensed">
+                        <tr><th>Date</th><th>Score</th><th>Votes</th><th>Outcome</th></tr>
+                    {% for pr in proposal.proposal_rounds|sort(attribute="round_id") %}
+                        <tr><td>{{pr.round.created.strftime("%Y-%m-%d")}}</td><td>{{pr.score|round(3)}}</td><td>{{pr.vote_count}}</td><td>{{pr.outcome}}</td></tr>
+                    {% endfor %}
+                    </table>
+                {% else %}
+                    <p>Not considered in any rounds yet.</p>
+                {% endif %}
+                <a class="btn btn-default" href="{{ url_for('.proposal_votes', proposal_id=proposal.id, **full_qs) }}">View votes</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endif %}
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Private notes</h3>
+            </div>
+            <div class="panel-body">
+                <form method="post" action="{{ url_for('.proposal_notes', proposal_id=proposal.id) }}">
+                    {{ notes_form.hidden_tag() }}
+                    <div style="width: 100%">
+                    {{ notes_form.private_notes(style="width:100%; height: 8em") }}
+                    </div>
+                    <div class="pull-right">
+                        {{ notes_form.update(class_='btn btn-default debounce') }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

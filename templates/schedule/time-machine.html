@@ -39,18 +39,18 @@
                         <strong>{{ venue_name }}</strong>
                     </td>
                     <td>
-                    <a href="{{url_for('schedule.item', year=year, proposal_id=talk.id)}}">
+                    <a href="{{url_for('schedule.item', year=year, schedule_item_id=talk.id)}}">
                         <strong>{{ talk.speaker }}</strong>
                     </a>
                     </td>
                     <td>
-                    <a href="{{url_for('schedule.item', year=year, proposal_id=talk.id)}}">
+                    <a href="{{url_for('schedule.item', year=year, schedule_item_id=talk.id)}}">
                         {{ talk.title }}
                     </a>
                     </td>
                     <td>
                     {% if talk.video %}
-                    <a href="{{url_for('schedule.item', year=year, proposal_id=talk.id)}}">
+                    <a href="{{url_for('schedule.item', year=year, schedule_item_id=talk.id)}}">
                     {{octicon('device-camera-video-24', alt="Has video")}}
                     </a>
                     {% endif %}
@@ -88,18 +88,18 @@
                         {% if talk.starts_in.hours >= 1 %}{{ talk.starts_in.hours }}h&nbsp;{% endif %}{% if talk.starts_in.minutes >= 1 %}{{ talk.starts_in.minutes }}m{% endif %}{% if talk.starts_in.seconds < 60 %}Now!{% endif %}
                     </td>
                     <td>
-                    <a href="{{url_for('schedule.item', year=year, proposal_id=talk.id)}}">
+                    <a href="{{url_for('schedule.item', year=year, schedule_item_id=talk.id)}}">
                         <strong>{{ talk.speaker }}</strong>
                     </a>
                     </td>
                     <td>
-                    <a href="{{url_for('schedule.item', year=year, proposal_id=talk.id)}}">
+                    <a href="{{url_for('schedule.item', year=year, schedule_item_id=talk.id)}}">
                         {{ talk.title }}
                     </a>
                     </td>
                     <td>
                     {% if talk.video %}
-                    <a href="{{url_for('schedule.item', year=year, proposal_id=talk.id)}}">
+                    <a href="{{url_for('schedule.item', year=year, schedule_item_id=talk.id)}}">
                     {{octicon('device-camera-video-24', alt="Has video")}}
                     </a>
                     {% endif %}

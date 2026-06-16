@@ -1,37 +1,49 @@
 {% extends "cfp_review/base.html" %}
 {% from "_formhelpers.html" import render_field  %}
+{% block title %}Venues{% endblock %}
 {% block body %}
 <h2>Venues</h2>
-
-<table class="table">
+<div class="btn-group pull-right">
+    {% if not request.args.all %}
+    <a href="{{url_for('.venues', all=True)}}" class="btn btn-default">View village venues</a>
+    {% else %}
+    <a href="{{url_for('.venues')}}" class="btn btn-default">View only official venues</a>
+    {% endif %}
+</div>
+<table class="table table-condensed table-striped">
     <tr>
         <th>Name</th>
         <th>Village</th>
-        <th>Allows Attendee Content</th>
+        <th>Capacity</th>
+        <th>Allows attendee content</th>
+        <th>Time blocks</th>
         <th></th>
     </tr>
     {% for venue in venues %}
         <tr>
             <td>{{ venue.name }}</td>
-            <td>{{ venue.village and venue.village.name }}</td>
-            <td>{{ not venue.scheduled_content_only }}</td>
-            <td><a href="{{ url_for('.edit_venue', venue_id=venue.id) }}">Edit</a></td>
+            <td>{{ venue.village and venue.village.name or '' }}</td>
+            <td>{{ venue.capacity or '' }}</td>
+            <td>{{ venue.allows_attendee_content }}</td>
+            <td>{{ venue.time_blocks|length or '' }}</td>
+            <td><a class="btn btn-sm btn-primary" href="{{ url_for('.edit_venue', venue_id=venue.id) }}">Edit</a></td>
         </tr>
     {% endfor %}
 </table>
 
 <h2>New Venue</h2>
+<div class="well col-md-8">
 <form method="POST">
     {{ form.hidden_tag() }}
 
     {{ render_field(form.name) }}
     {{ render_field(form.village_id) }}
-    {{ render_field(form.scheduled_content_only) }}
-    {{ render_field(form.latlon) }}
+    {{ render_field(form.allows_attendee_content) }}
+    {{ render_field(form.location_lat) }}
+    {{ render_field(form.location_lon) }}
     {{ render_field(form.capacity) }}
-    {{ render_field(form.allowed_types) }}
-    {{ render_field(form.default_for_types) }}
 
     {{ form.submit(class_="btn btn-success") }}
 </form>
+</div>
 {% endblock %}

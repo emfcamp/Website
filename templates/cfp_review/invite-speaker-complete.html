@@ -10,7 +10,7 @@
 </dl>
 
 <p>Please reply to them with this link which will ask them to log in with the above email address then direct them to submit a {{ proposal_type }}.</p>
-<b><p>{{ external_url('users.login', next=url_for("cfp.form", cfp_type=proposal_type)) }}</p></b>
+<b><p>{{ external_url('users.login', next=url_for("cfp.create_proposal", proposal_type=proposal_type)) }}</p></b>
 <p>&nbsp;</p>
 <a href="{{ url_for('.invite_speaker') }}" class="btn btn-success">Add another</a>
 {% endblock %}

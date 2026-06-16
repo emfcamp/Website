@@ -1,23 +1,22 @@
 ## Safety
 ### Health and safety
-
-- You should wear suitable footwear behind the bar: the floor may be wet, and there is a possibility that things might be dropped on it.
-- Although we’re not using much glass, there will be some glass bottles and it is possible that these might become broken. Don’t attempt to clear up broken glass by hand: use the dustpan and brush and make sure the broken glass goes in the bottle bin.
-- Report accidents or near-misses, bad practices and potential hazards to the bar organisers.
-- You are responsible for your own safety and that of everyone else. If you are unsure about something, seek advice.
+- You should wear suitable footwear behind the bar. The floor may be wet, and objects might be dropped on it.
+- Don’t attempt to clean up broken glass by hand. Use the dustpan and brush, and make sure the broken glass goes in the bottle bin.
+- Report accidents or near-misses, bad practices and potential hazards to the bar managers.
+- You are responsible for your own safety and that of everyone else. If you need clarification on something, ask a bar manager.
 
 ### Food safety
-The area behind the bar is a food preparation area. While you are in this area there are some things you must do and some things you must not do.
+The area behind the bar is a food preparation area. While you’re in this area, there are some things you must do or not do…
 
-#### Things you must do
+#### ✅ Do
+- Wash your hands:
+    - When entering the bar area.
+    - After wiping down the bar.
+- Cover cuts or other injuries with waterproof plasters.
+- Hold the cup from the bottom half at all times.
 
-- Wash your hands when entering the bar area.
-- Wash your hands after wiping down the bar.
-- Cuts and grazes, etc. must be covered using waterproof plasters.
-
-#### Things you must not do
-
-- You must not smoke or take snuff.
-- **You must not consume food while behind the bar.**​ (This is the rule that we have to remind people of most often.)
-- You must not put your fingers inside the glass or on the rim of the glass while pouring into it and handing it to the customer.
-- You must not use a glass to scoop up ice from the ice bucket. Always use the scoop or tongs provided.
+#### ❌ Do not
+- Consume food behind the bar.
+- Smoke or take snuff in the bar area.
+- Touch inside or around the rim of a cup.
+- Use a cup to scoop up ice from the ice bucket. Always use the scoop or tongs provided.

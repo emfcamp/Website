@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Diff: {{ page.title }} - Wiki{% endblock %}
+
+{% block body_class %}wiki{% endblock %}
+{% block body %}
+<h2>
+  Diff: <a href="{{ url_for('wiki.view', slug=page.slug) }}">{{ page.title }}</a>
+</h2>
+
+<div class="well well-sm">
+  <dl class="dl-horizontal" style="margin-bottom:0">
+    <dt>From</dt>
+    <dd>
+      Version #{{ from_txn }}
+      &mdash; {{ from_ver.transaction.issued_at.strftime('%Y-%m-%d %H:%M') }}
+      {% if current_user.is_authenticated and current_user.has_permission('admin') %}
+      {% if from_ver.transaction.user %}by {{ from_ver.transaction.user.name }}{% endif %}
+      {% endif %}
+    </dd>
+    <dt>To</dt>
+    <dd>
+      Version #{{ to_txn }}
+      &mdash; {{ to_ver.transaction.issued_at.strftime('%Y-%m-%d %H:%M') }}
+      {% if current_user.is_authenticated and current_user.has_permission('admin') %}
+      {% if to_ver.transaction.user %}by {{ to_ver.transaction.user.name }}{% endif %}
+      {% endif %}
+    </dd>
+  </dl>
+</div>
+
+{% if diff_lines %}
+<div class="diff-view">
+{% for line in diff_lines %}
+{% if line.startswith('---') or line.startswith('+++') %}<span class="d-hdr">{{ line }}</span>
+{% elif line.startswith('+') %}<span class="d-add">{{ line }}</span>
+{% elif line.startswith('-') %}<span class="d-del">{{ line }}</span>
+{% elif line.startswith('@@') %}<span class="d-hunk">{{ line }}</span>
+{% else %}<span>{{ line }}</span>
+{% endif %}
+{% endfor %}
+</div>
+{% else %}
+<p class="text-muted">No differences between these versions.</p>
+{% endif %}
+  <a href="{{ url_for('wiki.view', slug=page.slug) }}">View current page</a>
+</p>
+{% endblock %}

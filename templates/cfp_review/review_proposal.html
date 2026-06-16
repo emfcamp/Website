@@ -37,7 +37,7 @@
                 <dt>Cost per attendee</dt><dd>{{ proposal.cost }}</dd>
                 <dt>Attendee equipment</dt><dd>{{ proposal.participant_equipment }}</dd>
                 <dt>Age range</dt><dd>{{ proposal.age_range }}</dd>
-            {%- elif proposal.type == 'youthworkshop' -%}
+            {%- elif proposal.type == 'familyworkshop' -%}
                 <dt>Cost per attendee</dt><dd>{{ proposal.cost }}</dd>
                 <dt>Attendee equipment</dt><dd>{{ proposal.participant_equipment }}</dd>
                 <dt>Age range</dt><dd>{{ proposal.age_range }}</dd>
@@ -64,7 +64,7 @@
             <div><strong>Attendee equipment:</strong> {{ proposal.participant_equipment }}</div>
             <div><strong>Age range:</strong> {{ proposal.age_range }}</div>
             <div>&nbsp;</div>
-        {%- elif proposal.type == 'youthworkshop' and proposal.cost -%}
+        {%- elif proposal.type == 'familyworkshop' and proposal.cost -%}
             <div><strong>Cost per attendee:</strong> {{ proposal.cost }}</div>
             <div><strong>Attendee equipment:</strong> {{ proposal.participant_equipment }}</div>
             <div><strong>Age range:</strong> {{ proposal.age_range }}</div>
@@ -104,9 +104,9 @@
         </div>
         <div class="col-xs-12">&nbsp;</div>
         <div class="col-xs-12 btn-group-vertical">
-            {% if remaining %}
+            {% if remaining_count %}
                 <a href="{{ url_for('.review_proposal_next', proposal_id=proposal.id) }}" class="btn btn-default">
-                    View next proposal ({{ remaining }} remaining)
+                    View next proposal ({{ remaining_count }} remaining)
                 </a>
             {% endif %}
             <a href="{{ url_for('.review_list') }}" class="btn btn-default">

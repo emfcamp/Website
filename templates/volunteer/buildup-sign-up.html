@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% from "_formhelpers.html" import render_field, render_checkbox %}
+{% from "volunteer/_details_form.html" import volunteer_details_form %}
+
+{% block title %}Buildup Registration{% endblock %}
+{% block body %}
+{% include "volunteer/_nav.html" %}
+
+<h2>Buildup/Teardown Registration</h2>
+<div class="well">
+    {% if current_user.buildup_volunteer and current_user.buildup_volunteer.recorded_on_site %}
+    <p>You're marked as present on site. Please join our low-traffic buildup alerts group on Signal for important updates
+         - we also have a general chat group for volunteers on site.</p>
+    {% elif current_user.buildup_volunteer %}
+    <p>You are registered to help with buildup. Please keep us updated if your arrival time changes - you can update it at the bottom of this page.</p>
+    <p>Please join our low-traffic buildup alerts group on Signal for important updates.</p>
+    {% else %}
+    <p>Thanks for your offer to help with EMF buildup/teardown!</p>
+    <p>You must register with us before you arrive on site, so we can take care of your safety and ensure there's food available for you.
+        Please take some time to read the site rules below, and then fill in the form to register for buildup.
+    </p>
+    {% endif %}
+    {% if current_user.buildup_volunteer %}
+    <div class="btn-group">
+        {% if config['BUILDUP_ALERTS_GROUP'] %}
+            <a class="btn btn-primary btn-lg" href="{{config['BUILDUP_ALERTS_GROUP']}}">Buildup Alerts (Signal)</a>
+        {% endif %}
+        {% if current_user.buildup_volunteer.recorded_on_site and config['BUILDUP_SIGNAL_GROUP'] %}
+            <a class="btn btn-primary btn-lg" href="{{config['BUILDUP_SIGNAL_GROUP']}}">Buildup Chat (Signal)</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Site Rules</h3>
+    </div>
+    <div class="panel-body">
+        {% include_markdown "volunteer/_buildup-safety.md" %}
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Register</h3>
+    </div>
+    <div class="panel-body">
+        {% if volunteer_form and not volunteer %}
+        <p>
+        {% if current_user.is_authenticated %}
+        We've pre-filled some of your data from your existing profile.
+        {% else %}
+        We need a little information about you first.
+        {% endif %}
+        This information will be made available to volunteer managers. Should
+        you volunteer during the event, your name will be made available to
+        other volunteers on adjacent shifts.
+        </p>
+        <p>
+        {% if current_user.is_authenticated %}
+        If you would like to be contacted via a different email, or use a
+        different name, feel free to update it here.
+        {% else %}
+        If you already have an account, please <a href="{{ url_for('users.login', next=url_for('.main'), email=volunteer_form.volunteer_email.data) }}">log in</a> first. {% if SITE_STATE == 'event' %}If you're arriving with someone else, you might want to ask them to transfer your ticket to you.{% endif %}
+        {% endif %}
+        </p>
+        {% endif %}
+        <form class="form-horizontal" method="post">
+            <fieldset>
+            {% if volunteer_form.volunteer_email.was_duplicate %}
+            <div class="alert alert-warning">
+                This email address already exists in our system.
+                Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('.main'), email=volunteer_form.volunteer_email.data) }}">click here</a> to log in.        </div>
+            {% endif %}
+
+            <div class="col-sm-12">
+            {{ volunteer_form.hidden_tag() }}
+            {{ volunteer_details_form(volunteer_form, False) }}
+            <hr>
+
+            {{ buildup_form.hidden_tag() }}
+            {% call render_field(buildup_form.arrival_date, horizontal=9) %}
+            {% if buildup_form.arrival_date.render_kw['min'] %}
+            Your team has asked that you arrive on site <strong>after
+                {{buildup_form.arrival_date.render_kw['min'].strftime("%A %d %B at %H:%M")}}</strong>.
+            {% endif %}
+            {% endcall %}
+            {{ render_field(buildup_form.departure_date, horizontal=9) }}
+            {% call render_field(buildup_form.vehicle_registration, horizontal=9) %}
+            If you're arriving in a vehicle and know its registration number, please let us know.
+            {% endcall %}
+            {% call render_field(buildup_form.emergency_contact, horizontal=9) %}
+            Ideally a name and phone number.
+            {% endcall %}
+            {{ render_checkbox(buildup_form.health_and_safety_briefing, horizontal=9) }}
+
+            {{ buildup_form.save(class_="btn btn-primary debounce pull-right") }}
+            </div>
+            </fieldset>
+        </form>
+    </div>
+</div>
+{% endblock %}

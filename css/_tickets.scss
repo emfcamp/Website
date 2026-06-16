@@ -21,12 +21,19 @@
 
 .products select.amount {
   min-width: 3em;
+  // Ideally we'd inherit, but this makes the combo box background potentially white.
+  background-color: $highlight-background;
+  color: $form-element-text;
+}
+
+.products .odd select.amount {
+  background-color: color.adjust($highlight-background, $lightness: +10%);
 }
 
 @media (max-width: 768px) {
   .tickets .volunteer,
   .tickets .accessible {
-    display: none
+    display: none;
   }
 }
 
@@ -39,7 +46,7 @@
   padding-bottom: 80px;
 }
 
-.panel--payment .panel-footer-center{
+.panel--payment .panel-footer-center {
   position: absolute;
   bottom: 0;
   width: 100%;
@@ -56,4 +63,3 @@
 .sold-out {
   color: color.scale($highlight-background-text, $alpha: -60%);
 }
-

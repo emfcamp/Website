@@ -117,6 +117,7 @@ static/.webassets-cache/
 
 config/live.cfg*
 config/development.cfg
+logging.override.yaml
 
 .inside-vagrant
 .vagrant
@@ -134,3 +135,6 @@ node_modules
 !static/fonts
 !static/deliveries.pdf
 
+cov.md
+mypy-report/
+_docs/

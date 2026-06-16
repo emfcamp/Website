@@ -43,8 +43,11 @@
 
 
 {% block foot %}
+{#
+    FIXME what is this for?
     <script>
         var now_and_next_data = {{ proposals_by_venue | tojson }};
         // TODO clever JS things go here
     </script>
+#}
 {% endblock %}

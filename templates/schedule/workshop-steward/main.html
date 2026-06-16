@@ -12,10 +12,10 @@
   {% endfor %}
 </ul>
 
-<h2>Youth Workshops</h2>
+<h2>Family Workshops</h2>
 
 <ul>
-  {% for venue in youthworkshop_venues %}
+  {% for venue in familyworkshop_venues %}
     <li><a href="{{ url_for('.workshop_steward_venue', venue_id=venue.id) }}">{{ venue.name }}</a></li>
   {% endfor %}
 </ul>

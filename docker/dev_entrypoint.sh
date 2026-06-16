@@ -25,6 +25,9 @@ then
 	cp /app/config/development-example.cfg /app/config/development.cfg
 fi;
 
+# uv run doesn't remove dependencies, so run uv sync explicitly to do this.
+uv sync
+
 echo "Initialising database..."
 uv run flask db upgrade
 
@@ -34,9 +37,6 @@ fi
 
 echo "Creating base data..."
 uv run flask create_perms
-uv run flask dev createbankaccounts
-uv run flask cfp create_venues
-uv run flask cfp create_tags
-uv run flask tickets create
+[[ "$NO_DEV_DATA" == "" ]] && uv run flask dev data --idempotent
 echo "Starting dev server..."
 exec uv run flask run --extra-files ./config/development.cfg:./logging.yaml:./logging.override.yaml -h 0.0.0.0 -p 2342 --debug

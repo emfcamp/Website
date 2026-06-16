@@ -1,65 +1,89 @@
-from flask import render_template, flash, redirect, url_for, abort, request
-from flask_login import login_required, current_user
-
-from models import event_year
-from models.village import Village, VillageMember, VillageRequirements
-from models.cfp import Venue
+from flask import abort, flash, redirect, render_template, request, url_for
+from flask import current_app as app
+from flask.typing import ResponseReturnValue
+from flask_login import current_user, login_required
+from sqlalchemy import exists, func, select
 
 from main import db
+from models.content import Venue
+from models.village import Village, VillageJoinRequest, VillageMember
 
-from . import villages, load_village
-from .forms import VillageForm
+from ..common import render_untrusted_markdown
+from ..config import config
+from . import load_village, villages
+from .forms import (
+    AcceptVillageMemberForm,
+    JoinVillageForm,
+    LeaveVillageForm,
+    PromoteVillageMemberForm,
+    VillageDescriptionForm,
+    VillageForm,
+)
 
 
 @villages.route("/register", methods=["GET", "POST"])
 @login_required
-def register():
+def register() -> ResponseReturnValue:
     if current_user.village and current_user.village_membership.admin:
-        return redirect(url_for(".edit", year=event_year(), village_id=current_user.village.id))
+        # admin member of an existing village, edit that instead.
+        return redirect(url_for(".edit", year=config.event_year, village_id=current_user.village.id))
+
+    if current_user.village:
+        # non-admin member of an existing village, view it instead.
+        return redirect(
+            url_for(
+                ".view",
+                year=config.event_year,
+                village_id=current_user.village.id,
+                slug=current_user.village.slug,
+            )
+        )
+
+    if not current_user.has_admission_ticket:
+        flash("You can't create a village without a ticket to EMF")
+        return redirect(url_for("users.account"))
 
     form = VillageForm()
     if form.validate_on_submit():
+        # Checked by form so should never fail
+        assert form.name.data is not None
         if Village.get_by_name(form.name.data):
-            flash("A village already exists with that name, please choose another")
-            return redirect(url_for(".register"))
+            # TODO: should probably be a validator, although then you do have to give it
+            # a db handle and somehow pass in the current name. WTForms-alchemy has a
+            # ModelForm which solves this...
+            form.name.errors = ["A village already exists with that name, please choose another"]
+        else:
+            village = Village()
+            form.populate_obj(village)
 
-        village = Village(name=form.name.data, description=form.description.data)
+            membership = VillageMember(village=village, user=current_user, admin=True)
 
-        membership = VillageMember(village=village, user=current_user, admin=True)
+            venue = Venue(village=village, name=village.name)
 
-        venue = Venue(village=village, name=village.name)
+            db.session.add(village)
+            db.session.add(membership)
+            db.session.add(venue)
+            db.session.commit()
 
-        requirements = VillageRequirements(
-            village=village,
-            num_attendees=form.num_attendees.data,
-            size_sqm=form.size_sqm.data,
-            power_requirements=form.power_requirements.data,
-            noise=form.noise.data,
-            structures=form.structures.data,
-        )
-        db.session.add(village)
-        db.session.add(membership)
-        db.session.add(requirements)
-        db.session.add(venue)
-        db.session.commit()
-
-        flash("Your village registration has been received, thanks! You can edit it below.")
-        return redirect(url_for(".edit", year=event_year(), village_id=village.id))
+            flash("Your village registration has been received, thanks! You can edit it below.")
+            return redirect(
+                url_for(".view", year=config.event_year, village_id=village.id, slug=village.slug)
+            )
 
     return render_template("villages/register.html", form=form)
 
 
 @villages.route("/")
-def villages_redirect():
-    return redirect(url_for(".main", year=event_year()))
+def villages_redirect() -> ResponseReturnValue:
+    return redirect(url_for(".main", year=config.event_year))
 
 
 @villages.route("/<int:year>")
-def main(year):
-    if year != event_year():
+def main(year: int) -> ResponseReturnValue:
+    if year != config.event_year:
         abort(404)
 
-    villages = list(Village.query.all())
+    villages = list(db.session.scalars(select(Village).order_by(func.lower(Village.name))))
     any_village_located = any(v.location is not None for v in villages)
     return render_template(
         "villages/villages.html",
@@ -68,29 +92,287 @@ def main(year):
     )
 
 
+@villages.route("/<int:year>/<int:village_id>")
+@villages.route("/<int:year>/<int:village_id>-")
+@villages.route("/<int:year>/<int:village_id>-<slug>")
+def view(year: int, village_id: int, slug: str | None = None) -> ResponseReturnValue:
+    village = load_village(year, village_id)
+
+    if village.slug and slug != village.slug:
+        return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
+
+    return view_or_editdesc(village)
+
+
+def view_or_editdesc(
+    village: Village, edit_desc_form: VillageDescriptionForm | None = None
+) -> ResponseReturnValue:
+    user_is_village_admin = (
+        current_user.is_authenticated
+        and current_user.village is not None
+        and current_user.village.id == village.id
+        and current_user.village_membership.admin
+    )
+
+    user_is_village_member = (
+        current_user.is_authenticated
+        and current_user.village is not None
+        and current_user.village.id == village.id
+        and not current_user.village_membership.admin
+    )
+
+    user_has_requested_join_village = (
+        current_user.is_authenticated
+        and current_user.village_join_request is not None
+        and current_user.village_join_request.village.id == village.id
+    )
+
+    user_can_join_village = (
+        current_user.is_authenticated
+        and not village.private
+        and current_user.village is None
+        and current_user.village_join_request is None
+        and current_user.has_admission_ticket
+    )
+
+    return render_template(
+        "villages/view.html",
+        village=village,
+        user_is_village_admin=user_is_village_admin,
+        user_can_join_village=user_can_join_village,
+        user_is_village_member=user_is_village_member,
+        user_has_requested_join_village=user_has_requested_join_village,
+        village_long_description_html=(
+            render_untrusted_markdown(village.long_description) if village.long_description else None
+        ),
+        edit_desc_form=edit_desc_form,
+    )
+
+
 @villages.route("/<int:year>/<int:village_id>/edit", methods=["GET", "POST"])
 @login_required
-def edit(year, village_id):
+def edit(year: int, village_id: int) -> ResponseReturnValue:
     village = load_village(year, village_id, require_admin=True)
 
     form = VillageForm()
-    if form.validate_on_submit():
-        if Village.get_by_name(form.name.data):
-            # FIXME: this should be a WTForms validation
-            flash("A village already exists with that name, please choose another")
-            return redirect(url_for(".register"))
-
-        for venue in village.venues:
-            if venue.name == village.name:
-                # Rename a village venue if it exists and has the old name.
-                venue.name = form.name.data
-
-        form.populate_obj(village)
-        db.session.commit()
-        flash("Your village registration has been updated.")
-        return redirect(url_for(".edit", year=year, village_id=village_id))
-
-    if request.method != "POST":
+    if request.method == "GET":
         form.populate(village)
 
+    if form.validate_on_submit():
+        # Check to see if changed name clashes with another village
+        if db.session.execute(
+            select(exists().where(Village.name == form.name.data, Village.id != village.id))
+        ).scalar_one():
+            # TODO: see register()
+            form.name.errors = ["A village already exists with that name, please choose another"]
+        else:
+            # All good, update DB
+            for venue in village.venues:
+                if venue.name == village.name and form.name.data is not None:
+                    # Rename a village venue if it exists and has the old name.
+                    venue.name = form.name.data
+
+            form.populate_obj(village)
+            db.session.commit()
+            flash("Your village registration has been updated.")
+            return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
+
     return render_template("villages/edit.html", form=form, village=village)
+
+
+# An extra edit page which makes inline editing of the long_description look better
+@villages.route("/<int:year>/<int:village_id>/editdesc", methods=["GET", "POST"])
+@login_required
+def editdesc(year: int, village_id: int) -> ResponseReturnValue:
+    village = load_village(year, village_id, require_admin=True)
+
+    form = VillageDescriptionForm()
+    if request.method == "GET":
+        form.populate(village)
+
+    if form.validate_on_submit():
+        # Just update the long_description
+        village.long_description = form.long_description.data
+        db.session.commit()
+        flash("Your village's long description has been updated.")
+        return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
+
+    return view_or_editdesc(village, form)
+
+
+# View (and manage) village members.
+# Only for village admins (although there is an orga equivalent in the admin.py views)
+@villages.route("/<int:year>/<int:village_id>/members", methods=["GET"])
+@login_required
+def members(year: int, village_id: int) -> ResponseReturnValue:
+    village = load_village(year, village_id, require_admin=True)
+
+    return render_template("villages/members.html", village=village)
+
+
+@villages.route("/<int:year>/<int:village_id>/members/promote", methods=["POST"])
+@login_required
+def members_promote(year: int, village_id: int) -> ResponseReturnValue:
+    village = load_village(year, village_id, require_admin=True)
+
+    if not village:
+        abort(404)
+
+    form = PromoteVillageMemberForm()
+
+    if form.validate_on_submit():
+        village_membership = next(
+            (
+                member
+                for member in village.village_memberships
+                if member.user_id == form.user_id.data and not member.admin
+            ),
+            None,
+        )
+
+        if village_membership is None:
+            flash(f"User is not a member of village '{village.name}'")
+        else:
+            # lazy-load this before committing and detaching the object
+            email = village_membership.user.email
+
+            village_membership.admin = True
+            db.session.commit()
+
+            flash(f"{email} has been promoted to a village admin")
+
+    return redirect(url_for(".members", year=year, village_id=village_id))
+
+
+@villages.route("/<int:year>/<int:village_id>/members/accept", methods=["POST"])
+@login_required
+def members_accept_join_request(year: int, village_id: int) -> ResponseReturnValue:
+    village = load_village(year, village_id, require_admin=True)
+
+    if not village:
+        abort(404)
+
+    form = AcceptVillageMemberForm()
+
+    if form.validate_on_submit():
+        village_join_request = next(
+            (request for request in village.village_join_requests if request.user_id == form.user_id.data),
+            None,
+        )
+
+        if village_join_request is None:
+            flash(f"User doesn't have an outstanding request to join village '{village.name}'")
+        else:
+            # lazy-load this before committing and detaching the object
+            email = village_join_request.user.email
+
+            db.session.add(VillageMember(village_id=village.id, user_id=form.user_id.data, admin=False))
+            db.session.delete(village_join_request)
+
+            db.session.commit()
+
+            flash(f"{email} has been accepted as a village member")
+
+    return redirect(url_for(".members", year=year, village_id=village_id))
+
+
+@villages.route("/<int:year>/<int:village_id>/members/join", methods=["GET", "POST"])
+@login_required
+def members_join(year: int, village_id: int) -> ResponseReturnValue:
+    village = load_village(year, village_id)
+
+    if not village:
+        abort(404)
+
+    if village.private:
+        flash(f"{village.name} is a private village and is not accepting requests to join")
+        return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
+
+    if current_user.village:
+        flash(f"Already a member of village {current_user.village.name}")
+        return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
+
+    if not current_user.has_admission_ticket:
+        flash("You can't join a village without a ticket to EMF")
+        return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
+
+    form = JoinVillageForm()
+
+    if form.validate_on_submit():
+        db.session.add(VillageJoinRequest(village_id=village.id, user=current_user))
+        db.session.commit()
+
+        flash(f"You've requested to join village {village.name}")
+
+        return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
+    return render_template("villages/members_join.html", form=form, year=year, village=village)
+
+
+@villages.route("/<int:year>/<int:village_id>/members/leave", methods=["GET", "POST"])
+@login_required
+def members_leave(year: int, village_id: int) -> ResponseReturnValue:
+    village = load_village(year, village_id)
+
+    if not village:
+        abort(404)
+
+    # user has requested to join village, delete their request.
+    requested_to_join_correct_village = (
+        current_user.village_join_request is not None
+        and current_user.village_join_request.village_id == village_id
+    )
+    member_of_correct_village = current_user.village is not None and current_user.village.id == village_id
+
+    if not (requested_to_join_correct_village or member_of_correct_village):
+        flash(f"Not a member of village {current_user.village.name}")
+        return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
+
+    can_leave = False
+    delete_village = False
+
+    if member_of_correct_village and current_user.village_membership.admin and len(village.admins()) <= 1:
+        if len(village.non_admins()) > 0:
+            # This is the last admin, they can't leave because there are other members
+            pass
+        else:
+            # This is the last admin, they can leave as there are no other members.
+            # The village will be deleted
+            can_leave = True
+            delete_village = True
+    else:
+        # User can leave
+        can_leave = True
+
+    form = LeaveVillageForm()
+
+    if form.validate_on_submit():
+        if can_leave:
+            if delete_village:
+                app.logger.info(
+                    f"Village '{village.name}' (id {village.id}) deleted by {current_user} being the last to leave"
+                )
+                flash(f"You've left village {village.name} and it has been deleted")
+                db.session.delete(village)
+
+                db.session.commit()
+                return redirect(url_for(".main", year=year))
+
+            # User can leave
+            if member_of_correct_village:
+                db.session.delete(current_user.village_membership)
+            else:
+                db.session.delete(current_user.village_join_request)
+
+            flash(f"You've left village {village.name}")
+
+            db.session.commit()
+            return redirect(url_for(".view", year=year, village_id=village.id, slug=village.slug))
+
+    return render_template(
+        "villages/members_leave.html",
+        form=form,
+        year=year,
+        village=village,
+        can_leave=can_leave,
+        delete_village=delete_village,
+    )

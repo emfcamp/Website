@@ -7,10 +7,8 @@ This is to confirm your submission to our call for participation. We'll try to p
 {{ proposal.human_type | title }}
 Title: {{ proposal.title }}
 Description: {{ proposal.description }}
-{%- if proposal.type in ['talk', 'youthworkshop', 'workshop', 'performance'] %}
-Duration: {{ proposal.length }}
-{% elif proposal.type == 'installation' %}
-Size: {{ proposal.size }}
+{%- if proposal.type in ['talk', 'familyworkshop', 'workshop', 'performance'] %}
+Duration: {{ proposal.duration }}
 {% elif proposal.type == 'lightning' %}
 Day: {{ proposal.pretty_session() }}
 {%- endif %}

@@ -1,82 +1,91 @@
+"""
+Admin views relating to Venues and TimeBlocks.
+"""
+
+from collections import defaultdict
+from datetime import time
+from typing import get_args
+
 from flask import (
-    render_template,
-    redirect,
-    url_for,
+    abort,
     flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
 )
-
+from flask.typing import ResponseReturnValue
+from geoalchemy2.shape import from_shape, to_shape
+from shapely import Point
+from sqlalchemy import select
 from wtforms import (
-    StringField,
-    SelectField,
     BooleanField,
-    SubmitField,
-    SelectMultipleField,
+    FloatField,
     IntegerField,
+    SelectField,
+    SelectMultipleField,
+    StringField,
+    SubmitField,
 )
+from wtforms.fields import TimeField
 from wtforms.validators import DataRequired, Optional
-from geoalchemy2.shape import to_shape
 
-from main import db
-from models.cfp import Venue, Proposal, HUMAN_CFP_TYPES
+from main import db, get_or_404
+from models.content import SCHEDULE_ITEM_INFOS, Occurrence, Venue
+from models.content.schedule import ScheduleItemType
+from models.content.venue import TimeBlock
 from models.village import Village
+
+from ..cfp.date import CONTENT_DAY_START, content_days, content_timestamp, timestamp_to_content
+from ..common.forms import Form, coerce_optional
+from ..config import config
 from . import (
-    cfp_review,
     admin_required,
+    cfp_review,
 )
-from ..common.forms import Form
-
-
-VENUE_TYPE_CHOICES = [(k, v) for k, v in HUMAN_CFP_TYPES.items()]
 
 
 class VenueForm(Form):
     name = StringField("Name", [DataRequired()])
-    village_id = SelectField("Village", choices=[], coerce=int)
-    scheduled_content_only = BooleanField("Scheduled Content Only")
-    latlon = StringField("Location")
-    allowed_types = SelectMultipleField("Allowed for", choices=VENUE_TYPE_CHOICES)
-    default_for_types = SelectMultipleField("Default Venue for", choices=VENUE_TYPE_CHOICES)
+    village_id = SelectField("Village", coerce=coerce_optional(int))
+    allows_attendee_content = BooleanField("Allows Attendee Content")
+    location_lat = FloatField("Latitude", validators=[Optional()])
+    location_lon = FloatField("Longitude", validators=[Optional()])
     capacity = IntegerField("Capacity", validators=[Optional()])
     submit = SubmitField("Save")
     delete = SubmitField("Delete")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        choices = [(0, "")]
-        for v in Village.query.order_by(Village.name).all():
-            choices.append((v.id, v.name))
+        choices = [("", "")]
+        for v in db.session.query(Village).order_by(Village.name).all():
+            choices.append((str(v.id), v.name))
         self.village_id.choices = choices
 
-    def populate_from_venue(self, venue):
-        if venue.location is None:
-            self.latlon.data = ""
-        else:
+    def populate(self, venue: Venue) -> None:
+        if venue.location is not None:
             latlon = to_shape(venue.location)
-            self.latlon.data = "{}, {}".format(latlon.x, latlon.y)
+            self.location_lat.data = latlon.y
+            self.location_lon.data = latlon.x
 
-    def populate_obj(self, venue: Venue):
-        venue.scheduled_content_only = self.scheduled_content_only.data
-        venue.allowed_types = self.allowed_types.data
-        venue.default_for_types = self.default_for_types.data
-        venue.capacity = self.capacity.data
+    def populate_obj(self, venue: Venue) -> None:
+        super().populate_obj(venue)
 
-        if self.latlon.data:
-            latlon = self.latlon.data.split(",")
-            location = f"POINT({latlon[0]} {latlon[1]})"
+        if self.location_lat.data is not None and self.location_lon.data is not None:
+            location = from_shape(Point(self.location_lon.data, self.location_lat.data))
         else:
             location = None
         venue.location = location
 
-        if self.village_id.data == 0:
-            venue.village_id = None
-        else:
-            venue.village_id = self.village_id.data
-
 
 @cfp_review.route("/venues", methods=["GET", "POST"])
 @admin_required
-def venues():
-    venues = Venue.query.order_by(Venue.scheduled_content_only.desc(), Venue.name).all()
+def venues() -> ResponseReturnValue:
+    venues_query = db.session.query(Venue).order_by(Venue.name)
+    if not request.args.get("all"):
+        venues_query = venues_query.where(Venue.village_id.is_(None))
+
+    venues = venues_query.all()
     new_venue = Venue()
     form = VenueForm(obj=new_venue)
 
@@ -90,18 +99,18 @@ def venues():
     return render_template("cfp_review/venues/index.html", venues=venues, form=form)
 
 
-@cfp_review.route("/venues/<int:venue_id>", methods=["GET", "POST"])
+@cfp_review.route("/venues/<int:venue_id>/edit", methods=["GET", "POST"])
 @admin_required
-def edit_venue(venue_id):
-    venue = Venue.query.get_or_404(venue_id)
+def edit_venue(venue_id: int) -> ResponseReturnValue:
+    venue = get_or_404(db, Venue, venue_id)
     form = VenueForm(obj=venue)
     if form.validate_on_submit():
         if form.delete.data:
-            scheduled_content = Proposal.query.filter(
-                Proposal.scheduled_venue_id == venue.id, Proposal.is_accepted
-            ).count()
+            occurrences = list(
+                db.session.scalars(select(Occurrence).where(Occurrence.scheduled_venue_id == venue.id))
+            )
 
-            if scheduled_content > 0:
+            if occurrences:
                 flash("Cannot delete venue with scheduled content")
                 return redirect(url_for(".edit_venue", venue_id=venue_id))
 
@@ -109,12 +118,120 @@ def edit_venue(venue_id):
             db.session.commit()
             flash("Deleted venue")
             return redirect(url_for(".venues"))
+
         if form.submit.data:
             form.populate_obj(venue)
             db.session.commit()
             flash("Saved venue")
             return redirect(url_for(".venues"))
-    else:
-        form.populate_from_venue(venue)
+
+    form.populate(venue)
 
     return render_template("cfp_review/venues/edit.html", venue=venue, form=form)
+
+
+class TimeBlockForm(Form):
+    start = TimeField("Start time")
+    end = TimeField("End time")
+    automatic = BooleanField("Enable automatic scheduler")
+    type = SelectField("Content type", choices=get_args(ScheduleItemType))
+
+    submit = SubmitField("Save")
+    delete = SubmitField("Delete")
+
+
+class NewTimeBlockForm(TimeBlockForm):
+    days = SelectMultipleField("Days")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.days.choices = [(str(i), date.strftime("%a %d %B")) for i, date in enumerate(config.event_days)]
+
+
+@cfp_review.route("/venues/<int:venue_id>/time-blocks", methods=["GET", "POST"])
+@admin_required
+def venue_timeblocks(venue_id: int) -> ResponseReturnValue:
+    venue = get_or_404(db, Venue, venue_id)
+
+    days = list(content_days())
+
+    new_form = NewTimeBlockForm()
+
+    if new_form.validate_on_submit():
+        assert new_form.days.data and new_form.start.data and new_form.end.data
+        created = 0
+        for day in new_form.days.data:
+            time_block = TimeBlock()
+
+            date = days[int(day)][0]
+
+            time_block.start = content_timestamp(date, new_form.start.data)
+            time_block.end = content_timestamp(date, new_form.end.data)
+            time_block.type = new_form.type.data
+            time_block.automatic = new_form.automatic.data
+            venue.time_blocks += [time_block]
+            created += 1
+
+        db.session.commit()
+
+        flash(f"{created} new time block(s) created")
+        return redirect(url_for(".venue_timeblocks", venue_id=venue.id))
+
+    time_blocks_by_day = defaultdict(list)
+    for day, (day_start, day_end) in days:
+        for b in venue.time_blocks:
+            if day_start < b.start <= day_end:
+                height = (min(day_end, b.end) - max(day_start, b.start)).seconds * 100 / (24 * 60 * 60)
+                top = (max(day_start, b.start) - day_start).seconds * 100 / (24 * 60 * 60)
+                time_blocks_by_day[day].append(
+                    {
+                        "height": height,
+                        "top": top,
+                        "block": b,
+                        "title": SCHEDULE_ITEM_INFOS[b.type].human_type,
+                    }
+                )
+
+    timeblock_hours = [time(i % 24, 0, 0) for i in range(CONTENT_DAY_START.hour, CONTENT_DAY_START.hour + 24)]
+
+    return render_template(
+        "cfp_review/venues/time_blocks.html",
+        venue=venue,
+        days=[date for date, _ in days],
+        new_form=new_form,
+        time_blocks_by_day=time_blocks_by_day,
+        day_start=CONTENT_DAY_START,
+        timeblock_hours=timeblock_hours,
+    )
+
+
+@cfp_review.route("/venues/<int:venue_id>/time-blocks/<int:time_block_id>", methods=["GET", "POST"])
+@admin_required
+def timeblock_edit(venue_id: int, time_block_id: int) -> ResponseReturnValue:
+    venue = get_or_404(db, Venue, venue_id)
+    time_block = get_or_404(db, TimeBlock, time_block_id)
+    if venue.id != time_block.venue_id:
+        abort(404)
+
+    form = TimeBlockForm(obj=time_block)
+
+    day, _ = timestamp_to_content(time_block.start)
+
+    if form.validate_on_submit():
+        if form.delete.data:
+            db.session.delete(time_block)
+            flash("Time block deleted")
+        else:
+            assert form.start.data and form.end.data
+            time_block.start = content_timestamp(day, form.start.data)
+            time_block.end = content_timestamp(day, form.end.data)
+            time_block.automatic = form.automatic.data
+            time_block.type = form.type.data
+            flash("Time block updated")
+
+        db.session.commit()
+        return redirect(url_for(".venue_timeblocks", venue_id=venue.id))
+
+    return render_template(
+        "cfp_review/venues/time_block_edit.html", venue=venue, form=form, time_block=time_block
+    )

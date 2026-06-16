@@ -1,4 +1,4 @@
-{% if config.get('SERVER_NAME') != 'www.emfcamp.org' %}
+{% if config.get('SERVER_NAME') != 'www.emfcamp.org' -%}
 {#- Include a banner on anything that isn't production #}
 ============================================================================
 {%- if config.get('SERVER_NAME') %}
@@ -10,5 +10,5 @@ This message was not sent from production.
 If you did not expect an email, please get in touch at contact@emfcamp.org.
 ============================================================================
 {% endif %}
-{%- block body %}
+{% block body %}
 {% endblock %}

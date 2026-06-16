@@ -1,73 +1,178 @@
-import dateutil
-from wtforms import (
-    SubmitField,
-    StringField,
-    FieldList,
-    FormField,
-    SelectField,
-    TextAreaField,
-    BooleanField,
-    IntegerField,
-    FloatField,
-    SelectMultipleField,
-)
-from wtforms.validators import DataRequired, Optional, NumberRange, ValidationError
-
-from models.cfp import HUMAN_CFP_TYPES, Venue, ORDERED_STATES
-from models.cfp_tag import Tag
-from ..common.forms import Form
-from ..common.fields import HiddenIntegerField, EmailField
-from ..admin.users import NewUserForm
+from itertools import chain
+from typing import get_args
 
 from dateutil.parser import parse as parse_date
+from sqlalchemy import select
+from wtforms import (
+    BooleanField,
+    DateTimeField,
+    FieldList,
+    FloatField,
+    FormField,
+    IntegerField,
+    SelectField,
+    SelectMultipleField,
+    StringField,
+    SubmitField,
+    TextAreaField,
+)
+from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
+
+from main import db
+from models.content import (
+    PROPOSAL_INFOS,
+    PROPOSAL_STATE_TRANSITIONS,
+    ProposalType,
+    ScheduleItemState,
+    ScheduleItemType,
+    Venue,
+)
+from models.content.cfp import Proposal, ProposalState
+from models.content.schedule import SLOT_DURATION
+from models.user import User
+
+from ..admin.users import NewUserForm
+from ..common.fields import EmailField, HiddenIntegerField
+from ..common.forms import Form, coerce_optional
 
 
-def ValidVenue():
-    def validate_venue(self, field):
-        venue_name = field.data.strip()
-        if not venue_name:
-            return
-
-        count = Venue.query.filter_by(name=venue_name).count()
-        if count != 1:
-            raise ValidationError("Cannot identify venue")
-
-    return validate_venue
-
-
+# See also ProposalForm, etc in apps/cfp/views.py, but reviewers should be able to edit anything
 class UpdateProposalForm(Form):
-    # Admin can change anything
-    state = SelectField("State", choices=[(s, s) for s in ORDERED_STATES])
+    state = SelectField(
+        "State",
+        choices={
+            # see Proposal.is_editable
+            "Editable": [("new", "New"), ("edit", "Edit"), ("manual-review", "Manual review")],
+            "Pre-review": [("checked", "Checked")],
+            "Review": [
+                ("anonymised", "Anonymised"),
+                ("anon-blocked", "Can't anonymise"),
+            ],
+            "Final": [
+                ("accepted", "Accepted"),
+                ("finalised", "Finalised"),
+                ("rejected", "Rejected"),
+                ("withdrawn", "Withdrawn"),
+                ("conduct-blocked", "Blocked for conduct issues"),
+            ],
+        },
+    )
+
     title = StringField("Title", [DataRequired()])
     description = TextAreaField("Description", [DataRequired()])
-    tags = SelectMultipleField("Tags (hold ctrl to select multiple)")
+    duration = StringField("Duration")
+
+    needs_help = BooleanField("Needs Help")
     equipment_required = TextAreaField("Equipment Required")
     funding_required = TextAreaField("Funding Required")
-    additional_info = TextAreaField("Additional Info")
-    length = StringField("Length")
     notice_required = SelectField(
         "Required notice",
         choices=[
-            ("1 week", "1 week"),
-            ("1 month", "1 month"),
+            ("< 1 month", "Less than 1 month"),
             ("> 1 month", "Longer than 1 month"),
-            ("> 3 months", "Longer than 3 months"),
+            ("> 2 months", "Longer than 2 months"),
         ],
     )
-    needs_help = BooleanField("Needs Help")
+    additional_info = TextAreaField("Additional Info")
+
     needs_money = BooleanField("Needs Money")
     one_day = BooleanField("One day only")
-    will_have_ticket = BooleanField("Will have a ticket")
-    user_scheduled = BooleanField("User Scheduled")
+    # rejected_email_sent is internal
 
-    published_names = StringField("Published names")
-    published_pronouns = StringField("Published pronouns")
-    published_title = StringField("Published title")
-    published_description = TextAreaField("Published description")
-    arrival_period = StringField("Arrival time")
-    departure_period = StringField("Departure time")
-    telephone_number = StringField("Telephone")
-    eventphone_number = StringField("On-site extension")
+    # private_notes is managed by PrivateNotesForm
+
+    user_will_have_ticket = BooleanField("Will have a ticket")
+
+    update = SubmitField("Save changes")
+
+    def validate_allowed_times(self, field):
+        try:
+            for p in field.data.split("\n"):
+                if p:
+                    start, end = p.split(" > ")
+                    parse_date(start)
+                    parse_date(end)
+        except ValueError as e:
+            raise ValidationError("Unparsable Allowed Times. Fmt: datetime > datetime per line") from e
+
+
+# Mapping of which form fields are allowed for a specific target state
+STATE_FIELDS: dict[ProposalState, set[str]] = {
+    "accepted": {"accept"},
+    "rejected": {"reject", "reject_with_message"},
+    "checked": {"checked"},
+    "conduct-blocked": {"conduct_issues"},
+    "manual-review": {"manual_review"},
+    "edit": {"edit"},
+    "withdrawn": {"withdraw"},
+}
+
+
+class ProposalStateForm(Form):
+    """Form displayed to admins which only shows the appropriate actions for a proposal in this state."""
+
+    checked = SubmitField("Mark as checked", render_kw={"class": "btn btn-primary"})
+    conduct_issues = SubmitField("Has conduct issues", render_kw={"class": "btn btn-primary"})
+
+    manual_review = SubmitField("Send to manual review", render_kw={"class": "btn btn-primary"})
+    withdraw = SubmitField("Mark as withdrawn", render_kw={"class": "btn btn-primary"})
+
+    edit = SubmitField("Make editable by user", render_kw={"class": "btn btn-primary"})
+
+    accept = SubmitField("Accept and send email", render_kw={"class": "btn btn-primary"})
+    reject = SubmitField("Reject without telling user", render_kw={"class": "btn btn-danger"})
+    reject_with_message = SubmitField("Reject and send email", render_kw={"class": "btn btn-danger"})
+
+    _allowed_fields: set[str]
+
+    def __init__(self, proposal: Proposal) -> None:
+        super().__init__()
+        allowed_states = PROPOSAL_STATE_TRANSITIONS.get(proposal.state, set())
+
+        self._allowed_fields = set(
+            chain.from_iterable(STATE_FIELDS.get(state, {}) for state in allowed_states)
+        )
+        for field in list(self):
+            if field.name not in self._allowed_fields:
+                delattr(self, field.name)
+
+        if "checked" in allowed_states and proposal.state != "new":
+            if proposal.type_info.review_type == "anonymous":
+                self.checked.label.text = "Send to anonymisation"
+            else:
+                # We already have the "send to manual review" button which will do the same thing as "checked"
+                del self.checked
+
+    def result(self) -> ProposalState:
+        for field in self._allowed_fields:
+            if getattr(self, field) and getattr(self, field).data:
+                for k, v in STATE_FIELDS.items():
+                    if field in v:
+                        return k
+        raise ValueError("No result for ProposalStateForm")
+
+
+class ConvertProposalForm(Form):
+    new_type = SelectField("Destination type")
+    convert = SubmitField("Convert")
+
+
+class ScheduleItemForm(Form):
+    state = SelectField("State", choices=[(s, s.title()) for s in get_args(ScheduleItemState)])
+
+    # Allow blank values so an item can be published without doxxing
+    names = StringField("Names")
+    pronouns = StringField("Pronouns")
+    title = StringField("Title", [DataRequired()])
+    description = TextAreaField("Description", [DataRequired()])
+    short_description = StringField("Short description")
+
+    official_content = SelectField(
+        "Official content",
+        choices=[("official", "Official content"), ("attendee", "Attendee content")],
+        coerce=lambda v: v == "official",
+    )
+
     video_privacy = SelectField(
         "Recording",
         choices=[
@@ -75,8 +180,33 @@ class UpdateProposalForm(Form):
             ("review", "Do not stream, and do not publish until reviewed"),
             ("none", "Do not stream or record"),
         ],
-        validators=[Optional()],
+        default="public",
     )
+
+    contact_telephone = StringField("Telephone")
+
+
+class UpdateScheduleItemForm(ScheduleItemForm):
+    update = SubmitField("Update")
+
+
+class ConvertScheduleItemForm(Form):
+    new_type = SelectField("Destination type")
+    convert = SubmitField("Convert")
+
+
+class UpdateAvailabilityForm(Form):
+    update = SubmitField("Update")
+
+
+# The forms below should match the Attribute subclasses in the model.
+# TODO: maybe we could replace this all with some generic fields and type annotation.
+class UpdateAttributesForm(Form):
+    pass
+
+
+class UpdateScheduleItemTalkAttributesForm(UpdateAttributesForm):
+    content_note = StringField("Content note")
     needs_laptop = SelectField(
         "Needs laptop",
         choices=[
@@ -86,253 +216,78 @@ class UpdateProposalForm(Form):
         coerce=int,
         validators=[Optional()],
     )
-    available_times = StringField("Available times")
+    family_friendly = BooleanField("Family Friendly")
 
+
+class UpdateScheduleItemPerformanceAttributesForm(UpdateAttributesForm):
+    pass
+
+
+class UpdateScheduleItemWorkshopAttributesForm(UpdateAttributesForm):
+    age_range = StringField("Age range")
+    participant_cost = StringField("Cost per attendee")
+    participant_equipment = StringField("Attendee equipment")
     content_note = StringField("Content note")
     family_friendly = BooleanField("Family Friendly")
 
-    hide_from_schedule = BooleanField("Hide from schedule")
-    manually_scheduled = BooleanField("Manually scheduled")
-    allowed_venues = SelectMultipleField("Allowed Venues", coerce=int)
-    allowed_times = TextAreaField("Allowed Time Periods")
-    scheduled_duration = StringField("Duration")
-    scheduled_time = StringField("Scheduled Time")
-    scheduled_venue = StringField("Scheduled Venue", [ValidVenue()])
-    potential_time = StringField("Potential Time")
-    potential_venue = StringField("Potential Venue", [ValidVenue()])
 
-    thumbnail_url = StringField("Video Thumbnail URL")
-    c3voc_url = StringField("C3VOC Video URL")
-    youtube_url = StringField("YouTube URL")
-
-    update = SubmitField("Update")
-    reject = SubmitField("Reject without telling user")
-    checked = SubmitField("Mark as checked")
-    accept = SubmitField("Accept and send email")
-    reject_with_message = SubmitField("Reject and send email")
-
-    def validate_allowed_times(self, field):
-        try:
-            for p in field.data.split("\n"):
-                if p:
-                    start, end = p.split(" > ")
-                    parse_date(start)
-                    parse_date(end)
-        except ValueError:
-            raise ValidationError("Unparsable Allowed Times. Fmt: datetime > datetime per line")
-
-    def update_proposal(self, proposal):
-        proposal.title = self.title.data
-        proposal.description = self.description.data
-        proposal.tags = Tag.parse_serialised_tags(self.tags.data)
-        proposal.equipment_required = self.equipment_required.data
-        proposal.funding_required = self.funding_required.data
-        proposal.additional_info = self.additional_info.data
-        proposal.length = self.length.data
-        proposal.notice_required = self.notice_required.data
-        proposal.needs_help = self.needs_help.data
-        proposal.needs_money = self.needs_money.data
-        proposal.one_day = self.one_day.data
-        proposal.user.will_have_ticket = self.will_have_ticket.data
-        proposal.user_scheduled = self.user_scheduled.data
-
-        proposal.hide_from_schedule = self.hide_from_schedule.data
-        proposal.manually_scheduled = self.manually_scheduled.data
-
-        proposal.thumbnail_url = self.thumbnail_url.data
-        proposal.c3voc_url = self.c3voc_url.data
-        proposal.youtube_url = self.youtube_url.data
-
-        # Just talks? Weird to have here
-
-        if self.needs_laptop.raw_data:
-            proposal.needs_laptop = self.needs_laptop.data
-        proposal.video_privacy = self.video_privacy.data
-
-        # All these if statements are because this will nuke the data if you
-        # change the state when the fields are currently hidden, so changing
-        # from finalised -> cancelled -> finalised will wipe it all oh no
-
-        # Finalisation details
-        if self.published_names.raw_data:
-            proposal.published_names = self.published_names.data
-        if self.published_pronouns.raw_data:
-            proposal.published_pronouns = self.published_pronouns.data
-        if self.published_title.raw_data:
-            proposal.published_title = self.published_title.data
-        if self.published_description.raw_data:
-            proposal.published_description = self.published_description.data
-        if self.content_note.raw_data:
-            proposal.content_note = self.content_note.data
-        if self.family_friendly.raw_data:
-            proposal.family_friendly = self.family_friendly.data
-
-        # Finalising schedule details
-        if self.telephone_number.raw_data:
-            proposal.telephone_number = self.telephone_number.data
-        if self.eventphone_number.raw_data:
-            proposal.eventphone_number = self.eventphone_number.data
-        if self.arrival_period.raw_data:
-            proposal.arrival_period = self.arrival_period.data
-        if self.departure_period.raw_data:
-            proposal.departure_period = self.departure_period.data
-        if self.available_times.raw_data:
-            proposal.available_times = self.available_times.data
-
-        if self.scheduled_duration.data:
-            proposal.scheduled_duration = self.scheduled_duration.data
-        else:
-            proposal.scheduled_duration = None
-
-        # Windows users :(
-        stripped_allowed_times = self.allowed_times.data.strip().replace("\r\n", "\n")
-        if proposal.get_allowed_time_periods_serialised().strip() != stripped_allowed_times:
-            if stripped_allowed_times:
-                proposal.allowed_times = stripped_allowed_times
-            else:
-                proposal.allowed_times = None
-
-        if self.scheduled_time.data:
-            proposal.scheduled_time = dateutil.parser.parse(self.scheduled_time.data)
-        else:
-            proposal.scheduled_time = None
-
-        if self.scheduled_venue.data:
-            proposal.scheduled_venue = Venue.query.filter(
-                Venue.name == self.scheduled_venue.data.strip()
-            ).one()
-        else:
-            proposal.scheduled_venue = None
-
-        if self.potential_time.data:
-            proposal.potential_time = dateutil.parser.parse(self.potential_time.data)
-        else:
-            proposal.potential_time = None
-
-        if self.potential_venue.data:
-            proposal.potential_venue = Venue.query.filter(
-                Venue.name == self.potential_venue.data.strip()
-            ).one()
-        else:
-            proposal.potential_venue = None
-
-        proposal.allowed_venues = Venue.query.filter(Venue.id.in_(self.allowed_venues.data)).all()
+class UpdateScheduleItemFamilyWorkshopAttributesForm(UpdateAttributesForm):
+    age_range = StringField("Age range")
+    participant_cost = StringField("Cost per attendee")
+    participant_equipment = StringField("Attendee equipment")
+    content_note = StringField("Content note")
 
 
-class ConvertProposalForm(Form):
-    new_type = SelectField("Destination type")
-    convert = SubmitField("Convert")
-
-
-class UpdateTalkForm(UpdateProposalForm):
-    pass
-
-
-class UpdatePerformanceForm(UpdateProposalForm):
-    pass
-
-
-class UpdateLightningTalkForm(UpdateProposalForm):
+class UpdateScheduleItemLightningTalkAttributesForm(UpdateAttributesForm):
     session = StringField("Day")
     slide_link = StringField("Link")
 
-    def update_proposal(self, proposal):
-        if self.session.raw_data:
-            proposal.session = self.session.data
-        if self.slide_link.raw_data:
-            proposal.slide_link = self.slide_link.data
-        super(UpdateLightningTalkForm, self).update_proposal(proposal)
+
+class UpdateScheduleItemFilmForm(UpdateAttributesForm):
+    classification = StringField("Classification")
 
 
-class UpdateWorkshopForm(UpdateProposalForm):
-    attendees = StringField("Attendees", [DataRequired()])
-    requires_ticket = BooleanField("Requires ticket")
-    tickets = IntegerField("Total tickets", [Optional()])
-    non_lottery_tickets = IntegerField("Non lottery tickets", [Optional()])
-    cost = StringField("Cost per attendee")
-    participant_equipment = StringField("Attendee equipment")
-    age_range = StringField("Age range")
-    published_cost = StringField("Attendee cost")
-    published_participant_equipment = StringField("Attendee equipment")
-    published_age_range = StringField("Attendee age range")
-
-    def update_proposal(self, proposal):
-        if self.attendees.raw_data:
-            proposal.attendees = self.attendees.data
-        if self.requires_ticket.data:
-            proposal.total_tickets = self.tickets.data
-            proposal.non_lottery_tickets = self.non_lottery_tickets.data
-            proposal.requires_ticket = True
-        else:
-            proposal.total_tickets = 0
-            proposal.non_lottery_tickets = 0
-            proposal.requires_ticket = False
-        if self.cost.raw_data:
-            proposal.cost = self.cost.data
-        if self.participant_equipment.raw_data:
-            proposal.participant_equipment = self.participant_equipment.data
-        if self.age_range.raw_data:
-            proposal.age_range = self.age_range.data
-        if self.published_cost.raw_data:
-            proposal.published_cost = self.published_cost.data
-        if self.published_participant_equipment.raw_data:
-            proposal.published_participant_equipment = self.published_participant_equipment.data
-        if self.published_age_range.raw_data:
-            proposal.published_age_range = self.published_age_range.data
-        super(UpdateWorkshopForm, self).update_proposal(proposal)
+# And now the additional Proposal-only fields.
+class UpdateProposalTalkAttributesForm(UpdateScheduleItemTalkAttributesForm):
+    pass
 
 
-class UpdateYouthWorkshopForm(UpdateProposalForm):
-    attendees = StringField("Attendees", [DataRequired()])
-    requires_ticket = BooleanField("Requires ticket")
-    tickets = IntegerField("Total tickets")
-    non_lottery_tickets = IntegerField("Non lottery tickets")
-    cost = StringField("Cost per attendee")
-    participant_equipment = StringField("Attendee equipment")
-    age_range = StringField("Age range")
-    published_cost = StringField("Attendee cost")
-    published_participant_equipment = StringField("Attendee equipment")
-    published_age_range = StringField("Attendee age range")
-    valid_dbs = BooleanField("Has a valid DBS check")
-
-    def update_proposal(self, proposal):
-        if self.attendees.raw_data:
-            proposal.attendees = self.attendees.data
-        if self.requires_ticket.data:
-            proposal.total_tickets = self.tickets.data
-            proposal.non_lottery_tickets = self.non_lottery_tickets.data
-            proposal.requires_ticket = True
-        else:
-            proposal.total_tickets = 0
-            proposal.non_lottery_tickets = 0
-            proposal.requires_ticket = False
-        if self.cost.raw_data:
-            proposal.cost = self.cost.data
-        if self.participant_equipment.raw_data:
-            proposal.participant_equipment = self.participant_equipment.data
-        if self.age_range.raw_data:
-            proposal.age_range = self.age_range.data
-        if self.published_cost.raw_data:
-            proposal.published_cost = self.published_cost.data
-        if self.published_participant_equipment.raw_data:
-            proposal.published_participant_equipment = self.published_participant_equipment.data
-        if self.published_age_range.raw_data:
-            proposal.published_age_range = self.published_age_range.data
-        if self.valid_dbs.raw_data:
-            proposal.valid_dbs = self.valid_dbs.data
-        super(UpdateYouthWorkshopForm, self).update_proposal(proposal)
+class UpdateProposalPerformanceAttributesForm(UpdateScheduleItemPerformanceAttributesForm):
+    pass
 
 
-class UpdateInstallationForm(UpdateProposalForm):
-    installation_funding = StringField("Installation Funding")
+class UpdateProposalWorkshopAttributesForm(UpdateScheduleItemWorkshopAttributesForm):
+    participant_count = StringField("Attendees", [DataRequired()])
+
+
+class UpdateProposalFamilyWorkshopAttributesForm(UpdateScheduleItemFamilyWorkshopAttributesForm):
+    participant_count = StringField("Attendees", [DataRequired()])
+
+
+class UpdateProposalInstallationAttributesForm(UpdateAttributesForm):
     size = StringField("Size", [DataRequired()])
+    grant_requested = StringField("Installation Grant Requested")
 
-    def update_proposal(self, proposal):
-        if self.size.raw_data:
-            proposal.size = self.size.data
-        if self.installation_funding.raw_data:
-            proposal.installation_funding = self.installation_funding.data
-        super(UpdateInstallationForm, self).update_proposal(proposal)
+
+# Lightning talks don't exist as Proposals
+
+
+UPDATE_PROPOSAL_ATTRIBUTES_FORM_TYPES: dict[ProposalType, type[UpdateAttributesForm]] = {
+    "talk": UpdateProposalTalkAttributesForm,
+    "workshop": UpdateProposalWorkshopAttributesForm,
+    "familyworkshop": UpdateProposalFamilyWorkshopAttributesForm,
+    "performance": UpdateProposalPerformanceAttributesForm,
+    "installation": UpdateProposalInstallationAttributesForm,
+}
+
+UPDATE_SCHEDULE_ITEM_ATTRIBUTES_FORM_TYPES: dict[ScheduleItemType, type[UpdateAttributesForm]] = {
+    "talk": UpdateScheduleItemTalkAttributesForm,
+    "workshop": UpdateScheduleItemWorkshopAttributesForm,
+    "familyworkshop": UpdateScheduleItemFamilyWorkshopAttributesForm,
+    "performance": UpdateScheduleItemPerformanceAttributesForm,
+    "lightning": UpdateScheduleItemLightningTalkAttributesForm,
+    "film": UpdateScheduleItemFilmForm,
+}
 
 
 class ResolveVoteForm(Form):
@@ -397,7 +352,7 @@ class AcceptanceForm(Form):
             ("nobody", "Email nobody"),
             ("accepted_reject", "Email accepted, reject all unaccepted"),
         ],
-        default="accepted",
+        default="accepted_unaccepted",
     )
     confirm = SubmitField("Confirm")
     cancel = SubmitField("Cancel")
@@ -421,20 +376,43 @@ class SendMessageForm(Form):
             raise ValidationError("Message is required")
 
 
-class AddNoteForm(Form):
-    notes = TextAreaField("Notes")
-    send = SubmitField("Update notes")
+class PrivateNotesForm(Form):
+    private_notes = TextAreaField("Private notes")
+    update = SubmitField("Update notes")
+
+    def __init__(self, proposal: Proposal) -> None:
+        super().__init__(data={"private_notes": proposal.private_notes})
 
 
 class ChangeProposalOwner(Form):
-    user_email = EmailField("Which email address to associate this proposal with", [DataRequired()])
+    user_email = EmailField("Email address to associate this proposal with", [DataRequired()])
     user_name = StringField("User name (if creating new user)")
     submit = SubmitField("Change proposal owner")
 
+    def validate_user_name(form, field):
+        form._user = db.session.scalar(select(User).where(User.email == form.user_email.data))
+        if form._user and form.user_name.data:
+            raise ValidationError("User already exists, please check and remove name if correct")
+
+        if not form._user and not form.user_name.data:
+            raise ValidationError("New user requires a name")
+
+
+class ChangeScheduleItemOwner(Form):
+    user_email = EmailField("Email address to associate this schedule item with", [DataRequired()])
+    user_name = StringField("User name (if creating new user)")
+    submit = SubmitField("Change schedule item owner")
+
+    def validate_user_name(form, field):
+        form._user = db.session.scalar(select(User).where(User.email == form.user_email.data))
+        if form._user and form.user_name.data:
+            raise ValidationError("User already exists, please check and remove name if correct")
+
+        if not form._user and not form.user_name.data:
+            raise ValidationError("New user requires a name")
+
 
 class ReversionForm(Form):
-    proposal_id = HiddenIntegerField("Proposal ID")
-    txn_id = HiddenIntegerField("Transaction ID")
     revert = SubmitField("Revert to this version")
 
 
@@ -442,5 +420,58 @@ class InviteSpeakerForm(NewUserForm):
     invite_reason = StringField("Why are they being invited?", [DataRequired()])
     proposal_type = SelectField(
         "Proposal Type",
-        choices=[tuple(i) for i in HUMAN_CFP_TYPES.items() if i[0] != "lightning"],
+        choices=[(t.type, t.human_type) for t in PROPOSAL_INFOS.values()],
     )
+
+
+class CreateOccurrenceForm(Form):
+    create = SubmitField("Create new occurrence")
+
+
+def valid_venue(form, field):
+    if not field.data:
+        return
+    count = Venue.query.filter_by(name=field.data).count()
+    if count != 1:
+        raise ValidationError("Cannot identify venue")
+
+
+class UpdateOccurrenceForm(Form):
+    occurrence_num = IntegerField("Occurrence number")
+
+    manually_scheduled = BooleanField("Manually scheduled")
+    scheduled_duration = IntegerField("Duration in minutes", [Optional()])
+
+    # allowed_venues is an association so we need to assign Venues
+    allowed_venue_ids = SelectMultipleField("Allowed venues", coerce=int)
+    scheduled_venue_id = SelectField("Scheduled venue", coerce=coerce_optional(int))
+    scheduled_time = DateTimeField("Scheduled time", [Optional(strip_whitespace=True)])
+
+    c3voc_url = StringField("C3VOC video URL")
+    youtube_url = StringField("YouTube URL")
+    thumbnail_url = StringField("Video thumbnail URL")
+    video_recording_lost = BooleanField("Video recording lost")
+
+    update = SubmitField("Update")
+
+    def validate_scheduled_duration(form, field):
+        duration_minutes = SLOT_DURATION.total_seconds() / 60
+
+        if field.data % duration_minutes != 0:
+            raise ValidationError(f"Must be a multiple of {duration_minutes} minutes")
+
+
+class LotteryForm(Form):
+    state = SelectField(
+        "Lottery state",
+        choices=[
+            ("closed", "Closed"),
+            ("allow-entry", "Allow entry"),
+            # running-lottery
+            ("completed", "Completed"),
+            ("first-come-first-served", "First come first served"),
+        ],
+    )
+    total_tickets = IntegerField("Total tickets")
+    reserved_tickets = IntegerField("Reserved (non-lottery) tickets")
+    max_tickets_per_entry = IntegerField("Max tickets per user")

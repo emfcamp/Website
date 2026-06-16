@@ -1,20 +1,21 @@
-{% from "schedule/_proposal_lister.html" import list_proposals with context %}
+{% from "schedule/_schedule_item_lister.html" import list_schedule_items with context %}
 
 {% extends "base.html" %}
 {% block title %}Line-up{% endblock %}
 {% block body %}
 
 <h2>Line-up</h2>
-<div>
+<div class="well">
   <p>This is a list of the talks &amp; workshops that we're planning at EMF {{ event_year }}.
      Not all of them are announced yet, so check back frequently.</p>
   {% if current_user.is_authenticated %}
     <p>You can favourite talks which sound interesting, which will let you keep track of them, and help
-        our scheduling algorithm place them in the best slot.
+        our scheduling algorithm place them in the optimal slot.
     </p>
     {% if feature_enabled('SCHEDULE') %}
-    <p>You can also get this list as an <a href="{{ url_for('.schedule_ical', year=event_year) }}">iCal feed</a>
-       for your calendar, and a <a href="{{ url_for('.schedule_json', year=event_year) }}">json feed</a> for your giant robot.
+    <p>You can <a href="{{ webcal_url('.schedule_ical', year=event_year) }}">subscribe to this list in your calendar</a>
+       so it stays up to date, download it as an <a href="{{ url_for('.schedule_ical', year=event_year) }}">iCal file</a>,
+       or get a <a href="{{ url_for('.schedule_json', year=event_year) }}">json feed</a> for your giant robot.
     </p>
     {% endif %}
   {% else %}
@@ -24,21 +25,25 @@
   </div>
   {% endif %}
 
+  {% if feature_enabled("WORKSHOP_LOTTERY") %}
   <p>
     Workshops that require you to sign up for a ticket will be allocated via
-    <a href="{{ url_for('.about_event_tickets') }}" title="About the workshop ticket lottery">a lottery</a>.
+    <a href="{{ url_for('.about_lotteries') }}" title="About ticket lotteries">a lottery</a>.
   </p>
+  {% endif %}
 
   {% if current_user.is_authenticated %}
     <p>
       <strong><a class="btn btn-lg btn-primary" href="{{ url_for('.favourites') }}">View your favourites</a></strong>
-      <strong><a class="btn btn-lg btn-primary" href="{{ url_for('.event_tickets') }}">View your workshop tickets</a></strong>
+      {% if feature_enabled("WORKSHOP_LOTTERY") %}
+      <strong><a class="btn btn-lg btn-primary" href="{{ url_for('.lotteries') }}">View your lottery entries</a></strong>
+      {% endif %}
     </p>
   {% endif %}
 </div>
 
 <div class="line-up">
-{{ list_proposals(proposals) }}
+{{ list_schedule_items(grouped_schedule_items, ordered_type_infos) }}
 </div>
 
 {% endblock %}

@@ -3,34 +3,35 @@
 
 <h2>Lottery info</h2>
 
-<p><strong>Current signup state:</strong> {{ SIGNUP_STATE }}</p>
+<p>Workshops that require tickets are shown below.</p>
 
-<div>To run the lottery shell into the server and run <pre>./flask cfp lottery</pre></div>
-
-<p>These workshops require tickets:</p>
-
-{% for type, all_proposals in ticketed_proposals | groupby('type') %}
-<h3>{{ type | capitalize }}</h3>
+{% for human_type, type_occurrences in ticketed_occurrences | groupby('schedule_item.human_type') %}
+<h3>{{ human_type | capitalize }}</h3>
+<a href="{{ url_for(".lotteries_for_type", schedule_item_type=type_occurrences[0].schedule_item.type) }}" class="btn btn-success">Run lottery</a>
 <table class="table table-condensed table-striped">
     <thead>
         <tr>
+            <th>State</th>
             <th>Title</th>
+            <th>Occurrence</th>
             <th>Max workshop tickets</th>
-            <th>Max lottery tickets</th>
+            <th>Available lottery tickets</th>
             <th>Lottery tickets requested</th>
             <th>Workshop tickets issued</th>
             <th>Lottery/workshop tickets cancelled</th>
         </tr>
     </thead>
     <tbody>
-        {% for proposal in all_proposals %}
+        {% for occurrence in type_occurrences %}
             <tr>
-                <td><a href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}">{{ proposal.title }}</a></td>
-                <td>{{ proposal.total_tickets }}</td>
-                <td>{{ proposal.get_lottery_capacity() }}</td>
-                <td>{{ proposal.sum_tickets_in_state("entered-lottery") }}</td>
-                <td>{{ proposal.sum_tickets_in_state("ticket") }}</td>
-                <td>{{ proposal.sum_tickets_in_state("cancelled") }}</td>
+                <td>{{ occurrence.lottery.state }}</td>
+                <td><a href="{{ url_for('.update_occurrence', schedule_item_id=occurrence.schedule_item_id, occurrence_id=occurrence.id) }}">{{ occurrence.schedule_item.title }}</a></td>
+                <td>{{ occurrence.occurrence_num }}</td>
+                <td>{{ occurrence.lottery.total_tickets }}</td>
+                <td>{{ occurrence.lottery.get_lottery_capacity() }}</td>
+                <td>{{ occurrence.lottery.sum_tickets_in_state("entered") }}</td>
+                <td>{{ occurrence.lottery.sum_tickets_in_state("ticket") }}</td>
+                <td>{{ occurrence.lottery.sum_tickets_in_state("cancelled") }}</td>
             </tr>
         {% endfor %}
     </tbody>

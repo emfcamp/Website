@@ -1,29 +1,32 @@
-from decorator import decorator
-from collections import OrderedDict
 import re
+from collections import OrderedDict
 
+from decorator import decorator
 from flask import (
-    render_template,
-    redirect,
-    request,
-    flash,
-    url_for,
-    session,
-    current_app as app,
-    g,
     Blueprint,
     abort,
+    flash,
+    g,
+    redirect,
+    render_template,
     render_template_string,
+    request,
+    session,
+    url_for,
 )
-from markupsafe import Markup
+from flask import (
+    current_app as app,
+)
 from flask_login import current_user
+from markupsafe import Markup
 from sqlalchemy import func
 
-from main import db
+from main import db, get_or_404
 from models.arrivals import ArrivalsView
 from models.permission import Permission
-from models.purchase import Purchase, CheckinStateException
+from models.purchase import CheckinStateException, Purchase
 from models.user import User, checkin_code_re
+
 from .common import json_response
 
 arrivals = Blueprint("arrivals", __name__)
@@ -53,7 +56,7 @@ def arrivals_required(f, *args, **kwargs):
     else:
         views = (
             ArrivalsView.query.join(ArrivalsView.required_permission)
-            .join(Permission.user)
+            .join(Permission.users)
             .where(User.id == current_user.id)
             .all()
         )
@@ -84,7 +87,7 @@ def change_arrivals_view(view):
 @arrivals.route("/arrivals/qrcode/<code>")
 @arrivals_required
 def checkin_qrcode(code):
-    match = re.match("%s$" % checkin_code_re, code)
+    match = re.match(f"{checkin_code_re}$", code)
     if not match:
         abort(404)
 
@@ -97,7 +100,7 @@ def user_from_code(query):
         return None
 
     # QR code
-    match = re.match(re.escape(app.config.get("CHECKIN_BASE")) + "(%s)$" % checkin_code_re, query)
+    match = re.match(re.escape(app.config.get("CHECKIN_BASE")) + f"({checkin_code_re})$", query)
     if not match:
         return None
 
@@ -151,7 +154,7 @@ def search(query=None):
         query = request.form.get("q")
 
     if query.startswith("fail"):
-        raise ValueError("User-requested failure: %s" % query)
+        raise ValueError(f"User-requested failure: {query}")
 
     if not query:
         abort(404)
@@ -211,7 +214,7 @@ def search(query=None):
 @arrivals.route("/arrivals/<int:user_id>/<source>", methods=["GET", "POST"])
 @arrivals_required
 def checkin(user_id, source=None):
-    user = User.query.get_or_404(user_id)
+    user = get_or_404(db, User, user_id)
 
     if source not in {None, "typed", "transfer", "code"}:
         abort(404)
@@ -244,7 +247,7 @@ def checkin(user_id, source=None):
         if failed:
             failed_str = ", ".join(str(p.id) for p in failed)
             success_count = len(purchases) - len(failed)
-            flash("Checked in %s purchases. Already checked in: %s" % (success_count, failed_str))
+            flash(f"Checked in {success_count} purchases. Already checked in: {failed_str}")
 
             return redirect(url_for(".checkin", user_id=user.id))
 
@@ -280,7 +283,7 @@ def checkin(user_id, source=None):
 @arrivals.route("/arrivals/purchase/<purchase_id>", methods=["POST"])
 @arrivals_required
 def redeem_purchase(purchase_id):
-    purchase = Purchase.query.get_or_404(purchase_id)
+    purchase = get_or_404(db, Purchase, purchase_id)
     if not purchase.is_paid_for:
         abort(404)
 
@@ -299,7 +302,7 @@ def redeem_purchase(purchase_id):
 @arrivals.route("/arrivals/purchase/<purchase_id>/undo", methods=["POST"])
 @arrivals_required
 def unredeem_purchase(purchase_id):
-    purchase = Purchase.query.get_or_404(purchase_id)
+    purchase = get_or_404(db, Purchase, purchase_id)
     if not purchase.is_paid_for:
         abort(404)
 

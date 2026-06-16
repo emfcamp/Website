@@ -13,6 +13,10 @@
 {% if payment.expires %}
 <dt>Expires</dt><dd>{{ payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
 {% endif -%}
+{% if payment.voucher %}
+<dt>Voucher type</dt><dd><a href="{{  url_for('.product_views.product_view', view_id=payment.voucher.view.id) }}">{{payment.voucher.view.name}}</a></dd>
+<dt>Voucher code</dt><dd><a href="{{  url_for('.product_views.product_view_voucher_detail', view_id=payment.voucher.view.id, voucher_code=payment.voucher_code) }}">{{payment.voucher.code}}</a></dd>
+{% endif %}
 </dl>
 {% endmacro %}
 
@@ -31,9 +35,9 @@
 {% for purchase in payment.purchases %}
 <tr>
   <td>{{ purchase.product.parent.name }}</td>
-  <td><a href="{{url_for('admin.product_details', product_id=purchase.product.id)}}">{{ purchase.product.name}}</a></td>
+  <td><a href="{{url_for('admin.products.product_details', product_id=purchase.product.id)}}">{{ purchase.product.name}}</a></td>
   <td>{{ purchase.product.display_name }}</td>
-  <td><a href="{{url_for('admin.price_tier_details', tier_id=purchase.price_tier.id)}}">{{ purchase.price_tier.name }}</a></td>
+  <td><a href="{{url_for('admin.products.price_tier_details', tier_id=purchase.price_tier.id)}}">{{ purchase.price_tier.name }}</a></td>
   <td>{{ purchase.price_tier.get_price(payment.currency) | price }}</td>
   <td>{{ purchase.state }}</td>
   <td>

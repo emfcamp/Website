@@ -1,0 +1,109 @@
+{% from "_formhelpers.html" import render_field, render_dl_field, render_radio_field %}
+{% set active = "edit" %}
+{% extends "cfp_review/proposal/base.html" %}
+{% block proposal_body %}
+
+{% if proposal.schedule_item %}
+    {% include "cfp_review/proposal/_schedule_item_warning.html" %}
+{% endif %}
+<form method="post" action="{{ url_for('.update_proposal', proposal_id=proposal.id) }}" class="shrink">
+    {{ form.hidden_tag() }}
+    <div class="col-md-12">
+        <div class="panel-group" id="formAccordion" role="tablist" aria-multiselectable="true">
+
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="basicsPanelHeading">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" href="#basicsPanel" aria-expanded="true" aria-controls="basicsPanel">
+                            Proposal
+                        </a>
+                    </h4>
+                </div>
+                <div id="basicsPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="basicsPanelHeading">
+                    <div class="panel-body">
+                        <div class="alert alert-warning">
+                            <p>
+                                In normal circumstances you should not need to change the <strong>proposal state</strong> through this form.
+                                The recommended actions for this proposal are available through the buttons at the bottom of this page.
+                                The state should only be overridden through this form in exceptional circumstances.
+                            </p>
+                        </div>
+                        <dl class="dl-horizontal">
+                            {{ render_dl_field(form.state) }}
+                            {{ render_dl_field(form.title) }}
+                            {{ render_dl_field(form.description, rows=8) }}
+                            {{ render_dl_field(form.duration) }}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="requirementsPanelHeading">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" href="#requirementsPanel" aria-expanded="true" aria-controls="requirementsPanel">
+                            Requirements
+                        </a>
+                    </h4>
+                </div>
+                <div id="requirementsPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="requirementsPanelHeading">
+                    <div class="panel-body">
+                        <dl class="dl-horizontal">
+                            {{ render_dl_field(form.needs_help) }}
+                            {{ render_dl_field(form.equipment_required, rows=3) }}
+                            {{ render_dl_field(form.funding_required, rows=3) }}
+                            {{ render_dl_field(form.notice_required) }}
+                            {{ render_dl_field(form.additional_info, rows=3) }}
+
+                            {{ render_dl_field(form.needs_money) }}
+                            {{ render_dl_field(form.one_day) }}
+                            {# rejected_email_sent #}
+
+                            {{ render_dl_field(form.user_will_have_ticket) }}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="attributesPanelHeading">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" href="#attributesPanel" aria-expanded="true" aria-controls="attributesPanel">
+                            Type-specific attributes
+                        </a>
+                    </h4>
+                </div>
+                <div id="attributesPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="attributesPanelHeading">
+                    <div class="panel-body">
+                        <dl class="dl-horizontal">
+                            {% if proposal.type == 'talk' %}
+                                {{ render_dl_field(form.attributes.content_note) }}
+                                {{ render_dl_field(form.attributes.needs_laptop) }}
+                                {{ render_dl_field(form.attributes.family_friendly) }}
+
+                            {% elif proposal.type == 'performance' %}
+                                <div>There are no attributes for the type performance</div>
+
+                            {% elif proposal.type == 'workshop' or proposal.type == 'familyworkshop' %}
+                                {{ render_dl_field(form.attributes.participant_count) }}
+                                {{ render_dl_field(form.attributes.participant_cost) }}
+                                {{ render_dl_field(form.attributes.participant_equipment) }}
+                                {{ render_dl_field(form.attributes.age_range) }}
+                                {% if proposal.type == 'workshop' %}
+                                    {{ render_dl_field(form.attributes.family_friendly) }}
+                                {% endif %}
+
+                            {% elif proposal.type == 'installation' %}
+                                {{ render_dl_field(form.attributes.size) }}
+                                {{ render_dl_field(form.attributes.grant_requested) }}
+
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+        {{ form.update(class_="btn btn-primary debounce") }}
+    </div>
+</form>
+{% endblock %}

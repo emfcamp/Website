@@ -1,29 +1,38 @@
-import time
-import yaml
-import secrets
 import logging
 import logging.config
+import secrets
+import time
+from base64 import b64encode
 from pathlib import Path
+from typing import Any
 
-from flask import Flask, url_for, render_template, request, g
-from flask_mailman import Mail
+import email_validator
+import stripe
+import yaml
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from datetype import DateTime
+from flask import Config, Flask, abort, g, render_template, request, url_for
+from flask_caching import Cache
+from flask_cors import CORS
+from flask_debugtoolbar import DebugToolbarExtension
 from flask_login import LoginManager
-from flask_sqlalchemy import SQLAlchemy
+from flask_mailman import Mail
 from flask_migrate import Migrate
-from sqlalchemy import MetaData
+from flask_sqlalchemy import SQLAlchemy
+from flask_static_digest import FlaskStaticDigest
+from sqlalchemy import TIMESTAMP, MetaData
+from sqlalchemy.exc import NoResultFound
+from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy_continuum import make_versioned
 from sqlalchemy_continuum.manager import VersioningManager
 from sqlalchemy_continuum.plugins import FlaskPlugin
-from flask_static_digest import FlaskStaticDigest
-from flask_caching import Cache
-from flask_debugtoolbar import DebugToolbarExtension
-from flask_cors import CORS
-from loggingmanager import create_logging_manager, set_user_id
 from werkzeug.exceptions import HTTPException
-import stripe
-import pywisetransfer
-import email_validator
 
+from apps.config import config
+from loggingmanager import create_logging_manager, set_user_id
+
+# import pywisetransfer
 
 # If we have logging handlers set up here, don't touch them.
 # This is especially problematic during testing as we don't
@@ -32,10 +41,10 @@ import email_validator
 # a default stderr StreamHandler.
 if len(logging.root.handlers) == 0:
     install_logging = True
-    with open("logging.yaml", "r") as f:
+    with open("logging.yaml") as f:
         conf = yaml.load(f, Loader=yaml.FullLoader)
         if Path("logging.override.yaml").is_file():
-            with open("logging.override.yaml", "r") as fo:
+            with open("logging.override.yaml") as fo:
                 conf_overrides = yaml.load(fo, Loader=yaml.FullLoader)
 
                 def update_logging(d, s):
@@ -53,6 +62,8 @@ if len(logging.root.handlers) == 0:
 else:
     install_logging = False
 
+logger = logging.getLogger(__name__)
+
 naming_convention = {
     "ix": "ix_%(column_0_label)s",
     "uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -60,7 +71,36 @@ naming_convention = {
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
     "pk": "pk_%(table_name)s",
 }
-db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
+
+
+class BaseModel(DeclarativeBase):
+    metadata = MetaData(naming_convention=naming_convention)
+
+
+def get_or_404[M: BaseModel](db: SQLAlchemy, model: type[M], id: int) -> M:
+    try:
+        return db.session.get_one(model, id)
+    except NoResultFound:
+        abort(404)
+
+
+# Workaround for a weird issue where, with `DateTime[None]` in the type_annotation_map
+# directly, `Mapped[DateTime[None] \ None]` in models worked fine but
+# `Mapped[DateTime[None]]` resulted in "Could not locate SQLAlchemy Core type for Python
+# type datetype.DateTime[None]".
+NaiveDT = DateTime[None]
+
+
+type JSONValue = dict[str, "JSONValue"] | list["JSONValue"] | str | int | float | bool | None
+
+# We can't use `type_annotation_map` directly in the BaseModel due to flask-sqlalchemy
+# https://github.com/pallets-eco/flask-sqlalchemy/issues/1361
+db = SQLAlchemy(model_class=BaseModel)
+db.Model.registry.update_type_annotation_map(  # type: ignore[attr-defined]
+    {
+        NaiveDT: TIMESTAMP(timezone=False),
+    }
+)
 
 
 def include_object(object, name, type_, reflected, compare_to):
@@ -81,10 +121,10 @@ toolbar = DebugToolbarExtension()
 wise = None
 
 
-def get_stripe_client(config) -> stripe.StripeClient:
+def get_stripe_client(config: Config) -> stripe.StripeClient:
     return stripe.StripeClient(
         api_key=config["STRIPE_SECRET_KEY"],
-        stripe_version="2023-10-16",
+        stripe_version="2026-02-25.clover",
     )
 
 
@@ -92,12 +132,28 @@ def check_cache_configuration():
     """Check the cache configuration is appropriate for production"""
     if cache.cache.__class__.__name__ == "SimpleCache":
         # SimpleCache is per-process, not appropriate for prod
-        logging.warning("Per-process cache being used outside dev server - refreshing will not work")
+        logger.warning("Per-process cache being used outside dev server - refreshing will not work")
 
     TEST_CACHE_KEY = "emf_test_cache_key"
     cache.set(TEST_CACHE_KEY, "exists")
     if cache.get(TEST_CACHE_KEY) != "exists":
-        logging.warning("Flask-Caching backend does not appear to be working. Performance may be affected.")
+        logger.warning("Flask-Caching backend does not appear to be working. Performance may be affected.")
+
+
+def derive_secret_key(app: Flask) -> None:
+    """The database is cleared between events, but the secret key may not be reset, which raises the
+    risk of reuse of generated tokens (including ticket barcodes) from previous years.
+
+    Make extra sure this doesn't happen by mixing the event year into the secret key.
+    """
+    if "SECRET_KEY" not in app.config:
+        raise RuntimeError("SECRET_KEY must be set in the app config")
+
+    # We can't use the event_year() helper here due to circular dependencies.
+    year = app.config["EVENT_START"].split("-")[0].encode("utf-8")
+
+    kdf = HKDF(algorithm=hashes.SHA256(), length=32, salt=None, info=year)
+    app.config["SECRET_KEY"] = kdf.derive(bytes(app.config["SECRET_KEY"], "utf-8"))
 
 
 def create_app(dev_server=False, config_override=None):
@@ -105,12 +161,19 @@ def create_app(dev_server=False, config_override=None):
     app.config.from_envvar("SETTINGS_FILE")
     if config_override:
         app.config.from_mapping(config_override)
+
+    derive_secret_key(app)
+    config.init(app.config)
+
+    from apps.common.jinjaext import IncludemdExtension
+
     app.jinja_env.add_extension("jinja2.ext.do")
+    app.jinja_env.add_extension(IncludemdExtension)
 
     if install_logging:
         create_logging_manager(app)
         # Flask has now kindly installed its own log handler which we will summarily remove.
-        app.logger.propagate = 1
+        app.logger.propagate = True
         app.logger.handlers = []
         if not app.debug:
             logging.root.setLevel(logging.INFO)
@@ -127,11 +190,9 @@ def create_app(dev_server=False, config_override=None):
     @app.after_request
     def after_request(response):
         try:
-            request_duration.labels(request.endpoint, request.method).observe(
-                time.time() - request._start_time
-            )
+            request_duration.observe(time.time() - request._start_time)
         except AttributeError:
-            logging.exception("Request without _start_time - check app.before_request ordering")
+            logger.exception("Request without _start_time - check app.before_request ordering")
         request_total.labels(request.endpoint, request.method, response.status_code).inc()
         return response
 
@@ -146,8 +207,8 @@ def create_app(dev_server=False, config_override=None):
     CORS(
         app,
         resources={
-            r"/api/*": {"origins": cors_origins},
-            r"/static/*": {"origins": cors_origins},
+            r"/api/.*": {"origins": cors_origins},
+            r"/static/.*": {"origins": ["*"]},
         },
         supports_credentials=True,
     )
@@ -157,24 +218,24 @@ def create_app(dev_server=False, config_override=None):
     login_manager.init_app(app, add_context_processor=True)
     app.login_manager.login_view = "users.login"
 
+    from models import feature_flag, site_state
     from models.user import User, load_anonymous_user
-    from models import site_state, feature_flag
 
     @login_manager.user_loader
-    def load_user(userid):
-        user = User.query.filter_by(id=userid).first()
+    def load_user(userid: str) -> User | None:
+        user = db.session.get(User, userid)
         if user:
             set_user_id(user.email)
         return user
 
     login_manager.anonymous_user = load_anonymous_user
 
-    global wise
-    wise = pywisetransfer.Client(
-        api_key=app.config["TRANSFERWISE_API_TOKEN"],
-        environment=app.config["TRANSFERWISE_ENVIRONMENT"],
-        private_key_file=app.config.get("TRANSFERWISE_PRIVATE_KEY_FILE"),
-    )
+    # global wise
+    # wise = pywisetransfer.Client(
+    #     api_key=app.config["TRANSFERWISE_API_TOKEN"],
+    #     environment=app.config["TRANSFERWISE_ENVIRONMENT"],
+    #     private_key_file=app.config.get("TRANSFERWISE_PRIVATE_KEY_FILE"),
+    # )
 
     @app.before_request
     def load_per_request_state():
@@ -188,21 +249,24 @@ def create_app(dev_server=False, config_override=None):
             response.headers["X-Robots-Tag"] = "noindex, nofollow"
             return response
 
+    @app.before_request
+    def generate_csp_nonce():
+        g.csp_nonce = b64encode(secrets.token_bytes(16)).decode("utf-8")
+
     @app.context_processor
-    def add_csp_nonce():
-        g.csp_nonce = secrets.token_urlsafe(16)
-        return {"csp_nonce": g.csp_nonce}
+    def csp_nonce():
+        if hasattr(g, "csp_nonce"):
+            return {"csp_nonce": g.csp_nonce}
+        return {}
 
     @app.after_request
     def send_security_headers(response):
         use_hsts = app.config.get("HSTS", False)
         if use_hsts:
             max_age = app.config.get("HSTS_MAX_AGE", 3600 * 24 * 30 * 6)
-            response.headers["Strict-Transport-Security"] = "max-age=%s" % max_age
+            response.headers["Strict-Transport-Security"] = f"max-age={max_age}"
 
-        response.headers["X-Frame-Options"] = "deny"
         response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
 
@@ -220,6 +284,10 @@ def create_app(dev_server=False, config_override=None):
                 "https://www.youtube.com",
                 "https://archive.org",
             ],
+            "object-src": ["'none'"],
+            "frame-ancestors": ["'none'"],
+            "form-action": ["'self'"],
+            "base-uri": ["'none'"],
         }
 
         # Fixups for flask-admin which includes lots of nasty inline JS
@@ -240,19 +308,8 @@ def create_app(dev_server=False, config_override=None):
 
         value = "; ".join(k + " " + " ".join(v) for k, v in csp.items())
 
-        if app.config.get("DEBUG"):
-            response.headers["Content-Security-Policy"] = value
-        else:
-            response.headers["Content-Security-Policy-Report-Only"] = (
-                value + "; report-uri https://emfcamp.report-uri.com/r/d/csp/reportOnly"
-            )
-            response.headers["Report-To"] = (
-                '{"group":"default","max_age":31536000,"endpoints":[{"url":"https://emfcamp.report-uri.com/a/d/g"}],"include_subdomains":false}'
-            )
+        response.headers["Content-Security-Policy"] = value
 
-            # Disable Network Error Logging.
-            # This doesn't seem to be very useful and it's using up our report-uri quota.
-            response.headers["NEL"] = '{"max_age":0}'
         return response
 
     if not app.debug:
@@ -290,9 +347,24 @@ def create_app(dev_server=False, config_override=None):
         # And just for convenience
         ctx["db"] = db
 
+        import sqlalchemy
+
+        for attr in ["select", "and_", "or_", "func", "text"]:
+            ctx[attr] = getattr(sqlalchemy, attr)
+
+        from sqlalchemy import orm
+
+        for attr in ["selectinload", "joinedload", "undefer", "aliased"]:
+            ctx[attr] = getattr(orm, attr)
+
+        from sqlalchemy_continuum import utils
+
+        for attr in ["transaction_class", "version_class"]:
+            ctx[attr] = getattr(utils, attr)
+
         return ctx
 
-    if app.config["DEBUG"] or app.testing:
+    if app.config["DEBUG"] or app.config.get("REVIEW_ENVIRONMENT") or app.testing:
         if not email_validator.TEST_ENVIRONMENT:
             email_validator.TEST_ENVIRONMENT = True
             email_validator.SPECIAL_USE_DOMAIN_NAMES.remove("invalid")
@@ -301,33 +373,38 @@ def create_app(dev_server=False, config_override=None):
 
     load_utility_functions(app)
 
+    from apps.admin import admin
+    from apps.api import api_bp
+    from apps.arrivals import arrivals
     from apps.base import base
-    from apps.metrics import metrics
-    from apps.users import users
-    from apps.tickets import tickets
-    from apps.payments import payments
+    from apps.base.dev.dev import dev
     from apps.cfp import cfp
     from apps.cfp_review import cfp_review
+    from apps.metrics import metrics
+    from apps.payments import payments
     from apps.schedule import schedule
-    from apps.arrivals import arrivals
-    from apps.api import api_bp
+    from apps.tickets import tickets
+    from apps.users import users
     from apps.villages import villages
-    from apps.admin import admin
     from apps.volunteer import volunteer
     from apps.volunteer.admin import volunteer_admin
     from apps.volunteer.admin.notify import notify
+    from apps.wiki import wiki
 
     app.register_blueprint(base)
     app.register_blueprint(users)
     app.register_blueprint(metrics)
     app.register_blueprint(tickets)
     app.register_blueprint(payments)
+    if app.config["DEBUG"]:
+        app.register_blueprint(dev, url_prefix="/dev")
     app.register_blueprint(cfp)
-    app.register_blueprint(cfp_review, url_prefix="/cfp-review")
+    app.register_blueprint(cfp_review, url_prefix="/admin/cfp-review")
     app.register_blueprint(schedule)
     app.register_blueprint(arrivals, url_prefix="/arrivals")
     app.register_blueprint(api_bp, url_prefix="/api")
     app.register_blueprint(villages, url_prefix="/villages")
+    app.register_blueprint(wiki, url_prefix="/wiki")
     app.register_blueprint(admin, url_prefix="/admin")
     app.register_blueprint(volunteer, url_prefix="/volunteer")
     app.register_blueprint(notify, url_prefix="/volunteer/admin/notify")
@@ -337,8 +414,16 @@ def create_app(dev_server=False, config_override=None):
     return app
 
 
-def external_url(endpoint, **values):
+def external_url(endpoint: str, **values: Any) -> str:
     """Generate an absolute external URL. If you need to override this,
     you're probably doing something wrong.
     """
     return url_for(endpoint, _external=True, **values)
+
+
+def webcal_url(endpoint: str, **values: Any) -> str:
+    """Generate an absolute URL with the webcal:// scheme, so calendar
+    clients subscribe to the feed rather than downloading it once.
+    """
+    _, _, rest = external_url(endpoint, **values).partition("://")
+    return f"webcal://{rest}"

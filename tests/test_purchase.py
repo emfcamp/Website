@@ -1,30 +1,28 @@
-import pytest
-import os.path
 import json
+import os.path
+
+import pytest
 import stripe
 from flask_login import login_user
 
-from models.basket import Basket
-from models.product import PriceTier
-from models.payment import StripePayment, RefundRequest
-
-from apps.payments.stripe import (
-    stripe_start,
-    stripe_capture,
-    stripe_capture_post,
-    stripe_payment_intent_updated,
-    stripe_charge_refunded,
-)
 from apps.payments.refund import handle_refund_request
-
+from apps.payments.stripe import (
+    stripe_capture,
+    stripe_charge_refunded,
+    stripe_payment_intent_updated,
+    stripe_start,
+)
 from main import db
+from models.basket import Basket
+from models.payment import RefundRequest, StripePayment
+from models.product import PriceTier
 
 
 def load_webhook_fixture(name):
     fixture_path = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "webhook_fixtures", f"{name}.json"
     )
-    with open(fixture_path, "r") as f:
+    with open(fixture_path) as f:
         return stripe.Event.construct_from(json.load(f), None)
 
 
@@ -72,13 +70,6 @@ def test_create_stripe_purchase(user, app, monkeypatch):
         # doesn't cause any action on our end so we don't simulate this.
         assert payment.intent_id == intent_id
         assert payment.state == "new"
-
-        # User is now on the Stripe form, which captures the card details.
-        # Once this is complete, payment details are sent to Stripe and the form
-        # submission triggers stripe_capture_post
-        stripe_capture_post(payment.id)
-
-    assert payment.state == "charging"
 
     with app.test_request_context("/stripe-webhook"):
         # Stripe will now send a webhook to notify us of the payment success.

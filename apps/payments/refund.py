@@ -1,12 +1,14 @@
 from decimal import Decimal
-from stripe import StripeError
-from flask import current_app as app, render_template
-from flask_mailman import EmailMessage
-from typing import Optional
 
-from models.payment import RefundRequest, StripePayment, StripeRefund, BankRefund
-from main import get_stripe_client, db
-from ..common.email import from_email
+from flask import current_app as app
+from flask import render_template
+from flask_mailman import EmailMessage
+from stripe import StripeError
+
+from main import db, get_stripe_client
+from models.payment import BankRefund, RefundRequest, StripePayment, StripeRefund
+
+from ..config import config
 
 
 class RefundException(Exception):
@@ -18,13 +20,18 @@ class ManualRefundRequired(RefundException):
 
 
 def create_stripe_refund(
-    payment: StripePayment, amount: Decimal, metadata: dict = {}
-) -> Optional[StripeRefund]:
+    payment: StripePayment, amount: Decimal, metadata: dict[str, str] | None = None
+) -> StripeRefund | None:
     """Initiate a stripe refund, and return the StripeRefund object."""
+    if metadata is None:
+        metadata = dict()
     # TODO: This should probably live in the stripe module.
     stripe_client = get_stripe_client(app.config)
     assert amount > 0
-    charge = stripe_client.charges.retrieve(payment.charge_id)
+    if not payment.charge_id:
+        raise ValueError(f"Payment id {payment.id} has no charge_id!")
+
+    charge = stripe_client.v1.charges.retrieve(payment.charge_id)
     if charge.refunded:
         return None
 
@@ -52,7 +59,7 @@ def send_refund_email(request: RefundRequest, amount: Decimal) -> None:
     payment = request.payment
     msg = EmailMessage(
         "Your refund request has been processed",
-        from_email=from_email("TICKETS_EMAIL"),
+        from_email=config.from_email("TICKETS_EMAIL"),
         to=[payment.user.email],
     )
     # TODO: handle situation where currency of refund is different from currency of payment.
@@ -82,6 +89,8 @@ def handle_refund_request(request: RefundRequest) -> None:
 
     if request.method != "stripe":
         raise ManualRefundRequired("Manual refund required for non-Stripe refund")
+    # This is ensured by request.method != "stripe" above, but mypy can't work that out
+    assert isinstance(payment, StripePayment)
 
     if request.note is not None and request.note != "":
         raise ManualRefundRequired("Refund request has note")
@@ -103,7 +112,7 @@ def handle_refund_request(request: RefundRequest) -> None:
 
     refund = None
     if refund_amount > 0:
-        refund = create_stripe_refund(payment, refund_amount, metadata={"refund_request": request.id})
+        refund = create_stripe_refund(payment, refund_amount, metadata={"refund_request": str(request.id)})
 
     with db.session.no_autoflush:
         for purchase in payment.purchases:
@@ -112,6 +121,8 @@ def handle_refund_request(request: RefundRequest) -> None:
     # TODO: set partrefunded state if we have not refunded the whole payment
     payment.state = "refunded"
 
+    if refund:
+        db.session.add(refund)
     db.session.commit()
     send_refund_email(request, refund_amount)
 
@@ -135,6 +146,7 @@ def manual_bank_refund(request: RefundRequest) -> None:
             purchase.refund_purchase(refund)
 
     payment.state = "refunded"
+    db.session.add(refund)
 
     db.session.commit()
     send_refund_email(request, refund_amount)

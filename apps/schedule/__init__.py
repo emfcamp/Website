@@ -1,7 +1,5 @@
-"""
-Schedule App
+"""This app displays what talks are happening from the CfP system. A deceptively complex task.
 
-This app displays what talks are happening from the CfP system. A deceptively complex task.
 The schedule for an event can be in one of four modes:
 
     * There's no schedule yet, why not look at previous years'?
@@ -10,7 +8,8 @@ The schedule for an event can be in one of four modes:
     * There's actually a schedule and you should probably work out which talks you're going to.
     * The event has finished, and we're displaying an archived schedule.
 
-## Configuration Flags
+Configuration Flags
+^^^^^^^^^^^^^^^^^^^
 
 The schedule app uses two configuration flags to determine how to render the schedule
 for the current event (these don't affect historic events).
@@ -23,9 +22,9 @@ events.
 """
 
 import pytz
-from flask import Blueprint, redirect, url_for, abort
+from flask import Blueprint, abort, redirect, url_for
 
-from models import event_year
+from ..config import config
 
 schedule = Blueprint("schedule", __name__)
 event_tz = pytz.timezone("Europe/London")
@@ -44,26 +43,26 @@ def line_up_year_redirect(year):
     return redirect(url_for(".main_year", year=year), 301)
 
 
-@schedule.route("/talks/<int:year>/<int:proposal_id>")
-@schedule.route("/talks/<int:year>/<int:proposal_id>-<string:slug>")
-@schedule.route("/line-up/<int:year>/<int:proposal_id>")
-@schedule.route("/line-up/<int:year>/<int:proposal_id>-<string:slug>")
-def lineup_talk_redirect(year, proposal_id, slug=None):
-    return redirect(url_for(".item", year=year, proposal_id=proposal_id, slug=slug), 301)
+@schedule.route("/talks/<int:year>/<int:schedule_item_id>")
+@schedule.route("/talks/<int:year>/<int:schedule_item_id>-<string:slug>")
+@schedule.route("/line-up/<int:year>/<int:schedule_item_id>")
+@schedule.route("/line-up/<int:year>/<int:schedule_item_id>-<string:slug>")
+def lineup_talk_redirect(year, schedule_item_id, slug=None):
+    return redirect(url_for(".item", year=year, schedule_item_id=schedule_item_id, slug=slug), 301)
 
 
 @schedule.route("/schedule.<string:fmt>")
 def feed_redirect(fmt):
     routes = {
         "json": "schedule.schedule_json",
-        "frab": "schedule.schedule_frab",
+        "frab": "schedule.schedule_frab_xml",
         "ical": "schedule.schedule_ical",
         "ics": "schedule.schedule_ical",
     }
 
     if fmt not in routes:
         abort(404)
-    return redirect(url_for(routes[fmt], year=event_year()))
+    return redirect(url_for(routes[fmt], year=config.event_year))
 
 
 from . import base  # noqa

@@ -1,0 +1,18 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ user.name }}{% endblock %}
+{% block body %}
+    <h2>User: {{user.name}}</h2>
+    <ul class="nav nav-tabs">
+        <li role="presentation" {% if active == 'main' %} class="active" {% endif %}>
+            <a href="{{ url_for('.user', user_id=user.id) }}">
+                Main
+            </a>
+        </li>
+        <li role="presentation" {% if active == 'emails' %} class="active" {% endif %}>
+            <a href="{{ url_for('.user_emails_sent', user_id=user.id) }}">
+                Emails
+            </a>
+        </li>
+    </ul>
+    {% block user_body %}{% endblock %}
+{% endblock %}

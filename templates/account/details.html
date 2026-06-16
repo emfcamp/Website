@@ -2,23 +2,17 @@
 {% from "_diversityform.html" import render_diversity_fields %}
 
 {% extends "base.html" %}
-{% block title %}My Account{% endblock %}
+{% block title %}Your Details{% endblock %}
 {% block body %}
 {% include "account/_nav.html" %}
 <h3>Your Details</h3>
 
 <div class="panel panel-default">
-  <div class="panel-heading">
-    {% if feature_enabled('CFP') %}
-      <div>If you've made a submission to the CfP then your name (as it's set here) will be used
-           in the schedule.</div>
-    {% endif %}
-  </div>
   <div class="panel-body">
   <form method="post" class="form-horizontal">
     {{ form.hidden_tag() }}
     <fieldset>
-      <h4>Account details</h4>
+      <h4>Your details</h4>
       <div class="col-sm-12">
         <div class="form-group">
           <label class="col-sm-2 control-label">Email</label>

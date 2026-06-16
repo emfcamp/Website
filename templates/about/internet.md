@@ -1,40 +1,42 @@
 title: Internet
+
 ---
+
 # Internet
 
 As usual, the EMF Network Operations Centre will be aiming to provide fast wired and wireless networking across the field.
 
 ## Wireless
+
 <table class="table">
   <thead>
     <tr><th>Network (SSID)</th><th>Security</th><th></th>
   </thead>
   <tbody>
-    <tr><td><code>emf2024</code></td><td>🔐 WPA3 Enterprise 802.1X</td><td>✅ Recommended</td></tr>
-    <tr><td><code>emf2024-open</code></td><td>Open (OWE supported)</td><td></td></tr>
+    <tr><td><code>emf</code></td><td>🔐 WPA3 Enterprise 802.1X</td><td>✅ Recommended</td></tr>
+    <tr><td><code>emf-open</code></td><td>Open (OWE supported)</td><td></td></tr>
   </tbody>
 </table>
 
-We recommend you connect to the `emf2024` network for the highest security - this uses WPA Enterprise encryption which will ask for a username and password - you can use the below usernames and passwords (in the table) only to connect to this network.
+We recommend you connect to the `emf` network for the highest security - this uses WPA Enterprise encryption which will ask for a username and password - you can use the below usernames and passwords (in the table) only to connect to this network.
 
-The `emf2024-open` network supports [Opportunistic Wireless Encryption](https://en.wikipedia.org/wiki/Opportunistic_Wireless_Encryption) (OWE) which will automatically provide security comparable to a normal WiFi network with a shared password, *if your device supports OWE*. Otherwise, it will be completely unencrypted.
+The `emf-open` network supports [Opportunistic Wireless Encryption](https://en.wikipedia.org/wiki/Opportunistic_Wireless_Encryption) (OWE) which will automatically provide security comparable to a normal WiFi network with a shared password, _if your device supports OWE_. Otherwise, it will be completely unencrypted.
 
 By default, wireless devices are firewalled from the Internet, but inbound connections from other users on the event network are still allowed.
 
 In case you need additional information for that connection:
 
-* Certificate: ‘Use system certificates’ or explicitly select (after installation) [ISRG Root X1](https://letsencrypt.org/certs/isrgrootx1.pem) certificate.
-* Domain: radius.emf.camp
+- Certificate: ‘Use system certificates’ or explicitly select (after installation) [ISRG Root X2](https://letsencrypt.org/certificates/#root-cas:~:text=revoked%2C%20expired-,ISRG%20Root%20X2,-Subject%3A%20O) certificate.
+- Domain: radius.emf.camp
 
 It's fine to select ‘Do not validate’ for the **Online Certificate status** and leave the **Anonymous identity** blank.
 
-* EAP-TTLS: Phase 1: EAP-TTLS, Phase 2: PAP
-* PEAP: Phase 1: PEAP, Phase 2: MSCHAPv2 or EAP-MSCHAPv2 or PAP
-
+- EAP-TTLS: Phase 1: EAP-TTLS, Phase 2: PAP
+- PEAP: Phase 1: PEAP, Phase 2: MSCHAPv2 or EAP-MSCHAPv2 or PAP
 
 ### Special credentials
 
-There are some special usernames and passwords which can modify the firewall behaviour of the `emf2024` network:
+There are some special usernames and passwords which can modify the firewall behaviour of the `emf` network:
 
 <div class="table-responsive">
 <table class="table">
@@ -61,19 +63,20 @@ Please don’t set up your own access point if at all possible. Wireless airtime
 
 If you have no other choice (for running experiments and such), please be nice and follow these rules:
 
-* Do not operate non-WiFi equipment in these frequencies.
-* 2.4GHz: use channels 1, 5, 9 or 13 @ 20 MHz. Disable 802.11b.
-* 5GHz: use channels 36 or 140 @ 20 MHz.
-* Use a minimum data and beacon rate of 12 Mbit/s. Beacon interval 100 ms or higher.
-* Only broadcast one SSID. SSID spamming is is very antisocial.
-* Do not prefix your broadcasted SSID with “emf”. Do not use other well-known SSIDs.
-* Do not use high-gain antennas.
-* Limit your transmit power as much as possible, for example to 6 dBm or 4 mW.
+- Do not operate non-WiFi equipment in these frequencies.
+- 2.4GHz: use channels 1, 5, 9 or 13 @ 20 MHz. Disable 802.11b.
+- 5GHz: use channels 36 or 140 @ 20 MHz.
+- Use a minimum data and beacon rate of 12 Mbit/s. Beacon interval 100 ms or higher.
+- Only broadcast one SSID. SSID spamming is very antisocial.
+- Do not prefix your broadcasted SSID with “emf”. Do not use other well-known SSIDs.
+- Do not use high-gain antennas.
+- Limit your transmit power as much as possible, for example to 6 dBm or 4 mW.
 
 ## Wired ethernet
+
 All camping areas are within 60m of a datenklo (or data toilet), where you can connect to the network. If you intend to do so please bring 60-70m of CAT5 cable as we are unable to provide any.
 
-**Wired connections are completely unfiltered and will receive a public IP address**. If you have (older) devices that cannot be trusted with unrestricted incoming connections, bring a firewall. 
+**Wired connections are completely unfiltered and will receive a public IP address**. If you have (older) devices that cannot be trusted with unrestricted incoming connections, bring a firewall.
 
 Lay your own cable neatly from your tent back to the nearest Datenklo, and leave 6m of slack coiled on the floor in front of it. And please lay it so that it can be clearly seen that it needs to be plugged in - or you risk having your cable overlooked. At regular intervals a member of the NOC team will connect it up and enable the port.
 

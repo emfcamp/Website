@@ -1,33 +1,22 @@
 from flask import (
-    render_template,
-    redirect,
-    url_for,
     flash,
+    redirect,
+    render_template,
     request,
-    abort,
-    current_app as app,
+    url_for,
 )
 from flask_login import current_user
-from decorator import decorator
-
-from wtforms import SubmitField, BooleanField, FormField, FieldList
+from wtforms import BooleanField, FieldList, FormField, SubmitField
 from wtforms.validators import InputRequired
 
-from datetime import datetime, timedelta
-
-from main import db
+from main import db, get_or_404
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer as VolunteerUser
-from models.volunteer.shift import (
-    Shift,
-    ShiftEntry,
-    ShiftEntryStateException,
-)
 
-from . import volunteer, v_user_required
 from ..common import feature_enabled, feature_flag
-from ..common.forms import Form
 from ..common.fields import HiddenIntegerField
+from ..common.forms import Form
+from . import v_user_required, volunteer
 
 
 class RoleSelectForm(Form):
@@ -89,12 +78,11 @@ def choose_role():
         if feature_enabled("VOLUNTEERS_SCHEDULE"):
             flash("Your role list has been updated", "info")
             return redirect(url_for(".schedule"))
-        else:
-            flash(
-                "Thanks for volunteering! You'll be able to sign up for specific shifts soon.",
-                "info",
-            )
-            return redirect(url_for(".choose_role"))
+        flash(
+            "Thanks for volunteering! You'll be able to sign up for specific shifts soon.",
+            "info",
+        )
+        return redirect(url_for(".choose_role"))
 
     current_roles = current_volunteer.interested_roles.all()
     if current_roles:
@@ -111,31 +99,11 @@ def choose_role():
     return render_template("volunteer/choose_role.html", form=form)
 
 
-@volunteer.route("/role_admin", methods=["GET"])
-@v_user_required
-def role_admin_index():
-    roles = []
-    if (
-        current_user.has_permission("admin")
-        or current_user.has_permission("volunteer:manager")
-        or current_user.has_permission("volunteer:admin")
-    ):
-        roles = Role.query.order_by("name").all()
-    else:
-        roles = [admin.role for admin in current_user.volunteer_admin_roles]
-
-    if len(roles) == 0:
-        flash("You're not an admin for any roles.")
-        redirect(url_for(".choose_role"))
-
-    return render_template("volunteer/role_admin_index.html", roles=roles)
-
-
 @volunteer.route("/role/<int:role_id>", methods=["GET", "POST"])
 @feature_flag("VOLUNTEERS_SIGNUP")
 @v_user_required
 def role(role_id):
-    role = Role.query.get_or_404(role_id)
+    role = get_or_404(db, Role, role_id)
     current_volunteer = VolunteerUser.get_for_user(current_user)
     current_role_ids = [r.id for r in current_volunteer.interested_roles]
 
@@ -158,112 +126,4 @@ def role(role_id):
         description=role.full_description,
         role=role,
         current_volunteer=current_volunteer,
-    )
-
-
-@decorator
-def role_admin_required(f, *args, **kwargs):
-    """Check that current user has permissions to be RoleAdmin for role.id that is first entry in args"""
-    if current_user.is_authenticated:
-        if int(args[0]) in [ra.role_id for ra in current_user.volunteer_admin_roles] or (
-            current_user.has_permission("volunteer:admin") or current_user.has_permission("volunteer:manager")
-        ):
-            return f(*args, **kwargs)
-        abort(404)
-    return app.login_manager.unauthorized()
-
-
-@volunteer.route("role/<int:role_id>/admin")
-@role_admin_required
-def role_admin(role_id):
-    # Allow mocking the time for testing.
-    if "now" in request.args:
-        now = datetime.strptime(request.args["now"], "%Y-%m-%dT%H:%M")
-    else:
-        now = datetime.now()
-
-    limit = int(request.args.get("limit", "5"))
-    offset = int(request.args.get("offset", "0"))
-    role = Role.query.get_or_404(role_id)
-    cutoff = now - timedelta(minutes=30)
-    shifts = (
-        Shift.query.filter_by(role=role)
-        .filter(Shift.end >= cutoff)
-        .order_by(Shift.end)
-        .offset(offset)
-        .limit(limit)
-        .all()
-    )
-
-    active_shift_entries = (
-        ShiftEntry.query.filter(ShiftEntry.state == "arrived")
-        .join(ShiftEntry.shift)
-        .filter(Shift.role_id == role.id)
-        .all()
-    )
-    pending_shift_entries = (
-        ShiftEntry.query.join(ShiftEntry.shift)
-        .filter(
-            Shift.start <= now - timedelta(minutes=15), Shift.role == role, ShiftEntry.state == "signed_up"
-        )
-        .all()
-    )
-
-    return render_template(
-        "volunteer/role_admin.html",
-        role=role,
-        shifts=shifts,
-        active_shift_entries=active_shift_entries,
-        pending_shift_entries=pending_shift_entries,
-        now=now,
-        offset=offset,
-        limit=limit,
-    )
-
-
-@volunteer.route("role/<int:role_id>/set_state/<int:shift_id>/<int:user_id>", methods=["POST"])
-@role_admin_required
-def set_state(role_id: int, shift_id: int, user_id: int):
-    state = request.form["state"]
-
-    try:
-        se = ShiftEntry.query.filter(
-            ShiftEntry.shift_id == shift_id, ShiftEntry.user_id == user_id
-        ).first_or_404()
-        if se.state != state:
-            se.set_state(state)
-        db.session.commit()
-    except ShiftEntryStateException:
-        flash(f"{state} is not a valid state for this shift.")
-
-    return redirect(url_for(".role_admin", role_id=role_id))
-
-
-@volunteer.route("role/<int:role_id>/<int:shift_id>", methods=["POST"])
-@role_admin_required
-def update_shift(role_id: int, shift_id: int):
-    shift = Shift.query.get_or_404(shift_id)
-    shift.min_needed = int(request.form["min_needed"])
-    shift.max_needed = int(request.form["max_needed"])
-    db.session.add(shift)
-    db.session.commit()
-
-    flash("Shift requirements updated.")
-    return redirect(url_for(".role_admin", role_id=role_id, _anchor=f"shift-{shift.id}"))
-
-
-@volunteer.route("role/<int:role_id>/volunteers")
-@role_admin_required
-def role_volunteers(role_id):
-    role = Role.query.get_or_404(role_id)
-    interested = VolunteerUser.query.join(VolunteerUser.interested_roles).filter(Role.id == role_id).all()
-    entries = ShiftEntry.query.join(ShiftEntry.shift).filter(Shift.role_id == role_id).all()
-    signed_up = list(set([se.user.volunteer for se in entries]))
-    completed = list(set([se.user.volunteer for se in entries if se.state == "completed"]))
-    return render_template(
-        "volunteer/role_volunteers.html",
-        role=role,
-        interested=interested,
-        signed_up=signed_up,
-        completed=completed,
     )

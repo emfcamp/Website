@@ -6,6 +6,10 @@ body {
   padding-bottom: 40px;
 }
 
+h2 {
+  margin-top: 0;
+}
+
 header h1 {
   text-align: left;
   font-size: 12pt;
@@ -20,10 +24,24 @@ header h1 .logo {
 header h1 > * {
   font-size: 12pt;
 }
-.message-table .col-sm-2{
-    vertical-align: middle;
+
+.container-wide {
+  max-width: 1500px;
+  margin-left: auto;
+  margin-right: auto;
+  @media (max-width: 1400px) {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
 }
-.multiline { white-space: pre-wrap }
+
+.large {
+  font-size: 1.1em;
+}
+
+.multiline {
+  white-space: pre-wrap;
+}
 
 .product .expired,
 .product .limit-reached {
@@ -31,19 +49,162 @@ header h1 > * {
   color: #a00;
 }
 
-
 #product_overview .expired,
-    #product_overview .expired a,
-    #product_overview .inactive,
-    #product_overview .inactive a {
-    color: #a99;
+#product_overview .expired a,
+#product_overview .inactive,
+#product_overview .inactive a {
+  color: #a99;
 }
 
 table.hire-purchases tr.payment-pending td {
-    color: #999;
+  color: #999;
 }
 
 .non-prod-banner {
   margin-top: -20px; /* To match navbar's margin-bottom */
 }
 
+tr.even {
+  background-color: #efefef;
+}
+
+tr.odd {
+  background-color: #fafafa;
+}
+
+.actions-bar {
+  position: fixed;
+  background: #eee;
+  border-top: 1px solid #999;
+  bottom: 0;
+  left: 0;
+  padding: 1em;
+  width: 100%;
+}
+
+:has(.actions-bar) {
+  padding-bottom: 3em;
+}
+
+.btn-tiny {
+  height: 1.5em;
+  width: 1.5em;
+  font-size: 10px;
+  padding: 0;
+}
+
+.proposal-state {
+  color: #000;
+  display: inline-block;
+  border: 1px #ddd solid;
+  background-color: #eee;
+  padding: 0 0.3em;
+  border-radius: 5px;
+}
+
+.proposal-state-new {
+  background-color: #fff;
+}
+
+.proposal-state-accepted {
+  background-color: #bdffb5;
+}
+
+.proposal-state-finalised {
+  background-color: #b1fde1;
+}
+
+.proposal-state-anonymised {
+  background-color: #fbe1f4;
+}
+
+.proposal-state-checked {
+  background-color: #e0ebfb;
+}
+
+.proposal-state-manual-review {
+  background-color: #f7eda1;
+}
+
+.proposal-state-rejected {
+  background-color: #fbe3e7;
+}
+
+.content-type-talk {
+  background-color: #b3bced;
+}
+
+.content-type-performance {
+  background-color: #eeb17a;
+}
+
+.content-type-workshop {
+  background-color: #fba0bc;
+}
+
+.content-type-familyworkshop {
+  background-color: #a4c4db;
+}
+
+.content-type-film {
+  background-color: #a0d082;
+}
+
+.timeblocks {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 1em;
+  gap: 0.2em;
+  width: 100%;
+
+  .timeblock-day {
+    flex-grow: 1;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+  }
+
+  .timeblock-day h4 {
+    text-align: center;
+  }
+
+  .timeblock-content {
+    height: 35em;
+    position: relative; // Sub-blocks positioned relative to this
+  }
+
+  .timeblock-hour {
+    color: #aaa;
+    height: 4.1666666%;
+    font-size: 0.7em;
+    border-top: 0.5px solid #ddd;
+    padding-left: 0.5em;
+  }
+
+  .timeblock-hour.night {
+    background-color: #fafafa;
+  }
+
+  .timeblock-hour.midnight {
+    border-top-width: 1px;
+  }
+
+  .timeblock-block {
+    color: black;
+    position: absolute;
+    width: 70%;
+    right: 5%;
+    border: 1px solid #999;
+    border-radius: 5px;
+    padding: 0.25em;
+  }
+
+  .timeblock-icon {
+    float: right;
+    cursor: default;
+  }
+}
+
+.village-inline-form {
+  display: inline-block;
+  padding: 2px 0px;
+}

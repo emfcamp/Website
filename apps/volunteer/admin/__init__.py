@@ -1,18 +1,25 @@
+from flask import g
 from flask_admin import Admin
-from apps.volunteer.flask_admin_base import VolunteerAdminIndexView
+from flask_admin.theme import Bootstrap4Theme
 
+from apps.volunteer.flask_admin_base import VolunteerAdminIndexView
 
 volunteer_admin = Admin(
     url="/volunteer/admin",
     name="EMF Volunteers",
-    template_mode="bootstrap3",
     index_view=VolunteerAdminIndexView(url="/volunteer/admin"),
-    base_template="volunteer/admin/flask-admin-base.html",
+    theme=Bootstrap4Theme(
+        base_template="volunteer/admin/flask-admin-base.html",
+    ),
+    csp_nonce_generator=lambda: g.csp_nonce,
 )
 volunteer_admin.endpoint_prefix = "volunteer_admin"
 
 
-from . import role  # noqa: F401
-from . import shift  # noqa: F401
-from . import venue  # noqa: F401
-from . import volunteer  # noqa: F401
+from . import (
+    buildup,  # noqa: F401
+    role,  # noqa: F401
+    shift,  # noqa: F401
+    venue,  # noqa: F401
+    volunteer,  # noqa: F401
+)

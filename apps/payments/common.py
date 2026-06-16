@@ -1,12 +1,20 @@
-from flask import current_app as app, abort
+from flask import abort
+from flask import current_app as app
 from flask_login import current_user
+from sqlalchemy import select
 
+from main import db
 from models.payment import Payment
 
 
-def get_user_payment_or_abort(payment_id, provider=None, valid_states=None, allow_admin=False) -> Payment:
+def get_user_payment_or_abort(
+    payment_id: int,
+    provider: str | None = None,
+    valid_states: list[str] | None = None,
+    allow_admin: bool = False,
+) -> Payment:
     try:
-        payment = Payment.query.get(payment_id)
+        payment = db.session.execute(select(Payment).where(Payment.id == payment_id)).scalar_one_or_none()
     except Exception as e:
         app.logger.exception("Exception %r getting payment %s", e, payment_id)
         abort(404)
@@ -30,7 +38,12 @@ def get_user_payment_or_abort(payment_id, provider=None, valid_states=None, allo
     return payment
 
 
-def lock_user_payment_or_abort(payment_id, provider=None, valid_states=None, allow_admin=False) -> Payment:
+def lock_user_payment_or_abort(
+    payment_id: int,
+    provider: str | None = None,
+    valid_states: list[str] | None = None,
+    allow_admin: bool = False,
+) -> Payment:
     # This does an unlocked check on state, which is handy if it's invalid
     payment = get_user_payment_or_abort(payment_id, provider, valid_states, allow_admin)
 

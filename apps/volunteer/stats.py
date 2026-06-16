@@ -1,5 +1,6 @@
-from flask import jsonify
 from collections import defaultdict
+
+from flask import jsonify
 
 from models.volunteer.shift import Shift
 from models.volunteer.volunteer import Volunteer

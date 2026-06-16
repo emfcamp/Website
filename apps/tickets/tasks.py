@@ -1,26 +1,28 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
-from flask import current_app as app, render_template
+from flask import current_app as app
+from flask import render_template
 from flask_mailman import EmailMessage
 from sqlalchemy import func
 
-from main import db
 from apps.common import feature_enabled
-from ..common.email import from_email
-from apps.common.receipt import attach_tickets, set_tickets_emailed, RECEIPT_TYPES
+from apps.common.receipt import RECEIPT_TYPES, attach_tickets, set_tickets_emailed
+from main import db
+from models import naive_utcnow
 from models.payment import Payment
 from models.product import (
-    ProductGroup,
-    Product,
-    PriceTier,
     Price,
+    PriceTier,
+    Product,
+    ProductGroup,
     ProductView,
     ProductViewProduct,
 )
-from models.scheduled_task import scheduled_task
 from models.purchase import Purchase
+from models.scheduled_task import scheduled_task
 from models.user import User
 
+from ..config import config
 from . import tickets
 
 
@@ -58,7 +60,7 @@ def create_product_groups():
     for name, capacity in allocations:
         if ProductGroup.get_by_name(name):
             continue
-        ProductGroup(name=name, capacity_max=capacity, parent=admissions)
+        db.session.add(ProductGroup(name=name, capacity_max=capacity, parent=admissions))
 
     view = ProductView.get_by_name("main")
     if not view:
@@ -139,6 +141,7 @@ def create_product_groups():
             parent=general,
             attributes={"is_transferable": has_xfer},
         )
+        db.session.add(product)
 
         for index, (price_cap, gbp, eur) in enumerate(prices):
             if len(prices) == 1 or index == 0:
@@ -164,10 +167,11 @@ def create_product_groups():
                 parent=product,
                 active=active,
             )
-            Price(currency="GBP", price_int=gbp * 100, price_tier=pt)
-            Price(currency="EUR", price_int=eur * 100, price_tier=pt)
+            db.session.add(pt)
+            db.session.add(Price(currency="GBP", price_int=gbp * 100, price_tier=pt))
+            db.session.add(Price(currency="EUR", price_int=eur * 100, price_tier=pt))
 
-        ProductViewProduct(view, product, order)
+        db.session.add(ProductViewProduct(view, product, order))
         order += 1
 
     db.session.flush()
@@ -197,21 +201,29 @@ def create_product_groups():
     ]
 
     order = 0
-    for name, display_name, cap, personal_limit, gbp, eur, description, vat_rate in misc:
+    for name, display_name, _cap, personal_limit, gbp, eur, description, vat_rate in misc:
         if Product.get_by_name(name, name):
             continue
 
         group = ProductGroup.get_by_name(name)
         product = Product(name=name, display_name=display_name, description=description, parent=group)
+        db.session.add(product)
         pt = PriceTier(name=name, personal_limit=personal_limit, parent=product, vat_rate=vat_rate)
         db.session.add(pt)
         db.session.add(Price(currency="GBP", price_int=gbp * 100, price_tier=pt))
         db.session.add(Price(currency="EUR", price_int=eur * 100, price_tier=pt))
 
-        ProductViewProduct(view, product, order)
+        db.session.add(ProductViewProduct(view, product, order))
         order += 1
 
     db.session.commit()
+
+    # The speakers product view is required for the CfP round close flow (to issue tickets from)
+    speaker_view = ProductView.get_by_name("speakers")
+    if not speaker_view:
+        speaker_view = ProductView(name="speakers", cfp_accepted_only=True, type="ticket")
+        db.session.add(speaker_view)
+        db.session.commit()
 
     # ('t-shirt', 'T-Shirt', 200, 10, 10, 12, "Pre-order the official Electromagnetic Field t-shirt. T-shirts will be available to collect during the event."),
 
@@ -269,17 +281,18 @@ def create_merch():
     ]
 
     order = 0
-    for name, display_name, personal_limit, gbp, eur, description, vat_rate in badge_def:
+    for name, display_name, _personal_limit, gbp, eur, description, vat_rate in badge_def:
         if Product.get_by_name(badge_group.name, name):
             continue
 
         product = Product(name=name, display_name=display_name, description=description, parent=badge_group)
+        db.session.add(product)
         pt = PriceTier(name=name, parent=product, vat_rate=vat_rate)
         db.session.add(pt)
         db.session.add(Price(currency="GBP", price_int=gbp * 100, price_tier=pt))
         db.session.add(Price(currency="EUR", price_int=eur * 100, price_tier=pt))
 
-        ProductViewProduct(badge_view, product, order)
+        db.session.add(ProductViewProduct(badge_view, product, order))
         order += 1
 
     # name, display_name, GBP, EUR
@@ -304,12 +317,13 @@ def create_merch():
             continue
 
         product = Product(name=name, display_name=display_name, parent=tees_group)
+        db.session.add(product)
         pt = PriceTier(name=name, parent=product, vat_rate=vat_rate)
         db.session.add(pt)
         db.session.add(Price(currency="GBP", price_int=gbp * 100, price_tier=pt))
         db.session.add(Price(currency="EUR", price_int=eur * 100, price_tier=pt))
 
-        ProductViewProduct(tees_view, product, order)
+        db.session.add(ProductViewProduct(tees_view, product, order))
         order += 1
 
     db.session.commit()
@@ -336,7 +350,7 @@ def expire_reserved():
     payments = (
         Purchase.query.filter(
             Purchase.state == "reserved",
-            Purchase.modified < datetime.utcnow() - stalled_payment_grace_period,
+            Purchase.modified < naive_utcnow() - stalled_payment_grace_period,
             ~Purchase.payment_id.is_(None),
         )
         .join(Payment)
@@ -362,7 +376,7 @@ def expire_reserved():
 
     purchases = Purchase.query.filter(
         Purchase.state == "reserved",
-        Purchase.modified < datetime.utcnow() - incomplete_purchase_grace_period,
+        Purchase.modified < naive_utcnow() - incomplete_purchase_grace_period,
         Purchase.payment_id.is_(None),
     )
     for purchase in purchases:
@@ -370,11 +384,11 @@ def expire_reserved():
         purchase.cancel()
 
     # Purchases reserved by admins
-    admin_reservation_grace_period = timedelta(days=3)
+    admin_reservation_grace_period = timedelta(days=7)
 
     purchases = Purchase.query.filter(
         Purchase.state == "admin-reserved",
-        Purchase.modified < datetime.utcnow() - admin_reservation_grace_period,
+        Purchase.modified < naive_utcnow() - admin_reservation_grace_period,
         Purchase.payment_id.is_(None),
     )
     for purchase in purchases:
@@ -389,13 +403,13 @@ def email_transfer_reminders():
     pass
     # users_to_email = User.query.join(Ticket, TicketType).filter(
     #     TicketType.admits == 'full',
-    #     Ticket.paid == True,  # noqa: E712
+    #     Ticket.paid == True,
     #     Ticket.transfer_reminder_sent == False,
     # ).group_by(User).having(func.count() > 1)
 
     # for user in users_to_email:
     #     msg = EmailMessage("Your Electromagnetic Field Tickets",
-    #         from_email=from_email('TICKETS_EMAIL'),
+    #         from_email=config.from_email('TICKETS_EMAIL'),
     #         to=[user.email]
     #     )
 
@@ -416,12 +430,14 @@ def email_tickets():
     ctx.push()
 
     if not feature_enabled("ISSUE_TICKETS"):
-        app.logger.warn("Not emailing tickets as ISSUE_TICKETS is disabled")
+        app.logger.warning("Not emailing tickets as ISSUE_TICKETS is disabled")
         return
 
     users_purchase_counts = (
         Purchase.query.filter_by(is_paid_for=True)
-        .join(PriceTier, Product, ProductGroup)
+        .join(PriceTier)
+        .join(Product)
+        .join(ProductGroup)
         .filter(ProductGroup.type.in_(RECEIPT_TYPES))
         .filter(Purchase.ticket_issued == False)
         .join(Purchase.owner)
@@ -431,11 +447,11 @@ def email_tickets():
     )
 
     for user, purchase_count in users_purchase_counts:
-        plural = purchase_count != 1 and "s" or ""
+        plural = (purchase_count != 1 and "s") or ""
 
         msg = EmailMessage(
-            "Your Electromagnetic Field Ticket%s" % plural,
-            from_email=from_email("TICKETS_EMAIL"),
+            f"Your Electromagnetic Field Ticket{plural}",
+            from_email=config.from_email("TICKETS_EMAIL"),
             to=[user.email],
         )
 

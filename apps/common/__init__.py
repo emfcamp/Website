@@ -1,54 +1,57 @@
-from decorator import decorator
-from datetime import datetime
+import html
 import json
+import logging
 import re
-import os.path
+from decimal import Decimal
+from os import path
+from pathlib import Path
 from textwrap import wrap
-import pendulum
-from dataclasses import dataclass
+from typing import Any, cast, overload
+from urllib.parse import urljoin, urlparse, urlunparse
 
+import nh3
+import pendulum
+from decorator import decorator
 from flask import (
-    session,
     abort,
-    current_app as app,
     render_template,
     render_template_string,
+    request,
+    session,
+    url_for,
+)
+from flask import (
+    current_app as app,
 )
 from flask.json import jsonify
-from flask_login import login_user, current_user
+from flask_login import current_user, login_user
 from jinja2.utils import urlize
 from markdown import markdown
 from markupsafe import Markup
-from os import path
-from pathlib import Path
-from werkzeug.wrappers import Response
 from werkzeug.exceptions import HTTPException
+from werkzeug.wrappers import Response
 from yaml import safe_load as parse_yaml
 
-from main import db, external_url
+from main import db, external_url, webcal_url
+from models import Currency, User, naive_utcnow
 from models.basket import Basket
+from models.capacity import UnlimitedType
+from models.content import PROPOSAL_INFOS, SCHEDULE_ITEM_INFOS
+from models.feature_flag import get_db_flags
 from models.product import Price
 from models.purchase import Ticket
 from models.site_state import (
     get_refund_state,
     get_sales_state,
-    get_signup_state,
     get_site_state,
 )
-from models.feature_flag import get_db_flags
-from models import User, event_start, event_end
 
+from ..config import config
 from .preload import init_preload
 
+logger = logging.getLogger(__name__)
 
-@dataclass
-class Currency:
-    code: str
-    symbol: str
-
-
-CURRENCIES = [Currency("GBP", "£"), Currency("EUR", "€")]
-CURRENCY_SYMBOLS = {c.code: c.symbol for c in CURRENCIES}
+CURRENCY_SYMBOLS = {c.value: c.symbol for c in Currency}
 
 
 def load_utility_functions(app_obj):
@@ -72,15 +75,22 @@ def load_utility_functions(app_obj):
         return "-".join(wrap(sort_code, 2))
 
     @app_obj.template_filter("price")
-    def format_price(price, currency=None, after=False):
-        if isinstance(price, Price):
-            currency = price.currency
-            amount = price.value
-            # TODO: look up after from CURRENCIES
-        else:
-            amount = price
-        amount = "{0:.2f}".format(amount)
-        symbol = CURRENCY_SYMBOLS[currency]
+    def format_price(
+        _price: Price | int | float | Decimal, _currency: Currency | str | None = None, after: bool = False
+    ) -> str:
+        match _price, _currency:
+            case Price(), None:
+                amount = f"{_price.value:.2f}"
+                currency = _price.currency
+            case int() | float() | Decimal(), Currency():
+                amount = f"{_price:.2f}"
+                currency = _currency
+            case int() | float() | Decimal(), str():
+                amount = f"{_price:.2f}"
+                currency = Currency(_currency)
+            case _:
+                raise ValueError("Invalid use of price filter!")
+        symbol = currency.symbol
         if after:
             return amount + symbol
         return symbol + amount
@@ -89,35 +99,37 @@ def load_utility_functions(app_obj):
     def format_bankref(bankref):
         if bankref.startswith("RF"):
             return " ".join(wrap(bankref, 4))
-        return "%s-%s" % (bankref[:4], bankref[4:])
+        return f"{bankref[:4]}-{bankref[4:]}"
 
     @app_obj.template_filter("vatrate")
     def format_vatrate(vat_rate):
         if vat_rate is None:
             return "Exempt"
         normalized = (vat_rate * 100).normalize()
-        sign, digit, exp = normalized.as_tuple()
+        _sign, _digit, exp = normalized.as_tuple()
         pct = normalized if exp <= 0 else normalized.quantize(1)
         return f"{pct}%"
+
+    @app_obj.template_test("unlimited")
+    def test_unlimited(obj):
+        return isinstance(obj, UnlimitedType)
 
     @app_obj.context_processor
     def utility_processor():
         SALES_STATE = get_sales_state()
         SITE_STATE = get_site_state()
         REFUND_STATE = get_refund_state()
-        SIGNUP_STATE = get_signup_state()
 
         return dict(
             SALES_STATE=SALES_STATE,
             SITE_STATE=SITE_STATE,
             REFUND_STATE=REFUND_STATE,
-            SIGNUP_STATE=SIGNUP_STATE,
-            CURRENCIES=CURRENCIES,
             CURRENCY_SYMBOLS=CURRENCY_SYMBOLS,
             external_url=external_url,
+            webcal_url=webcal_url,
             feature_enabled=feature_enabled,
             get_user_currency=get_user_currency,
-            year=datetime.utcnow().year,
+            year=naive_utcnow().year,
         )
 
     @app_obj.context_processor
@@ -125,8 +137,8 @@ def load_utility_functions(app_obj):
         def suffix(d):
             return "th" if 11 <= d <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(d % 10, "th")
 
-        s = event_start()
-        e = event_end()
+        s = config.event_start
+        e = config.event_end
         assert s.year == e.year
         if s.month == e.month:
             fancy_dates = f"""{s.strftime("%B")}<span style="white-space: nowrap">
@@ -155,7 +167,7 @@ def load_utility_functions(app_obj):
     def octicons_processor():
         def octicon(name, **kwargs):
             cls_list = kwargs.get("class", [])
-            if type(cls_list) != list:
+            if not isinstance(cls_list, list):
                 cls_list = list(cls_list)
             classes = " ".join(cls_list)
 
@@ -167,24 +179,31 @@ def load_utility_functions(app_obj):
     @app_obj.template_filter("pretty_text")
     def pretty_text(text):
         text = text.strip(" \n\r")
+        # urlize calls markupsafe.escape before anything else
         text = urlize(text, trim_url_limit=40)
         text = "\n".join(f"<p>{para}</p>" for para in re.split(r"[\r\n]+", text))
         return Markup(text)
 
     @app_obj.context_processor
-    def contact_form_processor():
-        def contact_form(list):
-            """Renders a contact form for the requested list."""
+    def mailing_list_processor():
+        def mailing_list(list):
+            """Renders a signup form for the requested list."""
             if list not in app_obj.config["LISTMONK_LISTS"]:
                 msg = f"The list '{list}' is not configured. Add it to your config file under LISTMONK_LISTS."
                 raise ValueError(msg)
 
             return Markup(render_template("home/_mailing_list_form.html", list=list))
 
-        return {"contact_form": contact_form}
+        return {"mailing_list": mailing_list}
+
+    @app_obj.template_filter("yesno")
+    def yesno(value):
+        if value:
+            return "Yes"
+        return "No"
 
     @app_obj.template_filter("ticket_state_label")
-    def ticket_state_label(ticket: Ticket):
+    def ticket_state_label(ticket: Ticket) -> Markup:
         # see docs/ticket_states.md
 
         match ticket.state:
@@ -205,8 +224,17 @@ def load_utility_functions(app_obj):
 
         return Markup(f'<span class="label label-{cls}">{ticket.state}</span>')
 
+    app_obj.template_filter("tidy_workshop_cost")(tidy_workshop_cost)
 
-def create_current_user(email: str, name: str):
+    @app_obj.context_processor
+    def content_processor():
+        return dict(
+            PROPOSAL_INFOS=PROPOSAL_INFOS,
+            SCHEDULE_ITEM_INFOS=SCHEDULE_ITEM_INFOS,
+        )
+
+
+def create_current_user(email: str, name: str) -> User:
     user = User(email, name)
 
     db.session.add(user)
@@ -216,19 +244,34 @@ def create_current_user(email: str, name: str):
     # Login & make sure everything's set correctly
     login_user(user)
     assert current_user.id == user.id
-    # FIXME: why do we do this?
-    current_user.id = user.id
     return user
 
 
-def get_user_currency(default="GBP"):
-    return session.get("currency", default)
+def get_user_currency(default: Currency = Currency.GBP) -> Currency:
+    """Fetch the user's currency from the session.
+
+    If it's missing or invalid, returns `default`
+    """
+    if from_session := session.get("currency", None):
+        try:
+            return Currency(from_session)
+        except ValueError:
+            logger.warning(
+                "Invalid currency retrieved from session '%s', defaulting to %s", from_session, default
+            )
+    return default
 
 
-def set_user_currency(currency):
+def set_user_currency(currency: Currency | str) -> None:
+    """Set the user's currency in their session.
+
+    If currency is str, raises ValueError if it's not one of the valid `Currency` options.
+    """
+    if isinstance(currency, str):
+        currency = Currency(currency)
     basket = Basket.from_session(current_user, get_user_currency())
     basket.set_currency(currency)
-    session["currency"] = currency
+    session["currency"] = currency.value
 
 
 def feature_flag(feature):
@@ -287,48 +330,57 @@ def json_response(f, *args, **kwargs):
         return jsonify(data), 500
 
     else:
-        if isinstance(response, (app.response_class, Response)):
+        if isinstance(response, app.response_class | Response):
             return response
 
         return jsonify(response), 200
 
 
-def feature_enabled(feature) -> bool:
+def feature_enabled(feature: str) -> bool:
     """
     If a feature flag is defined in the database return that,
     otherwise fall back to the config setting.
     """
-    db_flags = get_db_flags()
+    # the cache decorator doesn't pass through types, so we have to cast here
+    db_flags = cast(dict[str, bool], get_db_flags())
 
     if feature in db_flags:
         return db_flags[feature]
 
-    return app.config.get(feature, False)
+    from_conf = app.config.get(feature, False)
+    if isinstance(from_conf, bool):
+        return from_conf
+    logger.warning("Feature '%s' read from config was not a boolean! using bool()")
+    return bool(from_conf)
 
 
-def archive_file(year, *path, raise_404=True):
+def archive_file(year: int, *path: str, raise_404: bool = True) -> Path | None:
     """Return the path to a given file within the archive.
     Optionally raise 404 if it doesn't exist.
     """
-    file_path = os.path.abspath(os.path.join(__file__, "..", "..", "..", "exports", str(year), *path))
+    EXPORT_ROOT = (Path(__file__) / ".." / ".." / ".." / "exports").resolve()
+    file_path = (EXPORT_ROOT / str(year) / Path(*path)).resolve()
 
-    if not os.path.exists(file_path):
-        if raise_404:
-            abort(404)
-        else:
-            return None
+    if EXPORT_ROOT in file_path.parents and file_path.exists():
+        return file_path
 
-    return file_path
+    if raise_404:
+        abort(404)
+
+    return None
 
 
-def load_archive_file(year: int, *path, raise_404=True):
+ArchivedScheduleData = list[dict[str, Any]]
+
+
+def load_archive_file(year: int, *path: str, raise_404: bool = True) -> ArchivedScheduleData | None:
     """Load the contents of a JSON file from the archive, and optionally
     abort with a 404 if it doesn't exist.
     """
     json_path = archive_file(year, *path, raise_404=raise_404)
     if json_path is None:
         return None
-    return json.load(open(json_path, "r"))
+    return cast(ArchivedScheduleData, json.load(open(json_path)))
 
 
 def page_template(metadata, template):
@@ -337,27 +389,102 @@ def page_template(metadata, template):
 
     if "show_nav" not in metadata or metadata["show_nav"] is True:
         return template
-    else:
-        return "static_page.html"
+    return "markdown.html"
 
 
-def render_markdown(source, template="about/template.html", **view_variables):
+def render_trusted_markdown(markdown_src: str) -> Markup:
+    return Markup(
+        markdown(
+            markdown_src,
+            extensions=[
+                "markdown.extensions.admonition",
+                "markdown.extensions.toc",
+            ],
+        )
+    )
+
+
+def render_template_markdown(filename: str, template: str = "about/template.html", **context: Any) -> str:
+    """Render trusted markdown
+
+    Similar to render_template, but accepts a file that contains markdown, and
+    after rendering converts the output from markdown to HTML. The HTML is then
+    passed to a wrapper template as the context variable "content".
+
+    All Jinja functionality is accessible from within the template, so do not
+    call this on untrusted content.
+
+    You can also change the wrapper template using metadata.
+    """
+
+    assert app.template_folder is not None
     template_root = Path(path.join(app.root_path, app.template_folder)).resolve()
-    source_file = template_root.joinpath(f"{source}.md").resolve()
+    source_file = template_root.joinpath(filename).resolve()
 
     if not source_file.is_relative_to(template_root) or not source_file.exists():
-        return abort(404)
+        abort(404)
 
-    with open(source_file, "r") as f:
+    with open(source_file) as f:
         source = f.read()
-        (metadata, content) = source.split("---", 2)
+        (metadata, content) = source.split("---", 1)
         metadata = parse_yaml(metadata)
-        content = Markup(
-            markdown(
-                render_template_string(content),
-                extensions=["markdown.extensions.nl2br"],
-            )
-        )
+        content = render_trusted_markdown(render_template_string(content))
 
-    view_variables.update(content=content, title=metadata["title"])
-    return render_template(page_template(metadata, template), **view_variables)
+    context.update(content=content, title=metadata["title"])
+    return render_template(page_template(metadata, template), **context)
+
+
+def render_untrusted_markdown(markdown_text: str) -> Markup:
+    """Render untrusted user-supplied markdown safely.
+
+    Sanitises HTML via nh3 and wraps output in a sandboxed iframe so that
+    arbitrary scripts and navigation from user content cannot affect the page.
+    """
+    extensions = ["markdown.extensions.nl2br", "markdown.extensions.smarty", "tables"]
+    content_html = nh3.clean(
+        markdown(markdown_text, extensions=extensions),
+        tags=(nh3.ALLOWED_TAGS - {"img"}),
+        link_rel="noopener nofollow",
+    ).replace("<table>", '<table class="table">')
+    inner_html = render_template("sandboxed-iframe.html", body=Markup(content_html))
+    iframe_html = f'<iframe sandbox="allow-scripts allow-top-navigation-by-user-activation" class="embedded-content" srcdoc="{html.escape(inner_html, True)}"></iframe>'
+    return Markup(iframe_html)
+
+
+def make_safe_url(target: str) -> str | None:
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    if test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc:
+        return urlunparse(test_url)
+    return None
+
+
+@overload
+def get_next_url(default: str) -> str: ...
+
+
+@overload
+def get_next_url() -> str | None: ...
+
+
+def get_next_url(default=None):
+    next_url = request.args.get("next")
+    if next_url:
+        if safe_url := make_safe_url(next_url):
+            return safe_url
+        app.logger.error(f"Dropping unsafe next URL {repr(next_url)}")
+    if default is None:
+        default = url_for(".account")
+    return default
+
+
+def tidy_workshop_cost(participant_cost: str) -> str:
+    # Some people put in a string, some just put in a £ amount
+    try:
+        floaty = float(participant_cost)
+        # We don't want to return anything if it doesn't cost anything
+        if floaty > 0:
+            return "£" + participant_cost
+        return ""
+    except ValueError:
+        return participant_cost

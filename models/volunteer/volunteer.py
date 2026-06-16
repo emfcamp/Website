@@ -1,57 +1,105 @@
 from collections import defaultdict
-from sqlalchemy.orm import backref
+from datetime import datetime
+from typing import TYPE_CHECKING, Any, TypeVar
+
 from flask_login import UserMixin
+from sqlalchemy import ARRAY, Column, ForeignKey, Integer, String, Table, select
+from sqlalchemy.ext.mutable import Mutable, MutableSet
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from apps.config import config
 from main import db
+from models.volunteer import buildup
+from models.volunteer.buildup import BuildupVolunteer
+
 from .. import BaseModel
+from .shift import ShiftEntry, ShiftEntryState
 
-from .shift import ShiftEntry
+if TYPE_CHECKING:
+    from ..user import User
+    from .role import Role, RoleAdmin, Team
 
+__all__ = [
+    "Volunteer",
+    "VolunteerRoleInterest",
+    "VolunteerRoleTraining",
+]
+
+_T = TypeVar("_T")
 
 # This effectively records the roles that a volunteer is interested in
-VolunteerRoleInterest = db.Table(
+VolunteerRoleInterest = Table(
     "volunteer_role_interest",
-    db.Model.metadata,
-    db.Column("volunteer_id", db.Integer, db.ForeignKey("volunteer.id"), primary_key=True),
-    db.Column("role_id", db.Integer, db.ForeignKey("volunteer_role.id"), primary_key=True),
+    BaseModel.metadata,
+    Column("volunteer_id", Integer, ForeignKey("volunteer.id"), primary_key=True),
+    Column("role_id", Integer, ForeignKey("volunteer_role.id", ondelete="CASCADE"), primary_key=True),
 )
 
 
 # Which roles has the volunteer been trained for
-VolunteerRoleTraining = db.Table(
+VolunteerRoleTraining = Table(
     "volunteer_role_training",
-    db.Model.metadata,
-    db.Column("volunteer_id", db.Integer, db.ForeignKey("volunteer.id"), primary_key=True),
-    db.Column("role_id", db.Integer, db.ForeignKey("volunteer_role.id"), primary_key=True),
+    BaseModel.metadata,
+    Column("volunteer_id", Integer, ForeignKey("volunteer.id"), primary_key=True),
+    Column("role_id", Integer, ForeignKey("volunteer_role.id", ondelete="CASCADE"), primary_key=True),
 )
 
 
+class MutableSetAsList(MutableSet[_T]):
+    @classmethod
+    def coerce(cls, index: str, value: Any) -> MutableSetAsList[_T] | None:
+        if not isinstance(value, cls):
+            if isinstance(value, set | list):
+                return cls(value)
+            return Mutable.coerce(index, value)
+        return value
+
+
 class Volunteer(BaseModel, UserMixin):
-    __table_name__ = "volunteer"
-    __versioned__: dict = {}
+    """A volunteer, which is mapped 1:1 to a website :class:`User`."""
 
-    id = db.Column(db.Integer, primary_key=True)
-    nickname = db.Column(db.String)
-    banned = db.Column(db.Boolean, nullable=False, default=False)
-    volunteer_phone = db.Column(db.String)
-    volunteer_email = db.Column(db.String)
-    over_18 = db.Column(db.Boolean, nullable=False, default=False)
-    allow_comms_during_event = db.Column(db.Boolean, nullable=False, default=False)
+    __tablename__ = "volunteer"
+    __versioned__: dict[str, str] = {}
 
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    user = db.relationship("User", backref=backref("volunteer", uselist=False))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    nickname: Mapped[str | None]
+    banned: Mapped[bool] = mapped_column(default=False)
+    volunteer_phone: Mapped[str | None]
+    volunteer_email: Mapped[str]
+    over_18: Mapped[bool] = mapped_column(default=False)
+    allergies: Mapped[set[str]] = mapped_column(MutableSetAsList.as_mutable(ARRAY(String)), default=set())
+    allergies_other: Mapped[str] = mapped_column(default="")
+    dietary_restrictions: Mapped[set[str]] = mapped_column(
+        MutableSetAsList.as_mutable(ARRAY(String)), default=set()
+    )
+    dietary_restrictions_other: Mapped[str] = mapped_column(default="")
+    allow_comms_during_event: Mapped[bool] = mapped_column(default=False)
 
-    interested_roles = db.relationship(
-        "Role",
-        backref="interested_volunteers",
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+
+    #: The website user object for this volunteer
+    user: Mapped[User] = relationship(back_populates="volunteer")
+
+    #: Roles a volunteer is interested in performing
+    interested_roles: Mapped[list[Role]] = relationship(
+        back_populates="interested_volunteers",
         secondary=VolunteerRoleInterest,
         lazy="dynamic",
     )
-    trained_roles = db.relationship(
-        "Role",
-        backref="trained_volunteers",
+
+    #: Roles a volunteer has been trained to perform
+    trained_roles: Mapped[list[Role]] = relationship(
+        back_populates="trained_volunteers",
         secondary=VolunteerRoleTraining,
         lazy="dynamic",
+    )
+
+    volunteer_admin_roles: Mapped[list[RoleAdmin]] = relationship(
+        back_populates="volunteer", cascade="all, delete-orphan"
+    )
+
+    administered_teams: Mapped[list[Team]] = relationship(
+        "Team", secondary="volunteer_team_admin", back_populates="admins"
     )
 
     def __repr__(self):
@@ -64,13 +112,17 @@ class Volunteer(BaseModel, UserMixin):
         shifts = ShiftEntry.query.filter(
             ShiftEntry.shift.has(role=role),
             ShiftEntry.user == self.user,
-            ShiftEntry.state == "completed",
+            ShiftEntry.state == ShiftEntryState.COMPLETED,
         ).all()
         return bool(shifts)
 
     @classmethod
     def get_by_id(cls, id):
         return cls.query.get_or_404(id)
+
+    @classmethod
+    def get_by_email(cls, email_address: str) -> Volunteer | None:
+        return db.session.scalar(select(cls).where(cls.volunteer_email == email_address))
 
     @classmethod
     def get_for_user(cls, user):
@@ -94,13 +146,42 @@ class Volunteer(BaseModel, UserMixin):
             },
         }
 
+    @property
+    def administered_role_ids(self) -> set[int]:
+        """Role IDs this user can administer, combining direct role admin and team admin."""
+        role_ids = {ra.role_id for ra in self.volunteer_admin_roles}
+        for team in self.administered_teams:
+            role_ids.update(r.id for r in team.roles)
+        return role_ids
+
+    @property
+    def administered_team_ids(self) -> set[int]:
+        """Team IDs this user can administer."""
+        return {t.id for t in self.administered_teams}
+
+    @property
+    def is_volunteer_admin(self) -> bool:
+        return bool(self.volunteer_admin_roles or self.administered_teams)
+
+    @property
+    def registered_for_buildup(self) -> bool:
+        return BuildupVolunteer.get_for_user(self.user) is not None
+
+    @property
+    def permitted_shift_times(self) -> tuple[datetime, datetime]:
+        """Returns the earliest and latest time at which this volunteer can take a shift."""
+        if self.registered_for_buildup:
+            return (buildup.buildup_start(), buildup.teardown_end())
+
+        return (config.event_start, config.event_end)
+
 
 """
 class Messages(db.Model):
-    from_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    to_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    sent = db.Column(db.DateTime)
-    text = db.Column(db.String)
-    is_read = db.Column(db.Boolean, nullable=False, default=False)
-    shift_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    from_user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
+    to_user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
+    sent: Mapped[datetime | None]
+    text: Mapped[str]
+    is_read: Mapped[bool] = mapped_column(default=False)
+    shift_id: Mapped[int | None] = mapped_column(ForeignKey('user.id'))
 """

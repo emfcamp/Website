@@ -12,7 +12,7 @@ Operating hours will be announced closer to the event.
 **Sunday:** 10:30am to 2pm
 #}
 
-## Youth Workshops
-We will also have a schedule of workshops targeted at under 12's which will be announced closer to the event.
+## Family Workshops
+We also have a range of workshops for families in a separate workshop tent.
 
 Not all of the content in the main schedule will be suitable for children or younger teenagers, but they are welcome to attend at your discretion.

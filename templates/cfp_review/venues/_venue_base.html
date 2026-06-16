@@ -1,0 +1,9 @@
+{% extends "cfp_review/base.html" %}
+{% block title %}Venue "{{ venue.name }}"{% endblock %}
+{% block body %}
+    <div class="col-md-12">
+        <h2>Venue: {{ venue.name }}</h2>
+    </div>
+    {% include "cfp_review/venues/_tabs.html" %}
+    {% block venue_body %}{% endblock %}
+{% endblock %}

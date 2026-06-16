@@ -1,6 +1,6 @@
 {% from "_formhelpers.html" import render_field %}
-{% extends "admin/base.html" %}
-
+{% set active = 'main' %}
+{% extends "admin/users/_base.html" %}
 {% macro tickets_table(tickets, show_owner=False) %}
 <table class="table table-condensed">
     <tr>
@@ -37,7 +37,12 @@
                 {% if ticket.is_paid_for and ticket.is_transferable %}
                 <a class="btn btn-default" href="{{ url_for('.transfer_ticket', ticket_id=ticket.id) }}">Transfer</a>
                 {% endif %}
+                {% if ticket.is_free and ticket.state not in ['cancelled', 'refunded'] %}
+                <a class="btn btn-default" href="{{ url_for('.cancel_free_ticket', ticket_id=ticket.id) }}">Cancel</a>
+                {% endif %}
+                {% if ticket.state not in ['cancelled', 'refunded'] %}
                 <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=ticket.id) }}">Convert</a>
+                {% endif %}
               </div>
             </td>
         </tr>
@@ -45,14 +50,20 @@
 </table>
 {% endmacro %}
 
-{% block title %}User {{user.name}}{% endblock %}
-{% block body %}
+{% block user_body %}
 <h2>User Details</h2>
 
 <table class="table table-condensed">
     <tr><th>ID</th><td>{{user.id}}</td></tr>
     <tr><th>Name</th><td>{{user.name}}</td></tr>
-    <tr><th>Email</th><td>{{user.email}}</td></tr>
+    <tr><th>Email</th><td>{{user.email}} (state: {{user.email_state}})</td></tr>
+    <tr><th>CfP Ticket Voucher?</th><td>
+        {%- if user.cfp_voucher -%}
+            <a href="{{url_for('admin.product_views.product_view_voucher_detail', view_id=user.cfp_voucher.view.id, voucher_code=user.cfp_voucher.code)}}">Yes: {{ user.cfp_voucher.tickets_remaining }} ticket(s) left</a>
+        {%- else -%}
+            No
+        {%- endif -%}
+    </td></tr>
 </table>
 
 <form method="post">
@@ -109,6 +120,7 @@
   <th>Purchases</th>
   <th>Amount</th>
   <th>Expires</th>
+  <th>Voucher</th>
 </tr></thead>
 <tbody>
 {% for payment in user.payments %}
@@ -118,6 +130,7 @@
   <td>{{ payment.purchases | count }}</td>
   <td><b>{{ payment.amount | price(payment.currency) }}</b></td>
   <td>{% if payment.expires %}{{ payment.expires.strftime('%Y-%m-%d') }}{% endif %}</td>
+  <td>{% if payment.voucher %}<a href="{{ url_for('.product_views.product_view_voucher_detail', view_id=payment.voucher.view.id, voucher_code=payment.voucher_code) }}">{{ payment.voucher_code }}</a>{% endif %}</td>
 </tr>
 {% endfor %}
 </tbody>
@@ -142,7 +155,7 @@
     {% for proposal in user.proposals %}
         <tr>
             <td>
-                <a href="{{ url_for('cfp_review.update_proposal', proposal_id = proposal.id ) }}">{{ proposal.title }}</a>
+                <a href="{{ url_for('cfp_review.proposal', proposal_id = proposal.id ) }}">{{ proposal.title }}</a>
             </td>
             <td>{{ proposal.type }}</td>
             <td>{{ proposal.state }}</td>

@@ -5,7 +5,7 @@
 {% endmacro %}
 
 {% macro menuitem(text, view, badge_count=0) %}
-<li {% if view_name == view and view != '.proposals' -%} class="active" {%- endif %}>
+<li {% if view_name == view and view not in ['.proposals', '.messages', '.schedule_items'] -%} class="active" {%- endif %}>
     <a href="{{url_for(view, **kwargs)}}">{{text}}{{badge(badge_count)}}</a>
 </li>
 {% endmacro %}
@@ -25,15 +25,14 @@
                 {{ menuitem("Workshops", ".proposals", type="workshop") }}
                 {{ menuitem("Installations", ".proposals", type="installation") }}
                 {{ menuitem("Performances", ".proposals", type="performance") }}
-                {{ menuitem("Youth Workshops", ".proposals", type="youthworkshop") }}
-                {{ menuitem("Lightning Talks", ".lightning_talks") }}
+                {{ menuitem("Family Workshops", ".proposals", type="familyworkshop") }}
                 <li role="separator" class="divider"></li>
                 {{ menuitem('Anon-blocked', ".proposals", proposal_counts['anon-blocked'], state='anon-blocked')}}
                 {{ menuitem('New', ".proposals", proposal_counts['new'], state='new')}}
                 {{ menuitem('Manual Review', ".proposals", proposal_counts['manual-review'], state='manual-review')}}
                 <li role="separator" class="divider"></li>
                 {{ menuitem('Summary', ".proposals_summary")}}
-                {{ menuitem('Changelog', ".proposal_versions" )}}
+                {{ menuitem('Changelog', ".entity_changelog", entity_type="proposal" )}}
             </ul>
         </li>
         <li class="dropdown">
@@ -43,13 +42,13 @@
                 Messages {{ badge(unread_count) }} <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                {{ menuitem("All", ".all_messages", unread_count) }}
+                {{ menuitem("All", ".messages", unread_count) }}
                 <li role="separator" class="divider"></li>
-                {{ menuitem("Talks", ".all_messages", type="talk") }}
-                {{ menuitem("Workshops", ".all_messages", type="workshop") }}
-                {{ menuitem("Youth Workshops", ".all_messages", type="youthworkshop") }}
-                {{ menuitem("Installations", ".all_messages", type="installation") }}
-                {{ menuitem("Performances", ".all_messages", type="performance") }}
+                {{ menuitem("Talks", ".messages", type="talk") }}
+                {{ menuitem("Workshops", ".messages", type="workshop") }}
+                {{ menuitem("Family Workshops", ".messages", type="familyworkshop") }}
+                {{ menuitem("Installations", ".messages", type="installation") }}
+                {{ menuitem("Performances", ".messages", type="performance") }}
             </ul>
         </li>
         {{ menuitem("Voting", ".vote_summary", unread_reviewer_notes) }}
@@ -60,8 +59,8 @@
                 Misc <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                {{ menuitem("Close Round", ".close_round") }}
-                {{ menuitem("Rank", ".rank") }}
+                {{ menuitem("Close Round (talk)", ".close_round", proposal_type="talk") }}
+                {{ menuitem("Close Round (workshop)", ".close_round", proposal_type="workshop") }}
                 {{ menuitem("(Workshop) Ticket lottery", ".lottery") }}
                 <li role="separator" class="divider"></li>
                 {{ menuitem('Anonymisation', '.anonymisation', proposal_counts['checked']) }}
@@ -73,6 +72,28 @@
                 {{ menuitem('Speaker diversity', '.speaker_diversity') }}
             </ul>
         </li>
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                aria-haspopup="true" aria-expanded="false">
+                Schedule items <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                {{ menuitem("All", ".schedule_items") }}
+                {{ menuitem("New", ".schedule_item_create")}}
+                <li role="separator" class="divider"></li>
+                {{ menuitem("Talks", ".schedule_items", type="talk") }}
+                {{ menuitem("Workshops", ".schedule_items", type="workshop") }}
+                {{ menuitem("Performances", ".schedule_items", type="performance") }}
+                {{ menuitem("Family Workshops", ".schedule_items", type="familyworkshop") }}
+                {{ menuitem("Lightning Talks", ".lightning_talks") }}
+                <li role="separator" class="divider"></li>
+                {{ menuitem('Published', ".schedule_items", schedule_item_counts['published'], state='published')}}
+                {{ menuitem('Unpublished', ".schedule_items", schedule_item_counts['unpublished'], state='unpublished')}}
+                {{ menuitem('Cancelled', ".schedule_items", schedule_item_counts['cancelled'], state='cancelled')}}
+                <li role="separator" class="divider"></li>
+                {{ menuitem('Changelog', ".entity_changelog", entity_type="schedule-item" )}}
+            </ul>
+        </li>
     {% endif %}
     {% if current_user.has_permission('cfp_admin') or current_user.has_permission('cfp_schedule') %}
         <li class="dropdown">
@@ -82,7 +103,8 @@
                 Scheduling <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                {{ menuitem("Potential Schedule Changes", ".potential_schedule_changes") }}
+                {{ menuitem('Schedule dashboard', ".schedule")}}
+                <li role="separator" class="divider"></li>
                 {{ menuitem("Schedule Tweaker", ".scheduler", venue=emf_venues) }}
                 {{ menuitem("Clashfinder", ".clashfinder") }}
                 {{ menuitem("Sense Check", ".sense_check") }}

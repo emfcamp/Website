@@ -1,0 +1,12 @@
+<ul class="nav nav-tabs">
+    <li role="presentation" {% if active == 'edit' %} class="active" {% endif %}>
+        <a href="{{ url_for('.edit_venue', venue_id=venue.id) }}">
+            Edit
+        </a>
+    </li>
+    <li role="presentation" {% if active == 'time_blocks' %} class="active" {% endif %}>
+        <a href="{{ url_for('.venue_timeblocks', venue_id=venue.id) }}">
+            Time Blocks
+        </a>
+    </li>
+</ul>

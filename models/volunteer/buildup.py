@@ -1,0 +1,86 @@
+from datetime import datetime, time, timedelta
+from typing import TYPE_CHECKING
+
+from sqlalchemy import ForeignKey, select
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from apps.config import config
+from main import db
+
+from .. import BaseModel
+
+if TYPE_CHECKING:
+    from .. import User
+
+__all__ = [
+    "BuildupSignupKey",
+    "BuildupVolunteer",
+    "buildup_end",
+    "buildup_start",
+    "teardown_end",
+    "teardown_start",
+]
+
+
+class BuildupSignupKey(BaseModel):
+    __table_name__ = "buildup_signup_key"
+    __versioned__: dict[str, str] = {}
+
+    token: Mapped[str] = mapped_column(primary_key=True)
+    team_name: Mapped[str]
+
+    min_arrival_date: Mapped[datetime]
+
+
+class BuildupVolunteer(BaseModel):
+    __table_name__ = "buildup_volunteer"
+    __versioned__: dict[str, str] = {}
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    user: Mapped[User] = relationship(back_populates="buildup_volunteer", foreign_keys=[user_id])
+
+    signup_key_token: Mapped[int | None] = mapped_column(ForeignKey("buildup_signup_key.token"))
+
+    #: The signup key used to register for buildup. This can be None if the user was auto-registered on arrival.
+    signup_key: Mapped[BuildupSignupKey | None] = relationship()
+
+    arrival_date: Mapped[datetime]
+    departure_date: Mapped[datetime]
+
+    emergency_contact: Mapped[str] = mapped_column(default="")
+    vehicle_registration: Mapped[str | None]
+
+    acked_health_and_safety_briefing_at: Mapped[datetime | None]
+
+    recorded_on_site: Mapped[datetime | None]
+    left_site: Mapped[datetime | None]
+
+    @classmethod
+    def get_for_user(cls, user: User) -> BuildupVolunteer | None:
+        return db.session.scalars(select(cls).where(BuildupVolunteer.user_id == user.id)).first()
+
+
+def buildup_start() -> datetime:
+    # Beginning of day -7
+    return datetime.combine(config.event_start.date() - timedelta(days=8), time(hour=0))
+
+
+def buildup_end() -> datetime:
+    # End of day 0
+    return datetime.combine(config.event_start.date() - timedelta(days=1), time(hour=22))
+
+
+def teardown_start() -> datetime:
+    # We start considering teardown from "midday" on day 5
+    return datetime.combine(config.event_end.date() + timedelta(days=1), time(hour=12))
+
+
+def teardown_end() -> datetime:
+    # After PM on day 8
+    return datetime.combine(config.event_end.date() + timedelta(days=4), time(hour=22))
+
+
+def date_requires_registration(date: datetime) -> bool:
+    return date <= buildup_end() or date >= teardown_start()

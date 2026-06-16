@@ -2,36 +2,8 @@
 {% block body %}
 
 <h2>Current allocations</h2>
-<p>This shows an estimate of the amount of time remaining for scheduling proposals.</p>
-<table class="table table-condensed table-striped">
-    <thead>
-    <tr>
-        <th>Type</th>
-        <th>Total accepted</th>
-        <th>Missing durations</th>
-        <th>Available</th>
-        <th>Allocated</th>
-        <th>Remaining</th>
-        <th>Available venues</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for type in proposal_types%}
-    <tr>
-        <th>{{type}}</th>
-        <td><a href="{{url_for('cfp_review.proposals', type=type, state=['accepted', 'finalised'])}}">
-                {{estimates[type].accepted_count}}
-            </a>
-        </td>
-        <td>{{estimates[type].unknown_lengths}}</td>
-        <td style="white-space:nowrap">{{estimates[type].available_time}}</td>
-        <td style="white-space:nowrap">{{estimates[type].allocated_time}}</td>
-        <td style="white-space:nowrap">{{estimates[type].remaining_time}}</td>
-        <td>{% for v in estimates[type].venues %}{{v.name}}{% if not loop.last %}, {% endif %}{% endfor %}</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<p>This shows an estimate of the amount of time remaining for scheduling proposals, based on the time blocks defined.</p>
+{% include "cfp_review/_schedule_time_estimates.html" %}
 
 <h2>Ranked proposals</h2>
 {% if not preview %}
@@ -45,21 +17,48 @@
     If there are proposals that shouldn't be accepted at this point, please set their state back to "anonymised" from "reviewed".
 </p>
 
-<p>Show 
-    <a href="{{ url_for('.rank') }}">all</a>,
-    <a href="{{ url_for('.rank', type='talk') }}">talks</a>,
-    <a href="{{ url_for('.rank', type='workshop') }}">workshops</a>,
-    <a href="{{ url_for('.rank', type='youthworkshop') }}">youth workshops</a>,
-    <a href="{{ url_for('.rank', type='installation') }}">installations</a>,
-    <a href="{{ url_for('.rank', type='performance') }}">performances</a>.
-</p>
-
 {% if preview %}
     <p>
         <span class="bg-info">Proposals</span> will be accepted.
     </p>
 {% endif %}
 <p>
+
+{% if duplicates %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a role="button" data-toggle="collapse" data-target="#duplicatesPanel"
+                aria-controls="duplicatesPanel" aria-expanded="true">
+                These users have other proposals
+            </a>
+        </h4>
+    </div>
+    <div class="panel-body collapse" id="duplicatesPanel">
+        <table class="table">
+            <tr>
+                <th>User</th>
+                <th>Type</th>
+                <th>State</th>
+                <th>Title</th>
+            </tr>
+            {% for (user, proposals) in duplicates.items() %}
+                <tr>
+                    <td rowspan="{{ proposals|length }}">{{ user.name }}</td>
+                {% for prop in proposals %}
+                    {% if not loop.first %}
+                    <tr>
+                    {% endif %}
+                    <td>{{ prop.type }}</td>
+                    <td>{{ prop.state }}</td>
+                    <td><a href="{{ url_for('.proposal', proposal_id=prop.id) }}">{{prop.title}}</a></td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endif %}
 
 
 <table class="table">
@@ -73,10 +72,10 @@
 {% for (prop, score) in proposals %}
     <tr {% if preview and score >= min_score %} class="info" {% endif %}>
         <td><small>{{ loop.index }}.</small></td>
-        <td>{{ score|round(4) }}</td>
+        <td><button class="btn btn-success debounce score-setter" data-score="{{ score }}">{{ score|round(4) }}</button></td>
         <td>{{prop.human_type | capitalize}}</td>
         <td>{{prop.user.name}}</td>
-        <td><a href="{{ url_for('.update_proposal', proposal_id=prop.id) }}">{{prop.title}}</a></td>
+        <td><a href="{{ url_for('.proposal', proposal_id=prop.id) }}">{{prop.title}}</a></td>
     </tr>
 {% else %}
     <tr><td colspan="5" class="text-center">No proposals found</td></tr>
@@ -104,4 +103,20 @@
     {% endif %}
 </form>
 
+{% endblock %}
+{% block script_extra %}
+    <script nonce="{{csp_nonce}}">
+        /*
+            script to make it easier to set the score by selecting it in the
+            table (rather than copying/pasting)
+        */
+        $(() => {
+            var scoreInput = $("input#min_score");
+            $("button.score-setter").each((_, btn) => {
+                $(btn).on("click", () => {
+                    scoreInput.val($(btn).attr("data-score"))
+                });
+            });
+        });
+    </script>
 {% endblock %}

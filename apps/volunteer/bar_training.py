@@ -1,21 +1,22 @@
 import json
 import os
+
 import markdown
-from . import v_user_required, volunteer
-
+from flask import abort, flash, redirect, render_template, url_for
+from flask import current_app as app
+from flask.typing import ResponseReturnValue
 from flask_login import current_user
-from flask import render_template, flash, redirect
-from flask import url_for, current_app as app, abort
-from main import db
-
-from wtforms import SubmitField, RadioField, FormField, FieldList
+from wtforms import FieldList, FormField, RadioField, SubmitField
 from wtforms.validators import InputRequired, ValidationError
-from ..common.forms import Form
-from ..common.fields import HiddenIntegerField
 
+from apps.common import render_template_markdown
+from main import db
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer
 
+from ..common.fields import HiddenIntegerField
+from ..common.forms import Form
+from . import v_user_required, volunteer
 
 APPLICATION_ROOT = os.path.abspath(os.path.join(__file__, "..", "..", ".."))
 
@@ -61,7 +62,7 @@ def load_training_json(path):
     if not os.path.exists(file_path):
         return None
 
-    return json.load(open(file_path, "r"))
+    return json.load(open(file_path))
 
 
 def load_training_markdown(path):
@@ -76,7 +77,7 @@ def load_training_markdown(path):
     with open(file_path) as md_file:
         md_content = md_file.read()
 
-    return markdown.markdown(md_content)
+    return markdown.markdown(md_content, extensions=["markdown.extensions.admonition"])
 
 
 def check_answer_correct(form, question):
@@ -104,7 +105,7 @@ class TrainingForm(Form):
         """
 
         # Check if the question already exists in the form, if not add it
-        for qid in question_data.keys():
+        for qid in question_data:
             question_exists = False
             for q in self.questions:
                 if q.question_id.data == qid:
@@ -122,11 +123,21 @@ class TrainingForm(Form):
             q.page = data["page"]
 
 
+@volunteer.route("/bar-training/guide", methods=["GET"], defaults={"page_name": "index"})
+@volunteer.route("/bar-training/guide/<page_name>", methods=["GET"])
+def bar_training_page(page_name: str) -> ResponseReturnValue:
+    return render_template_markdown(
+        f"volunteer/training/bar/{page_name}.md",
+        page_name=page_name,
+        template="volunteer/training/guide_page.html",
+    )
+
+
 @volunteer.route("/bar-training", methods=["GET", "POST"])
 @v_user_required
 def bar_training():
-    bar = Role.query.filter_by(name="Bar").one_or_none()
-    cybar = Role.query.filter_by(name="CYBAR").one_or_none()
+    bar = Role.query.filter_by(slug="bar").one_or_none()
+    cybar = Role.query.filter_by(slug="cybar").one_or_none()
     if bar is None or cybar is None:
         abort(404)
     volunteer = Volunteer.get_for_user(current_user)
@@ -147,7 +158,7 @@ def bar_training():
         if trained:  # The user might be re-doing the traing, no need to rewrite DB
             flash("You answered all the questions correctly!")
         else:
-            app.logger.info(f"{str(current_user)} passed the bar training.")
+            app.logger.info(f"{current_user} passed the bar training.")
             bar.trained_volunteers.append(volunteer)
             cybar.trained_volunteers.append(volunteer)
             db.session.commit()

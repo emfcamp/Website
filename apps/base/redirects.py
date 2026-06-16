@@ -1,6 +1,7 @@
 """Redirects for old pages or common URLs."""
 
 from flask import redirect, url_for
+from flask.typing import ResponseReturnValue
 
 from . import base
 
@@ -8,34 +9,34 @@ from . import base
 @base.route("/participating")
 @base.route("/get_involved")
 @base.route("/location")
-def old_urls_2012():
+def old_urls_2012() -> ResponseReturnValue:
     return redirect(url_for(".main"))
 
 
 @base.route("/contact")
-def contact_redirect():
+def contact_redirect() -> ResponseReturnValue:
     return redirect(url_for(".contact"))
 
 
 @base.route("/wave")
-def wave():
+def wave() -> ResponseReturnValue:
     return redirect("https://web.archive.org/web/20130627201413/https://www.emfcamp.org/wave")
 
 
 @base.route("/wave-talks")
 @base.route("/wave/talks")
-def wave_talks():
+def wave_talks() -> ResponseReturnValue:
     return redirect("https://web.archive.org/web/20130627201413/https://www.emfcamp.org/wave/talks")
 
 
 @base.route("/sine")
 @base.route("/wave/sine")
 @base.route("/wave/SiNE")
-def sine():
+def sine() -> ResponseReturnValue:
     return redirect("https://wiki-archive.emfcamp.org/2014/wiki/SiNE")
 
 
 @base.route("/now-and-next.json")
 @base.route("/upcoming.json")
-def old_now_next_feed():
+def old_now_next_feed() -> ResponseReturnValue:
     return redirect(url_for("schedule.now_and_next_json"), code=301)

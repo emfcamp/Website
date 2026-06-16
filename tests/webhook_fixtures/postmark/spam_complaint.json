@@ -1,0 +1,25 @@
+{
+  "RecordType": "SpamComplaint",
+  "MessageStream": "outbound",
+  "ID": 42,
+  "Type": "SpamComplaint",
+  "TypeCode": 512,
+  "Name": "Spam complaint",
+  "Tag": "Test",
+  "MessageID": "00000000-0000-0000-0000-000000000000",
+  "Metadata": {
+    "a_key": "a_value",
+    "b_key": "b_value"
+  },
+  "ServerID": 1234,
+  "Description": "",
+  "Details": "Test spam complaint details",
+  "Email": "john@example.com",
+  "From": "sender@example.com",
+  "BouncedAt": "2019-11-05T16:33:54.9070259Z",
+  "DumpAvailable": true,
+  "Inactive": true,
+  "CanActivate": false,
+  "Subject": "Test subject",
+  "Content": "<Abuse report dump>"
+}

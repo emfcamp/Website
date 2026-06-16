@@ -1,10 +1,13 @@
-import pytest
 import re
+
+import pytest
 
 login_link_re = r"(https?://[^\s/]*/login[^\s]*)"
 
 
 def test_login(user, client, outbox):
+    assert user.email_state == "unverified"
+
     url = "/login?next=/test"
     login_get = client.get(url)
     form_string = "Enter your email address and we'll email you a login link"
@@ -21,6 +24,9 @@ def test_login(user, client, outbox):
     login_link_get = client.get(match.group(0))
     assert login_link_get.status_code == 302
     assert login_link_get.location.endswith("/test")
+
+    # Logging in via email link sets email state to verified.
+    assert user.email_state == "verified"
 
 
 @pytest.mark.skip(reason="Intermittently fails on Github Actions with 'assert 404 == 200'")

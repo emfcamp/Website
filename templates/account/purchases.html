@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% set main_class = 'account-purchases' %}
 
-{% block title %}Your tickets{% endblock %}
+{% block title %}Your Tickets{% endblock %}
 {% block body %}
 {% include "account/_nav.html" %}
 {% if tickets %}
-  <h3>Your tickets</h2>
+  <h3>Your Tickets</h3>
   <a id="tickets"></a>
   {% if not config['ISSUE_TICKETS'] %}
   <p>We'll send you a scannable entry pass by email shortly before the event.
@@ -55,9 +55,28 @@
   Entrance to the festival is subject to our <a href="{{url_for('payments.terms')}}">Terms
   and Conditions</a> and the <a href="{{url_for('base.code_of_conduct')}}">Code of Conduct</a>.
 </p>
+{% if SALES_STATE != 'sales-ended' or SITE_STATE == 'event' %}
+{#
+We can sell main tickets in site_state available (and sometimes unavailable (e.g. vouchers or reservations)) (i.e. not sold-out and not sales-ended)
+parking tickets until sales end (even if we've sold out of main tickets)
+but badges even after sales end as long as the event is still on
+#}
 <div class="pull-right ticket-actions">
+    {% if SALES_STATE != 'sales-ended' and SALES_STATE != 'sold-out' %}
     <a href="{{ url_for('tickets.main') }}" class="btn btn-primary">Buy another ticket</a>
+    {% endif %}
+
+    {% if SALES_STATE != 'sales-ended' %}
+    <a href="{{ url_for('tickets.main', flow='other') }}" class="btn btn-primary">Buy a parking ticket</a>
+
+    <a href="{{ url_for('tickets.main', flow='club-mate') }}" class="btn btn-primary">Pre-order Club-Mate</a>
+
+    <a href="{{ url_for('tickets.main', flow='sponsor') }}" class="btn btn-primary">Sponsor EMF</a>
+    {% endif %}
+
+    <a href="{{ url_for('tickets.main', flow='badge') }}" class="btn btn-primary">Buy a badge</a>
 </div>
+{% endif %}
 <div class="clearfix"></div>
 <p>If you have any problems with your tickets, please contact us at <a href="mailto:{{config['TICKETS_EMAIL'][1]}}">{{config['TICKETS_EMAIL'][1]}}</a>.</p>
 {% endblock %}

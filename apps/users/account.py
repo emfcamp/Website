@@ -1,26 +1,25 @@
-from flask import (
-    abort,
-    render_template,
-    redirect,
-    request,
-    flash,
-    send_file,
-    url_for,
-    current_app as app,
-)
-from flask_login import login_required, current_user
-from wtforms import StringField, SubmitField, BooleanField
+import xml.etree.ElementTree as ET
+from datetime import datetime, timedelta
+from typing import Any
+
+import requests
+from dateutil.parser import parse as parse_date
+from flask import current_app as app
+from flask import abort, flash, redirect, render_template, request, send_file, url_for
+from flask.typing import ResponseReturnValue
+from flask_login import current_user, login_required
+from wtforms import BooleanField, StringField, SubmitField
 from wtforms.validators import DataRequired
 from apps.common import feature_enabled
 from apps.common.pkpass import generate_pkpass
 
 from main import db
-from models.purchase import Purchase
 from models.payment import Payment
+from models.purchase import Purchase
 from models.site_state import get_site_state
 
 from ..common.forms import DiversityForm
-
+from ..config import config
 from . import users
 
 
@@ -44,25 +43,55 @@ class AccountForm(DiversityForm):
         return super().set_from_user(user)
 
 
+BLOG_POSTS: dict[str, Any] = {"timestamp": None, "posts": []}
+
+
+def fetch_blog_posts():
+    global BLOG_POSTS
+    if BLOG_POSTS["timestamp"] is not None and BLOG_POSTS["timestamp"] > datetime.now() - timedelta(
+        minutes=15
+    ):
+        return BLOG_POSTS["posts"]
+    response = requests.get("https://blog.emfcamp.org/rss", timeout=1)
+    if response.status_code != 200:
+        return BLOG_POSTS["posts"]
+
+    posts = []
+
+    rss = ET.fromstring(response.text)
+    for entry in rss.findall(".//{http://www.w3.org/2005/Atom}entry")[:3]:
+        posts.append(
+            {
+                "title": entry.find("{http://www.w3.org/2005/Atom}title").text,
+                "date": parse_date(entry.find("{http://www.w3.org/2005/Atom}published").text),
+                "link": entry.find('{http://www.w3.org/2005/Atom}link[@type="text/html"]').attrib["href"],
+            }
+        )
+
+    BLOG_POSTS = {"timestamp": datetime.now(), "posts": posts}
+    return BLOG_POSTS["posts"]
+
+
 @users.route("/account", methods=["GET", "POST"])
 @login_required
-def account():
+def account() -> ResponseReturnValue:
     if get_site_state() == "cancelled":
         return redirect(url_for(".cancellation_refund"))
 
-    if not current_user.diversity:
-        flash(
-            "Please check that your user details are correct. "
-            "We'd also appreciate it if you could fill in our diversity survey."
-        )
-        return redirect(url_for(".details"))
+    blog_posts = []
+    try:
+        blog_posts = fetch_blog_posts()
+    except Exception:
+        app.logger.exception("Error fetching blog posts")
 
-    return render_template("account/main.html")
+    return render_template(
+        "account/main.html", blog_posts=blog_posts, now=datetime.now(), event_start=config.event_start
+    )
 
 
 @users.route("/account/details", methods=["GET", "POST"])
 @login_required
-def details():
+def details() -> ResponseReturnValue:
     form = AccountForm(user=current_user)
 
     if form.validate_on_submit():
@@ -81,13 +110,13 @@ def details():
 
 
 @users.route("/account/tickets")
-def purchases_redirect():
+def purchases_redirect() -> ResponseReturnValue:
     return redirect(url_for(".purchases"))
 
 
 @users.route("/account/purchases", methods=["GET", "POST"])
 @login_required
-def purchases():
+def purchases() -> ResponseReturnValue:
     if get_site_state() == "cancelled":
         return redirect(url_for(".cancellation_refund"))
 
@@ -95,13 +124,13 @@ def purchases():
         ~Purchase.state.in_(["cancelled", "reserved", "admin-reserved"])
     ).order_by(Purchase.id)
 
-    tickets = purchases.filter_by(is_ticket=True).all()
-    other_items = purchases.filter_by(is_ticket=False).all()
-
     payments = current_user.payments.filter(Payment.state != "cancelled").order_by(Payment.state).all()
 
-    if not tickets and not payments:
+    if purchases.count() == 0 and len(payments) == 0:
         return redirect(url_for("tickets.main"))
+
+    tickets = purchases.filter_by(is_ticket=True).all()
+    other_items = purchases.filter_by(is_ticket=False).all()
 
     transferred_to = current_user.transfers_to.all()
     transferred_from = current_user.transfers_from.all()

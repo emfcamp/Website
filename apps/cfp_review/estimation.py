@@ -1,86 +1,105 @@
-from collections import defaultdict
 from dataclasses import dataclass
 from datetime import timedelta
-from models.cfp import (
-    PROPOSAL_TIMESLOTS,
-    Proposal,
+
+import pendulum
+from pendulum import Duration
+from sqlalchemy import select
+
+from main import db
+from models.content import (
+    ScheduleItem,
+    ScheduleItemType,
     Venue,
-    get_days_map,
-    ROUGH_LENGTHS,
-    EVENT_SPACING,
-    SLOT_LENGTH,
-    make_periods_contiguous,
-    timeslot_to_period,
 )
+from models.content.schedule import SCHEDULE_ITEM_INFOS, ScheduleItemInfo
+from models.content.venue import TimeBlock
 
 
 @dataclass
 class CFPEstimate:
-    proposal_type: str
-    # The number of proposals currently accepted
-    accepted_count: int
+    schedule_item_info: ScheduleItemInfo
+    occurrence_count: int
+    missing_occurrences: int
     available_time: timedelta
     allocated_time: timedelta
     remaining_time: timedelta
-    unknown_lengths: int
+    unknown_durations: int
     venues: list[Venue]
 
 
-def get_available_proposal_minutes():
-    minutes = defaultdict(int)
-    venue_names_by_type = Venue.emf_venue_names_by_type()
-    for type, slots in PROPOSAL_TIMESLOTS.items():
-        periods = make_periods_contiguous([timeslot_to_period(ts, type=type) for ts in slots])
-        for period in periods:
-            minutes[type] += int((period.end - period.start).total_seconds() / 60) * len(
-                venue_names_by_type[type]
-            )
-    return minutes
+def get_available_proposal_time(type: ScheduleItemType) -> Duration:
+    blocks = db.session.query(TimeBlock).where(TimeBlock.type == type).all()
+    return sum(
+        ((pendulum.instance(block.end) - pendulum.instance(block.start)) for block in blocks),
+        Duration(),
+    )
 
 
-def get_cfp_estimate(proposal_type: str) -> CFPEstimate:
+def get_cfp_estimate(schedule_item_type: ScheduleItemType) -> CFPEstimate:
     """Calculate estimated scheduling capacity statistics for a given proposal type."""
-    if proposal_type not in ["talk", "workshop", "performance", "youthworkshop"]:
-        raise ValueError(f"Invalid proposal type: {proposal_type}")
+    schedule_items = (
+        db.session.query(ScheduleItem)
+        .filter(
+            ScheduleItem.type == schedule_item_type,
+            ScheduleItem.official_content,
+            ScheduleItem.type != "cancelled",
+        )
+        .all()
+    )
 
-    changeover_time = SLOT_LENGTH * EVENT_SPACING[proposal_type]
+    allocated_time = Duration()
+    unknown_durations: int = 0
 
-    accepted_proposals = Proposal.query_accepted().filter(Proposal.type == proposal_type).all()
+    missing_occurrences = 0
+    occurrence_count = 0
 
-    allocated_time = timedelta()
-    unknown_lengths: int = 0
+    for schedule_item in schedule_items:
+        if len(schedule_item.occurrences) == 0:
+            missing_occurrences += 1
 
-    for proposal in accepted_proposals:
-        length = None
-        if proposal.scheduled_duration:
-            length = timedelta(minutes=proposal.scheduled_duration)
-        else:
-            if proposal.length in ROUGH_LENGTHS:
-                length = timedelta(minutes=ROUGH_LENGTHS[proposal.length])
-            else:
-                unknown_lengths += 1
+        for occurrence in schedule_item.occurrences:
+            if occurrence.cancelled:
                 continue
 
-        allocated_time += length + changeover_time
+            occurrence_count += 1
 
-    num_days = len(get_days_map().items())
+            if not occurrence.scheduled_duration:
+                unknown_durations += 1
+                continue
 
-    available_venues = Venue.query.filter(Venue.default_for_types.any(proposal_type)).all()
+            duration = Duration(minutes=occurrence.scheduled_duration)
+            allocated_time += duration + occurrence.changeover_time
+
+    available_venues = list(
+        db.session.scalars(
+            select(Venue)
+            .join(Venue.time_blocks)
+            .filter(TimeBlock.type == schedule_item_type)
+            .group_by(Venue.id)
+        )
+    )
 
     # Correct for changeover period not being needed at the end of the day
     # This can go negative if there aren't many proposals accepted yet, so clamp to 0
-    changeover_correction = changeover_time * num_days * len(available_venues)
-    allocated_time = max(allocated_time - changeover_correction, timedelta(0))
+    #
+    # FIXME: We now don't know if changeover time is needed at the end of a TimeBlock.
+    # But this is also a pretty small adjustment given that this is a rough calculation.
+    # If we're this close to the wire, we should be running the scheduler to get a better indication.
+    # - Russ
+    #
+    # num_days = len(get_days_map().items())
+    # changeover_correction = changeover_time * num_days * len(available_venues)
+    # allocated_time = max(allocated_time - changeover_correction, Duration())
 
-    available_minutes = get_available_proposal_minutes()
-    available_time = timedelta(minutes=available_minutes[proposal_type])
+    available_time = get_available_proposal_time(schedule_item_type)
 
     return CFPEstimate(
-        proposal_type=proposal_type,
-        accepted_count=len(accepted_proposals),
+        schedule_item_info=SCHEDULE_ITEM_INFOS[schedule_item_type],
+        occurrence_count=occurrence_count,
+        missing_occurrences=missing_occurrences,
         available_time=available_time,
         allocated_time=allocated_time,
         remaining_time=available_time - allocated_time,
-        unknown_lengths=unknown_lengths,
+        unknown_durations=unknown_durations,
         venues=available_venues,
     )

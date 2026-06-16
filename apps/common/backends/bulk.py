@@ -1,7 +1,6 @@
 from flask import current_app as app
 from flask_mailman.backends.smtp import EmailBackend
 
-
 # We don't wrap the filebased or locmem backends for now
 # as I can't think of a reason they can't share config.
 # We also use the main MAIL_DEFAULT_CHARSET.

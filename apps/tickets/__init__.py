@@ -9,42 +9,44 @@ details.
 import re
 
 from flask import (
-    render_template,
-    redirect,
-    request,
-    flash,
     Blueprint,
-    url_for,
-    send_file,
     abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    session,
+    url_for,
+)
+from flask import (
     current_app as app,
 )
-from flask_login import login_required, current_user
+from flask_login import current_user, login_required
 from flask_mailman import EmailMessage
 from prometheus_client import Counter
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
 
 from main import db, external_url
-from models.user import User, checkin_code_re
-from models.product import ProductView
 from models.basket import Basket
+from models.product import ProductView
 from models.purchase import Purchase, Ticket
+from models.user import User, checkin_code_re
 
 from ..common import (
     CURRENCY_SYMBOLS,
+    feature_enabled,
     get_user_currency,
     set_user_currency,
-    feature_enabled,
 )
-from ..common.email import from_email
 from ..common.receipt import (
-    make_qr_png,
+    attach_tickets,
+    make_qrfile,
     render_pdf,
     render_receipt,
-    attach_tickets,
     set_tickets_emailed,
 )
-
+from ..config import config
 from .forms import TicketTransferForm
 
 tickets = Blueprint("tickets", __name__)
@@ -65,12 +67,22 @@ empty_baskets = Counter("emf_basket_empty_total", "Attempted purchases of empty 
 @tickets.route("/tickets/<flow>/reserved")
 @tickets.route("/tickets/<flow>/reserved/<currency>")
 def tickets_reserved(flow=None, currency=None):
-    if current_user.is_anonymous:
-        return redirect(url_for("users.login", next=url_for(".tickets_reserved", flow=flow)))
+    # This only allows for admin-reserved tickets or a
+    # lost checkout, not both, but I think that's fine
+    if current_user.is_authenticated:
+        basket = Basket(current_user, get_user_currency())
+        basket.load_purchases_by_user()
+        app.logger.info(f"Loaded {len(basket.values())} purchases by user")
+        basket.save_to_session()
 
-    basket = Basket(current_user, get_user_currency())
-    basket.load_purchases_from_db()
-    basket.save_to_session()
+    elif "basket_uuid" in session:
+        basket = Basket.from_session(current_user, get_user_currency())
+        basket.load_purchases_by_basket_uuid()
+        app.logger.info(f"Loaded {len(basket.values())} purchases by UUID")
+        basket.save_to_session()
+
+    else:
+        return redirect(url_for("users.login", next=url_for(".tickets_reserved", flow=flow)))
 
     if currency in CURRENCY_SYMBOLS:
         set_user_currency(currency)
@@ -131,7 +143,7 @@ def transfer(ticket_id):
 
         msg = EmailMessage(
             subject,
-            from_email=from_email("TICKETS_EMAIL"),
+            from_email=config.from_email("TICKETS_EMAIL"),
             to=[to_user.email],
         )
 
@@ -154,7 +166,7 @@ def transfer(ticket_id):
 
         msg = EmailMessage(
             "Purchase transfer confirmation",
-            from_email=from_email("TICKETS_EMAIL"),
+            from_email=config.from_email("TICKETS_EMAIL"),
             to=[current_user.email],
         )
         msg.body = render_template(
@@ -198,18 +210,15 @@ def receipt(user_id=None, format=None):
     return page
 
 
-# Generate a PNG-based QR code as xhtml2pdf doesn't support SVG.
-#
-# This only accepts the code on purpose - we can't authenticate the
-# user from the PDF renderer, and a full URL is awkward to validate.
+# This used to be for xhtml2pdf, but is handy for creating a shareable image
 @tickets.route("/receipt/<checkin_code>/qr")
 def tickets_qrcode(checkin_code):
-    if not re.match("%s$" % checkin_code_re, checkin_code):
+    if not re.match(f"{checkin_code_re}$", checkin_code):
         abort(404)
 
     url = app.config.get("CHECKIN_BASE") + checkin_code
 
-    qrfile = make_qr_png(url)
+    qrfile = make_qrfile(url, kind="png", scale=3)
     return send_file(qrfile, mimetype="image/png")
 
 

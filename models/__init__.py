@@ -1,52 +1,49 @@
+import enum
 from bisect import bisect
 from collections import OrderedDict
+from collections.abc import Sequence
+from datetime import UTC, datetime
 from decimal import Decimal
-from itertools import groupby
-from dateutil.parser import parse
+from itertools import groupby, pairwise
+from typing import TYPE_CHECKING, assert_never
 
-from flask import current_app as app
-
-from main import db
-from sqlalchemy import true, inspect
+import datetype
+from sqlalchemy import inspect
+from sqlalchemy.engine.row import Row
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.base import NO_VALUE
 from sqlalchemy.sql.functions import func
-from sqlalchemy.engine.row import Row
-from sqlalchemy_continuum.utils import version_class, transaction_class
+from sqlalchemy_continuum.utils import transaction_class, version_class
 
-from typing import TypeAlias
+from main import db
 
+# If we're type checking, we want models to inherit from the BaseModel (trivial subclass
+# of DeclarativeBase) as mypy can't handle using the sqlalchemy-flask generated db.Model
+if TYPE_CHECKING:
+    from main import BaseModel
 
-# This alias *was* required to apply type annotations to the model objects,
-# but I don't think it even does that any more.
-# MyPy doesn't support this nested class syntax which flask-sqlalchemy uses,
-# even though type annotations are now present. https://github.com/pallets-eco/flask-sqlalchemy/issues/1112
-BaseModel: TypeAlias = db.Model  # type: ignore[name-defined]
-
-""" Type alias for ISO currency (GBP or EUR currently). """
-# Note: A better type for this would be Union[Literal['GBP'], Literal['EUR']] but setting this
-# results in a world of pain currently.
-#
-# Ideally needs to be unified with the Currency class in app/common/__init__.py, but this is
-# non-trivial.
-Currency = str
+    __all__ = ["BaseModel"]
+else:
+    BaseModel = db.Model
 
 
-def event_start():
-    return config_date("EVENT_START")
+class Currency(enum.StrEnum):
+    GBP = "GBP"
+    EUR = "EUR"
+
+    @property
+    def symbol(self) -> str:
+        match self:
+            case Currency.GBP:
+                return "£"
+            case Currency.EUR:
+                return "€"
+            case _:
+                assert_never(self)
 
 
-def event_year():
-    """Year of the current event"""
-    return event_start().year
-
-
-def event_end():
-    return config_date("EVENT_END")
-
-
-def exists(query):
-    return db.session.query(true()).filter(query.exists()).scalar()
+def naive_utcnow() -> datetype.DateTime[None]:
+    return datetype.naive(datetime.now(UTC).replace(tzinfo=None))
 
 
 def to_dict(obj):
@@ -60,12 +57,11 @@ def count_groups(selectable, *entities):
             .group_by(*entities)
             .order_by(*entities)
         )
-    else:
-        return db.session.execute(
-            selectable.with_only_columns(func.count().label("count"), *entities)
-            .group_by(*entities)
-            .order_by(*entities)
-        )
+    return db.session.execute(
+        selectable.with_only_columns(func.count().label("count"), *entities)
+        .group_by(*entities)
+        .order_by(*entities)
+    )
 
 
 def nest_count_keys(rows):
@@ -80,23 +76,22 @@ def nest_count_keys(rows):
     return tree
 
 
-def bucketise(vals, boundaries) -> OrderedDict[str, int]:
+def bucketise[T: int | float](
+    vals: Sequence[T] | Sequence[tuple[T]] | Sequence[Row[tuple[T]]], boundaries: Sequence[T]
+) -> OrderedDict[str, int]:
     """Sort values into bins, like pandas.cut"""
-    ranges = [
-        "%s-%s" % (a, b - 1) if isinstance(b, int) and b - 1 > a else str(a)
-        for a, b in zip(boundaries[:-1], boundaries[1:])
-    ]
-    ranges.append("%s+" % boundaries[-1])
+    ranges = [f"{a}-{b - 1}" if isinstance(b, int) and b - 1 > a else str(a) for a, b in pairwise(boundaries)]
+    ranges.append(f"{boundaries[-1]}+")
     counts = OrderedDict.fromkeys(ranges, 0)
 
     for val in vals:
-        if isinstance(val, (tuple, Row)):
+        if isinstance(val, tuple | Row):
             # As a convenience for fetching counts/single columns in sqla
-            val, *_ = val
+            val = val[0]
 
         i = bisect(boundaries, val)
         if i == 0:
-            raise IndexError("{} is below the lowest boundary {}".format(val, boundaries[0]))
+            raise IndexError(f"{val} is below the lowest boundary {boundaries[0]}")
         counts[ranges[i - 1]] += 1
 
     return counts
@@ -127,7 +122,7 @@ def export_attr_edits(cls, attrs):
     totals = dict.fromkeys(attrs, 0)
     count = 0
 
-    for pk, attr_times in edits_iter:
+    for _pk, attr_times in edits_iter:
         for a in attrs:
             maxes[a] = max(maxes[a], len(attr_times[a]))
             totals[a] += len(attr_times[a])
@@ -170,7 +165,7 @@ def iter_attr_edits(cls, attrs, query=None):
         first = next(versions)
         attr_vals = {a: getattr(first, a) for a in attrs}
         attr_times = {a: [first.issued_at] for a in attrs}
-        for version in versions:
+        for version in versions:  # noqa: B031
             for attr in attrs:
                 val = getattr(version, attr)
                 if val != attr_vals[attr]:
@@ -180,27 +175,22 @@ def iter_attr_edits(cls, attrs, query=None):
         yield (pk, attr_times)
 
 
-def config_date(key):
-    return parse(app.config.get(key))
-
-
-from .user import *  # noqa: F401,F403
-from .payment import *  # noqa: F401,F403
-from .cfp import *  # noqa: F401,F403
-from .permission import *  # noqa: F401,F403
-from .email import *  # noqa: F401,F403
-from .product import *  # noqa: F401,F403
-from .purchase import *  # noqa: F401,F403
-from .basket import *  # noqa: F401,F403
-from .admin_message import *  # noqa: F401,F403
-from .volunteer import *  # noqa: F401,F403
-from .village import *  # noqa: F401,F403
-from .scheduled_task import *  # noqa: F401,F403
-from .feature_flag import *  # noqa: F401,F403
-from .site_state import *  # noqa: F401,F403
-from .arrivals import *  # noqa: F401,F403
-from .event_tickets import *  # noqa: F401,F403
-from .diversity import *  # noqa: F401,F403
-
+from .admin_message import *  # noqa: F403
+from .arrivals import *  # noqa: F403
+from .basket import *  # noqa: F403
+from .content import *  # noqa: F403
+from .diversity import *  # noqa: F403
+from .email import *  # noqa: F403
+from .feature_flag import *  # noqa: F403
+from .payment import *  # noqa: F403
+from .permission import *  # noqa: F403
+from .product import *  # noqa: F403
+from .purchase import *  # noqa: F403
+from .scheduled_task import *  # noqa: F403
+from .site_state import *  # noqa: F403
+from .user import *  # noqa: F403
+from .village import *  # noqa: F403
+from .volunteer import *  # noqa: F403
+from .wiki import *  # noqa: F403
 
 db.configure_mappers()

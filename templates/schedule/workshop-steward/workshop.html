@@ -3,30 +3,37 @@
 {% block title %}Workshop Steward{% endblock %}
 {% block body %}
 
-<h1>Workshop Steward -- {{ workshop.published_title or workshop.title }}</h1>
+<h1>
+  Workshop Steward -- {{ occurrence.schedule_item.title }}
+  {%- if occurrence.schedule_item.occurrences | length > 1 -%}
+  : occurrence {{ occurrence.occurrence_num }}
+  {% endif %}
+</h1>
 
-<em>Starts at: {{ workshop.scheduled_time }}</em>
+<em>Starts at: {{ occurrence.scheduled_time }}</em>
 
-<p>{{ workshop.published_description or workshop.description }}</p>
+<p>{{ occurrence.schedule_item.description }}</p>
+
+<p>{{ occurrence.short_description }}</p>
 
 <p>&nbsp;</p>
 
 {% if time_locked %}
   <p>The full list of attendees will be available after {{ show_list_after }}
-     and for the duration of the {{ workshop.type }}.</p>
+     and for the duration of the {{ occurrence.schedule_item.human_type }}.</p>
 {% else %}
   <ul>
     <form method="POST">
       {{ form.hidden_tag() }}
       <ul>
-      {% for ticket_form in form.event_tickets %}
+      {% for entry_form in form.lottery_entries %}
         <li>
-          {{ ticket_form._ticket.user.name }}
-          {{ ticket_form.event_ticket_id() }}
-          {{ ticket_form.use_all_codes(class_="btn btn-primary") }}
+          {{ entry_form._lottery_entry.user.name }}
+          {{ entry_form.lottery_entry_id() }}
+          {{ entry_form.use_all_codes(class_="btn btn-primary") }}
           <ul>
-            {% if ticket_form.codes %}
-              {% for code_form in ticket_form.codes %}
+            {% if entry_form.codes %}
+              {% for code_form in entry_form.codes %}
                 <li>
                   {{code_form.code()}}
                   {{code_form.code.data}}

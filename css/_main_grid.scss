@@ -1,4 +1,4 @@
-/** 
+/**
  * A simple flexbox-based grid for the main layout. This is fixed-width when the
  * window is larger than $main-content-width, and fluid below.
  */
@@ -6,22 +6,29 @@
 @use "./_variables.scss" as *;
 
 #emf-container {
+  /* Contains header, body, footer. Use grid to pin the footer to the bottom of the page. */
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+
   background-color: $main-background;
-  overflow: hidden;
 
   @media (min-width: $main-content-width + 14) {
     width: $main-content-width;
     margin-left: auto;
     margin-right: auto;
-    box-shadow: 5px 5px 15px $body-background-shadow,
+    box-shadow:
+      5px 5px 15px $body-background-shadow,
       -5px 5px 15px $body-background-shadow;
-    margin-bottom: 20px;
   }
   @media (max-width: $main-content-width + 14) {
     width: 100%;
     min-width: $min-width;
-    margin: 0 0 0 0;
-    padding: 0 0 0 0;
+
+    // Header is taken out of the grid in mobile-view.
+    grid-template-rows: 1fr auto;
+    margin: -$mobile-header-height 0 0 0;
+    padding: $mobile-header-height 0 0 0;
   }
 }
 
@@ -29,13 +36,9 @@
   display: flex;
   flex-flow: row;
 
-  @media(max-width: $main-content-width) {
+  @media (max-width: $main-content-width) {
     flex-flow: column;
   }
-}
-
-.main-row {
-  min-height: 600px;
 }
 
 .emf-col {

@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, current_app as app
+from flask import Blueprint, render_template
+from flask import current_app as app
 from flask_mailman import EmailMessage
 
-from .common import get_user_payment_or_abort, lock_user_payment_or_abort  # noqa: F401
-from ..common.email import from_email
+from ..config import config
 
 payments = Blueprint("payments", __name__)
 
@@ -14,16 +14,18 @@ def ticket_admin_email(title, template, **kwargs):
 
     msg = EmailMessage(
         title,
-        from_email=from_email("TICKETS_EMAIL"),
+        from_email=config.from_email("TICKETS_EMAIL"),
         to=[app.config["TICKETS_NOTICE_EMAIL"][1]],
     )
     msg.body = render_template(template, **kwargs)
     msg.send()
 
 
-from . import main  # noqa: F401
-from . import banktransfer  # noqa: F401
-from . import stripe  # noqa: F401
-from . import invoice  # noqa: F401
-from . import tasks  # noqa: F401
-from . import wise  # noqa: F401
+from . import (
+    banktransfer,  # noqa: F401
+    invoice,  # noqa: F401
+    main,  # noqa: F401
+    stripe,  # noqa: F401
+    tasks,  # noqa: F401
+    ## wise,  # noqa: F401, RUF100
+)

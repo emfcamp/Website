@@ -16,19 +16,26 @@ and do not run by default in dev. This process is run by cron so
 granularity is no better than a few minutes.
 """
 
-import pendulum
 import logging
-from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
 from functools import wraps
+from typing import Any
+
+import pendulum
+from sqlalchemy import JSON, DateTime, Interval, text
+from sqlalchemy.orm import Mapped, Session, mapped_column
 
 from main import db
+
 from . import BaseModel
+
+__all__ = ["ScheduledTask", "ScheduledTaskResult"]
 
 tasks = []
 log = logging.getLogger(__name__)
 
 
-class ScheduledTask(object):
+class ScheduledTask:
     def __init__(self, func, duration):
         self.func = func
         self.duration = duration
@@ -43,11 +50,11 @@ class ScheduledTask(object):
 
 class ScheduledTaskResult(BaseModel):
     __tablename__ = "scheduled_task_result"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    start_time = db.Column(db.DateTime(True), nullable=False)
-    duration = db.Column(db.Interval, nullable=False)
-    result = db.Column(db.JSON, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str]
+    start_time: Mapped[datetime] = mapped_column(DateTime(True))
+    duration: Mapped[timedelta] = mapped_column(Interval)
+    result: Mapped[dict[str, Any]] = mapped_column(JSON)
 
     def __init__(self, job_name):
         self.name = job_name
@@ -97,7 +104,7 @@ def execute_scheduled_tasks(force=False):
     # Create a new session, so tasks calling commit don't free our lock
     with Session(db.engine, autocommit=False) as lock_session:
         # Take an exclusive lock on the ScheduledTaskResult table to prevent tasks colliding
-        lock_session.execute(f"LOCK TABLE {ScheduledTaskResult.__tablename__} IN EXCLUSIVE MODE")
+        lock_session.execute(text(f"LOCK TABLE {ScheduledTaskResult.__tablename__} IN EXCLUSIVE MODE"))
 
         tasks_to_run = []
         if force:

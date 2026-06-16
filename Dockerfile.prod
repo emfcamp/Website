@@ -4,11 +4,12 @@ COPY . /app
 RUN npm install --no-audit && npx rsbuild build --mode production
 
 FROM ghcr.io/emfcamp/website-base:latest
+ENV UV_NO_DEV=1
 
 COPY . /app/
 WORKDIR /app
 
-RUN uv sync --no-dev \
+RUN uv sync \
 	&& uv run playwright install-deps \
 	&& uv run playwright install chromium \
 	&& rm -Rf ./static

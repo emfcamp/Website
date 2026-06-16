@@ -1,20 +1,17 @@
 name: Test
 
-on: [pull_request]
+on: 
+  pull_request:
+  merge_group:
 
-env:
-  COMPOSE_INTERACTIVE_NO_CLI: 1
+permissions:
+  contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build containers
-        run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml build --parallel
-      - name: Test
-        run: docker compose -f ./docker-compose.yml -f ./docker-compose.ci.yml run -T app uv run make test
+    name: Run tests
+    uses: ./.github/workflows/test.yml

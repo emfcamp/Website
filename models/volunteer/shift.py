@@ -1,31 +1,60 @@
-from typing import Literal, TypeAlias, Union
-import pytz
+import enum
+from collections.abc import Sequence
+from datetime import date, datetime
+from typing import TYPE_CHECKING, Self
 
+import pytz
 from pendulum import interval
-from sqlalchemy import select, func, text
+from sqlalchemy import ForeignKey, desc, func, select, text
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import Mapped, column_property, mapped_column, relationship
 
 from main import db
+
 from .. import BaseModel
+
+if TYPE_CHECKING:
+    from pendulum import DateTime
+
+    from ..content.schedule import Occurrence
+    from ..user import User
+    from .role import Role
+    from .venue import VolunteerVenue
+
+__all__ = [
+    "Shift",
+    "ShiftEntry",
+    "ShiftEntryState",
+    "ShiftEntryStateException",
+]
 
 event_tz = pytz.timezone("Europe/London")
 
 
-# state: [allowed next state, ] pairs
-ShiftEntryState: TypeAlias = Union[
-    Literal["signed_up"],
-    Literal["arrived"],
-    Literal["abandoned"],
-    Literal["completed"],
-    Literal["no_show"],
-]
+class ShiftEntryState(enum.StrEnum):
+    SIGNED_UP = "signed_up"
+    ARRIVED = "arrived"
+    ABANDONED = "abandoned"
+    COMPLETED = "completed"
+    NO_SHOW = "no_show"
 
+
+# state: [allowed next state, ] pairs
 SHIFT_ENTRY_STATES: dict[ShiftEntryState, list[ShiftEntryState]] = {
-    "signed_up": ["arrived", "completed", "abandoned", "no_show"],
-    "arrived": ["completed", "abandoned", "signed_up"],
-    "abandoned": ["arrived"],
-    "completed": ["arrived"],
-    "no_show": ["arrived"],
+    ShiftEntryState.SIGNED_UP: [
+        ShiftEntryState.ARRIVED,
+        ShiftEntryState.COMPLETED,
+        ShiftEntryState.ABANDONED,
+        ShiftEntryState.NO_SHOW,
+    ],
+    ShiftEntryState.ARRIVED: [
+        ShiftEntryState.COMPLETED,
+        ShiftEntryState.ABANDONED,
+        ShiftEntryState.SIGNED_UP,
+    ],
+    ShiftEntryState.ABANDONED: [ShiftEntryState.ARRIVED],
+    ShiftEntryState.COMPLETED: [ShiftEntryState.ARRIVED],
+    ShiftEntryState.NO_SHOW: [ShiftEntryState.ARRIVED],
 }
 
 
@@ -34,22 +63,29 @@ class ShiftEntryStateException(ValueError):
 
 
 class ShiftEntry(BaseModel):
+    """Join table used to indicate a volunteer has signed up for a given shift."""
+
     __tablename__ = "volunteer_shift_entry"
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
 
-    shift_id = db.Column(db.Integer, db.ForeignKey("volunteer_shift.id"), primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
-    state: ShiftEntryState = db.Column(db.String, default="signed_up")
+    shift_id: Mapped[int] = mapped_column(ForeignKey("volunteer_shift.id"), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
 
-    user = db.relationship("User", backref="shift_entries")
-    shift = db.relationship("Shift", backref="entries")
+    #: Indicates whether a volunteer has arrived for/completed a shift.
+    state: Mapped[ShiftEntryState] = mapped_column(default=ShiftEntryState.SIGNED_UP)
 
-    def set_state(self, state: ShiftEntryState):
-        if state not in SHIFT_ENTRY_STATES:
-            raise ShiftEntryStateException('"%s" is not a valid state' % state)
+    user: Mapped[User] = relationship(back_populates="shift_entries")
+    shift: Mapped[Shift] = relationship(back_populates="entries")
 
-        if state not in SHIFT_ENTRY_STATES[self.state]:
-            raise ShiftEntryStateException('"%s->%s" is not a valid transition' % (self.state, state))
+    def set_state(self, state: str | ShiftEntryState) -> None:
+        if isinstance(state, str):
+            try:
+                state = ShiftEntryState(state)
+            except ValueError as e:
+                raise ShiftEntryStateException(f'"{state}" is not a valid state') from e
+
+        if state not in self.valid_states():
+            raise ShiftEntryStateException(f'"{self.state}->{state}" is not a valid transition')
 
         self.state = state
 
@@ -58,30 +94,41 @@ class ShiftEntry(BaseModel):
 
 
 class Shift(BaseModel):
+    """An available shift for one or more volunteers to perform."""
+
     __tablename__ = "volunteer_shift"
-    __versioned__: dict = {}
+    __versioned__: dict[str, str] = {}
 
-    id = db.Column(db.Integer, primary_key=True)
-    role_id = db.Column(db.Integer, db.ForeignKey("volunteer_role.id"), nullable=False)
-    venue_id = db.Column(db.Integer, db.ForeignKey("volunteer_venue.id"), nullable=False)
-    proposal_id = db.Column(db.Integer, db.ForeignKey("proposal.id"), nullable=True)
-    start = db.Column(db.DateTime)
-    end = db.Column(db.DateTime)
-    min_needed = db.Column(db.Integer, nullable=False, default=0)
-    max_needed = db.Column(db.Integer, nullable=False, default=0)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    role_id: Mapped[int] = mapped_column(ForeignKey("volunteer_role.id"))
+    venue_id: Mapped[int] = mapped_column(ForeignKey("volunteer_venue.id"))
 
-    role = db.relationship("Role", backref="shifts")
-    venue = db.relationship("VolunteerVenue", backref="shifts")
-    proposal = db.relationship("Proposal", backref="shift")
+    occurrence_id: Mapped[int | None] = mapped_column(ForeignKey("occurrence.id"))
+    start: Mapped[datetime] = mapped_column()
+    end: Mapped[datetime] = mapped_column()
 
-    current_count = db.column_property(
-        select([func.count(ShiftEntry.shift_id)])
+    #: Minimum number of volunteers required for the shift
+    min_needed: Mapped[int] = mapped_column(default=0)
+    #: Maximum number of volunteers required for the shift
+    max_needed: Mapped[int] = mapped_column(default=0)
+
+    #: Role that this shift is filling
+    role: Mapped[Role] = relationship(back_populates="shifts")
+    #: Venue where the shift occurs
+    venue: Mapped[VolunteerVenue] = relationship(back_populates="shifts")
+    #: Optional Occurrence (talk/workshop) related to this shift
+    occurrence: Mapped[Occurrence] = relationship(back_populates="shifts")
+    #: Entries (volunteers) for this shift
+    entries: Mapped[list[ShiftEntry]] = relationship(back_populates="shift")
+
+    current_count = column_property(
+        select(func.count(ShiftEntry.shift_id))
         .where(ShiftEntry.shift_id == id)
-        .correlate_except(ShiftEntry)  # type: ignore[arg-type]
-        .scalar_subquery()  # type: ignore[attr-defined]
+        .correlate_except(ShiftEntry)
+        .scalar_subquery()
     )
 
-    duration = db.column_property(end - start)
+    duration = column_property(end - start)
 
     volunteers = association_proxy("entries", "user")
 
@@ -114,16 +161,22 @@ class Shift(BaseModel):
         }
 
     def is_clash(self, other):
-        """
-        If the venues and roles match then the shifts can overlap
-        """
+        """Calculate whether this shift clashes with another.
 
+        We use this to determine if we should allow a volunteer to sign up for
+        both shifts, which is only permitted if the other shift is filling the
+        same role in the same venue. In all other cases a volunteer can't sign
+        up for two shifts at the same time.
+
+        This is needed because contiguous shifts often have a slight overlap.
+        """
+        # If the venues and roles match then the shifts can overlap.
         if self.venue == other.venue and self.role == other.role:
             return False
         return other.start <= self.start <= other.end or self.start <= other.start <= self.end
 
     def __repr__(self):
-        return "<Shift {0}/{1}@{2}>".format(self.role.name, self.venue.name, self.start)
+        return f"<Shift {self.role.name}/{self.venue.name}@{self.start}>"
 
     def duration_in_minutes(self):
         return (self.start - self.end).total_seconds() // 60
@@ -135,7 +188,7 @@ class Shift(BaseModel):
             "id": self.id,
             "role_id": self.role_id,
             "venue_id": self.venue_id,
-            "proposal_id": self.proposal_id,
+            "occurrence_id": self.occurrence_id,
             "start": start.strftime("%Y-%m-%dT%H:%M:00"),
             "start_time": start.strftime("%H:%M"),
             "end": end.strftime("%Y-%m-%dT%H:%M:00"),
@@ -152,23 +205,61 @@ class Shift(BaseModel):
         return cls.query.order_by(Shift.start, Shift.venue_id).all()
 
     @classmethod
-    def get_all_for_day(cls, day: str):
-        """
-        Return all shifts for the requested day.
-        """
+    def get_all_for_day(cls, day: date) -> Sequence[Self]:
+        """Return all shifts for the requested day."""
         return (
-            cls.query.where(text("lower(to_char(start, 'Dy'))=:day").bindparams(day=day.lower()))
-            .order_by(Shift.start, Shift.venue_id)
+            db.session.execute(
+                select(cls)
+                .where(text("to_char(start, 'YYYY-MM-DD')=:day").bindparams(day=day.strftime("%Y-%m-%d")))
+                .order_by(Shift.start, Shift.venue_id)
+            )
+            .scalars()
             .all()
         )
 
     @classmethod
-    def generate_for(cls, role, venue, first, final, min, max, base_duration=120, changeover=15):
-        """
-        Will generate shifts between start and end times. The last shift will
-        end at end.
-        changeover is the changeover time in minutes.
-        This will mean that during changeover there will be two shifts created.
+    def earliest_and_latest_in_range(
+        cls, start: datetime, end: datetime
+    ) -> tuple[datetime | None, datetime | None]:
+        """Return the earliest and latest shift available to a volunteer."""
+
+        query = select(cls.start).where((cls.start >= start) & (cls.end <= end))
+        first = db.session.execute(query.order_by(cls.start)).scalar()
+        last = db.session.execute(query.order_by(desc(cls.end))).scalar()
+
+        return (first, last)
+
+    @classmethod
+    def generate_for(
+        cls,
+        role: Role,
+        venue: VolunteerVenue,
+        first: DateTime,
+        final: DateTime,
+        min: int,
+        max: int,
+        base_duration: int = 120,
+        changeover: int = 15,
+    ) -> list[Shift]:
+        """Build Shift records between start and end times.
+
+        Args:
+            first: an ISO8601 datetime indicating the start of the first shift
+
+            final: an ISO8601 datetime indicating the end of the last shift
+
+            min: is the minimum number of people needed to staff these shifts and still
+            get the job done.
+
+            max: is the maximum number of people who can practically staff these
+            shifts and having something to do.
+
+            base_duration: is how long we want a shift to be. The last shift of the
+            day may be slightly shorter.
+
+            changeover: indicates the time in minutes to overlap two shifts, allowing
+            some time for volunteers to handover between each other. Shifts will start
+            `changeover` minutes before the configured start time.
         """
 
         def start(t):

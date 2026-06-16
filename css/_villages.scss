@@ -1,0 +1,124 @@
+/* Villages */
+@use "./_variables.scss" as *;
+
+.village-table {
+  display: grid;
+  padding: 0;
+
+  .village-table-title a {
+    color: inherit;
+  }
+
+  /* Display as cards */
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+
+    .village-table-header {
+      display: none;
+    }
+    .village-table-village {
+      background-color: $highlight-background;
+      color: $highlight-background-text;
+      border-radius: $small-border-radius;
+      padding: 10px 15px 10px 15px;
+      margin-bottom: 10px;
+      list-style-type: none;
+    }
+
+    .village-table-title {
+      color: $highlight-background-text;
+      margin-top: 0;
+    }
+    .village-table-description {
+      margin: 0;
+    }
+    .village-table-links {
+      display: inline-block;
+    }
+    .village-table-member-count {
+      display: inline-block;
+      float: right;
+    }
+  }
+
+  /* Display as table */
+  @media (min-width: 600px) {
+    grid-template-columns: [title-start] auto [title-end desc-start] auto [desc-end member-count-start] auto [member-count-end links-start] max-content [links-end];
+
+    background-color: $highlight-background;
+    color: $highlight-background-text;
+    border-radius: $small-border-radius;
+
+    .village-table-village,
+    .village-table-header {
+      display: contents;
+    }
+    .village-table-header h4 {
+      font-weight: bold;
+    }
+
+    .village-table-title,
+    .village-table-description,
+    .village-table-member-count,
+    .village-table-links {
+      margin: 0;
+      padding: 10px 15px 5px 15px;
+    }
+    .village-table-village .village-table-title {
+      font-size: inherit;
+      font-family: inherit;
+    }
+    .village-table-village::before {
+      display: block;
+      content: "";
+      height: 0;
+      border-top: 1px solid #aaa;
+      grid-column: title-start / links-end;
+    }
+    .village-table-title {
+      grid-column: title-start / title-end;
+      color: $highlight-background-text;
+    }
+    .village-table-description {
+      grid-column: desc-start / desc-end;
+      color: $highlight-background-text;
+    }
+    .village-table-member-count {
+      grid-column: member-count-start / member-count-end;
+      color: $highlight-background-text;
+    }
+    .village-table-links {
+      grid-column: links-start / links-end;
+    }
+
+    &:not(.village-table-located) {
+      grid-template-columns: [title-start] auto [title-end desc-start] auto [desc-end member-count-start] auto [member-count-end links-start] 0 [links-end];
+    }
+
+    .village-table-member-count-title {
+      display: none;
+    }
+  }
+}
+
+.village-form {
+  textarea#description {
+    height: 100px;
+  }
+
+  textarea#long_description {
+    height: 200px;
+  }
+}
+
+.embedded-content {
+  width: 100%;
+  height: 450px; // default height, recalculated by javascript.
+  border: none;
+  overflow: hidden;
+}
+
+.village-inline-form {
+  display: inline-block;
+  padding: 2px 0px;
+}

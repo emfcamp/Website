@@ -3,10 +3,25 @@ Hi {{ user.name }},
 Your Electromagnetic Field {{ event_year }} {{ proposal.human_type }} "{{ proposal.title }}" has been accepted!
 
 We'll be in contact shortly to check how you'd like it to be listed in the schedule as well as to confirm some other details with you.
+{%- if proposal.type_info.grants_event_tickets %}
+{%- if user.cfp_voucher.tickets_remaining > 1 %}
 
-If you don't yet have EMF tickets, you can now get them on this page:
+You can buy your reserved tickets here{% if user.cfp_voucher.expiry %} before {{ user.cfp_voucher.expiry.strftime('%Y-%m-%d') }}{% endif %}:
 
   {{ external_url('tickets.main', flow='speakers') }}
+
+For more updates about the event, please visit our blog: https://blog.emfcamp.org
+
+{%- elif user.cfp_voucher.tickets_remaining == 1 %}
+
+You already have a ticket to EMF but if you would like to buy another{% if user.cfp_voucher.expiry %} before {{ user.cfp_voucher.expiry.strftime('%Y-%m-%d') }}{% endif %} you can do so here:
+
+  {{ external_url('tickets.main', flow='speakers') }}
+{%- else %}
+
+You already have two adult admission tickets so cannot buy any more.
+{%- endif %}
+{%- endif %}
 
 Don't hesitate to get in touch if you have any questions:
 

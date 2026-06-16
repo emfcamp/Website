@@ -3,49 +3,101 @@
 {% block title %}My Account{% endblock %}
 {% block body %}
 {% include "account/_nav.html" %}
-{% set owned_tickets = current_user.get_owned_tickets(True)|list %}
-<p>
-  You're logged in as <strong>{{current_user.name}}</strong> (<strong>{{ current_user.email }}</strong>).
-    <a href="{{url_for('.details')}}">Edit your account details</a>.
-</p>
+{% set owned_tickets = current_user.get_owned_tickets(True, type="admission_ticket")|list %}
 <div class="panel-grid">
+    {% set bv = current_user.buildup_volunteer %}
+    {% if bv and event_start > now %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+        <h3 class="panel-title">Buildup</h3>
+        </div>
+        <div class="panel-body">
+            {% if not bv.recorded_on_site %}
+            <p>You're scheduled to arrive on site on
+                <strong>{{bv.arrival_date.strftime("%A %d %B at %H:%M")}}</strong>.
+                If your plans have changed, please <a href="{{ url_for("volunteer.buildup_amend") }}">update your details</a>.
+            </p>
+            {% else %}
+            <p>Welcome to EMF!</p>
+            {% endif %}
+        </div>
+        <div class="panel-footer">
+            <div class="btn-group">
+                {% if not bv.recorded_on_site %}
+                <a class="btn btn-primary" href="{{ url_for("volunteer.buildup_amend") }}">Update details</a>
+                {% elif config['BUILDUP_SIGNAL_GROUP'] %}
+                    <a class="btn btn-primary" href="{{config['BUILDUP_SIGNAL_GROUP']}}" target="_blank">Buildup chat (Signal)</a>
+                {% endif %}
+                {% if config['BUILDUP_ALERTS_GROUP'] %}
+                    <a class="btn btn-primary" href="{{config['BUILDUP_ALERTS_GROUP']}}" target="_blank">Buildup alerts (Signal)</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
   <div class="panel panel-default">
       <div class="panel-heading">
         <h3 class="panel-title">Villages</h3>
       </div>
-      <div class="panel-body">
-        {% if current_user.village %}
-          <p>You're a member of the <strong>{{current_user.village.name}}</strong> village.</p>
-          {% if current_user.village_membership.admin %}
+      {% if current_user.village %}
+        <div class="panel-body">
+          <p>You're a{% if current_user.village_membership.admin %}n admin{% else %} member{% endif %} of the <strong><a href="{{url_for('villages.view', year=event_year, village_id=current_user.village.id)}}">{{current_user.village.name}}</a></strong> village.</p>
+        </div>
+        {% if current_user.village_membership.admin %}
+          <div class="panel-footer">
             <a class="btn btn-primary" href="{{url_for('villages.edit', year=event_year, village_id=current_user.village.id)}}">
               Edit village details</a>
-          {% endif %}
-        {% else %}
+          </div>
+        {% endif %}
+      {% elif current_user.village_join_request %}
+        <div class="panel-body">
+          <p>You've requested to join the <strong><a href="{{url_for('villages.view', year=event_year, village_id=current_user.village_join_request.village.id)}}">{{current_user.village_join_request.village.name}}</a></strong> village.</p>
+        </div>
+      {% else %}
+        <div class="panel-body">
           <p>Village registration is open! If you're planning on camping with a group of people,
           you can let us know about it by registering your village.
           This will help us try to make sure you have the space and facilities you need.
           <a href="{{url_for('base.page', page_name='villages')}}">Learn more about villages</a>.
           </p>
-          <div class="btn-group">
-            <a class="btn btn-primary" href="{{ url_for("villages.register") }}">Register a village</a>
-            <a class="btn btn-default" href="{{url_for("villages.main", year=event_year)}}">View villages</a>
-          </div>
-        {% endif %}
-      </div>
+        </div>
+        <div class="panel-footer">
+          <a class="btn btn-primary" href="{{ url_for("villages.register") }}">Register a village</a>
+          <a class="btn btn-default" href="{{url_for("villages.main", year=event_year)}}">View villages</a>
+        </div>
+      {% endif %}
   </div>
 
-  {% if feature_enabled('CFP') and not feature_enabled('CFP_CLOSED') %}
+  {% if feature_enabled('CFP') %}
+  {% set cfp_basically_closed = feature_enabled('CFP_CLOSED') or feature_enabled('CFP_TALKS_CLOSED') or feature_enabled('CFP_WORKSHOPS_CLOSED') or feature_enabled('CFP_PERFORMANCES_CLOSED') %}
+  {% set proposal_count = current_user.proposals | length %}
+  {% if cfp_basically_closed and proposal_count == 0 %}
+    {# Hide the CfP panel #}
+  {% else %}
     <div class="panel panel-default">
       <div class="panel-heading">
         <h3 class="panel-title">Call for Participation</h3>
       </div>
       <div class="panel-body">
-        <p>Our Call for Participation is open!<br>
-        We're looking for talks, workshops, or performances at EMF {{event_year}}.
-        </p>
-        <a class="btn btn-primary" href="{{url_for('cfp.main')}}">Submit a proposal</a>
+        {% if not cfp_basically_closed %}
+          <p>Our Call for Participation is open!</p>
+          <p>We're looking for talks, workshops, or performances at EMF {{event_year}}.</p>
+        {% endif %}
+        {% if proposal_count %}
+          <p>You've already submitted {{ proposal_count }} {{ 'proposal' if proposal_count == 1 else 'proposals' }}.</p>
+        {% endif %}
+      </div>
+      <div class="panel-footer">
+        {% if not cfp_basically_closed %}
+          <a class="btn btn-primary" href="{{url_for('cfp.main')}}">Submit {{ 'another' if proposal_count else 'a' }} proposal</a>
+        {% endif %}
+        {% if proposal_count %}
+          <a class="btn btn-default" href="{{ url_for('cfp.proposals') }}">View or edit your {{ 'proposal' if proposal_count == 1 else 'proposals' }}</a>
+        {% endif %}
       </div>
     </div>
+  {% endif %}
   {% endif %}
 
   {% if feature_enabled('ATTENDEE_CONTENT') %}
@@ -61,6 +113,8 @@
           If you're part of a village you'll be able to schedule content occurring there,
           and anyone can arrange gatherings in the main bar or lounge.
         </p>
+      </div>
+      <div class="panel-footer">
         <a class="btn btn-primary" href="{{url_for('schedule.attendee_content')}}">Manage your content</a>
       </div>
     </div>
@@ -76,11 +130,61 @@
         You have more than one ticket assigned to you. We recommend you transfer tickets to
         whoever will be using them, so they can receive updates from us and sign up for workshops.
         </p>
+      </div>
+      <div class="panel-footer">
         <a class="btn btn-primary" href="{{url_for(".purchases")}}">Transfer tickets</a>
       </div>
     </div>
   {% endif %}
 
+    <div class="panel panel-default">
+        <div class="panel-heading">
+        <h3 class="panel-title">Chat</h3>
+        </div>
+        <div class="panel-body">
+        <p>Ask us questions and get in touch with other EMF attendees in our Matrix chat channels.
+        </p>
+        </div>
+        <div class="panel-footer">
+          <a class="btn btn-primary" href="https://matrix.to/#/#emf:emfcamp.org" target="_blank">EMF Matrix Space</a>
+        </div>
+    </div>
+
+    {% if blog_posts %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+        <h3 class="panel-title">Latest Updates</h3>
+        </div>
+        <div class="panel-body">
+            <p>Read the latest updates about EMF from <a href="https://blog.emfcamp.org" target="_blank">our blog</a>:</p>
+        <ul>
+        {% for post in blog_posts %}
+        <li><a href="{{post['link']}}" target="_blank">{{post['title']}}</a> ({{post['date'].strftime("%Y-%m-%d")}})</li>
+        {% endfor %}
+        <ul>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if SALES_STATE != 'sales-ended' and event_year == 2026 %}
+    {# If you update this, check templates/account/purchases.html to see if you need to make any changes there as well #}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Other Stuff</h3>
+        </div>
+        <div class="panel-body">
+            <p>We have a number of extra bits on sale for attendees:</p>
+            <ul>
+                <li>Art &amp; Installation fund donations are <a href="{{ url_for('tickets.main', flow='sponsor') }}">in the shop</a>, directly supporting art and attendee projects at EMF, and give you the opportunity to have your name displayed in a special Wall of Fame installation in the field.</li>
+                <li>Whether you have <a href="https://tildagon.badge.emfcamp.org">a Tildagon badge</a> already and are looking to get <a href="https://blog.emfcamp.org/2026/05/28/tildagon-2026-spaceagon/">the new 2026 Spaceagon</a> upgrade kit or want to pick one up for the first time, badges are <a href="{{ url_for('tickets.main', flow='badge') }}">on sale now</a>.</li>
+                <li>If you're bringing a car, please <a href="{{ url_for('tickets.main', flow='other') }}">buy a parking ticket</a> ahead of time.</li>
+                <li>Crates of Club-Mate are now <a href="{{ url_for('tickets.main', flow='club-mate') }}">available for discounted pre-order</a> from the bar for collection on site. (Don't worry, we'll still be selling bottles from the bar!)</li>
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+  {#
   {% if SITE_STATE in ('sales', 'event') %}
     <div class="panel panel-default">
       <div class="panel-heading">
@@ -89,12 +193,13 @@
       <div class="panel-body">
         <p>We still have a limited number of EMF 2024 T-shirts and Tildagon electronic badges available
         for sale &mdash; order now and collect them at the event.</p>
-        <div class="btn-group">
-          <a class="btn btn-primary" href="{{url_for("tickets.main", flow="tees")}}">Buy t-shirts</a>
-          <a class="btn btn-primary" href="{{url_for("tickets.main", flow="badge")}}">Buy badges</a>
-        </div>
+      </div>
+      <div class="panel-footer">
+        <a class="btn btn-primary" href="{{url_for("tickets.main", flow="tees")}}">Buy t-shirts</a>
+        <a class="btn btn-primary" href="{{url_for("tickets.main", flow="badge")}}">Buy badges</a>
       </div>
     </div>
   {% endif %}
+  #}
   </div>
 {% endblock %}

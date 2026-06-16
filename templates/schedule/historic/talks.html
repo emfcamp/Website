@@ -59,12 +59,12 @@
 {% for row in venue.events %}
   <tr class="{{- loop.cycle('odd', 'even') }}">
     <td>
-      <a href="{{url_for('schedule.item', year=year, proposal_id=row.id)}}">
+      <a href="{{url_for('schedule.item', year=year, schedule_item_id=row.id)}}">
           <strong>{{ row.speaker }}</strong>
       </a>
     </td>
     <td>
-      <a href="{{url_for('schedule.item', year=year, proposal_id=row.id)}}">
+      <a href="{{url_for('schedule.item', year=year, schedule_item_id=row.id)}}">
         {{ row.title }}
       </a>
     </td>

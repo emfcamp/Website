@@ -26,7 +26,7 @@ If you request an invoice for your payment, we are required by law to retain a c
 When we accept card payments at our events, we store receipts and any other data generated in accordance with PCI DSS standards. Merchant payment receipts will be securely disposed of no later than 6 months after the event ends.
 
 ## Video
-If you choose to allow recording of your session, the video will be available indefinitely to stream and download under a Creative Commons license on our [YouTube channel](https://www.youtube.com/user/emfcamp) and [media.ccc.de](https://media.ccc.de).
+If you choose to allow recording of your session, the video will be available indefinitely to stream and download under a Creative Commons license on our [YouTube channel](https://www.youtube.com/c/electromagneticfield) and [media.ccc.de](https://media.ccc.de).
 
 You may contact us to have the streaming video removed from our channels, however we cannot control its distribution elsewhere under the open license.
 

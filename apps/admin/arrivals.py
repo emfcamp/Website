@@ -1,30 +1,31 @@
-# coding=utf-8
 from flask import (
-    render_template,
-    redirect,
+    current_app as app,
+)
+from flask import (
     flash,
+    redirect,
+    render_template,
     request,
     url_for,
-    current_app as app,
 )
 from sqlalchemy.dialects.postgresql import insert
 
-from main import db
-from models.permission import Permission
+from main import db, get_or_404
 from models.arrivals import (
     ArrivalsView,
     ArrivalsViewProduct,
 )
+from models.permission import Permission
 from models.product import (
-    ProductGroup,
     Product,
+    ProductGroup,
 )
 
 from . import admin
 from .forms import (
-    NewArrivalsViewForm,
-    EditArrivalsViewForm,
     AddArrivalsViewProductForm,
+    EditArrivalsViewForm,
+    NewArrivalsViewForm,
 )
 
 
@@ -61,7 +62,7 @@ def arrivals_view_new():
 
 @admin.route("/arrivals/views/<int:view_id>", methods=["GET", "POST"])
 def arrivals_view(view_id):
-    view = ArrivalsView.query.get_or_404(view_id)
+    view = get_or_404(db, ArrivalsView, view_id)
 
     form = EditArrivalsViewForm(obj=view)
     if request.method != "POST":
@@ -107,7 +108,7 @@ def arrivals_view(view_id):
     methods=["GET", "POST"],
 )
 def arrivals_view_add(view_id, group_id=None, product_id=None):
-    view = ArrivalsView.query.get_or_404(view_id)
+    view = get_or_404(db, ArrivalsView, view_id)
     form = AddArrivalsViewProductForm()
 
     root_groups = ProductGroup.query.filter_by(parent_id=None).order_by(ProductGroup.id).all()
@@ -133,12 +134,12 @@ def arrivals_view_add(view_id, group_id=None, product_id=None):
 
         elif form.add_all_products_recursive.data:
 
-            def _fetch_all_products(group) -> list[dict[str, int]]:
+            def _fetch_all_products(group: ProductGroup) -> list[dict[str, int]]:
                 out = []
                 for product in group.products:
                     out.append({"view_id": view.id, "product_id": product.id})
-                for group in group.children:
-                    out.extend(_fetch_all_products(group))
+                for child_group in group.children:
+                    out.extend(_fetch_all_products(child_group))
                 return out
 
             db.session.execute(

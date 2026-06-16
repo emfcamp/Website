@@ -1,21 +1,22 @@
-from decimal import Decimal
-from datetime import datetime
-import pytest
 import random
 import string
+from datetime import datetime
+from decimal import Decimal
 
+import pytest
+
+from main import db
 from models.basket import Basket
 from models.exc import CapacityException
 from models.payment import BankPayment
-from models.product import Product, ProductGroup, PriceTier, Price
+from models.product import Price, PriceTier, Product, ProductGroup
 from models.purchase import (
-    PurchaseStateException,
-    PurchaseTransferException,
     PURCHASE_STATES,
     CheckinStateException,
+    PurchaseStateException,
+    PurchaseTransferException,
 )
 from models.user import User
-from main import db
 
 
 @pytest.fixture()
@@ -98,6 +99,7 @@ def test_validate_capacity_max(db, parent_group):
 
     # If that was OK, we can give it a name and check it flushes successfully.
     group.name = group_name
+    db.session.add(group)
     db.session.flush()
     assert group.id is not None
 
@@ -115,6 +117,7 @@ def test_capacity_propagation(db, parent_group, user):
     product2 = Product(name="product2", parent=parent_group)
     tier3 = PriceTier(name="tier3", parent=product2)
     Price(price_tier=tier3, currency="GBP", price_int=30)
+    db.session.add(tier3)
     db.session.commit()
 
     # Check all our items have the correct initial capacity
@@ -258,7 +261,9 @@ def test_product_group_get_counts_by_state(db, parent_group, user):
 
     # Add another purchase in another tier
     tier2 = PriceTier(name="2", parent=product)
+    db.session.add(tier2)
     price = Price(price_tier=tier2, currency="GBP", price_int=666)
+    db.session.add(price)
     db.session.commit()
     create_purchases(tier2, 1, user)
 
@@ -306,7 +311,7 @@ def test_redemption(db, parent_group, user):
 @pytest.mark.skip(reason="Intermittently fails on Github Actions with PurchaseTransferException")
 def test_transfer(db, user, parent_group):
     user1 = user
-    user2 = User("test_user_{}@test.invalid".format(random_string(8)), "test_user2")
+    user2 = User(f"test_user_{random_string(8)}@test.invalid", "test_user2")
     db.session.add(user2)
 
     product = Product(name="product", parent=parent_group)

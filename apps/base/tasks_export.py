@@ -1,19 +1,22 @@
-from datetime import datetime
 import json
 import os
-from typing import Optional
+from collections.abc import Iterable
+from typing import Any, cast
 
 import click
 from flask import current_app as app
-from sqlalchemy_continuum.utils import version_class, is_versioned
+from sqlalchemy.orm.decl_api import DeclarativeBase
+from sqlalchemy_continuum.utils import is_versioned, version_class
 
-from main import db
 from apps.common.json_export import ExportEncoder
-from models import event_year
+from main import db
+from models import naive_utcnow
+
+from ..config import config
 from . import base
 
 
-def get_export_data(table_filter: Optional[str] = None):
+def get_export_data(table_filter: str | None = None) -> Iterable[tuple[str, Any]]:
     """Export data to archive using the `get_export_data` method in the model class."""
     # As we go, we check against the list of all tables, in case we forget about some
     # new object type (e.g. association table).
@@ -24,7 +27,7 @@ def get_export_data(table_filter: Optional[str] = None):
 
     all_model_classes = {
         cls
-        for cls in db.Model.registry._class_registry.values()
+        for cls in cast(type[DeclarativeBase], db.Model).registry._class_registry.values()
         if isinstance(cls, type) and issubclass(cls, db.Model)
     }
 
@@ -67,7 +70,7 @@ def get_export_data(table_filter: Optional[str] = None):
             try:
                 export = model_class.get_export_data()
                 yield model, export
-            except Exception as e:
+            except Exception:
                 app.logger.error("Error exporting %s", model)
                 raise
 
@@ -102,7 +105,7 @@ def export_db(stdout, table):
     shouldn't be called, and that its associated table doesn't need to be checked.
     """
 
-    year = event_year()
+    year = config.event_year
     path = os.path.join("exports", str(year))
     for dirname in ["public", "private"]:
         os.makedirs(os.path.join(path, dirname), exist_ok=True)
@@ -110,38 +113,45 @@ def export_db(stdout, table):
     for model, export in get_export_data(table):
         for dirname in ["public", "private"]:
             if dirname in export:
-                filename = os.path.join(path, dirname, "{}.json".format(model))
+                filename = os.path.join(path, dirname, f"{model}.json")
                 try:
                     if stdout:
                         app.logger.info(json.dumps(export[dirname]))
                     else:
-                        json.dump(
-                            export[dirname],
-                            open(filename, "w"),
-                            indent=4,
-                            cls=ExportEncoder,
-                        )
-                except:
+                        with open(filename, "w") as f:
+                            json.dump(
+                                export[dirname],
+                                f,
+                                indent=4,
+                                cls=ExportEncoder,
+                            )
+                except Exception as e:
                     app.logger.exception("Error encoding export for %s", model)
-                    raise click.Abort()
+                    raise click.Abort() from e
                 app.logger.info("Exported data from %s to %s", model, filename)
 
     data = {
-        "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+        "timestamp": naive_utcnow().strftime("%Y-%m-%d %H:%M:%S"),
     }
     filename = os.path.join(path, "export.json")
 
     if stdout:
         app.logger.info(json.dumps(data))
     else:
-        json.dump(data, open(filename, "w"), indent=4, cls=ExportEncoder)
+        with open(filename, "w") as f:
+            json.dump(data, f, indent=4, cls=ExportEncoder)
 
     if table:
         return
 
     with app.test_client() as client:
-        for file_type in ["frab", "json", "ics"]:
-            url = f"/schedule/{year}.{file_type}"
+        for file_type, url_suffix in [
+            ("frab", "frab.xml"),
+            ("frab_json", "frab.json"),
+            ("json", "json"),
+            ("ics", "ics"),
+        ]:
+            url = f"/schedule/{year}.{url_suffix}"
             dest_path = os.path.join(path, "public", f"schedule.{file_type}")
             response = client.get(url)
             if response.status_code != 200:

@@ -3,88 +3,107 @@
 
 <h2>Sponsors</h2>
 
-<div class="well">
+<div class="alert alert-info">
   We're still accepting sponsors for this year's event.
-  <a href="{{url_for('.sponsor')}}"
-    >Learn more about sponsoring Electromagnetic Field</a
-  >.
+  <a href="{{url_for('.sponsor')}}">Learn more about sponsoring Electromagnetic Field</a>.
 </div>
 
 {% macro sponsor(url, image, alt, dark=False) %}
 <div class="sponsor{% if dark %} sponsor-dark{% endif %}">
-  <a class="clearfix" href="{{ url }}" title="{{alt}}">
-    <img
-      class="img-responsive col-xs-12 img-sponsor"
-      alt="{{alt}}"
-      src="{{ url_for('static', filename='images/sponsors/' + image) }}"
-    />
+  <a href="{{ url }}" title="{{alt}}" target="_blank" rel="noopener">
+    <img class="img-responsive col-xs-12 img-sponsor" alt="{{alt}}"
+      src="{{ url_for('static', filename='images/sponsors/' + image) }}" />
   </a>
 </div>
 {% endmacro %}
-
-<div
-  class="col-xs-6 col-sm-5 col-sm-offset-1"
->
-  <h3>Gold</h3>
-  {{ sponsor("https://www.and.digital/", "ANDDigital.svg", "AND Digital") }}
-  {{ sponsor("https://www.mathworks.com/", "mathworks.png", "MathWorks") }}
-
-  <h3>Silver</h3>
-  {{ sponsor("https://www.onega.net/", "onega.jpg", "Onega") }}
-  {{ sponsor("https://www.msd-animal-health.com/research-and-development/technology-labs/", "msd-animal-health.png", "MSD Animal Health Technology Labs") }}
-  {{ sponsor("https://www.mythic-beasts.com/", "mythicbeasts.svg", "Mythic Beasts") }}
-  {{ sponsor("https://www.nationwide.co.uk/", "nationwide.svg", "Nationwide") }}
-  {{ sponsor("https://www.pcbway.com/", "pcbway.png", "PCBWay") }}
-  {{ sponsor("https://utaw.tech/about/", "UTAW.svg", "United Tech and Allied Workers") }}
-
-  <h3>Bronze</h3>
-  {{ sponsor("https://www.codethink.co.uk/", "codethink.svg", "Codethink") }}
-  {{ sponsor("https://feng-ltd.com/", "FEng.svg", "Fieldhouse Engineering") }}
-  {{ sponsor("https://www.infobip.com/developers", "infobip.png", "Infobip") }}
-  {{ sponsor("https://octopus.energy/", "octopus-stacked.png", "Octopus Energy") }}
-  {{ sponsor("https://www.softwire.com/", "softwire-blue.svg", "Softwire") }}
-
-  <h3>Copper</h3>
-  {{ sponsor("https://connectedthings.store/", "connectedthings.svg", "Connected Things") }}
-  {{ sponsor("https://hookdeck.com/", "hookdeck-logo-color.svg", "Hookdeck") }}
-  {{ sponsor("https://canonical.com", "Canonical_logo_2023.svg", "Canonical") }}
-
+<div class="row">
+  <div class="col-xs-12">
+    <h3>Palladium</h3>
+    <div class="sponsors-list sponsors-list--palladium">
+      {{ sponsor("https://nationwide.co.uk/", "nationwide.svg", "Nationwide") }}
+    </div>
+  </div>
 </div>
-<div
-  class="col-xs-6 col-sm-5"
->
-  <h3>Badge</h3>
-  {{ sponsor("https://www.bosch-sensortec.com/", "bosch.png", "Bosch") }}
-  {{ sponsor("https://www.espressif.com/", "espressif-logo.svg", "Espressif") }}
-  {{ sponsor("https://www.ti.com/", "texasinstruments.svg", "Texas Instruments") }}
-
-  <h3>Arcade</h3>
-  {{ sponsor("https://lightburnsoftware.com/", "lightburn.svg", "Lightburn") }}
-  {{ sponsor("https://pimoroni.com/", "pimoroni.svg", "Pimoroni") }}
-  {{ sponsor("https://smokeandmirrors.store/", "smokeandmirrors.svg", "Smoke & Mirrors") }}
-
+<div class="row">
+  <div class="col-xs-12">
+    <h3>Gold</h3>
+    <div class="sponsors-list sponsors-list--gold">
+      {{ sponsor("https://foundryzero.co.uk/", "foundry-zero.svg", "Foundry Zero") }}
+      {{ sponsor("https://zzoomm.com/", "zzoomm.png", "zzoomm") }}
+      {{ sponsor("https://fullfibre.co/", "fullfibre.png", "FullFIbre") }}
+      {{ sponsor("https://mathworks.com/", "mathworks.svg", "MathWorks") }}
+    </div>
+  </div>
 </div>
-<div class="clearfix col-xs-12">
-  <h3>Special Thanks</h3>
-  <p>
-    We'd like to extend special thanks to the following organisations who have
-    been instrumental in making EMF happen:
-  </p>
-  <p>
-    <a href="http://bitfolk.com">Bitfolk</a>, the
-    <a href="https://www.ccc.de">Chaos Computer Club</a>,
-    <a href="https://eventinfra.org">EventInfra</a>, {#
-    <a href="https://www.flexoptix.net">Flexoptix</a>,#}
-    <a href="https://www.irccloud.com">IRCCloud</a>,
-    <a href="https://lakefest.co.uk/">Lakefest</a>,
-    <a href="https://www.lonap.net">LONAP</a>,
-    <a href="https://www.opentech.org.uk/">OpenTech</a>,
-    <a href="https://rtwilson.com/">Robin Wilson</a>,
-    <a href="https://businessconnect.sky.com">Sky Connect</a>,
-    <a href="https://www.templant.co.uk/">Templant</a>,
-    <a href="https://multi-streamer.com/">Volkert Software</a>,
-    <a href="https://info-beamer.com">info-beamer</a>,
-    and everyone who volunteered.
-  </p>
+
+<div class="row">
+  <div class="clearfix col-xs-12">
+    <h3>Silver</h3>
+    <div class="sponsors-list sponsors-list--silver">
+      {{ sponsor("https://antithesis.com/", "antithesis.svg", "Antithesis", True) }}
+      {{ sponsor("https://cside.com/", "cside.png", "cside") }}
+      {{ sponsor("https://grafana.com/", "grafana.svg", "Grafana", True) }}
+      {{ sponsor("https://mullvad.net/", "mullvad.png", "Mullvad") }}
+      {{ sponsor("https://www.mythic-beasts.com/", "mythicbeasts.svg", "Mythic Beasts") }}
+      {{ sponsor("https://www.onega.net/", "onega.jpg", "Onega") }}
+      {{ sponsor("https://utaw.tech/", "utaw.svg", "UTAW") }}
+    </div>
+  </div>
 </div>
+
+<div class="row">
+  <div class="clearfix col-xs-12">
+    <h3>Bronze</h3>
+    <div class="sponsors-list sponsors-list--bronze">
+      {{ sponsor("https://codemyriad.io/", "codemyriad.svg", "Codemyriad", True) }}
+      {{ sponsor("https://coretech-security.com/", "coretech.svg", "Coretech-Security") }}
+      {{ sponsor("https://feng-ltd.com/", "FEng.svg", "FEng Ltd") }}
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="clearfix col-xs-12">
+    <h3>Badge</h3>
+    <div class="sponsors-list sponsors-list--badge">
+      {{ sponsor("https://www.bosch-sensortec.com/", "bosch.png", "Bosch Sensortec") }}
+      {{ sponsor("https://espressif.com/", "espressif-logo.svg", "Espressif") }}
+      {{ sponsor("https://nextpcb.com/", "NextPCB.svg", "NextPCB") }}
+      {{ sponsor("https://ti.com/", "texasinstruments.svg", "Texas Instruments") }}
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="clearfix col-xs-12">
+    <h3>Copper</h3>
+    <p>
+      Pimoroni,
+      Hookdeck
+    </p>
+  </div>
+</div>
+
+{#
+<div class="row">
+  <div class="clearfix col-xs-12">
+    <h3>Special Thanks</h3>
+    <p>
+      We'd like to extend special thanks to the following organisations who have
+      been instrumental in making EMF happen:
+    </p>
+    <p>
+      The
+      <a href="https://www.ccc.de">Chaos Computer Club</a>,
+      <a href="https://eventinfra.org">EventInfra</a>,
+      <a href="https://www.flexoptix.net">Flexoptix</a>,
+      <a href="https://lakefest.co.uk/">Lakefest</a>,
+      <a href="https://www.lonap.net">LONAP</a>,
+      <a href="https://multi-streamer.com/">Volkert Software</a>,
+      <a href="https://info-beamer.com">info-beamer</a>,
+      and everyone who volunteered.
+    </p>
+  </div>
+</div>
+#}
 {% endblock %}

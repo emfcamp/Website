@@ -1,0 +1,55 @@
+{% set active = "time_blocks" %}
+{% extends "cfp_review/venues/_venue_base.html" %}
+{% from "_formhelpers.html" import render_field  %}
+{% block venue_body %}
+<div class="alert alert-info">
+<p>
+    Time blocks control when official EMF content can be scheduled in this venue.
+    Villages can schedule content at any time in their own venues, and in official
+    venues such as the Lounge and Bar which have "Attendee content" enabled.
+</p>
+</div>
+<div class="timeblocks">
+    {% for day in days %}
+        {% set blocks = time_blocks_by_day[day] %}
+        <div class="timeblock-day">
+            <h4>{{day.strftime("%a %d %B")}}</h4>
+            <div class="timeblock-content">
+            {% for time in timeblock_hours %}
+                <div class="timeblock-hour {% if time.hour < 5 or time.hour > 21 %}night{% endif %} {% if time.hour == 0 %}midnight{%endif %}">
+                    {{time.strftime("%H:%M")}}
+                </div>
+            {% endfor %}
+            {% for block in blocks %}
+                <div class="timeblock-block content-type-{{block.block.type}}" style="height:{{block.height}}%; top:{{block.top}}%">
+                    <a href="{{url_for('.timeblock_edit', venue_id=venue.id, time_block_id=block.block.id)}}">{{block.title|capitalize}}</a>
+                    {% if block.block.automatic %}
+                    <div class="timeblock-icon" title="Automatic scheduler">🤖</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="col-md-6">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Create Time Block</h3>
+        </div>
+    <div class="panel-body">
+        <form method="POST">
+            {{ new_form.hidden_tag() }}
+            {{ render_field(new_form.days) }}
+            {{ render_field(new_form.start) }}
+            {{ render_field(new_form.end) }}
+            {{ render_field(new_form.type) }}
+            {{ render_field(new_form.automatic) }}
+            {{ new_form.submit(class_="btn btn-success") }}
+        </form>
+    </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,13 +1,19 @@
 exclude: ^(migrations/.*)$
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.9
+    rev: v0.15.12
     hooks:
       - id: ruff-format
       - id: ruff-check
 
-  - repo: git@github.com:pre-commit/pre-commit-hooks
+  - repo: https://github.com/mirrors-prettier/mirrors-prettier
+    rev: v3.8.2
+    hooks:
+      - id: prettier
+        files: ".*\\.(scss|js|jsx)"
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.4.0
     hooks:
       - id: no-commit-to-branch
-        args: ['--branch', 'main']
+        args: ["--branch", "main"]

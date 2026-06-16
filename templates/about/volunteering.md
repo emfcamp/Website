@@ -7,7 +7,7 @@ We’d like everyone to consider volunteering to help the event run smoothly, ev
 
 <div class="well">
   <p>To be notified when we're looking for help please subscribe to the volunteering mailing list:</p>
-  {{ contact_form("volunteer") }}
+  {{ mailing_list("volunteer") }}
 </div>
 
 ## Before the event
@@ -34,7 +34,7 @@ If you’re on site for setup/teardown you have to help with everything - not ju
 
 <div class="well">
   <p>To be notified when we start looking for help with setup & teardown please subscribe to the volunteering mailing list:</p>
-  {{ contact_form("volunteer") }}
+  {{ mailing_list("volunteer") }}
 </div>
 
 

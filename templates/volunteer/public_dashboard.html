@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Public Volunteer Dashboard{% endblock %}
+
+{% block head %}
+    {% if refresh > 0 %}
+        <meta http-equiv="refresh" content="{{ refresh }}">
+    {% endif %}
+{% endblock %}
+
+{% block document %}
+<header role="banner">
+  <a aria-label="Electromagnetic Field" href="/" id="main-logo">
+    <img id="logomark" src="{{ static_url_for('static', filename="images/brand/2026/emf2026-logo-light-clipped.svg") }}" alt="">
+    <span class="logo-line logo-line1">Electromagnetic</span>
+    <span class="logo-line logo-line2">Field <span class="brand-2026-rainbow">2026</span></span>
+  </a>
+  <div id="header-text">
+    Eastnor, UK
+    <br>
+    <span class="header-date">July 16<sup>th</sup> – 19<sup>th</sup> 2026</span>
+  </div>
+</header>
+<div class="volunteer-dashboard">
+    <h1>Register yourself as a volunteer at {{ external_url('.sign_up') }}</h1>
+    <div class="row">
+    {% for shift in shifts %}
+        <div class="col-xs-3">
+            <div class="volunteer-dashboard-card {% if shift.min_needed > 0 and shift.min_needed <= shift.current_count %}min_reached{% else %}{% if shift.start <= now %}now{% elif shift.start <= soon %}upcoming{% endif %}{% endif %}">
+                <h2>{{ shift.role.name }}</h2>
+                <p class="shift-time">{{ shift.start.strftime("%H:%M") }} to {{ shift.end.strftime("%H:%M") }}</p>
+                <p class="volunteer-num">{{ shift.max_needed - shift.current_count }}/{{ shift.max_needed }} needed</p>
+            </div>
+        </div>
+        {% if loop.index % 4 == 0 %}
+    </div>
+    <div class="row">
+        {%  endif %}
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}

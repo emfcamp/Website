@@ -4,6 +4,8 @@
     Bar training
 {% endblock %}
 
+{% block body_class %}bar-training{% endblock %}
+
 {% block body %}
 {% include "volunteer/_nav.html" %}
 
@@ -19,25 +21,15 @@
 {% else %}
 
 {% if trained %}
-
-<h2>You have completed this training!</h2>
-{% if feature_enabled("VOLUNTEERS_SCHEDULE") %}
-    <p>
-        <strong>Congratulations - you have completed your training for working in the bar.</strong>
-        You can now <a href="{{ url_for('volunteer.schedule') }}">sign up</a> for bar shifts.
-    </p>
-{% else %}
-    <p>
-        <strong>Congratulations - you have completed your training for working in the bar.</strong>
-        You will be able to sign up for bar shifts once the volunteer schedule is live.
-    </p>
-{% endif %}
-<p>
-    You are welcome to review the training material again to boost your knowledge, or even
-    complete the questions again - however you are not required to.
-</p>
-<hr />
-
+<div class="admonition success">
+    <h3>You have completed this training!</h3>
+    {% if feature_enabled("VOLUNTEERS_SCHEDULE") %}
+        <p>You can now <a href="{{ url_for('volunteer.schedule') }}">sign up</a> for bar shifts.</p>
+    {% else %}
+        <p>You will be able to sign up for bar shifts once the volunteer schedule is live.</p>
+    {% endif %}
+    <p>You are welcome to review the training material again to boost your knowledge, or even complete the questions again - however you are not required to.</p>
+</div>
 {% endif %}
 
 <form method="post">
@@ -47,30 +39,30 @@
 
     {% for page in pages %}
         <div id="page-{{ page['number'] }}" class="paged-content">
-            {% if page['number'] != 1 %}<hr />{% endif %}
-
             {{ page.content|safe }}
 
             {% if page.questions %}
+                <div class="well">
                 <h3>Questions</h3>
-                {% for q in form.questions %}
-                    {% if page['number'] == q.page %}
+                    {% for q in form.questions %}
+                        {% if page['number'] == q.page %}
 
-                        {% if q.answers.errors %}
-                            <p>
-                                <mark>
-                                    {{q.question_id.data + 1}}. {{ q.question|safe }}
-                                    <strong class="pull-right" style="color: red">{{ ', '.join(q.answers.errors) }}</strong>
-                                </mark>
-                            </p>
-                        {% else %}
-                            <p>{{q.question_id.data + 1}}. {{ q.question|safe }}</p>
+                            {% if q.answers.errors %}
+                                <p>
+                                    <mark>
+                                        {{q.question_id.data + 1}}. {{ q.question|safe }}
+                                        <strong class="pull-right" style="color: red">{{ ', '.join(q.answers.errors) }}</strong>
+                                    </mark>
+                                </p>
+                            {% else %}
+                                <p>{{q.question_id.data + 1}}. {{ q.question|safe }}</p>
+                            {% endif %}
+
+                            {{ q.answers(class_="no-list-style") }}
+                            {{ q.hidden_tag() }}
                         {% endif %}
-
-                        {{ q.answers(class_="no-list-style") }}
-                        {{ q.hidden_tag() }}
-                    {% endif %}
-                {% endfor %}
+                    {% endfor %}
+                </div>
             {% endif %}
 
             {% if page['number'] == last_page %}

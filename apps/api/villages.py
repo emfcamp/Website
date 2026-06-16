@@ -1,31 +1,50 @@
+from typing import Any, TypedDict
+
 from flask import abort, request
+from flask_cors import cross_origin
 from flask_login import current_user
 from flask_restful import Resource
+from geoalchemy2.shape import from_shape, to_shape
+from shapely.geometry import Point
+
+from apps.config import config
+from main import db, external_url
+from models.content import Venue
 from models.user import User
 from models.village import Village, VillageMember
-from models.cfp import Venue
-from shapely.geometry import Point
-from geoalchemy2.shape import to_shape, from_shape
 
-from main import db
 from . import api
 
 
-def render_village(village: Village):
+class VillageResponse(TypedDict):
+    id: int
+    name: str
+    url: str
+    external_url: str | None
+    description: str | None
+    location: dict[str, Any] | None
+    num_members: int
+
+
+def render_village(village: Village) -> VillageResponse:
     return {
         "id": village.id,
         "name": village.name,
-        "url": village.url,
+        "url": external_url("villages.view", year=config.event_year, village_id=village.id),
+        "external_url": village.url,
         "description": village.description,
-        "location": (to_shape(village.location).__geo_interface__ if village.location else None),
+        "location": to_shape(village.location).__geo_interface__ if village.location else None,
+        "num_members": len(village.village_memberships),
     }
 
 
 class VillagesMap(Resource):
+    @cross_origin()
     def get(self):
         features = []
-        for obj in Village.query.filter(Village.location.isnot(None)):
+        for obj in db.session.query(Village).filter(Village.location.isnot(None)):
             data = obj.__geo_interface__
+            assert data
             if data["properties"].get("description") is not None:
                 desc = data["properties"]["description"]
                 data["properties"]["description"] = (desc[:230] + "...") if len(desc) > 230 else desc
@@ -36,7 +55,7 @@ class VillagesMap(Resource):
 class Villages(Resource):
     def get(self):
         result = []
-        for village in Village.query.all():
+        for village in db.session.query(Village).all():
             result.append(render_village(village))
         return result
 
@@ -46,7 +65,7 @@ class MyVillages(Resource):
         if not current_user.is_authenticated:
             return abort(404)
 
-        my_villages = Village.query.join(VillageMember)
+        my_villages = db.session.query(Village).join(VillageMember)
         if (not current_user.has_permission("villages")) or request.args.get("all") != "true":
             my_villages = my_villages.filter(
                 (VillageMember.user == current_user) & (VillageMember.admin.is_(True))
@@ -63,7 +82,7 @@ class MyVillages(Resource):
 
 class VillageResource(Resource):
     def get(self, id):
-        village = Village.query.get(id)
+        village = db.session.query(Village).get(id)
         if not village:
             return {"error": "Not found"}, 404
         return render_village(village)
@@ -71,12 +90,13 @@ class VillageResource(Resource):
     def post(self, id):
         # Used to update village location from the map.
         # This only updates location for the moment.
-        obj = Village.query.get(id)
+        obj = db.session.query(Village).get(id)
         if not obj:
             return abort(404)
 
         village_admins = (
-            User.query.join(VillageMember)
+            db.session.query(User)
+            .join(VillageMember)
             .filter(VillageMember.village_id == obj.id, VillageMember.admin.is_(True))
             .all()
         )
@@ -87,16 +107,18 @@ class VillageResource(Resource):
         data = request.get_json()
 
         if "location" not in data:
-            return
+            return None
 
         obj.location = from_shape(Point(data["location"]), srid=4326)
         db.session.commit()
+        return None
 
 
 class VenuesMap(Resource):
+    @cross_origin()
     def get(self):
         features = []
-        for obj in Venue.query.filter(Venue.location.isnot(None)):
+        for obj in db.session.query(Venue).filter(Venue.location.isnot(None)):
             features.append(obj.__geo_interface__)
         return {"type": "FeatureCollection", "features": features}
 
