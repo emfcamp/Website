@@ -21,13 +21,27 @@
 <dt>Capacity</dt><dd>{{ coalesce(new_tier.parent.capacity_max) }}</dd>
 </dl>
 
+{% if price_change %}
+<div class="alert alert-danger">This ticket type conversion will result in a refund of {{ price_change }} {{ticket.price.currency }}.</div>
+{% endif %}
+
 <form method="post">
 {{ form.hidden_tag() }}
+{% if price_change %}
+{{ form.convert(class_="btn btn-danger debounce") }}
+{% else %}
 {{ form.convert(class_="btn btn-primary debounce") }}
+{% endif %}
 </form>
 
 {% else %}
 <h4>Choose a price tier to convert to</h4>
+
+{% if allow_refund %}
+<a class="btn btn-default" href="?allow_refund=False">Don't show tiers which will result in a refund</a>
+{% else %}
+<a class="btn btn-danger" href="?allow_refund=True">Show tiers which will result in a refund</a>
+{% endif %}
 
 <table class="table table-condensed" id="product_overview">
     <thead>
@@ -52,7 +66,12 @@
             <td>{{coalesce(tier.parent.capacity_max)}}</td>
             <td>
                 {% if tier != ticket.price_tier %}
-                <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=ticket.id, price_tier_id=tier.id)}}">Convert</a>
+                {% set will_refund = tier.get_price(ticket.price.currency).value != ticket.price.value %}
+                {% if will_refund %}
+                    <a class="btn btn-danger" href="{{ url_for('.convert_ticket', ticket_id=ticket.id, price_tier_id=tier.id, allow_refund=allow_refund)}}">Convert (with refund)</a>
+                {% else %}
+                    <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=ticket.id, price_tier_id=tier.id, allow_refund=allow_refund)}}">Convert</a>
+                {% endif %}
                 {% endif %}
             </td>
         </tr>

@@ -3,6 +3,7 @@ from flask import (
     flash,
     redirect,
     render_template,
+    request,
     send_file,
     url_for,
 )
@@ -21,6 +22,7 @@ from models.user import User
 from ..common import feature_enabled
 from ..common.receipt import attach_tickets, render_pdf, render_receipt, set_tickets_emailed
 from ..config import config
+from ..payments.refund import create_stripe_refund
 from . import admin
 from .forms import (
     CancelTicketForm,
@@ -194,23 +196,75 @@ def cancel_free_ticket(ticket_id: int) -> ResponseReturnValue:
 @admin.route("/ticket/<int:ticket_id>/convert")
 @admin.route("/ticket/<int:ticket_id>/convert/<int:price_tier_id>", methods=["GET", "POST"])
 def convert_ticket(ticket_id, price_tier_id=None):
+    allow_refund = request.args.get("allow_refund", None) == "True"
+
     ticket = get_or_404(db, Purchase, ticket_id)
 
+    def flash_and_bail(*args, bad_tier=True, **kwargs):
+        flash(*args, **kwargs)
+        url_args = {
+            "ticket_id": ticket.id,
+            "allow_refund": str(allow_refund),
+        }
+        if not bad_tier:
+            url_args["price_tier_id"] = price_tier_id
+        return redirect(
+            url_for(
+                ".convert_ticket",
+                **url_args,
+            )
+        )
+
     new_tier = None
+    new_price = None
+    price_change = None
     if price_tier_id is not None:
         new_tier = PriceTier.query.get(price_tier_id)
+
+        new_price = new_tier.get_price(ticket.price.currency)
+        if new_price:
+            price_change = ticket.price.value - new_price.value
+
+        if allow_refund:
+            if not new_price:
+                # The new tier must have a price in the same currency.
+                return flash_and_bail(
+                    "New price tier has no price in the same currency as the ticket was sold in", "danger"
+                )
+            if new_price.price_int > ticket.price.price_int:
+                return flash_and_bail(
+                    "New price tier cannot be worth more than the previous price tier", "danger"
+                )
+        elif price_change:
+            return flash_and_bail(
+                f"New price tier costs {new_price} which is not the same as ticket price {ticket.price}, and issuing a partial refund has not been explicitly enabled",
+                "danger",
+            )
+
+        if price_change:
+            payment = ticket.payment
+            if payment.provider != "stripe":
+                return flash_and_bail(
+                    "Ticket conversions involving non-Stripe refunds must be done manually", "danger"
+                )
+            if not payment.is_refundable(ignore_event_refund_state=True):
+                return flash_and_bail("The payment is not in a state where refunds are possible", "danger")
+
+        if ticket.price_tier == new_tier:
+            return flash_and_bail("Cannot convert ticket to its current price tier", "danger")
 
     form = ConvertTicketForm()
     if form.validate_on_submit():
         if form.convert.data:
             app.logger.info(
-                "Converting ticket %s to %s (tier %s, product %s)",
+                "Converting ticket %s to %s (tier %s, product %s) (old price %s, new price %s, changing? %s)",
                 ticket.id,
                 new_tier.id,
                 new_tier.parent.name,
+                ticket.price,
+                new_price,
+                price_change,
             )
-
-            assert ticket.price_tier != new_tier
 
             with db.session.no_autoflush:
                 ticket.price_tier.return_instances(1)
@@ -219,29 +273,49 @@ def convert_ticket(ticket_id, price_tier_id=None):
             db.session.flush()
             if new_tier.get_total_remaining_capacity() < 0:
                 db.session.rollback()
-                flash("Insufficient capacity to convert ticket")
-                return redirect(
-                    url_for(
-                        ".convert_ticket",
-                        ticket_id=ticket.id,
-                        price_tier_id=price_tier_id,
-                    )
-                )
+                return flash_and_bail("Insufficient capacity to convert ticket", "danger", bad_tier=False)
 
-            ticket.price = new_tier.get_price(ticket.price.currency)
+            if price_change:
+                # We're doing the part-refund for real.
+                refund_amount = ticket.price.value - new_price.value
+                assert refund_amount > 0, "Refund amount is non-zero; we should have caught this already!"
+                app.logger.info(
+                    "Creating Stripe admin-conversion part-refund for %s of %s",
+                    ticket,
+                    refund_amount,
+                )
+                refund = create_stripe_refund(
+                    ticket.payment,
+                    refund_amount,
+                    {
+                        "type": "admin-conversion",
+                        "purchase_id": ticket.id,
+                        "old_price_tier": ticket.price_tier.id,
+                        "old_price": ticket.price.id,
+                        "old_product": ticket.product,
+                        "new_price_tier": new_tier.id,
+                        "new_price": new_price.id,
+                        "new_product": new_tier.parent,
+                    },
+                )
+                db.session.add(refund)
+                flash("Created part refund", "success")
+
+            ticket.price = new_price
             ticket.price_tier = new_tier
             ticket.product = new_tier.parent
 
             db.session.commit()
-            flash("Ticket converted")
+            flash("Ticket converted", "success")
             return redirect(url_for(".convert_ticket", ticket_id=ticket.id))
 
-    convertible_tiers = (
-        Price.query.filter_by(currency=ticket.price.currency, price_int=ticket.price.price_int)
-        .join(PriceTier)
-        .with_entities(PriceTier)
-        .order_by(PriceTier.id)
-    )
+    price_query = db.session.query(Price).filter_by(currency=ticket.price.currency)
+    if allow_refund:
+        price_query = price_query.filter(Price.price_int <= ticket.price.price_int)
+    else:
+        price_query = price_query.filter(Price.price_int == ticket.price.price_int)
+
+    convertible_tiers = price_query.join(PriceTier).with_entities(PriceTier).order_by(PriceTier.id)
 
     return render_template(
         "admin/tickets/ticket-convert.html",
@@ -249,6 +323,8 @@ def convert_ticket(ticket_id, price_tier_id=None):
         form=form,
         convertible_tiers=convertible_tiers,
         new_tier=new_tier,
+        price_change=price_change,
+        allow_refund=allow_refund,
     )
 
 
