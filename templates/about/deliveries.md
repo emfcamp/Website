@@ -20,15 +20,13 @@ To make sure your item gets to you, you need to do three things:
 
 Please address the item in this format:
 
-```
-Your Name
-Your Village Name (if applicable)
-EMF Electromagnetic Field 2026
-Eastnor Deer Park
-Access from A438
-Eastnor, LEDBURY HR8 1RQ
-Phone: 07441 101723
-```
+> Your Name
+> Your Village Name (if applicable)
+> EMF Electromagnetic Field 2026
+> Eastnor Deer Park
+> Access from A438
+> Eastnor, LEDBURY HR8 1RQ
+> Phone: 07441 101723
 
 It's important you get all of this in; if the service you're using doesn't have that many address lines, combine some (the name/village name line and the Deer Park/A438 lines could be combined).
 
