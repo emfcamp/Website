@@ -23,10 +23,12 @@
 {% set schedule_item = proposal.schedule_item %}
 
 {% if proposal.is_editable %}
+{% if proposal.state in ['new', 'edit'] %}
   <div>You can currently edit your proposal as it has not been sent for review.
      For more information on the selection process, please see our
      <a href="{{ url_for('.guidance') }}" target="_blank">guidance</a>.
   </div>
+{% endif %}
   <p></p>
   {% include "cfp/edit-form.html" %}
 {% else %}
