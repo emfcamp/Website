@@ -165,12 +165,13 @@ def schedule_ical(year: int) -> ResponseReturnValue:
 
     for flat_sid in flat_sids:
         cal_event = Event()
-        cal_event.add("uid", "{}-{}".format(year, flat_sid["id"]))
+        occurrence = flat_sid["occurrences"][0]
+        cal_event.add("uid", "{}-{}-{}".format(year, flat_sid["id"], occurrence["occurrence_num"]))
         cal_event.add("summary", flat_sid["title"])
         cal_event.add("description", _format_event_description(flat_sid))
-        cal_event.add("location", flat_sid["occurrences"][0]["venue"])
-        cal_event.add("dtstart", flat_sid["occurrences"][0]["start_date"])
-        cal_event.add("dtend", flat_sid["occurrences"][0]["end_date"])
+        cal_event.add("location", occurrence["venue"])
+        cal_event.add("dtstart", occurrence["start_date"])
+        cal_event.add("dtend", occurrence["end_date"])
         cal.add_component(cal_event)
 
     return Response(cal.to_ical(), mimetype="text/calendar")
@@ -238,12 +239,15 @@ def favourites_ical() -> ResponseReturnValue:
 
     for flat_sid in flat_sids:
         cal_event = Event()
-        cal_event.add("uid", "{}-{}".format(config.event_year, flat_sid["id"]))
+        occurrence = flat_sid["occurrences"][0]
+        cal_event.add(
+            "uid", "{}-{}-{}".format(config.event_year, flat_sid["id"], occurrence["occurrence_num"])
+        )
         cal_event.add("summary", flat_sid["title"])
         cal_event.add("description", _format_event_description(flat_sid))
-        cal_event.add("location", flat_sid["occurrences"][0]["venue"])
-        cal_event.add("dtstart", flat_sid["occurrences"][0]["start_date"])
-        cal_event.add("dtend", flat_sid["occurrences"][0]["end_date"])
+        cal_event.add("location", occurrence["venue"])
+        cal_event.add("dtstart", occurrence["start_date"])
+        cal_event.add("dtend", occurrence["end_date"])
         cal.add_component(cal_event)
 
     return Response(cal.to_ical(), mimetype="text/calendar")
