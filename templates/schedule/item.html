@@ -112,7 +112,7 @@
   <tr>
     <td><b>Attending this {{ schedule_item.human_type }} will cost</b></td>
     <td>
-      {% if schedule_item.attributes.participant_cost %}
+      {% if schedule_item.attributes.participant_cost and schedule_item.attributes.participant_cost | tidy_workshop_cost %}
       {{ schedule_item.attributes.participant_cost | tidy_workshop_cost }}
       {% else %}
       Free
