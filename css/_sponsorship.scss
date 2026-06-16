@@ -5,10 +5,14 @@
   text-decoration: none;
 }
 
+.sponsors .sponsor-blurb {
+  margin-top: 20px;
+}
+
 .sponsors .sponsor {
   padding: 15px;
   background-color: $main-background-text;
-  border-radius: $small-border-radius;
+  border-radius: 15px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -16,6 +20,34 @@
 
 .sponsors .sponsor-dark {
   background-color: #222;
+}
+
+.sponsors .sponsor-well {
+  background-color: $brand-2026-orange;
+  color: black;
+  border-radius: 15px;
+  margin: 15px;
+  padding: 14px 30px 6px 30px;
+  font-weight: 600;
+
+  a {
+    color: black;
+  }
+}
+
+.sponsors .sponsor-row {
+  margin-top: 30px;
+}
+
+.sponsors .sponsor-tier-name {
+  font-weight: 600;
+
+  &--palladium {
+    @media (min-width: 768px) {
+      line-height: 100px;
+      margin: 15px 0;
+    }
+  }
 }
 
 .sponsors .sponsors-list {
@@ -40,8 +72,8 @@
     }
     &--palladium {
       grid-template-columns: 1fr;
-      margin-left: 20%;
-      margin-right: 20%;
+      /*margin-left: 20%;
+      margin-right: 20%;*/
 
       img.img-sponsor {
         height: 100px;

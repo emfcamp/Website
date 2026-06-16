@@ -1,12 +1,22 @@
 {% set main_class='sponsors' %} {% extends "base.html" %} {% block title
 %}Sponsors{% endblock %} {% block body %}
 
-<h2>Sponsors</h2>
+<div class="row">
+  <div class="col-sm-7 sponsor-blurb">
+    <h2>Sponsors</h2>
+    
+    <p>We routinely work with sponsors to tailor their sponsorship package to an appropriate area. If you're interested in sponsoring <strong>EMF {{ event_year }}</strong>, we'd love to hear from you.</p>
+  </div>
 
-<div class="alert alert-info">
-  We're still accepting sponsors for this year's event.
-  <a href="{{url_for('.sponsor')}}">Learn more about sponsoring Electromagnetic Field</a>.
+  <div class="col-sm-5">
+    <div class="sponsor-well">
+      <p>We're still accepting sponsors for this year's event.</p>
+      <p><a href="{{url_for('.sponsor')}}">Learn more about sponsoring Electromagnetic Field</a>.</p>
+    </div>
+  </div>
 </div>
+
+<hr>
 
 {% macro sponsor(url, image, alt, dark=False) %}
 <div class="sponsor{% if dark %} sponsor-dark{% endif %}">
@@ -16,17 +26,19 @@
   </a>
 </div>
 {% endmacro %}
-<div class="row">
-  <div class="col-xs-12">
-    <h3>Palladium</h3>
+<div class="row sponsor-row">
+  <div class="col-sm-4">
+    <h3 class="sponsor-tier-name sponsor-tier-name--palladium">Palladium</h3>
+  </div>
+  <div class="col-sm-8">
     <div class="sponsors-list sponsors-list--palladium">
       {{ sponsor("https://nationwide.co.uk/", "nationwide.svg", "Nationwide") }}
     </div>
   </div>
 </div>
-<div class="row">
+<div class="row sponsor-row">
   <div class="col-xs-12">
-    <h3>Gold</h3>
+    <h3 class="sponsor-tier-name sponsor-tier-name--gold">Gold</h3>
     <div class="sponsors-list sponsors-list--gold">
       {{ sponsor("https://foundryzero.co.uk/", "foundry-zero.svg", "Foundry Zero") }}
       {{ sponsor("https://zzoomm.com/", "zzoomm.png", "zzoomm") }}
@@ -36,9 +48,9 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row sponsor-row">
   <div class="clearfix col-xs-12">
-    <h3>Silver</h3>
+    <h3 class="sponsor-tier-name sponsor-tier-name--silver">Silver</h3>
     <div class="sponsors-list sponsors-list--silver">
       {{ sponsor("https://antithesis.com/", "antithesis.svg", "Antithesis", True) }}
       {{ sponsor("https://cside.com/", "cside.png", "cside") }}
@@ -51,9 +63,9 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row sponsor-row">
   <div class="clearfix col-xs-12">
-    <h3>Bronze</h3>
+    <h3 class="sponsor-tier-name sponsor-tier-name--bronze">Bronze</h3>
     <div class="sponsors-list sponsors-list--bronze">
       {{ sponsor("https://codemyriad.io/", "codemyriad.svg", "Codemyriad", True) }}
       {{ sponsor("https://coretech-security.com/", "coretech.svg", "Coretech-Security") }}
@@ -62,9 +74,9 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row sponsor-row">
   <div class="clearfix col-xs-12">
-    <h3>Badge</h3>
+    <h3 class="sponsor-tier-name sponsor-tier-name--badge">Badge</h3>
     <div class="sponsors-list sponsors-list--badge">
       {{ sponsor("https://www.bosch-sensortec.com/", "bosch.png", "Bosch Sensortec") }}
       {{ sponsor("https://espressif.com/", "espressif-logo.svg", "Espressif") }}
@@ -74,9 +86,9 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row sponsor-row">
   <div class="clearfix col-xs-12">
-    <h3>Copper</h3>
+    <h3 class="sponsor-tier-name sponsor-tier-name--copper">Copper</h3>
     <p>
       Pimoroni,
       Hookdeck
