@@ -49,7 +49,14 @@ from .historic import historic_talk_data, item_historic, talks_historic
 
 # This controls both which types show on lineup and favourites,
 # and in which order they are presented.
-LINEUP_TYPE_ORDER: list[ScheduleItemType] = ["talk", "workshop", "familyworkshop", "performance", "film"]
+LINEUP_TYPE_ORDER: list[ScheduleItemType] = [
+    "talk",
+    "workshop",
+    "familyworkshop",
+    "performance",
+    "music",
+    "film",
+]
 
 
 @schedule.route("/schedule/")
@@ -67,7 +74,7 @@ def main_year(year):
             return schedule_current()
         if feature_enabled("LINE_UP"):
             # Show the lineup (list of talks without times/venues)
-            return line_up()
+            return line_up(year)
         # No schedule should be shown yet.
         return render_template("schedule/no-schedule.html")
     return talks_historic(year)
@@ -86,9 +93,12 @@ def schedule_current():
     )
 
 
-# FIXME this should probably work for other years
-@schedule.route("/schedule/line-up/2026")
-def line_up() -> ResponseReturnValue:
+@schedule.route("/schedule/line-up/<int:year>")
+def line_up(year: int) -> ResponseReturnValue:
+    if year != config.event_year:
+        # FIXME this should probably work for other years
+        abort(404)
+
     schedule_items: list[ScheduleItem] = list(
         db.session.scalars(
             select(ScheduleItem)
