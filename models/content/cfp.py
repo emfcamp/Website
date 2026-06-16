@@ -288,6 +288,9 @@ class Proposal(BaseModel):
     @property
     def is_editable(self) -> bool:
         """Whether this proposal can be edited by the submitter."""
+        if self.type == "installation" and self.state == "accepted":
+            # Accepted installations can be edited
+            return True
         if self.state in {"new", "edit"}:
             return True
         return False
