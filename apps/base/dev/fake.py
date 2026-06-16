@@ -1,7 +1,7 @@
 import logging
 import random
 from collections.abc import Mapping
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 from fractions import Fraction
 from typing import TypeVar, get_args
 
@@ -38,7 +38,7 @@ from models.content.lottery import (
     LotteryState,
     get_max_rank_for_user,
 )
-from models.content.schedule import ScheduleItemAvailability
+from models.content.schedule import ScheduleItemAvailability, ScheduleItemType
 from models.content.venue import Venue
 from models.diversity import (
     AGE_CHOICES,
@@ -174,6 +174,10 @@ class FakeDataGenerator:
             # rejected_email_sent
         )
 
+        created_ago = random.randint(0, 60 * 60 * 24 * 90)
+        proposal.created = datetime.now() - timedelta(seconds=created_ago)
+        proposal.modified = datetime.now() - timedelta(seconds=random.randint(0, created_ago))
+
         state = random_choice(states)
 
         if proposal.type not in {"installation"}:
@@ -218,7 +222,12 @@ class FakeDataGenerator:
         return proposal
 
     def create_schedule_item(
-        self, *, official_content: bool = True, user: User | None = None, proposal: Proposal | None = None
+        self,
+        *,
+        official_content: bool = True,
+        user: User | None = None,
+        proposal: Proposal | None = None,
+        type: ScheduleItemType | None = None,
     ) -> ScheduleItem | None:
         if proposal and proposal.type_info.schedule == False:
             return None
@@ -252,20 +261,25 @@ class FakeDataGenerator:
             if random_bool(0.9):
                 description = proposal.description
 
+        if not type:
+            type = random.choice(["talk", "performance", "workshop", "familyworkshop", "film"])
+
         schedule_item = ScheduleItem(
             # TODO: weightings for type
             # No lightning talks yet
-            type=random.choice(["talk", "performance", "workshop", "familyworkshop", "film"]),
+            type=type,
             state=random_choice(states),
             user=user,
             proposal=proposal,
-            names=names,
-            pronouns=pronouns,
+            names=names if type != "film" else "",
+            pronouns=pronouns if type != "film" else "",
             title=title,
             description=description,
             short_description=self.fake.sentence(nb_words=20, variable_nb_words=True),
             official_content=official_content,
-            video_privacy=random_choice({"public": 0.8, "review": 0.1, "none": 0.1}),
+            video_privacy=random_choice({"public": 0.8, "review": 0.1, "none": 0.1})
+            if type != "film"
+            else "none",
             # arrival_period
             # departure_period
             # contact_telephone
@@ -482,12 +496,19 @@ class FakeDataGenerator:
             if random_bool(0.5):
                 self.create_village(user)
 
-        for _ in range(10):
-            # Some unparented schedule items, created by the CFP team
-            self.create_schedule_item(
-                official_content=True,
-                user=random.choice(self.cfp_admins),
-            )
+        official_schedule_items: dict[ScheduleItemType, int] = {
+            "film": 10,
+            "performance": 20,
+            "talk": 3,
+            "workshop": 5,
+        }
+
+        for type, count in official_schedule_items.items():
+            # Schedule items manually created by content team
+            for _ in range(count):
+                self.create_schedule_item(
+                    official_content=True, user=random.choice(self.cfp_admins), type=type
+                )
 
         for _ in range(40):
             # Attendee content
