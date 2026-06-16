@@ -3,26 +3,26 @@
 {% block title %}Favourites{% endblock %}
 {% block body %}
 <h2>Favourites</h2>
-
+<div class="well">
 <p>You can <a href="{{ webcal_url('.favourites_ical', token=token) }}">subscribe to this list in your calendar</a>
    so it stays up to date, download it as an <a href="{{ url_for('.favourites_ical') }}?token={{ token }}">iCal file</a>,
    or get a <a href="{{ url_for('.favourites_json') }}?token={{ token }}">json feed</a> for your giant robot.
 </p>
 {% if not feature_enabled('SCHEDULE') %}
-<p>The feed will only contain talks or workshops once they've been allocated a stage and time.</p>
+<p>The feeds will only contain items once they've been allocated a stage and time.</p>
 {% endif %}
 <p><strong><a class="btn btn-lg btn-primary" href="{{ url_for('schedule.main_year', year=event_year) }}">View line-up</a></strong></p>
-
+</div>
 <div class="line-up">
 {{ list_schedule_items(grouped_schedule_items, ordered_type_infos) }}
 </div>
 
 {% if grouped_schedule_items | count == 0 %}
-    <p>
-        You currently don't have any favourites, add some by going to our
-        <a href="{{ url_for('schedule.main_year', year=event_year) }}">line-up</a>, clicking anything
-        that interests, you then clicking the &lsquo;Favourite&rsquo; button.
-    </p>
+    <div class="alert alert-warning">
+        You currently don't have any favourites! Add some by going to our
+        <a href="{{ url_for('schedule.main_year', year=event_year) }}">line-up</a> and
+        clicking the &lsquo;Favourite&rsquo; button.
+    </div>
 {% endif %}
 
 {% endblock %}
