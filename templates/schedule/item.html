@@ -13,6 +13,7 @@
   </small>
 </h2>
 
+{% if feature_enabled("SCHEDULE") %}
 {% for occurrence in schedule_item.occurrences %}
   <div class="panel panel-default">
     {% if schedule_item.occurrences | length > 1 %}
@@ -95,6 +96,7 @@
   </div>
 
 {% endfor %}
+{% endif %}
 
 {% if schedule_item.attributes.content_note %}
 <p><strong>This {{ schedule_item.human_type }} has the following content notes:</strong><br>
