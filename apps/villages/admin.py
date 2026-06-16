@@ -448,7 +448,7 @@ def admin_email_owners() -> ResponseReturnValue:
             subject: str = form.subject.data
             enqueue_emails(
                 users=users,
-                from_email=config.from_email("CONTACT_EMAIL"),
+                from_email=config.from_email("VILLAGES_EMAIL"),
                 subject=subject,
                 text_body=format_trusted_plaintext_email(body),
                 html_body=format_trusted_html_email(body, subject),
