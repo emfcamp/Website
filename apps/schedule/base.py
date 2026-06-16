@@ -104,16 +104,18 @@ def line_up(year: int) -> ResponseReturnValue:
             .where(ScheduleItem.type.in_(LINEUP_TYPE_ORDER))
             .where(ScheduleItem.state == "published")
             .where(ScheduleItem.official_content == True)
-            # ensure consistent shuffle when unchanged
-            .order_by(ScheduleItem.id)
         )
     )
 
+    user_id = current_user.get_id()
+
+    def key(item):
+        rng = random.Random(f"{user_id}:{item.id}")
+        return (item.type, rng.randbytes(4), item.id)
+
     # Shuffle the order, but keep it fixed per-user
     # (Because we don't want a bias in starring)
-    random.Random(current_user.get_id()).shuffle(schedule_items)
-    # sort is stable so this keeps the shuffle within a type
-    schedule_items.sort(key=lambda si: si.type)
+    schedule_items.sort(key=key)
 
     # We can't use jinja's groupby directly because we want to use
     # LINEUP_TYPE_ORDER and it accepts an attribute, not a lambda.
