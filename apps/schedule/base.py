@@ -52,8 +52,8 @@ from .historic import historic_talk_data, item_historic, talks_historic
 LINEUP_TYPE_ORDER: list[ScheduleItemType] = [
     "talk",
     "workshop",
-    "familyworkshop",
-    "performance",
+#    "familyworkshop",
+#    "performance",
     "film",
 ]
 
