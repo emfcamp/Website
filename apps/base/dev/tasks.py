@@ -17,7 +17,7 @@ from models.content.schedule import ScheduleItemType
 from models.content.venue import TimeBlock
 from models.feature_flag import FeatureFlag, refresh_flags
 from models.payment import BankAccount
-from models.site_state import refresh_states
+from models.site_state import SiteState, refresh_states
 from models.user import User
 
 from ...config import config
@@ -30,6 +30,13 @@ from .fake import FakeDataGenerator
 @click.option("--idempotent", is_flag=True)
 def dev_data(ctx, idempotent):
     """Make all categories of fake data for dev"""
+
+    # If the site state hasn't been set, set it to sales.
+    res = db.session.query(SiteState).filter_by(name="site_state").one_or_none()
+    if not res:
+        db.session.add(SiteState(name="site_state", state="sales"))
+        db.session.commit()
+
     ctx.invoke(enable_cfp)
     ctx.invoke(volunteer_data)
     ctx.invoke(create_tags)
