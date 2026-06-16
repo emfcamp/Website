@@ -96,6 +96,7 @@ class FakeDataGenerator:
             self.admin = User("admin@test.invalid", "Test Admin")
             self.admin.grant_permission("admin")
             db.session.add(self.admin)
+            self.create_admission_tickets_and_commit(self.admin)
 
         self.cfp_admins = []
         for i in range(4):
