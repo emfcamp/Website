@@ -6,7 +6,8 @@ The quick summary:
 1. Make sure you have Git and Docker installed
 2. Check out the website repository: ``git clone https://github.com/emfcamp/Website.git``
 3. Start the development environment: ``docker compose up``
-4. Load the website at http://localhost:2342
+4. Wait for the containers to start
+5. Load the website at http://localhost:2342
 
 Once you've finished making your changes:
 
@@ -76,15 +77,19 @@ set this up on the host where you’ll be using git:
 Adding accounts
 ---------------
 
-Once you’ve created an account on the website, you can use
-``./flask make_admin`` to make your user an administrator. Or, you can
-create an account and simultaneously make it an admin by using
-``./flask make_admin -e email@domain.tld``
+Randomly-generated fake development data is created automatically when
+the development instance starts. This includes an admin user with the email
+address ``admin@test.invalid``, as well as a number of other users.
 
-E-mail sending is disabled in development (but is printed out on the
-console). You can also log in directly by setting ``BYPASS_LOGIN=True``
+You can log in at http://localhost:2342/login, and the login email will be
+printed out to the console.
+
+You can also log in directly by setting ``BYPASS_LOGIN=True``
 in ``config/development.cfg`` and then using a URL of the form
 e.g. ``/login/admin@test.invalid``.
+
+The ``./flask make_admin`` command can be used to create/promote another
+admin user.
 
 Database Migrations
 -------------------
