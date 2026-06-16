@@ -5,6 +5,9 @@ from models.payment import BankPayment
 
 
 def make_epc_qr(payment: BankPayment) -> QRCode:
+    assert payment.recommended_destination
+    assert payment.recommended_destination.payee_name
+    assert payment.recommended_destination.iban
     return helpers.make_epc_qr(
         name=payment.recommended_destination.payee_name,
         iban=payment.recommended_destination.iban,

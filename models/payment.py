@@ -1,7 +1,7 @@
 import random
 import re
 import typing
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from datetime import datetime, timedelta
 from decimal import Decimal
 
@@ -84,7 +84,7 @@ class Payment(BaseModel):
 
     __mapper_args__ = {"polymorphic_on": "provider"}
 
-    def __init__(self, currency: Currency, amount: int | float, voucher_code: str | None = None):
+    def __init__(self, currency: Currency, amount: Decimal, voucher_code: str | None = None):
         self.currency = currency
         self.amount = amount
 
@@ -98,14 +98,19 @@ class Payment(BaseModel):
             return {}
 
         purchase_counts = (
-            cls.query.outerjoin(cls.purchases).group_by(cls.id).with_entities(func.count(Ticket.id))
-        )
-        refund_counts = cls.query.outerjoin(cls.refunds).group_by(cls.id).with_entities(func.count(Refund.id))
+            db.session.query(cls)
+            .outerjoin(cls.purchases)
+            .group_by(cls.id)
+            .with_entities(func.count(Ticket.id))
+        ).all()
+        refund_counts = (
+            db.session.query(cls).outerjoin(cls.refunds).group_by(cls.id).with_entities(func.count(Refund.id))
+        ).all()
 
         cls_version = version_class(cls)
         cls_transaction = transaction_class(cls)
-        changes = cls.query.join(cls.versions).group_by(cls.id)
-        change_counts = changes.with_entities(func.count(cls_version.id))
+        changes = db.session.query(cls).join(cls.versions).group_by(cls.id)
+        change_counts = changes.with_entities(func.count(cls_version.id)).all()
         first_changes = select(column("created")).select_from(
             changes.join(cls_version.transaction)
             .with_entities(func.min(cls_transaction.issued_at).label("created"))
@@ -118,7 +123,8 @@ class Payment(BaseModel):
         cls_txn_paid = aliased(cls_transaction)
         active_time = func.max(cls_txn_paid.issued_at) - func.max(cls_txn_new.issued_at)
         active_times = (
-            cls.query.join(cls_ver_new, cls_ver_new.id == cls.id)
+            db.session.query(cls)
+            .join(cls_ver_new, cls_ver_new.id == cls.id)
             .join(cls_ver_paid, cls_ver_paid.id == cls.id)
             .join(cls_txn_new, cls_txn_new.id == cls_ver_new.transaction_id)
             .join(cls_txn_paid, cls_txn_paid.id == cls_ver_paid.transaction_id)
@@ -144,7 +150,7 @@ class Payment(BaseModel):
                         ),
                         "active_time": bucketise([r.active_time for r in active_times], time_buckets),
                         "amounts": bucketise(
-                            cls.query.with_entities(cls.amount_int / 100),
+                            db.session.query(cls).with_entities(cls.amount_int / 100).all(),
                             [0, 10, 20, 30, 40, 50, 100, 150, 200],
                         ),
                     }
@@ -168,11 +174,11 @@ class Payment(BaseModel):
         ] and (get_refund_state() != "off" or ignore_event_refund_state)
 
     @property
-    def amount(self):
+    def amount(self) -> Decimal:
         return Decimal(self.amount_int) / 100
 
     @amount.setter
-    def amount(self, val):
+    def amount(self, val: Decimal) -> None:
         self.amount_int = int(val * 100)
 
     def change_currency(self, currency: Currency) -> None:
@@ -192,7 +198,7 @@ class Payment(BaseModel):
         # If we added a premium, it would need to be added again here
         self.currency = currency
 
-    def paid(self):
+    def paid(self) -> None:
         if self.state == "paid":
             raise StateException("Payment is already paid")
 
@@ -200,7 +206,7 @@ class Payment(BaseModel):
             purchase.set_state("paid")
         self.state = "paid"
 
-    def cancel(self):
+    def cancel(self) -> None:
         if self.state == "cancelled":
             raise StateException("Payment is already cancelled")
 
@@ -221,7 +227,7 @@ class Payment(BaseModel):
 
         db.session.flush()
 
-    def manual_refund(self):
+    def manual_refund(self) -> None:
         # Only to be called for full out-of-band refunds, for book-keeping.
         # Providers should cancel purchases individually and insert their
         # own Refunds subclass for partial refunds.
@@ -238,7 +244,10 @@ class Payment(BaseModel):
             for purchase in self.purchases:
                 if purchase.owner != self.user:
                     raise StateException("Cannot refund transferred purchase")
-                if purchase.price_tier.get_price(self.currency).value > 0 and not purchase.is_paid_for:
+                price = purchase.price_tier.get_price(self.currency)
+                if not price:
+                    raise StateException("No price for PriceTier")
+                if price.value > 0 and not purchase.is_paid_for:
                     # This might turn out to be too strict
                     raise StateException("Purchase is not paid, so cannot be refunded")
 
@@ -258,15 +267,15 @@ class Payment(BaseModel):
         self.user.payments.append(other)
         return other
 
-    def order_number(self):
+    def order_number(self) -> str:
         """Note this is not a VAT invoice number."""
         return f"WEB-{config.event_year}-{self.id:05d}"
 
-    def issue_vat_invoice_number(self):
+    def issue_vat_invoice_number(self) -> str:
         if not self.vat_invoice_number:
             sequence_name = "vat_invoice"
             try:
-                seq = PaymentSequence.query.filter_by(name=sequence_name).with_for_update().one()
+                seq = db.session.query(PaymentSequence).filter_by(name=sequence_name).with_for_update().one()
                 seq.value += 1
             except NoResultFound:
                 seq = PaymentSequence()
@@ -278,11 +287,13 @@ class Payment(BaseModel):
         return f"WEBV-{config.event_year}-{self.vat_invoice_number:05d}"
 
     @property
-    def expires_in(self):
+    def expires_in(self) -> timedelta | None:
+        if not self.expires:
+            return None
         return self.expires - naive_utcnow()
 
-    def lock(self):
-        Payment.query.with_for_update().get(self.id)
+    def lock(self) -> Payment:
+        return db.session.query(Payment).filter_by(id=self.id).with_for_update().one()
 
 
 @event.listens_for(Session, "after_flush")
@@ -300,7 +311,7 @@ class BankPayment(Payment):
 
     transactions: Mapped[list[BankTransaction]] = relationship(back_populates="payment")
 
-    def __init__(self, currency: Currency, amount: int | float, voucher_code: str | None = None):
+    def __init__(self, currency: Currency, amount: Decimal, voucher_code: str | None = None):
         Payment.__init__(self, currency, amount, voucher_code)
 
         # not cryptographic
@@ -309,23 +320,23 @@ class BankPayment(Payment):
     def __repr__(self):
         return f"<BankPayment: {self.state} {self.bankref}>"
 
-    def manual_refund(self):
+    def manual_refund(self) -> None:
         if self.state not in {"paid", "refund-requested"}:
             raise StateException("Only BankPayments that have been paid can be marked as refunded")
 
         super().manual_refund()
 
     @property
-    def recommended_destination(self):
+    def recommended_destination(self) -> BankAccount | None:
         for currency in [self.currency, "GBP"]:
             try:
-                return BankAccount.query.filter_by(currency=currency, active=True).one()
+                return db.session.query(BankAccount).filter_by(currency=currency, active=True).one()
             except MultipleResultsFound, NoResultFound:
                 continue
         return None
 
     @property
-    def customer_reference(self):
+    def customer_reference(self) -> str | None:
         if self.id is None:
             raise Exception(
                 "Customer references can only be generated for payments that have been persisted to the database."
@@ -391,9 +402,9 @@ class BankAccount(BaseModel):
 
     @classmethod
     def get(cls, sort_code, acct_id):
-        return cls.query.filter_by(acct_id=acct_id, sort_code=sort_code).one()
+        return db.session.query(cls).filter_by(acct_id=acct_id, sort_code=sort_code).one()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<BankAccount: {self.sort_code} {self.acct_id}>"
 
 
@@ -436,25 +447,29 @@ class BankTransaction(BaseModel):
         self.fit_id = fit_id
         self.wise_id = wise_id
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<BankTransaction: {self.amount}, {self.payee}>"
 
     @property
-    def amount(self):
+    def amount(self) -> Decimal:
         return Decimal(self.amount_int) / 100
 
     @amount.setter
-    def amount(self, val):
+    def amount(self, val: Decimal) -> None:
         self.amount_int = int(val * 100)
 
-    def get_matching(self):
+    def get_matching(self) -> Sequence[BankTransaction]:
         # fit_ids can change, and payments can be reposted
-        matching = self.query.filter_by(
-            account_id=self.account_id,
-            posted=self.posted,
-            type=self.type,
-            amount_int=self.amount_int,
-            payee=self.payee,
+        matching = (
+            db.session.query(self.__class__)
+            .filter_by(
+                account_id=self.account_id,
+                posted=self.posted,
+                type=self.type,
+                amount_int=self.amount_int,
+                payee=self.payee,
+            )
+            .all()
         )
         return matching
 
@@ -533,10 +548,10 @@ class StripePayment(Payment):
         super().cancel()
 
     @property
-    def description(self):
+    def description(self) -> str:
         return f"EMF {config.event_year} purchase"
 
-    def manual_refund(self):
+    def manual_refund(self) -> None:
         if self.state not in {"charged", "paid", "refund-requested"}:
             raise StateException(
                 "Only StripePayments that have been paid or charged can be marked as refunded"
@@ -565,22 +580,27 @@ class Refund(BaseModel):
         self.amount = amount
 
     @classmethod
-    def get_export_data(cls):
+    def get_export_data(cls) -> dict[str, typing.Any]:
         if cls.__name__ == "Refund":
             # Export stats for each refund type separately
             return {}
 
         purchase_counts = (
-            cls.query.outerjoin(cls.purchases).group_by(cls.id).with_entities(func.count("Ticket.id"))
-        )
+            db.session.query(cls)
+            .outerjoin(cls.purchases)
+            .group_by(cls.id)
+            .with_entities(func.count(Ticket.id))
+        ).all()
         data = {
             "public": {
                 "refunds": {
                     "counts": {
-                        "timestamp_week": export_intervals(cls.query, cls.timestamp, "week", "YYYY-MM-DD"),
+                        "timestamp_week": export_intervals(
+                            db.session.query(cls), cls.timestamp, "week", "YYYY-MM-DD"
+                        ),
                         "purchases": bucketise(purchase_counts, [0, 1, 2, 3, 4]),
                         "amounts": bucketise(
-                            cls.query.with_entities(cls.amount_int / 100),
+                            db.session.query(cls).with_entities(cls.amount_int / 100).all(),
                             [0, 10, 20, 30, 40, 50, 100, 150, 200],
                         ),
                     }
@@ -592,11 +612,11 @@ class Refund(BaseModel):
         return data
 
     @property
-    def amount(self):
+    def amount(self) -> Decimal:
         return Decimal(self.amount_int) / 100
 
     @amount.setter
-    def amount(self, val):
+    def amount(self, val: Decimal) -> None:
         self.amount_int = int(val * 100)
 
 
@@ -628,7 +648,7 @@ class RefundRequest(BaseModel):
     payment: Mapped[Payment] = relationship(back_populates="refund_requests")
 
     @property
-    def method(self):
+    def method(self) -> str:
         """The method we use to refund this request.
 
         This will be "stripe" if the payment can be refunded through Stripe,
@@ -650,6 +670,6 @@ class PaymentSequence(BaseModel):
     value: Mapped[int]
 
     @classmethod
-    def get_export_data(cls):
+    def get_export_data(cls) -> dict[str, typing.Any]:
         rows = db.session.scalars(select(cls))
         return {"public": {r.name: r.value for r in rows}}
