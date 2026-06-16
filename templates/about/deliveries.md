@@ -8,7 +8,7 @@ If you want to get items delivered to the event while you're here, the Logistics
     If you need something delivered for an EMF team or if it's larger than a pallet, please contact the Logistics team at <logistics@emfcamp.org> or DECT 1030 for instructions.
 
 !!! info "No supermarket/food deliveries"
-    Logistics does not accept deliveries from supermarkets, Amazon, or anywhere else that delivers perishable food. If you or your village needs food, please drive into Ledbury to get it. If we do receive a supermarket delivery, we will use it for crew snacks.
+    Logistics does not accept deliveries from supermarkets, Amazon Fresh, or anywhere else that delivers perishable food. If you or your village needs food, please drive into Ledbury to get it. If we do receive a supermarket delivery, we will use it for crew snacks.
 
 To make sure your item gets to you, you need to do three things:
 
