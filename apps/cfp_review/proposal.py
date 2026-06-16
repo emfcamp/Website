@@ -201,7 +201,6 @@ def update_proposal(proposal_id: int) -> ResponseReturnValue:
         proposal.user.will_have_ticket = form.user_will_have_ticket.data
 
         msg = f"Updating proposal {proposal_id}"
-        proposal.state = form.state.data
         return flash_commit_and_go(msg, ".proposal", proposal_id=proposal_id)
 
     if request.method == "GET":
