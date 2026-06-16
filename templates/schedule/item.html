@@ -96,9 +96,9 @@
 
 {% endfor %}
 
-{% if schedule_item.content_note %}
+{% if schedule_item.attributes.content_note %}
 <p><strong>This {{ schedule_item.human_type }} has the following content notes:</strong><br>
-  {{ schedule_item.content_note }} </p>
+  {{ schedule_item.attributes.content_note }} </p>
 {% endif %}
 
 <div class="well">
