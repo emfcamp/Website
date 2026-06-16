@@ -130,7 +130,7 @@ def line_up(year: int) -> ResponseReturnValue:
 
 
 @schedule.route("/schedule/add-favourite", methods=["POST"])
-def add_favourite():
+def add_favourite() -> ResponseReturnValue:
     if not current_user.is_authenticated:
         abort(401)
 
@@ -329,7 +329,7 @@ def item_current(year: int, schedule_item_id: int, slug: str | None = None) -> R
 
 
 @schedule.route("/schedule/lottery/about")
-def about_lotteries():
+def about_lotteries() -> ResponseReturnValue:
     return render_template("schedule/about_lotteries.html")
 
 
@@ -428,7 +428,7 @@ def now_and_next() -> ResponseReturnValue:
 @schedule.route("/time-machine")
 def time_machine():
     # now = pendulum.datetime(2018, 8, 31, 12, 00, tz=event_tz)
-    now = pendulum.now(event_tz)
+    now = pendulum.now(event_tz.zone)
     now_time = now.time()
     now_weekday = now.weekday()
 
@@ -497,7 +497,7 @@ class HeraldStageForm(Form):
 
 @schedule.route("/herald/<string:venue_name>", methods=["GET", "POST"])
 @v_user_required
-def herald_venue(venue_name):
+def herald_venue(venue_name: str) -> ResponseReturnValue:
     def herald_message(message, occurrence=None):
         app.logger.info(f"Creating new message {message}")
         if occurrence is None:
@@ -506,13 +506,13 @@ def herald_venue(venue_name):
             end = occurrence.scheduled_time + timedelta(minutes=occurrence.scheduled_duration)
         return AdminMessage(f"[{venue_name}] -- {message}", current_user, end=end, topic="heralds")
 
-    venue = Venue.query.filter_by(name=venue_name).one()
+    venue = db.session.query(Venue).filter_by(name=venue_name).one()
     occurrences = list(
         db.session.scalars(
             select(Occurrence)
             .where(Occurrence.scheduled_venue == venue)
             .where(Occurrence.schedule_item.has(ScheduleItem.state == "published"))
-            .where(Occurrence.scheduled_time > pendulum.now(event_tz))
+            .where(Occurrence.scheduled_time > pendulum.now(event_tz.zone))
             .order_by(Occurrence.scheduled_time)
             .limit(2)
             .options(selectinload(Occurrence.schedule_item))
@@ -523,15 +523,15 @@ def herald_venue(venue_name):
     form = HeraldStageForm()
 
     if form.validate_on_submit():
+        if now is None or form.now.occurrence_id.data != now.id:
+            flash("'now' changed, please refresh")
+            return redirect(url_for(".herald_venue", venue_name=venue_name))
+        msg = None
         if form.now.update.data:
-            if now is None or form.now.occurrence_id.data != now.id:
-                flash("'now' changed, please refresh")
-                return redirect(url_for(".herald_venue", venue_name=venue_name))
-
             msg = herald_message(
                 f"Change: video privacy '{now.video_privacy}' for '{now.schedule_item.title}'", now
             )
-            now.video_privacy = form.now.video_privacy.data
+            now.schedule_item.video_privacy = form.now.video_privacy.data
 
         elif form.next.update.data:
             if next is None or form.next.occurrence_id.data != next.id:
@@ -543,18 +543,19 @@ def herald_venue(venue_name):
             )
             # In theory this allows a herald to set any video_privacy for an Occurrence
             # they can change the time/venue for, but let's not worry about that
-            next.video_privacy = form.next.video_privacy.data
+            next.schedule_item.video_privacy = form.next.video_privacy.data
 
         elif form.now.speaker_here.data:
-            msg = herald_message(f"{now.names}, arrived.", now)
+            msg = herald_message(f"{now.schedule_item.names}, arrived.", now)
 
-        elif form.next.speaker_here.data:
-            msg = herald_message(f"{next.names}, arrived.", next)
+        elif form.next.speaker_here.data and next:
+            msg = herald_message(f"{next.schedule_item.names}, arrived.", next)
 
         elif form.send_message.data:
             msg = herald_message(form.message.data)
 
-        db.session.add(msg)
+        if msg:
+            db.session.add(msg)
         db.session.commit()
         return redirect(url_for(".herald_venue", venue_name=venue_name))
 
@@ -590,7 +591,7 @@ class GreenroomMessageForm(Form):
 
 @schedule.route("/greenroom", methods=["GET", "POST"])
 @cfp_admin_required
-def greenroom():
+def greenroom() -> ResponseReturnValue:
     def greenroom_message(message):
         app.logger.info(f"Creating new message '{message}'")
         end = datetime.now() + timedelta(hours=1)
@@ -609,12 +610,18 @@ def greenroom():
                     ScheduleItem.type.in_({"talk", "workshop", "familyworkshop", "performance"}),
                 )
             )
-            .where(Occurrence.scheduled_time > pendulum.now(event_tz))
+            .where(Occurrence.scheduled_time > pendulum.now(event_tz.zone))
             .order_by(Occurrence.scheduled_time)
             .limit(show)
         )
     )
-    arrived_form.speakers.choices = [occurrence.schedule_item.names for occurrence in upcoming]
+    arrived_form.speakers.choices = [
+        (
+            occurrence.schedule_item.id,
+            occurrence.schedule_item.names or f"Speaker(s) for {occurrence}",
+        )
+        for occurrence in upcoming
+    ]
 
     if arrived_form.arrived.data:
         if arrived_form.validate_on_submit():
@@ -648,7 +655,7 @@ def greenroom():
 
 @schedule.route("/schedule/workshop-steward")
 @v_user_required
-def workshop_steward_main():
+def workshop_steward_main() -> ResponseReturnValue:
     # TODO: support any venue types that might support lottery?
 
     workshop_venues = db.session.scalars(
@@ -721,6 +728,9 @@ def workshop_steward_occurrence(occurrence_id):
     else:
         abort(401)
 
+    assert occurrence.scheduled_time
+    assert occurrence.scheduled_duration
+
     show_list_after = event_tz.localize(occurrence.scheduled_time - pendulum.duration(minutes=60))
     show_list_before = event_tz.localize(
         occurrence.scheduled_time + pendulum.duration(minutes=(occurrence.scheduled_duration + 60))
@@ -729,7 +739,7 @@ def workshop_steward_occurrence(occurrence_id):
     if app.config.get("DEBUG") and request.args.get("ignore_time_lock"):
         time_locked = False
 
-    elif show_list_after < pendulum.now(event_tz) < show_list_before:
+    elif show_list_after < pendulum.now(event_tz.zone) < show_list_before:
         time_locked = False
 
     else:
@@ -741,7 +751,8 @@ def workshop_steward_occurrence(occurrence_id):
 
     if form.validate_on_submit():
         for entry_form in form.lottery_entries:
-            lottery_entry = LotteryEntry.query.get(entry_form.lottery_entry_id.data)
+            lottery_entry = db.session.query(LotteryEntry).get(entry_form.lottery_entry_id.data)
+            assert lottery_entry
             if entry_form.use_all_codes.data:
                 lottery_entry.use_all_codes()
                 db.session.commit()
