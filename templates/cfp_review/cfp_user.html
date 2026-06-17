@@ -25,51 +25,87 @@
         </p>
         <p>They can use their voucher by visiting <code>{{external_url('tickets.main', flow='speakers')}}</code>.</p>
         <button class="btn btn-primary" name="issue_voucher" value="True">Extend voucher expiry</button>
-        {% else %}
+        {% elif (user.schedule_items | selectattr("official_content")) or (user.proposals | selectattr("state", "in", ["accepted", "finalised"])) %}
         <p>This user has {{user.adult_tickets_held(voucher=True)}} adult tickets.</p>
         {% if user.adult_tickets_held(voucher=True) < 2 %}
         <p>You can issue a content voucher to this user, which will entitle them to {{[2-user.adult_tickets_held(voucher=True), 0]|max}} adult tickets.
             They will receive an email with the voucher details.
         </p>
         <button class="btn btn-primary" name="issue_voucher" value="True">Issue CfP voucher</button>
+        {% else %}
+        This user does not have any accepted proposals or official schedule items.
         {% endif %}
         {% endif %}
         </form>
     </div>
 </div>
+
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">CfP Submissions</h3>
+        <h3 class="panel-title">Proposals</h3>
     </div>
-<div class="panel-body">
 
-<table class="table table-condensed">
-    <tr>
-        <th class="col-md-1">Date</th>
-        <th>State</th>
-        <th class="col-md-1">Type</th>
-        <th class="col-md-1">Notice</th>
-        <th>Duration</th>
-        <th>Title</th>
-        <th>Messages</th>
-        <th>Notes</th>
-    </tr>
-{% for proposal in user.proposals %}
-    <tr>
-        <td>{{proposal.created.strftime("%d/%m")}}</td>
-        <td>{{proposal.state | capitalize}}</td>
-        <td>{%- if not proposal.official_content %}Attendee&nbsp;{% endif -%}{{proposal.human_type | capitalize}}</td>
-        <td>{{proposal.notice_required or ''}}</td>
-        <td>{{proposal.duration or ''}}</td>
-        <td>
-            <a href="{{ url_for('.proposal', proposal_id=proposal.id, **full_qs) }}">{{ proposal.title }}</a>
-        </td>
-        <td>
-            <a href="{{ url_for('.message_proposer', proposal_id=proposal.id, **full_qs) }}">{{ proposal.get_unread_count(current_user) }}/{{ proposal.messages | length }}</a>
-        </td>
-        <td><a href="{{ url_for('.proposal_notes', proposal_id=proposal.id, **full_qs) }}">{{ proposal.notes | length }}</a></td>
-    </tr>
-{% endfor %}
-</table>
+    <div class="panel-body">
+
+        <table class="table table-condensed">
+            <tr>
+                <th class="col-md-1">Date</th>
+                <th>State</th>
+                <th class="col-md-1">Type</th>
+                <th class="col-md-1">Notice</th>
+                <th>Duration</th>
+                <th>Title</th>
+                <th>Messages</th>
+                <th>Notes</th>
+            </tr>
+        {% for proposal in user.proposals %}
+            <tr>
+                <td>{{proposal.created.strftime("%d/%m")}}</td>
+                <td>{{proposal.state | capitalize}}</td>
+                <td>{{proposal.human_type | capitalize}}</td>
+                <td>{{proposal.notice_required or ''}}</td>
+                <td>{{proposal.duration or ''}}</td>
+                <td>
+                    <a href="{{ url_for('.proposal', proposal_id=proposal.id, **full_qs) }}">{{ proposal.title }}</a>
+                </td>
+                <td>
+                    <a href="{{ url_for('.message_proposer', proposal_id=proposal.id, **full_qs) }}">{{ proposal.get_unread_count(current_user) }}/{{ proposal.messages | length }}</a>
+                </td>
+                <td><a href="{{ url_for('.proposal_notes', proposal_id=proposal.id, **full_qs) }}">{{ proposal.notes | length }}</a></td>
+            </tr>
+        {% endfor %}
+        </table>
+
+    </div>
 </div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Schedule items</h3>
+    </div>
+
+    <div class="panel-body">
+
+        <table class="table table-condensed">
+            <tr>
+                <th class="col-md-1">State</th>
+                <th class="col-md-2">Type</th>
+                <th class="col-md-1">Official</th>
+                <th>Title</th>
+            </tr>
+        {% for schedule_item in user.schedule_items %}
+            <tr>
+                <td>{{ schedule_item.state | capitalize }}</td>
+                <td>{{ schedule_item.human_type | capitalize }}</td>
+                <td>{{ schedule_item.official_content }}
+                <td>
+                    <a href="{{ url_for('.schedule_item', schedule_item_id=schedule_item.id, **full_qs) }}">{{ schedule_item.title }}</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </table>
+
+    </div>
+</div>
+
 {% endblock %}
