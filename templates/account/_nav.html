@@ -6,8 +6,7 @@
 
 {% macro menuitem(text, view, badge_count=0, classes="") %}
 <li class="{% if request.endpoint == view %}active{% endif %} {{classes}}">
-    <a href="{{ url_for(view) }}">{{text}}</a>
-    {{badge(badge_count)}}
+    <a href="{{ url_for(view) }}">{{ text }}{{ badge(badge_count) }}</a>
   </li>
 {% endmacro %}
 
