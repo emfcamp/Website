@@ -29,7 +29,7 @@ class MajorityJudgementException(Exception):
     pass
 
 
-def get_floor_median(values):
+def get_floor_median(values: list[int]) -> int:
     """
     Return the middle element (rounding down) from a sorted list of values
     """
@@ -41,7 +41,7 @@ def get_floor_median(values):
     return values[median_index]
 
 
-def calculate_score(score_list, base=3):
+def calculate_score(score_list: list[int], base: int = 3) -> int:
     """
     Using the majority judgement (MJ) algorithm (i.e. taking the median as the
     score for any round) calculate a score.
@@ -59,7 +59,7 @@ def calculate_score(score_list, base=3):
 
     """
     if len(score_list) == 0:
-        return None
+        raise Exception("Cannot find median of empty list")
     score_list = sorted(list(score_list)[:])
     res = []
     while score_list:
@@ -71,12 +71,11 @@ def calculate_score(score_list, base=3):
         res.append(str(score))
         score_list.remove(score)
 
-    res = "".join(res)
     # Use int to cast from an arbitrary base
-    return int(res, base)
+    return int("".join(res), base)
 
 
-def calculate_max_normalised_score(score_list, base=3):
+def calculate_max_normalised_score(score_list: list[int], base: int = 3) -> float:
     """
     Calculate the score of a score_list as a fraction of the maximum possible
     score for that may votes.

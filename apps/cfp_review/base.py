@@ -464,7 +464,7 @@ def rank(round_id: int) -> ResponseReturnValue:
     for round_prop in round.proposal_rounds:
         if round_prop.outcome == "not-enough-votes":
             continue
-        score_list = [v.vote for v in round_prop.proposal.votes if v.state == "voted"]
+        score_list = [v.vote for v in round_prop.proposal.votes if v.state == "voted" and v.vote]
         score = calculate_max_normalised_score(score_list)
         scored_proposals.append((round_prop.proposal, score))
 
