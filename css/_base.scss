@@ -82,7 +82,7 @@ a:hover {
   color: $highlight-background-text;
   border: none;
 
-  a,
+  a:not(.btn),
   code {
     color: inherit;
   }
@@ -116,7 +116,7 @@ a:hover {
     margin-top: 0;
   }
 
-  a {
+  a:not(.btn) {
     color: $main-background-text;
   }
 
@@ -492,9 +492,9 @@ a.collapse-toggle:hover .glyphicon {
   overflow: auto;
   clear: both;
 
-  a:link,
-  a:visited,
-  a:hover {
+  a:not(.btn):link,
+  a:not(.btn):visited,
+  a:not(.btn):hover {
     color: inherit;
   }
 
