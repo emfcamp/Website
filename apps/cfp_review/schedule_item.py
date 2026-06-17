@@ -340,7 +340,7 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseRetu
     valid_allowed_venues = set(occurrence.valid_allowed_venues)
     # We don't block saving an occurrence if the valid list has changed
     # allowed_venues is an input into the scheduler, not a constraint on us
-    valid_allowed_venues |= set(occurrence.allowed_venues)
+    valid_allowed_venues |= set(occurrence.get_allowed_venues())
     if occurrence.scheduled_venue:
         valid_allowed_venues.add(occurrence.scheduled_venue)
 
@@ -349,6 +349,7 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseRetu
         (str(v.id), v.name) for v in sorted(valid_allowed_venues, key=lambda v: v.priority, reverse=True)
     ]
     form.allowed_venue_ids.choices = allowed_venue_choices
+
     form.scheduled_venue_id.choices = [("", "")] + allowed_venue_choices
 
     if occurrence.lottery:
@@ -368,14 +369,13 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseRetu
 
         assert form.allowed_venue_ids.data is not None
         occurrence.allowed_venues = [venues_dict[v] for v in form.allowed_venue_ids.data]
-
         db.session.commit()
         return redirect(
             url_for(".update_occurrence", schedule_item_id=schedule_item_id, occurrence_id=occurrence_id)
         )
 
     if request.method != "POST":
-        form.allowed_venue_ids.data = [v.id for v in occurrence.valid_allowed_venues]
+        form.allowed_venue_ids.data = [v.id for v in occurrence.get_allowed_venues()]
 
         if occurrence.schedule_item.type_info.supports_lottery:
             form.lottery.max_tickets_per_entry.default = (
