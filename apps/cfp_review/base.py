@@ -20,6 +20,7 @@ from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy_continuum.utils import version_class
 
 from apps.common import get_next_url
+from apps.common.email import enqueue_emails
 from main import db, external_url, get_or_404
 from models.content import (
     Occurrence,
@@ -259,6 +260,8 @@ def message_batch():
     if form.validate_on_submit():
         if form.send.data:
             for proposal in proposals:
+                app.logger.info("Sending message from %s to %s", current_user.id, proposal.user_id)
+
                 msg = ProposalMessage()
                 msg.is_to_admin = False
                 msg.from_user_id = current_user.id
@@ -266,24 +269,24 @@ def message_batch():
                 msg.message = form.message.data
 
                 db.session.add(msg)
-                db.session.commit()
-
-                app.logger.info("Sending message from %s to %s", current_user.id, proposal.user_id)
 
                 msg_url = external_url("cfp.proposal_messages", proposal_id=proposal.id)
-                msg = EmailMessage(
-                    "New message about your EMF proposal",
-                    from_email=config.from_email("CONTENT_EMAIL"),
-                    to=[proposal.user.email],
-                )
-                msg.body = render_template(
+                text_body = render_template(
                     "cfp_review/email/new_message.txt",
                     url=msg_url,
                     to_user=proposal.user,
                     from_user=current_user,
                     proposal=proposal,
                 )
-                msg.send()
+
+                enqueue_emails(
+                    users=[proposal.user],
+                    from_email=config.from_email("CONTENT_EMAIL"),
+                    subject="New message about your EMF proposal",
+                    text_body=text_body,
+                )
+
+            db.session.commit()
 
             flash(f"Messaged {len(proposals)} proposals", "info")
             return redirect(url_for(".proposals", **request.args))
