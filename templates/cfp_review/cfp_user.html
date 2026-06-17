@@ -25,7 +25,7 @@
         </p>
         <p>They can use their voucher by visiting <code>{{external_url('tickets.main', flow='speakers')}}</code>.</p>
         <button class="btn btn-primary" name="issue_voucher" value="True">Extend voucher expiry</button>
-        {% elif user.proposals | selectattr("is_accepted") | list %}
+        {% else %}
         <p>This user has {{user.adult_tickets_held(voucher=True)}} adult tickets.</p>
         {% if user.adult_tickets_held(voucher=True) < 2 %}
         <p>You can issue a content voucher to this user, which will entitle them to {{[2-user.adult_tickets_held(voucher=True), 0]|max}} adult tickets.
