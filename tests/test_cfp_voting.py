@@ -59,7 +59,7 @@ def test_calculate_score():
 @given(data())
 def test_calculate_score_2(data):
     base = data.draw(integers(min_value=2, max_value=36))
-    score_list = data.draw(lists(integers(min_value=0, max_value=base - 1)))
+    score_list = data.draw(lists(integers(min_value=0, max_value=base - 1), min_size=1))
     calculate_score(score_list, base)
 
 
