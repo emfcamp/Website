@@ -549,7 +549,8 @@ def rank(round_id: int) -> ResponseReturnValue:
 
     schedule_item_types: list[ScheduleItemType] = ["talk", "workshop"]
     estimates = {
-        schedule_item_type: get_cfp_estimate(schedule_item_type) for schedule_item_type in schedule_item_types
+        schedule_item_type: get_cfp_estimate(schedule_item_type, "automatic")
+        for schedule_item_type in schedule_item_types
     }
 
     # Find proposals where the submitter has already had an accepted proposal

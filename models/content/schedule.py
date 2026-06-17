@@ -2,6 +2,7 @@ import dataclasses
 import re
 import typing
 from collections import namedtuple
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import (  # noqa: UP035
@@ -419,6 +420,8 @@ class Occurrence(BaseModel):
 
     scheduled_duration: Mapped[int | None] = mapped_column()  # in minutes
 
+    #: The time this occurrence is scheduled to happen at.
+    #: This may be changed by the automatic scheduler, unless `manually_scheduled` is set.
     scheduled_time: Mapped[datetime | None] = mapped_column()
     scheduled_venue_id: Mapped[int | None] = mapped_column(ForeignKey("venue.id"))
 
@@ -437,10 +440,15 @@ class Occurrence(BaseModel):
     )
 
     #: Venues this occurrence is allowed to be scheduled in.
+    #: If the `manually_scheduled` flag is set, and `scheduled_venue` is set, this is ignored.
+    #: `get_allowed_venues()` should be used to access this, which will default if this isn't set.
     allowed_venues: Mapped[list[Venue]] = relationship(
         secondary=OccurrenceAllowedVenues,
         back_populates="allowed_occurrences",
     )
+
+    #: The venue this occurrence is scheduled in. This may be changed by the automatic scheduler,
+    #: unless `manually_scheduled` is set.
     scheduled_venue: Mapped[Venue | None] = relationship(
         back_populates="occurrences",
         primaryjoin="Venue.id == Occurrence.scheduled_venue_id",
@@ -457,9 +465,9 @@ class Occurrence(BaseModel):
         if value is None:
             return value
 
-        # When creating an occurrence the schedule_item isn't available so we can't run this check here
+        # When creating an occurrence, the schedule_item isn't available so we can't run this check here
+        # Attendee content does not need to conform to the slot duration.
         if not self.schedule_item or not self.schedule_item.official_content:
-            # Attendee content does not need to conform to the slot duration.
             return value
 
         duration_minutes = SLOT_DURATION.total_seconds() / 60
@@ -469,6 +477,20 @@ class Occurrence(BaseModel):
                 f"Scheduled duration ({value} minutes) is not a multiple of slot duration ({duration_minutes} minutes)"
             )
         return value
+
+    def time_blocks(self) -> Iterable[TimeBlock]:
+        """TimeBlocks which this Occurrence can be scheduled in."""
+        if self.manually_scheduled and self.scheduled_venue:
+            for timeblock in self.scheduled_venue.time_blocks:
+                if timeblock.type == self.schedule_item.type:
+                    # FIXME: This doesn't take into account scheduled_time - it probably should but I don't think it matters.
+                    yield timeblock
+            return
+
+        for venue in self.get_allowed_venues():
+            for timeblock in venue.time_blocks:
+                if timeblock.type == self.schedule_item.type:
+                    yield timeblock
 
     def is_valid_slot(self, start_time: datetime, venue: Venue, user: User | None = None) -> bool:
         """Check whether this occurrence can be scheduled in a given start_time and venue.
@@ -523,6 +545,19 @@ class Occurrence(BaseModel):
         """
         return self.schedule_item.availability
 
+    def get_allowed_venues(self) -> list[Venue]:
+        """Get the allowed venues for this Occurrence, defaulting to venues with automatic TimeBlocks if none are set."""
+        if self.allowed_venues:
+            return self.allowed_venues
+
+        return list(
+            db.session.scalars(
+                select(Venue)
+                .join(Venue.time_blocks)
+                .where(TimeBlock.type == self.schedule_item.type, TimeBlock.automatic)
+            )
+        )
+
     @property
     def valid_allowed_venues(self) -> list[Venue]:
         """A list of venues this Occurrence is allowed to be scheduled in."""
@@ -542,7 +577,7 @@ class Occurrence(BaseModel):
         assert len(self.availability) > 0
 
         result = {}
-        for venue in self.valid_allowed_venues:
+        for venue in self.get_allowed_venues():
             allowed = []
             for time_block in venue.time_blocks:
                 if time_block.automatic != automatic:

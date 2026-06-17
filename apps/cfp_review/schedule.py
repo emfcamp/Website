@@ -44,7 +44,7 @@ def schedule() -> ResponseReturnValue:
     schedule_item_types: list[ScheduleItemInfo] = [i for i in SCHEDULE_ITEM_INFOS.values()]
 
     estimates = {
-        schedule_item_type.type: get_cfp_estimate(schedule_item_type.type)
+        schedule_item_type.type: get_cfp_estimate(schedule_item_type.type, "automatic")
         for schedule_item_type in schedule_item_types
     }
 

@@ -133,7 +133,7 @@ def edit_venue(venue_id: int) -> ResponseReturnValue:
 class TimeBlockForm(Form):
     start = TimeField("Start time")
     end = TimeField("End time")
-    automatic = BooleanField("Enable automatic scheduler")
+    automatic = BooleanField("Allow automatic scheduling")
     type = SelectField("Content type", choices=get_args(ScheduleItemType))
 
     submit = SubmitField("Save")

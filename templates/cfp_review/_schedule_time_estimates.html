@@ -14,6 +14,7 @@
     </thead>
     <tbody>
     {% for type, estimate in estimates.items() %}
+    {% if estimate.allocated_time.total_hours() > 0 %}
     <tr>
         <th style="white-space:nowrap"><a href="{{url_for('cfp_review.schedule_items', official_content='official', type=type)}}">{{estimate.schedule_item_info.human_type|capitalize}}</a></th>
         <td><a href="{{url_for('cfp_review.schedule_items', official_content='official', type=type, no_occurrence=True)}}">
@@ -34,6 +35,7 @@
                 <a href="{{url_for('.venue_timeblocks', venue_id=v.id)}}" target="_blank">{{v.name}}</a>{% if not loop.last %}, {% endif %}
             {% endfor %}</td>
     </tr>
+    {% endif %}
     {% endfor %}
     </tbody>
 </table>
