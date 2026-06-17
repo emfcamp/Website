@@ -370,7 +370,7 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseRetu
                 occurrence=occurrence,
             )
             db.session.add(occurrence.lottery)
-        else:
+        elif hasattr(form, "lottery"):
             del form.lottery
 
         form.populate_obj(occurrence)
@@ -390,7 +390,7 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseRetu
                 occurrence.schedule_item.type_info.default_max_tickets_per_entry
             )
 
-        if not occurrence.lottery:
+        if not occurrence.lottery and hasattr(form, "lottery"):
             form.lottery.state.data = ""
 
     return render_template(
