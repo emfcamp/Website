@@ -357,13 +357,21 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseRetu
             form.lottery.state.choices = [(c, _) for c, _ in form.lottery.state.choices if c == "completed"]
         else:
             form.lottery.state.choices = [(c, _) for c, _ in form.lottery.state.choices if c != "completed"]
+    else:
+        form.lottery.state.choices.insert(0, ("", ""))
 
     if form.validate_on_submit():
-        if occurrence.schedule_item.type_info.supports_lottery and not occurrence.lottery:
+        if (
+            occurrence.schedule_item.type_info.supports_lottery
+            and not occurrence.lottery
+            and form.lottery.state.data != ""
+        ):
             occurrence.lottery = Lottery(
                 occurrence=occurrence,
             )
             db.session.add(occurrence.lottery)
+        else:
+            del form.lottery
 
         form.populate_obj(occurrence)
 
@@ -381,6 +389,9 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseRetu
             form.lottery.max_tickets_per_entry.default = (
                 occurrence.schedule_item.type_info.default_max_tickets_per_entry
             )
+
+        if not occurrence.lottery:
+            form.lottery.state.data = ""
 
     return render_template(
         "cfp_review/schedule_item/occurrence.html",

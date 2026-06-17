@@ -472,6 +472,6 @@ class LotteryForm(Form):
             ("first-come-first-served", "First come first served"),
         ],
     )
-    total_tickets = IntegerField("Total tickets")
-    reserved_tickets = IntegerField("Reserved (non-lottery) tickets")
-    max_tickets_per_entry = IntegerField("Max tickets per user")
+    total_tickets = IntegerField("Total tickets", validators=[Optional()])
+    reserved_tickets = IntegerField("Reserved (non-lottery) tickets", validators=[Optional()])
+    max_tickets_per_entry = IntegerField("Max tickets per user", validators=[Optional()])
