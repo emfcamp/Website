@@ -357,7 +357,7 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseRetu
             form.lottery.state.choices = [(c, _) for c, _ in form.lottery.state.choices if c == "completed"]
         else:
             form.lottery.state.choices = [(c, _) for c, _ in form.lottery.state.choices if c != "completed"]
-    else:
+    elif hasattr(form, "lottery"):
         form.lottery.state.choices.insert(0, ("", ""))
 
     if form.validate_on_submit():
