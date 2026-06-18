@@ -2,7 +2,9 @@ import random
 from typing import ClassVar
 
 from dateutil.rrule import DAILY, rrule
+from flask import redirect, request, url_for
 from flask_admin import expose
+from flask_admin.actions import action
 from flask_admin.form import Field
 from flask_login import current_user
 from wtforms import StringField
@@ -54,6 +56,10 @@ class BuildupSignupKeyModelView(VolunteerModelView):
 
         form.token.render_kw["readonly"] = True
         return form
+
+    @action("breakdown", "View Arrival Breakdown")
+    def action_view_breakdown(self, ids):
+        return redirect(url_for(".breakdown", signup_key=ids))
 
 
 volunteer_admin.add_view(
@@ -133,9 +139,18 @@ volunteer_admin.add_view(
 class BuildupVolunteerBreakdownView(VolunteerBaseView):
     @expose("/")
     def index(self):
+        query = db.session.query(BuildupVolunteer)
+
+        signup_keys = None
+        if signup_keys_strs := request.args.getlist("signup_key"):
+            signup_keys = (
+                db.session.query(BuildupSignupKey).filter(BuildupSignupKey.token.in_(signup_keys_strs)).all()
+            )
+            query = query.filter(BuildupVolunteer.signup_key_token.in_(signup_keys_strs))
+
         days_data = []
         is_just_after_event = False
-        earliest_buildup = db.session.query(BuildupVolunteer).order_by(BuildupVolunteer.arrival_date).first()
+        earliest_buildup = query.order_by(BuildupVolunteer.arrival_date).first()
         if earliest_buildup is None:
             start = buildup_start()
         else:
@@ -144,12 +159,10 @@ class BuildupVolunteerBreakdownView(VolunteerBaseView):
             if buildup_end() <= dt <= teardown_start():
                 is_just_after_event = True
                 continue
-            predicted_volunteers = db.session.query(BuildupVolunteer).filter(
+            predicted_volunteers = query.filter(
                 (BuildupVolunteer.arrival_date <= dt) & (BuildupVolunteer.departure_date >= dt)
             )
-            arrived_volunteers = db.session.query(BuildupVolunteer).filter(
-                BuildupVolunteer.recorded_on_site <= dt
-            )
+            arrived_volunteers = query.filter(BuildupVolunteer.recorded_on_site <= dt)
             date_str = dt.date().strftime("%a %d-%b")
             am_or_pm = "AM" if dt.time().hour < 12 else "PM"
             days_data.append(
@@ -170,6 +183,7 @@ class BuildupVolunteerBreakdownView(VolunteerBaseView):
             days_data=days_data,
             max_predicted=max_predicted,
             max_arrived=max_arrived,
+            signup_keys=signup_keys,
         )
 
 

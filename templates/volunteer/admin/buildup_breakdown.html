@@ -3,6 +3,10 @@
 {% block body %}
 <h1>Buildup Breakdown</h1>
 
+{% if signup_keys %}
+<h2>For {{ signup_keys | join(', ', attribute='team_name') }}</h2>
+{% endif %}
+
 <style>
 .breakdown-table-date {
     width: 10rem;
