@@ -1,0 +1,35 @@
+img.about-badge-tildagon-parts {
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.about-badge-hexp-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+  padding: 0;
+  list-style: none;
+}
+.about-badge-hexp-list > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.about-badge-hexp-list figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+.about-badge-hexp-list img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.about-badge-hexp-list figcaption {
+  margin-top: 0.5rem;
+  font-weight: 600;
+  text-align: center;
+}
