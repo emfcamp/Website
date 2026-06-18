@@ -1,0 +1,23 @@
+table.about-phones-dect-models tbody tr td:nth-child(4) {
+  font-size: 14px;
+}
+
+.about-phones-dial-in {
+  display: inline-block;
+}
+.about-phones-dial-in .dial-in-number {
+  font-size: 32px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 0.25em;
+}
+.about-phones-dial-in p {
+  margin: 0.25em 0 0;
+}
+.about-phones-dial-in .extn {
+  color: #f77f02;
+}
+.about-phones-dial-in .dial-in-number .extn {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
