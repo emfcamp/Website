@@ -59,7 +59,7 @@ class BuildupSignupKeyModelView(VolunteerModelView):
 
     @action("breakdown", "View Arrival Breakdown")
     def action_view_breakdown(self, ids):
-        return redirect(url_for(".breakdown", signup_key=ids))
+        return redirect(url_for("volunteer_admin_breakdown.index", signup_key=ids))
 
 
 volunteer_admin.add_view(
@@ -80,6 +80,10 @@ class BuildupVolunteerModelView(VolunteerModelView):
         "acked_health_and_safety_briefing_at",
         "recorded_on_site",
         "left_site",
+    )
+    column_filters = (
+        "user.volunteer.nickname",
+        "signup_key.team_name",
     )
     column_labels: ClassVar[dict[str, str]] = {
         "user.volunteer.nickname": "Name",
