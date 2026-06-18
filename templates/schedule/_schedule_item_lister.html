@@ -15,8 +15,8 @@
             <form method="post" action="{{url_for(".add_favourite")}}">
             <div>
                 {% for schedule_item in grouped_schedule_items[type_info.type] %}
-                <a href="{{ url_for('.item', year=event_year, schedule_item_id=schedule_item.id, slug=schedule_item.slug) }}"
-                   class="event schedule-item" id="schedule-item-{{ schedule_item.id }}">
+                {% set item_url = url_for('.item', year=event_year, schedule_item_id=schedule_item.id, slug=schedule_item.slug) %}
+                <div class="event schedule-item" id="schedule-item-{{ schedule_item.id }}">
                 <div class="row">
                     <div class="col-xs-10">
                         {% if schedule_item.names %}
@@ -25,11 +25,11 @@
                             {{ schedule_item_icons(schedule_item) }}
                         </div>
                         <div>
-                            {{ schedule_item.title }}
+                            <a href="{{ item_url }}">{{ schedule_item.title }}</a>
                         </div>
                         {% else %}
                         <div>
-                            <b>{{ schedule_item.title }}</b>
+                            <b><a href="{{ item_url }}">{{ schedule_item.title }}</a></b>
                             {{ schedule_item_icons(schedule_item) }}
                         </div>
                         <div>
@@ -46,7 +46,14 @@
                     </div>
                     {% endif %}
                 </div>
-                </a>
+                {% if schedule_item.description %}
+                <div class="row">
+                    <div class="col-xs-12">
+                        <p class="multiline schedule-item-description">{{ schedule_item.description | urlize }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                </div>
                 {% endfor %}
             </div>
             </form>

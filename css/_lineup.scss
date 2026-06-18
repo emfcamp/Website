@@ -9,24 +9,21 @@
     visibility: visible;
   }
   .event {
-    text-decoration: none;
-  }
-  .event > div {
-    padding: 10px 4px;
+    padding: 10px 4px 14px;
     border-bottom: 1px solid rgba(100, 100, 100, 0.4);
-    padding-top: 14px;
   }
-  .event:first-child > div {
+  .event:first-child {
     border-top: 1px solid rgba(100, 100, 100, 0.4);
   }
-  .event:hover,
-  .event:focus,
-  .event:active,
-  .event:hover div,
-  .event:focus div,
-  .event:active div {
-    background-color: #33071c;
-    color: inherit;
+  .schedule-item-description {
+    max-width: 70ch;
+    margin: 0.4em 0 0;
+  }
+  &.descriptions-collapsed .schedule-item-description {
+    display: none;
+  }
+  [data-toggle-descriptions] {
+    margin-bottom: 10px;
   }
   h2.event-type {
     padding-top: 40px;
