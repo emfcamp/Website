@@ -161,7 +161,7 @@ def sponsor() -> ResponseReturnValue:
 
 @base.route("/badge")
 def badge() -> ResponseReturnValue:
-    return redirect("https://tildagon.badge.emfcamp.org/")
+    return redirect("/about/badge")
 
 
 @base.route("/googlec108e6ab4f75019d.html")
