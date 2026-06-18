@@ -9,15 +9,14 @@ It is a small (hold in your hand small) electronic device that does things and c
 
 It's called a badge because they were originally used instead of a paper or card pass on a lanyard to display people's names and show they were an attendee of a conference. They've since developed into all sorts of forms!
 
-Ours is called the Tildagon because the EMF sign is a Tilde (one of these `~`) and it's in the shape of a hexagon. When we say badge here, we mean the Tildagon.
+Ours is called the Tildagon because the EMF sign is a tilde (one of these `~`) and it's in the shape of a hexagon. When we say badge here, we mean the Tildagon.
 
 ## What can you do with it?
 
-You can use it on its own to display your name, you can add games or gadgets to it, and you can plug in extra things (Hexpansions) to make it do even more! You can write your own programmes for it in MicroPython and upload them with a USB cable.
+You can use it on its own to display your name, you can add games or gadgets to it, and you can plug in extra things (Hexpansions) to make it do even more! You can write your own programs for it in MicroPython and upload them with a USB cable.
 
 Some things you can currently do with the Tildagon:
 
-* Make it into a tamagotchi
 * Display your name
 * Show a Pride flag
 * Play a pocket-monster catching game
@@ -29,13 +28,13 @@ Some things you can currently do with the Tildagon:
 * Battle a friend with another badge
 * Turn it into a mobile disco light
 
-..and many more!
+... and many more!
 
 <a href="https://apps.badge.emfcamp.org" class="btn btn-primary">Have a look at the App Store for more ideas</a>
 
 ## Do I need one?
 
-You do not have to have one as you will be given a wrist band to show you belong at the festival. Badges will not be available to buy at the festival, so it's a decision you need to make beforehand and pre-order. Spare badges are generally easy to re-sell, especially since we intend to re-use the Tildagon in following years.
+You don't need one to attend, as you will be given a wristband to show you belong at the festival. Badges will not be available to buy on-site, so you'll need to make the decision beforehand and pre-order. Spare badges are generally easy to re-sell, especially since we intend to re-use the Tildagon in future years.
 
 There are some games and installations which use the badge as a controller, but if you don't have your own you might be able to find a friendly attendee who can let you have a go with theirs.
 
@@ -43,7 +42,7 @@ If you are excited by small electronic devices, then you probably want one. If y
 
 ## Where do I order my badge?
 
-You can order a badge through the EMF website by visting your account, selecting 'Your tickets' and selecting the 'Buy a badge' button at the bottom of the page, or click below!
+You can order a badge here:
 
 <a href="/tickets/badge" class="btn btn-primary">Order my badge!</a>
 
@@ -68,7 +67,7 @@ IMPORTANT: You will need to supply your own USB C-C cable if you want to connect
 
 ## What is a "Hexpansion"?
 
-Around the outside of the hexagon shape of the Tildagon are some little plug sockets, where you can plug in an expansion device. Some of these are for fun and do nothing other than look pretty, like cat ears, or a rubber duck, or even an emergency bottle of spicy sauce. Others allow you to add sensors, lights, extra displays, motors, or even a keyboard.
+Around the outside of the hexagon shape of the Tildagon are some little plug sockets, where you can plug in various expansion devices. Some are just for fun and do nothing other than look pretty, like cat ears, or a rubber duck, or even an emergency bottle of spicy sauce. Others allow you to add sensors, lights, extra displays, motors, or even a keyboard.
 
 {% set hexpList = [
   {
@@ -99,13 +98,13 @@ Around the outside of the hexagon shape of the Tildagon are some little plug soc
 
 ## Where do I get Hexpansions?
 
-There will be a market in NullSector Saturday 2-4pm and Sunday 10am-12pm for people who have made Hexpansions to bring and sell or swap them and for other attendees to buy or swap for them. 
+There will be a market in NullSector on Saturday 2-4pm and Sunday 10am-12pm for people who have made Hexpansions to bring and sell or swap them and for other attendees to buy or swap for them.
 
 You might also meet other attendees around the festival site who are carrying Hexpansions with them as little tokens to swap - perhaps you may be able to swap for some of your own stickers, token coins, or other home-made goods (think treasures a magpie would love and you're mostly there).
 
 ## Can I make my own Hexpansion?
 
-Of course you can! There is a guide here that should contain all you need to know, including measurements and electrical connections if you are going to use them. If it's your first time making an electronic Hexpansion (or even if you're a seasoned pro) you should test it first to make sure it won't damage people's badges, or you are not going to be popular.
+Of course you can! There is a [guide here](https://tildagon.badge.emfcamp.org/hexpansions/) that should contain all you need to know, including measurements and electrical connections if you are going to use them. If it's your first time making an electronic Hexpansion (or even if you're a seasoned pro) you should test it first to make sure it won't damage people's badges, or you are not going to be popular.
 
 If you are making one at home or on camp, the easiest way is to cut a piece of 1mm thick card (a cereal box will do) into the right shape and glue things to the bit of card that sticks out. Googly eyes are a particular favourite.
 
@@ -122,7 +121,7 @@ The buttons around the outside are used to operate the menu. If you hold the bad
 
 ## What's the badge App Store?
 
-It is a place people can upload their apps (little programs) for the badge, and anyone else can download and use them. It costs nothing, but your badge needs to be connected to WiFi for it to work. If you want to know how to get your program onto the App Store, you can have a look here.
+It is a place people can upload their apps (little programs) for the badge, and anyone else can download and use them. It costs nothing, but your badge needs to be connected to WiFi for it to work. If you want to know how to get your program onto the App Store, you can [have a look here](https://tildagon.badge.emfcamp.org/tildagon-apps/).
 
 ## How do I write programs for the badge?
 
