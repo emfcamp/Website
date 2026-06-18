@@ -3,7 +3,8 @@ EMF website documentation
 
 This is the developer documentation for the Electromagnetic Field website, `www.emfcamp.org`_.
 
-This site is intended for developers -- if you're looking for help buying tickets, or with any other issues, please get in touch through our website.
+This site is intended for developers and EMF team members who need to understand how the website
+works -- if you're looking for help buying tickets, or with any other issues, please get in touch through our website.
 
 .. _www.emfcamp.org: https://www.emfcamp.org
 

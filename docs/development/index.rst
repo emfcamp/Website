@@ -20,3 +20,4 @@ We don't want you to waste your time!
 
    getting-started
    upgrading-python
+   docs
