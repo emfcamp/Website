@@ -17,6 +17,7 @@
         <meta property="og:description" content="{{ self.description()|replace("\n", " ") }}">
         <meta name="description" content="{% filter replace("\n", " ") %}{% block description %}{% endblock %}{% endfilter %}">
         {% endif -%}
+        <meta name="fediverse:creator" content="@emf@emfcamp.org">
         <meta name="theme-color" content="#171123">
         <link rel="shortcut icon" type="image/x-icon" href="{{ static_url_for('static', filename='images/favicon.ico') }}">
         <link rel="manifest" href="{{ static_url_for('static', filename='manifest.json') }}">
