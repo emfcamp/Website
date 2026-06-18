@@ -73,6 +73,7 @@ class BuildupVolunteerModelView(VolunteerModelView):
     details_modal = True
     column_list = (
         "user.volunteer.nickname",
+        "signup_key.team_name",
         "arrival_date",
         "departure_date",
         "vehicle_registration",
@@ -82,6 +83,7 @@ class BuildupVolunteerModelView(VolunteerModelView):
     )
     column_labels: ClassVar[dict[str, str]] = {
         "user.volunteer.nickname": "Name",
+        "signup_key.team_name": "Team",
         "arrival_date": "Arrival",
         "departure_date": "Departure",
         "vehicle_registration": "Vehicle Reg",
