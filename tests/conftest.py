@@ -122,7 +122,7 @@ def request_context(app):
 def user(db):
     "Yield a test user. Note that this user will be identical across all tests in a module."
     email = "test_user@example.com"
-    user = User.query.filter(User.email == email).one_or_none()
+    user = db.session.query(User).filter(User.email == email).one_or_none()
     if not user:
         user = User(email, "Test User")
         db.session.add(user)

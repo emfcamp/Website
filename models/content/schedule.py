@@ -1,7 +1,7 @@
 import dataclasses
 import re
 import typing
-from collections import namedtuple
+from collections import defaultdict, namedtuple
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -478,20 +478,6 @@ class Occurrence(BaseModel):
             )
         return value
 
-    def time_blocks(self) -> Iterable[TimeBlock]:
-        """TimeBlocks which this Occurrence can be scheduled in."""
-        if self.manually_scheduled and self.scheduled_venue:
-            for timeblock in self.scheduled_venue.time_blocks:
-                if timeblock.type == self.schedule_item.type:
-                    # FIXME: This doesn't take into account scheduled_time - it probably should but I don't think it matters.
-                    yield timeblock
-            return
-
-        for venue in self.get_allowed_venues():
-            for timeblock in venue.time_blocks:
-                if timeblock.type == self.schedule_item.type:
-                    yield timeblock
-
     def is_valid_slot(self, start_time: datetime, venue: Venue, user: User | None = None) -> bool:
         """Check whether this occurrence can be scheduled in a given start_time and venue.
 
@@ -545,50 +531,82 @@ class Occurrence(BaseModel):
         """
         return self.schedule_item.availability
 
-    def get_allowed_venues(self) -> list[Venue]:
+    def get_allowed_venues(self) -> set[Venue]:
         """Get the allowed venues for this Occurrence, defaulting to venues with automatic TimeBlocks if none are set."""
         if self.allowed_venues:
-            return self.allowed_venues
+            return set(self.allowed_venues)
 
-        return list(
+        return set(
             db.session.scalars(
                 select(Venue)
                 .join(Venue.time_blocks)
                 .where(TimeBlock.type == self.schedule_item.type, TimeBlock.automatic)
+                .group_by(Venue.id)
             )
         )
 
     @property
-    def valid_allowed_venues(self) -> list[Venue]:
-        """A list of venues this Occurrence is allowed to be scheduled in."""
+    def valid_allowed_venues(self) -> set[Venue]:
+        """A list of venues this Occurrence could be scheduled in. This is used to offer the correct
+        selection of venues to admin users when setting allowed_venues.
+        """
         if self.schedule_item.official_content:
-            return list(
+            return set(
                 db.session.scalars(
                     select(Venue).join(Venue.time_blocks).where(TimeBlock.type == self.schedule_item.type)
                 )
             )
-        return list(db.session.scalars(select(Venue).where(Venue.allows_attendee_content == True)))
+        return set(db.session.scalars(select(Venue).where(Venue.allows_attendee_content == True)))
+
+    def time_blocks(self) -> Iterable[TimeBlock]:
+        """TimeBlocks which this Occurrence can be scheduled in.
+
+        This takes into account whether the Occurrence has been manually scheduled, but it doesn't
+        take into account speaker availability.
+        """
+        if self.manually_scheduled and self.scheduled_venue and self.scheduled_time:
+            # Occurrence is manually scheduled, so we only return the TimeBlock which it's scheduled in
+            for timeblock in self.scheduled_venue.time_blocks:
+                if timeblock.type == self.schedule_item.type and (
+                    timeblock.start <= self.scheduled_time < timeblock.end
+                ):
+                    yield timeblock
+                    break
+
+        else:
+            for venue in self.get_allowed_venues():
+                for timeblock in venue.time_blocks:
+                    if timeblock.type == self.schedule_item.type:
+                        yield timeblock
 
     def allowed_times(self, automatic: bool) -> dict[Venue, list[tuple[datetime, datetime]]]:
-        """Return a mapping of Venue -> time range for when this occurrence is allowed to be scheduled.
-        This is the intersection of speaker availability and venue TimeBlocks for this content type.
+        """Return a mapping of Venue -> time range for when this occurrence is allowed to be scheduled,
+            which is the input into the automatic scheduler.
+
+        This is the intersection of speaker availability and the allowed TimeBlocks for this content type.
         """
         assert self.schedule_item.official_content
-        assert len(self.availability) > 0
 
-        result = {}
-        for venue in self.get_allowed_venues():
-            allowed = []
-            for time_block in venue.time_blocks:
-                if time_block.automatic != automatic:
-                    continue
+        if self.manually_scheduled and self.scheduled_venue and self.scheduled_time:
+            # Manually scheduled - return a single time range which encompasses the scheduled time.
+            assert self.scheduled_end_time
+            return {self.scheduled_venue: [(self.scheduled_time, self.scheduled_end_time)]}
 
-                for availability in self.availability:
-                    if availability.start <= time_block.end and availability.end >= time_block.start:
-                        allowed.append(
-                            (max(availability.start, time_block.start), min(availability.end, time_block.end))
-                        )
-            result[venue] = allowed
+        result: dict[Venue, list[tuple[datetime, datetime]]] = defaultdict(list)
+        for time_block in self.time_blocks():
+            if time_block.automatic != automatic:
+                continue
+
+            if not self.availability:
+                # No availability provided, return all available timeblocks
+                result[time_block.venue].append((time_block.start, time_block.end))
+                continue
+
+            for availability in self.availability:
+                if availability.start <= time_block.end and availability.end >= time_block.start:
+                    result[time_block.venue].append(
+                        (max(availability.start, time_block.start), min(availability.end, time_block.end))
+                    )
         return result
 
     def overlaps_with(self, other: Self) -> bool:

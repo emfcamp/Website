@@ -4,7 +4,7 @@ from itertools import chain
 
 from flask import current_app as app
 from slotmachine import SchedulingProblem, SchedulingSolution, SlotMachine, Talk
-from sqlalchemy import and_, select
+from sqlalchemy import and_, not_, select
 from sqlalchemy.orm import joinedload
 
 from main import db
@@ -33,27 +33,28 @@ class Scheduler:
         self.venues = {}
 
     def get_schedulable_occurrences(self, types: list[ScheduleItemType]) -> list[Occurrence]:
-        """Fetch a list of Occurrences that the automatic scheduler should consider"""
-        return list(
-            db.session.scalars(
-                select(Occurrence)
-                .where(
-                    Occurrence.cancelled != True,
-                    Occurrence.schedule_item.has(
-                        and_(
-                            ScheduleItem.type.in_(types),
-                            # We only check this here so things should work if we decide to extend it to attendee content
-                            ScheduleItem.official_content,
-                        )
-                    ),
-                    Occurrence.scheduled_duration.isnot(None),
-                    # Used when we manually schedule things into slots and we want the scheduler to ignore them
-                    Occurrence.manually_scheduled.isnot(True),
-                )
-                .options(joinedload(Occurrence.schedule_item).joinedload(ScheduleItem.proposal))
-                .order_by(ScheduleItem.favourite_count.desc())
+        """Fetch a list of Occurrences that the automatic scheduler should consider
+
+        The scheduler needs to consider all official content, even content which is manually scheduled,
+        in order to prevent speaker clashes.
+        """
+        occurrences = db.session.scalars(
+            select(Occurrence)
+            .where(
+                not_(Occurrence.cancelled),
+                Occurrence.schedule_item.has(
+                    and_(
+                        ScheduleItem.type.in_(types),
+                        ScheduleItem.official_content,
+                    )
+                ),
+                Occurrence.scheduled_duration.isnot(None),
             )
-        )
+            .options(joinedload(Occurrence.schedule_item).joinedload(ScheduleItem.proposal))
+            .order_by(ScheduleItem.favourite_count.desc())
+        ).all()
+
+        return list(occurrences)
 
     def get_schedule_problem(self, types: list[ScheduleItemType] | None = None) -> SchedulingProblem:
         if types is None:
@@ -98,10 +99,6 @@ class Scheduler:
                     preferred_venues = {ordered_venues[0]}
 
                 speakers = {occurrence.schedule_item.user.id}
-
-                if not occurrence.availability:
-                    app.logger.warning(f"Skipping scheduling occurrence {occurrence} - no availability.")
-                    continue
 
                 # Mapping of venues to allowed time ranges
                 allowed_times = occurrence.allowed_times(True)
