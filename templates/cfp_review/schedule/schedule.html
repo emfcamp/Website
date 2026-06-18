@@ -41,10 +41,27 @@
         <h3 class="panel-title">Time estimates</h3>
     </div>
     <div class="panel-body">
-        <p>This covers <strong>automatically scheduled items only</strong>. (Items are considered automatically scheduled unless
-            their allowed venues only include venues with no automatic TimeBlocks for their content type.)
-        </p>
-{% include "cfp_review/_schedule_time_estimates.html" %}
+        <ul class="nav nav-tabs">
+          <li class="active"><a data-toggle="tab" href="#estimates-auto">Automatic</a></li>
+          <li><a data-toggle="tab" href="#estimates-manual">Manual</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="estimates-auto" class="tab-pane fade in active">
+                <p>This covers <strong>automatically scheduled items only</strong>. Items are considered automatically scheduled by default
+                    until they are manually scheduled or their allowed_venues are set to venues with manually-scheduled TimeBlocks.
+                </p>
+                {% with estimates=estimates_auto %}
+                    {% include "cfp_review/_schedule_time_estimates.html" %}
+                {% endwith %}
+            </div>
+            <div id="estimates-manual" class="tab-pane fade">
+                <p>This covers <strong>manually scheduled items only</strong>.
+                </p>
+                {% with estimates=estimates_manual %}
+                    {% include "cfp_review/_schedule_time_estimates.html" %}
+                {% endwith %}
+            </div>
+        </div>
     </div>
 </div>
 </div>

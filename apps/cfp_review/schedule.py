@@ -43,8 +43,13 @@ def schedule() -> ResponseReturnValue:
 
     schedule_item_types: list[ScheduleItemInfo] = [i for i in SCHEDULE_ITEM_INFOS.values()]
 
-    estimates = {
+    estimates_auto = {
         schedule_item_type.type: get_cfp_estimate(schedule_item_type.type, "automatic")
+        for schedule_item_type in schedule_item_types
+    }
+
+    estimates_manual = {
+        schedule_item_type.type: get_cfp_estimate(schedule_item_type.type, "manual")
         for schedule_item_type in schedule_item_types
     }
 
@@ -90,7 +95,8 @@ def schedule() -> ResponseReturnValue:
         "cfp_review/schedule/schedule.html",
         counts_by_type=counts_by_type,
         counts_by_state=counts_by_state,
-        estimates=estimates,
+        estimates_auto=estimates_auto,
+        estimates_manual=estimates_manual,
         schedule_state=schedule_state,
         schedule_state_by_type=schedule_state_by_type,
         potential_schedules=potential_schedules,
