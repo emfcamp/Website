@@ -45,6 +45,16 @@
       {{ render_field(form.power_requirements, horizontal=9) }}
     </fieldset>
     <fieldset>
+    <fieldset>
+      <legend>Village location</legend>
+      <p>
+        You can mark a location on the map to show to others where you intend to camp.
+        Please be aware that this does not guarantee you a spot!
+        To do this, go to the EMF map below and click the white 'plus' button in the top right corner.
+      </p>
+      <a href="https://map.emfcamp.org" class="btn btn-default" target="_blank">View the EMF map</a>
+    </fieldset>
+    <fieldset>
     <div class="form-actions">
       {% if village %}
       <button type="submit" name="Update" class="btn btn-primary btn-lg pull-right debounce">Update</button>
