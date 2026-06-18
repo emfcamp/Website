@@ -305,6 +305,20 @@ class ScheduleItem(BaseModel):
             occurrence.cancel()
 
     @property
+    def presenters(self) -> set[User]:
+        """The list of Users who are presenting this ScheduleItem, which may be different to the
+            user who owns it.
+
+        Currently only returns a single user, or an empty list for manually-added ScheduleItems.
+        This is used by the automatic scheduler to prevent speaker clashes.
+        """
+        # Manually-added ScheduleItems will have the team member who created them as self.user.
+        # We don't want this to be displayed or used by the scheduler to detect clashes.
+        if self.proposal:
+            return {self.user}
+        return set()
+
+    @property
     def slug(self):
         return schedule_item_slug(self.title)
 

@@ -98,8 +98,6 @@ class Scheduler:
                     # This supports a list, but we only want one for now
                     preferred_venues = {ordered_venues[0]}
 
-                speakers = {occurrence.schedule_item.user.id}
-
                 # Mapping of venues to allowed time ranges
                 allowed_times = occurrence.allowed_times(True)
                 allowed_venues = set(v.id for v in allowed_times)
@@ -115,7 +113,7 @@ class Scheduler:
                 talk = Talk(
                     id=occurrence.id,
                     duration=occurrence.scheduled_duration,
-                    speakers=speakers,
+                    speakers={speaker.id for speaker in occurrence.schedule_item.presenters},
                     allowed_venues=allowed_venues,
                     allowed_times=allowed_time_ranges,
                     preferred_venues=preferred_venues,
