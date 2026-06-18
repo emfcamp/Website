@@ -61,6 +61,10 @@ class BuildupSignupKeyModelView(VolunteerModelView):
     def action_view_breakdown(self, ids):
         return redirect(url_for("volunteer_admin_breakdown.index", signup_key=ids))
 
+    @action("volunteers", "View Volunteers")
+    def action_view_volunteers(self, ids):
+        return redirect(url_for("volunteer_admin_buildupvolunteer.index_view", signup_key=ids))
+
 
 volunteer_admin.add_view(
     BuildupSignupKeyModelView(BuildupSignupKey, db, name="Signup keys", category="Buildup")
@@ -82,6 +86,7 @@ class BuildupVolunteerModelView(VolunteerModelView):
         "left_site",
     )
     column_filters = (
+        "signup_key_token",
         "user.volunteer.nickname",
         "signup_key.team_name",
     )
@@ -135,6 +140,12 @@ class BuildupVolunteerModelView(VolunteerModelView):
                 ]
             kwargs["details_columns"] = details_columns
         return super().render(*args, **kwargs)
+
+    def get_query(self):
+        query = super().get_query()
+        if signup_keys_strs := request.args.getlist("signup_key"):
+            query = query.filter(BuildupVolunteer.signup_key_token.in_(signup_keys_strs))
+        return query
 
 
 volunteer_admin.add_view(
