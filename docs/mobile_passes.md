@@ -38,14 +38,19 @@ developer account with active developer program subscription.
 1. Test it: go to `/account/purchases` and click the add to wallet button. This should download and show the pass on a Mac or iOS device. If it doesn't, something's wrong - most likely with the signing. You can debug by looking at console.app messages on a Mac (search for "pass").
 
 ## Styling
-The pass can be styled with the assets in `images/pkpass`. Optionally can be overridden with `PKPASS_ASSETS_DIR`. See (somewhat out of date) docs at https://developer.apple.com/library/archive/documentation/UserExperience/Conceptual/PassKit_PG/Creating.html.
-Note that our pass is an "event ticket" pass - so you should use:
-- `icon.png` - shown on the lockscreen/in notifications
-- `logo.png` - shown on the pass itself
-- `background.png` - shown (blurred) in the background of the pass
-- `strip.png` - optionally shown below the pass name as background to the ticket number information
+The pass is an "event ticket" pass. Its artwork is generated at runtime from the
+site's existing brand assets (see `get_pass_assets` in `apps/common/pkpass.py`), so
+there are no pass-specific images to maintain:
+- `icon.png` (lockscreen/notifications) - the EMF glyph on a brand-orange tile
+- `logo.png` (shown on the pass) - the white EMF wordmark
+- `background.png` (shown blurred behind the pass) - the hero graphic
 
-There should be @2x and @3x variants of all the above too.
+`@2x` and `@3x` variants of each are produced automatically.
+
+To use bespoke artwork instead, point `PKPASS_ASSETS_DIR` at a directory containing
+the files above (plus their `@2x`/`@3x` variants, and optionally `strip.png`). See
+the (somewhat out of date) Apple docs at
+https://developer.apple.com/library/archive/documentation/UserExperience/Conceptual/PassKit_PG/Creating.html.
 
 ## Locations/beacons
 The pass can be automatically shown on iOS devices when the device is near a GPS location or bluetooth le beacon. These are configured in
@@ -53,3 +58,19 @@ The pass can be automatically shown on iOS devices when the device is near a GPS
 - `PKPASS_BEACONS`
 See the docs for the schema: https://developer.apple.com/documentation/walletpasses/pass
 The `relevantText` fields are optional but recommended given the user sees them directly on the lockscreen notification.
+
+## Android
+There's no native pkpass support on Android (Google Wallet won't open one), but the
+format is portable: third-party readers such as
+[WalletPasses](https://walletpasses.io/) or the FOSS
+[PassAndroid](https://f-droid.org/packages/org.ligi.passandroid/) parse `pass.json`
+and render the same fields and artwork. We emit both the modern `barcodes` array and
+the deprecated singular `barcode` key so older readers still show the QR code.
+
+Most Android readers don't verify Apple's signature chain, which is handy for local
+testing: a self-signed pass (or one signed with the real cert) opens fine, so you can
+preview the generated artwork without an Apple device.
+
+The location/beacon lock-screen surfacing above is Apple-specific. Some Android
+readers (e.g. PassWallet) support location notifications, but it's best-effort and not
+guaranteed — treat lock-screen relevance as an iOS-only nicety.

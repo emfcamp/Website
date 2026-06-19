@@ -5,15 +5,15 @@ from typing import Any
 
 import requests
 from dateutil.parser import parse as parse_date
-from flask import current_app as app
 from flask import abort, flash, redirect, render_template, request, send_file, url_for
+from flask import current_app as app
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 from wtforms import BooleanField, StringField, SubmitField
 from wtforms.validators import DataRequired
+
 from apps.common import feature_enabled
 from apps.common.pkpass import generate_pkpass
-
 from main import db
 from models.payment import Payment
 from models.purchase import Purchase
