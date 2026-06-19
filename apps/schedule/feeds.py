@@ -1,5 +1,7 @@
 import json
+from datetime import timedelta
 
+from dateutil.parser import parse as parse_date
 from flask import Response, abort, redirect, request, url_for
 from flask import current_app as app
 from flask.typing import ResponseReturnValue
@@ -14,7 +16,7 @@ from models.user import User
 
 from ..common import feature_enabled, feature_flag, json_response
 from ..config import config
-from . import schedule
+from . import event_tz, schedule
 from .data import (
     ScheduleFilter,
     ScheduleItemDict,
@@ -166,7 +168,7 @@ def schedule_ical(year: int) -> ResponseReturnValue:
     for flat_sid in flat_sids:
         cal_event = Event()
         occurrence = flat_sid["occurrences"][0]
-        cal_event.add("uid", "{}-{}-{}".format(year, flat_sid["id"], occurrence["occurrence_num"]))
+        cal_event.add("uid", f"{year}-content-{flat_sid['id']}-{occurrence['occurrence_num']}")
         cal_event.add("summary", flat_sid["title"])
         cal_event.add("description", _format_event_description(flat_sid))
         cal_event.add("location", occurrence["venue"])
@@ -220,16 +222,22 @@ def favourites_ical() -> ResponseReturnValue:
     else:
         user = current_user
 
-    filter = ScheduleFilter(
-        venues=[],
-        is_favourite=True,
-        user=user,
-    )
-    assert filter.user is not None
+    if feature_enabled("SCHEDULE"):
+        filter = ScheduleFilter(
+            venues=[],
+            is_favourite=True,
+            user=user,
+        )
+        assert filter.user is not None
 
-    schedule_items = get_schedule_items(filter)
-    flat_sids = [flat_sid for si in schedule_items for flat_sid in get_schedule_item_dicts_flat(filter, si)]
-    title = f"EMF {config.event_year} Favourites for {filter.user.name}"
+        schedule_items = get_schedule_items(filter)
+        flat_sids = [
+            flat_sid for si in schedule_items for flat_sid in get_schedule_item_dicts_flat(filter, si)
+        ]
+    else:
+        flat_sids = []
+
+    title = f"EMF {config.event_year} Favourites for {user.name}"
 
     cal = Calendar()
     cal.add("summary", title)
@@ -237,12 +245,28 @@ def favourites_ical() -> ResponseReturnValue:
     cal.add("X-WR-CALDESC", title)
     cal.add("version", "2.0")
 
+    event_address = app.config["EVENT_ADDRESS"]
+
+    fixed_events = {
+        "Gates open": app.config["GATE_OPENED"],
+        "Site closes": app.config["GATE_CLOSED"],
+    }
+
+    for i, fev in enumerate(fixed_events.items()):
+        name, start_s = fev
+        start_date = event_tz.localize(parse_date(start_s))
+        cal_event = Event()
+        cal_event.add("uid", f"{config.event_year}-fixed-{i}")
+        cal_event.add("summary", name)
+        cal_event.add("location", event_address)
+        cal_event.add("dtstart", start_date)
+        cal_event.add("dtend", start_date + timedelta(hours=1))
+        cal.add_component(cal_event)
+
     for flat_sid in flat_sids:
         cal_event = Event()
         occurrence = flat_sid["occurrences"][0]
-        cal_event.add(
-            "uid", "{}-{}-{}".format(config.event_year, flat_sid["id"], occurrence["occurrence_num"])
-        )
+        cal_event.add("uid", f"{config.event_year}-content-{flat_sid['id']}-{occurrence['occurrence_num']}")
         cal_event.add("summary", flat_sid["title"])
         cal_event.add("description", _format_event_description(flat_sid))
         cal_event.add("location", occurrence["venue"])
