@@ -1,6 +1,6 @@
-from collections import namedtuple
 import asyncio
 import io
+from collections import namedtuple
 from typing import IO, Any
 
 import segno
@@ -23,7 +23,7 @@ TicketMeta = namedtuple(
 )
 
 
-def get_purchase_metadata(user) -> TicketMeta:
+def get_purchase_metadata(user: Any) -> TicketMeta:
     purchases = (
         user.owned_purchases.filter_by(is_paid_for=True)
         .join(PriceTier)
