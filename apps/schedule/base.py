@@ -2,6 +2,7 @@ import random
 from collections import defaultdict
 from datetime import datetime, timedelta
 from itertools import groupby
+from typing import Any
 
 import pendulum
 from flask import abort, flash, redirect, render_template, request, url_for
@@ -20,7 +21,7 @@ from wtforms import (
 )
 from wtforms.validators import InputRequired
 
-from main import db, get_or_404
+from main import cache, db, get_or_404
 from models.admin_message import AdminMessage
 from models.content import (
     SCHEDULE_ITEM_INFOS,
@@ -92,12 +93,73 @@ def schedule_current():
     )
 
 
+@cache.memoize(timeout=10)
+def get_user_lineup_ids(user_id: int) -> list[int]:
+    """
+    Shuffle the line-up, because we don't want a bias in starring,
+    while keep it fixed per-user, and across changes in published
+    state. This uses random seeding off the user ID and line-up
+    item ID to create a consistent hash.
+
+    Sorts by LINEUP_TYPE_ORDER first because we group by that in
+    the line-up, and want prev/next to go to the right next group.
+    """
+
+    schedule_items = db.session.scalars(
+        select(ScheduleItem)
+        .where(ScheduleItem.type.in_(LINEUP_TYPE_ORDER))
+        .where(ScheduleItem.state == "published")
+        .where(ScheduleItem.official_content == True)
+    )
+
+    def key(schedule_item: ScheduleItem) -> Any:
+        type_order = LINEUP_TYPE_ORDER.index(schedule_item.type)
+        rng = random.Random(f"{user_id}:{schedule_item.id}")
+        return (type_order, rng.randbytes(4), schedule_item.id)
+
+    return [si.id for si in sorted(schedule_items, key=key)]
+
+
+def get_lineup_prev_next_ids(schedule_item_id: int) -> tuple[int | None, int | None]:
+    """
+    Calculate the target of the prev/next buttons according to the current user's
+    view of the line-up.
+    """
+
+    # Get the cached order for this user
+    user_id = current_user.get_id()
+    user_lineup_ids: list[int] = get_user_lineup_ids(user_id)
+
+    try:
+        index = user_lineup_ids.index(schedule_item_id)
+    except ValueError:
+        # Oops, this item's fallen off the line-up, bail
+        return None, None
+
+    if index == 0:
+        prev_id = None
+    else:
+        prev_id = user_lineup_ids[index - 1]
+
+    try:
+        next_id = user_lineup_ids[index + 1]
+    except IndexError:
+        next_id = None
+
+    return prev_id, next_id
+
+
 @schedule.route("/schedule/line-up/<int:year>")
 def line_up(year: int) -> ResponseReturnValue:
     if year != config.event_year:
         # FIXME this should probably work for other years
         abort(404)
 
+    # Get the cached order for this user
+    user_id = current_user.get_id()
+    user_lineup_ids: list[int] = get_user_lineup_ids(user_id)
+
+    # This may not match the cached order
     schedule_items: list[ScheduleItem] = list(
         db.session.scalars(
             select(ScheduleItem)
@@ -107,15 +169,8 @@ def line_up(year: int) -> ResponseReturnValue:
         )
     )
 
-    user_id = current_user.get_id()
-
-    def key(item):
-        rng = random.Random(f"{user_id}:{item.id}")
-        return (item.type, rng.randbytes(4), item.id)
-
-    # Shuffle the order, but keep it fixed per-user
-    # (Because we don't want a bias in starring)
-    schedule_items.sort(key=key)
+    schedule_items_dict = {si.id: si for si in schedule_items}
+    schedule_items = [schedule_items_dict[i] for i in user_lineup_ids if i in schedule_items_dict]
 
     # We can't use jinja's groupby directly because we want to use
     # LINEUP_TYPE_ORDER and it accepts an attribute, not a lambda.
@@ -318,6 +373,12 @@ def item_current(year: int, schedule_item_id: int, slug: str | None = None) -> R
                 flash(msg)
             return redirect(url_for(".item", year=year, schedule_item_id=schedule_item_id, slug=slug))
 
+    if feature_enabled("SCHEDULE"):
+        # Meaningless unless we still allow access to the line-up page
+        prev_id, next_id = None, None
+    else:
+        prev_id, next_id = get_lineup_prev_next_ids(schedule_item_id)
+
     return render_template(
         "schedule/item.html",
         schedule_item=schedule_item,
@@ -326,6 +387,8 @@ def item_current(year: int, schedule_item_id: int, slug: str | None = None) -> R
         occurrences_dict=occurrences_dict,
         occurrence_forms=occurrence_forms,
         lottery_entry=lottery_entry,
+        prev_id=prev_id,
+        next_id=next_id,
     )
 
 

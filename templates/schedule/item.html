@@ -164,6 +164,16 @@
     &nbsp;Favourite
   </button>
 
+  <div class="pull-right">
+    {% if prev_id %}
+    <a class="btn btn-info" href="{{ url_for(".item", year=year, schedule_item_id=prev_id) }}">Previous</a>
+    {% endif %}
+
+    {% if next_id %}
+    <a class="btn btn-success" href="{{ url_for(".item", year=year, schedule_item_id=next_id) }}">Next</a>
+    {% endif %}
+  </div>
+
   </form>
 
 {% endif %}
