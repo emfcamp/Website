@@ -28,6 +28,8 @@ class Role(BaseModel):
     """A role which a volunteer can perform."""
 
     __tablename__ = "volunteer_role"
+    __versioned__: dict[str, Any] = {}
+
     id: Mapped[int] = mapped_column(primary_key=True)
     #: A short, stable, urlsafe, identifier used for de-duplication during data seeding.
     slug: Mapped[str] = mapped_column(unique=True, index=True)
