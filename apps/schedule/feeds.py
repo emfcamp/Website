@@ -59,12 +59,15 @@ def schedule_json(year: int) -> ResponseReturnValue:
     if year != config.event_year:
         return feed_historic(year, "json")
 
-    if not feature_enabled("SCHEDULE"):
+    if not feature_enabled("LINE_UP"):
         abort(404)
 
     filter = ScheduleFilter.from_request()
     schedule_items = get_schedule_items(filter)
     full_sids = [get_schedule_item_dict_full(filter, si) for si in schedule_items]
+
+    if not feature_enabled("SCHEDULE"):
+        full_sids = [sid | {"occurrences": []} for sid in full_sids]
 
     _fix_up_times_horribly(full_sids)
 
