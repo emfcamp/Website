@@ -72,6 +72,20 @@ class Role(BaseModel):
         back_populates="trained_roles", secondary=VolunteerRoleTraining, passive_deletes=True
     )
 
+    @classmethod
+    def grouped_by_team(cls, only: list[int] | None = None) -> dict[Team, list[Role]]:
+        """Return a list of roles grouped by the team they sit under.
+
+        If `only` is passed then only roles within the pass list of IDs will be returned,
+        this is primarily intended to scope this to the list of roles a user has admin
+        privileges for.
+        """
+        query = select(Role).join(Role.team).order_by(Team.name, Role.name)
+        if only is not None:
+            query = query.where(Role.id.in_(only))
+        roles = db.session.scalars(query).all()
+        return {team: list(team_roles) for team, team_roles in groupby(roles, key=lambda r: r.team)}
+
     @property
     def team_name(self) -> str:
         return self.team.name
