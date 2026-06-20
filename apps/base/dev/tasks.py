@@ -243,6 +243,21 @@ def volunteer_data():
     init_shifts()
 
 
+@dev_cli.command("pkpass")
+@click.option("--email", default=None, help="User to build the pass for (default: first user).")
+@click.option("--out", "outfile", default="unsigned.pkpass", type=click.Path(), show_default=True)
+def dump_unsigned_pkpass(email, outfile):
+    """Write an UNSIGNED .pkpass for previewing artwork/layout (e.g. in Wallet Pass Designer)."""
+    from apps.common.pkpass import generate_unsigned_pkpass
+
+    user = User.query.filter_by(email=email).one() if email else User.query.first()
+    if user is None:
+        raise click.ClickException("No users found; run `flask dev data` first.")
+    with open(outfile, "wb") as f:
+        f.write(generate_unsigned_pkpass(user).read())
+    click.echo(f"Wrote unsigned pass for {user.email} to {outfile}")
+
+
 @dev_cli.command("createbankaccounts")
 def create_bank_accounts_cmd():
     create_bank_accounts()
