@@ -9,10 +9,16 @@
 #}
 {% if current_user.is_authenticated and feature_enabled('ISSUE_TICKETS') and (current_user.get_owned_tickets(paid=True) | list) %}
 <button type="button" id="show-ticket-btn" class="show-ticket-fab" aria-haspopup="dialog">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <rect x="2.5" y="5" width="19" height="14" rx="2.5" fill="currentColor" opacity="0.25"/>
-    <rect x="2.5" y="5" width="19" height="14" rx="2.5" stroke="currentColor" stroke-width="1.6"/>
-    <path d="M2.5 10h19" stroke="currentColor" stroke-width="1.6"/>
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <rect x="3.5" y="3.5" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="2"/>
+    <rect x="14.5" y="3.5" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="2"/>
+    <rect x="3.5" y="14.5" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="2"/>
+    <g fill="currentColor">
+      <rect x="14" y="14" width="2.6" height="2.6" rx="0.4"/>
+      <rect x="17.9" y="14" width="2.6" height="2.6" rx="0.4"/>
+      <rect x="14" y="17.9" width="2.6" height="2.6" rx="0.4"/>
+      <rect x="17.9" y="17.9" width="2.6" height="2.6" rx="0.4"/>
+    </g>
   </svg>
   Show ticket
 </button>
@@ -63,22 +69,23 @@
     z-index: 1000;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 13px 26px;
+    gap: 11px;
+    padding: 11px 22px;
     border: none;
     border-radius: 999px;
-    background: #f77f02; /* $brand-2026-orange */
+    background: #005d96; /* $brand-2026-mid-blue */
     color: #fff;
-    font-size: 1.05rem;
+    font-size: 1.75rem;
     font-weight: 700;
+    white-space: nowrap;
     cursor: pointer;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
   }
-  .show-ticket-fab:hover { background: #e07300; }
+  .show-ticket-fab:hover { background: #00466f; }
   @media print { .show-ticket-fab, dialog.ticket-dialog { display: none !important; } }
 
   dialog.ticket-dialog {
-    width: min(360px, 92vw);
+    width: min(380px, 94vw);
     border: none;
     border-radius: 22px;
     padding: 26px 24px 28px;
@@ -96,8 +103,8 @@
   }
   .ticket-dialog__close:hover { color: #fff; }
 
-  .ticket-dialog__event { margin: -6px 0 2px; font-size: 1.25rem; font-weight: 700; }
-  .ticket-dialog__name { margin: 0 0 18px; color: #c7c7c7; font-size: 1rem; }
+  .ticket-dialog__event { margin: -6px 0 4px; font-size: 1.55rem; font-weight: 700; }
+  .ticket-dialog__name { margin: 0 0 18px; color: #c7c7c7; font-size: 1.2rem; }
 
   .ticket-dialog__qr {
     background: #fff;
@@ -112,12 +119,13 @@
   }
 
   .ticket-dialog__code {
-    margin: 16px 0 2px;
+    margin: 18px 0 2px;
     font-family: ui-monospace, "SF Mono", Menlo, monospace;
-    font-size: 1.35rem;
-    letter-spacing: 2px;
+    font-size: 1.7rem;
+    letter-spacing: 1.5px;
+    word-break: break-all;
   }
-  .ticket-dialog__hint { margin: 0 0 20px; color: #9a9a9a; font-size: 0.85rem; }
+  .ticket-dialog__hint { margin: 0 0 20px; color: #9a9a9a; font-size: 1rem; }
 
   .ticket-dialog__wallets { display: flex; flex-direction: column; gap: 10px; }
   .wallet-btn {
@@ -130,12 +138,12 @@
     background: #000;
     border: 1px solid #2c2c2e;
     color: #fff;
-    font-size: 1rem;
+    font-size: 1.12rem;
     font-weight: 600;
     text-decoration: none;
   }
   .wallet-btn:hover { background: #1a1a1c; text-decoration: none; }
-  .ticket-dialog__wallethint { margin: 12px 0 0; color: #7c7c7c; font-size: 0.78rem; }
+  .ticket-dialog__wallethint { margin: 12px 0 0; color: #7c7c7c; font-size: 0.9rem; }
 </style>
 
 <script nonce="{{ csp_nonce }}">
