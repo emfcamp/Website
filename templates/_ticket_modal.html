@@ -1,0 +1,154 @@
+{#
+  Floating "Show ticket" button + ticket modal, shown site-wide once tickets are
+  distributed (ISSUE_TICKETS) to attendees who hold a paid ticket. The modal shows
+  the check-in QR and the Apple/Google Wallet buttons.
+
+  Self-contained on purpose: the CSP allows inline styles (style-src 'unsafe-inline')
+  and nonce'd scripts, so this needs no SCSS/JS build changes. The wallet buttons and
+  the QR both reuse existing routes (users.pkpass_ticket, tickets.tickets_qrcode).
+#}
+{% if current_user.is_authenticated and feature_enabled('ISSUE_TICKETS') and (current_user.get_owned_tickets(paid=True) | list) %}
+<button type="button" id="show-ticket-btn" class="show-ticket-fab" aria-haspopup="dialog">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <rect x="2.5" y="5" width="19" height="14" rx="2.5" fill="currentColor" opacity="0.25"/>
+    <rect x="2.5" y="5" width="19" height="14" rx="2.5" stroke="currentColor" stroke-width="1.6"/>
+    <path d="M2.5 10h19" stroke="currentColor" stroke-width="1.6"/>
+  </svg>
+  Show ticket
+</button>
+
+<dialog id="ticket-dialog" class="ticket-dialog" aria-label="Your festival ticket">
+  <form method="dialog" class="ticket-dialog__closeform">
+    <button class="ticket-dialog__close" aria-label="Close">&times;</button>
+  </form>
+
+  <p class="ticket-dialog__event">Electromagnetic Field</p>
+  <p class="ticket-dialog__name">{{ current_user.name }}</p>
+
+  <div class="ticket-dialog__qr">
+    <img src="{{ url_for('tickets.tickets_qrcode', checkin_code=current_user.checkin_code) }}"
+         alt="Your check-in QR code" width="280" height="280">
+  </div>
+
+  <p class="ticket-dialog__code">{{ current_user.checkin_code }}</p>
+  <p class="ticket-dialog__hint">Show this at the gate to check in.</p>
+
+  {% if feature_enabled('ISSUE_APPLE_PKPASS_TICKETS') %}
+  <div class="ticket-dialog__wallets">
+    <a class="wallet-btn" href="{{ url_for('users.pkpass_ticket') }}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M16.36 12.78c-.02-2.3 1.88-3.4 1.96-3.46-1.07-1.56-2.73-1.78-3.32-1.8-1.41-.14-2.76.83-3.47.83-.72 0-1.82-.81-2.99-.79-1.54.02-2.96.9-3.75 2.28-1.6 2.78-.41 6.89 1.15 9.15.76 1.1 1.67 2.34 2.86 2.3 1.15-.05 1.58-.74 2.97-.74 1.38 0 1.77.74 2.98.72 1.23-.02 2.01-1.12 2.76-2.23.87-1.28 1.23-2.52 1.25-2.58-.03-.01-2.4-.92-2.42-3.65zM14.6 5.8c.64-.77 1.07-1.85.95-2.92-.92.04-2.03.61-2.69 1.38-.59.68-1.11 1.78-.97 2.83 1.03.08 2.07-.52 2.71-1.29z"/>
+      </svg>
+      Add to Apple Wallet
+    </a>
+    <a class="wallet-btn" href="{{ url_for('users.pkpass_ticket') }}">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="#4285F4" d="M21.6 12.23c0-.64-.06-1.25-.16-1.84H12v3.49h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.9-1.75 2.98-4.33 2.98-7.17z"/>
+        <path fill="#34A853" d="M12 22c2.7 0 4.96-.9 6.62-2.42l-3.24-2.5c-.9.6-2.05.96-3.38.96-2.6 0-4.8-1.76-5.59-4.12H3.06v2.59A10 10 0 0 0 12 22z"/>
+        <path fill="#FBBC05" d="M6.41 13.92a6 6 0 0 1 0-3.84V7.49H3.06a10 10 0 0 0 0 9.02l3.35-2.59z"/>
+        <path fill="#EA4335" d="M12 5.96c1.47 0 2.79.5 3.83 1.5l2.87-2.87C16.95 2.98 14.7 2 12 2A10 10 0 0 0 3.06 7.49l3.35 2.59C7.2 7.72 9.4 5.96 12 5.96z"/>
+      </svg>
+      Add to Google Wallet
+    </a>
+  </div>
+  <p class="ticket-dialog__wallethint">On Android, "Add to Google Wallet" opens the same pass in Google Wallet.</p>
+  {% endif %}
+</dialog>
+
+<style>
+  .show-ticket-fab {
+    position: fixed;
+    left: 50%;
+    bottom: 18px;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 26px;
+    border: none;
+    border-radius: 999px;
+    background: #f77f02; /* $brand-2026-orange */
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  }
+  .show-ticket-fab:hover { background: #e07300; }
+  @media print { .show-ticket-fab, dialog.ticket-dialog { display: none !important; } }
+
+  dialog.ticket-dialog {
+    width: min(360px, 92vw);
+    border: none;
+    border-radius: 22px;
+    padding: 26px 24px 28px;
+    background: #0d0e0e; /* matches the wallet pass */
+    color: #fff;
+    text-align: center;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.6);
+  }
+  dialog.ticket-dialog::backdrop { background: rgba(0, 0, 0, 0.7); }
+
+  .ticket-dialog__closeform { margin: 0; text-align: right; }
+  .ticket-dialog__close {
+    background: none; border: none; color: #9a9a9a;
+    font-size: 1.9rem; line-height: 1; cursor: pointer; padding: 0 2px;
+  }
+  .ticket-dialog__close:hover { color: #fff; }
+
+  .ticket-dialog__event { margin: -6px 0 2px; font-size: 1.25rem; font-weight: 700; }
+  .ticket-dialog__name { margin: 0 0 18px; color: #c7c7c7; font-size: 1rem; }
+
+  .ticket-dialog__qr {
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px;
+    display: inline-block;
+    line-height: 0;
+  }
+  .ticket-dialog__qr img {
+    width: 280px; height: 280px;
+    image-rendering: pixelated; /* keep QR modules crisp when upscaled */
+  }
+
+  .ticket-dialog__code {
+    margin: 16px 0 2px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 1.35rem;
+    letter-spacing: 2px;
+  }
+  .ticket-dialog__hint { margin: 0 0 20px; color: #9a9a9a; font-size: 0.85rem; }
+
+  .ticket-dialog__wallets { display: flex; flex-direction: column; gap: 10px; }
+  .wallet-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: #000;
+    border: 1px solid #2c2c2e;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .wallet-btn:hover { background: #1a1a1c; text-decoration: none; }
+  .ticket-dialog__wallethint { margin: 12px 0 0; color: #7c7c7c; font-size: 0.78rem; }
+</style>
+
+<script nonce="{{ csp_nonce }}">
+  (function () {
+    var dlg = document.getElementById("ticket-dialog");
+    var openBtn = document.getElementById("show-ticket-btn");
+    if (!dlg || !openBtn || typeof dlg.showModal !== "function") return;
+    openBtn.addEventListener("click", function () { dlg.showModal(); });
+    // Close when the backdrop (the dialog element itself) is clicked.
+    dlg.addEventListener("click", function (e) {
+      if (e.target === dlg) dlg.close();
+    });
+  })();
+</script>
+{% endif %}
