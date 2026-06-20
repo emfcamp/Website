@@ -21,6 +21,7 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import URL, InputRequired, Optional
 from wtforms.widgets import TextArea
 from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TimeField
+from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField, TimeField
 from wtforms.validators import InputRequired, Optional
 
 from apps.common.forms import Form
@@ -78,7 +79,7 @@ class ShiftTemplateForm(Form):
         [InputRequired()],
         description="The maximum number of volunteers you can make use of.",
     )
-    notes = StringField(
+    notes = TextAreaField(
         "Notes", [Optional()], description="Any notes you want on this template, not visible to attendees."
     )
     delete = BooleanField("Delete")

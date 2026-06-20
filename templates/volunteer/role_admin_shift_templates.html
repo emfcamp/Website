@@ -5,22 +5,70 @@
   EMF Volunteer Role Admin
 {% endblock %}
 
-{% macro template_row(form) %}
-    <tr>
-        <td>
-            {{ form.id() }}
-            {{ form.notes(type="hidden") }}
-            {{ form.venue_id(class="form-control") }}
-        </td>
-        <td>{{ form.event_day(size=1, class="form-control") }}</td>
-        <td>{{ form.start_time(class="form-control") }}</td>
-        <td>{{ form.end_time(class="form-control") }}</td>
-        <td>{{ form.duration(size=3, class="form-control") }}</td>
-        <td>{{ form.changeover_time(size=2, class="form-control") }}</td>
-        <td>{{ form.min_needed(size=2, class="form-control") }}</td>
-        <td>{{ form.max_needed(size=2, class="form-control") }}</td>
-        <td>{{ form.delete(class="delete-row-checkbox") }}</td>
-    </tr>
+{% macro render_shift_template(form) %}
+    <fieldset class="shift-template-fieldset panel panel-default" style="padding: 12px; margin-bottom: 16px;">
+        {{ form.id() }}
+        <div class="row">
+            <div class="col-sm-5 form-group">
+                <label>Venue</label>
+                {{ form.venue_id(class="form-control") }}
+            </div>
+            <div class="col-sm-2 form-group">
+                <label>Day</label>
+                {{ form.event_day(class="form-control") }}
+            </div>
+            <div class="col-sm-5 form-group">
+                <label>Start / Finish</label>
+                <div style="display:flex; align-items:center; gap:6px;">
+                    {{ form.start_time(class="form-control") }}
+                    <span>&ndash;</span>
+                    {{ form.end_time(class="form-control") }}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-5 form-group">
+                <label>Needed: Min / Max</label>
+                <div style="display:flex; align-items:center; gap:6px;">
+                    {{ form.min_needed(class="form-control") }}
+                    <span>/</span>
+                    {{ form.max_needed(class="form-control") }}
+                </div>
+            </div>
+            <div class="col-sm-7">
+                <div class="row">
+                    <div class="col-xs-6 form-group">
+                        <label>Duration</label>
+                        <div class="input-group">
+                            {{ form.duration(class="form-control") }}
+                            <span class="input-group-addon">hrs</span>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 form-group">
+                        <label>Changeover</label>
+                        <div class="input-group">
+                            {{ form.changeover_time(class="form-control") }}
+                            <span class="input-group-addon">min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 form-group">
+                <label>Notes</label>
+                {{ form.notes(class="form-control", rows=3) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 form-group">
+                <label class="btn btn-danger delete-row-label">
+                    {{ form.delete(class="delete-row-checkbox", style="display:none") }}
+                    Delete
+                </label>
+            </div>
+        </div>
+    </fieldset>
 {% endmacro %}
 
 {% block body %}
@@ -32,29 +80,14 @@
   </div>
 
   <form method="post">
-      <table>
-          <thead>
-              <tr>
-                  <th>Venue</th>
-                  <th>Day</th>
-                  <th>Start</th>
-                  <th>End</th>
-                  <th>Duration</th>
-                  <th>Changeover</th>
-                  <th>Min</th>
-                  <th>Max</th>
-                  <th>Delete</th>
-              </tr>
-          </thead>
-          <tbody id="shift-templates-body">
-              {% for form in forms %}
-                  {{ template_row(form) }}
-              {% endfor %}
-              {% for form in new_forms %}
-                  {{ template_row(form) }}
-              {% endfor %}
-          </tbody>
-      </table>
+      <div id="shift-templates-body">
+          {% for form in forms %}
+              {{ render_shift_template(form) }}
+          {% endfor %}
+          {% for form in new_forms %}
+              {{ render_shift_template(form) }}
+          {% endfor %}
+      </div>
       <div class="form-group">
           <button type="button" id="add-template-btn" class="btn btn-default">Add Template</button>
           <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -62,15 +95,18 @@
   </form>
 
   <template id="new-row-template">
-      {{ template_row(template_form) }}
+      {{ render_shift_template(template_form) }}
   </template>
 
   <script nonce="{{ csp_nonce }}">
     function applyDeleteState(checkbox) {
-        var row = checkbox.closest('tr');
-        row.style.opacity = checkbox.checked ? '0.4' : '';
-        row.querySelectorAll('input:not(.delete-row-checkbox):not([type=hidden]), select').forEach(function (el) {
-            if (checkbox.checked) {
+        var fieldset = checkbox.closest('fieldset');
+        var label = fieldset.querySelector('.delete-row-label');
+        var deleting = checkbox.checked;
+        fieldset.style.opacity = deleting ? '0.4' : '';
+        label.classList.toggle('active', deleting);
+        fieldset.querySelectorAll('input:not(.delete-row-checkbox):not([type=hidden]), select, textarea').forEach(function (el) {
+            if (deleting) {
                 var text = el.tagName === 'SELECT'
                     ? (el.selectedIndex >= 0 ? el.options[el.selectedIndex].text : '')
                     : el.value;
@@ -104,9 +140,9 @@
         clone.querySelectorAll('[name]').forEach(function (el) {
             el.name = el.name.replace('template-new-', prefix);
         });
-        var row = clone.querySelector('tr');
+        var fieldset = clone.querySelector('fieldset');
         document.getElementById('shift-templates-body').appendChild(clone);
-        bindDeleteCheckbox(row.querySelector('.delete-row-checkbox'));
+        bindDeleteCheckbox(fieldset.querySelector('.delete-row-checkbox'));
         newRowCount++;
     });
   </script>
