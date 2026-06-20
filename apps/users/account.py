@@ -1,3 +1,4 @@
+import html
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from typing import Any
@@ -58,9 +59,13 @@ def fetch_blog_posts():
 
     rss = ET.fromstring(response.text)
     for entry in rss.findall(".//{http://www.w3.org/2005/Atom}entry")[:3]:
+        title = entry.find("{http://www.w3.org/2005/Atom}title")
+        title_text = title.text
+        if title.attrib["type"] == "html":
+            title_text = html.unescape(title_text)
         posts.append(
             {
-                "title": entry.find("{http://www.w3.org/2005/Atom}title").text,
+                "title": title_text,
                 "date": parse_date(entry.find("{http://www.w3.org/2005/Atom}published").text),
                 "link": entry.find('{http://www.w3.org/2005/Atom}link[@type="text/html"]').attrib["href"],
             }
