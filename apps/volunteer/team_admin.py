@@ -29,7 +29,7 @@ def team_admin_required(f, *args, **kwargs):
 def team_admin(team_id: int) -> ResponseReturnValue:
     """Allow management of a team."""
     team = get_or_404(db, Team, team_id)
-    return render_template("volunteer/team_admin.html", team=team)
+    return render_template("volunteer/role_admin/team.html", team=team)
 
 
 @volunteer.route("/team/<int:team_id>/add_admin", methods=["POST"])
