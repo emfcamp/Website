@@ -1,7 +1,5 @@
-import itertools
 import re
 from datetime import datetime, timedelta
-from itertools import groupby
 
 from decorator import decorator
 from flask import (
@@ -22,12 +20,13 @@ from wtforms import StringField, SubmitField
 from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField, TimeField
 from wtforms.validators import URL, InputRequired, Optional
 from wtforms.widgets import TextArea
+from wtforms.fields import BooleanField, IntegerField, SelectField, TextAreaField, TimeField
+from wtforms.validators import InputRequired, Optional
 
 from apps.common.fields import HiddenIntegerField
 from apps.common.forms import Form
 from apps.volunteer import v_user_required, volunteer
 from main import db, get_or_404
-from models.user import User
 from models.volunteer.role import Role
 from models.volunteer.shift import (
     Shift,
@@ -109,27 +108,24 @@ class RoleForm(Form):
 @volunteer.route("/role-admin", methods=["GET"])
 @v_user_required
 def role_admin_index():
-    roles = []
     if (
         current_user.has_permission("admin")
         or current_user.has_permission("volunteer:manager")
         or current_user.has_permission("volunteer:admin")
     ):
-        roles = Role.query.order_by("name").all()
+        administered_ids = None
     else:
         administered_ids = current_user.administered_role_ids
-        roles = Role.query.filter(Role.id.in_(administered_ids)).order_by("name").all()
+        if len(administered_ids) == 0:
+            flash("You're not an admin for any roles.")
+            return redirect(url_for(".choose_role"))
 
-    if len(roles) == 0:
-        flash("You're not an admin for any roles.")
-        return redirect(url_for(".choose_role"))
-
-    if len(roles) == 1:
-        return redirect(url_for(".role_admin", role_id=roles[0].id))
+        if len(administered_ids) == 1:
+            return redirect(url_for(".role_admin", role_id=administered_ids[0]))
 
     return render_template(
         "volunteer/role_admin/index.html",
-        roles={team: list(team_roles) for team, team_roles in groupby(roles, key=lambda r: r.team)},
+        roles=Role.grouped_by_team(administered_ids),
     )
 
 
