@@ -80,6 +80,17 @@ EMF Volunteer Role Admin
     <a href="{{ url_for('volunteer.schedule') }}" class="btn btn-primary">Schedule</a>
 </div>
 
+{% if feature_enabled("VOLUNTEERS_SCHEDULE") %}
+    <div class="alert alert-danger">
+        <p><strong>Volunteer shift signup is active!</strong></p>
+        <p>Any changes made here will <strong>delete all existing shifts</strong> and create new ones,
+           which will result in anyone who was signed up for shifts being removed from them and having
+           to sign up again.</p>
+        <p><strong>If you're not 100% certain nobody has signed up for shifts under this role yet leave
+            now and either edit existing shifts in role admin, or talk to the volunteer team.</strong></p>
+    </div>
+{% endif %}
+
 <form method="post">
     <div id="shift-templates-body">
         {% for form in forms %}
