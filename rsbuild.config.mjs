@@ -79,6 +79,7 @@ export default defineConfig({
             "arrivals.js": "./js/arrivals.js",
             "sandboxed-iframe-parent.js": "./js/sandboxed-iframe-parent.js",
             "sandboxed-iframe-child.js": "./js/sandboxed-iframe-child.js",
+            "shift_templates.js": "./js/shift_templates.js",
 
             "admin.scss": "./css/admin.scss",
             "arrivals.scss": "./css/arrivals.scss",
