@@ -211,6 +211,7 @@ class Team(BaseModel):
     """A team that can have a number of volunteer roles attached."""
 
     __tablename__ = "volunteer_team"
+    __versioned__: dict[str, str] = {}
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
