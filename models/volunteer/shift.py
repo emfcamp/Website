@@ -142,6 +142,7 @@ class ShiftTemplate(BaseModel):
     """
 
     __tablename__ = "volunteer_shift_template"
+    __versioned__: dict[str, str] = {}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     role_id: Mapped[int] = mapped_column(ForeignKey("volunteer_role.id", ondelete="CASCADE"))
