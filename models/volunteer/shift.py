@@ -188,7 +188,7 @@ class ShiftTemplate(BaseModel):
 
     @property
     def start_datetime(self) -> datetime:
-        return datetime.combine(self.start_date, self.start_time, event_tz)
+        return event_tz.localize(datetime.combine(self.start_date, self.start_time))
 
     @property
     def end_date(self) -> date:
@@ -196,7 +196,7 @@ class ShiftTemplate(BaseModel):
 
     @property
     def end_datetime(self) -> datetime:
-        return datetime.combine(self.end_date, self.end_time, event_tz)
+        return event_tz.localize(datetime.combine(self.end_date, self.end_time))
 
     @property
     def shift_start_times(self) -> list[datetime]:
@@ -219,8 +219,12 @@ class ShiftTemplate(BaseModel):
                 venue=self.venue,
                 min_needed=self.min_needed,
                 max_needed=self.max_needed,
-                start=shift_start - timedelta(minutes=self.changeover_time),
-                end=shift_start + timedelta(minutes=self.duration),
+                start=(shift_start - timedelta(minutes=self.changeover_time))
+                .astimezone(pytz.utc)
+                .replace(tzinfo=None),
+                end=(shift_start + timedelta(minutes=self.duration))
+                .astimezone(pytz.utc)
+                .replace(tzinfo=None),
             )
             for shift_start in self.shift_start_times
         ]
