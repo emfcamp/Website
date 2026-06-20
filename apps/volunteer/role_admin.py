@@ -27,11 +27,6 @@ from wtforms.fields import (
 )
 from wtforms.validators import URL, InputRequired, Optional
 from wtforms.widgets import TextArea
-from wtforms.validators import InputRequired, Optional
-from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TimeField
-from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField, TimeField
-from wtforms.fields import BooleanField, IntegerField, SelectField, TextAreaField, TimeField
-from wtforms.validators import InputRequired, Optional
 
 from apps.common.fields import HiddenIntegerField
 from apps.common.forms import Form
