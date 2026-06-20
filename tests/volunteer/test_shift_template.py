@@ -1,11 +1,12 @@
-from datetime import time, timedelta
+from datetime import datetime, time, timedelta
 
 import pytest
+import pytz
 from flask_sqlalchemy import SQLAlchemy
 
 from apps.config import config
 from models.volunteer.role import Role, Team
-from models.volunteer.shift import ShiftTemplate
+from models.volunteer.shift import ShiftTemplate, event_tz
 from models.volunteer.venue import VolunteerVenue
 
 
@@ -54,10 +55,7 @@ def test_end_date_on_next_day(template: ShiftTemplate):
 
 def test_shift_start_times(template: ShiftTemplate):
     assert template.shift_start_times == [
-        template.start_datetime,
-        template.start_datetime + timedelta(minutes=60),
-        template.start_datetime + timedelta(minutes=120),
-        template.start_datetime + timedelta(minutes=180),
+        event_tz.localize(datetime.combine(template.start_date, time(hour, 0, 0))) for hour in range(9, 13)
     ]
 
 
@@ -66,8 +64,8 @@ def test_build_shifts(template: ShiftTemplate, role: Role, venue: VolunteerVenue
     assert len(shifts) == 4
 
     shift = shifts[0]
-    assert shift.start == template.start_datetime - timedelta(minutes=template.changeover_time)
-    assert shift.end == template.start_datetime + timedelta(minutes=template.duration)
+    assert shift.start == datetime.combine(template.start_date, time(7, 50, 0), None)
+    assert shift.end == datetime.combine(template.start_date, time(9, 0, 0), None)
     assert shift.min_needed == template.min_needed
     assert shift.max_needed == template.max_needed
     assert shift.role == role

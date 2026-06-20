@@ -49,6 +49,10 @@ def app_factory(cache):
         os.mkdir(prometheus_dir)
 
     # We don't support events which span the year-end, so generate a date next year.
+    #
+    # Event start should always sit within BST so that tests shake out places we're not
+    # correctly handling timezones. If you change this to a date that makes the event
+    # timezone GMT then a bunch of tests will break.
     now = datetime.datetime.now()
     fake_event_start = datetime.datetime(year=now.year + 1, month=6, day=2, hour=8)
     config_override = {
