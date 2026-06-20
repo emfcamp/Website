@@ -58,7 +58,9 @@ class Role(BaseModel):
     shifts: Mapped[list[Shift]] = relationship(back_populates="role", cascade="all, delete-orphan")
     #: Shift templates used to generate the full shift schedule for this role
     shift_templates: Mapped[list[ShiftTemplate]] = relationship(
-        back_populates="role", cascade="all, delete-orphan"
+        back_populates="role",
+        cascade="all, delete-orphan",
+        order_by="[ShiftTemplate.event_day, ShiftTemplate.start_time]",
     )
 
     #: Volunteers who are interested in this role
