@@ -2,148 +2,170 @@
 {% from "_formhelpers.html" import render_field %}
 
 {% block title %}
-  EMF Volunteer Role Admin
+EMF Volunteer Role Admin
 {% endblock %}
 
 {% macro render_shift_template(form) %}
-    <fieldset class="shift-template-fieldset panel panel-default" style="padding: 12px; margin-bottom: 16px;">
-        {{ form.id() }}
-        <div class="row">
-            <div class="col-sm-5 form-group">
-                <label>Venue</label>
-                {{ form.venue_id(class="form-control") }}
-            </div>
-            <div class="col-sm-2 form-group">
-                <label>Day</label>
-                {{ form.event_day(class="form-control") }}
-            </div>
-            <div class="col-sm-5 form-group">
-                <label>Start / Finish</label>
-                <div style="display:flex; align-items:center; gap:6px;">
-                    {{ form.start_time(class="form-control") }}
-                    <span>&ndash;</span>
-                    {{ form.end_time(class="form-control") }}
-                </div>
+<fieldset class="shift-template-fieldset panel panel-default" style="padding: 12px; margin-bottom: 16px;">
+    {{ form.id() }}
+    <div class="row">
+        <div class="col-sm-5 form-group">
+            <label>Venue</label>
+            {{ form.venue_id(class="form-control") }}
+        </div>
+        <div class="col-sm-2 form-group">
+            <label>Day</label>
+            {{ form.event_day(class="form-control") }}
+        </div>
+        <div class="col-sm-5 form-group">
+            <label>Start / Finish</label>
+            <div style="display:flex; align-items:center; gap:6px;">
+                {{ form.start_time(class="form-control") }}
+                <span>&ndash;</span>
+                {{ form.end_time(class="form-control") }}
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-5 form-group">
-                <label>Needed: Min / Max</label>
-                <div style="display:flex; align-items:center; gap:6px;">
-                    {{ form.min_needed(class="form-control") }}
-                    <span>/</span>
-                    {{ form.max_needed(class="form-control") }}
-                </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-5 form-group">
+            <label>Needed: Min / Max</label>
+            <div style="display:flex; align-items:center; gap:6px;">
+                {{ form.min_needed(class="form-control") }}
+                <span>/</span>
+                {{ form.max_needed(class="form-control") }}
             </div>
-            <div class="col-sm-7">
-                <div class="row">
-                    <div class="col-xs-6 form-group">
-                        <label>Duration</label>
-                        <div class="input-group">
-                            {{ form.duration(class="form-control") }}
-                            <span class="input-group-addon">hrs</span>
-                        </div>
-                    </div>
-                    <div class="col-xs-6 form-group">
-                        <label>Changeover</label>
-                        <div class="input-group">
-                            {{ form.changeover_time(class="form-control") }}
-                            <span class="input-group-addon">min</span>
-                        </div>
+        </div>
+        <div class="col-sm-7">
+            <div class="row">
+                <div class="col-xs-6 form-group">
+                    <label>Duration</label>
+                    <div class="input-group">
+                        {{ form.duration(class="form-control") }}
+                        <span class="input-group-addon">hrs</span>
                     </div>
                 </div>
+                <div class="col-xs-6 form-group">
+                    <label>Changeover</label>
+                    <div class="input-group">
+                        {{ form.changeover_time(class="form-control") }}
+                        <span class="input-group-addon">min</span>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-12 form-group">
-                <label>Notes</label>
-                {{ form.notes(class="form-control", rows=3) }}
-            </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 form-group">
+            <label>Notes</label>
+            {{ form.notes(class="form-control", rows=3) }}
         </div>
-        <div class="row">
-            <div class="col-sm-12 form-group">
-                <label class="btn btn-danger delete-row-label">
-                    {{ form.delete(class="delete-row-checkbox", style="display:none") }}
-                    Delete
-                </label>
-            </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 form-group">
+            <button type="button" class="btn btn-default clone-row-btn">Clone</button>
+            <label class="btn btn-danger delete-row-label">
+                {{ form.delete(class="delete-row-checkbox", style="display:none") }}
+                Delete
+            </label>
         </div>
-    </fieldset>
+    </div>
+</fieldset>
 {% endmacro %}
 
 {% block body %}
-  {% include "volunteer/_nav.html" %}
-  <h2>{{ role }} Shift Configuration</h2>
-  <div>
+{% include "volunteer/_nav.html" %}
+<h2>{{ role }} Shift Configuration</h2>
+<div class="form-group">
     <a href="{{ url_for('.role_admin', role_id=role.id) }}" class="btn btn-default">Back to role admin</a>
     <a href="{{ url_for('volunteer.schedule') }}" class="btn btn-primary">Schedule</a>
-  </div>
+</div>
 
-  <form method="post">
-      <div id="shift-templates-body">
-          {% for form in forms %}
-              {{ render_shift_template(form) }}
-          {% endfor %}
-          {% for form in new_forms %}
-              {{ render_shift_template(form) }}
-          {% endfor %}
-      </div>
-      <div class="form-group">
-          <button type="button" id="add-template-btn" class="btn btn-default">Add Template</button>
-          <button type="submit" class="btn btn-primary">Save Changes</button>
-      </div>
-  </form>
+<form method="post">
+    <div id="shift-templates-body">
+        {% for form in forms %}
+            {{ render_shift_template(form) }}
+        {% endfor %}
+        {% for form in new_forms %}
+            {{ render_shift_template(form) }}
+        {% endfor %}
+    </div>
+    <div class="sticky-buttons form-group">
+        <button type="button" id="add-template-btn" class="btn btn-default">Add Template</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </div>
+</form>
 
-  <template id="new-row-template">
-      {{ render_shift_template(template_form) }}
-  </template>
+<template id="new-row-template">
+    {{ render_shift_template(template_form) }}
+</template>
 
-  <script nonce="{{ csp_nonce }}">
-    function applyDeleteState(checkbox) {
-        var fieldset = checkbox.closest('fieldset');
-        var label = fieldset.querySelector('.delete-row-label');
-        var deleting = checkbox.checked;
-        fieldset.style.opacity = deleting ? '0.4' : '';
-        label.classList.toggle('active', deleting);
-        fieldset.querySelectorAll('input:not(.delete-row-checkbox):not([type=hidden]), select, textarea').forEach(function (el) {
-            if (deleting) {
-                var text = el.tagName === 'SELECT'
-                    ? (el.selectedIndex >= 0 ? el.options[el.selectedIndex].text : '')
-                    : el.value;
-                var span = document.createElement('span');
-                span.className = 'delete-preview';
-                span.textContent = text;
-                el.parentNode.insertBefore(span, el);
-                el.style.display = 'none';
-                el.disabled = true;
-            } else {
-                var preview = el.parentNode.querySelector('.delete-preview');
-                if (preview) preview.remove();
-                el.style.display = '';
-                el.disabled = false;
-            }
-        });
-    }
-
-    function bindDeleteCheckbox(checkbox) {
-        checkbox.addEventListener('change', function () { applyDeleteState(this); });
-        applyDeleteState(checkbox);
-    }
-
-    document.querySelectorAll('.delete-row-checkbox').forEach(bindDeleteCheckbox);
-
-    var newRowCount = {{ new_forms | length }};
-    document.getElementById('add-template-btn').addEventListener('click', function () {
-        var tmpl = document.getElementById('new-row-template');
-        var clone = document.importNode(tmpl.content, true);
-        var prefix = 'template-new-' + newRowCount + '-';
-        clone.querySelectorAll('[name]').forEach(function (el) {
-            el.name = el.name.replace('template-new-', prefix);
-        });
-        var fieldset = clone.querySelector('fieldset');
-        document.getElementById('shift-templates-body').appendChild(clone);
-        bindDeleteCheckbox(fieldset.querySelector('.delete-row-checkbox'));
-        newRowCount++;
+<script nonce="{{ csp_nonce }}">
+function applyDeleteState(checkbox) {
+    var fieldset = checkbox.closest('fieldset');
+    var label = fieldset.querySelector('.delete-row-label');
+    var deleting = checkbox.checked;
+    fieldset.style.opacity = deleting ? '0.4' : '';
+    label.classList.toggle('active', deleting);
+    fieldset.querySelectorAll('input:not(.delete-row-checkbox):not([type=hidden]), select, textarea').forEach(function (el) {
+        if (deleting) {
+            var text = el.tagName === 'SELECT'
+                ? (el.selectedIndex >= 0 ? el.options[el.selectedIndex].text : '')
+                : el.value;
+            var span = document.createElement('span');
+            span.className = 'delete-preview';
+            span.textContent = text;
+            el.parentNode.insertBefore(span, el);
+            el.style.display = 'none';
+            el.disabled = true;
+        } else {
+            var preview = el.parentNode.querySelector('.delete-preview');
+            if (preview) preview.remove();
+            el.style.display = '';
+            el.disabled = false;
+        }
     });
-  </script>
+}
+
+function bindDeleteCheckbox(checkbox) {
+    checkbox.addEventListener('change', function () { applyDeleteState(this); });
+    applyDeleteState(checkbox);
+}
+
+document.querySelectorAll('.delete-row-checkbox').forEach(bindDeleteCheckbox);
+
+var newRowCount = {{ new_forms | length }};
+
+function addNewRow(sourceFieldset) {
+    var tmpl = document.getElementById('new-row-template');
+    var clone = document.importNode(tmpl.content, true);
+    var prefix = 'template-new-' + newRowCount + '-';
+    clone.querySelectorAll('[name]').forEach(function (el) {
+        el.name = el.name.replace('template-new-', prefix);
+    });
+    var fieldset = clone.querySelector('fieldset');
+    if (sourceFieldset) {
+        var srcInputs = sourceFieldset.querySelectorAll('input:not(.delete-row-checkbox):not([type=hidden]), select, textarea');
+        var dstInputs = fieldset.querySelectorAll('input:not(.delete-row-checkbox):not([type=hidden]), select, textarea');
+        srcInputs.forEach(function (src, i) {
+            if (dstInputs[i]) dstInputs[i].value = src.value;
+        });
+    }
+    document.getElementById('shift-templates-body').appendChild(clone);
+    bindDeleteCheckbox(fieldset.querySelector('.delete-row-checkbox'));
+    bindCloneButton(fieldset.querySelector('.clone-row-btn'));
+    newRowCount++;
+}
+
+function bindCloneButton(btn) {
+    btn.addEventListener('click', function () {
+        addNewRow(this.closest('fieldset'));
+    });
+}
+
+document.querySelectorAll('.clone-row-btn').forEach(bindCloneButton);
+
+document.getElementById('add-template-btn').addEventListener('click', function () {
+    addNewRow(null);
+});
+</script>
 {% endblock %}

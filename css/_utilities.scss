@@ -1,0 +1,8 @@
+@use "./_variables.scss" as *;
+
+.sticky-buttons {
+  position: sticky;
+  bottom: 0;
+  background: $main-background;
+  padding: 12px;
+}
