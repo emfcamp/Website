@@ -90,17 +90,95 @@ def _get_beacons():
     return beacons
 
 
-def generate_pass_data(user: User) -> dict[str, Any]:
+_EVENT_NAME = "Electromagnetic Field 2026"
+_VENUE_SHORT = "Eastnor Deer Park"
+_VENUE_FULL = "Eastnor Castle Deer Park, Eastnor, Herefordshire"
+
+
+def _event_datetimes() -> tuple[datetime, datetime]:
+    """Event start/end as timezone-aware datetimes.
+
+    Use localize() rather than replace(tzinfo=...): pytz zones carry historical
+    offsets, so replace() yields a bogus LMT offset (e.g. -00:01) instead of BST.
+    """
+    tz = pytz.timezone("Europe/London")
+    start = tz.localize(datetime.strptime(app.config["EVENT_START"], "%Y-%m-%d %H:%M:%S"))
+    end = tz.localize(datetime.strptime(app.config["EVENT_END"], "%Y-%m-%d %H:%M:%S"))
+    return start, end
+
+
+def _format_date_range(start: datetime, end: datetime) -> str:
+    """e.g. '16–19 Jul 2026', or '30 Jul – 2 Aug 2026' across a month boundary."""
+    if (start.year, start.month) == (end.year, end.month):
+        return f"{start.day}–{end.day} {start:%b %Y}"
+    return f"{start.day} {start:%b} – {end.day} {end:%b %Y}"
+
+
+def _build_event_fields(user: User) -> dict[str, list[dict[str, Any]]]:
+    """Assemble the eventTicket field groups, including only the fields the user
+    actually has tickets for so we never show 'Parking 0'."""
     meta = get_purchase_metadata(user)
-    # Use localize() rather than replace(tzinfo=...): pytz zones carry historical
-    # offsets, so replace() yields a bogus LMT offset (e.g. -00:01) instead of BST.
-    expire_dt = pytz.timezone("Europe/London").localize(
-        datetime.strptime(app.config["EVENT_END"], "%Y-%m-%d %H:%M:%S")
-    )
+    start, end = _event_datetimes()
+    n_admission = len(meta.admissions)
+    n_parking = len(meta.parking_tickets)
+    n_campervan = len(meta.campervan_tickets)
+
+    # No header field: the logo text ("Electromagnetic Field") needs the full
+    # width of the top row, and a header field on the right truncates it to
+    # "Electromagneti…". The dates still show in the auxiliary row and the back.
+    header: list[dict[str, Any]] = []
+
+    # Field values are strings, not ints: Apple renders either, but Google
+    # Wallet's pkpass import (localizedBody.value) requires strings and rejects
+    # bare numbers, so str() everything for cross-wallet compatibility.
+    # Large, overlaid on the hero — the headline of an entry pass.
+    primary = [{"key": "admission", "label": "Admission", "value": str(n_admission)}]
+
+    secondary = [
+        {"key": "attendee", "label": "Attendee", "value": user.name},
+        {"key": "location", "label": "Location", "value": _VENUE_SHORT},
+    ]
+
+    auxiliary = [
+        {"key": "gates", "label": "Gates open", "value": f"{start:%a} {start.day} {start:%b}, {start:%H:%M}"},
+    ]
+    if n_parking:
+        auxiliary.append({"key": "parking", "label": "Parking", "value": str(n_parking)})
+    if n_campervan:
+        auxiliary.append({"key": "campervan", "label": "Campervan", "value": str(n_campervan)})
+
+    back = [
+        {"key": "b_attendee", "label": "Attendee", "value": user.name},
+        {"key": "b_email", "label": "Email", "value": user.email},
+        {"key": "b_checkin", "label": "Check-in code", "value": user.checkin_code},
+        {"key": "b_event", "label": "Event", "value": _EVENT_NAME},
+        {"key": "b_venue", "label": "Location", "value": _VENUE_FULL},
+        {"key": "b_dates", "label": "Dates", "value": _format_date_range(start, end)},
+        {"key": "b_admission", "label": "Admission tickets", "value": str(n_admission)},
+    ]
+    if n_parking:
+        back.append({"key": "b_parking", "label": "Parking tickets", "value": str(n_parking)})
+    if n_campervan:
+        back.append({"key": "b_campervan", "label": "Campervan tickets", "value": str(n_campervan)})
+    back.append({"key": "gen", "label": "Generated at", "value": datetime.now().isoformat()})
+
+    return {
+        "headerFields": header,
+        "primaryFields": primary,
+        "secondaryFields": secondary,
+        "auxiliaryFields": auxiliary,
+        "backFields": back,
+    }
+
+
+def generate_pass_data(user: User) -> dict[str, Any]:
+    _, expire_dt = _event_datetimes()
     barcode = {
         "format": "PKBarcodeFormatQR",
         "message": app.config["CHECKIN_BASE"] + user.checkin_code,
         "messageEncoding": "iso-8859-1",
+        # Shown as readable text under the QR.
+        "altText": user.checkin_code,
     }
     return {
         "passTypeIdentifier": app.config["PKPASS_IDENTIFIER"],
@@ -110,6 +188,10 @@ def generate_pass_data(user: User) -> dict[str, Any]:
         "serialNumber": user.checkin_code,
         "organizationName": "Electromagnetic Field",
         "description": "Electromagnetic Field Entry Pass",
+        # Shown as the ticket title at the top, next to the logo mark. Kept to
+        # the bare event name so it fills the top row without truncating; the
+        # dates live in the auxiliary row and on the back.
+        "logoText": "Electromagnetic Field",
         "locations": _get_and_validate_locations(),
         "beacons": _get_beacons(),
         "maxDistance": app.config.get("PKPASS_MAX_DISTANCE", 50),
@@ -124,21 +206,7 @@ def generate_pass_data(user: User) -> dict[str, Any]:
         "sharingProhibited": False,
         # ISO 8601 with a colon in the offset, e.g. 2026-07-19T23:00:00+01:00.
         "expirationDate": expire_dt.isoformat(),
-        "eventTicket": {
-            "primaryFields": [
-                {"key": "admissions", "value": len(meta.admissions), "label": "Admission"},
-                {"key": "parking", "value": len(meta.parking_tickets), "label": "Parking"},
-                {"key": "caravan", "value": len(meta.campervan_tickets), "label": "Campervan"},
-            ],
-            "secondaryFields": [],
-            "backFields": [
-                {
-                    "key": "gen",
-                    "value": f"{datetime.now().isoformat()}",
-                    "label": "Generated at ",
-                }
-            ],
-        },
+        "eventTicket": _build_event_fields(user),
     }
 
 
@@ -156,24 +224,33 @@ _ICON_BG = (247, 127, 2)
 # Target sizes in points; Apple wants @2x and @3x raster variants of each.
 _SCALES = (("", 1), ("@2x", 2), ("@3x", 3))
 _LOGO_HEIGHT = 50
-_ICON_SIZE = 29
-# eventTicket strip (the band shown behind the primary fields). Unlike
-# background.png, the strip is drawn consistently by Apple Wallet, Android pkpass
-# readers and the various online viewers.
-_STRIP_SIZE = (375, 123)
-# Card colour, shown where the strip doesn't reach and behind the white fields.
+# Wallet's icon slot is 38pt (so @3x is 114×114); anything smaller is rejected
+# by Pass Designer's validator as the wrong dimensions.
+_ICON_SIZE = 38
+# eventTicket background.png fills the whole card (Wallet blurs and darkens it
+# behind the fields). Wallet requires a 345×505pt background (@3x 1035×1515); the
+# hero is a portrait crop centred on the comet arc to fill that taller frame.
+_BACKGROUND_SIZE = (345, 505)
+# Card colour, shown behind the fields where the artwork is unavailable.
 _BACKGROUND_COLOR = "rgb(13, 14, 14)"
 _LANCZOS = Image.Resampling.LANCZOS
 
 
-def _render_strip(width: int, height: int) -> bytes:
-    """Crop a wide band of the hero graphic for the pass strip (sits behind the fields)."""
+def _render_background(width: int, height: int) -> bytes:
+    """Portrait crop of the hero for the full-card background.
+
+    The comet arc, dish and its reflection sit in the left-centre of the wide
+    source, so we centre a portrait crop there rather than on the image centre.
+    """
     with Image.open(_HERO_IMAGE) as src:
         img = src.convert("RGB")
-        # Full width, horizontal slice through the comet arc and dish.
-        crop_h = min(img.height, round(img.width * height / width))
-        top = round((img.height - crop_h) * 0.3)
-        box = (0, top, img.width, top + crop_h)
+        target = width / height
+        crop_h = img.height * 0.82  # keep a little sky above the arc and foreground below
+        crop_w = crop_h * target
+        cx, cy = img.width * 0.27, img.height * 0.52
+        left = max(0.0, min(cx - crop_w / 2, img.width - crop_w))
+        top = max(0.0, min(cy - crop_h / 2, img.height - crop_h))
+        box = (left, top, left + crop_w, top + crop_h)
         out = io.BytesIO()
         img.resize((width, height), _LANCZOS, box=box).save(out, "PNG")
     return out.getvalue()
@@ -210,8 +287,8 @@ def _generate_brand_assets() -> dict[str, bytes]:
     for suffix, scale in _SCALES:
         assets[f"icon{suffix}.png"] = _render_icon(_ICON_SIZE * scale)
         assets[f"logo{suffix}.png"] = _render_logo(_LOGO_HEIGHT * scale)
-        assets[f"strip{suffix}.png"] = _render_strip(
-            _STRIP_SIZE[0] * scale, _STRIP_SIZE[1] * scale
+        assets[f"background{suffix}.png"] = _render_background(
+            _BACKGROUND_SIZE[0] * scale, _BACKGROUND_SIZE[1] * scale
         )
     return assets
 
@@ -249,13 +326,33 @@ def smime_sign(data: bytes, signer_cert_file: Path, key_file: Path, cert_chain_f
     return p.stdout
 
 
+def _pass_files(user: User) -> dict[str, bytes]:
+    """The pass.json plus image assets that make up a .pkpass archive."""
+    files = {"pass.json": json.dumps(generate_pass_data(user)).encode()}
+    files |= get_pass_assets()
+    return files
+
+
+def _zip_files(files: dict[str, bytes]) -> io.BytesIO:
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w") as zf:
+        for name, contents in files.items():
+            zf.writestr(name, contents)
+    zip_buffer.seek(0)
+    return zip_buffer
+
+
+def generate_unsigned_pkpass(user: User) -> io.BytesIO:
+    """Build a .pkpass without a signature, for previewing artwork and layout
+    (e.g. in Apple's Wallet Pass Designer). Not valid for installation."""
+    files = _pass_files(user)
+    files["manifest.json"] = json.dumps(generate_manifest(files)).encode()
+    return _zip_files(files)
+
+
 def generate_pkpass(user: User) -> io.BytesIO:
     """Generates a signed Apple Wallet pass for a user."""
-    zip_buffer = io.BytesIO()
-    files = {
-        "pass.json": json.dumps(generate_pass_data(user)).encode(),
-    }
-    files |= get_pass_assets()
+    files = _pass_files(user)
     manifest = json.dumps(generate_manifest(files)).encode()
     signature = smime_sign(
         manifest,
@@ -265,8 +362,4 @@ def generate_pkpass(user: User) -> io.BytesIO:
     )
     files["manifest.json"] = manifest
     files["signature"] = signature
-    with zipfile.ZipFile(zip_buffer, "w") as zf:
-        for name, contents in files.items():
-            zf.writestr(name, contents)
-    zip_buffer.seek(0)
-    return zip_buffer
+    return _zip_files(files)
