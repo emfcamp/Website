@@ -16,10 +16,20 @@ from flask import (
 from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from sqlalchemy import select
-from wtforms import StringField, SubmitField
-from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField, TimeField
+from wtforms.fields import (
+    BooleanField,
+    IntegerField,
+    SelectField,
+    StringField,
+    SubmitField,
+    TextAreaField,
+    TimeField,
+)
 from wtforms.validators import URL, InputRequired, Optional
 from wtforms.widgets import TextArea
+from wtforms.validators import InputRequired, Optional
+from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TimeField
+from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField, TimeField
 from wtforms.fields import BooleanField, IntegerField, SelectField, TextAreaField, TimeField
 from wtforms.validators import InputRequired, Optional
 
@@ -239,7 +249,7 @@ def _venue_choices() -> list[tuple[int, str]]:
 
 @volunteer.route("role/<int:role_id>/admin/shift_templates", methods=["GET", "POST"])
 @role_admin_required
-def role_shift_templates(role_id: int):
+def role_shift_templates(role_id: int) -> ResponseReturnValue:
     role = get_or_404(db, Role, role_id)
     templates = role.shift_templates
     venue_choices = _venue_choices()
