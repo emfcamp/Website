@@ -1,3 +1,4 @@
+import itertools
 import re
 from datetime import datetime, timedelta
 from itertools import groupby
@@ -18,13 +19,10 @@ from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from sqlalchemy import select
 from wtforms import StringField, SubmitField
+from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField, TimeField
 from wtforms.validators import URL, InputRequired, Optional
 from wtforms.widgets import TextArea
-from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TimeField
-from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField, TimeField
-from wtforms.validators import InputRequired, Optional
 
-from apps.common.forms import Form
 from apps.common.fields import HiddenIntegerField
 from apps.common.forms import Form
 from apps.volunteer import v_user_required, volunteer
@@ -39,6 +37,7 @@ from models.volunteer.shift import (
     ShiftTemplate,
 )
 from models.volunteer.venue import VolunteerVenue
+from models.volunteer.volunteer import Volunteer
 
 
 class ShiftTemplateForm(Form):
@@ -129,7 +128,7 @@ def role_admin_index():
         return redirect(url_for(".role_admin", role_id=roles[0].id))
 
     return render_template(
-        "volunteer/role_admin_index.html",
+        "volunteer/role_admin/index.html",
         roles={team: list(team_roles) for team, team_roles in groupby(roles, key=lambda r: r.team)},
     )
 
@@ -185,7 +184,7 @@ def role_admin(role_id):
     )
 
     return render_template(
-        "volunteer/role_admin.html",
+        "volunteer/role_admin/role.html",
         role=role,
         shifts=shifts,
         active_shift_entries=active_shift_entries,
@@ -210,7 +209,7 @@ def role_edit(role_id: int) -> ResponseReturnValue:
         flash("Role details have been updated.")
         return redirect(url_for(".role_admin", role_id=role_id))
 
-    return render_template("volunteer/role_edit.html", role=role, form=form)
+    return render_template("volunteer/role_admin/edit.html", role=role, form=form)
 
 
 def _form(template: ShiftTemplate, venue_choices: list[tuple[int, str]]) -> ShiftTemplateForm:
@@ -279,7 +278,7 @@ def role_shift_templates(role_id: int):
             return redirect(url_for(".role_shift_templates", role_id=role_id))
 
     return render_template(
-        "volunteer/role_admin_shift_templates.html",
+        "volunteer/role_admin/shift_templates.html",
         role=role,
         forms=forms,
         templates=templates,
@@ -330,12 +329,12 @@ def update_shift(role_id: int, shift_id: int) -> ResponseReturnValue:
 @role_admin_required
 def role_volunteers(role_id):
     role = get_or_404(db, Role, role_id)
-    interested = User.query.join(User.interested_roles).filter(Role.id == role_id).all()
+    interested = Volunteer.query.join(Volunteer.interested_roles).filter(Role.id == role_id).all()
     entries = ShiftEntry.query.join(ShiftEntry.shift).filter(Shift.role_id == role_id).all()
     signed_up = list(set([se.user.volunteer for se in entries]))
     completed = list(set([se.user.volunteer for se in entries if se.state == "completed"]))
     return render_template(
-        "volunteer/role_volunteers.html",
+        "volunteer/role_admin/volunteers.html",
         role=role,
         interested=interested,
         signed_up=signed_up,
