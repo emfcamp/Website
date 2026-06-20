@@ -108,10 +108,10 @@ def _event_datetimes() -> tuple[datetime, datetime]:
 
 
 def _format_date_range(start: datetime, end: datetime) -> str:
-    """e.g. '16–19 Jul 2026', or '30 Jul – 2 Aug 2026' across a month boundary."""
+    """e.g. '16-19 Jul 2026', or '30 Jul - 2 Aug 2026' across a month boundary."""
     if (start.year, start.month) == (end.year, end.month):
-        return f"{start.day}–{end.day} {start:%b %Y}"
-    return f"{start.day} {start:%b} – {end.day} {end:%b %Y}"
+        return f"{start.day}-{end.day} {start:%b %Y}"
+    return f"{start.day} {start:%b} - {end.day} {end:%b %Y}"
 
 
 def _build_event_fields(user: User) -> dict[str, list[dict[str, Any]]]:
@@ -224,11 +224,11 @@ _ICON_BG = (247, 127, 2)
 # Target sizes in points; Apple wants @2x and @3x raster variants of each.
 _SCALES = (("", 1), ("@2x", 2), ("@3x", 3))
 _LOGO_HEIGHT = 50
-# Wallet's icon slot is 38pt (so @3x is 114×114); anything smaller is rejected
+# Wallet's icon slot is 38pt (so @3x is 114x114); anything smaller is rejected
 # by Pass Designer's validator as the wrong dimensions.
 _ICON_SIZE = 38
 # eventTicket background.png fills the whole card (Wallet blurs and darkens it
-# behind the fields). Wallet requires a 345×505pt background (@3x 1035×1515); the
+# behind the fields). Wallet requires a 345x505pt background (@3x 1035x1515); the
 # hero is a portrait crop centred on the comet arc to fill that taller frame.
 _BACKGROUND_SIZE = (345, 505)
 # Card colour, shown behind the fields where the artwork is unavailable.
