@@ -23,7 +23,9 @@
   <div>
     <a href="{{ url_for('.role_volunteers', role_id=role.id) }}" class="btn btn-primary">All Volunteers</a>
     <a href="{{ url_for('.train_users', role_id=role.id) }}" class="btn btn-primary">Training</a>
-    <a href="{{ url_for('.role_shift_templates', role_id=role.id) }}" class="btn btn-primary">Shift Configuration</a>
+    {% if not feature_enabled("VOLUNTEERS_SCHEDULE") %}
+        <a href="{{ url_for('.role_shift_templates', role_id=role.id) }}" class="btn btn-primary">Shift Configuration</a>
+    {% endif %}
   </div>
   <h3>Volunteers on Shift</h3>
   <div class="role-admin-shift well content-well">
