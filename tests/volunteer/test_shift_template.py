@@ -1,7 +1,6 @@
-from datetime import datetime, time, timedelta
+from datetime import date, datetime, time, timedelta
 
 import pytest
-import pytz
 from flask_sqlalchemy import SQLAlchemy
 
 from apps.config import config
@@ -40,32 +39,38 @@ def template(role: Role, venue: VolunteerVenue) -> ShiftTemplate:
     )
 
 
-def test_start_date(template: ShiftTemplate):
-    assert template.start_date == config.event_start.date()
+@pytest.fixture
+def shift_date() -> date:
+    # Event day 1 is the listed start date.
+    return config.event_start.date()
 
 
-def test_end_date_on_same_day(template: ShiftTemplate):
-    assert template.end_date == config.event_start.date()
+def test_start_date(template: ShiftTemplate, shift_date: date):
+    assert template.start_date == shift_date
 
 
-def test_end_date_on_next_day(template: ShiftTemplate):
+def test_end_date_on_same_day(template: ShiftTemplate, shift_date: date):
+    assert template.end_date == shift_date
+
+
+def test_end_date_on_next_day(template: ShiftTemplate, shift_date: date):
     template.end_time = time(2, 0)
-    assert template.end_date == config.event_start.date() + timedelta(days=1)
+    assert template.end_date == shift_date + timedelta(days=1)
 
 
-def test_shift_start_times(template: ShiftTemplate):
+def test_shift_start_times(template: ShiftTemplate, shift_date: date):
     assert template.shift_start_times == [
-        event_tz.localize(datetime.combine(template.start_date, time(hour, 0, 0))) for hour in range(9, 13)
+        event_tz.localize(datetime.combine(shift_date, time(hour, 0, 0))) for hour in range(9, 13)
     ]
 
 
-def test_build_shifts(template: ShiftTemplate, role: Role, venue: VolunteerVenue):
+def test_build_shifts(template: ShiftTemplate, role: Role, venue: VolunteerVenue, shift_date: date):
     shifts = template.build_shifts()
     assert len(shifts) == 4
 
     shift = shifts[0]
-    assert shift.start == datetime.combine(template.start_date, time(7, 50, 0), None)
-    assert shift.end == datetime.combine(template.start_date, time(9, 0, 0), None)
+    assert shift.start == datetime.combine(shift_date, time(7, 50, 0), None)
+    assert shift.end == datetime.combine(shift_date, time(9, 0, 0), None)
     assert shift.min_needed == template.min_needed
     assert shift.max_needed == template.max_needed
     assert shift.role == role
