@@ -17,6 +17,7 @@ from models.user import User
 from ..common import feature_enabled, feature_flag, json_response
 from ..config import config
 from . import event_tz, schedule
+from .base import LINEUP_TYPE_ORDER
 from .data import (
     ScheduleFilter,
     ScheduleItemDict,
@@ -65,6 +66,10 @@ def schedule_json(year: int) -> ResponseReturnValue:
         abort(404)
 
     filter = ScheduleFilter.from_request()
+
+    if not feature_enabled("SCHEDULE"):
+        filter.types = LINEUP_TYPE_ORDER
+
     schedule_items = get_schedule_items(filter)
     full_sids = [get_schedule_item_dict_full(filter, si) for si in schedule_items]
 
@@ -201,6 +206,9 @@ def favourites_json() -> ResponseReturnValue:
         is_favourite=True,
         user=user,
     )
+
+    if not feature_enabled("SCHEDULE"):
+        filter.types = LINEUP_TYPE_ORDER
 
     schedule_items = get_schedule_items(filter)
     full_sids = [get_schedule_item_dict_full(filter, sid) for sid in schedule_items]

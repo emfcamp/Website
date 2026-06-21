@@ -77,6 +77,7 @@ class ScheduleFilter:
     venues: Sequence[str] = field(default_factory=list)
     is_favourite: bool = False
     user: User | None = None
+    types: Sequence[str] = field(default_factory=list)
 
     @classmethod
     def from_request(cls):
@@ -230,6 +231,9 @@ def get_schedule_items(filter: ScheduleFilter) -> list[ScheduleItem]:
         # you still need to filter out individual occurrences that don't match.
         # get_schedule_item_dicts_flat and get_schedule_item_dicts_full do this.
         query = query.where(ScheduleItem.occurrences.any(Occurrence.scheduled_venue.in_(filter.venues)))
+
+    if filter.types:
+        query = query.where(ScheduleItem.type.in_(filter.types))
 
     schedule_items = list(db.session.scalars(query))
     return schedule_items
