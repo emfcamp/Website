@@ -5,7 +5,7 @@
 {% block schedule_item_body %}
 <form method="post" action="{{ url_for('.update_occurrence', schedule_item_id=schedule_item.id, occurrence_id=occurrence.id) }}" class="shrink">
     {{ form.hidden_tag() }}
-    <div class="col-md-8">
+    <div class="col-md-8 occurrence {{ "cancelled" if occurrence.cancelled }}">
         <div class="panel-group" id="formAccordion" role="tablist" aria-multiselectable="true">
 
             <div class="panel panel-default">
@@ -18,6 +18,14 @@
                 </div>
                 <div id="basicsPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="basicsPanelHeading">
                     <div class="panel-body">
+                        {% if occurrence.cancelled %}
+                        <div class="alert alert-warning">
+                            <p>
+                                This occurrence has been cancelled. It will not show up on any schedule feeds or be considered by the scheduler.
+                            </p>
+                        </div>
+                        {% endif %}
+
                         <dl class="dl-horizontal">
                             {{ render_dl_field(form.occurrence_num) }}
 
@@ -81,9 +89,17 @@
 
         {{ form.update(class_="btn btn-primary debounce", tabindex=1) }}
     </div>
+</form>
+<form method="POST" action="{{ url_for('.cancel_occurrence', schedule_item_id=schedule_item.id, occurrence_id=occurrence.id) }}">
     <div class="col-md-4 col-xs-12" role="group">
         <h4>Occurrence actions</h4>
         <div class="btn-group-vertical" role="group">
+            {% if occurrence.cancelled %}
+            {{ cancel_form.uncancel(class_="btn btn-warning debounce", tabindex=1) }}
+            {% else %}
+            {{ cancel_form.cancel(class_="btn btn-danger debounce", tabindex=1) }}
+            {% endif %}
+
             {% if next_id %}
                 <a href="{{ url_for('.update_schedule_item', schedule_item_id=next_id, **full_qs) }}"
                     class="btn btn-default">

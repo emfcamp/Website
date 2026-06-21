@@ -1,5 +1,7 @@
+@use "sass:color";
 @use "../node_modules/bootstrap/dist/css/bootstrap.css";
 @use "./_non_prod_banner.scss" as *;
+@use "./_variables.scss" as *;
 
 body {
   padding-top: 70px;
@@ -216,3 +218,21 @@ tr.odd {
 .d-none {
   display: none !important;
 }
+
+.occurrence.cancelled {
+  & > .panel-group > .panel > .panel-heading {
+    background-color: $warning-background;
+    color: $warning-text;
+  }
+  & > .panel-group > .panel > .panel-collapse > .panel-body {
+    background-color: color.adjust($warning-background, $lightness: +50%);
+    border-color: color.adjust($warning-background, $lightness: -5%);
+  }
+}
+
+.nav-tabs.schedule-item {
+  .occurrence.cancelled a {
+    text-decoration: line-through;
+  }
+}
+

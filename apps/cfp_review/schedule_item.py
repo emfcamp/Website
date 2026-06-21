@@ -39,6 +39,7 @@ from models.user import User
 from . import admin_required, bool_qs, cfp_review, sort_schedule_items
 from .forms import (
     UPDATE_SCHEDULE_ITEM_ATTRIBUTES_FORM_TYPES,
+    CancelOccurrenceForm,
     ChangeScheduleItemOwner,
     ConvertScheduleItemForm,
     CreateOccurrenceForm,
@@ -393,11 +394,42 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseRetu
         if not occurrence.lottery and hasattr(form, "lottery"):
             form.lottery.state.data = ""
 
+    cancel_form = CancelOccurrenceForm()
+
     return render_template(
         "cfp_review/schedule_item/occurrence.html",
         schedule_item=occurrence.schedule_item,
         occurrence=occurrence,
         form=form,
+        cancel_form=cancel_form,
+    )
+
+
+@cfp_review.route(
+    "/schedule-items/<int:schedule_item_id>/occurrences/<int:occurrence_id>/cancel", methods=["POST"]
+)
+@admin_required
+def cancel_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseReturnValue:
+    occurrence: Occurrence = get_or_404(db, Occurrence, occurrence_id)
+    if occurrence.schedule_item_id != schedule_item_id:
+        abort(404)
+
+    cancel_form = CancelOccurrenceForm()
+    if occurrence.cancelled:
+        del cancel_form.cancel
+    else:
+        del cancel_form.uncancel
+
+    if not cancel_form.validate_on_submit():
+        abort(400)
+
+    if occurrence.cancelled:
+        occurrence.uncancel()
+    else:
+        occurrence.cancel()
+    db.session.commit()
+    return redirect(
+        url_for(".update_occurrence", schedule_item_id=schedule_item_id, occurrence_id=occurrence_id)
     )
 
 

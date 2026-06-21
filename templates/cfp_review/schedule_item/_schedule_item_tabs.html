@@ -1,4 +1,4 @@
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs schedule-item">
     <li role="presentation" {% if active == 'main' %} class="active" {% endif %}>
         <a href="{{ url_for('.schedule_item', schedule_item_id=schedule_item.id, **full_qs) }}">
             Main
@@ -15,7 +15,7 @@
         </a>
     </li>
     {% for occurrence in schedule_item.occurrences %}
-    <li role="presentation" {% if active == 'occurrence-%s' % occurrence.id %} class="active" {% endif %}>
+    <li role="presentation" class="occurrence {{ "active" if active == 'occurrence-%s' % occurrence.id }} {{"cancelled" if occurrence.cancelled }}">
         <a href="{{ url_for('.update_occurrence', schedule_item_id=schedule_item.id, occurrence_id=occurrence.id, **full_qs) }}">
             Occurrence {{ occurrence.occurrence_num }}
         </a>

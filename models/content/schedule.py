@@ -531,6 +531,10 @@ class Occurrence(BaseModel):
         """Cancel this occurrence."""
         self.cancelled = True
 
+    def uncancel(self) -> None:
+        """Uncancel this occurrence."""
+        self.cancelled = False
+
     @property
     def video_privacy(self) -> VideoPrivacy:
         # Occurrences can inherit their video privacy from the ScheduleItem.

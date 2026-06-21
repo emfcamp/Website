@@ -428,6 +428,11 @@ class CreateOccurrenceForm(Form):
     create = SubmitField("Create new occurrence")
 
 
+class CancelOccurrenceForm(Form):
+    cancel = SubmitField("Cancel occurrence")
+    uncancel = SubmitField("Uncancel occurrence")
+
+
 def valid_venue(form, field):
     if not field.data:
         return
