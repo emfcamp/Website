@@ -195,14 +195,12 @@ class OccurrenceC3VOCPublishingWebhook(Resource):
                     )
                     occurrence.c3voc_url = None
 
-                if payload["voctoweb"]["thumb_path"]:
-                    path = payload["voctoweb"]["thumb_path"]
-                    if path.startswith("/static.media.ccc.de"):
-                        path = "https://static.media.ccc.de/media" + path[len("/static.media.ccc.de") :]
-                    if not path.startswith("https://"):
+                if payload["voctoweb"]["thumb_url"]:
+                    path = payload["voctoweb"]["thumb_url"]
+                    if not path.startswith("https://static.media.ccc.de/"):
                         abort(
                             406,
-                            message="voctoweb thumb_path must start with https:// or /static.media.ccc.de",
+                            message="voctoweb thumb_url must start with https://static.media.ccc.de/",
                         )
                     app.logger.info(f"C3VOC webhook set thumbnail_url for {occurrence.id=} to {path}")
                     occurrence.thumbnail_url = path
