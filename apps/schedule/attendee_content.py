@@ -265,7 +265,7 @@ def attendee_content_edit(schedule_item_id: int) -> ResponseReturnValue:
     for occurrence in schedule_item.occurrences:
         if not occurrence.scheduled_venue:
             continue
-        if occurrence.scheduled_venue.village_id == current_user.village.id:
+        if current_user.village and occurrence.scheduled_venue.village_id == current_user.village.id:
             in_user_managed_venue = True
 
     if schedule_item.user != current_user and not in_user_managed_venue:
