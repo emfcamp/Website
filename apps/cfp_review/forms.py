@@ -247,6 +247,14 @@ class UpdateScheduleItemFilmForm(UpdateAttributesForm):
     classification = StringField("Classification")
 
 
+class UpdateScheduleItemMusicAttributesForm(UpdateAttributesForm):
+    pass
+
+
+class UpdateScheduleItemMeetupAttributesForm(UpdateAttributesForm):
+    pass
+
+
 # And now the additional Proposal-only fields.
 class UpdateProposalTalkAttributesForm(UpdateScheduleItemTalkAttributesForm):
     pass
@@ -269,7 +277,7 @@ class UpdateProposalInstallationAttributesForm(UpdateAttributesForm):
     grant_requested = StringField("Installation Grant Requested")
 
 
-# Lightning talks don't exist as Proposals
+# Lightning talks, music, and meetups don't exist as Proposals
 
 
 UPDATE_PROPOSAL_ATTRIBUTES_FORM_TYPES: dict[ProposalType, type[UpdateAttributesForm]] = {
@@ -287,6 +295,8 @@ UPDATE_SCHEDULE_ITEM_ATTRIBUTES_FORM_TYPES: dict[ScheduleItemType, type[UpdateAt
     "performance": UpdateScheduleItemPerformanceAttributesForm,
     "lightning": UpdateScheduleItemLightningTalkAttributesForm,
     "film": UpdateScheduleItemFilmForm,
+    "music": UpdateScheduleItemMusicAttributesForm,
+    "meetup": UpdateScheduleItemMeetupAttributesForm,
 }
 
 
