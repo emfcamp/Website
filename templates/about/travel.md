@@ -34,9 +34,7 @@ Once you're near the site, you'll see yellow temporary road signs for EMF - fol
 
 Unless you are travelling in a live-in vehicle, you will be parked in the main car park which is adjacent to the event site, at most a 300m walk from the main gate. [More information for live-in vehicles](/about/live-in-vehicles).
 
-{# 2024
-We encourage attendees to carpool where possible. There's a [lift sharing](https://wiki.emfcamp.org/wiki/Lift_sharing) page on the wiki to find other people on the same route.
-#}
+We encourage attendees to carpool where possible. There's a [lift sharing](https://www.emfcamp.org/wiki/lift-sharing) page to find other people on the same route.
 
 ### Electric Vehicles
 We do not provide electric vehicle charging at EMF. We ask that you arrive at the event with enough charge to leave at the end of the event. We will be able to provide EV charging in an emergency.
