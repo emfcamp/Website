@@ -29,6 +29,9 @@
                             <b>{{ schedule_item.title }}</b>
                             {{ schedule_item_icons(schedule_item) }}
                         </div>
+                        <div>
+                            {{ schedule_item.short_description }}
+                        </div>
                         {% endif %}
                     </div>
                     {% if current_user.is_authenticated %}
