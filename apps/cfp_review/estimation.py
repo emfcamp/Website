@@ -53,7 +53,7 @@ def get_cfp_estimate(schedule_item_type: ScheduleItemType, estimate_type: Estima
         .filter(
             ScheduleItem.type == schedule_item_type,
             ScheduleItem.official_content,
-            ScheduleItem.type != "cancelled",
+            ScheduleItem.state != "cancelled",
         )
         .all()
     )
