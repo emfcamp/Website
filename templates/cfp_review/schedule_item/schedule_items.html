@@ -79,7 +79,7 @@
         </td>
         <td>{% if schedule_item.availability|length > 0 %}✔️{% endif %}</td>
         <td>{% if schedule_item.occurrences|length > 0 and schedule_item.occurrences[0].scheduled %}✔️{% endif %}</td>
-        <td>{{schedule_item.occurrences|length}}</td>
+        <td>{{ schedule_item.occurrences| rejectattr("cancelled")|list|length}}</td>
         <td>{{ schedule_item.favourite_count }}</td>
         <td>{{ schedule_item.names }}</td>
         <td>
