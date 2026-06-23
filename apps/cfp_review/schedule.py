@@ -5,6 +5,7 @@ from datetime import timedelta
 from itertools import combinations
 from typing import Any, get_args
 
+import slotmachine
 from flask import current_app as app
 from flask import flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
@@ -112,11 +113,14 @@ def run_scheduler():
     if request.method == "POST" and request.form.get("run"):
         scheduler = Scheduler()
         # FIXME: maybe configure the content types here
-        result = scheduler.run(["talk", "workshop"])
-        db.session.add(result)
-        db.session.commit()
-
-        return redirect(url_for(".potential_schedule", schedule_id=result.id))
+        try:
+            result = scheduler.run(["talk", "workshop"])
+            db.session.add(result)
+            db.session.commit()
+            return redirect(url_for(".potential_schedule", schedule_id=result.id))
+        except slotmachine.Unsatisfiable as e:
+            app.logger.exception("Unsatisfiable schedule")
+            flash(f"Schedule was unsatisfiable :( {e}")
 
     return render_template("cfp_review/schedule/schedule_run.html")
 
