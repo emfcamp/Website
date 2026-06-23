@@ -260,11 +260,6 @@ def schedule_item_availability(schedule_item_id: int) -> ResponseReturnValue:
 def convert_schedule_item(schedule_item_id: int) -> ResponseReturnValue:
     schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
 
-    if schedule_item.proposal:
-        # We don't want to get into having mismatched proposal/schedule_item types yet
-        flash("The schedule item is associated with a proposal, please convert this instead.")
-        return redirect(url_for(".convert_proposal", proposal_id=schedule_item.proposal_id))
-
     form = ConvertScheduleItemForm()
     types = get_args(ScheduleItemType)
     form.new_type.choices = [(t, t.title()) for t in types if t != schedule_item.type]
