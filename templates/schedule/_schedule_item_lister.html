@@ -8,7 +8,7 @@
     {% endif %}
     {% for type_info in ordered_type_infos %}
         {% if grouped_schedule_items[type_info.type] %}
-            <h2 class="event-type" id="{{ type_info.type }}">{{ type_info.human_type | title }}s</h2>
+            <h2 class="event-type" id="{{ type_info.type }}">{{ type_info.human_type | title }}{% if type_info.type != "music" %}s{% endif %}</h2>
             <form method="post" action="{{url_for(".add_favourite")}}">
             <div>
                 {% for schedule_item in grouped_schedule_items[type_info.type] %}
