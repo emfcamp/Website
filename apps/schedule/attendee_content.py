@@ -104,7 +104,13 @@ class AttendeeContentForm(Form):
     type = SelectField(
         "Type of content",
         default="workshop",
-        choices=[("talk", "Talk"), ("performance", "Performance"), ("workshop", "Workshop")],
+        choices=[
+            ("talk", "Talk"),
+            ("workshop", "Workshop"),
+            ("performance", "Performance"),
+            ("music", "Music"),
+            ("meetup", "Meetup"),
+        ],
     )
     # Attendees cannot hide or unhide schedule items but we still show the details
     state = SelectField(

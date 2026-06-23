@@ -46,6 +46,8 @@ from .attributes import (
     FamilyWorkshopAttributes,
     FilmAttributes,
     LightningTalkAttributes,
+    MeetupAttributes,
+    MusicAttributes,
     PerformanceAttributes,
     TalkAttributes,
     WorkshopAttributes,
@@ -86,6 +88,8 @@ EVENT_SPACING = {
     "familyworkshop": 2,
     "installation": 0,
     "film": 2,
+    "music": 0,
+    "meetup": 0,
 }
 
 # The size of a scheduling slot
@@ -124,6 +128,8 @@ ScheduleItemType = Literal[
     "familyworkshop",
     "installation",
     "lightning",
+    "music",
+    "meetup",
 ]
 
 
@@ -406,6 +412,18 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
         human_type="lightning talk",
         human_type_a="a lightning talk",
         attributes_cls=LightningTalkAttributes,
+    ),
+    "music": ScheduleItemInfo(
+        type="music",
+        human_type="music",
+        human_type_a="a music performance",
+        attributes_cls=MusicAttributes,
+    ),
+    "meetup": ScheduleItemInfo(
+        type="meetup",
+        human_type="meetup",
+        human_type_a="a meetup",
+        attributes_cls=MeetupAttributes,
     ),
 }
 

@@ -76,6 +76,16 @@ class FilmAttributes(Attributes):
     classification: str | None = None
 
 
+@dataclass
+class MusicAttributes(Attributes):
+    pass
+
+
+@dataclass
+class MeetupAttributes(Attributes):
+    pass
+
+
 # Attributes only used by the review process
 # These won't get copied across when creating a schedule item
 
