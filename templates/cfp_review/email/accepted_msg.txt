@@ -2,11 +2,20 @@ Hi {{ user.name }},
 
 Your Electromagnetic Field {{ event_year }} {{ proposal.human_type }} "{{ proposal.title }}" has been accepted!
 
+{%- if proposal.schedule_item -%}
+{%- if feature_enabled("CFP_FINALISE") %}
+
+Please confirm your {{ proposal.human_type }} details and your availability here:
+
+ {{ external_url('cfp.finalise_proposal', proposal_id=proposal.id) }}
+{%- else %}
 We'll be in contact shortly to check how you'd like it to be listed in the schedule as well as to confirm some other details with you.
+{%- endif -%}
+{%- endif %}
 {%- if proposal.type_info.grants_event_tickets %}
 {%- if user.cfp_voucher.tickets_remaining > 1 %}
 
-You can buy your reserved tickets here{% if user.cfp_voucher.expiry %} before {{ user.cfp_voucher.expiry.strftime('%Y-%m-%d') }}{% endif %}:
+We've reserved you tickets for EMF, which you can buy here{% if user.cfp_voucher.expiry %} before {{ user.cfp_voucher.expiry.strftime('%Y-%m-%d') }}{% endif %}:
 
   {{ external_url('tickets.main', flow='speakers') }}
 
@@ -23,7 +32,7 @@ You already have two adult admission tickets so cannot buy any more.
 {%- endif %}
 {%- endif %}
 
-Don't hesitate to get in touch if you have any questions:
+Don't hesitate to get in touch through our messaging system if you have any questions:
 
   {{ external_url('cfp.proposal_messages', proposal_id=proposal.id) }}
 
