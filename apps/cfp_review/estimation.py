@@ -12,7 +12,7 @@ from models.content import (
     ScheduleItemType,
     Venue,
 )
-from models.content.schedule import SCHEDULE_ITEM_INFOS, ScheduleItemInfo
+from models.content.schedule import EVENT_SPACING, SCHEDULE_ITEM_INFOS, SLOT_DURATION, ScheduleItemInfo
 from models.content.venue import TimeBlock
 
 # Estimates either cover automatically-scheduled or manually-scheduled content.
@@ -32,7 +32,7 @@ class CFPEstimate:
     venues: list[Venue]
 
 
-def get_available_proposal_time(type: ScheduleItemType, estimate_type: EstimateType) -> Duration:
+def get_blocks_for_type(type: ScheduleItemType, estimate_type: EstimateType) -> list[TimeBlock]:
     blocks_query = db.session.query(TimeBlock).where(TimeBlock.type == type)
     match estimate_type:
         case "manual":
@@ -40,8 +40,13 @@ def get_available_proposal_time(type: ScheduleItemType, estimate_type: EstimateT
         case "automatic":
             blocks_query = blocks_query.where(TimeBlock.automatic)
 
+    return blocks_query.all()
+
+
+def get_available_proposal_time(type: ScheduleItemType, estimate_type: EstimateType) -> Duration:
+    blocks = get_blocks_for_type(type, estimate_type)
     return sum(
-        ((pendulum.instance(block.end) - pendulum.instance(block.start)) for block in blocks_query.all()),
+        ((pendulum.instance(block.end) - pendulum.instance(block.start)) for block in blocks),
         Duration(),
     )
 
@@ -104,20 +109,14 @@ def get_cfp_estimate(schedule_item_type: ScheduleItemType, estimate_type: Estima
             available_venues_query = available_venues_query.filter(not_(TimeBlock.automatic))
 
     available_venues = available_venues_query.group_by(Venue.id).all()
-
-    # Correct for changeover period not being needed at the end of the day
-    # This can go negative if there aren't many proposals accepted yet, so clamp to 0
-    #
-    # FIXME: We now don't know if changeover time is needed at the end of a TimeBlock.
-    # But this is also a pretty small adjustment given that this is a rough calculation.
-    # If we're this close to the wire, we should be running the scheduler to get a better indication.
-    # - Russ
-    #
-    # num_days = len(get_days_map().items())
-    # changeover_correction = changeover_time * num_days * len(available_venues)
-    # allocated_time = max(allocated_time - changeover_correction, Duration())
-
     available_time = get_available_proposal_time(schedule_item_type, estimate_type)
+
+    # We do not need changeover time at the end of a block because blocks are
+    # placed to ensure the amount of time required is between them, so correct
+    # for over-estimation by occurrences always taking it into account
+    changeover_time = SLOT_DURATION * EVENT_SPACING[schedule_item_type]
+    end_slot_correction = changeover_time * len(get_blocks_for_type(schedule_item_type, estimate_type))
+    allocated_time -= end_slot_correction
 
     return CFPEstimate(
         type=estimate_type,
