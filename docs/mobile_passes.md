@@ -35,7 +35,7 @@ developer account with active developer program subscription.
 1. Download Apple's root and convert it to text format:
    `curl -L http://developer.apple.com/certificationauthority/AppleWWDRCA.cer | openssl x509 -inform der -out applewwdrca.crt`. Point `PKPASS_CHAIN_FILE` to this file.
 1. Enable pkpass generation with the `ISSUE_APPLE_PKPASS_TICKETS` feature flag.
-1. Test it: go to `/account/purchases` and click the add to wallet button. This should download and show the pass on a Mac or iOS device. If it doesn't, something's wrong - most likely with the signing. You can debug by looking at console.app messages on a Mac (search for "pass").
+1. Test it: go to `/account/purchases` and click the Add to Apple Wallet button. This should download and show the pass on a Mac or iOS device. If it doesn't, something's wrong - most likely with the signing. You can debug by looking at console.app messages on a Mac (search for "pass").
 
 ## Styling
 The pass is an "event ticket" pass. Its artwork is generated at runtime from the

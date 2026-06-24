@@ -16,6 +16,7 @@ from flask import current_app as app
 from PIL import Image
 
 from apps.common.receipt import get_purchase_metadata
+from apps.config import config
 from models.user import User
 
 # https://developer.apple.com/library/archive/documentation/UserExperience/Conceptual/PassKit_PG/Creating.html
@@ -102,8 +103,8 @@ def _event_datetimes() -> tuple[datetime, datetime]:
     offsets, so replace() yields a bogus LMT offset (e.g. -00:01) instead of BST.
     """
     tz = pytz.timezone("Europe/London")
-    start = tz.localize(datetime.strptime(app.config["EVENT_START"], "%Y-%m-%d %H:%M:%S"))
-    end = tz.localize(datetime.strptime(app.config["EVENT_END"], "%Y-%m-%d %H:%M:%S"))
+    start = tz.localize(config.event_start)
+    end = tz.localize(config.event_end)
     return start, end
 
 
