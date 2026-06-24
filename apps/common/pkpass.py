@@ -3,7 +3,6 @@
 import hashlib
 import io
 import json
-import subprocess
 import zipfile
 from collections.abc import Iterable
 from datetime import datetime
@@ -12,6 +11,12 @@ from pathlib import Path
 from typing import Any
 
 import pytz
+from cryptography.hazmat.primitives.asymmetric.ec import EllipticCurvePrivateKey
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
+from cryptography.hazmat.primitives.hashes import SHA256
+from cryptography.hazmat.primitives.serialization import Encoding, load_pem_private_key
+from cryptography.hazmat.primitives.serialization.pkcs7 import PKCS7Options, PKCS7SignatureBuilder
+from cryptography.x509 import load_pem_x509_certificate, load_pem_x509_certificates
 from flask import current_app as app
 from PIL import Image
 
@@ -304,27 +309,23 @@ def get_pass_assets() -> dict[str, bytes]:
 
 
 def smime_sign(data: bytes, signer_cert_file: Path, key_file: Path, cert_chain_file: Path) -> bytes:
-    """Call openssl smime to sign some data."""
-    cmd = [
-        "openssl",
-        "smime",
-        "-binary",
-        "-sign",
-        "-signer",
-        str(signer_cert_file),
-        "-inkey",
-        str(key_file),
-        "-certfile",
-        str(cert_chain_file),
-        "-outform",
-        "der",
-    ]
-    try:
-        p = subprocess.run(args=cmd, input=data, check=True, capture_output=True)
-    except subprocess.CalledProcessError as e:
-        app.logger.error("Error signing pkpass: %s", e.stderr)
-        raise
-    return p.stdout
+    cert = load_pem_x509_certificate(signer_cert_file.read_bytes())
+    key = load_pem_private_key(key_file.read_bytes(), password=None)
+    # TODO use PKCS7PrivateKeyTypes when mypy supports it
+    if not isinstance(key, RSAPrivateKey | EllipticCurvePrivateKey):
+        raise ValueError(f"Key {key_file} is not a suitable private key")
+    cert_chain = load_pem_x509_certificates(cert_chain_file.read_bytes())
+
+    builder = PKCS7SignatureBuilder()
+    builder = builder.set_data(data)
+    builder = builder.add_signer(cert, key, SHA256())
+    for cert in cert_chain:
+        builder = builder.add_certificate(cert)
+
+    return builder.sign(
+        encoding=Encoding.DER,
+        options=[PKCS7Options.Binary, PKCS7Options.DetachedSignature],
+    )
 
 
 def _pass_files(user: User) -> dict[str, bytes]:
@@ -357,9 +358,9 @@ def generate_pkpass(user: User) -> io.BytesIO:
     manifest = json.dumps(generate_manifest(files)).encode()
     signature = smime_sign(
         manifest,
-        app.config["PKPASS_SIGNER_CERT_FILE"],
-        app.config["PKPASS_KEY_FILE"],
-        app.config["PKPASS_CHAIN_FILE"],
+        Path(app.config["PKPASS_SIGNER_CERT_FILE"]),
+        Path(app.config["PKPASS_KEY_FILE"]),
+        Path(app.config["PKPASS_CHAIN_FILE"]),
     )
     files["manifest.json"] = manifest
     files["signature"] = signature
