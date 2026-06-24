@@ -10,4 +10,8 @@
 <form method="POST">
     <button name="run" value="1" class="btn btn-primary">Run scheduler</button>
 </form>
+<p class="help-block" style="margin-top: 2em;">
+    For debugging, you can
+    <a href="{{ url_for('.run_scheduler_export') }}">download the current scheduling problem as JSON</a> (<code>python -m slotmachine slotmachine-problem.json</code>).
+</p>
 {% endblock %}
