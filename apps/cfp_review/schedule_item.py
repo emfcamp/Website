@@ -350,11 +350,13 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseRetu
 
     if occurrence.lottery:
         if occurrence.lottery.state == "completed":
+            # These can get replaced with del as soon as we include https://github.com/pallets-eco/wtforms/pull/923 (wtforms 3.3)
             form.lottery.state.choices = [(c, _) for c, _ in form.lottery.state.choices if c == "completed"]
         else:
             form.lottery.state.choices = [(c, _) for c, _ in form.lottery.state.choices if c != "completed"]
     elif hasattr(form, "lottery"):
         form.lottery.state.choices.insert(0, ("", ""))
+        form.lottery.state.choices = [(c, _) for c, _ in form.lottery.state.choices if c != "completed"]
 
     if form.validate_on_submit():
         if (
