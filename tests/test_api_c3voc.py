@@ -136,7 +136,7 @@ def test_update_voctoweb_with_correct_url(client, app, db, occurrence, valid_aut
             "voctoweb": {
                 "enabled": True,
                 "frontend_url": "https://media.ccc.de/",
-                "thumb_path": "",
+                "thumb_url": "",
             },
             "youtube": {
                 "enabled": False,
@@ -168,7 +168,7 @@ def test_denies_voctoweb_with_wrong_url(client, app, db, occurrence, valid_auth_
             "voctoweb": {
                 "enabled": True,
                 "frontend_url": "https://example.org",
-                "thumb_path": "",
+                "thumb_url": "",
             },
             "youtube": {
                 "enabled": False,
@@ -199,7 +199,7 @@ def test_clears_voctoweb(client, app, db, occurrence, valid_auth_headers):
             "voctoweb": {
                 "enabled": True,
                 "frontend_url": "",
-                "thumb_path": "",
+                "thumb_url": "",
             },
             "youtube": {
                 "enabled": False,
@@ -210,34 +210,6 @@ def test_clears_voctoweb(client, app, db, occurrence, valid_auth_headers):
 
     occurrence = db.session.get(Occurrence, occurrence.id)
     assert occurrence.c3voc_url is None
-
-
-def test_update_thumbnail_with_path(client, app, db, occurrence, valid_auth_headers):
-    rv = client.post(
-        "/api/occurrence/c3voc-publishing-webhook",
-        headers=valid_auth_headers,
-        json={
-            "is_master": True,
-            "fahrplan": {
-                "conference": f"emf{config.event_year}",
-                "id": occurrence.id,
-            },
-            "voctoweb": {
-                "enabled": True,
-                "frontend_url": "",
-                "thumb_path": "/static.media.ccc.de/thumb.jpg",
-            },
-            "youtube": {
-                "enabled": False,
-            },
-        },
-    )
-    assert rv.status_code == 204
-
-    occurrence = db.session.get(Occurrence, occurrence.id)
-    assert occurrence.thumbnail_url == "https://static.media.ccc.de/media/thumb.jpg"
-    assert occurrence.c3voc_url is None
-    assert occurrence.youtube_url is None
 
 
 def test_update_thumbnail_with_url(client, app, db, occurrence, valid_auth_headers):
@@ -253,7 +225,7 @@ def test_update_thumbnail_with_url(client, app, db, occurrence, valid_auth_heade
             "voctoweb": {
                 "enabled": True,
                 "frontend_url": "",
-                "thumb_path": "https://example.com/thumb.jpg",
+                "thumb_url": "https://static.media.ccc.de/media/thumb.jpg",
             },
             "youtube": {
                 "enabled": False,
@@ -263,13 +235,13 @@ def test_update_thumbnail_with_url(client, app, db, occurrence, valid_auth_heade
     assert rv.status_code == 204
 
     occurrence = db.session.get(Occurrence, occurrence.id)
-    assert occurrence.thumbnail_url == "https://example.com/thumb.jpg"
+    assert occurrence.thumbnail_url == "https://static.media.ccc.de/media/thumb.jpg"
     assert occurrence.c3voc_url is None
     assert occurrence.youtube_url is None
 
 
-def test_denies_thumbnail_not_url(client, app, db, occurrence, valid_auth_headers):
-    occurrence.thumbnail_url = "https://example.com/thumb.jpg"
+def test_denies_thumbnail_not_ccc(client, app, db, occurrence, valid_auth_headers):
+    occurrence.thumbnail_url = "https://static.media.ccc.de/media/thumb.jpg"
     db.session.commit()
 
     rv = client.post(
@@ -284,7 +256,7 @@ def test_denies_thumbnail_not_url(client, app, db, occurrence, valid_auth_header
             "voctoweb": {
                 "enabled": True,
                 "frontend_url": "",
-                "thumb_path": "/example.com/thumb.jpg",
+                "thumb_url": "https://example.com/thumb.jpg",
             },
             "youtube": {
                 "enabled": False,
@@ -294,7 +266,7 @@ def test_denies_thumbnail_not_url(client, app, db, occurrence, valid_auth_header
     assert rv.status_code == 406
 
     occurrence = db.session.get(Occurrence, occurrence.id)
-    assert occurrence.thumbnail_url == "https://example.com/thumb.jpg"
+    assert occurrence.thumbnail_url == "https://static.media.ccc.de/media/thumb.jpg"
 
 
 def test_clears_thumbnail(client, app, db, occurrence, valid_auth_headers):
@@ -313,7 +285,7 @@ def test_clears_thumbnail(client, app, db, occurrence, valid_auth_headers):
             "voctoweb": {
                 "enabled": True,
                 "frontend_url": "",
-                "thumb_path": "",
+                "thumb_url": "",
             },
             "youtube": {
                 "enabled": False,
