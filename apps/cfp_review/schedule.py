@@ -1,13 +1,15 @@
 """Scheduling views"""
 
+import json
 from collections import Counter, defaultdict
-from datetime import timedelta
+from datetime import datetime, timedelta
+from io import BytesIO
 from itertools import combinations
 from typing import Any, get_args
 
 import slotmachine
 from flask import current_app as app
-from flask import flash, redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, request, send_file, url_for
 from flask.typing import ResponseReturnValue
 from sqlalchemy import and_, select
 from sqlalchemy.orm import joinedload
@@ -27,6 +29,12 @@ from models.content.potential_schedule import PotentialSchedule
 from models.content.schedule import SCHEDULE_ITEM_INFOS, ScheduleItemInfo, ScheduleItemState, ScheduleItemType
 
 from . import cfp_review, schedule_required
+
+# Types of content that will be fed to the automatic scheduler. This is
+# incorrect because we _also_ need to feed other types to the scheduler in
+# locked positions to avoid speaker conflicts - it's here for now to ensure
+# that the slotmachine download is the same as the actual schedule-run button.
+AUTO_SCHEDULE_TYPES: list[ScheduleItemType] = ["talk", "workshop"]
 
 
 @cfp_review.route("/schedule")
@@ -109,12 +117,10 @@ def schedule() -> ResponseReturnValue:
 @cfp_review.route("/schedule/run-scheduler", methods=["GET", "POST"])
 @schedule_required
 def run_scheduler():
-
     if request.method == "POST" and request.form.get("run"):
         scheduler = Scheduler()
-        # FIXME: maybe configure the content types here
         try:
-            result = scheduler.run(["talk", "workshop"])
+            result = scheduler.run(AUTO_SCHEDULE_TYPES)
             db.session.add(result)
             db.session.commit()
             return redirect(url_for(".potential_schedule", schedule_id=result.id))
@@ -123,6 +129,23 @@ def run_scheduler():
             flash(f"Schedule was unsatisfiable :( {e}")
 
     return render_template("cfp_review/schedule/schedule_run.html")
+
+
+@cfp_review.route("/schedule/run-scheduler/export.json")
+@schedule_required
+def run_scheduler_export() -> ResponseReturnValue:
+    # Export the scheduling problem as JSON for debugging with slotmachine
+    problem = Scheduler().get_schedule_problem(AUTO_SCHEDULE_TYPES)
+    data = [talk.to_dict() for talk in problem.talks]
+    json_str = json.dumps(data, sort_keys=True, indent=4, separators=(",", ": "))
+
+    now = datetime.now().isoformat()
+    return send_file(
+        BytesIO(json_str.encode()),
+        mimetype="application/json",
+        as_attachment=True,
+        download_name=f"slotmachine-problem-{now}.json",
+    )
 
 
 @cfp_review.route("/schedule/potential_schedule/<int:schedule_id>", methods=["GET", "POST"])
