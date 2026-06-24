@@ -366,7 +366,7 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseRetu
                 occurrence=occurrence,
             )
             db.session.add(occurrence.lottery)
-        elif hasattr(form, "lottery"):
+        elif hasattr(form, "lottery") and not occurrence.lottery:
             del form.lottery
 
         form.populate_obj(occurrence)
