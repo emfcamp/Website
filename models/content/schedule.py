@@ -90,6 +90,7 @@ EVENT_SPACING = {
     "film": 2,
     "music": 0,
     "meetup": 0,
+    "lightning": 0,
 }
 
 # The size of a scheduling slot
