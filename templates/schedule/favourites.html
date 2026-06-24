@@ -14,7 +14,7 @@
 <p><strong><a class="btn btn-lg btn-primary" href="{{ url_for('schedule.main_year', year=event_year) }}">View line-up</a></strong></p>
 </div>
 <div class="line-up">
-{{ list_schedule_items(grouped_schedule_items, ordered_type_infos) }}
+{{ list_schedule_items(grouped_schedule_items, ordered_type_infos, jump_links=True) }}
 </div>
 
 {% if grouped_schedule_items | count == 0 %}

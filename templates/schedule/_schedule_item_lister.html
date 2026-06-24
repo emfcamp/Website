@@ -2,9 +2,12 @@
 {% from "schedule/_schedule_item_icons.html" import schedule_item_icons %}
 
 {# List schedule items - works for the current event year only #}
-{% macro list_schedule_items(grouped_schedule_items, ordered_type_infos) %}
+{% macro list_schedule_items(grouped_schedule_items, ordered_type_infos, jump_links=False) %}
     {% if grouped_schedule_items %}
     {% include "schedule/_icon_key.html" %}
+    {% endif %}
+    {% if jump_links and grouped_schedule_items %}
+    <p><strong>Jump to:</strong> {% for type, items in grouped_schedule_items.items() %}<a href="#{{ type }}">{{ items[0].human_type | title }}{% if type != "music" %}s{% endif %}</a>{% if not loop.last %}, {% endif %}{% endfor %}</p>
     {% endif %}
     {% for type_info in ordered_type_infos %}
         {% if grouped_schedule_items[type_info.type] %}

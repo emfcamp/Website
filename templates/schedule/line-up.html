@@ -6,11 +6,11 @@
 
 <h2>Line-up</h2>
 <div class="well">
-  <p>This is a list of the talks &amp; workshops that we're planning at EMF {{ event_year }}.
+  <p>This is a list of the events we're planning at EMF {{ event_year }}.
      Not all of them are announced yet, so check back frequently.</p>
   {% if current_user.is_authenticated %}
-    <p>You can favourite talks which sound interesting, which will let you keep track of them, and help
-        our scheduling algorithm place them in the optimal slot.
+    <p>You can favourite events which sound interesting - this lets you keep track of them, and helps
+        our scheduling algorithm place them in the optimal time.
     </p>
     {% if feature_enabled('SCHEDULE') %}
     <p>You can <a href="{{ webcal_url('.schedule_ical', year=event_year) }}">subscribe to this list in your calendar</a>
@@ -43,7 +43,7 @@
 </div>
 
 <div class="line-up">
-{{ list_schedule_items(grouped_schedule_items, ordered_type_infos) }}
+{{ list_schedule_items(grouped_schedule_items, ordered_type_infos, jump_links=True) }}
 </div>
 
 {% endblock %}
