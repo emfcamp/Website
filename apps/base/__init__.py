@@ -143,6 +143,11 @@ def phones() -> ResponseReturnValue:
     return redirect("/about/phones")
 
 
+@base.route("/phonebook")
+def phonebook() -> ResponseReturnValue:
+    return redirect("https://phones.emfcamp.org/phonebook")
+
+
 @base.route("/feedback")
 def feedback() -> ResponseReturnValue:
     return render_template("feedback.html")
