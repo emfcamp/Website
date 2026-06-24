@@ -2,6 +2,7 @@ import html
 import json
 import logging
 import re
+from datetime import timedelta
 from decimal import Decimal
 from os import path
 from pathlib import Path
@@ -65,6 +66,21 @@ def load_utility_functions(app_obj):
     @app_obj.template_filter("time_ago")
     def time_ago(date):
         return pendulum.instance(date).diff_for_humans()
+
+    @app_obj.template_filter("duration_hm")
+    def format_duration_hm(duration: timedelta) -> str:
+        total_minutes = round(duration.total_seconds() / 60)
+        hours, minutes = divmod(abs(total_minutes), 60)
+
+        sign = ""
+        if total_minutes < 0:
+            sign = "-"
+        if hours and minutes:
+            return f"{sign}{hours}h {minutes}m"
+        if hours:
+            return f"{sign}{hours}h"
+
+        return f"{sign}{minutes}m"
 
     @app_obj.template_filter("iban")
     def format_iban(iban):

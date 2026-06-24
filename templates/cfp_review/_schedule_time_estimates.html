@@ -24,9 +24,9 @@
             {{estimate.unknown_durations}}
         </a></td>
         <td>{{estimate.occurrence_count}}</td>
-        <td style="white-space:nowrap">{{estimate.available_time.total_hours()|round(1)}} hours</td>
-        <td style="white-space:nowrap">{{estimate.allocated_time.total_hours()|round(1)}} hours</td>
-        <td style="white-space:nowrap">{{estimate.remaining_time.total_hours()|round(1)}} hours
+        <td style="white-space:nowrap">{{estimate.available_time|duration_hm}}</td>
+        <td style="white-space:nowrap">{{estimate.allocated_time|duration_hm}}</td>
+        <td style="white-space:nowrap">{{estimate.remaining_time|duration_hm}}
             {% if estimate.available_time %}
                 ({{(estimate.remaining_time/estimate.available_time * 100)|int}}%)
             {% endif %}
