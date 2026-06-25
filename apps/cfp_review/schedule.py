@@ -339,7 +339,9 @@ def scheduleitems_to_finalise():
     return [
         si
         for si in db.session.query(ScheduleItem).where(
-            ScheduleItem.has_availability != True, ScheduleItem.proposal_id.is_not(None)
+            ScheduleItem.has_availability != True,
+            ScheduleItem.proposal.has(),
+            ScheduleItem.state != "cancelled",
         )
         if len(si.occurrences) > 0 and si.occurrences[0].scheduled_duration is not None
     ]
