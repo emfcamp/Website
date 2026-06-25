@@ -194,7 +194,7 @@ def generate_pass_data(user: User) -> dict[str, Any]:
         # Use the checkin code as a unique serial.
         "serialNumber": user.checkin_code,
         "organizationName": "Electromagnetic Field",
-        "description": "Electromagnetic Field Entry Pass",
+        "description": "EMF Entry Pass",
         # Shown as the ticket title at the top, next to the logo mark. Kept to
         # the bare event name so it fills the top row without truncating; the
         # dates live in the auxiliary row and on the back.
