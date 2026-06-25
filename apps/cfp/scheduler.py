@@ -46,6 +46,7 @@ class Scheduler:
                     and_(
                         ScheduleItem.type.in_(types),
                         ScheduleItem.official_content,
+                        ScheduleItem.state != "cancelled",
                     )
                 ),
                 Occurrence.scheduled_duration.isnot(None),
@@ -107,6 +108,11 @@ class Scheduler:
                 allowed_time_ranges = list(chain.from_iterable(allowed_times.values()))
 
                 if len(allowed_time_ranges) == 0:
+                    # FIXME: this happens when an Occurrence is constrained to a manually-scheduled venue, but
+                    # has not been assigned a time yet.
+                    # Manually-scheduled talks should still be sent to the automatic scheduler to take speaker
+                    # availability into account.
+                    # We should surface the number/list of these occurrences to the user who's running the scheduler.
                     app.logger.warning(f"Skipping scheduling occurrence {occurrence} - no allowed times.")
                     continue
 
