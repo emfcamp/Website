@@ -33,10 +33,6 @@ from models.content import (
     ScheduleItem,
     ScheduleItemType,
 )
-from models.content.attributes import (
-    ProposalFamilyWorkshopAttributes,
-    ProposalWorkshopAttributes,
-)
 from models.content.schedule import ScheduleItemAvailability
 from models.user import User
 
@@ -511,11 +507,12 @@ FINALISE_ATTRIBUTES_FORM_TYPES: dict[ScheduleItemType, type[FinaliseAttributesFo
 }
 
 
-def get_finalise_form(proposal_type: ProposalType) -> type[FinaliseForm]:
+def get_finalise_form(schedule_item_type: ScheduleItemType) -> type[FinaliseForm]:
     class FinaliseFormWithAttributes(FinaliseForm):
         pass
 
-    FinaliseFormWithAttributes.attributes = FormField(FINALISE_ATTRIBUTES_FORM_TYPES[proposal_type])
+    if schedule_item_type in FINALISE_ATTRIBUTES_FORM_TYPES:
+        FinaliseFormWithAttributes.attributes = FormField(FINALISE_ATTRIBUTES_FORM_TYPES[schedule_item_type])
 
     return FinaliseFormWithAttributes
 
@@ -628,7 +625,8 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
     if proposal.state not in {"accepted", "finalised"}:
         return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
 
-    Form = get_finalise_form(proposal.type)
+    # The ScheduleItem type can differ from the Proposal type!
+    Form = get_finalise_form(proposal.schedule_item.type)
     form = Form(obj=schedule_item)
     form.load_choices(schedule_item)
 
@@ -643,7 +641,7 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
 
         # For convenience, we ask them to update their participant_count,
         # but this isn't exposed on the ScheduleItem
-        if isinstance(proposal.attributes, ProposalWorkshopAttributes | ProposalFamilyWorkshopAttributes):
+        if hasattr(form, "attributes") and hasattr(form.attributes, "proposal_participant_count"):
             proposal.attributes.participant_count = form.attributes.proposal_participant_count.data
             # Now delete this, or populate_obj will try to add it
             del form.attributes.form.proposal_participant_count
@@ -659,7 +657,7 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
             if channel := app.config.get("MATTERMOST_CFP_CHANNEL"):
                 mattermost_notify(
                     channel,
-                    f"🗓️🚨 **ScheduleItem availability changed** for {proposal.human_type}: "
+                    f"🗓️🚨 **Submitter changed their availability for scheduled {proposal.schedule_item.human_type}**: "
                     f"[{proposal.title}]({external_url('cfp_review.message_proposer', proposal_id=proposal_id)})",
                 )
 
@@ -679,7 +677,7 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
     if request.method != "POST":
         # These proxy to the proposal, so it doesn't matter if schedule_item exists
         form.proposal_equipment_required.data = proposal.equipment_required
-        if isinstance(proposal.attributes, ProposalWorkshopAttributes | ProposalFamilyWorkshopAttributes):
+        if hasattr(form, "attributes") and hasattr(form.attributes, "proposal_participant_count"):
             form.attributes.proposal_participant_count.data = proposal.attributes.participant_count
 
     return render_template(
