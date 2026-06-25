@@ -6,7 +6,9 @@
 
 <ul>
   {% for occurrence in occurrences %}
-    <li><a href="{{ url_for('.workshop_steward', occurrence_id=occurrence.id) }}">{{ occurrence.scheduled_time }} -- {{ occurrence.schedule_item.title }}</a></li>
+    <li><a href="{{ url_for('.workshop_steward_occurrence', occurrence_id=occurrence.id) }}">
+      {{ occurrence.scheduled_time }} -- {{ occurrence.schedule_item.title }}
+    </a></li>
   {% endfor %}
 </ul>
 

@@ -31,7 +31,6 @@ from models.content import (
     Venue,
 )
 from models.content.lottery import (
-    Lottery,
     LotteryEntry,
     LotteryEntryState,
 )
@@ -438,20 +437,7 @@ def lotteries() -> ResponseReturnValue:
         lottery_entry._form = form.entries[-1]
         entries_dict[lottery_entry.state][lottery_entry.lottery.schedule_item.type].append(lottery_entry)
 
-    lotteries: list[Lottery] = list(
-        db.session.scalars(
-            select(Lottery)
-            .where(Lottery.state == "allow-entry")
-            .options(
-                selectinload(Lottery.occurrence).selectinload(Occurrence.schedule_item),
-            )
-        )
-    )
-    open_lotteries = {k: list(g) for k, g in groupby(lotteries, lambda lottery: lottery.schedule_item.type)}
-
-    return render_template(
-        "schedule/lottery_entries.html", entries_dict=entries_dict, open_lotteries=open_lotteries, form=form
-    )
+    return render_template("schedule/lottery_entries.html", entries_dict=entries_dict, form=form)
 
 
 @schedule.route("/api/schedule/lottery/<int:entry_id>/cancel", methods=["POST"])
@@ -724,11 +710,11 @@ def workshop_steward_main() -> ResponseReturnValue:
     # TODO: support any venue types that might support lottery?
 
     workshop_venues = db.session.scalars(
-        select(Venue).join(Venue.time_blocks).where(TimeBlock.type == "workshop")
+        select(Venue).where(Venue.time_blocks.any(TimeBlock.type == "workshop"))
     )
 
     familyworkshop_venues = db.session.scalars(
-        select(Venue).join(Venue.time_blocks).where(TimeBlock.type == "familyworkshop")
+        select(Venue).where(Venue.time_blocks.any(TimeBlock.type == "familyworkshop"))
     )
 
     return render_template(
@@ -822,14 +808,14 @@ def workshop_steward_occurrence(occurrence_id):
                 lottery_entry.use_all_codes()
                 db.session.commit()
                 flash(f"Checked in {lottery_entry.user.name}")
-                return redirect(url_for(".workshop_steward", occurrence_id=occurrence_id))
+                return redirect(url_for(".workshop_steward_occurrence", occurrence_id=occurrence_id))
 
             for code_form in entry_form.codes:
                 if code_form.use_code.data:
                     lottery_entry.use_code(code_form.code.data)
                     db.session.commit()
                     flash(f"Used {lottery_entry.user.name}'s code '{code_form.code.data}'")
-                    return redirect(url_for(".workshop_steward", occurrence_id=occurrence_id))
+                    return redirect(url_for(".workshop_steward_occurrence", occurrence_id=occurrence_id))
 
     for lottery_entry in lottery.entries:
         if not lottery_entry.ticket_codes:

@@ -55,7 +55,7 @@
     <form method="POST">
       {{ form.hidden_tag() }}
 
-      {% if open_lotteries %}
+      {% if entries_dict["entered"] %}
         <h2>Open lotteries</h2>
 
         <p>
@@ -81,8 +81,7 @@
           {% set type_info = SCHEDULE_ITEM_INFOS[schedule_item_type] %}
           {{ draggable_entries_block(type_info.human_name, lottery_entries, "lottery-entries-" + schedule_item_type) }}
         {% endfor %}
-
-        {% endif %}
+      {% endif %}
 
       {% for state in ["valid-tickets", "cancelled"] if entries_dict[state] %}
         {% if state == "cancelled" %}
@@ -92,7 +91,7 @@
             lottery. If there are still tickets you can apply for them once they re-open.</p>
         {% elif state == "valid-tickets" %}
           <h2>Tickets</h2>
-          <p>Tickets you have to won in the lottery.</p>
+          <p>Tickets you have won in the lottery.</p>
           <p>When it's time for the event, aim to arrive 15&nbsp;minutes early and give
             the assistant a code for each person, your name or your email address.
             Each code can only be used once.</p>
@@ -109,6 +108,7 @@
         {% endfor %}
 
       {% endfor %}
+
     </form>
   </div>
 {% else %}
