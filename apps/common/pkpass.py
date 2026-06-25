@@ -19,6 +19,7 @@ from cryptography.hazmat.primitives.serialization.pkcs7 import PKCS7Options, PKC
 from cryptography.x509 import load_pem_x509_certificate, load_pem_x509_certificates
 from flask import current_app as app
 from PIL import Image
+from PIL.Image import Palette, Resampling
 
 from apps.common.receipt import get_purchase_metadata
 from apps.config import config
@@ -237,9 +238,11 @@ _ICON_SIZE = 38
 # behind the fields). Wallet requires a 345x505pt background (@3x 1035x1515); the
 # hero is a portrait crop centred on the comet arc to fill that taller frame.
 _BACKGROUND_SIZE = (345, 505)
+# Currently (iOS 26) backgrounds are rendered with heavy blurring, so we resize
+# right down, and then scale back up to the target.
+_BACKGROUND_SIZE_SMALL = (69, 101)
 # Card colour, shown behind the fields where the artwork is unavailable.
 _BACKGROUND_COLOR = "rgb(13, 14, 14)"
-_LANCZOS = Image.Resampling.LANCZOS
 
 
 def _render_background(width: int, height: int) -> bytes:
@@ -258,7 +261,11 @@ def _render_background(width: int, height: int) -> bytes:
         top = max(0.0, min(cy - crop_h / 2, img.height - crop_h))
         box = (left, top, left + crop_w, top + crop_h)
         out = io.BytesIO()
-        img.resize((width, height), _LANCZOS, box=box).save(out, "PNG")
+        img = img.resize(_BACKGROUND_SIZE_SMALL, Resampling.LANCZOS, box=box)
+        img = img.resize((width, height), Resampling.NEAREST)
+        img = img.convert("P", palette=Palette.ADAPTIVE, colors=256)
+        img.save(out, "PNG", optimize=True, compress_level=9)
+        # open("background.png", "wb").write(out.getvalue())
     return out.getvalue()
 
 
@@ -268,7 +275,7 @@ def _render_logo(height: int) -> bytes:
         img = src.convert("RGBA")
         width = round(img.width * height / img.height)
         out = io.BytesIO()
-        img.resize((width, height), _LANCZOS).save(out, "PNG")
+        img.resize((width, height), Resampling.LANCZOS).save(out, "PNG")
     return out.getvalue()
 
 
@@ -276,7 +283,7 @@ def _render_icon(size: int) -> bytes:
     """White EMF glyph centred on a brand-orange tile."""
     inner = round(size * 0.66)
     with Image.open(_GLYPH_IMAGE) as img:
-        glyph_alpha = img.convert("RGBA").resize((inner, inner), _LANCZOS).split()[3]
+        glyph_alpha = img.convert("RGBA").resize((inner, inner), Resampling.LANCZOS).split()[3]
     mask = Image.new("L", (size, size), 0)
     mask.paste(glyph_alpha, ((size - inner) // 2, (size - inner) // 2))
     tile = Image.new("RGB", (size, size), _ICON_BG)
