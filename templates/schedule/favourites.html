@@ -9,7 +9,7 @@
    or get a <a href="{{ url_for('.favourites_json') }}?token={{ token }}">json feed</a> for your giant robot.
 </p>
 {% if not feature_enabled('SCHEDULE') %}
-<p>The feeds will only contain items once they've been allocated a stage and time.</p>
+<p>The calendar feeds will only contain items once they've been allocated a stage and time. To help you confirm your client is working, we've already added the gates opening and site closing times.</p>
 {% endif %}
 <p><strong><a class="btn btn-lg btn-primary" href="{{ url_for('schedule.main_year', year=event_year) }}">View line-up</a></strong></p>
 </div>
