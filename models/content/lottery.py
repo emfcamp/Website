@@ -28,7 +28,7 @@ LotteryState = Literal["closed", "allow-entry", "running-lottery", "completed", 
 LotteryEntryState = Literal["entered", "valid-tickets", "cancelled"]
 
 LOTTERY_ENTRY_STATE_TRANSITIONS: dict[LotteryState, dict[LotteryEntryState, list[LotteryEntryState]]] = {
-    "closed": {},
+    "closed": {"entered": ["cancelled"]},
     "allow-entry": {
         "entered": ["cancelled"],
         "cancelled": ["entered"],
@@ -41,6 +41,7 @@ LOTTERY_ENTRY_STATE_TRANSITIONS: dict[LotteryState, dict[LotteryEntryState, list
         "valid-tickets": ["cancelled"],
     },
     "first-come-first-served": {
+        "entered": ["cancelled"],
         "valid-tickets": ["cancelled"],
         "cancelled": ["valid-tickets"],
     },

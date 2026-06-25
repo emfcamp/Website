@@ -8,8 +8,10 @@
     {{ octicon("grabber-24") }}
   {% endif %}
   <a href="{{ url_for('.item', schedule_item_id=entry.lottery.schedule_item.id, year=event_year ) }}">{{ entry.lottery.schedule_item.title }}</a>
+  {% if entry.occurrence.scheduled %}
   on <time datetime="{{ entry.occurrence.scheduled_time.strftime('%Y-%m-%dT%H:%M:%S') }}">{{ entry.occurrence.scheduled_time.strftime('%A at %H:%M') }}</time>
   in <a href="{{ entry.occurrence.map_link }}">{{ entry.occurrence.scheduled_venue.name }}</a>
+  {% endif %}
   {% if entry.state != "cancelled" %}({{ entry.ticket_count}} ticket{{ "s" if entry.ticket_count != 1 }}){% endif %}
   {% if entry.state == "valid-tickets" %}
     <br><em>Codes for this {{ entry.lottery.schedule_item.human_type }}: {{ entry.ticket_codes | replace(',', ', ') | upper }}</em>
