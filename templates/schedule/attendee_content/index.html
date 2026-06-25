@@ -6,9 +6,13 @@
     You can help other people find you or your village's talks, workshops, installations, and gatherings by
     adding them to the schedule.
 </p>
-<p>
-    <strong>You should not add content that you have submitted to the CfP here.</strong>
-</p>
+    {% if current_user.proposals|length > 0 %}
+<div class="well">
+    <p>This page is for managing attendee content. If you're looking for your proposals in the main event
+        Call for Participation, you can view them here:</p>
+    <a class="btn btn-primary" href="{{url_for('cfp.proposals')}}">View your CfP submissions</a>
+</div>
+    {% endif %}
     {% if schedule_items | length > 0 %}
     <h2>Your Content</h2>
     <table class="table">
