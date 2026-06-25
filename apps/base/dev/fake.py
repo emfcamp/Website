@@ -3,7 +3,7 @@ import random
 from collections.abc import Mapping
 from datetime import datetime, time, timedelta
 from fractions import Fraction
-from typing import TypeVar, get_args
+from typing import TypeVar, cast
 
 from faker import Faker
 from flask import current_app as app
@@ -82,6 +82,10 @@ class FakeDataGenerator:
     def __init__(self):
         self.fake = Faker("en_GB")
 
+    def fake_title(self, *args, **kwargs) -> str:  # type: ignore[no-untyped-def]
+        title: str = self.fake.sentence(*args, **kwargs)
+        return title.removesuffix(".")
+
     def create_users(self) -> None:
         all_users: list[User] = list(db.session.scalars(select(User)).unique())
 
@@ -145,24 +149,31 @@ class FakeDataGenerator:
 
     def create_proposal(self, user: User, reviewers: list[User]) -> Proposal:
         states: dict[ProposalState, float] = {
-            "new": 0.05,
-            "edit": 0.05,
-            "checked": 0.15,
-            "rejected": 0.05,
-            "anonymised": 0.1,
-            "anon-blocked": 0.05,
-            "manual-review": 0.05,
-            "accepted": 0.1,
-            "finalised": 0.3,
-            "withdrawn": 0.05,
+            "new": 5,
+            "edit": 5,
+            "checked": 10,
+            "rejected": 5,
+            "anonymised": 10,
+            "anon-blocked": 5,
+            "manual-review": 5,
+            "accepted": 30,
+            "finalised": 60,
+            "withdrawn": 5,
+        }
+
+        types: dict[ProposalType, float] = {
+            "talk": 500,
+            "installation": 200,
+            "workshop": 200,
+            "performance": 100,
+            "familyworkshop": 50,
         }
 
         proposal = Proposal(
-            # TODO: weightings for type
-            type=random.choice(get_args(ProposalType)),
+            type=random_choice(types),
             state="new",
             user=user,
-            title=self.fake.sentence(nb_words=6, variable_nb_words=True),
+            title=self.fake_title(nb_words=6, variable_nb_words=True),
             description=self.fake.text(max_nb_chars=500),
             # duration below
             needs_help=random_bool(0.2),
@@ -207,9 +218,21 @@ class FakeDataGenerator:
             proposal.attributes.participant_count = str(random.randint(5, 50))
 
         if state in {"accepted", "finalised"}:
-            proposal.accept()
+            # See Proposal.accept
+            if proposal.type_info.schedule:
+                self.create_schedule_item(
+                    official_content=True,
+                    user=proposal.user,
+                    proposal=proposal,
+                )
+
+            if proposal.type_info.grants_event_tickets:
+                proposal.user.issue_cfp_voucher()
 
         if state == "finalised" and proposal.schedule_item:
+            if random_bool(0.95):
+                proposal.schedule_item.state = "published"
+
             proposal.schedule_item.availability = [
                 ScheduleItemAvailability(
                     start=datetime.combine(day, time(10)), end=datetime.combine(day, time(20))
@@ -233,11 +256,35 @@ class FakeDataGenerator:
         if proposal and proposal.type_info.schedule == False:
             return None
 
-        states = {
-            "published": 7,
-            "unpublished": 2,
-            "cancelled": 1,
+        # TODO: different weighting based on official_content
+        types: dict[ScheduleItemType, float] = {
+            "talk": 200,
+            "workshop": 100,
+            "performance": 25,
+            "familyworkshop": 10,
+            "film": 10,
+            "meetup": 10,
+            "music": 10,
         }
+
+        if not proposal or proposal.state == "finalised":
+            states = {
+                "published": 90,
+                "unpublished": 5,
+                "cancelled": 5,
+            }
+        elif proposal and proposal.state == "accepted":
+            states = {
+                "published": 70,
+                "unpublished": 20,
+                "cancelled": 10,
+            }
+        else:
+            states = {
+                "published": 5,
+                "unpublished": 90,
+                "cancelled": 5,
+            }
 
         pronoun_choices = {
             "he/him": 0.5,
@@ -250,10 +297,13 @@ class FakeDataGenerator:
         name_count = random.randint(1, 3)
         names = ", ".join(self.fake.name() for _ in range(name_count))
         pronouns = ", ".join(random_choice(pronoun_choices) for _ in range(name_count))
-        title = self.fake.sentence(nb_words=6, variable_nb_words=True)
+        title = self.fake_title(nb_words=6, variable_nb_words=True)
         description = self.fake.text(max_nb_chars=500)
 
         if proposal:
+            # Most fields match the proposal, but not always
+            if random_bool(0.9):
+                type = cast(ScheduleItemType, proposal.type)
             if random_bool(0.9):
                 names = proposal.user.name
                 pronouns = random_choice(pronoun_choices)
@@ -263,10 +313,11 @@ class FakeDataGenerator:
                 description = proposal.description
 
         if not type:
-            type = random.choice(["talk", "performance", "workshop", "familyworkshop", "film"])
+            # mypy infers random_choice's type as ScheduleItemType | None without this dance
+            random_type: ScheduleItemType = random_choice(types)
+            type = random_type
 
         schedule_item = ScheduleItem(
-            # TODO: weightings for type
             # No lightning talks yet
             type=type,
             state=random_choice(states),
@@ -278,9 +329,7 @@ class FakeDataGenerator:
             description=description,
             short_description=self.fake.sentence(nb_words=20, variable_nb_words=True),
             official_content=official_content,
-            video_privacy=random_choice({"public": 0.8, "review": 0.1, "none": 0.1})
-            if type != "film"
-            else "none",
+            video_privacy=random_choice({"public": 90, "review": 3, "none": 7}) if type != "film" else "none",
             # arrival_period
             # departure_period
             # contact_telephone
@@ -312,25 +361,26 @@ class FakeDataGenerator:
 
         db.session.add(schedule_item)
 
-        # The overwhelming majority have 1 occurrence
-        occurrence_count = random_choice(
-            {
-                1: 100,
-                2: 10,
-            }
-        )
+        occurrence_counts = {
+            1: 100,
+            2: 10,
+            3: 3,
+            4: 1,
+            5: 1,
+        }
 
-        for occurrence_num in range(1, occurrence_count):
+        for occurrence_num in range(random_choice(occurrence_counts)):
             self.create_occurrence(schedule_item, occurrence_num)
 
         return schedule_item
 
     def create_occurrence(self, schedule_item: ScheduleItem, occurrence_num: int) -> Occurrence:
         # TODO: implement scheduling?
+        # TODO: vary some scheduled_durations?
         occurrence = Occurrence(
             schedule_item=schedule_item,
             occurrence_num=occurrence_num,
-            manually_scheduled=random_bool(0.9),
+            manually_scheduled=random_bool(0.05),
             scheduled_duration=random.choice(list(ROUGH_DURATIONS.values())),
             # allowed_times
             # potential_time
@@ -344,11 +394,17 @@ class FakeDataGenerator:
         )
         db.session.add(occurrence)
 
-        if schedule_item.type_info.supports_lottery and random_bool(0.7):
+        if schedule_item.type_info.supports_lottery and random_bool(0.9):
             participant_count = random.randint(10, 15)
+            lottery_states: dict[LotteryState, float] = {
+                "closed": 10,
+                "allow-entry": 80,
+                # running-lottery
+                # completed
+                "first-come-first-served": 10,
+            }
             occurrence.lottery = Lottery(
-                # TODO: weightings for state
-                state=random.choice(get_args(LotteryState)),
+                state=random_choice(lottery_states),
                 occurrence=occurrence,
                 total_tickets=participant_count + 10,
                 # reserved_tickets
@@ -357,14 +413,14 @@ class FakeDataGenerator:
 
             db.session.add(occurrence.lottery)
 
-            participants = random.sample(self.users, participant_count)
+            assert self.admin
+            participants = random.sample(self.users + [self.admin], participant_count)
             self.create_lottery_entries(occurrence.lottery, participants)
 
         return occurrence
 
     def create_village(self, user):
-        name = self.fake.sentence(nb_words=4, variable_nb_words=True)
-        name = name.removesuffix(".")
+        name = self.fake_title(nb_words=4, variable_nb_words=True)
         if db.session.scalar(select(Village.id).where(Village.name == name)):
             app.logger.warning("Generated a village name that already exists, skipping")
             return
@@ -478,7 +534,7 @@ class FakeDataGenerator:
                 payment.manual_refund()
                 db.session.commit()
 
-    def run(self):
+    def run(self) -> None:
         self.create_users()
 
         for user in self.users:
@@ -497,15 +553,18 @@ class FakeDataGenerator:
             if random_bool(0.5):
                 self.create_village(user)
 
+        # Schedule items manually created by content team
+        # Don't add too many here, the amount of official content
+        # is scaled by the number of users, while this isn't.
         official_schedule_items: dict[ScheduleItemType, int] = {
-            "film": 10,
-            "performance": 20,
-            "talk": 3,
-            "workshop": 5,
+            "film": 2,
+            "music": 2,
+            "performance": 2,
+            "talk": 2,
+            "workshop": 1,
+            "meetup": 1,
         }
-
         for type, count in official_schedule_items.items():
-            # Schedule items manually created by content team
             for _ in range(count):
                 self.create_schedule_item(
                     official_content=True, user=random.choice(self.cfp_admins), type=type
