@@ -641,7 +641,11 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
 
         # For convenience, we ask them to update their participant_count,
         # but this isn't exposed on the ScheduleItem
-        if hasattr(form, "attributes") and hasattr(form.attributes, "proposal_participant_count"):
+        if (
+            hasattr(form, "attributes")
+            and hasattr(form.attributes, "proposal_participant_count")
+            and hasattr(proposal.attributes, "participant_count")
+        ):
             proposal.attributes.participant_count = form.attributes.proposal_participant_count.data
             # Now delete this, or populate_obj will try to add it
             del form.attributes.form.proposal_participant_count
@@ -677,7 +681,11 @@ def finalise_proposal(proposal_id: int) -> ResponseReturnValue:
     if request.method != "POST":
         # These proxy to the proposal, so it doesn't matter if schedule_item exists
         form.proposal_equipment_required.data = proposal.equipment_required
-        if hasattr(form, "attributes") and hasattr(form.attributes, "proposal_participant_count"):
+        if (
+            hasattr(form, "attributes")
+            and hasattr(form.attributes, "proposal_participant_count")
+            and hasattr(proposal.attributes, "participant_count")
+        ):
             form.attributes.proposal_participant_count.data = proposal.attributes.participant_count
 
     return render_template(
