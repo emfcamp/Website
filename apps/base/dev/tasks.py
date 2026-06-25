@@ -9,6 +9,7 @@ from flask import current_app as app
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 
 from apps.cfp.tasks import create_tags
+from apps.common.pkpass import generate_pkpass, generate_unsigned_pkpass
 from apps.tickets.tasks import create_product_groups
 from apps.volunteer.init_data import shifts as init_shifts
 from main import db
@@ -245,17 +246,29 @@ def volunteer_data():
 
 @dev_cli.command("pkpass")
 @click.option("--email", default=None, help="User to build the pass for (default: first user).")
-@click.option("--out", "outfile", default="unsigned.pkpass", type=click.Path(), show_default=True)
-def dump_unsigned_pkpass(email, outfile):
-    """Write an UNSIGNED .pkpass for previewing artwork/layout (e.g. in Wallet Pass Designer)."""
-    from apps.common.pkpass import generate_unsigned_pkpass
+@click.option(
+    "--out", "outfile", type=click.Path(), help="File to write (default: signed.pkpass or unsigned.pkpass)"
+)
+@click.option(
+    "--signed", "signed", is_flag=True, help="Sign the pkpass using the certificate specified in config"
+)
+def dump_pkpass(email, outfile=None, signed=False):
+    """Write a signed or unsigned .pkpass for previewing artwork/layout (e.g. in Wallet Pass Designer)."""
 
     user = User.query.filter_by(email=email).one() if email else User.query.first()
     if user is None:
         raise click.ClickException("No users found; run `flask dev data` first.")
+    if signed:
+        pkpass = generate_pkpass(user)
+        if outfile is None:
+            outfile = "signed.pkpass"
+    else:
+        pkpass = generate_unsigned_pkpass(user)
+        if outfile is None:
+            outfile = "unsigned.pkpass"
     with open(outfile, "wb") as f:
-        f.write(generate_unsigned_pkpass(user).read())
-    click.echo(f"Wrote unsigned pass for {user.email} to {outfile}")
+        f.write(pkpass.read())
+    click.echo(f"Wrote pass for {user.email} to {outfile}")
 
 
 @dev_cli.command("createbankaccounts")

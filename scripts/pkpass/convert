@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# All the examples with openssl use pem, so let's stick to that
+
+# See the bottom of https://developer.apple.com/account/resources/certificates/add
+curl -sO https://www.apple.com/certificateauthority/AppleWWDRCAG4.cer
+openssl x509 -in AppleWWDRCAG4.cer -inform der -out AppleWWDRCAG4.crt -outform pem
+
+openssl x509 -in pass.cer -inform der -out pass.crt -outform pem
+

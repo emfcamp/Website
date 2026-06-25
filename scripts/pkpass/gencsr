@@ -1,0 +1,6 @@
+#!/bin/bash
+
+openssl genrsa -out pkpass.key 2048
+# Only country seems to be copied across these days, but they still ask for it in docs
+openssl req -new -key pkpass.key -out pkpass.csr -subj "/emailAddress=tickets@emfcamp.org, CN=Electromagnetic Field, C=GB"
+
