@@ -4,17 +4,16 @@
   <tr>
     <th>Date</th>
     <th>Type</th>
-    <th>Sender's name</th>
     <th>Sender's email</th>
   </tr>
 </thead>
 <tbody>
 
   {% for trans in transferred_to %}
+  {# Note: we don't show the name here as it's an information leak. #}
   <tr class="{{- loop.cycle('odd', 'even') }}">
     <td>{{ trans.timestamp.strftime('%d %b %Y') }}</td>
     <td>{{ trans.purchase.product.name }}</td>
-    <td>{{ trans.from_user.name }}</td>
     <td>{{ trans.from_user.email }}</td>
   </tr>
   {% endfor %}
