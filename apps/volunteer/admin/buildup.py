@@ -242,6 +242,9 @@ class DietaryRequirementsView(VolunteerBaseView):
                 for allergen in v.user.volunteer.allergies:
                     allergies[allergen] += 1
 
+                for restriction in v.user.volunteer.dietary_restrictions:
+                    dietary_restrictions[restriction] += 1
+
             all_allergies |= set(allergies.keys())
             all_restrictions |= set(dietary_restrictions.keys())
 
