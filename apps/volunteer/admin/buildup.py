@@ -237,21 +237,10 @@ class DietaryRequirementsView(VolunteerBaseView):
             allergies = Counter()
             dietary_restrictions = Counter()
 
-            other_allergies = set()
-            other_restrictions = set()
             for v in predicted_volunteers.all():
                 assert v.user.volunteer
                 for allergen in v.user.volunteer.allergies:
                     allergies[allergen] += 1
-
-                if v.user.volunteer.allergies_other:
-                    other_allergies.add(v.user.volunteer.allergies_other)
-
-                for restriction in v.user.volunteer.dietary_restrictions:
-                    dietary_restrictions[restriction] += 1
-
-                if v.user.volunteer.dietary_restrictions_other:
-                    other_restrictions.add(v.user.volunteer.dietary_restrictions_other)
 
             all_allergies |= set(allergies.keys())
             all_restrictions |= set(dietary_restrictions.keys())
@@ -265,18 +254,31 @@ class DietaryRequirementsView(VolunteerBaseView):
                     "is_just_after_event": is_just_after_event,
                     "allergies": allergies,
                     "dietary_restrictions": dietary_restrictions,
-                    "other_allergies": other_allergies,
-                    "other_restrictions": other_restrictions,
                     "predicted_onsite": predicted_volunteers.count(),
                 }
             )
             if is_just_after_event:
                 is_just_after_event = False
+
+        other_allergies = []
+        other_restrictions = []
+
+        for v in query.all():
+            assert v.user.volunteer
+            if v.user.volunteer.allergies_other:
+                other_allergies.append((v.arrival_date, v.departure_date, v.user.volunteer.allergies_other))
+            if v.user.volunteer.dietary_restrictions_other:
+                other_restrictions.append(
+                    (v.arrival_date, v.departure_date, v.user.volunteer.dietary_restrictions_other)
+                )
+
         return self.render(
             "volunteer/admin/dietary.html",
             days_data=days_data,
             all_allergies=all_allergies,
             all_restrictions=all_restrictions,
+            other_allergies=other_allergies,
+            other_restrictions=other_restrictions,
         )
 
 

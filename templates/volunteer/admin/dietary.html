@@ -5,6 +5,13 @@
 
 <table class="table table-hover">
     <thead>
+        <tr><th colspan="3"></th>
+            {% if all_allergies|length > 0 %}
+            <th colspan="{{all_allergies|length}}">Allergens</th>
+            {% endif %}
+            {% if all_restrictions|length > 0 %}
+            <th colspan="{{all_restrictions|length}}">Restrictions</th>
+            {% endif %}
         <tr>
             <th scope="col" colspan="2">Date</th>
             <th>Volunteers</th>
@@ -14,7 +21,6 @@
             {% for restriction in all_restrictions %}
             <th>{{restriction|title}}</th>
             {% endfor %}
-            <th>Other</th>
         </tr>
     </thead>
     <tbody>
@@ -47,13 +53,22 @@
                 {% endif %}
                 </td>
             {% endfor %}
-            <td>
-                {{data['other_allergies']|join(",")}}
-                {{data['other_restrictions']|join(",")}}
-            </td>
         </tr>
         {% set ns.prev = data.date_str %}
         {% endfor %}
     </tbody>
 </table>
+
+<h3>"Other" allergies</h3>
+<ul>
+{% for from, until, info in other_allergies %}
+    <li>{{from}} - {{until}}: {{info}}</li>
+{% endfor %}
+</ul>
+<h3>"Other" restrictions</h3>
+<ul>
+{% for from, until, info in other_restrictions %}
+    <li>{{from}} - {{until}}: {{info}}</li>
+{% endfor %}
+</ul>
 {% endblock %}
