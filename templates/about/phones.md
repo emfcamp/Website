@@ -39,6 +39,8 @@ Here are some of our suggestions:
   </tbody>
 </table>
 
+Please note that you don't need to purchase a base station (we run the network in the field for you!), so listings for 'Additional Handset' are what you're after.
+
 If you already have a DECT phone, feel free to bring it along! You can also check our [DECT compatibility list](https://phones.emfcamp.org/help/dect-compatibility), generally Gigaset and Mitel handsets tend to be good options.
 
 There may also be some DECT phones available to buy at the shop during the event.
