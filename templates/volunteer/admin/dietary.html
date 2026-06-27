@@ -1,0 +1,59 @@
+{% extends "volunteer/admin/base.html" %}
+{% block title %}Buildup/teardown dietary info{% endblock %}
+{% block body %}
+<h1>Buildup/teardown dietary info</h1>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col" colspan="2">Date</th>
+            <th>Volunteers</th>
+            {% for allergen in all_allergies %}
+            <th>{{allergen|title}}</th>
+            {% endfor %}
+            {% for restriction in all_restrictions %}
+            <th>{{restriction|title}}</th>
+            {% endfor %}
+            <th>Other</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% set ns = namespace(prev=0) %}
+        {% for data in days_data %}
+        {% if data.is_just_after_event %}
+        <tr class="info">
+            <th colspan="6">THE EVENT</th>
+        </tr>
+        {% endif %}
+        <tr>
+            {% if ns.prev != data.date_str %}
+                <th class="breakdown-table-date" scope="row"{% if data.am_or_pm == "AM" %} rowspan="2"{% endif %}>{{ data.date_str }}</th>
+            {% endif %}
+            <th class="breakdown-table-ampm" scope="row">{{ data.am_or_pm }}</th>
+            <td class="breakdown-table-predicted-num">
+                {{ data.predicted_onsite }}
+            </td>
+            {% for allergen in all_allergies %}
+                <td>
+                {% if data['allergies'][allergen] > 0 %}
+                    {{data['allergies'][allergen]}}
+                {% endif %}
+                </td>
+            {% endfor %}
+            {% for restriction in all_restrictions %}
+                <td>
+                {% if data['dietary_restrictions'][restriction] > 0 %}
+                    {{data['dietary_restrictions'][restriction]}}
+                {% endif %}
+                </td>
+            {% endfor %}
+            <td>
+                {{data['other_allergies']|join(",")}}
+                {{data['other_restrictions']|join(",")}}
+            </td>
+        </tr>
+        {% set ns.prev = data.date_str %}
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
