@@ -64,6 +64,9 @@
             No
         {%- endif -%}
     </td></tr>
+    {% if user.buildup_volunteer %}
+    <tr><th>Buildup volunteer</th><td>{{user.buildup_volunteer.arrival_date}} - {{user.buildup_volunteer.departure_date}}</td></tr>
+    {% endif %}
 </table>
 
 <form method="post">
