@@ -42,7 +42,7 @@
       </div>
       {% if current_user.village %}
         <div class="panel-body">
-          <p>You're a{% if current_user.village_membership.admin %}n admin{% else %} member{% endif %} of the <strong><a href="{{url_for('villages.view', year=event_year, village_id=current_user.village.id)}}">{{current_user.village.name}}</a></strong> village.</p>
+          <p>You're a{% if current_user.village_membership.admin %}n admin{% else %} member{% endif %} of the <strong><a href="{{current_user.village.view_url}}">{{current_user.village.name}}</a></strong> village.</p>
         </div>
         {% if current_user.village_membership.admin %}
           <div class="panel-footer">
@@ -52,7 +52,7 @@
         {% endif %}
       {% elif current_user.village_join_request %}
         <div class="panel-body">
-          <p>You've requested to join the <strong><a href="{{url_for('villages.view', year=event_year, village_id=current_user.village_join_request.village.id)}}">{{current_user.village_join_request.village.name}}</a></strong> village.</p>
+          <p>You've requested to join the <strong><a href="{{current_user.village_join_request.village.view_url}}">{{current_user.village_join_request.village.name}}</a></strong> village.</p>
         </div>
       {% else %}
         <div class="panel-body">

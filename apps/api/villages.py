@@ -7,8 +7,7 @@ from flask_restful import Resource
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import Point
 
-from apps.config import config
-from main import db, external_url
+from main import db
 from models.content import Venue
 from models.user import User
 from models.village import Village, VillageMember
@@ -30,7 +29,7 @@ def render_village(village: Village) -> VillageResponse:
     return {
         "id": village.id,
         "name": village.name,
-        "url": external_url("villages.view", year=config.event_year, village_id=village.id),
+        "url": village.view_url_external,
         "external_url": village.url,
         "description": village.description,
         "location": to_shape(village.location).__geo_interface__ if village.location else None,

@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Any
 
+from flask import url_for
 from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import to_shape
 from slugify import slugify
@@ -83,7 +84,7 @@ class Village(BaseModel):
                 "id": self.id,
                 "name": self.name,
                 "description": self.description,
-                "url": external_url("villages.view", year=config.event_year, village_id=self.id),
+                "url": self.view_url_external,
                 "external_url": self.url,
                 "num_members": len(self.village_memberships),
             },
@@ -103,6 +104,14 @@ class Village(BaseModel):
             return None
         lat, lon = self.latlon
         return f"https://map.emfcamp.org/#18.5/{lat}/{lon}/m={lat},{lon}"
+
+    @property
+    def view_url_external(self) -> str:
+        return external_url("villages.view", year=config.event_year, village_id=self.id, slug=self.slug)
+
+    @property
+    def view_url(self) -> str:
+        return url_for("villages.view", year=config.event_year, village_id=self.id, slug=self.slug)
 
     @property
     def slug(self) -> str:
