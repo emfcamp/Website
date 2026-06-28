@@ -8,6 +8,11 @@ Our phones network allows EMF attendees to call each other in the field, dial in
 
 Follow us on the Fediverse at [@phones@emfcamp.org](https://social.emfcamp.org/@phones) for updates!
 
+<div>
+  <a href="https://phones.emfcamp.org/phonebook" class="btn btn-primary">View phonebook</a>
+  <a href="https://phones.emfcamp.org" class="btn btn-primary">Register a number</a>
+</div>
+
 ## Ahead of the event
 
 If you want to take part in our phone network, we highly suggest picking up a DECT phone (like a landline phone you might have at home)!
@@ -62,9 +67,6 @@ Every EMF extension also has its very own real phone number you can call from a 
 You can configure if you want people to be able to use dial-in for your extension from the number management page.
 
 ## Registering a number
-
-!!! warning ""
-    phones.emfcamp.org isn't quite ready for the public yet, but watch out for an upcoming announcement very soon!
 
 Closer to the event start date, we will publish instructions here about registering a personal extension number you can use during the event.
 
