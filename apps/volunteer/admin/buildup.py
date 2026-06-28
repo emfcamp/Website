@@ -269,11 +269,9 @@ class DietaryRequirementsView(VolunteerBaseView):
         for v in query.all():
             assert v.user.volunteer
             if v.user.volunteer.allergies_other:
-                other_allergies.append((v.arrival_date, v.departure_date, v.user.volunteer.allergies_other))
+                other_allergies.append((v, v.user.volunteer.allergies_other))
             if v.user.volunteer.dietary_restrictions_other:
-                other_restrictions.append(
-                    (v.arrival_date, v.departure_date, v.user.volunteer.dietary_restrictions_other)
-                )
+                other_restrictions.append((v, v.user.volunteer.dietary_restrictions_other))
 
         return self.render(
             "volunteer/admin/dietary.html",

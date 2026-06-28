@@ -60,15 +60,25 @@
 </table>
 
 <h3>"Other" allergies</h3>
-<ul>
-{% for from, until, info in other_allergies %}
-    <li>{{from}} - {{until}}: {{info}}</li>
+<table class="table">
+<thead>
+    <tr><th>Arrival</th><th>Departure</th><th>Email</th><th>Requirement</th></tr>
+</thead>
+<tbody>
+{% for v, info in other_allergies %}
+    <tr><td>{{v.arrival_date}}</td><td>{{v.departure_date}}</td><td>{{v.user.email}}</td><td>{{info}}</td>
 {% endfor %}
-</ul>
+</tbody>
+</table>
 <h3>"Other" restrictions</h3>
-<ul>
-{% for from, until, info in other_restrictions %}
-    <li>{{from}} - {{until}}: {{info}}</li>
+<table class="table">
+<thead>
+    <tr><th>Arrival</th><th>Departure</th><th>Email</th><th>Requirement</th></tr>
+</thead>
+<tbody>
+{% for v, info in other_restrictions %}
+    <tr><td>{{v.arrival_date}}</td><td>{{v.departure_date}}</td><td>{{v.user.email}}</td><td>{{info}}</td>
 {% endfor %}
-</ul>
+</tbody>
+</table>
 {% endblock %}
