@@ -85,6 +85,7 @@ class ScheduleFilter:
             venues=request.args.getlist("venue"),
             is_favourite=request.args.get("is_favourite"),
             user=(current_user.is_authenticated and current_user) or None,
+            types=request.args.getlist("type"),
         )
 
 
