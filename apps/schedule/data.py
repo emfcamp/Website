@@ -13,7 +13,7 @@ from sqlalchemy.orm import selectinload
 
 from apps.common import tidy_workshop_cost
 from main import db, external_url
-from models.content import Occurrence, ScheduleItem
+from models.content import Occurrence, ScheduleItem, Venue
 from models.content.attributes import (
     FamilyWorkshopAttributes,
     TalkAttributes,
@@ -230,7 +230,11 @@ def get_schedule_items(filter: ScheduleFilter) -> list[ScheduleItem]:
         # Although this excludes schedule items with no matching occurrences,
         # you still need to filter out individual occurrences that don't match.
         # get_schedule_item_dicts_flat and get_schedule_item_dicts_full do this.
-        query = query.where(ScheduleItem.occurrences.any(Occurrence.scheduled_venue.in_(filter.venues)))
+        query = query.where(
+            ScheduleItem.occurrences.any(
+                Occurrence.scheduled_venue_id.in_(select(Venue.id).where(Venue.name.in_(filter.venues)))
+            )
+        )
 
     if filter.types:
         query = query.where(ScheduleItem.type.in_(filter.types))
