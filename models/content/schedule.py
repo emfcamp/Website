@@ -85,7 +85,7 @@ EVENT_SPACING = {
     "talk": 1,
     "workshop": 3,
     "performance": 0,
-    "familyworkshop": 2,
+    "familyworkshop": 3,
     "installation": 0,
     "film": 2,
     "music": 0,
