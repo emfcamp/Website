@@ -26,7 +26,7 @@ Timetables and further information can be found on the [shuttle bus page](https:
 #}
 
 ## By Car
-If you plan to drive, you will need to [buy a parking ticket or live-in vehicle ticket](/tickets/other). Motorcycles do not require a parking ticket. 
+If you plan to drive, you will need to [buy a parking ticket or live-in vehicle ticket](/tickets/other).
 
 Plan your travel to the south gate on the A438 - postcode **HR8 1RQ** should get you there. The entrance to the site is located at [52.0322, -2.3837](https://geohack.toolforge.org/geohack.php?pagename=Electromagnetic_Field_(festival)&params=52.03222_N_2.3837_W_region:GB), grid reference SO 73774 37158.
 
@@ -42,6 +42,10 @@ We do not provide electric vehicle charging at EMF. We ask that you arrive at th
 ## By Bike
 
 While we do not have any dedicated bike parking, EMF is an extremely safe event and you are welcome to lock your bike to our perimeter fence or other structures as long as it's out of the way.
+
+### Motorcycles
+
+Motorbikes do not require a parking ticket.
 
 ## By Air
 The closest major airport is [Birmingham (BHX)](https://en.wikipedia.org/wiki/Birmingham_Airport), which [has free shuttles to the train station](https://www.thetrainline.com/airport-transfers/united-kingdom/trains-from-birmingham-airport) and is around 1:40 by train to Ledbury station; or an hour by road. [Bristol (BRS)](https://en.wikipedia.org/wiki/Bristol_Airport) and [Cardiff (CWL)](https://en.wikipedia.org/wiki/Cardiff_Airport) are around 1:40 by road, but poorly connected by public transport.
