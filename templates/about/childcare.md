@@ -8,10 +8,10 @@ Operating hours will be announced closer to the event.
 #}
 
 ## Operating Hours
-**Thursday:** 2pm to 6pm
-**Friday:** 10:30am to 6pm
-**Saturday:** 10:30am to 6pm
-**Sunday:** 10:30am to 4pm
+* **Thursday:** 2pm to 6pm
+* **Friday:** 10:30am to 6pm
+* **Saturday:** 10:30am to 6pm
+* **Sunday:** 10:30am to 4pm
 
 ## Family Workshops
 We also have a range of workshops for families in a separate workshop tent.
