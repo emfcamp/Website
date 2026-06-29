@@ -28,7 +28,7 @@ Anyone who is vulnerable will usually be accompanied by a responsible adult (a p
 
 If a volunteer or attendee witnesses any of the above or has any concerns about a child or vulnerable person’s welfare, they should:
 
-* Contact the conduct team by calling 1234.
+* Contact the conduct team by calling 1234 or visiting [report.emf.camp](https://report.emf.camp).
 * Report that there are concerns about a person’s welfare.
 * Provide as many details as possible, including location and relevant descriptions.
 * If possible, try to do the above without causing any distress to other attendees - be mindful of what others can hear.
