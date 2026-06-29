@@ -25,7 +25,9 @@
   {%- if latest_version.transaction.user %} by {{ latest_version.transaction.user.name }}{% endif -%}
   {% endif -%}.
   {% endif %}
-  <a href="{{ url_for('wiki.history', slug=page.slug) }}">View history</a>
+  {%- if current_user.is_authenticated and current_user.has_permission('wiki') %}
+    <a href="{{ url_for('wiki.history', slug=page.slug) }}">View history</a>
+  {% endif -%}
 </p>
 <p class="small"><em>Content on this page is provided by attendees and is not the responsibility of EMF.</em></p>
 {% endblock %}
