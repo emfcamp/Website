@@ -58,7 +58,7 @@ info_vol_shifts = {
             },
         ]
     },
-    "cable-plugger": {
+    "runner": {
         "info-volunteer-tent": [
             {
                 "first": edt(d, "10:00:00"),
@@ -71,9 +71,9 @@ info_vol_shifts = {
         + [
             {
                 "first": edt("mon", "10:00:00"),
-                "final": edt("mon", "12:00:00"),
+                "final": edt("mon", "18:00:00"),
                 "min": 1,
-                "max": 2,
+                "max": 10,
             },
         ]
     },
