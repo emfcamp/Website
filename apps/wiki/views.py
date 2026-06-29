@@ -158,6 +158,7 @@ def edit(slug: str) -> ResponseReturnValue:
 
 
 @wiki.route("/<slug>/history")
+@require_permission("wiki")
 def history(slug: str) -> ResponseReturnValue:
     page = WikiPage.get_by_slug(slug)
     if page is None:
@@ -169,6 +170,7 @@ def history(slug: str) -> ResponseReturnValue:
 
 
 @wiki.route("/<slug>/diff/<int:from_txn>/<int:to_txn>")
+@require_permission("wiki")
 def diff(slug: str, from_txn: int, to_txn: int) -> ResponseReturnValue:
     page = WikiPage.get_by_slug(slug)
     if page is None:
