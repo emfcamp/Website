@@ -370,7 +370,7 @@ class FakeDataGenerator:
         }
 
         for occurrence_num in range(random_choice(occurrence_counts)):
-            self.create_occurrence(schedule_item, occurrence_num)
+            self.create_occurrence(schedule_item, occurrence_num + 1)
 
         return schedule_item
 
