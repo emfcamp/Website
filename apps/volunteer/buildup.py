@@ -127,7 +127,7 @@ def _buildup_register(
     buv = current_user.is_authenticated and BuildupVolunteer.get_for_user(current_user)
     buildup_form = BuildupSignUpForm(prefix="b", obj=buv)
 
-    if buv and buv.signup_key:
+    if not key and buv:
         key = buv.signup_key
 
     if key:
@@ -143,6 +143,9 @@ def _buildup_register(
         buv = current_user.is_authenticated and BuildupVolunteer.get_for_user(current_user)
         if buv:
             buv = update_buildup_volunteer_from_form(buv, buildup_form)
+            if key:
+                # Update key if the user has updated their details via a different link.
+                buv.signup_key = key
             db.session.add(buv)
         else:
             new_buv = BuildupVolunteer()
@@ -216,9 +219,6 @@ def buildup_register(token: str) -> ResponseReturnValue:
     ).scalar_one_or_none()
     if not key:
         abort(404)
-
-    if BuildupVolunteer.get_for_user(current_user):
-        return redirect(url_for(".buildup_amend"))
 
     if response := _buildup_register(key=key):
         return response
