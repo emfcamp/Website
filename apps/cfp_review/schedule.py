@@ -34,7 +34,7 @@ from . import cfp_review, schedule_required
 # incorrect because we _also_ need to feed other types to the scheduler in
 # locked positions to avoid speaker conflicts - it's here for now to ensure
 # that the slotmachine download is the same as the actual schedule-run button.
-AUTO_SCHEDULE_TYPES: list[ScheduleItemType] = ["talk", "workshop"]
+AUTO_SCHEDULE_TYPES: list[ScheduleItemType] = ["talk", "workshop", "familyworkshop"]
 
 
 @cfp_review.route("/schedule")
