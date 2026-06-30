@@ -1,9 +1,8 @@
 from collections import defaultdict
 from datetime import timedelta
-from itertools import chain
 
 from flask import current_app as app
-from slotmachine import SchedulingProblem, SchedulingSolution, SlotMachine, Talk
+from slotmachine import SchedulingProblem, SchedulingSolution, SlotMachine, Talk, VenueTimes
 from sqlalchemy import and_, not_, select
 from sqlalchemy.orm import joinedload
 
@@ -99,15 +98,14 @@ class Scheduler:
                     # This supports a list, but we only want one for now
                     preferred_venues = {ordered_venues[0]}
 
-                # Mapping of venues to allowed time ranges
+                # Per-venue allowed time ranges: the intersection of the speaker's availability
+                # and each venue's TimeBlocks for this content type.
                 allowed_times = occurrence.allowed_times(True)
-                allowed_venues = set(v.id for v in allowed_times)
+                venue_times = [
+                    VenueTimes(venue=venue.id, times=times) for venue, times in allowed_times.items()
+                ]
 
-                # FIXME: SlotMachine doesn't support per-venue allowed time ranges yet, it will soon.
-                # This will emit an inaccurate scheduling problem until fixed!
-                allowed_time_ranges = list(chain.from_iterable(allowed_times.values()))
-
-                if len(allowed_time_ranges) == 0:
+                if len(venue_times) == 0:
                     # FIXME: this happens when an Occurrence is constrained to a manually-scheduled venue, but
                     # has not been assigned a time yet.
                     # Manually-scheduled talks should still be sent to the automatic scheduler to take speaker
@@ -120,8 +118,7 @@ class Scheduler:
                     id=occurrence.id,
                     duration=occurrence.scheduled_duration,
                     speakers={speaker.id for speaker in occurrence.schedule_item.presenters},
-                    allowed_venues=allowed_venues,
-                    allowed_times=allowed_time_ranges,
+                    venue_times=venue_times,
                     preferred_venues=preferred_venues,
                     minutes_after=total_minutes(occurrence.changeover_time),
                 )
