@@ -322,13 +322,15 @@ def occurrences(schedule_item_id: int) -> ResponseReturnValue:
 )
 @admin_required
 def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseReturnValue:
-    occurrence: Occurrence | None = db.session.scalar(
-        select(Occurrence)
-        .filter_by(id=occurrence_id, schedule_item_id=schedule_item_id)
-        .options(selectinload(Occurrence.schedule_item))
-    )
-    if not occurrence:
-        abort(404)
+    occurrence: Occurrence = get_or_404(db, Occurrence, occurrence_id)
+    if occurrence.schedule_item_id != schedule_item_id:
+        return redirect(
+            url_for(
+                ".update_occurrence",
+                schedule_item_id=occurrence.schedule_item_id,
+                occurrence_id=occurrence.id,
+            )
+        )
 
     Form = get_update_occurrence_type_form(occurrence.schedule_item.type)
     form = Form(obj=occurrence)
