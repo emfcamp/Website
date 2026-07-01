@@ -45,3 +45,7 @@ Our pub, the Robot Arms, is northwest of Stage B. It sells a wide selection of s
 The solarpunks have taken over NullSector’s Cybar and are now serving draught beers, soft drinks and even water we think they tapped from an underground pipe.
 
 #}
+
+## Water
+
+Tap water will be available at the bars and at water points throughout the site. You can [view all the water points and bars on the map](https://map.emfcamp.org/).
