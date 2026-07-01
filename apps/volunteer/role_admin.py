@@ -131,6 +131,9 @@ def role_admin_index():
     return render_template(
         "volunteer/role_admin/index.html",
         roles=Role.grouped_by_team(administered_ids),
+        volunteer_admin=(
+            current_user.has_permission("admin") or current_user.has_permission("volunteer:admin")
+        ),
     )
 
 
@@ -274,8 +277,14 @@ def role_shift_templates(role_id: int) -> ResponseReturnValue:
                 db.session.flush()  # assign PK before regenerate_shifts uses it
                 new_template.regenerate_shifts()
 
+            role.shifts_finalised = "finalise" in request.form
             db.session.commit()
-            flash("Shift templates updated.")
+
+            if role.shifts_finalised:
+                flash("Shifts finalised.")
+            else:
+                flash("Shifts updated.")
+
             return redirect(url_for(".role_shift_templates", role_id=role_id))
 
     return render_template(

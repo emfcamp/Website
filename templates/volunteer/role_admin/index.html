@@ -23,7 +23,10 @@ EMF Volunteer Role Admin
         <h3>{{ team.name }} <a href="{{url_for('.team_admin', team_id=team.id)}}" class="btn btn-xs btn-default">Manage</a></h3>
         <ul class="list-unstyled">
             {% for role in team_roles %}
-            <li><a href="{{url_for('.role_admin', role_id=role.id)}}">{{role.name}}</a></li>
+                <li>
+                    <a href="{{url_for('.role_admin', role_id=role.id)}}">{{role.name}}</a>
+                    {% if volunteer_admin and role.shifts_finalised %}✓{% endif %}
+                </li>
             {% endfor %}
         </ul>
     {% endfor %}
