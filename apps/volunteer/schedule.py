@@ -19,6 +19,7 @@ from icalendar import Calendar, Event
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload, with_parent
 
+from apps.cfp.date import CONTENT_DAY_START
 from apps.users.calendar import CalendarDict, CalendarEntry, fetch_events
 from main import db, get_or_404
 from models.user import User, generate_api_token
@@ -116,9 +117,9 @@ def _active_day(permitted: list[date]) -> date:
     if day > permitted[1]:
         return permitted[1]
 
-    # We're at a festival. If its before 4am it's not tomorrow yet, show what
+    # We're at a festival. If the sun isn't up it's not tomorrow yet, show what
     # is technically the previous day.
-    if now.hour < 4:
+    if now.hour < CONTENT_DAY_START.hour:
         return day - timedelta(days=1)
 
     return day
