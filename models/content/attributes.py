@@ -82,6 +82,11 @@ class MusicAttributes(Attributes):
 
 
 @dataclass
+class DJSetAttributes(Attributes):
+    pass
+
+
+@dataclass
 class MeetupAttributes(Attributes):
     pass
 

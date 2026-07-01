@@ -3,7 +3,7 @@
 {% block body %}
     <h2>Schedule Item: {{schedule_item.title}}<br>
         <small>
-            {{ schedule_item.human_type_a | capitalize }} by
+            {{ schedule_item.human_type_a | capitalize_add }} by
             <a href="{{ url_for('cfp_review.cfp_user', user_id=schedule_item.user.id) }}">{{ schedule_item.user.name }}</small></a>
     </h2>
 {% include "cfp_review/schedule_item/_schedule_item_tabs.html" %}

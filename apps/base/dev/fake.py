@@ -265,6 +265,7 @@ class FakeDataGenerator:
             "film": 10,
             "meetup": 10,
             "music": 10,
+            "djset": 10,
         }
 
         if not proposal or proposal.state == "finalised":
@@ -559,6 +560,7 @@ class FakeDataGenerator:
         official_schedule_items: dict[ScheduleItemType, int] = {
             "film": 2,
             "music": 2,
+            "djset": 2,
             "performance": 2,
             "talk": 2,
             "workshop": 1,

@@ -1,0 +1,9 @@
+{% macro human_group_title(type_info) %}
+  {%- if type_info.type == "music" -%}
+    Live Music
+  {%- elif type_info.type == "djset" -%}
+    DJs
+  {%- else -%}
+    {{ type_info.human_type | title_add + "s" }}
+  {%- endif -%}
+{% endmacro %}

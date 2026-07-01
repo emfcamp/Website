@@ -6,7 +6,6 @@ import csv
 import json
 from http import HTTPStatus
 from io import BytesIO, StringIO
-from typing import get_args
 
 from flask import (
     abort,
@@ -25,6 +24,7 @@ from sqlalchemy.orm import selectinload, undefer
 from wtforms import FormField
 
 from apps.cfp.views import TimeRangesHandler
+from apps.common import title_add
 from main import db, get_or_404
 from models.content import (
     SCHEDULE_ITEM_INFOS,
@@ -261,8 +261,11 @@ def convert_schedule_item(schedule_item_id: int) -> ResponseReturnValue:
     schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
 
     form = ConvertScheduleItemForm()
-    types = get_args(ScheduleItemType)
-    form.new_type.choices = [(t, t.title()) for t in types if t != schedule_item.type]
+    form.new_type.choices = [
+        (ti.type, title_add(ti.human_type))
+        for ti in SCHEDULE_ITEM_INFOS.values()
+        if ti.type != schedule_item.type
+    ]
 
     if form.validate_on_submit():
         new_type = form.new_type.data
