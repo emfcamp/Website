@@ -1,6 +1,7 @@
 import enum
 from collections.abc import Sequence
 from datetime import date, datetime, time, timedelta
+from math import ceil, floor
 from typing import TYPE_CHECKING, Self, TypedDict
 
 import pytz
@@ -201,14 +202,45 @@ class ShiftTemplate(BaseModel):
 
     @property
     def shift_start_times(self) -> list[datetime]:
-        final_shift_start = self.end_datetime - timedelta(minutes=self.duration)
+        period = (self.end_datetime - self.start_datetime).seconds // 60
 
+        num_shifts = round(period / self.duration)
+        if num_shifts == 0:
+            num_shifts = 1
+
+        # Sometimes we can't fit an exact multiple of duration into the
+        # time period covered by a template. `slop` is the number of minutes
+        # we're out by, which can be positive or negative.
+        slop = period - num_shifts * self.duration
+
+        # `adj` is used to try and keep shift duration adjustments to multiples
+        # of 15 minutes.
+        if slop >= 0:
+            adj = 15 * ceil(slop / num_shifts / 15)
+        else:
+            adj = 15 * floor(slop / num_shifts / 15)
+
+        # Calculate start times
         shift_starts = []
         time = self.start_datetime
-        while time < final_shift_start:
+        while time < self.end_datetime:
+            if slop != 0:
+                # If there's only a little bit of slop left apply it in its entirety
+                # to this shift.
+                if abs(slop) < abs(adj):
+                    this_duration = self.duration + slop
+                    slop = 0
+
+                # Otherwise apply a bigger chunk of adjustment and leave some
+                # slop for the next shift.
+                else:
+                    this_duration = self.duration + adj
+                    slop -= adj
+            else:
+                this_duration = self.duration
+
             shift_starts.append(time)
-            time = time + timedelta(minutes=self.duration)
-        shift_starts.append(final_shift_start)
+            time = time + timedelta(minutes=this_duration)
 
         return shift_starts
 
