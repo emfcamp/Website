@@ -27,7 +27,7 @@ from models.volunteer.shift import Shift, ShiftEntry, ShiftEntryState
 from models.volunteer.venue import VolunteerVenue
 from models.volunteer.volunteer import Volunteer
 
-from ..common import feature_flag, get_next_url
+from ..common import feature_enabled, feature_flag, get_next_url
 from ..config import config
 from ..schedule import event_tz
 from . import v_admin_required, v_user_required, volunteer
@@ -125,9 +125,17 @@ def _active_day(permitted: list[date]) -> date:
 
 
 @volunteer.route("/schedule")
-@feature_flag("VOLUNTEERS_SCHEDULE")
 @v_user_required
 def schedule():
+    # Volunteer admins and role admins can see the schedule at any time.
+    is_admin = (
+        current_user.has_permission("admin")
+        or current_user.has_permission("volunteer_admin")
+        or len(current_user.administered_roles) > 0
+    )
+    if not feature_enabled("VOLUNTEERS_SCHEDULE") and not is_admin:
+        abort(404)
+
     current_volunteer = Volunteer.get_for_user(current_user)
     earliest, latest = Shift.earliest_and_latest_in_range(*current_volunteer.permitted_shift_times)
     if earliest is None or latest is None:
@@ -140,7 +148,7 @@ def schedule():
     else:
         active_day = _active_day(dates)
 
-    shifts = Shift.get_all_for_day(active_day)
+    shifts = Shift.get_all_for_day(active_day, include_unfinalised=is_admin)
     if len(shifts) == 0:
         # If there's no shifts nothing can conflict, so don't bother looking.
         user_calendar = []
@@ -175,6 +183,8 @@ def schedule():
         active_day=active_day,
         untrained_roles=untrained_roles,
         buildup_volunteer=current_volunteer.registered_for_buildup,
+        is_admin=is_admin,
+        owned_roles=current_volunteer.administered_role_ids,
         token=token,
     )
 

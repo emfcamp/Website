@@ -236,6 +236,18 @@ function init_volunteer_schedule() {
       saveFilters();
       updateRowDisplay();
     });
+  document
+    .getElementById("select-owned-roles")
+    .addEventListener("click", () => {
+      document
+        .querySelectorAll("input[data-role-id]")
+        .forEach(
+          (checkbox) =>
+            (checkbox.checked = checkbox.getAttribute("data-owned") == "True"),
+        );
+      saveFilters();
+      updateRowDisplay();
+    });
   document.getElementById("select-day").addEventListener("change", (ev) => {
     document.location.replace(ev.target.value);
   });
