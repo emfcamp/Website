@@ -420,6 +420,26 @@ def render_trusted_markdown(markdown_src: str) -> Markup:
     )
 
 
+class MetaMarkdown:
+    metadata: dict[str, Any]
+    content: str
+
+    """
+    Class that parses optional yaml-style headers from a markdown document.
+    Similar https://python-markdown.github.io/extensions/meta_data/, except
+    that it does parse the metadata as yaml.
+    """
+
+    def __init__(self, data: str):
+        metadata, _, content = data.partition("---")
+        if content:
+            self.metadata = parse_yaml(metadata)
+            self.content = content
+        else:
+            self.content = metadata
+            self.metadata = {}
+
+
 def render_template_markdown(filename: str, template: str = "about/template.html", **context: Any) -> str:
     """Render trusted markdown
 
@@ -440,14 +460,11 @@ def render_template_markdown(filename: str, template: str = "about/template.html
     if not source_file.is_relative_to(template_root) or not source_file.exists():
         abort(404)
 
-    with open(source_file) as f:
-        source = f.read()
-        (metadata, content) = source.split("---", 1)
-        metadata = parse_yaml(metadata)
-        content = render_trusted_markdown(render_template_string(content))
+    doc = MetaMarkdown(source_file.read_text())
+    content = render_trusted_markdown(render_template_string(doc.content))
 
-    context.update(content=content, title=metadata["title"])
-    return render_template(page_template(metadata, template), **context)
+    context.update(content=content, title=doc.metadata.get("title", ""))
+    return render_template(page_template(doc.metadata, template), **context)
 
 
 def render_untrusted_markdown(markdown_text: str) -> Markup:
