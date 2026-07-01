@@ -80,7 +80,7 @@ EMF Volunteer Role Admin
     <a href="{{ url_for('volunteer.schedule') }}" class="btn btn-primary">Schedule</a>
 </div>
 
-{% if feature_enabled("VOLUNTEERS_SCHEDULE") %}
+{% if role.shifts_finalised %}
     <div class="alert alert-danger">
         <p><strong>Volunteer shift signup is active!</strong></p>
         <p>Any changes made here will <strong>delete all existing shifts</strong> and create new ones,
@@ -88,6 +88,25 @@ EMF Volunteer Role Admin
            to sign up again.</p>
         <p><strong>If you're not 100% certain nobody has signed up for shifts under this role yet leave
             now and either edit existing shifts in role admin, or talk to the volunteer team.</strong></p>
+    </div>
+{% else %}
+    <div class="alert alert-success">
+        <p><strong>Read this first!</strong></p>
+        <p>This page allows you to adjust your role's shift timings by defining a set of templates. As a role
+           admin you're able to see the shift schedule before attendees can by clicking the Schedule button
+           above.</p>
+        <p>Each template specifies details of the location, time, duration, and volunteer requirements for
+           a given time period. You can have multiple templates for a single day if your volunteer requirements
+           will change over the course of a day, and you can have templates for multiple locations.</p>
+        <p>The duration field specifies how long a shift should be, changeover specifies the amount of
+           overlap with the preceeding shift to allow volunteer briefing and handover. Unless you have
+           a good reason otherwise please try to keep shifts to 2 hours.</p>
+        <p>All days are event days with Day 0 being the Wednesday before gates open, and run from 4am to 4am
+           so that late night shifts show up in the volunteer schedule for the day before.</p>
+        <p>Once you check the finalise shifts box and save your shifts will be considered ready to sign
+           people up for, and they will be made visible to all volunteers once shift signup is opened. You
+           will not be able to safely edit these templates once that happens so double check you're happy
+           first.</p>
     </div>
 {% endif %}
 
@@ -99,10 +118,11 @@ EMF Volunteer Role Admin
         {% for form in new_forms %}
             {{ render_shift_template(form, is_new=true) }}
         {% endfor %}
+        <button type="button" id="add-template-btn" class="btn btn-default">Add Template</button>
     </div>
     <div class="sticky-buttons form-group">
-        <button type="button" id="add-template-btn" class="btn btn-default">Add Template</button>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <p>Once finalised shifts will be made available for attendee signup and you will no longer be able to adjust their timings.</p>
+        <button type="submit" class="btn btn-primary">Save Changes</button> <label><input type="checkbox" name="finalise" {{ role.shifts_finalised and "checked" }}> Finalise shifts</label>
     </div>
 </form>
 {% endblock %}

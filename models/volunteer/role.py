@@ -63,6 +63,11 @@ class Role(BaseModel):
         order_by="[ShiftTemplate.event_day, ShiftTemplate.start_time]",
     )
 
+    #: Whether shift timings have been finalised.
+    #: Once finalised no further changes can be made via shift templates as the role will be made
+    #: available to attendees for shift signup.
+    shifts_finalised: Mapped[bool] = mapped_column(default=False)
+
     #: Volunteers who are interested in this role
     interested_volunteers: Mapped[list[Volunteer]] = relationship(
         back_populates="interested_roles", secondary=VolunteerRoleInterest, passive_deletes=True
