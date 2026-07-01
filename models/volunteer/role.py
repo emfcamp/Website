@@ -112,6 +112,7 @@ class Role(BaseModel):
             "description": self.description,
             "role_notes": self.role_notes,
             "requires_training": self.requires_training,
+            "shifts_finalised": self.shifts_finalised,
         }
 
     #: Render the full description as Markdown.

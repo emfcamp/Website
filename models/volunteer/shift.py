@@ -387,27 +387,34 @@ class Shift(BaseModel):
         return cls.query.order_by(Shift.start, Shift.venue_id).all()
 
     @classmethod
-    def get_all_for_day(cls, day: date) -> Sequence[Self]:
+    def get_all_for_day(cls, day: date, *, include_unfinalised: bool = False) -> Sequence[Self]:
         """Return all shifts for the requested day.
 
         For the purposes of shifts we consider a day to run from 04:00-03:59 so
         that late night shifts get shown in the context of the day leading up to
         them.
+
+        If `include_unfinalised` is True than all shifts will be returned, otherwise
+        only those from finalised roles will be returned.
         """
         next_day = day + timedelta(days=1)
         start = event_tz.localize(datetime.strptime(f"{day} 03:59:00", "%Y-%m-%d %H:%M:%S"))
         end = event_tz.localize(datetime.strptime(f"{next_day} 04:00:00", "%Y-%m-%d %H:%M:%S"))
 
-        return (
-            db.session.execute(
-                select(cls)
-                .where(Shift.start >= start)
-                .where(Shift.end <= end)
-                .order_by(Shift.start, Shift.venue_id)
-            )
-            .scalars()
-            .all()
+        query = (
+            select(cls)
+            .where(Shift.start >= start)
+            .where(Shift.end <= end)
+            .order_by(Shift.start, Shift.venue_id)
         )
+
+        if not include_unfinalised:
+            # Unless we import only when the function is called we end up with a circular import.
+            from .role import Role
+
+            query = query.join(Shift.role).where(Role.shifts_finalised)
+
+        return db.session.execute(query).scalars().all()
 
     @classmethod
     def earliest_and_latest_in_range(

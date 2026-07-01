@@ -16,6 +16,7 @@
                     data-role-id="{{ r.id }}"
                     data-trained="{{ r.is_trained }}"
                     data-interested="{{ r.is_interested }}"
+                    data-owned="{{ r.id in owned_roles }}"
                 />
                 <label for="role-{{r.id}}" id="role-{{r.id}}-label">{{ r.name }}</label>
             </div>
@@ -27,7 +28,8 @@
             <a class="checkbox-filter" href="#" id="select-no-roles">None</a>
             <a class="checkbox-filter" href="#" id="select-interested-roles">Roles I'm interested in</a>
             <a class="checkbox-filter" href="#" id="select-trained-roles">Roles I'm trained for</a>
-        </p>
+            <a class="checkbox-filter" href="#" id="select-owned-roles">Roles I'm admin for</a>
+         </p>
     </div>
 </div>
 
