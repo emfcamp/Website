@@ -7,7 +7,7 @@
 <div class="col-md-4">
 <div class="btn-group btn-group-vertical">
     {% for info in SCHEDULE_ITEM_INFOS.values() %}
-    <a class="btn btn-default" href="{{url_for('.schedule_item_create_type', type=info.type)}}">{{info.human_type|capitalize}}</a>
+    <a class="btn btn-default" href="{{url_for('.schedule_item_create_type', type=info.type)}}">{{info.human_type|capitalize_add}}</a>
     {% endfor %}
 </div>
 </div>

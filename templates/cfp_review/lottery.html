@@ -6,7 +6,7 @@
 <p>Workshops that require tickets are shown below.</p>
 
 {% for human_type, type_occurrences in ticketed_occurrences | groupby('schedule_item.human_type') %}
-<h3>{{ human_type | capitalize }}</h3>
+<h3>{{ human_type | capitalize_add }}</h3>
 <a href="{{ url_for(".lotteries_for_type", schedule_item_type=type_occurrences[0].schedule_item.type) }}" class="btn btn-success">Run lottery</a>
 <table class="table table-condensed table-striped">
     <thead>

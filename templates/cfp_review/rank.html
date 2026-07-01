@@ -73,7 +73,7 @@
     <tr {% if preview and score >= min_score %} class="info" {% endif %}>
         <td><small>{{ loop.index }}.</small></td>
         <td><button class="btn btn-success debounce score-setter" data-score="{{ score }}">{{ score|round(4) }}</button></td>
-        <td>{{prop.human_type | capitalize}}</td>
+        <td>{{prop.human_type | capitalize_add }}</td>
         <td>{{prop.user.name}}</td>
         <td><a href="{{ url_for('.proposal', proposal_id=prop.id) }}">{{prop.title}}</a></td>
     </tr>

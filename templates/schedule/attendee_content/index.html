@@ -39,7 +39,7 @@
             {% for schedule_item in schedule_items %}
             <tr>
                 <td>{{ schedule_item.title }}</td>
-                <td>{{ schedule_item.human_type | capitalize }}</td>
+                <td>{{ schedule_item.human_type | capitalize_add }}</td>
                 <td>
                     {% for occurrence in schedule_item.occurrences %}
                     {{ occurrence.scheduled_venue.name }}<br/>

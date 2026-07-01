@@ -67,7 +67,7 @@
 {% for schedule_item in schedule_items %}
     <tr class="{{- loop.cycle('odd', 'even') -}}">
         <td>{{ schedule_item.state | capitalize }}</td>
-        <td>{{ schedule_item.human_type | capitalize }}</td>
+        <td>{{ schedule_item.human_type | capitalize_add }}</td>
         <td>
             {% if schedule_item.proposal %}
                 <a href="{{url_for('.proposal', proposal_id=schedule_item.proposal.id) }}">CfP</a>

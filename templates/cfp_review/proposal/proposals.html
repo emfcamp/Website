@@ -111,7 +111,7 @@
             {{proposal_state(proposal)}}
         {%- endcall %}
         {% call cell("type", True) -%}
-            {{proposal.human_type | capitalize}}
+            {{proposal.human_type | capitalize_add}}
         {%- endcall %}
         {% call cell("notice", True) -%}
             {{proposal.notice_required or ''}}

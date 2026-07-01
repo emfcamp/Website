@@ -16,7 +16,7 @@
     {% for type, estimate in estimates.items() %}
     {% if estimate.allocated_time.total_hours() > 0 %}
     <tr>
-        <th style="white-space:nowrap"><a href="{{url_for('cfp_review.schedule_items', official_content='official', type=type)}}">{{estimate.schedule_item_info.human_type|capitalize}}</a></th>
+        <th style="white-space:nowrap"><a href="{{url_for('cfp_review.schedule_items', official_content='official', type=type)}}">{{estimate.schedule_item_info.human_type|capitalize_add}}</a></th>
         <td><a href="{{url_for('cfp_review.schedule_items', official_content='official', type=type, no_occurrence=True)}}">
             {{estimate.missing_occurrences}}
         </a></td>

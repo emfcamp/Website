@@ -62,7 +62,7 @@
             <tr>
                 <td>{{proposal.created.strftime("%d/%m")}}</td>
                 <td>{{proposal.state | capitalize}}</td>
-                <td>{{proposal.human_type | capitalize}}</td>
+                <td>{{proposal.human_type | capitalize_add}}</td>
                 <td>{{proposal.notice_required or ''}}</td>
                 <td>{{proposal.duration or ''}}</td>
                 <td>
@@ -96,7 +96,7 @@
         {% for schedule_item in user.schedule_items %}
             <tr>
                 <td>{{ schedule_item.state | capitalize }}</td>
-                <td>{{ schedule_item.human_type | capitalize }}</td>
+                <td>{{ schedule_item.human_type | capitalize_add }}</td>
                 <td>{{ schedule_item.official_content }}
                 <td>
                     <a href="{{ url_for('.schedule_item', schedule_item_id=schedule_item.id, **full_qs) }}">{{ schedule_item.title }}</a>

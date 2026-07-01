@@ -44,7 +44,7 @@
         <tr>
             <td>{% if proposal.user.check_will_have_ticket() %}Yes{% endif %}</td>
             <td>{{proposal.state | capitalize}}</td>
-            <td>{{proposal.human_type | capitalize}}</td>
+            <td>{{proposal.human_type | capitalize_add}}</td>
             <td>{{proposal.notice_required or ''}}</td>
             <td>
                 <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id ) }}">{{proposal.user.name}}</a>

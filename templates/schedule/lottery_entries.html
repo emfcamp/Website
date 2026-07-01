@@ -99,7 +99,7 @@
 
         {% for schedule_item_type, lottery_entries in entries_dict[state].items() %}
           {% set type_info = SCHEDULE_ITEM_INFOS[schedule_item_type] %}
-          <strong>{{ type_info.human_type | capitalize }}</strong>
+          <strong>{{ type_info.human_type | capitalize_add }}</strong>
           <div class="list-group">
           {% for e in lottery_entries %}
             {{ display_entry(e) }}

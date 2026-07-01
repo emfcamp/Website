@@ -81,8 +81,8 @@
 {% for potential in potential_schedule.changed_occurrences() %}
     {% set occurrence = potential.occurrence %}
     <tr>
-        <td>{{occurrence.schedule_item.human_type | capitalize}}</td>
-        <td>{{occurrence.scheduled_duration or '--'}}</td>
+        <td>{{ occurrence.schedule_item.human_type | capitalize_add }}</td>
+        <td>{{ occurrence.scheduled_duration or '--' }}</td>
         <td>
             <a href="{{ url_for('cfp_review.cfp_user', user_id=occurrence.schedule_item.user.id ) }}">{{ occurrence.schedule_item.user.name }}</a>
         </td>

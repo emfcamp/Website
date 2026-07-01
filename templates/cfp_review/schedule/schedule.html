@@ -4,7 +4,7 @@
     <th>State</th>
     <th>Total</th>
     {% for type_info in schedule_item_types %}
-      <th>{{ type_info.human_type | capitalize }}</th>
+      <th>{{ type_info.human_type | capitalize_add }}</th>
     {% endfor %}
   </tr>
   {% for (state, counts_by_type) in counts.items() | sort(attribute=0) %}
@@ -109,7 +109,7 @@
                 {% set counts = schedule_state_by_type[type.type] %}
                 {% if counts.scheduled + counts.missing_availability + counts.unscheduled > 0 %}
                     <tr>
-                        <th><a href="{{url_for('.schedule_items', official_content='official', type=type.type)}}">{{type.human_type|capitalize}}</a></th>
+                        <th><a href="{{url_for('.schedule_items', official_content='official', type=type.type)}}">{{type.human_type|capitalize_add}}</a></th>
                         <td>{{counts.scheduled}}</td><td>{{counts.missing_availability}}</td><td>{{counts.unscheduled}}</td>
                     </tr>
                 {% endif %}

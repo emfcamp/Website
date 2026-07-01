@@ -4,7 +4,7 @@
     <th></th>
     <th>Total</th>
     {% for type_info in PROPOSAL_INFOS.values() %}
-      <th>{{ type_info.human_type | capitalize }}</th>
+      <th>{{ type_info.human_type | capitalize_add }}</th>
     {% endfor %}
   </tr>
   {% for (value, counts_by_type) in counts.items() | sort(attribute=0) %}
