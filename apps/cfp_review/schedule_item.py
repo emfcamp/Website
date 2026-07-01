@@ -214,6 +214,10 @@ def update_schedule_item(schedule_item_id: int) -> ResponseReturnValue:
 
         return redirect(url_for(".update_schedule_item", schedule_item_id=schedule_item_id))
 
+    if request.method != "POST":
+        # wtforms is ridiculous
+        form.official_content.data = schedule_item.official_content
+
     occurrence_form = CreateOccurrenceForm()
 
     return render_template(
