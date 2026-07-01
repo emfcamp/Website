@@ -24,7 +24,7 @@
     </fieldset>
 
     <fieldset>
-        <legend>Confirm Your {{ schedule_item.human_type | title }}</legend>
+        <legend>Confirm Your {{ schedule_item.human_type | title_add }}</legend>
         <p>Please confirm the details you would like to be publicly visible in the schedule</p>
         {{ render_field(form.title, 9) }}
         <div class="col-md-9 col-md-offset-3"><small>Your description should be about 100-150 words.</small></div>

@@ -4,7 +4,7 @@ Hi {{ proposal.user.name }},
 
 This is to confirm your submission to our call for participation. We'll try to process your submission as quickly as possible. Here's a summary of your submission:
 
-{{ proposal.human_type | title }}
+{{ proposal.human_type | title_add }}
 Title: {{ proposal.title }}
 Description: {{ proposal.description }}
 {%- if proposal.type in ['talk', 'familyworkshop', 'workshop', 'performance'] %}

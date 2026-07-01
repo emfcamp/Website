@@ -10,7 +10,7 @@
 {% for proposal in proposals %}
 <div class="well">
     <div class="row">
-    <div class="col-md-12"><h3>{{ proposal.human_type | title }}: {{ proposal.title }}</h3></div>
+    <div class="col-md-12"><h3>{{ proposal.human_type | title_add }}: {{ proposal.title }}</h3></div>
     <div class="col-md-9">
     <dl class="dl-horizontal">
     <dt>Submitted</dt>

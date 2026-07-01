@@ -43,6 +43,7 @@ from ..user import User
 from . import validate_state_transitions
 from .attributes import (
     Attributes,
+    DJSetAttributes,
     FamilyWorkshopAttributes,
     FilmAttributes,
     LightningTalkAttributes,
@@ -89,6 +90,7 @@ EVENT_SPACING = {
     "installation": 0,
     "film": 2,
     "music": 0,
+    "djset": 0,
     "meetup": 0,
 }
 
@@ -129,6 +131,7 @@ ScheduleItemType = Literal[
     "installation",
     "lightning",
     "music",
+    "djset",
     "meetup",
 ]
 
@@ -338,7 +341,6 @@ class ScheduleItem(BaseModel):
 
     @property
     def human_type_a(self) -> str:
-        # Same as human_type but includes a/an
         return self.type_info.human_type_a
 
     @property
@@ -363,7 +365,9 @@ validate_state_transitions(ScheduleItem.state, SCHEDULE_ITEM_STATE_TRANSITIONS)
 @dataclass
 class ScheduleItemInfo:
     type: ScheduleItemType
+    #: Type to expose to users
     human_type: str
+    #: Same as human_type but includes a/an
     human_type_a: str
     attributes_cls: Type[Attributes]  # noqa: UP006
     supports_lottery: bool = False
@@ -416,8 +420,14 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
     "music": ScheduleItemInfo(
         type="music",
         human_type="music",
-        human_type_a="a music performance",
+        human_type_a="a live music performance",
         attributes_cls=MusicAttributes,
+    ),
+    "djset": ScheduleItemInfo(
+        type="djset",
+        human_type="DJ set",
+        human_type_a="a DJ set",
+        attributes_cls=DJSetAttributes,
     ),
     "meetup": ScheduleItemInfo(
         type="meetup",

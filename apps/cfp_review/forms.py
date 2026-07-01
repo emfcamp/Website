@@ -251,6 +251,10 @@ class UpdateScheduleItemMusicAttributesForm(UpdateAttributesForm):
     pass
 
 
+class UpdateScheduleItemDJSetAttributesForm(UpdateAttributesForm):
+    pass
+
+
 class UpdateScheduleItemMeetupAttributesForm(UpdateAttributesForm):
     pass
 
@@ -296,6 +300,7 @@ UPDATE_SCHEDULE_ITEM_ATTRIBUTES_FORM_TYPES: dict[ScheduleItemType, type[UpdateAt
     "lightning": UpdateScheduleItemLightningTalkAttributesForm,
     "film": UpdateScheduleItemFilmForm,
     "music": UpdateScheduleItemMusicAttributesForm,
+    "djset": UpdateScheduleItemDJSetAttributesForm,
     "meetup": UpdateScheduleItemMeetupAttributesForm,
 }
 

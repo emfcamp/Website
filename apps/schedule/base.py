@@ -55,6 +55,7 @@ LINEUP_TYPE_ORDER: list[ScheduleItemType] = [
     #    "familyworkshop",
     "performance",
     "music",
+    "djset",
     "film",
 ]
 

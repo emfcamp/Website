@@ -241,6 +241,8 @@ def load_utility_functions(app_obj):
         return Markup(f'<span class="label label-{cls}">{ticket.state}</span>')
 
     app_obj.template_filter("tidy_workshop_cost")(tidy_workshop_cost)
+    app_obj.template_filter("title_add")(title_add)
+    app_obj.template_filter("capitalize_add")(capitalize_add)
 
     @app_obj.context_processor
     def content_processor():
@@ -521,3 +523,16 @@ def tidy_workshop_cost(participant_cost: str) -> str:
         return ""
     except ValueError:
         return participant_cost
+
+
+def title_add(value: str) -> str:
+    # Converts to title case, while preserving any existing capitals.
+    # Replaces whitespace with space, like str.capwords.
+    # e.g. a DJ's set -> A DJ's Set
+    return " ".join(p.title() if p.islower() else p for p in value.split())
+
+
+def capitalize_add(value: str) -> str:
+    # Capitalises the first letter, while preserving any other capitals.
+    # e.g. a DJ's set -> A DJ's set
+    return value[0].upper() + value[1:]

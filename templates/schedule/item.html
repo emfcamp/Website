@@ -8,7 +8,7 @@
 <h2>{{ schedule_item.title }}</h2>
 <h2>
   <small>
-  {{ schedule_item.human_type | title }}{% if schedule_item.names %} by {{ schedule_item.names }}{% if schedule_item.pronouns %} ({{schedule_item.pronouns}}){% endif %}{% endif %}
+  {{ schedule_item.human_type | title_add }}{% if schedule_item.names %} by {{ schedule_item.names }}{% if schedule_item.pronouns %} ({{schedule_item.pronouns}}){% endif %}{% endif %}
   {{ schedule_item_icons(schedule_item) }}
   </small>
 </h2>
