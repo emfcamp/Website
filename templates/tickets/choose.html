@@ -14,7 +14,7 @@ Buy Items
   {% include 'purchase/tickets.html' %}
 {% elif flow in ['other'] %}
   {% include 'purchase/extra.html' %}
-{% elif flow in ['tees', 'speakers', 'hire', 'bales', 'badge', 'sponsor'] %}
+{% elif flow in ['tees', 'speakers', 'hire', 'bales', 'badge', 'sponsor', 'merch'] %}
   {% include 'purchase/' + flow + '.html' %}
 {% endif %}
 {% if not current_user.is_authenticated and SITE_STATE != 'after-event' %}
