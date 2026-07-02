@@ -45,5 +45,20 @@
   {% block tail %}
   {% endblock %}
 
+<script {{ admin_csp_nonce_attribute }}>
+  [...document.querySelectorAll('.admin-require-confirm-btn')].forEach((btnEl) => {
+    btnEl.disabled = false;
+    btnEl.addEventListener('click', (e) => {
+      try {
+        if (!confirm(btnEl.dataset.confirm)) {
+          e.preventDefault();
+        }
+      } catch (e) {
+        e.preventDefault();
+      }
+    });
+  });
+</script>
+
 {% endblock %}
 
