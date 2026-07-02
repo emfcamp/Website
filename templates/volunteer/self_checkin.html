@@ -30,7 +30,7 @@
     <p>Click the relevant button to check in or out of these active shifts.</p>
     <table class="table table-bordered responsive-table shifts-table checkin">
         <thead><tr>
-            <th>local_starts</th>
+            <th>Starts</th>
             <th>Ends</th>
             <th>Role</th>
             <th></th>
@@ -39,7 +39,7 @@
             {% for shift_entry in open_shift_entries %}
                 {% set shift = shift_entry.shift %}
                 <tr id="shift-{{ shift_entry.id }}">
-                    <td class="local_start_time">{{ shift.local_local_start.strftime("%H:%M") }}</td>
+                    <td class="start_time">{{ shift.local_local_start.strftime("%H:%M") }}</td>
                     <td class="end_time">{{ shift.local_end.strftime("%H:%M") }}</td>
                     <td class="time mobile-only">
                         {{ shift.local_local_start.strftime("%H:%M") }}{% if shift.local_end %} to {{ shift.local_end.strftime("%H:%M") }}{% endif %}
@@ -74,7 +74,7 @@
 
 {% if upcoming_shift_entries %}
     <h3>Upcoming shifts</h3>
-    <p>You can't check in for these shifts yet, shifts are available for self check-in from 15 minutes before their local_start time.</p>
+    <p>You can't check in for these shifts yet, shifts are available for self check-in from 15 minutes before their start time.</p>
     <table class="table table-bordered responsive-table shifts-table">
         <thead><tr>
             <th>Starts</th>
@@ -85,7 +85,7 @@
             {% for shift_entry in upcoming_shift_entries %}
                 {% set shift = shift_entry.shift %}
                 <tr id="shift-{{ shift_entry.id }}">
-                    <td class="local_start_time">{{ shift.local_start.strftime("%H:%M") }}</td>
+                    <td class="start_time">{{ shift.local_start.strftime("%H:%M") }}</td>
                     <td class="end_time">{{ shift.local_end.strftime("%H:%M") }}</td>
                     <td class="time mobile-only">
                         {{ shift.local_start.strftime("%H:%M") }}{% if shift.local_end %} to {{ shift.local_end.strftime("%H:%M") }}{% endif %}
@@ -110,7 +110,7 @@
             {% for shift_entry in previous_shift_entries %}
                 {% set shift = shift_entry.shift %}
                 <tr id="shift-{{ shift_entry.id }}">
-                    <td class="local_start_time">{{ shift.local_start.strftime("%H:%M") }}</td>
+                    <td class="start_time">{{ shift.local_start.strftime("%H:%M") }}</td>
                     <td class="end_time">{{ shift.local_end.strftime("%H:%M") }}</td>
                     <td class="time mobile-only">
                         {{ shift.local_start.strftime("%H:%M") }}{% if shift.local_end %} to {{ shift.local_end.strftime("%H:%M") }}{% endif %}
