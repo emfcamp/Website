@@ -92,6 +92,7 @@ EVENT_SPACING = {
     "music": 0,
     "djset": 0,
     "meetup": 0,
+    "lightning": 0,
 }
 
 # The size of a scheduling slot
