@@ -93,16 +93,20 @@ class Scheduler:
                 # Save the occurrence by ID so we can quickly look it up from the result
                 self.occurrences[occurrence.id] = occurrence
 
-                preferred_venues = set()
-                if ordered_venues:
-                    # This supports a list, but we only want one for now
-                    preferred_venues = {ordered_venues[0]}
-
                 # Per-venue allowed time ranges: the intersection of the speaker's availability
                 # and each venue's TimeBlocks for this content type.
+                #
+                # Venue weight is the venue capacity for all venues that
+                # haven't been shifted off already due to talk popularity,
+                # meaning that equal-sized venues have equal weight.
                 allowed_times = occurrence.allowed_times(True)
                 venue_times = [
-                    VenueTimes(venue=venue.id, times=times) for venue, times in allowed_times.items()
+                    VenueTimes(
+                        venue=venue.id,
+                        times=times,
+                        venue_weight=(venue.capacity or 0) if venue.id in ordered_venues else 0,
+                    )
+                    for venue, times in allowed_times.items()
                 ]
 
                 if len(venue_times) == 0:
@@ -114,12 +118,15 @@ class Scheduler:
                     app.logger.warning(f"Skipping scheduling occurrence {occurrence} - no allowed times.")
                     continue
 
+                proposal = occurrence.schedule_item.proposal
+                tags = set(proposal.tags) if proposal else set()
+
                 talk = Talk(
                     id=occurrence.id,
                     duration=occurrence.scheduled_duration,
                     speakers={speaker.id for speaker in occurrence.schedule_item.presenters},
                     venue_times=venue_times,
-                    preferred_venues=preferred_venues,
+                    tags=tags,
                     minutes_after=total_minutes(occurrence.changeover_time),
                 )
 
