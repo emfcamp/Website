@@ -12,7 +12,7 @@ EMF Volunteer Role Admin
 {# Users with roles in a single team just see a list of roles #}
 {% if roles|length == 1 %}
     <ul class="list-unstyled">
-        {% for role in roles[0] %}
+        {% for role, shift_count in roles[0] %}
         <li><a href="{{ url_for('.role_admin', role_id=role.id) }}">{{ role.name }}</a></li>
         {% endfor %}
     </ul>
@@ -22,10 +22,10 @@ EMF Volunteer Role Admin
     {% for team, team_roles in roles.items() %}
         <h3>{{ team.name }} <a href="{{url_for('.team_admin', team_id=team.id)}}" class="btn btn-xs btn-default">Manage</a></h3>
         <ul class="list-unstyled">
-            {% for role in team_roles %}
+            {% for role, shift_count in team_roles %}
                 <li>
                     <a href="{{url_for('.role_admin', role_id=role.id)}}">{{role.name}}</a>
-                    {% if volunteer_admin and role.shifts_finalised %}✓{% endif %}
+                    {% if volunteer_admin and role.shifts_finalised %} - {{ shift_count }} ✓{% endif %}
                 </li>
             {% endfor %}
         </ul>

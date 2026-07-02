@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 from markdown import markdown
 from markupsafe import Markup
 from sqlalchemy import Column, ForeignKey, Integer, Table, Text, func, select
-from sqlalchemy.orm import Mapped, mapped_column, noload, relationship
+from sqlalchemy.orm import Mapped, contains_eager, mapped_column, noload, relationship
 
 from main import db, get_or_404
 
@@ -78,18 +78,31 @@ class Role(BaseModel):
     )
 
     @classmethod
-    def grouped_by_team(cls, only: list[int] | None = None) -> dict[Team, list[Role]]:
-        """Return a list of roles grouped by the team they sit under.
+    def grouped_by_team(cls, only: list[int] | None = None) -> dict[Team, list[tuple[Role, int]]]:
+        """Return a list of roles, and their shift counts, grouped by the team they sit under.
 
         If `only` is passed then only roles within the pass list of IDs will be returned,
         this is primarily intended to scope this to the list of roles a user has admin
         privileges for.
         """
-        query = select(Role).join(Role.team).order_by(Team.name, Role.name)
+        from . import Shift
+
+        shift_count = func.count(Shift.id).label("shift_count")
+        query = (
+            select(Role, shift_count)
+            .join(Role.team)
+            .options(contains_eager(Role.team))
+            .outerjoin(Shift, Shift.role_id == Role.id)
+            .group_by(Role.id, Team.id)
+            .order_by(Team.name, Role.name)
+        )
         if only is not None:
             query = query.where(Role.id.in_(only))
-        roles = db.session.scalars(query).all()
-        return {team: list(team_roles) for team, team_roles in groupby(roles, key=lambda r: r.team)}
+        results = db.session.execute(query).all()
+        return {
+            team: [(role, count) for role, count in team_results]
+            for team, team_results in groupby(results, key=lambda r: r.Role.team)
+        }
 
     @property
     def team_name(self) -> str:
