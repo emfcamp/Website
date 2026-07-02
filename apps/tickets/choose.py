@@ -32,6 +32,11 @@ from . import empty_baskets, get_product_view, invalid_vouchers, no_capacity, ti
 from .forms import TicketAmountsForm
 
 
+@tickets.route("/tickets/tees")
+def tees_redirect():
+    return redirect(url_for(".main", flow="merch"))
+
+
 @tickets.route("/tickets", methods=["GET", "POST"])
 @tickets.route("/tickets/<flow>", methods=["GET", "POST"])
 def main(flow="main"):
