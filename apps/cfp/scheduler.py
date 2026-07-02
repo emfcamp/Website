@@ -1,8 +1,9 @@
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import timedelta
+from itertools import combinations
 
 from flask import current_app as app
-from slotmachine import SchedulingProblem, SchedulingSolution, SlotMachine, Talk, VenueTimes
+from slotmachine import Conflict, SchedulingProblem, SchedulingSolution, SlotMachine, Talk, VenueTimes
 from sqlalchemy import and_, not_, select
 from sqlalchemy.orm import joinedload
 
@@ -51,6 +52,7 @@ class Scheduler:
                 Occurrence.scheduled_duration.isnot(None),
             )
             .options(joinedload(Occurrence.schedule_item).joinedload(ScheduleItem.proposal))
+            .options(joinedload(Occurrence.schedule_item).selectinload(ScheduleItem.favourited_by))
             .order_by(ScheduleItem.favourite_count.desc())
         ).all()
 
@@ -74,6 +76,7 @@ class Scheduler:
                     raise Exception(f"Official venue has no capacity defined: {venue}")
                 capacity_by_type[block.type][venue.id] = venue.capacity or 0
 
+        user_faves: dict[int, list[Occurrence]] = defaultdict(list)
         scheduler_talks = []
         for type, occurrences in occurrences_by_type.items():
             # We assign the largest venues as being preferred for the most popular talks
@@ -96,15 +99,21 @@ class Scheduler:
                 # Per-venue allowed time ranges: the intersection of the speaker's availability
                 # and each venue's TimeBlocks for this content type.
                 #
-                # Venue weight is the venue capacity for all venues that
-                # haven't been shifted off already due to talk popularity,
-                # meaning that equal-sized venues have equal weight.
+                # We add the same weight to all venues of the current max
+                # capacity venue, because variable venue weightings cause
+                # serious performance degredation in slotmachine at this scale
+
+                current_venues = [
+                    v
+                    for v in ordered_venues
+                    if self.venues[v].capacity == self.venues[ordered_venues[0]].capacity
+                ]
                 allowed_times = occurrence.allowed_times(True)
                 venue_times = [
                     VenueTimes(
                         venue=venue.id,
                         times=times,
-                        venue_weight=(venue.capacity or 0) if venue.id in ordered_venues else 0,
+                        venue_weight=5 if venue.id in current_venues else 0,
                     )
                     for venue, times in allowed_times.items()
                 ]
@@ -118,15 +127,16 @@ class Scheduler:
                     app.logger.warning(f"Skipping scheduling occurrence {occurrence} - no allowed times.")
                     continue
 
-                proposal = occurrence.schedule_item.proposal
-                tags = set(proposal.tags) if proposal else set()
+                ## tag diversity currently disabled due to performance degredation
+                # proposal = occurrence.schedule_item.proposal
+                # tags = set(proposal.tags) if proposal else set()
 
                 talk = Talk(
                     id=occurrence.id,
                     duration=occurrence.scheduled_duration,
                     speakers={speaker.id for speaker in occurrence.schedule_item.presenters},
                     venue_times=venue_times,
-                    tags=tags,
+                    # tags=tags, # tag diversity currently disabled due to performance degredation
                     minutes_after=total_minutes(occurrence.changeover_time),
                 )
 
@@ -138,6 +148,10 @@ class Scheduler:
 
                 scheduler_talks.append(talk)
 
+                # For conflict detection
+                for user in occurrence.schedule_item.favourited_by:
+                    user_faves[user.id].append(occurrence)
+
                 # Shift to the next venue when we hit the division
                 if count > split_count:
                     count = 0
@@ -145,7 +159,25 @@ class Scheduler:
                 else:
                     count += 1
 
-        return SchedulingProblem(talks=scheduler_talks, slot_duration=total_minutes(SLOT_DURATION))
+        # Calculate the top 1000 most commonly co-starred occurrences
+        # and flag them as conflicts
+        popularity: Counter[tuple[Occurrence, Occurrence]] = Counter()
+        for occurrences in user_faves.values():
+            for o1, o2 in combinations(sorted(occurrences, key=lambda o: o.id), 2):
+                # We don't care about clashes with other occurrences of the
+                # same proposal, we have a hard constraint preventing them
+                # clashing
+                if o1.proposal == o2.proposal:
+                    continue
+                popularity.update([(o1, o2)])
+
+        conflicts = []
+        for (o1, o2), count in popularity.most_common()[:1000]:
+            conflicts.append(Conflict(talks={o1.id, o2.id}, weight=max(1, count)))
+
+        return SchedulingProblem(
+            talks=scheduler_talks, conflicts=conflicts, slot_duration=total_minutes(SLOT_DURATION)
+        )
 
     def generate_potential_schedule(self, solution: SchedulingSolution) -> PotentialSchedule:
         potential_schedule = PotentialSchedule()

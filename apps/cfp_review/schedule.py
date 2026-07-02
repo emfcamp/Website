@@ -329,41 +329,43 @@ def clashfinder() -> ResponseReturnValue:
 
     ranked: list[tuple[Occurrence, Occurrence, int, int]] = []
 
-    candidates: list[tuple[tuple[Occurrence, Occurrence], int]] = []
-    a_fans = []
-    b_fans = []
-    for (a, b), count in popularity.items():
-        if count < MIN_PEOPLE:
-            continue
-        candidates.append(((a, b), count))
-        a_fans.append(fans[a])
-        b_fans.append(fans[b])
-
-    if candidates:
-        expected = [na * nb / population for na, nb in zip(a_fans, b_fans, strict=True)]
-        pvalues = hypergeom.sf([count - 1 for _, count in candidates], population, a_fans, b_fans)
-        qvalues = false_discovery_control(pvalues, method="bh")
-
-        for ((o1, o2), count), mean, qvalue in zip(candidates, expected, qvalues, strict=True):
-            if count < MIN_LIFT * mean or qvalue > MAX_QVALUE:
+    if request.args.get("old_scoring") == "true":
+        for (a, b), count in popularity.most_common(1000):
+            ranked.append((a, b, count, 0))
+    else:
+        candidates: list[tuple[tuple[Occurrence, Occurrence], int]] = []
+        a_fans = []
+        b_fans = []
+        for (a, b), count in popularity.items():
+            if count < MIN_PEOPLE:
                 continue
+            candidates.append(((a, b), count))
+            a_fans.append(fans[a])
+            b_fans.append(fans[b])
 
-            ranked.append((o1, o2, count, max(1, round(count - mean))))
-        ranked.sort(key=lambda r: r[3], reverse=True)
+        if candidates:
+            expected = [na * nb / population for na, nb in zip(a_fans, b_fans, strict=True)]
+            pvalues = hypergeom.sf([count - 1 for _, count in candidates], population, a_fans, b_fans)
+            qvalues = false_discovery_control(pvalues, method="bh")
+
+            for ((o1, o2), count), mean, qvalue in zip(candidates, expected, qvalues, strict=True):
+                if count < MIN_LIFT * mean or qvalue > MAX_QVALUE:
+                    continue
+
+                ranked.append((o1, o2, count, max(1, round(count - mean))))
+            ranked.sort(key=lambda r: r[3], reverse=True)
 
     show_all = request.args.get("show_all") == "true"
 
     clashes = []
     number = 0
     for o1, o2, favourite_count, weight in ranked:
-        p1 = o1.schedule_item.proposal
-        p2 = o2.schedule_item.proposal
-        if not p1 or not p2:
-            # TODO: this should be rare, do we flag it up?
+        # We don't care about clashes with other occurrences of the same
+        # proposal, we have a hard constraint preventing them clashing
+        if o1.proposal == o2.proposal:
             continue
 
-        if p1.state not in {"accepted", "finalised"} or p2.state not in {"accepted", "finalised"}:
-            # TODO: this also should be rare, do we flag it up?
+        if o1.cancelled or o2.cancelled:
             continue
 
         overlaps = o1.overlaps_with(o2)
