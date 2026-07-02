@@ -11,6 +11,7 @@ import slotmachine
 from flask import current_app as app
 from flask import flash, redirect, render_template, request, send_file, url_for
 from flask.typing import ResponseReturnValue
+from scipy.stats import false_discovery_control, hypergeom
 from sqlalchemy import and_, select
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import desc
@@ -303,14 +304,58 @@ def clashfinder() -> ResponseReturnValue:
             # Don't check state because we want to include potential times/venues
             user_faves[user.id] += schedule_item.occurrences
 
+    population = len(user_faves)
+    fans: Counter[Occurrence] = Counter()
     popularity: Counter[tuple[Occurrence, Occurrence]] = Counter()
     for occurrences in user_faves.values():
-        popularity.update((o1, o2) for o1, o2 in combinations(sorted(occurrences, key=lambda o: o.id), 2))
+        unique = set(occurrences)
+        fans.update(unique)
+        popularity.update(combinations(sorted(unique, key=lambda o: o.id), 2))
+
+    # Because some people just favourite everything a pure pairwise count can
+    # flag up things as being common clashes when people are really just loving
+    # everything we do. We correct for this by identifying pairs of talks that
+    # are statistically more common than noise, and apply a correction to
+    # handle people who love too much. This can be tuned using the following
+    # params, which are currently based entirely on vibes and can be
+    # played with via undocumented query params.
+
+    # ignore pairs co-favourited by fewer people than this
+    MIN_PEOPLE = request.args.get("min_people", 5, type=int)
+    # only consider clashes that are 1.5x higher than noise
+    MIN_LIFT = request.args.get("min_lift", 1.5, type=float)
+    # and have a q-value no larger than this
+    MAX_QVALUE = request.args.get("max_qvalue", 0.05, type=float)
+
+    ranked: list[tuple[Occurrence, Occurrence, int, int]] = []
+
+    candidates: list[tuple[tuple[Occurrence, Occurrence], int]] = []
+    a_fans = []
+    b_fans = []
+    for (a, b), count in popularity.items():
+        if count < MIN_PEOPLE:
+            continue
+        candidates.append(((a, b), count))
+        a_fans.append(fans[a])
+        b_fans.append(fans[b])
+
+    if candidates:
+        expected = [na * nb / population for na, nb in zip(a_fans, b_fans, strict=True)]
+        pvalues = hypergeom.sf([count - 1 for _, count in candidates], population, a_fans, b_fans)
+        qvalues = false_discovery_control(pvalues, method="bh")
+
+        for ((o1, o2), count), mean, qvalue in zip(candidates, expected, qvalues, strict=True):
+            if count < MIN_LIFT * mean or qvalue > MAX_QVALUE:
+                continue
+
+            ranked.append((o1, o2, count, max(1, round(count - mean))))
+        ranked.sort(key=lambda r: r[3], reverse=True)
+
+    show_all = request.args.get("show_all") == "true"
 
     clashes = []
-    offset = 0
-    for (o1, o2), count in popularity.most_common()[:1000]:
-        offset += 1
+    number = 0
+    for o1, o2, favourite_count, weight in ranked:
         p1 = o1.schedule_item.proposal
         p2 = o2.schedule_item.proposal
         if not p1 or not p2:
@@ -321,17 +366,26 @@ def clashfinder() -> ResponseReturnValue:
             # TODO: this also should be rare, do we flag it up?
             continue
 
-        if o1.overlaps_with(o2):
-            clashes.append(
-                {
-                    "occurrence_1": o1,
-                    "occurrence_2": o2,
-                    "favourite_count": count,
-                    "number": offset,
-                }
-            )
+        overlaps = o1.overlaps_with(o2)
+        if not overlaps and not show_all:
+            continue
 
-    return render_template("cfp_review/schedule/clashfinder.html", clashes=clashes)
+        # favourite_count is how many people actually favourited both talks,
+        # weight is approximately how many people would be forced to choose
+        # between one of them after correction has been applied
+        number += 1
+        clashes.append(
+            {
+                "occurrence_1": o1,
+                "occurrence_2": o2,
+                "favourite_count": favourite_count,
+                "number": number,
+                "weight": weight,
+                "overlaps": overlaps,
+            }
+        )
+
+    return render_template("cfp_review/schedule/clashfinder.html", clashes=clashes, show_all=show_all)
 
 
 def scheduleitems_to_finalise():

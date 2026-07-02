@@ -3,7 +3,13 @@
 {% block body %}
 <h2>Clashfinder</h2>
 
-<p>These are the clashes in the top 1000 occurrences most commonly starred together. "Number" is how far down the 1000-list the clash is, "Count" is the number of people who starred both of the corresponding schedule items.</p>
+<p>These are pairs of talks that are favourited together more often than chance. "Number" is the rank in that list, "Weight" is approx how many people would be forced to miss one of the talks, "Favs" is the actual number of people who favourited both.</p>
+
+{% if show_all %}
+<a href="{{ url_for('.clashfinder') }}">Show only talks that currently clash</a>.</p>
+{% else %}
+<a href="{{ url_for('.clashfinder', show_all='true') }}">Show all most-favourited potential clashes</a>.</p>
+{% endif %}
 
 <table class="table table-condensed">
     <tr>
@@ -11,7 +17,10 @@
             Number
         </th>
         <th class="col-md-1">
-            Count
+            Weight
+        </th>
+        <th class="col-md-1">
+            Favs
         </th>
         <th>
             Occurrence 1
@@ -19,10 +28,14 @@
         <th>
             Occurrence 2
         </th>
+        <th class="col-md-1">
+            Clashes
+        </th>
     </tr>
 {% for clash in clashes %}
     <tr>
         <td><b>#{{clash.number}}</b></td>
+        <td>{{clash.weight}}</td>
         <td>{{clash.favourite_count}}</td>
         <td>
             <a href="{{ url_for('.update_occurrence', occurrence_id=clash.occurrence_1.id, schedule_item_id=clash.occurrence_1.schedule_item.id) }}">{{ clash.occurrence_1.schedule_item.title }}</a>
@@ -30,9 +43,16 @@
         <td>
             <a href="{{ url_for('.update_occurrence', occurrence_id=clash.occurrence_2.id, schedule_item_id=clash.occurrence_2.schedule_item.id) }}">{{clash.occurrence_2.schedule_item.title}}</a>
         </td>
+        <td>
+            {% if clash.overlaps %}
+                <span class="label label-danger">YES</span>
+            {% else %}
+                <span class="label label-default">No</span>
+            {% endif %}
+        </td>
     </tr>
 {% else %}
-    <tr><td colspan="5" class="text-center">No clashes found in the top-1000 favourite co-occurrences</td></tr>
+    <tr><td colspan="5" class="text-center">No significant clashes found</td></tr>
 {% endfor %}
 </table>
 {% endblock %}
