@@ -243,6 +243,7 @@ def load_utility_functions(app_obj):
     app_obj.template_filter("tidy_workshop_cost")(tidy_workshop_cost)
     app_obj.template_filter("title_add")(title_add)
     app_obj.template_filter("capitalize_add")(capitalize_add)
+    app_obj.template_filter("human_list")(human_list)
 
     @app_obj.context_processor
     def content_processor():
@@ -536,3 +537,13 @@ def capitalize_add(value: str) -> str:
     # Capitalises the first letter, while preserving any other capitals.
     # e.g. a DJ's set -> A DJ's set
     return value[0].upper() + value[1:]
+
+
+def human_list(values: list[str], oxford: bool = True) -> str:
+    # Joins a list with commas and a final "and".
+    if not values:
+        return ""
+    *rest, last = values
+    if not rest:
+        return last
+    return (", and " if oxford else " and ").join([", ".join(rest), last])

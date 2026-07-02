@@ -217,9 +217,20 @@ def main() -> ResponseReturnValue:
 
     lightning_talks_closed = all([i <= 0 for i in get_days_with_slots().values()])
 
+    proposal_infos_open = []
+    proposal_infos_closed = []
+    for ti in PROPOSAL_INFOS.values():
+        human_type_plural = ti.human_type + "s"
+        if feature_enabled(f"CFP_{ti.type.upper()}S_CLOSED"):
+            proposal_infos_closed.append(human_type_plural)
+        else:
+            proposal_infos_open.append(human_type_plural)
+
     return render_template(
         "cfp/main.html",
         ignore_closed=ignore_closed,
+        proposal_infos_open=proposal_infos_open,
+        proposal_infos_closed=proposal_infos_closed,
         lightning_talks_closed=lightning_talks_closed,
     )
 

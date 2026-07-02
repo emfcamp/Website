@@ -6,11 +6,32 @@
 our non-profit festival in the UK this summer.{% endblock %}
 {% block body %}
 <h2>Call for Participation</h2>
-    <div class="well">
-      <div>The Call for Participation is now closed for talks & workshops{# 2026 #}.</div>
-      <div>&nbsp;</div>
-      <div>You can still submit installations, performances and family drop-in workshops. For those with tickets, lightning talk submissions will open shortly before the event.</div>
-    </div>
+
+    {% if proposal_infos_open and proposal_infos_closed %}
+      {# Things get busy here, so we update it automatically #}
+      {# The actual closing (CFP_CLOSED) uses a different template #}
+
+      <div class="well">
+        <div>The Call for Participation is now closed for {{ proposal_infos_closed | human_list }}.</div>
+        <div>&nbsp;</div>
+        <div>
+          You can still submit {{ proposal_infos_open | human_list }}.
+          For those with tickets, lightning talk submissions will open shortly before the event.
+        </div>
+      </div>
+
+    {% else %}
+
+      <div class="well">
+        <div>The Call for Participation will close for talks &amp; workshops at midnight on
+        <span class="emphasis">Sunday 7th June{# 2026 #}</span>.</div>
+       <div>&nbsp;</div>
+       <div>
+          You will still be able to submit installations, performances, and family drop-in workshops after this date.
+          For those with tickets, lightning talk submissions will open shortly before the event.</div>
+      </div>
+
+    {% endif %}
 
     <p class="emphasis"><a href="{{ url_for('base.about') }}">Electromagnetic
       Field</a> is a camping festival for those with an inquisitive mind
