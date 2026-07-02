@@ -136,8 +136,7 @@ def run_scheduler():
 def run_scheduler_export() -> ResponseReturnValue:
     # Export the scheduling problem as JSON for debugging with slotmachine
     problem = Scheduler().get_schedule_problem(AUTO_SCHEDULE_TYPES)
-    data = [talk.to_dict() for talk in problem.talks]
-    json_str = json.dumps(data, sort_keys=True, indent=4, separators=(",", ": "))
+    json_str = json.dumps(problem.to_dict(), sort_keys=True, indent=4, separators=(",", ": "))
 
     now = datetime.now().isoformat()
     return send_file(
