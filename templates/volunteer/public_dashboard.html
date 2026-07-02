@@ -26,9 +26,9 @@
     <div class="row">
     {% for shift in shifts %}
         <div class="col-xs-3">
-            <div class="volunteer-dashboard-card {% if shift.min_needed > 0 and shift.min_needed <= shift.current_count %}min_reached{% else %}{% if shift.start <= now %}now{% elif shift.start <= soon %}upcoming{% endif %}{% endif %}">
+            <div class="volunteer-dashboard-card {% if shift.min_needed > 0 and shift.min_needed <= shift.current_count %}min_reached{% else %}{% if shift.local_start <= now %}now{% elif shift.local_start <= soon %}upcoming{% endif %}{% endif %}">
                 <h2>{{ shift.role.name }}</h2>
-                <p class="shift-time">{{ shift.start.strftime("%H:%M") }} to {{ shift.end.strftime("%H:%M") }}</p>
+                <p class="shift-time">{{ shift.local_start.strftime("%H:%M") }} to {{ shift.local_end.strftime("%H:%M") }}</p>
                 <p class="volunteer-num">{{ shift.max_needed - shift.current_count }}/{{ shift.max_needed }} needed</p>
             </div>
         </div>

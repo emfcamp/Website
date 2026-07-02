@@ -362,18 +362,26 @@ class Shift(BaseModel):
     def duration_in_minutes(self):
         return (self.start - self.end).total_seconds() // 60
 
+    @property
+    def local_start(self):
+        """Shift start time in the event timezone."""
+        return event_tz.fromutc(self.start)
+
+    @property
+    def local_end(self):
+        """Shift end time in the event timezone."""
+        return event_tz.fromutc(self.end)
+
     def to_localtime_dict(self):
-        start = event_tz.localize(self.start)
-        end = event_tz.localize(self.end)
         return {
             "id": self.id,
             "role_id": self.role_id,
             "venue_id": self.venue_id,
             "occurrence_id": self.occurrence_id,
-            "start": start.strftime("%Y-%m-%dT%H:%M:00"),
-            "start_time": start.strftime("%H:%M"),
-            "end": end.strftime("%Y-%m-%dT%H:%M:00"),
-            "end_time": end.strftime("%H:%M"),
+            "start": self.local_start.strftime("%Y-%m-%dT%H:%M:00"),
+            "start_time": self.local_start.strftime("%H:%M"),
+            "end": self.local_end.strftime("%Y-%m-%dT%H:%M:00"),
+            "end_time": self.local_end.strftime("%H:%M"),
             "min_needed": self.min_needed,
             "max_needed": self.max_needed,
             "role": self.role.to_dict(),
