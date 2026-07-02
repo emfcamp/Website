@@ -25,7 +25,7 @@ from wtforms.fields import (
     TextAreaField,
     TimeField,
 )
-from wtforms.validators import URL, InputRequired, Optional
+from wtforms.validators import URL, InputRequired, NumberRange, Optional
 from wtforms.widgets import TextArea
 
 from apps.common.fields import HiddenIntegerField
@@ -66,7 +66,7 @@ class ShiftTemplateForm(Form):
     )
     duration = IntegerField(
         "Duration",
-        [InputRequired()],
+        [InputRequired(), NumberRange(min=5)],
         description="The length of each shift, in minutes. Please speak to the volunteer team if you need this to be significantly more or less than two hours.",
     )
     changeover_time = IntegerField(
