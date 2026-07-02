@@ -159,12 +159,11 @@ def schedule():
     by_time = defaultdict(lambda: [])
 
     for s in shifts:
-        hour_key = s.start.strftime("%H:%M")
         to_add = s.to_localtime_dict()
         to_add["conflicts_with"], to_add["conflicts_detail"] = _get_conflicts(s, user_calendar)
         to_add["sign_up_url"] = url_for(".shift", shift_id=to_add["id"])
         to_add["is_user_shift"] = current_user in s.volunteers
-        by_time[hour_key].append(to_add)
+        by_time[to_add["start_time"]].append(to_add)
 
     roles = _get_roles_with_user_data(current_user)
     venues = VolunteerVenue.get_all()

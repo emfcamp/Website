@@ -9,8 +9,8 @@
     <div>
         <h2>{{shift.role.name}} <small>at {{shift.venue.name}}</small></h2>
     </div>
-    <div>Start: {{ shift.start.strftime('%A %H:%M') }}</div>
-    <div>Stop: {{ shift.end.strftime('%A %H:%M') }}</div>
+    <div>Start: {{ shift.local_start.strftime('%A %H:%M') }}</div>
+    <div>Stop: {{ shift.local_end.strftime('%A %H:%M') }}</div>
     <div>{{ shift.role.full_description() }}</div>
 
     {% if current_user.has_permission('volunteer:manager') %}

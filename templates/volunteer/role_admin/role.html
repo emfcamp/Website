@@ -30,7 +30,7 @@
     {% for active in active_shift_entries %}
       <div class="volunteer">
         <p>
-          <strong>{{ active.user.volunteer.nickname }}</strong> {{ active.shift.start.strftime("%a %H:%M") }}&ndash;{{ active.shift.end.strftime("%H:%M") }}
+          <strong>{{ active.user.volunteer.nickname }}</strong> {{ active.shift.local_start.strftime("%a %H:%M") }}&ndash;{{ active.shift.local_end.strftime("%H:%M") }}
           {% if now > active.shift.end %}
               <br /><span class="overtime">{{ now - active.shift.end }} over</span>
           {% endif %}
@@ -44,7 +44,7 @@
   <div class="role-admin-shift well content-well">
     {% for pending in pending_shift_entries %}
       <div class="volunteer">
-        <p>{{ pending.user.volunteer.nickname }}: {{ pending.shift.start.strftime("%a %H:%M") }}&ndash;{{ pending.shift.end.strftime("%H:%M") }}</p>
+        <p>{{ pending.user.volunteer.nickname }}: {{ pending.shift.local_start.strftime("%a %H:%M") }}&ndash;{{ pending.shift.local_end.strftime("%H:%M") }}</p>
         {{ state_selector(pending) }}
       </div>
     {% endfor %}
@@ -53,7 +53,7 @@
   <h3>Upcoming Shifts</h3>
   {% for shift in shifts %}
     <div class="role-admin-shift well content-well">
-      <h4 id="shift-{{ shift.id }}">{{ shift.start.strftime("%a %H:%M") }} - {{ shift.end.strftime("%H:%M") }} - {{ shift.venue.name }}</h4>
+      <h4 id="shift-{{ shift.id }}">{{ shift.local_start.strftime("%a %H:%M") }} - {{ shift.local_end.strftime("%H:%M") }} - {{ shift.venue.name }}</h4>
       <form method="post" class="shift-editor" id="shift-editor-{{ shift.id }}" action="/volunteer/role/{{ shift.role_id }}/{{ shift.id }}">
         <div class="form-group">
           <label class="control-label" for="min_needed">Minimum Volunteers</label>
