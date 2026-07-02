@@ -201,7 +201,8 @@ class ShiftTemplate(BaseModel):
         return event_tz.localize(datetime.combine(self.end_date, self.end_time))
 
     @property
-    def shift_start_times(self) -> list[datetime]:
+    def shift_timings(self) -> list[tuple[datetime, int]]:
+        """Return a list of (start_time, duration) tuples to be turned into shifts."""
         period = (self.end_datetime - self.start_datetime).seconds // 60
 
         num_shifts = round(period / self.duration)
@@ -239,7 +240,7 @@ class ShiftTemplate(BaseModel):
             else:
                 this_duration = self.duration
 
-            shift_starts.append(time)
+            shift_starts.append((time, this_duration))
             time = time + timedelta(minutes=this_duration)
 
         return shift_starts
@@ -255,11 +256,9 @@ class ShiftTemplate(BaseModel):
                 start=(shift_start - timedelta(minutes=self.changeover_time))
                 .astimezone(pytz.utc)
                 .replace(tzinfo=None),
-                end=(shift_start + timedelta(minutes=self.duration))
-                .astimezone(pytz.utc)
-                .replace(tzinfo=None),
+                end=(shift_start + timedelta(minutes=duration)).astimezone(pytz.utc).replace(tzinfo=None),
             )
-            for shift_start in self.shift_start_times
+            for shift_start, duration in self.shift_timings
         ]
 
     def regenerate_shifts(self) -> None:

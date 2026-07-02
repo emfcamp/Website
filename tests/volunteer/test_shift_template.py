@@ -58,9 +58,9 @@ def test_end_date_on_next_day(template: ShiftTemplate, shift_date: date):
     assert template.end_date == shift_date + timedelta(days=1)
 
 
-def test_shift_start_times(template: ShiftTemplate, shift_date: date):
-    assert template.shift_start_times == [
-        event_tz.localize(datetime.combine(shift_date, time(hour, 0, 0))) for hour in range(9, 13)
+def test_shift_start_timings(template: ShiftTemplate, shift_date: date):
+    assert template.shift_timings == [
+        (event_tz.localize(datetime.combine(shift_date, time(hour, 0, 0))), 60) for hour in range(9, 13)
     ]
 
 
