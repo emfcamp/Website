@@ -330,7 +330,7 @@ def clashfinder() -> ResponseReturnValue:
     ranked: list[tuple[Occurrence, Occurrence, int, int]] = []
 
     if request.args.get("old_scoring") == "true":
-        for (a, b), count in popularity.most_common(1000):
+        for (a, b), count in popularity.most_common():
             ranked.append((a, b, count, 0))
     else:
         candidates: list[tuple[tuple[Occurrence, Occurrence], int]] = []
@@ -356,6 +356,7 @@ def clashfinder() -> ResponseReturnValue:
             ranked.sort(key=lambda r: r[3], reverse=True)
 
     show_all = request.args.get("show_all") == "true"
+    max_clashes = request.args.get("max_clashes", 1000, type=int)
 
     clashes = []
     number = 0
@@ -368,6 +369,10 @@ def clashfinder() -> ResponseReturnValue:
         if o1.cancelled or o2.cancelled:
             continue
 
+        number += 1
+        if number > max_clashes:
+            break
+
         overlaps = o1.overlaps_with(o2)
         if not overlaps and not show_all:
             continue
@@ -375,7 +380,6 @@ def clashfinder() -> ResponseReturnValue:
         # favourite_count is how many people actually favourited both talks,
         # weight is approximately how many people would be forced to choose
         # between one of them after correction has been applied
-        number += 1
         clashes.append(
             {
                 "occurrence_1": o1,
@@ -387,7 +391,9 @@ def clashfinder() -> ResponseReturnValue:
             }
         )
 
-    return render_template("cfp_review/schedule/clashfinder.html", clashes=clashes, show_all=show_all)
+    return render_template(
+        "cfp_review/schedule/clashfinder.html", clashes=clashes, show_all=show_all, population=population
+    )
 
 
 def scheduleitems_to_finalise():
