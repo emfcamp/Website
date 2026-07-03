@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from typing import TypeGuard, get_args
 
 from flask import render_template, request
-from sqlalchemy import select
+from sqlalchemy import not_, select
 from sqlalchemy.orm import selectinload
 
 from main import db
@@ -180,7 +180,12 @@ def sense_check():
                 select(Occurrence)
                 .join(Occurrence.schedule_item)
                 .options(selectinload(Occurrence.schedule_item))
-                .where(ScheduleItem.type.in_(types))
+                .where(
+                    not_(Occurrence.cancelled),
+                    ScheduleItem.type.in_(types),
+                    ScheduleItem.official_content,
+                    ScheduleItem.state != "cancelled",
+                )
                 .order_by(ScheduleItem.type, ScheduleItem.id, Occurrence.id)
             )
         )
