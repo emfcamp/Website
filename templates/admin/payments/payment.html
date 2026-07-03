@@ -29,4 +29,65 @@
 {% endif %}
 </div>
 
+<h3>History</h3>
+
+<table class="table table-condensed table-striped">
+<thead>
+  <tr>
+    <th>Timestamp</th>
+    <th>User</th>
+    <th>Provider</th>
+    <th>Currency</th>
+    <th>Amount_int</th>
+    <th>State</th>
+    <th>Voucher code</th>
+    <th>VAT invoice number</th>
+    <th colspan="2">Bank transfer</th>
+    <th colspan="2">Stripe</th>
+  </tr>
+  <tr>
+    <th colspan="8"></th>
+    <th>Expires</th>
+    <th>Bank ref</th>
+    <th>Intent</th>
+    <th>Charge</th>
+  </tr>
+</thead>
+<tbody>
+{% for version in payment.versions %}
+<tr>
+  <td>{{ version.transaction.issued_at }}</td>
+  <td>
+    {% if version.transaction.user %}
+      <a href="{{ url_for('.user', user_id=version.transaction.user_id) }}">{{ version.transaction.user.name }}</a>
+    {% else %}
+      <i>System</i>
+    {% endif %}
+  </td>
+  <td>{{ version.provider }}</td>
+  <td>{{ version.currency }}</td>
+  <td>{{ version.amount_int }}</td>
+  <td>{{ version.state }}</td>
+  <td>
+    {% if version.voucher_code %}
+      <a href="{{  url_for('.product_views.product_view_voucher_detail', voucher_code=version.voucher_code) }}">{{ version.voucher.code }}</a>
+    {% endif %}
+  </td>
+  <td>{{ version.vat_invoice_number or '' }}</td>
+  <td>{{ version.expires and version.expires.strftime('%Y-%m-%d %H:%M:%S') or '' }}</td>
+  <td>{{ version.bankref and (version.bankref | bankref) or '' }}</td>
+  <td>
+    {% if version.intent_id %}
+    <a href="https://dashboard.stripe.com/search?query={{ version.intent_id }}">{{ version.intent_id }}</a>
+    {% endif %}
+  </td>
+  <td>
+    {% if version.charge_id %}
+    <a href="https://dashboard.stripe.com/search?query={{ version.charge_id }}">{{ version.charge_id }}</a>
+    {% endif %}
+  </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
 {% endblock %}
