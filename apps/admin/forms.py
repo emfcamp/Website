@@ -169,7 +169,6 @@ class AddProductViewProductForm(Form):
 
 class VoucherForm(Form):
     expires = DateField("Expiry Date", default=datetime.now() + timedelta(days=30))
-    num_purchases = IntegerField("Max Purchases", [InputRequired()], default=1)
     num_tickets = IntegerField("Max Adult Tickets", [InputRequired()], default=2)
 
 
@@ -183,12 +182,10 @@ class EditVoucherForm(VoucherForm):
 
     def init_with_voucher(self, voucher):
         self.expires.data = voucher.expiry
-        self.num_purchases.data = voucher.purchases_remaining
         self.num_tickets.data = voucher.tickets_remaining
 
     def update_voucher(self, voucher):
         voucher.expiry = self.expires.data
-        voucher.purchases_remaining = self.num_purchases.data
         voucher.tickets_remaining = self.num_tickets.data
 
 
@@ -218,7 +215,6 @@ Everyone at Electromagnetic Field
     )
     emails = TextAreaField("Email Addresses", [DataRequired()])
     expires = DateField("Expiry Date", default=datetime.now() + timedelta(days=30))
-    num_purchases = IntegerField("Max Purchases", [InputRequired()], default=1)
     num_tickets = IntegerField("Max Adult Tickets", [InputRequired()], default=2)
     preview = SubmitField("Preview")
     create = SubmitField("Send")

@@ -37,8 +37,8 @@ Buy Items
 
 {% if voucher %}
 <div class="well">
-    <p>Your voucher allows you to buy <strong>{{voucher.tickets_remaining}}</strong> adult tickets, and you have
-        <strong>{{voucher.purchases_remaining}}</strong> purchase{% if voucher.purchases_remaining > 1 %}s{%endif %} remaining. To clear your voucher, please <a href="{{ url_for(".tickets_voucher_clear", flow=flow) }}">click here</a>.
+    <p>Your voucher allows you to buy <strong>{{voucher.tickets_remaining}}</strong> adult tickets.
+    To clear your voucher, please <a href="{{ url_for(".tickets_voucher_clear", flow=flow) }}">click here</a>.
     </p>
 </div>
 {% endif %}

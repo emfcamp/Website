@@ -569,9 +569,6 @@ class Voucher(BaseModel):
 
     product_view_id: Mapped[int | None] = mapped_column(ForeignKey("product_view.id"))
 
-    # The number of purchases remaining on this voucher
-    purchases_remaining: Mapped[int] = mapped_column(default=1)
-
     # The number of adult tickets remaining to purchase on this voucher
     tickets_remaining: Mapped[int] = mapped_column(default=2)
 
@@ -580,7 +577,7 @@ class Voucher(BaseModel):
 
     __table_args__ = (UniqueConstraint("email", "product_view_id", name="uniq_voucher_email_product_view"),)
 
-    is_used = column_property((purchases_remaining == 0) | (tickets_remaining == 0))
+    is_used = column_property(tickets_remaining == 0)
 
     @classmethod
     def get_by_code(cls, code: str | None) -> Voucher | None:
@@ -594,13 +591,11 @@ class Voucher(BaseModel):
         code: str | None = None,
         expiry: NaiveDT | None = None,
         email: str | None = None,
-        purchases_remaining: int = 1,
         tickets_remaining: int = 2,
     ):
         super().__init__()
         self.view = view
         self.email = email
-        self.purchases_remaining = purchases_remaining
         self.tickets_remaining = tickets_remaining
         self.expiry = expiry
 
@@ -632,9 +627,6 @@ class Voucher(BaseModel):
 
     def consume_capacity(self, payment: Payment) -> None:
         """Decrease the voucher's capacity based on tickets in a payment."""
-        if self.purchases_remaining < 1:
-            raise VoucherUsedError(f"Attempting to use voucher with no remaining purchases: {self}")
-
         adult_tickets = len(
             [purchase for purchase in payment.purchases if purchase.product.is_adult_ticket(voucher=True)]
         )
@@ -644,8 +636,7 @@ class Voucher(BaseModel):
                 f"Attempting to purchase more adult tickets than allowed by voucher: {self}"
             )
 
-        log.info("Consuming 1 purchase and %s tickets from %s", adult_tickets, self)
-        self.purchases_remaining = Voucher.purchases_remaining - 1
+        log.info("Consuming %s tickets from %s", adult_tickets, self)
         self.tickets_remaining = Voucher.tickets_remaining - adult_tickets
 
     def return_capacity(self, payment: Payment) -> None:
@@ -654,7 +645,6 @@ class Voucher(BaseModel):
             [purchase for purchase in payment.purchases if purchase.product.is_adult_ticket(voucher=True)]
         )
         log.info("Returning 1 purchase and %s tickets to %s", adult_tickets, self)
-        self.purchases_remaining = Voucher.purchases_remaining + 1
         self.tickets_remaining = Voucher.tickets_remaining + adult_tickets
 
     def __repr__(self):

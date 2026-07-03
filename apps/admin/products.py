@@ -543,7 +543,6 @@ def product_view_add_voucher(view_id):
             view,
             code=form.voucher.data,
             expiry=form.expires.data,
-            purchases_remaining=form.num_purchases.data,
             tickets_remaining=form.num_tickets.data,
         )
         db.session.add(voucher)
@@ -634,7 +633,6 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 code=random_voucher(),
                 email=email,
                 expiry=form.expires.data,
-                purchases_remaining=form.num_purchases.data,
                 tickets_remaining=form.num_tickets.data,
             )
             db.session.add(voucher)
