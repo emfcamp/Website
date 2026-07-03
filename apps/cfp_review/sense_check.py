@@ -110,15 +110,22 @@ def not_sensible_reasons(
             )
 
         # -- Occurrence lies outside the allowed time periods.
-        permitted_time = False
-        for period in occurrence.get_allowed_time_periods():
-            if t >= period.start and t <= period.end:
-                permitted_time = True
+        if occurrence.schedule_item.official_content:
+            allowed_ranges = [
+                period
+                for automatic in (True, False)
+                for ranges in occurrence.allowed_times(automatic).values()
+                for period in ranges
+            ]
+            permitted_time = False
+            for start, end in allowed_ranges:
+                if t >= start and t <= end:
+                    permitted_time = True
 
-        if not permitted_time:
-            reasons[f"{reason_key}_outside_allowed_times"] = (
-                f"{note} is outside allowed occurrence time periods"
-            )
+            if not permitted_time:
+                reasons[f"{reason_key}_outside_allowed_times"] = (
+                    f"{note} is outside allowed occurrence time periods"
+                )
 
     _check_timing(occurrence.potential_time, "Proposed start", "proposed_start")
     _check_timing(occurrence.scheduled_time, "Scheduled start", "scheduled_start")
