@@ -9,7 +9,7 @@ from flask import current_app as app
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 
 from apps.cfp.tasks import create_tags
-from apps.common.pkpass import generate_pkpass, generate_unsigned_pkpass
+from apps.common.walletpass import generate_pkpass, generate_unsigned_pkpass
 from apps.tickets.tasks import create_product_groups
 from apps.volunteer.init_data import shifts as init_shifts
 from main import db

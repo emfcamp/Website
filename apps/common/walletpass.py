@@ -1,4 +1,4 @@
-"""Stuff to generate Apple pkpass tickets."""
+"""Stuff to generate Apple pkpass/Google Wallet tickets."""
 
 import hashlib
 import io
@@ -29,11 +29,11 @@ from models.user import User
 MAX_PASS_LOCATIONS = 10
 
 
-class PkPassException(Exception):
+class PassException(Exception):
     """Base pkpass generator exception."""
 
 
-class TooManyPassLocations(PkPassException):
+class TooManyPassLocations(PassException):
     """Too many pass locations specified in config."""
 
     def __init__(self, count: int) -> None:
@@ -43,7 +43,7 @@ class TooManyPassLocations(PkPassException):
         return f"{self.__doc__} Got {self.count}, max is {MAX_PASS_LOCATIONS}"
 
 
-class InvalidPassConfig(PkPassException):
+class InvalidPassConfig(PassException):
     """Pass config does not match expected schema"""
 
     missing: set[str]
@@ -121,7 +121,7 @@ def _format_date_range(start: datetime, end: datetime) -> str:
     return f"{start.day} {start:%b} - {end.day} {end:%b %Y}"
 
 
-def _build_event_fields(user: User) -> dict[str, list[dict[str, Any]]]:
+def _build_pkpass_event_fields(user: User) -> dict[str, list[dict[str, Any]]]:
     """Assemble the eventTicket field groups, including only the fields the user
     actually has tickets for so we never show 'Parking 0'."""
     meta = get_purchase_metadata(user)
@@ -175,7 +175,7 @@ def _build_event_fields(user: User) -> dict[str, list[dict[str, Any]]]:
     }
 
 
-def generate_pass_data(user: User) -> dict[str, Any]:
+def _generate_pkpass_data(user: User) -> dict[str, Any]:
     _, expire_dt = _event_datetimes()
     barcode = {
         "format": "PKBarcodeFormatQR",
@@ -210,11 +210,11 @@ def generate_pass_data(user: User) -> dict[str, Any]:
         "sharingProhibited": False,
         # ISO 8601 with a colon in the offset, e.g. 2026-07-19T23:00:00+01:00.
         "expirationDate": expire_dt.isoformat(),
-        "eventTicket": _build_event_fields(user),
+        "eventTicket": _build_pkpass_event_fields(user),
     }
 
 
-# Pass artwork is derived at runtime from the site's existing brand assets, so we
+# PKPass artwork is derived at runtime from the site's existing brand assets, so we
 # don't carry a set of event-specific images just for this feature. Set
 # PKPASS_ASSETS_DIR to override with a directory of ready-made pkpass images.
 _BRAND_DIR = Path("images/brand/2026")
@@ -334,7 +334,7 @@ def smime_sign(data: bytes, signer_cert_file: Path, key_file: Path, cert_chain_f
 
 def _pass_files(user: User) -> dict[str, bytes]:
     """The pass.json plus image assets that make up a .pkpass archive."""
-    files = {"pass.json": json.dumps(generate_pass_data(user)).encode()}
+    files = {"pass.json": json.dumps(_generate_pkpass_data(user)).encode()}
     files |= get_pass_assets()
     return files
 

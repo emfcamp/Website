@@ -13,7 +13,7 @@ from wtforms import BooleanField, StringField, SubmitField
 from wtforms.validators import DataRequired
 
 from apps.common import feature_enabled
-from apps.common.pkpass import generate_pkpass
+from apps.common.walletpass import generate_pkpass
 from main import db
 from models.payment import Payment
 from models.purchase import Purchase
