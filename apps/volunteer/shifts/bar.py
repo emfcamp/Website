@@ -37,9 +37,7 @@ bar_shifts = {
                 "changeover": 10,
             }
             for d in [("fri", "sat"), ("sat", "sun"), ("sun", "mon")]
-        ]
-    },
-    "cybar": {
+        ],
         "cybar": [
             {
                 "first": edt("fri", "18:00:00"),
@@ -62,6 +60,6 @@ bar_shifts = {
                 "max": 2,
                 "changeover": 10,
             },
-        ]
+        ],
     },
 }

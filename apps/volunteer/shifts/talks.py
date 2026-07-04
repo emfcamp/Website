@@ -111,11 +111,6 @@ talks_shifts = {
         "stage-b": stage_bc_pattern,
         "stage-c": stage_bc_pattern,
     },
-    "talks-venue-manager": {
-        "stage-a": stage_a_herald_vm,
-        "stage-b": stage_bc_pattern,
-        "stage-c": stage_bc_pattern,
-    },
     "video-editor": {
         "voc": [
             {
