@@ -142,7 +142,6 @@ def _build_event_fields(user: User) -> dict[str, list[dict[str, Any]]]:
     primary = [{"key": "admission", "label": "Admission", "value": str(n_admission)}]
 
     secondary = [
-        {"key": "attendee", "label": "Attendee", "value": user.name},
         {"key": "location", "label": "Location", "value": _VENUE_SHORT},
     ]
 
@@ -155,8 +154,6 @@ def _build_event_fields(user: User) -> dict[str, list[dict[str, Any]]]:
         auxiliary.append({"key": "campervan", "label": "Campervan", "value": str(n_campervan)})
 
     back = [
-        {"key": "b_attendee", "label": "Attendee", "value": user.name},
-        {"key": "b_email", "label": "Email", "value": user.email},
         {"key": "b_checkin", "label": "Check-in code", "value": user.checkin_code},
         {"key": "b_event", "label": "Event", "value": _EVENT_NAME},
         {"key": "b_venue", "label": "Location", "value": _VENUE_FULL},
