@@ -116,6 +116,7 @@ var/prometheus
 static/.webassets-cache/
 
 config/live.cfg*
+config/*.json
 config/development.cfg
 logging.override.yaml
 

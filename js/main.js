@@ -172,3 +172,20 @@ $(() => {
     });
   });
 });
+
+$(() => {
+  document.querySelectorAll(".google-wallet-btn").forEach((el) => {
+    el.addEventListener("click", (event) => {
+      try {
+        const res = confirm(
+          "To deliver a Google Wallet pass, the information on your pass will be transmitted to Google - this includes the number of admission tickets, parking tickets, and live-in vehicle tickets, but not your name.\n\nIf you want to avoid your data being shared with Google, press Cancel and use an alternative Apple Wallet-compatible app with the .pkpass file from the Apple Wallet link.",
+        );
+        if (!res) {
+          event.preventDefault();
+        }
+      } catch (e) {
+        event.preventDefault();
+      }
+    });
+  });
+});
