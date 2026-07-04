@@ -319,7 +319,7 @@ def _generate_brand_assets() -> dict[str, bytes]:
 def get_pass_assets() -> dict[str, bytes]:
     """Pass images keyed by filename, either generated from brand assets or loaded
     from PKPASS_ASSETS_DIR if that override is configured."""
-    override = config.get("PKPASS_ASSETS_DIR")
+    override = config.get("PKPASS_ASSETS_DIR", None)
     if override:
         return {p.name: p.read_bytes() for p in Path(override).iterdir() if p.is_file()}
     return dict(_generate_brand_assets())

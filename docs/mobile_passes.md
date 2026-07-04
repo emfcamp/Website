@@ -130,7 +130,7 @@ associated .json key):
 1. Set `GOOGLE_WALLET_CLASS_ID` to something relevant (e.g. `emf2026test`).
 1. Run `./flask tickets googlewallet create-or-update-class` to create the
    class.
-1. Enable pkpass generation with the `ISSUE_GOOGLE_WALLET_TICKETS` feature
+1. Enable pass generation with the `ISSUE_GOOGLE_WALLET_TICKETS` feature
    flag.
 1. Test it: go to `/account/purchases` and click the Add to Google Wallet
    button. This should prompt you to transmit data to Google and, once
