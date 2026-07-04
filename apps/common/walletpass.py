@@ -83,7 +83,7 @@ def _validate_keys(
 
 def _get_and_validate_locations():
     """Get and validate pkpass locations from config."""
-    locs = app.config.get("PKPASS_LOCATIONS", [])
+    locs = config.get("PKPASS_LOCATIONS", [])
     if len(locs) > MAX_PASS_LOCATIONS:
         raise TooManyPassLocations(count=len(locs))
     _validate_keys(locs, {"latitude", "longitude"}, {"altitude", "relevantText"})
@@ -92,7 +92,7 @@ def _get_and_validate_locations():
 
 def _get_beacons():
     """Get and validate pkpass beacons from config."""
-    beacons = app.config.get("PKPASS_BEACONS", [])
+    beacons = config.get("PKPASS_BEACONS", [])
     _validate_keys(beacons, {"proximityUUID"}, {"relevantText", "major", "minor"})
     return beacons
 
@@ -179,14 +179,14 @@ def _generate_pkpass_data(user: User) -> dict[str, Any]:
     _, expire_dt = _event_datetimes()
     barcode = {
         "format": "PKBarcodeFormatQR",
-        "message": app.config["CHECKIN_BASE"] + user.checkin_code,
+        "message": config.get("CHECKIN_BASE") + user.checkin_code,
         "messageEncoding": "iso-8859-1",
         # Shown as readable text under the QR.
         "altText": user.checkin_code,
     }
     return {
-        "passTypeIdentifier": app.config["PKPASS_IDENTIFIER"],
-        "teamIdentifier": app.config["PKPASS_TEAM_ID"],
+        "passTypeIdentifier": config.get("PKPASS_IDENTIFIER"),
+        "teamIdentifier": config.get("PKPASS_TEAM_ID"),
         "formatVersion": 1,
         # Use the checkin code as a unique serial.
         "serialNumber": user.checkin_code,
@@ -198,7 +198,7 @@ def _generate_pkpass_data(user: User) -> dict[str, Any]:
         "logoText": "Electromagnetic Field",
         "locations": _get_and_validate_locations(),
         "beacons": _get_beacons(),
-        "maxDistance": app.config.get("PKPASS_MAX_DISTANCE", 50),
+        "maxDistance": config.get("PKPASS_MAX_DISTANCE", 50),
         "barcodes": [barcode],
         # Deprecated singular form, kept for older Wallet readers (notably some
         # Android pkpass apps) that don't understand the "barcodes" array.
@@ -306,7 +306,7 @@ def _generate_brand_assets() -> dict[str, bytes]:
 def get_pass_assets() -> dict[str, bytes]:
     """Pass images keyed by filename, either generated from brand assets or loaded
     from PKPASS_ASSETS_DIR if that override is configured."""
-    override = app.config.get("PKPASS_ASSETS_DIR")
+    override = config.get("PKPASS_ASSETS_DIR")
     if override:
         return {p.name: p.read_bytes() for p in Path(override).iterdir() if p.is_file()}
     return dict(_generate_brand_assets())
@@ -362,9 +362,9 @@ def generate_pkpass(user: User) -> io.BytesIO:
     manifest = json.dumps(generate_manifest(files)).encode()
     signature = smime_sign(
         manifest,
-        Path(app.config["PKPASS_SIGNER_CERT_FILE"]),
-        Path(app.config["PKPASS_KEY_FILE"]),
-        Path(app.config["PKPASS_CHAIN_FILE"]),
+        Path(config.get("PKPASS_SIGNER_CERT_FILE")),
+        Path(config.get("PKPASS_KEY_FILE")),
+        Path(config.get("PKPASS_CHAIN_FILE")),
     )
     files["manifest.json"] = manifest
     files["signature"] = signature
