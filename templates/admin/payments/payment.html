@@ -68,11 +68,7 @@
   <td>{{ version.currency }}</td>
   <td>{{ version.amount_int }}</td>
   <td>{{ version.state }}</td>
-  <td>
-    {% if version.voucher_code %}
-      <a href="{{  url_for('.product_views.product_view_voucher_detail', voucher_code=version.voucher_code) }}">{{ version.voucher.code }}</a>
-    {% endif %}
-  </td>
+  <td>{{ version.voucher_code and version.voucher_code }}</td>
   <td>{{ version.vat_invoice_number or '' }}</td>
   <td>{{ version.expires and version.expires.strftime('%Y-%m-%d %H:%M:%S') or '' }}</td>
   <td>{{ version.bankref and (version.bankref | bankref) or '' }}</td>
