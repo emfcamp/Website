@@ -523,6 +523,13 @@ class User(BaseModel, UserMixin):
                 return entry
         return None
 
+    @property
+    def google_wallet_pass_url(self) -> str:
+        # Avoid circular import
+        from apps.common import walletpass
+
+        return walletpass.generate_gwallet_pass_url(self)
+
 
 Index("ix_user_email_lower", func.lower(User.email), unique=True)
 Index(

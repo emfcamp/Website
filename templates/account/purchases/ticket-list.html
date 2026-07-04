@@ -7,7 +7,10 @@
 <a class="btn btn-success" href="{{ url_for('tickets.receipt') }}">Printable ticket</a>
 <a class="btn btn-primary" href="{{ url_for('tickets.receipt', format='pdf') }}">Download PDF</a>
 {% if feature_enabled("ISSUE_APPLE_PKPASS_TICKETS") %}
-  <a class="btn btn-dark" href="{{ url_for('users.pkpass_ticket') }}"> Add to Apple Wallet</a>
+  <a class="btn btn-dark" href="{{ url_for('users.pkpass_ticket') }}">Add to Apple Wallet</a>
+{% endif %}
+{% if feature_enabled("ISSUE_GOOGLE_WALLET_TICKETS") %}
+  <a class="btn btn-dark google-wallet-btn" href="{{ current_user.google_wallet_pass_url }}">Add to Google Wallet</a>
 {% endif %}
 </p>
 {% endif %}

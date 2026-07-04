@@ -62,6 +62,8 @@ dependencies = [
     "stripe<15.0",
     "wtforms-sqlalchemy<0.5",
     "wtforms<3.3",
+    "google-api-python-client>=2.198.0",
+    "google-api-python-client-stubs>=1.37.0",
 ]
 
 [dependency-groups]

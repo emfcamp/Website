@@ -8,8 +8,12 @@ from collections.abc import Iterable
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any, TypedDict
 
+import google.auth.crypt
+import google.auth.jwt
+import google.oauth2.service_account
+import googleapiclient.discovery
 import pytz
 from cryptography.hazmat.primitives.asymmetric.ec import EllipticCurvePrivateKey
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
@@ -17,13 +21,16 @@ from cryptography.hazmat.primitives.hashes import SHA256
 from cryptography.hazmat.primitives.serialization import Encoding, load_pem_private_key
 from cryptography.hazmat.primitives.serialization.pkcs7 import PKCS7Options, PKCS7SignatureBuilder
 from cryptography.x509 import load_pem_x509_certificate, load_pem_x509_certificates
-from flask import current_app as app
 from PIL import Image
 from PIL.Image import Palette, Resampling
 
 from apps.common.receipt import get_purchase_metadata
 from apps.config import config
+from main import static_digest
 from models.user import User
+
+if TYPE_CHECKING:
+    pass
 
 # https://developer.apple.com/library/archive/documentation/UserExperience/Conceptual/PassKit_PG/Creating.html
 MAX_PASS_LOCATIONS = 10
@@ -217,10 +224,16 @@ def _generate_pkpass_data(user: User) -> dict[str, Any]:
 # PKPass artwork is derived at runtime from the site's existing brand assets, so we
 # don't carry a set of event-specific images just for this feature. Set
 # PKPASS_ASSETS_DIR to override with a directory of ready-made pkpass images.
+# Google Wallet imagery needs to be pre-baked, since we have to be able to cook up
+# a URL for it at any time, and generating it on the fly seems unwise.
 _BRAND_DIR = Path("images/brand/2026")
 _HERO_IMAGE = _BRAND_DIR / "hero-black.jpg"
+_GWALLET_HERO_IMAGE = _BRAND_DIR / "gwallet-hero.jpg"  # should be 1032x336px
 # Symbol-only mark (ringed planet + stars, no wordmark) for the pass logo.
 _LOGO_IMAGE = _BRAND_DIR / "emf2026-logo-white.png"
+_GWALLET_LOGO_IMAGE = _BRAND_DIR / "gwallet-logo.png"  # should be 660x660px
+# Full logo (including wordmark)
+_GWALLET_WIDE_LOGO_IMAGE = _BRAND_DIR / "gwallet-logo-wide.png"  # should be 1280x400px
 _GLYPH_IMAGE = Path("images/pwa/icon-512.png")
 # $brand-2026-orange from css/_variables.scss
 _ICON_BG = (247, 127, 2)
@@ -369,3 +382,307 @@ def generate_pkpass(user: User) -> io.BytesIO:
     files["manifest.json"] = manifest
     files["signature"] = signature
     return _zip_files(files)
+
+
+def _gwallet_class_id() -> str:
+    return f"{config.get('GOOGLE_WALLET_ISSUER_ID')}.{config.get('GOOGLE_WALLET_CLASS_ID')}"
+
+
+def _gwallet_localised_str(s: str) -> googleapiclient._apis.walletobjects.v1.LocalizedString:
+    return {
+        "defaultValue": {
+            "language": "en-GB",
+            "value": s,
+        },
+    }
+
+
+def _gwallet_image_url(static_filename: str) -> googleapiclient._apis.walletobjects.v1.Image:
+    url = static_digest.static_url_for("static", filename=static_filename, _external=True)
+    return {
+        "sourceUri": {
+            "uri": url,
+        },
+    }
+
+
+def generate_gwallet_class() -> googleapiclient._apis.walletobjects.v1.EventTicketClass:
+    """Generates the base class from which tickets will be derived."""
+    start, end = _event_datetimes()
+    pkpass_locations = _get_and_validate_locations()
+    locations: list[googleapiclient._apis.walletobjects.v1.MerchantLocation] = [
+        {"latitude": loc["latitude"], "longitude": loc["longitude"]} for loc in pkpass_locations
+    ]
+
+    return {
+        "id": _gwallet_class_id(),
+        "eventName": _gwallet_localised_str(_EVENT_NAME),
+        "eventId": _gwallet_class_id(),
+        "issuerName": "Electromagnetic Field",
+        "logo": _gwallet_image_url(str(_GWALLET_LOGO_IMAGE)),
+        "wideLogo": _gwallet_image_url(str(_GWALLET_WIDE_LOGO_IMAGE)),
+        "venue": {
+            "name": _gwallet_localised_str(_VENUE_SHORT),
+            "address": _gwallet_localised_str(_VENUE_FULL),
+        },
+        "dateTime": {
+            "start": start.isoformat(),
+            "end": end.isoformat(),
+        },
+        "reviewStatus": "UNDER_REVIEW",  # automatically flipped to active
+        "countryCode": "GB",
+        "heroImage": _gwallet_image_url(str(_GWALLET_HERO_IMAGE)),
+        "hexBackgroundColor": "#050706",
+        "multipleDevicesAndHoldersAllowedStatus": "MULTIPLE_HOLDERS",
+        "linksModuleData": {
+            "uris": [
+                {
+                    "uri": "https://www.emfcamp.org",
+                    "description": "Main EMF Website",
+                },
+                {
+                    "uri": "https://map.emfcamp.org",
+                    "description": "Site Map",
+                },
+                {
+                    "uri": "https://www.emfcamp.org/about/travel",
+                    "description": "Travelling to EMF",
+                },
+            ],
+        },
+        "textModulesData": [
+            {
+                "id": "dates",
+                "header": "Dates",
+                "body": _format_date_range(start, end),
+            },
+        ],
+        "merchantLocations": locations,
+        "classTemplateInfo": {
+            "cardTemplateOverride": {
+                # Overrides what we display on the main 'card' view, when you click on the pass
+                "cardRowTemplateInfos": [
+                    # First row: Start date - End date
+                    {
+                        "oneItem": {
+                            "item": {
+                                "firstValue": {
+                                    "fields": [
+                                        {
+                                            "fieldPath": "class.textModulesData['dates']",
+                                        }
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    # Second row: Admission / Parking / Live-in vehicle
+                    {
+                        "threeItems": {
+                            "startItem": {
+                                "firstValue": {
+                                    "fields": [
+                                        {
+                                            "fieldPath": "object.textModulesData['n_admission']",
+                                        }
+                                    ],
+                                },
+                            },
+                            "middleItem": {
+                                "firstValue": {
+                                    "fields": [
+                                        {
+                                            "fieldPath": "object.textModulesData['n_parking']",
+                                        }
+                                    ],
+                                },
+                            },
+                            "endItem": {
+                                "firstValue": {
+                                    "fields": [
+                                        {
+                                            "fieldPath": "object.textModulesData['n_campervan']",
+                                        }
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    # Third row (if necessary): merchandise items
+                    {
+                        "oneItem": {
+                            "item": {
+                                "firstValue": {
+                                    "fields": [
+                                        {
+                                            "fieldPath": "object.textModulesData['n_merch']",
+                                        }
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                ],
+            },
+            "listTemplateOverride": {
+                # Overrides what we show on the list-of-all-passes view
+                # First row: the event name
+                "firstRowOption": {
+                    "fieldOption": {
+                        "fields": [
+                            {
+                                "fieldPath": "class.eventName",
+                            }
+                        ],
+                    },
+                },
+                # Second row: the dates
+                "secondRowOption": {
+                    "fields": [
+                        {
+                            "fieldPath": "class.textModulesData['dates']",
+                        }
+                    ],
+                },
+            },
+            "detailsTemplateOverride": {
+                # Overrides the 'back of pass' list
+                "detailsItemInfos": [
+                    # Dates
+                    {"item": {"firstValue": {"fields": [{"fieldPath": "class.textModulesData['dates']"}]}}},
+                    # Address
+                    {"item": {"firstValue": {"fields": [{"fieldPath": "class.venue"}]}}},
+                    # Checkin code
+                    {"item": {"firstValue": {"fields": [{"fieldPath": "object.ticketNumber"}]}}},
+                    # Admission tickets
+                    {
+                        "item": {
+                            "firstValue": {"fields": [{"fieldPath": "object.textModulesData['n_admission']"}]}
+                        }
+                    },
+                    {
+                        "item": {
+                            "firstValue": {"fields": [{"fieldPath": "object.textModulesData['n_parking']"}]}
+                        }
+                    },
+                    {
+                        "item": {
+                            "firstValue": {"fields": [{"fieldPath": "object.textModulesData['n_campervan']"}]}
+                        }
+                    },
+                    {
+                        "item": {
+                            "firstValue": {"fields": [{"fieldPath": "object.textModulesData['n_merch']"}]}
+                        }
+                    },
+                    # URLs
+                    {"item": {"firstValue": {"fields": [{"fieldPath": "class.linksModuleData"}]}}},
+                ],
+            },
+        },
+    }
+
+
+def generate_gwallet_pass(user: User) -> googleapiclient._apis.walletobjects.v1.EventTicketObject:
+    start, end = _event_datetimes()
+    meta = get_purchase_metadata(user)
+    n_admission = len(meta.admissions)
+    n_parking = len(meta.parking_tickets)
+    n_campervan = len(meta.campervan_tickets)
+    n_merch = len(meta.merch)
+    pass_valid_start = start
+    if user.buildup_volunteer is not None:
+        pass_valid_start = pytz.timezone("Europe/London").localize(user.buildup_volunteer.arrival_date)
+    text_modules: list[googleapiclient._apis.walletobjects.v1.TextModuleData] = [
+        {
+            "id": "n_admission",
+            "header": "Admission",
+            "body": str(n_admission),
+        }
+    ]
+    if n_parking:
+        text_modules.append(
+            {
+                "id": "n_parking",
+                "header": "Parking",
+                "body": str(n_parking),
+            }
+        )
+    if n_campervan:
+        text_modules.append(
+            {
+                "id": "n_campervan",
+                "header": "Live-in vehicles",
+                "body": str(n_campervan),
+            }
+        )
+    if n_merch:
+        text_modules.append(
+            {
+                "id": "n_merch",
+                "header": "Merchandise items",
+                "body": str(n_merch),
+            }
+        )
+
+    return {
+        "id": f"{config.get('GOOGLE_WALLET_ISSUER_ID')}.{user.checkin_code}",
+        "classId": _gwallet_class_id(),
+        "state": "ACTIVE",
+        "barcode": {
+            "type": "QR_CODE",
+            "value": config.get("CHECKIN_BASE") + user.checkin_code,
+            "alternateText": user.checkin_code,
+        },
+        "ticketNumber": user.checkin_code,
+        "textModulesData": text_modules,
+        "validTimeInterval": {
+            "start": {"date": pass_valid_start.isoformat()},
+            "end": {"date": end.isoformat()},
+        },
+    }
+
+
+class WalletJWT(TypedDict):
+    iss: str
+    aud: str
+    origins: list[str]
+    typ: str
+    payload: WalletJWTPayload
+
+
+class WalletJWTPayload(TypedDict):
+    eventTicketObjects: list[googleapiclient._apis.walletobjects.v1.EventTicketObject]
+
+
+def _sign_gwallet_jwt_to_url(claims: Any) -> str:
+    signer = google.auth.crypt.RSASigner.from_service_account_file(
+        config.get("GOOGLE_WALLET_SERVICE_ACCOUNT_KEY")
+    )
+    token = google.auth.jwt.encode(signer, claims).decode("utf-8")
+    return f"https://pay.google.com/gp/v/save/{token}"
+
+
+def generate_gwallet_pass_url(user: User) -> str:
+    new_pass = generate_gwallet_pass(user)
+    claims = {
+        "iss": config.get("GOOGLE_WALLET_SERVICE_ACCOUNT_EMAIL"),
+        "aud": "google",
+        "origins": ["www.emfcamp.org"],
+        "typ": "savetowallet",
+        "payload": {
+            "eventTicketObjects": [new_pass],
+        },
+    }
+    return _sign_gwallet_jwt_to_url(claims)
+
+
+def gwallet_api_client() -> googleapiclient._apis.walletobjects.v1.resources.WalletobjectsResource:
+    credentials = google.oauth2.service_account.Credentials.from_service_account_file(
+        config.get("GOOGLE_WALLET_SERVICE_ACCOUNT_KEY"),
+        scopes=["https://www.googleapis.com/auth/wallet_object.issuer"],
+    )
+    client: googleapiclient._apis.walletobjects.v1.resources.WalletobjectsResource = (
+        googleapiclient.discovery.build("walletobjects", "v1", credentials=credentials)
+    )
+    return client
