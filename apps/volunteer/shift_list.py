@@ -4,7 +4,6 @@ def get_shift_list():
     # ever need to load them when someone hits the init_shifts endpoint. So...
     from .shifts.arcade import arcade_shifts
     from .shifts.badge import badge_shifts
-    from .shifts.bands import bands_shifts
     from .shifts.bar import bar_shifts
     from .shifts.entrance import entrance_shifts
     from .shifts.family_workshops import family_workshop_shifts
@@ -13,7 +12,7 @@ def get_shift_list():
     from .shifts.logistics import logistics_shifts
     from .shifts.nullsector import nullsector_shifts
     from .shifts.parking import parking_shifts
-    from .shifts.phone import phone_shifts
+    from .shifts.performances import bands_shifts
     from .shifts.shop import shop_shifts
     from .shifts.talks import talks_shifts
 
@@ -27,7 +26,6 @@ def get_shift_list():
     shift_list.update(logistics_shifts)
     shift_list.update(nullsector_shifts)
     shift_list.update(parking_shifts)
-    shift_list.update(phone_shifts)
     shift_list.update(shop_shifts)
     shift_list.update(talks_shifts)
     shift_list.update(family_workshop_shifts)
