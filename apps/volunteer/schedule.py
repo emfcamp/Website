@@ -129,11 +129,7 @@ def _active_day(permitted: list[date]) -> date:
 @v_user_required
 def schedule():
     # Volunteer admins and role admins can see the schedule at any time.
-    is_admin = (
-        current_user.has_permission("admin")
-        or current_user.has_permission("volunteer_admin")
-        or len(current_user.administered_roles) > 0
-    )
+    is_admin = current_user.has_permission("admin") or current_user.has_permission("volunteer_admin")
     if not feature_enabled("VOLUNTEERS_SCHEDULE") and not is_admin:
         abort(404)
 
