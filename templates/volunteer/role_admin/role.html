@@ -66,6 +66,11 @@
           <input name="max_needed" type="number" class="form-control" value="{{ shift.max_needed }}">
         </div>
         <div class="form-group">
+          <label class="control-label" for="notes">Notes</label>
+          <input name="notes" type="text" class="form-control" value="{{ shift.notes }}">
+          <p class="help-block">Notes to make available for volunteers signing up to this shift. Leave blank if none required. Primarily intended for workshop helpers.</p>
+        </div>
+        <div class="form-group">
           <button type="button" class="btn btn-danger shift-editor-cancel" data-shift-id="{{ shift.id }}">Cancel</button>
           <button type="submit" class="btn btn-primary">Update</button>
         </div>
@@ -77,6 +82,9 @@
         <li><strong>Current:</strong> {{ shift.entries | count }}</li>
         <li><a href="#shift-status-{{ shift.id }}" class="shift-status-edit" data-shift-id="{{ shift.id }}">Edit</a></li>
       </ul>
+      {% if shift.notes %}
+        <p><strong>Notes:</strong><br>{{ shift.notes }}</p>
+      {% endif %}
       {% for se in shift.entries|sort(attribute="user_id") %}
         <div class="volunteer">
           <p>

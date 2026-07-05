@@ -328,6 +328,7 @@ def update_shift(role_id: int, shift_id: int) -> ResponseReturnValue:
     shift = get_or_404(db, Shift, shift_id)
     shift.min_needed = int(request.form["min_needed"])
     shift.max_needed = int(request.form["max_needed"])
+    shift.notes = request.form["notes"] if len(request.form["notes"].strip()) > 0 else None
     db.session.add(shift)
     db.session.commit()
 
