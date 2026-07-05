@@ -11,6 +11,7 @@ from sqlalchemy.orm import Mapped, column_property, mapped_column, relationship
 
 from apps.config import config
 from main import db
+from models.volunteer.venue import VolunteerVenue
 
 from .. import BaseModel
 
@@ -18,7 +19,6 @@ if TYPE_CHECKING:
     from ..content.schedule import Occurrence
     from ..user import User
     from .role import Role
-    from .venue import VolunteerVenue
 
 __all__ = [
     "Shift",
@@ -415,9 +415,10 @@ class Shift(BaseModel):
 
         query = (
             select(cls)
+            .join(Shift.venue)
             .where(Shift.start >= start)
             .where(Shift.end <= end)
-            .order_by(Shift.start, Shift.venue_id)
+            .order_by(Shift.start, Shift.end, VolunteerVenue.name)
         )
 
         if not include_unfinalised:
