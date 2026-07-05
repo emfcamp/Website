@@ -163,34 +163,45 @@ def role_admin(role_id):
     offset = int(request.args.get("offset", "0"))
     role = get_or_404(db, Role, role_id)
     cutoff = now - timedelta(minutes=30)
-    shifts = (
-        Shift.query.filter_by(role=role)
-        .filter(Shift.end >= cutoff)
+
+    venues = db.session.scalars(
+        select(VolunteerVenue)
+        .join(Shift, Shift.venue_id == VolunteerVenue.id)
+        .where(Shift.role_id == role.id)
+        .distinct()
+        .order_by(VolunteerVenue.name)
+    ).all()
+    selected_venue_id = request.args.get("venue_id", 0, type=int)
+
+    shift_query = (
+        select(Shift)
+        .where(Shift.role_id == role.id and Shift.end >= cutoff)
         .order_by(Shift.end)
         .offset(offset)
         .limit(limit)
-        .all()
     )
+    shift_entries_query = select(ShiftEntry).join(ShiftEntry.shift).where(Shift.role_id == role.id)
 
-    active_shift_entries = (
-        ShiftEntry.query.filter(ShiftEntry.state == ShiftEntryState.ARRIVED)
-        .join(ShiftEntry.shift)
-        .filter(Shift.role_id == role.id)
-        .all()
-    )
-    pending_shift_entries = (
-        ShiftEntry.query.join(ShiftEntry.shift)
-        .filter(
+    if selected_venue_id != 0:
+        shift_query = shift_query.where(Shift.venue_id == selected_venue_id)
+        shift_entries_query = shift_entries_query.where(Shift.venue_id == selected_venue_id)
+
+    shifts = db.session.scalars(shift_query).all()
+    active_shift_entries = db.session.scalars(
+        shift_entries_query.where(ShiftEntry.state == ShiftEntryState.ARRIVED)
+    ).all()
+    pending_shift_entries = db.session.scalars(
+        shift_entries_query.where(
             Shift.start <= now - timedelta(minutes=15),
-            Shift.role == role,
             ShiftEntry.state == ShiftEntryState.SIGNED_UP,
         )
-        .all()
-    )
+    ).all()
 
     return render_template(
         "volunteer/role_admin/role.html",
         role=role,
+        venues=venues,
+        selected_venue_id=selected_venue_id,
         shifts=shifts,
         active_shift_entries=active_shift_entries,
         pending_shift_entries=pending_shift_entries,
