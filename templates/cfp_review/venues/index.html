@@ -15,6 +15,7 @@
         <th>Name</th>
         <th>Village</th>
         <th>Capacity</th>
+        <th>Official</th>
         <th>Allows attendee content</th>
         <th>Time blocks</th>
         <th></th>
@@ -24,6 +25,7 @@
             <td>{{ venue.name }}</td>
             <td>{{ venue.village and venue.village.name or '' }}</td>
             <td>{{ venue.capacity or '' }}</td>
+            <td>{{ venue.official_venue }}</td>
             <td>{{ venue.allows_attendee_content }}</td>
             <td>{{ venue.time_blocks|length or '' }}</td>
             <td><a class="btn btn-sm btn-primary" href="{{ url_for('.edit_venue', venue_id=venue.id) }}">Edit</a></td>

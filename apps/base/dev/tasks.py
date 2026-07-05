@@ -68,6 +68,7 @@ class VenueDefinition:
             name=self.name,
             priority=self.priority,
             location=self.location,
+            official_venue=True,
             allows_attendee_content=self.allows_attendee_content,
             capacity=self.capacity,
         )

@@ -48,6 +48,7 @@ from . import (
 class VenueForm(Form):
     name = StringField("Name", [DataRequired()])
     village_id = SelectField("Village", coerce=coerce_optional(int))
+    official_venue = BooleanField("Official Venue")
     allows_attendee_content = BooleanField("Allows Attendee Content")
     location_lat = FloatField("Latitude", validators=[Optional()])
     location_lon = FloatField("Longitude", validators=[Optional()])
@@ -83,7 +84,7 @@ class VenueForm(Form):
 def venues() -> ResponseReturnValue:
     venues_query = db.session.query(Venue).order_by(Venue.name)
     if not request.args.get("all"):
-        venues_query = venues_query.where(Venue.village_id.is_(None))
+        venues_query = venues_query.where(Venue.official_venue == True)
 
     venues = venues_query.all()
     new_venue = Venue()
