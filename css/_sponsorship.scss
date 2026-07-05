@@ -82,6 +82,10 @@
     &--gold {
       grid-template-columns: 1fr 1fr;
     }
+
+    &--pyro {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
   }
 }
 
