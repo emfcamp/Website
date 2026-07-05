@@ -20,7 +20,7 @@
         {% if current_user.buildup_volunteer %}
             {{ menuitem('Buildup/Teardown', '.buildup_amend')}}
         {% endif %}
-        {% if current_user.has_permission('volunteer:admin') or current_user.has_permission('volunteer:manager') or current_user.is_volunteer_admin %}
+        {% if current_user.volunteer.is_volunteer_admin %}
             {{ menuitem('Role Admin', '.role_admin_index')}}
         {% endif %}
         {% if current_user.has_permission('volunteer:admin') %}

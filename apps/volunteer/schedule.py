@@ -130,12 +130,7 @@ def _active_day(permitted: list[date]) -> date:
 def schedule():
     # Volunteer admins and role admins can see the schedule at any time.
     current_volunteer = Volunteer.get_for_user(current_user)
-    is_admin = (
-        current_user.has_permission("admin")
-        or current_user.has_permission("volunteer:admin")
-        or current_volunteer.is_volunteer_admin
-    )
-    if not feature_enabled("VOLUNTEERS_SCHEDULE") and not is_admin:
+    if not feature_enabled("VOLUNTEERS_SCHEDULE") and not current_volunteer.is_volunteer_admin:
         abort(404)
 
     earliest, latest = Shift.earliest_and_latest_in_range(*current_volunteer.permitted_shift_times)
@@ -149,7 +144,7 @@ def schedule():
     else:
         active_day = _active_day(dates)
 
-    shifts = Shift.get_all_for_day(active_day, include_unfinalised=is_admin)
+    shifts = Shift.get_all_for_day(active_day, include_unfinalised=current_volunteer.is_volunteer_admin)
     if len(shifts) == 0:
         # If there's no shifts nothing can conflict, so don't bother looking.
         user_calendar = []
@@ -183,7 +178,7 @@ def schedule():
         active_day=active_day,
         untrained_roles=untrained_roles,
         buildup_volunteer=current_volunteer.registered_for_buildup,
-        is_admin=is_admin,
+        is_admin=current_volunteer.is_volunteer_admin,
         owned_roles=current_volunteer.administered_role_ids,
         token=token,
     )
@@ -243,7 +238,9 @@ def shift(shift_id):
 @v_user_required
 def shift_sign_up(shift_id):
     shift = get_or_404(db, Shift, shift_id)
-    if current_user.has_permission("volunteer:admin") and "user_id" in request.form:
+    if (
+        current_user.has_permission("volunteer:admin") or current_user.has_permission("volunteer:manager")
+    ) and "user_id" in request.form:
         user = User.query.get(request.form["user_id"])
     else:
         user = current_user

@@ -12,8 +12,10 @@ EMF Volunteer Role Admin
 {# Users with roles in a single team just see a list of roles #}
 {% if roles|length == 1 %}
     <ul class="list-unstyled">
-        {% for role, shift_count in roles[0] %}
-        <li><a href="{{ url_for('.role_admin', role_id=role.id) }}">{{ role.name }}</a></li>
+        {% for _, team_roles in roles.items() %}
+            {% for role, _ in team_roles %}
+                <li><a href="{{ url_for('.role_admin', role_id=role.id) }}">{{ role.name }}</a></li>
+            {% endfor %}
         {% endfor %}
     </ul>
 

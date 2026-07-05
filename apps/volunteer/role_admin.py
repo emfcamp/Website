@@ -120,7 +120,7 @@ def role_admin_index():
     ):
         administered_ids = None
     else:
-        administered_ids = current_user.administered_role_ids
+        administered_ids = current_user.volunteer.administered_role_ids
         if len(administered_ids) == 0:
             flash("You're not an admin for any roles.")
             return redirect(url_for(".choose_role"))
