@@ -8,12 +8,15 @@
         {#
         <p>If you have been asked to submit a new proposal for a talk, performance, workshop, family workshop or installation, please
         #}
+        {#
         <p>You can still
             {% if proposal_type %}
             <a href="{{ url_for('cfp.create_proposal', proposal_type=proposal_type) + '?closed' }}">submit a new proposal for an installation or lightning talk</a>.</p>
             {% else %}
             <a href="{{ url_for('cfp.main') + '?closed' }}">submit a new proposal for an installation or lightning talk</a>.</p>
             {% endif %}
+        #}
+        <p>Thanks to everyone who participated.</p>
 
         {% if current_user.is_authenticated %}
           {% if current_user.proposals %}
