@@ -16,7 +16,7 @@ from wtforms import (
     SubmitField,
     TextAreaField,
 )
-from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
+from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional, ValidationError
 
 from main import db
 from models.content import (
@@ -197,6 +197,13 @@ class ConvertScheduleItemForm(Form):
 
 class UpdateAvailabilityForm(Form):
     update = SubmitField("Update")
+
+
+class ScheduleItemPresentersForm(Form):
+    # Actually rendered hidden, but manually
+    user_id = IntegerField("user_id", [InputRequired()])
+    delete = SubmitField("Remove")
+    add = SubmitField("Add")
 
 
 # The forms below should match the Attribute subclasses in the model.

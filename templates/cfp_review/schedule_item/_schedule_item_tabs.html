@@ -14,6 +14,11 @@
             Availability
         </a>
     </li>
+    <li role="presentation" {% if active == 'presenters' %} class="active" {% endif %}>
+        <a href="{{ url_for('.schedule_item_presenters', schedule_item_id=schedule_item.id, **full_qs) }}">
+            Presenters
+        </a>
+    </li>
     {% for occurrence in schedule_item.occurrences %}
     <li role="presentation" class="occurrence {{ "active" if active == 'occurrence-%s' % occurrence.id }} {{"cancelled" if occurrence.cancelled }}">
         <a href="{{ url_for('.update_occurrence', schedule_item_id=schedule_item.id, occurrence_id=occurrence.id, **full_qs) }}">

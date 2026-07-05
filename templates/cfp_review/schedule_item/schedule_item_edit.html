@@ -34,15 +34,27 @@
                             {% endif %}
                             <dt>Num favourites</dt>
                             <dd>{{ schedule_item.favourite_count }}</dd>
-
+                        </dl>
+                        <dl class="dl-horizontal">
                             {{ render_dl_field(form.official_content) }}
                             {{ render_dl_field(form.state) }}
-
                         </dl>
                         <dl class="dl-horizontal">
                             {{ render_dl_field(form.title) }}
+                            {% if schedule_item.schedule_item_presenters %}
+                            <dt>Presenters</dt>
+                            <dd>
+                              <ul style="padding: 0; margin-top: 5px; margin-bottom: 5px">
+                              {% for sip in schedule_item.schedule_item_presenters %}
+                                <li style="display: block"><a href="{{ url_for('admin.user', user_id=sip.user.id) }}">{{ sip.user.name }}</a></li>
+                              {% endfor %}
+                              </ul>
+                            </dd>
+                            {% endif %}
                             {{ render_dl_field(form.names) }}
                             {{ render_dl_field(form.pronouns) }}
+                        </dl>
+                        <dl class="dl-horizontal">
                             {{ render_dl_field(form.description, rows=4) }}
                             {{ render_dl_field(form.short_description) }}
 
@@ -105,6 +117,10 @@
             <a href="{{ url_for('.schedule_item_change_owner', schedule_item_id=schedule_item.id) }}"
                     class="btn btn-warning">
                 Change schedule item owner
+            </a>
+            <a href="{{ url_for('.schedule_item_presenters', schedule_item_id=schedule_item.id) }}"
+                    class="btn btn-primary">
+                Edit presenters
             </a>
             {{ occurrence_form.create(class_="btn btn-success debounce", tabindex=1) }}
 

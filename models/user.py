@@ -16,7 +16,7 @@ from flask import session
 from flask_login import AnonymousUserMixin, UserMixin
 from sqlalchemy import Column, ForeignKey, Index, Integer, Table, func, select, text
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.associationproxy import AssociationProxy, association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from apps.config import config
@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from .admin_message import AdminMessage
     from .content.cfp import ProposalMessage, ProposalVote
     from .content.lottery import LotteryEntry
-    from .content.schedule import Occurrence, ScheduleItem
+    from .content.schedule import Occurrence, ScheduleItem, ScheduleItemPresenter
     from .content.tagging import Tag
     from .diversity import UserDiversity
     from .email import EmailJobRecipient
@@ -288,6 +288,14 @@ class User(BaseModel, UserMixin):
     schedule_items: Mapped[list[ScheduleItem]] = relationship(
         primaryjoin="ScheduleItem.user_id == User.id",
         back_populates="user",
+    )
+
+    schedule_item_presenters: Mapped[list[ScheduleItemPresenter]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    presented_schedule_items: AssociationProxy[list[ScheduleItem]] = association_proxy(
+        "schedule_item_presenters", "schedule_item"
     )
 
     favourites: Mapped[list[ScheduleItem]] = relationship(
