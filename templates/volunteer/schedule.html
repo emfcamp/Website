@@ -73,14 +73,14 @@
                                     <td class="start_time hidden">{{ hour }}</td>
                                 {% endif %}
                                 <td class="end_time">
-                                    {% if current_user.has_permission("volunteer:admin") %}
+                                    {% if current_user.has_permission("volunteer:admin") or current_user.has_permission("volunteer:manager") %}
                                         <a href="{{ url_for('.shift', shift_id=shift.id) }}">{{ shift.end_time if shift.end else '--' }}</a>
                                     {% else %}
                                         {{ shift.end_time if shift.end else '--' }}
                                     {% endif %}
                                 </td>
                                 <td class="time mobile-only">
-                                    {% if current_user.has_permission("volunteer:admin") %}
+                                    {% if current_user.has_permission("volunteer:admin") or current_user.has_permission("volunteer:manager") %}
                                         <a href="{{ url_for('.shift', shift_id=shift.id) }}">{{ hour }}{% if shift.end %} to {{ shift.end_time }}{% endif %}</a>
                                     {% else %}
                                         {{ hour }}{% if shift.end %} to {{ shift.end_time }}{% endif %}

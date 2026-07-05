@@ -161,7 +161,12 @@ class Volunteer(BaseModel, UserMixin):
 
     @property
     def is_volunteer_admin(self) -> bool:
-        return bool(self.volunteer_admin_roles or self.administered_teams)
+        return bool(
+            self.user.has_permission("volunteer:manager")
+            or self.user.has_permission("volunteer:admin")
+            or self.volunteer_admin_roles
+            or self.administered_teams
+        )
 
     @property
     def registered_for_buildup(self) -> bool:
