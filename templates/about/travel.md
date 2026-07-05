@@ -16,14 +16,19 @@ from Paddington, you will need to be in the front three coaches to get off the t
 
 ### Shuttle bus
 
-We will be providing a free shuttle bus service between Ledbury station and the EMF site during the event. Closer to the event date, there will be a dedicated page with timetables and further information about the shuttle bus.
+We will be providing a free shuttle bus service between Ledbury station and the EMF site during the event.
 
-{# 2024
+Buses are roughly hourly, and are timed to conincide with rail services from and to Birmingham. There will be an additional bus on Thursday, Friday, Sunday, and Monday morning to meet services to and from London (which are not hourly).
 
-Timetables and further information can be found on the [shuttle bus page](https://bus.emf.camp/about/).
+The shuttle bus service will operate between the following times. A full schedule and live tracking will be available shortly.
 
-**Note:** There is engineering work on the Sunday of EMF (June 2nd) which means the line between Ledbury and Worcester is closed until 18:00, with a rail replacement bus service. We are planning to run our shuttle bus service to **Worcestershire Parkway** station during the day. Our buses will run to Ledbury after 18:00 to meet the trains there, but if you're travelling by train, we recommend you stay until Monday if possible.
-#}
+| Day                | Start | End   |
+|--------------------|-------|-------|
+| Thursday 16th July | 10:00 | 20:00 |
+| Friday 17th July   | 09:00 | 22:00 |
+| Saturday 18th July | 09:00 | 22:00 |
+| Sunday 19th July   | 09:00 | 22:00 |
+| Monday 20th July   | 09:00 | 16:00 |
 
 ## By Car
 If you plan to drive, you will need to [buy a parking ticket or live-in vehicle ticket](/tickets/other).
