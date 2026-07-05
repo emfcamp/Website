@@ -13,10 +13,10 @@
         <form class="form-horizontal" method="post">
             <fieldset>
                 {{ form.hidden_tag() }}
-                {{ render_field(form.name, horizontal=9) }}
-                {{ render_field(form.full_description_md, horizontal=9) }}
-                {{ render_field(form.role_notes, horizontal=9) }}
-                {{ render_field(form.instructions_url, horizontal=9) }}
+                {% call render_field(form.name, horizontal=9) %}{{ form.name.description }}{% endcall %}
+                {% call render_field(form.full_description_md, horizontal=9, style="height: 20em") %}{{ form.full_description_md.description }}{% endcall %}
+                {% call render_field(form.role_notes, horizontal=9, style="height: 20em") %}{{ form.role_notes.description }}{% endcall %}
+                {% call render_field(form.instructions_url, horizontal=9) %}{{ form.instructions_url.description }}{% endcall %}
                 {{ form.save(class_="btn btn-primary debounce pull-right") }}
             </fieldset>
         </form>

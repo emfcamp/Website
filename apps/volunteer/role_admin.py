@@ -98,7 +98,7 @@ class RoleForm(Form):
     )
     role_notes = StringField(
         "Role notes (supports markdown)",
-        [Optional(), InputRequired()],
+        [Optional()],
         widget=TextArea(),
         description="Displayed to volunteers when they check in for a shift.",
     )
@@ -205,7 +205,6 @@ def role_edit(role_id: int) -> ResponseReturnValue:
     """Allows editing details of a role."""
     role = get_or_404(db, Role, role_id)
     form = RoleForm(request.form, obj=role)
-
     if request.method == "POST" and form.validate():
         form.populate_obj(role)
         db.session.add(role)
