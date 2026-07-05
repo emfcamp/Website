@@ -2,28 +2,12 @@
 {% extends "base.html" %}
 {% block title %}Village: {{village.name}}{% endblock %}
 {% block body %}
-<h1>
-  {{village.name}}
-  {% if user_is_village_admin %}
-  <a href="{{url_for('villages.members', year=event_year, village_id=village.id)}}" class="btn btn-primary btn-lg pull-right">Members</a>
-  <a href="{{url_for('villages.edit', year=event_year, village_id=village.id)}}" class="btn btn-primary btn-lg pull-right">Edit</a>
-  <a href="{{url_for('villages.members_leave', year=event_year, village_id=village.id)}}" class="btn btn-danger btn-lg pull-right">Leave</a>
-  {% elif user_is_village_member %}
-  <a href="{{url_for('villages.members_leave', year=event_year, village_id=village.id)}}" class="btn btn-danger btn-lg pull-right">Leave</a>
-  {% elif user_has_requested_join_village %}
-  <a href="{{url_for('villages.members_leave', year=event_year, village_id=village.id)}}" class="btn btn-danger btn-lg pull-right">Cancel join request</a>
-  {% endif %}
-
-  {% if user_can_join_village %}
-    <a href="{{url_for('villages.members_join', year=event_year, village_id=village.id)}}" class="btn btn-success btn-lg pull-right">Request to join</a>
-  {% endif %}
-</h1>
-
+<div class="village-page">
+<h1>{{village.name}}</h1>
 {% if village.description %}
 {# TODO: now that we have long_description_html, this should ideally be H2. But in 2026 people have already put long things here #}
 <p>{{village.description}}</p>
 {% endif %}
-
 {% if edit_desc_form %}
 <div class="well">
   <form method="post" class="form-horizontal village-form" role="form">
@@ -43,30 +27,58 @@
   </form>
 </div>
 {% elif village_long_description_html %}
+<div>
   {% if user_is_village_admin %}
-  <a class="pull-right" href="{{ url_for('.editdesc', village_id=village.id, year=year) }}">Edit</a>
+  <a class="btn btn-default pull-right" href="{{ url_for('.editdesc', village_id=village.id, year=year) }}">Edit description</a>
   {% endif %}
 
   {# This is render-blocking, but we want the listener ready for the iframe.
     Better to delay first render than to have a two-way handshake that flashes. #}
   <script src="{{static_url_for('static', filename="js/sandboxed-iframe-parent.js")}}"></script>
   <p>{{village_long_description_html}}</p>
+</div>
+{% endif %}
+{% if village.url %}
+<div>
+<a href="{{ village.url }}" class="btn btn-default" rel="nofollow" target="_blank">More about this village</a>
+</div>
 {% endif %}
 
+
 <div>
-  <a href="{{url_for('villages.main', year=event_year)}}" class="btn btn-default pull-right">View all villages</a>
-  {# TODO: embed a map somehow? #}
   {% if village.map_link %}
+  <emf-map class="village-map"
+      center="{{village.latlon[1]}},{{village.latlon[0]}}"
+      zoom=18
+      marker="{{village.latlon[1]}},{{village.latlon[0]}}"
+  >
+  </emf-map>
+
+  <script type="module" rel="preload" src="https://map.emfcamp.org/component.js"></script>
   <a href="{{ village.map_link }}" class="btn btn-default" target="_blank">📍&nbsp;View on map</a>
-  {% endif %}
-  {% if village.url %}
-  <a href="{{ village.url }}" class="btn btn-default" rel="nofollow" target="_blank">More about this village</a>
   {% endif %}
 </div>
 
-<p style="margin-top: 30px">
-  <em>Content and external links on this page are provided by attendees and are not the responsibility of EMF.</em>
-</p>
-
+<div class="village-footer">
+    <div class="btn-group">
+        {% if user_is_village_admin %}
+        <a href="{{url_for('villages.members', year=event_year, village_id=village.id)}}" class="btn btn-primary">Members</a>
+        <a href="{{url_for('villages.edit', year=event_year, village_id=village.id)}}" class="btn btn-primary">Edit</a>
+        <a href="{{url_for('villages.members_leave', year=event_year, village_id=village.id)}}" class="btn btn-danger">Leave</a>
+        {% elif user_is_village_member %}
+        <a href="{{url_for('villages.members_leave', year=event_year, village_id=village.id)}}" class="btn btn-danger">Leave</a>
+        {% elif user_has_requested_join_village %}
+        <a href="{{url_for('villages.members_leave', year=event_year, village_id=village.id)}}" class="btn btn-danger">Cancel join request</a>
+        {% endif %}
+        {% if user_can_join_village %}
+        <a href="{{url_for('villages.members_join', year=event_year, village_id=village.id)}}" class="btn btn-success">Request to join</a>
+        {% endif %}
+    </div>
+    <div class="btn-group pull-right">
+        <a href="{{url_for('villages.main', year=event_year)}}" class="btn btn-default">View all villages</a>
+    </div>
+    <p><em>Content and external links on this page are provided by attendees and are not the responsibility of EMF.</em></p>
+</div>
+</div>
 {# TODO: Can we show what's on at the village venues here? #}
 {% endblock %}

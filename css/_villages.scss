@@ -101,6 +101,12 @@
   }
 }
 
+.village-page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .village-form {
   textarea#description {
     height: 100px;
@@ -109,6 +115,10 @@
   textarea#long_description {
     height: 200px;
   }
+}
+
+.village-footer {
+  margin-top: auto;
 }
 
 .embedded-content {
@@ -121,4 +131,10 @@
 .village-inline-form {
   display: inline-block;
   padding: 2px 0px;
+}
+
+.village-map {
+  max-width: 100%;
+  margin: 1em;
+  height: 300px;
 }

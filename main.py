@@ -272,8 +272,9 @@ def create_app(dev_server=False, config_override=None):
 
         csp = {
             # unsafe-eval is required by the dhtmlx scheduler on the admin interface currently.
-            "script-src": ["'self'", "https://js.stripe.com", "'unsafe-eval'"],
+            "script-src": ["'self'", "https://js.stripe.com", "https://map.emfcamp.org", "'unsafe-eval'"],
             "style-src": ["'self'", "'unsafe-inline'"],
+            "worker-src": ["blob:"],
             # Note: the below is more strict as it only allows inline styles in style=
             # attributes, however it's unsupported by Safari at this time...
             #  "style-src-attr": ["'unsafe-inline'"],
