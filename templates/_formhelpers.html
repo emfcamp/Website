@@ -201,3 +201,20 @@
         <p class="help-block" id="help-block-{{field.name}}">{{ help_text }}</p>
     {% endif -%}</div>
 {% endmacro %}
+
+{% macro render_collapse_panel(title, name, expanded=True) %}
+<div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="{{ name }}PanelHeading">
+        <h4 class="panel-title">
+            <a role="button" data-toggle="collapse" href="#{{ name }}Panel" class="{{ "collapsed" if not expanded }}" aria-expanded="{{ "true" if expanded else "false" }}" aria-controls="{{ name }}Panel">
+                {{ title }}
+            </a>
+        </h4>
+    </div>
+    <div id="{{ name }}Panel" class="panel-collapse collapse {{ "in" if expanded }}" role="tabpanel" aria-labelledby="{{ name }}PanelHeading">
+        <div class="panel-body">
+            {{ caller() }}
+        </div>
+    </div>
+</div>
+{% endmacro %}

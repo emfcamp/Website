@@ -19,7 +19,7 @@ from flask import (
 from flask import current_app as app
 from flask.typing import ResponseReturnValue
 from flask_login import current_user
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import selectinload, undefer
 from wtforms import FormField
 
@@ -31,6 +31,7 @@ from models.content import (
     Lottery,
     Occurrence,
     ScheduleItem,
+    ScheduleItemPresenter,
     ScheduleItemType,
 )
 from models.content.attributes import convert_attributes_between_types
@@ -45,6 +46,7 @@ from .forms import (
     CreateOccurrenceForm,
     LotteryForm,
     ScheduleItemForm,
+    ScheduleItemPresentersForm,
     UpdateAvailabilityForm,
     UpdateOccurrenceForm,
     UpdateScheduleItemForm,
@@ -292,6 +294,70 @@ def _convert_schedule_item(schedule_item: ScheduleItem, new_type: ScheduleItemTy
     new_attributes = schedule_item.type_info.attributes_cls()
     convert_attributes_between_types(old_attributes, new_attributes)
     schedule_item.attributes = new_attributes
+
+
+@cfp_review.route("/schedule-items/<int:schedule_item_id>/presenters", methods=["GET", "POST"])
+@admin_required
+def schedule_item_presenters(schedule_item_id: int) -> ResponseReturnValue:
+    schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
+
+    form = ScheduleItemPresentersForm()
+
+    if form.validate_on_submit():
+        user = db.session.get(User, form.user_id.data)
+        if not user:
+            abort(400)
+
+        if form.delete.data:
+            if schedule_item not in user.presented_schedule_items:
+                flash("The user was already not presenting this schedule item")
+                return redirect(url_for(".schedule_item_presenters", schedule_item_id=schedule_item_id))
+
+            for sip in schedule_item.schedule_item_presenters:
+                if sip.user == user:
+                    flash("Presenter removed")
+                    db.session.delete(sip)
+
+        elif form.add.data:
+            if schedule_item in user.presented_schedule_items:
+                flash("This user is already presenting this schedule item")
+                return redirect(url_for(".schedule_item_presenters", schedule_item_id=schedule_item_id))
+
+            flash("Presenter added")
+            db.session.add(
+                ScheduleItemPresenter(
+                    schedule_item=schedule_item,
+                    user=user,
+                )
+            )
+
+        db.session.commit()
+        return redirect(url_for(".schedule_item_presenters", schedule_item_id=schedule_item_id))
+
+    try:
+        size = int(request.args.get("size", 500))
+    except ValueError:
+        return redirect(url_for(".users"))
+
+    search = request.args.get("search")
+    if search is not None:
+        query = db.select(User).where(or_(User.name.ilike(f"%{search}%"), User.email.ilike(f"%{search}%")))
+        users = query.order_by(User.id)
+        total_users = db.session.query(func.count(User.id)).scalar()
+        users_paged = db.paginate(users, per_page=size, error_out=False)
+    else:
+        users = None
+        total_users = None
+        users_paged = None
+
+    return render_template(
+        "cfp_review/schedule_item/presenters.html",
+        schedule_item=schedule_item,
+        form=form,
+        search=search,
+        users=users_paged,
+        total_users=total_users,
+    )
 
 
 @cfp_review.route("/schedule-items/<int:schedule_item_id>/occurrences", methods=["POST"])

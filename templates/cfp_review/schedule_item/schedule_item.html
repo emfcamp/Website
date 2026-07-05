@@ -24,6 +24,18 @@
                     <tr><th>Created from proposal</th><td><a href="{{url_for('.proposal', proposal_id=schedule_item.proposal.id)}}">{{schedule_item.proposal.title}}</a></td></tr>
                     {% endif %}
                     <tr><th>Owner</th><td><a href="{{ url_for('cfp_review.cfp_user', user_id=schedule_item.user.id) }}">{{schedule_item.user.name}}</a></td></tr>
+                    {% if schedule_item.schedule_item_presenters %}
+                    <tr>
+                      <th>Presenters</th>
+                      <td>
+                        <ul style="padding: 0; margin-top: 0px; margin-bottom: 0px">
+                        {% for sip in schedule_item.schedule_item_presenters %}
+                          <li style="display: block"><a href="{{ url_for('admin.user', user_id=sip.user.id) }}">{{ sip.user.name }}</a></li>
+                        {% endfor %}
+                        </ul>
+                      </td>
+                    {% endif %}
+
                     <tr><th>Has ticket?</th><td>{{ schedule_item.user.check_will_have_ticket()|yesno }}</td></tr>
                     <tr><th>Voucher sent?</th><td>{{ schedule_item.user.cfp_voucher|yesno }}
                         {% if not schedule_item.user.cfp_voucher %}(<a href="{{ url_for('cfp_review.cfp_user', user_id=schedule_item.user.id) }}">send voucher</a>){%endif %}

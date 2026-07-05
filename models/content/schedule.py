@@ -220,6 +220,17 @@ class ScheduleItemAvailability(BaseModel):
     end: Mapped[datetime]
 
 
+class ScheduleItemPresenter(BaseModel):
+    __tablename__ = "schedule_item_presenter"
+    __export_data__ = False  # Stats exported by ScheduleItem
+
+    schedule_item_id: Mapped[int] = mapped_column(ForeignKey("schedule_item.id"), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey(User.id), primary_key=True, index=True)
+
+    schedule_item: Mapped[ScheduleItem] = relationship(back_populates="schedule_item_presenters")
+    user: Mapped[User] = relationship(back_populates="schedule_item_presenters")
+
+
 class ScheduleItem(BaseModel):
     """An item of content in the schedule.
 
@@ -285,6 +296,11 @@ class ScheduleItem(BaseModel):
     occurrences: Mapped[list[Occurrence]] = relationship(
         back_populates="schedule_item", order_by="Occurrence.occurrence_num"
     )
+    schedule_item_presenters: Mapped[list[ScheduleItemPresenter]] = relationship(
+        back_populates="schedule_item",
+        order_by="ScheduleItemPresenter.user_id",
+        cascade="all, delete-orphan",
+    )
 
     is_published: Mapped[bool] = column_property(state.in_({"published"}))
 
@@ -318,10 +334,15 @@ class ScheduleItem(BaseModel):
         """The list of Users who are presenting this ScheduleItem, which may be different to the
             user who owns it.
 
-        Currently only returns a single user, or an empty list for manually-added ScheduleItems.
+        If no presenters are associated with the schedule item, returns the creator/owner,
+        or an empty list for manually-added ScheduleItems.
+
         This is used by the automatic scheduler to prevent speaker clashes.
         """
+        if self.schedule_item_presenters:
+            return set(p.user for p in self.schedule_item_presenters)
         # Manually-added ScheduleItems will have the team member who created them as self.user.
+        # Attendee content will have the village admin who owns it as self.user.
         # We don't want this to be displayed or used by the scheduler to detect clashes.
         if self.proposal:
             return {self.user}
