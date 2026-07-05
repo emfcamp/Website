@@ -302,6 +302,10 @@ class Shift(BaseModel):
     #: The ShiftTemplate that resulted in this shift
     generated_from: Mapped[ShiftTemplate | None] = relationship(back_populates="shifts")
 
+    #: Additional notes for this shift, primarily used for workshop helpers where every
+    #: shift has slightly different requirements.
+    notes: Mapped[str | None] = mapped_column(default=None)
+
     current_count = column_property(
         select(func.count(ShiftEntry.shift_id))
         .where(ShiftEntry.shift_id == id)
@@ -386,6 +390,7 @@ class Shift(BaseModel):
             "max_needed": self.max_needed,
             "role": self.role.to_dict(),
             "venue": self.venue.to_dict(),
+            "notes": self.notes,
             "current_count": self.current_count,
         }
 

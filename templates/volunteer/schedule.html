@@ -88,7 +88,12 @@
                                 </td>
                                 <td class="conflicts" {% if shift.is_user_shift %}title="You're signed up for this shift"{% endif %}></td>
                                 <td class="venue"><a href="{{ shift.venue.mapref }}">{{ shift.venue.name }}</a></td>
-                                <td class="role">{{ shift.role.name }}</td>
+                                <td class="role">
+                                    {{ shift.role.name }}
+                                    {% if shift.notes %}
+                                        <p class="help-block">{{ shift.notes}}</p>
+                                    {% endif %}
+                                </td>
                                 <td class="staffing">
                                     {{ staffing_icon(shift) }}
                                     {{ shift.current_count }}/{{ shift.max_needed }}
