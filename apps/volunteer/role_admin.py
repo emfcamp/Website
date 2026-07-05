@@ -126,7 +126,8 @@ def role_admin_index():
             return redirect(url_for(".choose_role"))
 
         if len(administered_ids) == 1:
-            return redirect(url_for(".role_admin", role_id=administered_ids[0]))
+            role_id = next(iter(administered_ids))
+            return redirect(url_for(".role_admin", role_id=role_id))
 
     return render_template(
         "volunteer/role_admin/index.html",
