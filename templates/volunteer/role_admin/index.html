@@ -15,7 +15,10 @@ EMF Volunteer Role Admin
         {% for role, shift_count in team_roles %}
             <li>
                 <a href="{{url_for('.role_admin', role_id=role.id)}}">{{role.name}}</a>
-                {% if volunteer_admin and role.shifts_finalised %} - {{ shift_count }} ✓{% endif %}
+                {% if volunteer_admin %}
+                    - {{ shift_count }}
+                    {% if role.shifts_finalised %}✓{% endif %}
+                {% endif %}
             </li>
         {% endfor %}
     </ul>
