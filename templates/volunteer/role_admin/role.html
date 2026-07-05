@@ -81,7 +81,7 @@
         </div>
         <div class="form-group">
           <label class="control-label" for="notes">Notes</label>
-          <input name="notes" type="text" class="form-control" value="{{ shift.notes }}">
+          <input name="notes" type="text" class="form-control" value="{{ shift.notes if shift.notes }}">
           <p class="help-block">Notes to make available for volunteers signing up to this shift. Leave blank if none required. Primarily intended for workshop helpers.</p>
         </div>
         <div class="form-group">
