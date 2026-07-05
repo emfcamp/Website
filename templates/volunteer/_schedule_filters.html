@@ -1,4 +1,5 @@
 {# Filter form on /volunteer/schedule #}
+{% macro vol_schedule_filters(roles, is_admin=False) %}
 <div class="panel panel-default" id="roles" style="display: none">
     <div class="panel-heading" id="roles-toggle">
         <h2 class="panel-title">
@@ -28,7 +29,9 @@
             <a class="checkbox-filter" href="#" id="select-no-roles">None</a>
             <a class="checkbox-filter" href="#" id="select-interested-roles">Roles I'm interested in</a>
             <a class="checkbox-filter" href="#" id="select-trained-roles">Roles I'm trained for</a>
-            <a class="checkbox-filter" href="#" id="select-owned-roles">Roles I'm admin for</a>
+            {% if is_admin %}
+                <a class="checkbox-filter" href="#" id="select-owned-roles">Roles I'm admin for</a>
+            {% endif %}
          </p>
     </div>
 </div>
@@ -61,7 +64,6 @@
                 <input
                     type="checkbox"
                     id="hide_full"
-                    checked
                 />
                 Hide full shifts
             </label>
@@ -76,10 +78,19 @@
                 <input
                     type="checkbox"
                     id="hide_conflicting"
-                    checked
                 />
                 Hide conflicting shifts
             </label>
+            {% if is_admin %}
+                <label class="checkbox" title="Hides any shifts which haven't been confirmed yet.">
+                    <input
+                        type="checkbox"
+                        id="hide_unfinalised"
+                    />
+                    Hide unfinalised shifts
+                </label>
+            {% endif %}
         </div>
     </div>
 </div>
+{% endmacro %}
