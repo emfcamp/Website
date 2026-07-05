@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% from "_formhelpers.html" import render_field %}
+{% from "volunteer/_schedule_filters.html" import vol_schedule_filters %}
 
 {% macro tabnav(day, full_day, active_day) %}
     <li id="tabnav-{{day}}" role="presentation" {%- if active_day == day %} class="active" {% endif %}>
@@ -24,12 +25,6 @@
         </div>
     </noscript>
 
-    <h2 class="sr-only">Pick your shifts</h2>
-    {# <p>Select a day to sign up for shifts. You can also <a href="{{ url_for('.choose_role') }}">change which roles you're interested in</a>.</p>
-
-    <p>You can <a href="{{ webcal_url('.schedule_ical', token=token) }}">subscribe to your shifts in your calendar</a>,
-       or get them as an <a href="{{ url_for('.schedule_ical', token=token) }}">iCal file</a>.</p> #}
-
     {% if untrained_roles %}
         <div class="alert alert-danger">
             <h3>You still need training before starting a shift for the following roles:</h3>
@@ -41,7 +36,7 @@
         </div>
     {% endif %}
 
-    {% include "volunteer/_schedule_filters.html" %}
+    {{ vol_schedule_filters(roles, is_admin) }}
 
     <ul class="nav nav-tabs has-nav-select" role="tablist">
         {% for day in dates %}

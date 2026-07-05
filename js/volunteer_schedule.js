@@ -1,5 +1,5 @@
 const { verified } = require("@primer/octicons");
-const filterStorageKey = "volunteer-filters:v5";
+const filterStorageKey = "volunteer-filters:v6";
 
 function saveFilters() {
   localStorage.setItem(filterStorageKey, JSON.stringify(getFilters()));
@@ -20,6 +20,7 @@ function loadFilters() {
       hide_full: true,
       hide_staffed: true,
       hide_conflicting: true,
+      hide_unfinalised: false,
     });
   }
 
@@ -33,6 +34,8 @@ function loadFilters() {
   document.getElementById("is_understaffed").checked = filters.hide_staffed;
   document.getElementById("hide_conflicting").checked =
     filters.hide_conflicting;
+  document.getElementById("hide_unfinalised").checked =
+    filters.hide_unfinalised;
   updateRowDisplay();
 }
 
@@ -46,6 +49,7 @@ function getFilters() {
     hide_full: document.getElementById("hide_full").checked,
     hide_staffed: document.getElementById("is_understaffed").checked,
     hide_conflicting: document.getElementById("hide_conflicting").checked,
+    hide_unfinalised: document.getElementById("hide_unfinalised").checked,
   };
   return filters;
 }
@@ -62,6 +66,7 @@ function getNodeData(node) {
     max_staff: parseInt(node.getAttribute("data-max-staff")),
     current_staff: parseInt(node.getAttribute("data-current-staff")),
     conflicts_with: node.getAttribute("data-conflicts-with"),
+    finalised: node.getAttribute("data-finalised") == "True",
   };
 }
 
@@ -98,6 +103,9 @@ function shouldDisplayNode(node_data, filters, node) {
     node_data["conflicts_with"] == "volunteer_shift"
   ) {
     filter_reasons.push("conflicting");
+  }
+  if (filters["hide_unfinalised"] && !node_data["finalised"]) {
+    filter_reasons.push("unfinalised");
   }
   if (filter_reasons.length > 0) {
     node.setAttribute("data-filter-reasons", filter_reasons.join(","));
@@ -175,6 +183,7 @@ function init_volunteer_schedule() {
     "hide_full",
     "is_understaffed",
     "hide_conflicting",
+    "hide_unfinalised",
   ].forEach((id) => {
     document.getElementById(id).addEventListener("change", () => {
       saveFilters();
