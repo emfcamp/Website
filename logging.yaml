@@ -19,6 +19,10 @@ formatters:
     class: loggingmanager.ContextFormatter
     format: "%(asctime)s %(name)-12s %(levelname)-8s %(pid)s %(user)-12s %(message)s"
 
+filters:
+  no_static:
+    (): loggingmanager.NoStaticFilter
+
 root:
   level: NOTSET
   handlers: [stream_handler]
@@ -26,6 +30,7 @@ root:
 loggers:
   werkzeug:
     level: INFO
+    filters: [no_static]
   sqlalchemy.engine:
     handlers: [sqlalchemy]
     propagate: false

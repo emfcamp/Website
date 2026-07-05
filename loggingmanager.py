@@ -24,6 +24,13 @@ class ContextFormatter(logging.Formatter):
         return logging.Formatter.format(self, record)
 
 
+class NoStaticFilter(logging.Filter):
+    """Disable logging of static content requests."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return "/static/" not in record.getMessage()
+
+
 def set_user_id(uid):
     """Set the user ID for later use in logging."""
     local.user_id = uid
