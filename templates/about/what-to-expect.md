@@ -8,7 +8,7 @@ As well as the what to bring page, this page is aimed at first-timers who want t
 
 This very much depends on what kind of things you enjoy and how you like to be woken up/kept awake!
 
-Firstly, EMF is a festival with live music, and a fully operational nightclub that is open to the air. This means the nearer you get to the top end of the site, the noisier it gets (in general). You can check out the [map online](https://map.emfcamp.org/) or in your booklet for other noise-making things, such as villages and the Karaoke Tent. Villages will also make their own amounts of noise, from banging sound systems (they're usually on the top end of the site) to happy chatting people up until the wee hours discussing projects. You can usually spot them by small marquees or camping shelters with circles of chairs.
+Firstly, EMF is a festival with live music, and a fully operational nightclub that is open to the air. This means the nearer you get to the top end of the site, the noisier it gets (in general). You can check out the [map online](https://map.emfcamp.org/) or in your booklet for other noise-making things, such as villages and some installations. Villages will also make their own amounts of noise, from banging sound systems (they're usually on the top end of the site) to happy chatting people up until the wee hours discussing projects. You can usually spot them by small marquees or camping shelters with circles of chairs.
 
 ### Noise sensitivity?
 
