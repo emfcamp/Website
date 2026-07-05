@@ -129,11 +129,15 @@ def _active_day(permitted: list[date]) -> date:
 @v_user_required
 def schedule():
     # Volunteer admins and role admins can see the schedule at any time.
-    is_admin = current_user.has_permission("admin") or current_user.has_permission("volunteer_admin")
+    current_volunteer = Volunteer.get_for_user(current_user)
+    is_admin = (
+        current_user.has_permission("admin")
+        or current_user.has_permission("volunteer:admin")
+        or current_volunteer.is_volunteer_admin
+    )
     if not feature_enabled("VOLUNTEERS_SCHEDULE") and not is_admin:
         abort(404)
 
-    current_volunteer = Volunteer.get_for_user(current_user)
     earliest, latest = Shift.earliest_and_latest_in_range(*current_volunteer.permitted_shift_times)
     if earliest is None or latest is None:
         abort(404)
