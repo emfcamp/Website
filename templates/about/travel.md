@@ -22,13 +22,18 @@ Buses are roughly hourly, and are timed to conincide with rail services from and
 
 The shuttle bus service will operate between the following times. A full schedule and live tracking will be available shortly.
 
-| Day                | Start | End   |
-|--------------------|-------|-------|
-| Thursday 16th July | 10:00 | 20:00 |
-| Friday 17th July   | 09:00 | 22:00 |
-| Saturday 18th July | 09:00 | 22:00 |
-| Sunday 19th July   | 09:00 | 22:00 |
-| Monday 20th July   | 09:00 | 16:00 |
+<table class="table table-striped">
+  <thead>
+    <tr><th>Day</th><th>Start</th><th>End</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Thursday 16th July</td><td>10:00</td><td>20:00</td></tr>
+    <tr><td>Friday 17th July</td><td>09:00</td><td>22:00</td></tr>
+    <tr><td>Saturday 18th July</td><td>09:00</td><td>22:00</td></tr>
+    <tr><td>Sunday 19th July</td><td>09:00</td><td>22:00</td></tr>
+    <tr><td>Monday 20th July</td><td>09:00</td><td>16:00</td></tr>
+  </tbody>
+</table>
 
 ## By Car
 If you plan to drive, you will need to [buy a parking ticket or live-in vehicle ticket](/tickets/other).
