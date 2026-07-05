@@ -22,6 +22,7 @@
   <h2>{{ role }} Admin</h2>
   <div>
     <a href="{{ url_for('.role_volunteers', role_id=role.id) }}" class="btn btn-primary">All Volunteers</a>
+    <a href="{{ url_for('.role_edit', role_id=role.id) }}" class="btn btn-primary">Edit</a>
     <a href="{{ url_for('.train_users', role_id=role.id) }}" class="btn btn-primary">Training</a>
     <a href="{{ url_for('.role_shift_templates', role_id=role.id) }}" class="btn btn-primary">Shift Configuration</a>
   </div>
