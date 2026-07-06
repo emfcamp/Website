@@ -16,6 +16,9 @@
             {{ menuitem('Shift sign-up', '.schedule') }}
         {% endif %}
         {{ menuitem('Bar Training', '.bar_training') }}
+        {% if current_user.volunteer.trained_roles.all() | selectattr("slug", "==", "workshop-steward") | list %}
+        {{ menuitem('Workshop Steward', 'schedule.workshop_steward_main') }}
+        {% endif %}
         {{ menuitem('Handbook', '.info') }}
         {% if current_user.buildup_volunteer %}
             {{ menuitem('Buildup/Teardown', '.buildup_amend')}}

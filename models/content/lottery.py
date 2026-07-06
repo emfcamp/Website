@@ -20,7 +20,7 @@ __all__ = [
     "LotteryEntryException",
 ]
 
-LotteryState = Literal["closed", "allow-entry", "running-lottery", "completed", "first-come-first-served"]
+LotteryState = Literal["closed", "allow-entry", "running-lottery", "completed", "sign-up-list"]
 
 # entered -- an entry in the lottery for a number of tickets
 # valid-tickets -- either a winning lottery entry or a simply issued ticket
@@ -40,7 +40,7 @@ LOTTERY_ENTRY_STATE_TRANSITIONS: dict[LotteryState, dict[LotteryEntryState, list
     "completed": {
         "valid-tickets": ["cancelled"],
     },
-    "first-come-first-served": {
+    "sign-up-list": {
         "entered": ["cancelled"],
         "valid-tickets": ["cancelled"],
         "cancelled": ["valid-tickets"],
@@ -191,7 +191,7 @@ class LotteryEntry(BaseModel):
 
             raise LotteryEntryException("This lottery is currently full.")
 
-        if lottery.state == "first-come-first-served":
+        if lottery.state == "sign-up-list":
             if ticket_count <= lottery.get_all_ticket_capacity():
                 entry = LotteryEntry(
                     state="valid-tickets", user=user, lottery=lottery, ticket_count=ticket_count

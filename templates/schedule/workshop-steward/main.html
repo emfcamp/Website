@@ -8,15 +8,13 @@
 
 <ul>
   {% for venue in workshop_venues %}
-    <li><a href="{{ url_for('.workshop_steward_venue', venue_id=venue.id) }}">{{ venue.name }}</a></li>
+    <li>
+      <a href="{{ url_for('.workshop_steward_venue', venue_id=venue.id) }}">{{ venue.name }}</a>
+      {% if venue.village %}
+      ({{ venue.village.name }})
+      {% endif %}
+    </li>
   {% endfor %}
 </ul>
 
-<h2>Family Workshops</h2>
-
-<ul>
-  {% for venue in familyworkshop_venues %}
-    <li><a href="{{ url_for('.workshop_steward_venue', venue_id=venue.id) }}">{{ venue.name }}</a></li>
-  {% endfor %}
-</ul>
 {% endblock %}

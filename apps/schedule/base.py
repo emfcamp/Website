@@ -711,17 +711,12 @@ def workshop_steward_main() -> ResponseReturnValue:
     # TODO: support any venue types that might support lottery?
 
     workshop_venues = db.session.scalars(
-        select(Venue).where(Venue.time_blocks.any(TimeBlock.type == "workshop"))
-    )
-
-    familyworkshop_venues = db.session.scalars(
-        select(Venue).where(Venue.time_blocks.any(TimeBlock.type == "familyworkshop"))
+        select(Venue).where(Venue.time_blocks.any(TimeBlock.type == "workshop")).order_by(Venue.name)
     )
 
     return render_template(
         "schedule/workshop-steward/main.html",
         workshop_venues=workshop_venues,
-        familyworkshop_venues=familyworkshop_venues,
     )
 
 

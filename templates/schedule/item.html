@@ -67,7 +67,7 @@
             <p>This {{ schedule_item.human_type }} does not have any tickets available via lottery.</p>
           {% endif %}
 
-        {% elif lottery.state == "first-come-first-served" %}:
+        {% elif lottery.state == "sign-up-list" %}:
           {% if lottery.get_all_ticket_capacity() > 0 %}
             {{ occurrence_form.ticket_count.label() }}
             {{ occurrence_form.ticket_count(class_="form-control") }}
@@ -77,9 +77,9 @@
           {% endif %}
 
         {% elif lottery.state == "complete" %}
-          {# FIXME add info about held tickets here #}
-          {# It's presumably a reference to Lottery.reserved_tickets, and not related to the first-come-first-served functionality? #}
-          <p>The lottery for this {{ schedule_item.human_type }} is currently closed. A small number of tickets will be available first-come, first-served on the day.</p>
+          <p>The lottery for this {{ schedule_item.human_type }} is currently closed.
+             Remaining space in this workshop will be available on a first-come, first-served basis
+             to people arriving at the workshop venue 15 minutes before the workshop start time.</p>
 
         {% endif %}
         </form>
@@ -143,7 +143,7 @@
 
 {% else %}
 
-  {% if schedule_item.lottery and schedule_item.lottery.state in ["complete", "first-come-first-served"] and lottery_entry and lottery_entry.state == "valid-tickets" %}
+  {% if schedule_item.lottery and schedule_item.lottery.state in ["complete", "sign-up-list"] and lottery_entry and lottery_entry.state == "valid-tickets" %}
     <div class="well">
       You currently have {{ lottery_entry.ticket_count }} codes for this {{ schedule_item.human_type }}.
       When you attend you can either give your name or a code to get in. Your codes are:

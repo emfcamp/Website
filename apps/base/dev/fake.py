@@ -402,7 +402,7 @@ class FakeDataGenerator:
                 "allow-entry": 80,
                 # running-lottery
                 # completed
-                "first-come-first-served": 10,
+                "sign-up-list": 10,
             }
             occurrence.lottery = Lottery(
                 state=random_choice(lottery_states),

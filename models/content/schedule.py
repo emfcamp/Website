@@ -427,7 +427,7 @@ SCHEDULE_ITEM_INFOS: dict[ScheduleItemType, ScheduleItemInfo] = {
         type="familyworkshop",
         human_type="family workshop",
         human_type_a="a family workshop",
-        supports_lottery=True,
+        supports_lottery=False,
         attributes_cls=FamilyWorkshopAttributes,
         default_max_tickets_per_entry=5,
     ),

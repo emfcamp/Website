@@ -19,6 +19,9 @@
     {{ menuitem("Account", "users.account") }}
     {{ menuitem("Your Details", "users.details") }}
     {{ menuitem("Your Tickets", "users.purchases") }}
+    {% if feature_enabled("WORKSHOP_LOTTERY") %}
+    {{ menuitem("Workshop Lottery", "schedule.lotteries") }}
+    {% endif %}
 
     {% if feature_enabled('CFP') %}
       {% if current_user.proposals | length > 0 %}

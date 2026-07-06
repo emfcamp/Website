@@ -16,10 +16,12 @@
   {% if entry.state == "valid-tickets" %}
     <br><em>Codes for this {{ entry.lottery.schedule_item.human_type }}: {{ entry.ticket_codes | replace(',', ', ') | upper }}</em>
   {% endif %}
+  {# Don't show the cancel button for now. We have enough reserved that it doesn't matter and this is too easy to hit by accident.
   {% if entry.state != "cancelled" %}
     {{ entry._form.cancel(class_="btn btn-primary pull-right")}}
     <div class="clearfix"></div>
   {% endif %}
+  #}
 </div>
 {% endmacro %}
 

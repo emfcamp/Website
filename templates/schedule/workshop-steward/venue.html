@@ -2,7 +2,12 @@
 {% block title %}Workshop Steward -- {{ venue.name }}{% endblock %}
 {% block body %}
 
-<h1>Workshop Steward for {{ venue.name }}</h1>
+<h1>
+  Workshop Steward for {{ venue.name }}
+  {% if venue.village %}
+  ({{ venue.village.name }})
+  {% endif %}
+</h1>
 
 <ul>
   {% for occurrence in occurrences %}
