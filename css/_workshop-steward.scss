@@ -1,0 +1,31 @@
+.workshop-steward {
+  .ticket-code {
+    &.used button[data-action="use"] {
+      display: none;
+    }
+    &.unused button[data-action="unuse"] {
+      display: none;
+    }
+  }
+
+  .capacity-amounts {
+    font-size: 120%;
+  }
+  .capacity-panel {
+    padding-top: 30px;
+    &.full .total-tickets-used {
+      background-color: red;
+    }
+  }
+  form.on-the-door > button {
+    font-size: 120%;
+    padding: 20px 24px;
+    margin: 0 10px;
+  }
+
+  &:not(.js-inited) {
+    button {
+      visibility: hidden;
+    }
+  }
+}

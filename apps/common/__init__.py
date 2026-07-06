@@ -352,6 +352,9 @@ def json_response(f, *args, **kwargs):
         if isinstance(response, app.response_class | Response):
             return response
 
+        if isinstance(response, tuple) and len(response) == 2:
+            return jsonify(response[0]), response[1]
+
         return jsonify(response), 200
 
 

@@ -1,52 +1,116 @@
 {% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block title %}Workshop Steward{% endblock %}
+{% block body_class %}workshop-steward{% endblock %}
 {% block body %}
 
+{% set schedule_item = occurrence.schedule_item %}
+{% set lottery = occurrence.lottery %}
+
 <h1>
-  Workshop Steward -- {{ occurrence.schedule_item.title }}
-  {%- if occurrence.schedule_item.occurrences | length > 1 -%}
+  {{ schedule_item.title }}
+  {%- if schedule_item.occurrences | length > 1 -%}
   : occurrence {{ occurrence.occurrence_num }}
   {% endif %}
 </h1>
-
-<em>Starts at: {{ occurrence.scheduled_time }}</em>
-
-<p>{{ occurrence.schedule_item.description }}</p>
-
 <p>{{ occurrence.short_description }}</p>
 
-<p>&nbsp;</p>
+<dl class="dl-horizontal">
+  <dt>Starts at</dt><dd>{{ occurrence.scheduled_time }}</dd>
+  <dt>Suitable age range</dt><dd>{{ schedule_item.attributes.age_range }}</dd>
+  <dt>Cost per attendee</dt>
+  <dd>
+    {% if schedule_item.attributes.participant_cost and schedule_item.attributes.participant_cost | tidy_workshop_cost %}
+    {{ schedule_item.attributes.participant_cost | tidy_workshop_cost }}
+    {% else %}
+    Free
+    {% endif %}
+  </dd>
+  <dt>Attendee equipment</dt><dd>{{ schedule_item.attributes.attendee_equipment }}</dd>
+  <dt>Content note</dt><dd>{{ schedule_item.attributes.content_note }}</dd>
+  <dt>Family friendly</dt><dd>{{ "Yes" if schedule_item.attributes.family_friendly else "No" }}</dd>
+</dl>
+
+<p>{{ schedule_item.description }}</p>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Capacity tracking</h3>
+  </div>
+  <div class="panel-body capacity-panel {% if lottery.sum_ticket_codes_used() + lottery.reserved_tickets_used >= lottery.total_tickets %}full{% endif %}">
+    <div class="col-sm-6">
+      <table class="table table-striped capacity-amounts">
+        <tr>
+          <td>Total attendees</td>
+          <td class="total-tickets-used">{{ lottery.sum_ticket_codes_used() + lottery.reserved_tickets_used }}</td>
+          <td>/</td>
+          <td class="total-tickets">{{ lottery.total_tickets }}</td>
+        </tr>
+        <tr>
+          <td>Checked in</td>
+          <td class="ticket-codes-used">{{ lottery.sum_ticket_codes_used() }}</td>
+          <td>/</td>
+          <td class="ticket-codes">{{ lottery.sum_tickets_in_state("valid-tickets") }}</td>
+        </tr>
+        <tr>
+          <td>On the door</td>
+          <td class="on-the-door-used">{{ lottery.reserved_tickets_used }}</td>
+          <td>/</td>
+          <td class="on-the-door">{{ lottery.reserved_tickets }}</td>
+        </tr>
+      </table>
+    </div>
+    <div class="col-sm-6">
+      <p>You can track on-the-door attendees with these buttons:
+      <form class="on-the-door" data-url="{{ url_for(".workshop_steward_occurrence_on_the_door", occurrence_id=occurrence.id) }}">
+        <button class="btn btn-success" data-action="inc">+1</button>
+        On the door
+        <button class="btn btn-danger" data-action="dec" {% if lottery.reserved_tickets_used == 0 %}disabled{% endif %}>-1</button>
+      </form>
+    </div>
+  </div>
+</div>
 
 {% if time_locked %}
   <p>The full list of attendees will be available after {{ show_list_after }}
-     and for the duration of the {{ occurrence.schedule_item.human_type }}.</p>
-{% else %}
-  <ul>
-    <form method="POST">
-      {{ form.hidden_tag() }}
-      <ul>
-      {% for entry_form in form.lottery_entries %}
-        <li>
-          {{ entry_form._lottery_entry.user.name }}
-          {{ entry_form.lottery_entry_id() }}
-          {{ entry_form.use_all_codes(class_="btn btn-primary") }}
-          <ul>
-            {% if entry_form.codes %}
-              {% for code_form in entry_form.codes %}
-                <li>
-                  {{code_form.code()}}
-                  {{code_form.code.data}}
-                  {{code_form.use_code(class_="btn btn-warning")}}
-                </li>
-              {% endfor %}
-            {% endif %}
-          </ul>
-        </li>
+     and for the duration of the {{ schedule_item.human_type }}.</p>
+{% endif %}
+{% if not time_locked or config.get("DEBUG") %}
+  <form class="ticket-codes" data-url="{{ url_for(".workshop_steward_occurrence_checkin", occurrence_id=occurrence.id) }}">
+  <table class="table">
+    {% for entry in lottery.entries %}
+      {% set stripe = loop.cycle('odd', 'even') %}
+      {% for ticket_code in entry.ticket_codes %}
+        <tr class="{{ stripe }}">
+        {% if loop.first %}
+          <td>
+          {{ entry.user.name }}
+          </td>
+        {% else %}
+          <td></td>
+        {% endif %}
+        <td>
+          {{ ticket_code.code }}
+        </td>
+        <td class="ticket-code {{ "used" if ticket_code.used else "unused" }}">
+          <div class="pull-right ">
+            <button class="btn btn-default" data-ticket_code_id="{{ ticket_code.id }}" data-action="use">Check in</button>
+            <button class="btn btn-success" data-ticket_code_id="{{ ticket_code.id }}" data-action="unuse">Un-check in</button>
+          </div>
+        </td>
+        </tr>
       {% endfor %}
-      </ul>
-    </form>
-  </ul>
+    {% endfor %}
+  </table>
+  </form>
 {% endif %}
 
 {% endblock %}
+
+{% block foot %}
+{{ super() }}
+<script src="{{ static_url_for('static', filename='js/workshop-steward.js') }}"></script>
+<input type="hidden" id="stats" data-url="{{ url_for(".workshop_steward_occurrence_stats", occurrence_id=occurrence.id) }}"/>
+{% endblock %}
+
+

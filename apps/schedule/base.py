@@ -14,7 +14,7 @@ from sqlalchemy.orm import selectinload
 from wtforms import (
     FieldList,
     FormField,
-    HiddenField,
+    IntegerField,
     SelectField,
     StringField,
     SubmitField,
@@ -31,14 +31,16 @@ from models.content import (
     Venue,
 )
 from models.content.lottery import (
+    Lottery,
     LotteryEntry,
     LotteryEntryState,
+    LotteryTicketCode,
 )
 from models.content.venue import TimeBlock
 from models.user import generate_api_token
 
 from ..cfp_review import admin_required as cfp_admin_required
-from ..common import feature_enabled, feature_flag
+from ..common import feature_enabled, feature_flag, json_response
 from ..common.fields import HiddenIntegerField
 from ..common.forms import Form
 from ..config import config
@@ -740,30 +742,32 @@ def workshop_steward_venue(venue_id: int) -> ResponseReturnValue:
     return render_template("schedule/workshop-steward/venue.html", venue=venue, occurrences=occurrences)
 
 
-class LotteryCheckInEntryCodeForm(Form):
-    code = HiddenField("code")
-    use_code = SubmitField("Check-in Code")
-
-
-class LotteryCheckInEntryForm(Form):
-    lottery_entry_id = HiddenIntegerField("lottery_entry_id")
-    codes = FieldList(FormField(LotteryCheckInEntryCodeForm))
-    use_all_codes = SubmitField("Check in all")
-
-
 class LotteryCheckInForm(Form):
-    lottery_entries = FieldList(FormField(LotteryCheckInEntryForm))
+    # Actually rendered hidden, but manually
+    ticket_code_id = IntegerField("ticket_code_id", [InputRequired()])
+    use = SubmitField("Check in")
+    unuse = SubmitField("Uncheck in")
 
 
-@schedule.route("/schedule/workshop-steward/workshop/<int:occurrence_id>", methods=["GET", "POST"])
-@v_user_required
-def workshop_steward_occurrence(occurrence_id):
-    occurrence = get_or_404(db, Occurrence, occurrence_id)
-    lottery = occurrence.lottery
+def get_time_lock(occurrence):
+    if not occurrence.scheduled_time or not occurrence.scheduled_duration:
+        return False
 
+    # Only show the attendee list the hour before
+    show_list_after = event_tz.localize(occurrence.scheduled_time - pendulum.duration(minutes=60))
+    show_list_before = event_tz.localize(
+        occurrence.scheduled_time + pendulum.duration(minutes=(occurrence.scheduled_duration + 60))
+    )
+
+    if show_list_after < pendulum.now(event_tz.zone) < show_list_before:
+        return False, show_list_after
+    return True, show_list_after
+
+
+def check_training(occurrence):
     user_role_names = {r.name for r in current_user.volunteer.interested_roles}
 
-    # Require that the user has the appropriate role & only show the attendee list the hour before
+    # Require that the user has the appropriate role
     if occurrence.schedule_item.type == "familyworkshop":
         if "Family Workshop Helper" not in user_role_names:
             abort(401)
@@ -775,55 +779,25 @@ def workshop_steward_occurrence(occurrence_id):
     else:
         abort(401)
 
-    assert occurrence.scheduled_time
-    assert occurrence.scheduled_duration
 
-    show_list_after = event_tz.localize(occurrence.scheduled_time - pendulum.duration(minutes=60))
-    show_list_before = event_tz.localize(
-        occurrence.scheduled_time + pendulum.duration(minutes=(occurrence.scheduled_duration + 60))
-    )
+@schedule.route("/schedule/workshop-steward/workshop/<int:occurrence_id>", methods=["GET", "POST"])
+@v_user_required
+def workshop_steward_occurrence(occurrence_id):
+    occurrence = get_or_404(db, Occurrence, occurrence_id)
 
-    if app.config.get("DEBUG") and request.args.get("ignore_time_lock"):
-        time_locked = False
+    check_training(occurrence)
+    time_locked, show_list_after = get_time_lock(occurrence)
 
-    elif show_list_after < pendulum.now(event_tz.zone) < show_list_before:
-        time_locked = False
+    if time_locked:
+        if app.config.get("DEBUG"):
+            flash(
+                f"The attendee list would normally be visible after {show_list_after}. This is not enforced in DEBUG mode."
+            )
 
-    else:
-        flash(f"The attendee list will be visible after {show_list_after}")
-        time_locked = True
+        else:
+            flash(f"The attendee list will be visible after {show_list_after}")
 
-    # Now actually do the form
     form = LotteryCheckInForm()
-
-    if form.validate_on_submit():
-        for entry_form in form.lottery_entries:
-            lottery_entry = db.session.query(LotteryEntry).get(entry_form.lottery_entry_id.data)
-            assert lottery_entry
-            if entry_form.use_all_codes.data:
-                lottery_entry.use_all_codes()
-                db.session.commit()
-                flash(f"Checked in {lottery_entry.user.name}")
-                return redirect(url_for(".workshop_steward_occurrence", occurrence_id=occurrence_id))
-
-            for code_form in entry_form.codes:
-                if code_form.use_code.data:
-                    lottery_entry.use_code(code_form.code.data)
-                    db.session.commit()
-                    flash(f"Used {lottery_entry.user.name}'s code '{code_form.code.data}'")
-                    return redirect(url_for(".workshop_steward_occurrence", occurrence_id=occurrence_id))
-
-    for lottery_entry in lottery.entries:
-        if not lottery_entry.ticket_codes:
-            continue
-
-        form.lottery_entries.append_entry()
-        form.lottery_entries[-1]._lottery_entry = lottery_entry
-        form.lottery_entries[-1].lottery_entry_id.data = lottery_entry.id
-
-        for code in lottery_entry.ticket_codes.split(","):
-            form.lottery_entries[-1].codes.append_entry()
-            form.lottery_entries[-1].codes[-1].code.data = code
 
     return render_template(
         "schedule/workshop-steward/workshop.html",
@@ -832,3 +806,107 @@ def workshop_steward_occurrence(occurrence_id):
         occurrence=occurrence,
         show_list_after=show_list_after,
     )
+
+
+@schedule.route("/schedule/workshop-steward/workshop/<int:occurrence_id>/check-in", methods=["PUT"])
+@v_user_required
+@json_response
+def workshop_steward_occurrence_checkin(occurrence_id):
+    occurrence = get_or_404(db, Occurrence, occurrence_id)
+
+    check_training(occurrence)
+    time_locked, _ = get_time_lock(occurrence)
+    if time_locked and not app.config.get("DEBUG"):
+        abort(401)
+
+    data = request.get_json()
+
+    ticket_code = get_or_404(db, LotteryTicketCode, data["ticket_code_id"])
+    if data["action"] == "use":
+        if ticket_code.used:
+            status = 409
+        else:
+            ticket_code.used = True
+            db.session.commit()
+            status = 200
+
+    elif data["action"] == "unuse":
+        if not ticket_code.used:
+            status = 409
+        else:
+            ticket_code.used = False
+            db.session.commit()
+            status = 200
+
+    result = {
+        "used": ticket_code.used,
+        "stats": get_capacity_stats(occurrence.lottery),
+    }
+    return result, status
+
+
+@schedule.route("/schedule/workshop-steward/workshop/<int:occurrence_id>/on-the-door", methods=["PUT"])
+@v_user_required
+@json_response
+def workshop_steward_occurrence_on_the_door(occurrence_id):
+    occurrence = get_or_404(db, Occurrence, occurrence_id)
+
+    check_training(occurrence)
+    time_locked, _ = get_time_lock(occurrence)
+    if time_locked and not app.config.get("DEBUG"):
+        abort(401)
+
+    lottery = occurrence.lottery
+
+    data = request.get_json()
+
+    if data["action"] == "inc":
+        lottery.reserved_tickets_used = Lottery.reserved_tickets_used + 1
+        # Don't care about going over the expected number
+        db.session.commit()
+        status = 200
+
+    elif data["action"] == "dec":
+        lottery.reserved_tickets_used = Lottery.reserved_tickets_used - 1
+        db.session.flush()
+        if lottery.reserved_tickets_used < 0:
+            db.session.rollback()
+            status = 409
+        else:
+            db.session.commit()
+            status = 200
+
+    result = {
+        "stats": get_capacity_stats(lottery),
+    }
+    return result, status
+
+
+def get_capacity_stats(lottery):
+    stats = {
+        "total_tickets": lottery.total_tickets,
+        "on_the_door_used": lottery.reserved_tickets_used,
+        "on_the_door": lottery.reserved_tickets,
+        "ticket_codes_used": lottery.sum_ticket_codes_used(),
+        "ticket_codes": lottery.sum_tickets_in_state("valid-tickets"),
+    }
+    return stats
+
+
+@schedule.route("/schedule/workshop-steward/workshop/<int:occurrence_id>/stats")
+@v_user_required
+@json_response
+def workshop_steward_occurrence_stats(occurrence_id):
+    occurrence = get_or_404(db, Occurrence, occurrence_id)
+
+    check_training(occurrence)
+    time_locked, _ = get_time_lock(occurrence)
+    if time_locked and not app.config.get("DEBUG"):
+        abort(401)
+
+    lottery = occurrence.lottery
+
+    result = {
+        "stats": get_capacity_stats(lottery),
+    }
+    return result, 200

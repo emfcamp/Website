@@ -148,8 +148,8 @@
       You currently have {{ lottery_entry.ticket_count }} codes for this {{ schedule_item.human_type }}.
       When you attend you can either give your name or a code to get in. Your codes are:
       <ul>
-        {% for code in lottery_entry.ticket_codes.split(",") %}
-          <li>{{code | upper}}</li>
+        {% for ticket_code in lottery_entry.ticket_codes %}
+          <li>{{ ticket_code.code }}</li>
         {% endfor %}
       </ul>
     </div>

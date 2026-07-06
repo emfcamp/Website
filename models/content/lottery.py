@@ -65,8 +65,11 @@ class Lottery(BaseModel):
         default="closed",
     )
 
+    #: The capacity of this schedule item, covering all ticket types. We don't count the stewards, presenters, or assistants.
     total_tickets: Mapped[int | None]
+    #: Tickets that are reserved for on-the-door. The available lottery tickets are total_tickets - reserved_tickets.
     reserved_tickets: Mapped[int | None] = mapped_column(default=5)
+    reserved_tickets_used: Mapped[int] = mapped_column(default=0, server_default="0")
     max_tickets_per_entry: Mapped[int]
 
     occurrence: Mapped[Occurrence] = relationship(back_populates="lottery")
@@ -83,6 +86,22 @@ class Lottery(BaseModel):
     def sum_tickets_in_state(self, state: str) -> int:
         return sum([t.ticket_count for t in self.entries if t.state == state])
 
+    def sum_ticket_codes_used(self) -> int:
+        return len([t for e in self.entries for t in e.ticket_codes if t.used == True])
+
+    def sum_ticket_codes_unused(self) -> int:
+        return len([t for e in self.entries for t in e.ticket_codes if t.used == False])
+
+
+class LotteryTicketCode(BaseModel):
+    __tablename__ = "lottery_ticket_code"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    entry_id: Mapped[int] = mapped_column(ForeignKey("lottery_entry.id"))
+    code: Mapped[str]
+    used: Mapped[bool] = mapped_column(default=False)
+
+    entry: Mapped[LotteryEntry] = relationship(back_populates="ticket_codes")
+
 
 class LotteryEntry(BaseModel):
     __tablename__ = "lottery_entry"
@@ -93,28 +112,12 @@ class LotteryEntry(BaseModel):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     rank: Mapped[int | None]
     ticket_count: Mapped[int] = mapped_column(default=1)
-    ticket_codes: Mapped[str | None]
 
     lottery: Mapped[Lottery] = relationship(back_populates="entries")
     user: Mapped[User] = relationship(back_populates="lottery_entries")
+    ticket_codes: Mapped[list[LotteryTicketCode]] = relationship(back_populates="entry")
 
     occurrence: AssociationProxy[Occurrence] = association_proxy("lottery", "occurrence")
-
-    # add a way to indicate a code has been used?
-    def use_code(self, code: str) -> None:
-        if self.ticket_codes is None:
-            return
-        all_codes = self.ticket_codes.split(",")
-        if code not in all_codes:
-            raise LotteryEntryException(f"Code '{code}' not found")
-
-        all_codes.remove(code)
-        self.ticket_codes = ",".join(all_codes)
-
-    def use_all_codes(self) -> None:
-        if not self.ticket_codes:
-            raise LotteryEntryException("No codes found")
-        self.ticket_codes = ""
 
     def get_users_other_lottery_entries_for_type(self) -> list[LotteryEntry]:
         return [
@@ -146,10 +149,13 @@ class LotteryEntry(BaseModel):
     def generate_codes(self) -> None:
         # These are in no way cryptographically secure etc but 1 in 308m should
         # be low enough odds for guessing.
-        codes = []
         for _ in range(self.ticket_count):
-            codes.append("".join(choices(SAFECHARS, k=6)))
-        self.ticket_codes = ",".join(codes)
+            db.session.add(
+                LotteryTicketCode(
+                    entry=self,
+                    code="".join(choices(SAFECHARS, k=6)),
+                )
+            )
 
     def won_lottery_and_cancel_others(self):
         self.change_state("valid-tickets")

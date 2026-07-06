@@ -5,8 +5,8 @@ Hi {{ entry.user.name }},
 Good news! You've won a spot in the {{ entry.lottery.schedule_item.human_type }} '{{ entry.lottery.schedule_item.title }}'.
 
 Your codes for this {{ entry.lottery.schedule_item.human_type }} are:
-{% for code in (entry.ticket_codes or "").split(",") %}
-  * {{ code | upper }}
+{% for ticket_code in entry.ticket_codes %}
+  * {{ ticket_code.code | upper }}
 {%- endfor %}
 
 Love

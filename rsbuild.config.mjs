@@ -76,6 +76,7 @@ export default defineConfig({
             "schedule.js": "./js/schedule.js",
             "volunteer_schedule.js": "./js/volunteer_schedule.js",
             "lottery.js": "./js/lottery.js",
+            "workshop-steward.js": "./js/workshop-steward.js",
             "arrivals.js": "./js/arrivals.js",
             "sandboxed-iframe-parent.js": "./js/sandboxed-iframe-parent.js",
             "sandboxed-iframe-child.js": "./js/sandboxed-iframe-child.js",
