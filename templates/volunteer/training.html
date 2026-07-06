@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    EMF volunteer training
+{% endblock %}
+
+{% block body %}
+{% include "volunteer/_nav.html" %}
+
+    <h2>Training</h2>
+    <p>Listed below you can find all the roles you've chosen which have training
+       information attached so you can either complete the training or revisit it.</p>
+
+    <ul>
+        {% if include_bar %}
+            <li>
+                <a href="{{ url_for('.bar_training') }}">Bar</a>
+                {% if trained_roles.all() | selectattr("uses_bar_training") | list %}
+                    - Trained
+                {% endif %}
+            </li>
+        {% endif %}
+        {% for role in roles %}
+            <li>
+                <a href="{{ url_for('.training', role_id=role.id) }}">{{ role.name }}</a>
+                {% if role in trained_roles %} - Trained{% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock body %}

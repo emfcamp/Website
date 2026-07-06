@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    EMF {{ role.name }} training
+{% endblock %}
+
+{% block body %}
+{% include "volunteer/_nav.html" %}
+
+    <h2>{{ role.name }} Training</h2>
+    {{ role.formatted_training_notes }}
+
+    {% if role.allows_self_training %}
+        <form method="post">
+            <button type="submit" class="btn btn-primary">I have read the notes above and recognise I'll look quite silly if I turn up and its obvious I haven't</button
+        </form>
+    {% endif %}
+{% endblock body %}

@@ -47,6 +47,16 @@ class Role(BaseModel):
     over_18_only: Mapped[bool] = mapped_column(default=False)
     #: Whether the role requires training to perform
     requires_training: Mapped[bool] = mapped_column(default=False)
+    #: Whether this role is covered by the bar training. Roles that have this attribute
+    #: set will use the bar training page rather than the generic role training page,
+    #: and on completing bar training all roles with this attribute will be marked as
+    #: trained.
+    uses_bar_training: Mapped[bool] = mapped_column(default=False)
+    #: Some markdown which will be presented on the role's training page
+    training_notes: Mapped[str] = mapped_column(default="")
+    #: When True volunteers can declare themselves trained, if False they have to be
+    #: approved by a role admin.
+    allows_self_training: Mapped[bool] = mapped_column(default=False)
 
     team_id: Mapped[int] = mapped_column(ForeignKey("volunteer_team.id"))
     #: The team this role is under
@@ -124,7 +134,10 @@ class Role(BaseModel):
             "name": self.name,
             "description": self.description,
             "role_notes": self.role_notes,
+            "over_18_only": self.over_18_only,
             "requires_training": self.requires_training,
+            "allows_self_training": self.allows_self_training,
+            "training_notes": self.training_notes,
             "shifts_finalised": self.shifts_finalised,
         }
 
@@ -139,6 +152,12 @@ class Role(BaseModel):
     def formatted_role_notes(self) -> Markup | None:
         if self.role_notes:
             return Markup(markdown(self.role_notes, extensions=["markdown.extensions.nl2br"]))
+        return None
+
+    @property
+    def formatted_training_notes(self) -> Markup | None:
+        if self.training_notes:
+            return Markup(markdown(self.training_notes, extensions=["markdown.extensions.nl2br"]))
         return None
 
     @classmethod

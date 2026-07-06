@@ -1,13 +1,57 @@
-from flask import current_app as app
+from collections.abc import Sequence
+
 from flask import flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
+from flask_login import current_user
 
 from apps.volunteer.role_admin import role_admin_required
 from main import db
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer
 
-from . import volunteer
+from . import v_user_required, volunteer
+
+
+@volunteer.route("/training")
+@v_user_required
+def training_index() -> ResponseReturnValue:
+    volunteer: Volunteer = current_user.volunteer
+
+    # We filter out roles that use bar training and just link that once because otherwise there'll
+    # be repeated roles that all link to the same training.
+    roles = (
+        volunteer.interested_roles.filter(Role.requires_training, Role.uses_bar_training == False)  # type: ignore
+        .order_by(Role.name)
+        .all()
+    )
+    return render_template(
+        "volunteer/training.html",
+        roles=roles,
+        include_bar=volunteer.over_18,
+        trained_roles=volunteer.trained_roles,
+    )
+
+
+@volunteer.route("/training/<int:role_id>", methods=["GET", "POST"])
+@v_user_required
+def training(role_id: int) -> ResponseReturnValue:
+    role = Role.get_by_id(role_id)
+    if not role.requires_training:
+        flash(f"{role.name} doesn't require any training.")
+        return redirect(url_for(".choose_role"))
+
+    if request.method == "GET":
+        return render_template("volunteer/role_training.html", role=role)
+
+    if not role.allows_self_training:
+        flash("Nice try. This role doesn't allow self training.")
+        return redirect(url_for(".training", role_id=role.id))
+
+    role.trained_volunteers.append(current_user.volunteer)
+    db.session.commit()
+
+    flash(f"Thanks! You're now trained for {role.name} and can sign up for shifts.")
+    return redirect("/volunteer")
 
 
 @volunteer.route("/role-admin/<role_id>/train-users", methods=["GET", "POST"])
@@ -15,7 +59,7 @@ from . import volunteer
 def train_users(role_id: int) -> ResponseReturnValue:
     role = Role.get_by_id(role_id)
 
-    volunteers = []
+    volunteers: Sequence[Volunteer] = []
     if request.method == "POST" and request.form["query"] != "":
         volunteers = Volunteer.find_by_query(request.form["query"])
 
