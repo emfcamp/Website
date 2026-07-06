@@ -21,6 +21,7 @@ from cryptography.hazmat.primitives.hashes import SHA256
 from cryptography.hazmat.primitives.serialization import Encoding, load_pem_private_key
 from cryptography.hazmat.primitives.serialization.pkcs7 import PKCS7Options, PKCS7SignatureBuilder
 from cryptography.x509 import load_pem_x509_certificate, load_pem_x509_certificates
+from flask import current_app as app
 from PIL import Image
 from PIL.Image import Palette, Resampling
 
@@ -319,7 +320,7 @@ def _generate_brand_assets() -> dict[str, bytes]:
 def get_pass_assets() -> dict[str, bytes]:
     """Pass images keyed by filename, either generated from brand assets or loaded
     from PKPASS_ASSETS_DIR if that override is configured."""
-    override = config.get("PKPASS_ASSETS_DIR", None)
+    override = app.config.get("PKPASS_ASSETS_DIR")
     if override:
         return {p.name: p.read_bytes() for p in Path(override).iterdir() if p.is_file()}
     return dict(_generate_brand_assets())
