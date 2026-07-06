@@ -193,6 +193,13 @@ function init_volunteer_schedule() {
 
   ["filters", "roles"].forEach((panel) => {
     document.getElementById(panel).style.display = "";
+    if (
+      panel == "roles" &&
+      document.querySelectorAll("input[data-role-id]:checked").length == 0
+    ) {
+      // Show the roles panel if none are selected
+      $(`#roles-body`).toggle(true);
+    }
     document.getElementById(`${panel}-toggle`).addEventListener("click", () => {
       $(`#${panel}-body`).toggle();
     });
