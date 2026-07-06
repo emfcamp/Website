@@ -15,6 +15,14 @@
                 {{ form.hidden_tag() }}
                 {% call render_field(form.name, horizontal=9) %}{{ form.name.description }}{% endcall %}
                 {% call render_field(form.full_description_md, horizontal=9, style="height: 20em") %}{{ form.full_description_md.description }}{% endcall %}
+                {% call render_field(form.over_18_only, horizontal=9) %}{{ form.over_18_only.description }}{% endcall %}
+                {% call render_field(form.requires_training, horizontal=9) %}{{ form.requires_training.description }}{% endcall %}
+                <div id="training-only">
+                    {% call render_field(form.uses_bar_training, horizontal=9) %}{{ form.uses_bar_training.description }}{% endcall %}
+                    {% call render_field(form.allows_self_training, horizontal=9) %}{{ form.allows_self_training.description }}{% endcall %}
+                    {% call render_field(form.training_notes, horizontal=9, style="height: 20em") %}{{ form.training_notes.description }}{% endcall %}
+                </div>
+
                 {% call render_field(form.role_notes, horizontal=9, style="height: 20em") %}{{ form.role_notes.description }}{% endcall %}
                 {% call render_field(form.instructions_url, horizontal=9) %}{{ form.instructions_url.description }}{% endcall %}
                 {{ form.save(class_="btn btn-primary debounce pull-right") }}
@@ -23,3 +31,18 @@
     </div>
 
 {% endblock body %}
+{% block foot %}
+<script nonce="{{ csp_nonce }}">
+function showHideTrainingFields() {
+  requiresTraining = document.getElementById('requires_training').checked;
+  if (requiresTraining) {
+    document.getElementById('training-only').style.display = 'block';
+  } else {
+    document.getElementById('training-only').style.display = 'none';
+  }
+}
+
+document.getElementById('requires_training').addEventListener('change', showHideTrainingFields)
+showHideTrainingFields()
+</script>
+{% endblock %}

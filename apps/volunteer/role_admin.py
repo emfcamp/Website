@@ -96,6 +96,28 @@ class RoleForm(Form):
         widget=TextArea(),
         description="Displayed in the main role list when signing up.",
     )
+    requires_training = BooleanField(
+        "Requires training",
+        description="Whether volunteers need to complete training before they can sign up for shifts",
+    )
+    allows_self_training = BooleanField(
+        "Allows self training",
+        description="If enabled volunteers can declare they've read the training notes and are then considered trained, otherwise they need to be approved by a role admin.",
+    )
+    uses_bar_training = BooleanField(
+        "Uses bar training",
+        description="Should only be set for bar roles. Overrides all other training settings. Don't set this unless you know you need it and why.",
+    )
+    training_notes = StringField(
+        "Training notes",
+        [Optional()],
+        widget=TextArea(),
+        description="Details to be shown when a volunteer goes to the training page. If you allow self training a button declaring they've understood will be shown underneath, otherwise provide directions on how to get approved. (supports markdown)",
+    )
+    over_18_only = BooleanField(
+        "Over 18 only",
+        description="Whether we require volunteers to be over 18 for this role. Please use sparingly.",
+    )
     role_notes = StringField(
         "Role notes (supports markdown)",
         [Optional()],
@@ -216,7 +238,7 @@ def role_admin(role_id):
 def role_edit(role_id: int) -> ResponseReturnValue:
     """Allows editing details of a role."""
     role = get_or_404(db, Role, role_id)
-    form = RoleForm(request.form, obj=role)
+    form = RoleForm(obj=role)
     if request.method == "POST" and form.validate():
         form.populate_obj(role)
         db.session.add(role)

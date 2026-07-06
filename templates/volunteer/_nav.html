@@ -15,7 +15,7 @@
         {% if feature_enabled('VOLUNTEERS_SCHEDULE') %}
             {{ menuitem('Shift sign-up', '.schedule') }}
         {% endif %}
-        {{ menuitem('Bar Training', '.bar_training') }}
+        {{ menuitem('Training', '.training_index') }}
         {% if current_user.volunteer.trained_roles.all() | selectattr("slug", "==", "workshop-steward") | list %}
         {{ menuitem('Workshop Steward', 'schedule.workshop_steward_main') }}
         {% endif %}

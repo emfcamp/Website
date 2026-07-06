@@ -136,12 +136,12 @@ def bar_training_page(page_name: str) -> ResponseReturnValue:
 @volunteer.route("/bar-training", methods=["GET", "POST"])
 @v_user_required
 def bar_training():
-    bar = Role.query.filter_by(slug="bar").one_or_none()
-    cybar = Role.query.filter_by(slug="cybar").one_or_none()
-    if bar is None or cybar is None:
+    bar_roles = Role.query.filter_by(uses_bar_training=True).all()
+    if len(bar_roles) == 0:
         abort(404)
+
     volunteer = Volunteer.get_for_user(current_user)
-    trained = bar in volunteer.trained_roles
+    trained = bar_roles[0] in volunteer.trained_roles
 
     training_json_path = app.config.get("BAR_TRAINING_JSON", "models/fixtures/training/bar.json")
     training_json = load_training_json(training_json_path)
@@ -159,8 +159,9 @@ def bar_training():
             flash("You answered all the questions correctly!")
         else:
             app.logger.info(f"{current_user} passed the bar training.")
-            bar.trained_volunteers.append(volunteer)
-            cybar.trained_volunteers.append(volunteer)
+            for role in bar_roles:
+                role.trained_volunteers.append(volunteer)
+
             db.session.commit()
             flash("Your completion of bar training has been saved.")
         return redirect(url_for(".bar_training"))

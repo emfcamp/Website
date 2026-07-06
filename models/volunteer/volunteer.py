@@ -1,6 +1,6 @@
 from collections import defaultdict
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 from flask_login import UserMixin
 from sqlalchemy import ARRAY, Column, ForeignKey, Integer, String, Table, select
@@ -17,6 +17,9 @@ from .. import BaseModel
 from .shift import ShiftEntry, ShiftEntryState
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from typing import Any
+
     from ..user import User
     from .role import Role, RoleAdmin, Team
 
@@ -126,7 +129,7 @@ class Volunteer(BaseModel, UserMixin):
         return db.session.scalar(select(cls).where(cls.volunteer_email == email_address))
 
     @classmethod
-    def find_by_query(cls, query: str) -> list[Volunteer]:
+    def find_by_query(cls, query: str) -> Sequence[Volunteer]:
         return db.session.scalars(
             select(cls).where(or_(cls.volunteer_email.ilike(f"%{query}%"), cls.nickname.ilike(f"%{query}%")))
         ).all()
