@@ -105,7 +105,7 @@ def load_utility_functions(app_obj):
                 amount = f"{_price:.2f}"
                 currency = Currency(_currency)
             case _:
-                raise ValueError("Invalid use of price filter!")
+                raise ValueError(f"Invalid use of price filter: {_price}, {_currency}")
         symbol = currency.symbol
         if after:
             return amount + symbol
