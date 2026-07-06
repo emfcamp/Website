@@ -214,8 +214,10 @@ class FakeDataGenerator:
 
         if isinstance(proposal.attributes, ProposalWorkshopAttributes):
             proposal.attributes.participant_count = str(random.randint(5, 50))
+            proposal.attributes.drop_in = random_bool(0.5)
         elif isinstance(proposal.attributes, ProposalFamilyWorkshopAttributes):
             proposal.attributes.participant_count = str(random.randint(5, 50))
+            proposal.attributes.drop_in = True
 
         if state in {"accepted", "finalised"}:
             # See Proposal.accept

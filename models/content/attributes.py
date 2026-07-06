@@ -49,6 +49,7 @@ class WorkshopAttributes(Attributes):
     participant_equipment: str | None = None
     content_note: str | None = None
     family_friendly: bool = False
+    drop_in: bool = False
 
 
 @dataclass
@@ -58,6 +59,7 @@ class FamilyWorkshopAttributes(Attributes):
     participant_equipment: str | None = None
     content_note: str | None = None
     # No need for family_friendly
+    drop_in: bool = True
 
 
 @dataclass

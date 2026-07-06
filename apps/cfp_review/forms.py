@@ -173,6 +173,8 @@ class ScheduleItemForm(Form):
         coerce=lambda v: v == "official",
     )
 
+    drop_in = BooleanField("Drop-in")
+
     video_privacy = SelectField(
         "Recording",
         choices=[
@@ -236,6 +238,7 @@ class UpdateScheduleItemWorkshopAttributesForm(UpdateAttributesForm):
     participant_equipment = StringField("Attendee equipment")
     content_note = StringField("Content note")
     family_friendly = BooleanField("Family Friendly")
+    drop_in = BooleanField("Drop-in")
 
 
 class UpdateScheduleItemFamilyWorkshopAttributesForm(UpdateAttributesForm):
@@ -243,6 +246,7 @@ class UpdateScheduleItemFamilyWorkshopAttributesForm(UpdateAttributesForm):
     participant_cost = StringField("Cost per attendee")
     participant_equipment = StringField("Attendee equipment")
     content_note = StringField("Content note")
+    drop_in = BooleanField("Drop-in")
 
 
 class UpdateScheduleItemLightningTalkAttributesForm(UpdateAttributesForm):
