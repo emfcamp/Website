@@ -26,7 +26,8 @@ fix-syntax:
 
 
 check-mypy:
-	mypy ./*.py ./apps ./models --txt-report mypy-report
+	mkdir -p mypy-report
+	mypy ./*.py ./apps ./models --txt-report mypy-report --timing-stats mypy-report/timing.txt
 
 
 docs:
