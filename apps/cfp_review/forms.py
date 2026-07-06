@@ -496,7 +496,7 @@ class LotteryForm(Form):
             ("allow-entry", "Allow entry"),
             # running-lottery
             ("completed", "Completed"),
-            ("sign-up-list", "Guest list"),
+            ("sign-up-list", "Sign-up list"),
         ],
     )
     total_tickets = IntegerField("Capacity", validators=[Optional()])
