@@ -1,10 +1,21 @@
-We've attached {% if already_emailed %}an updated{% else %}a{% endif %} PDF to this email. Admissions tickets can be shown
-on your phone, but we recommend you print them out for convenience.
+We've attached {% if already_emailed %}an updated{% else %}a{% endif %} PDF{% if config.get("ISSUE_APPLE_PKPASS_TICKETS") %} and an Apple Wallet-compatible .pkpass{% endif %} to this email.
+{%- if config.get("ISSUE_GOOGLE_WALLET_TICKETS") %}
+If you have an Android phone, you can use a third party .pkpass reader app,
+or add your pass directly to Google Wallet using this link:
 
+  {{ external_url('users.google_wallet_ticket') }}
+{%- endif %}
+{% if user.has_admission_ticket %}
+Admissions tickets can be shown on your phone, or you can print them out.
+{% else %}
+Your account has no associated entrance tickets. This ticket will not
+allow you to enter the event. If someone else bought your ticket, you
+should ask them to transfer it to you.
+{% endif %}
 {% if payment %}
 If you have bought a ticket for someone else, you can send it to them
 by logging in and clicking 'transfer' beside the relevant ticket. This
-will also let them favourite talks on the website and easily sign up
+will also let them favourite items on the schedule and easily sign up
 to volunteer:
 
   {{ external_url('users.purchases') }}
@@ -14,8 +25,6 @@ If you're coming by car and you don't have a parking ticket, you'll
 need to buy one before you arrive:
 
   {{ external_url('tickets.main', flow='other') }}
-
-Any parking tickets must be printed and displayed on your dashboard.
 
 If you're travelling by public transport, we will be running shuttle
 buses between a local train station and the festival site.

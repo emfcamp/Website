@@ -2,7 +2,7 @@ import html
 import json
 import logging
 import re
-from datetime import timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
 from os import path
 from pathlib import Path
@@ -177,6 +177,8 @@ def load_utility_functions(app_obj):
             "event_start": s,
             "event_end": e,
             "event_year": s.year,
+            "gate_opened": config.gate_opened,
+            "gate_closed": config.gate_closed,
         }
 
     @app_obj.context_processor
@@ -244,6 +246,9 @@ def load_utility_functions(app_obj):
     app_obj.template_filter("title_add")(title_add)
     app_obj.template_filter("capitalize_add")(capitalize_add)
     app_obj.template_filter("human_list")(human_list)
+    app_obj.template_filter("human_time")(human_time)
+    app_obj.template_filter("human_day")(human_day)
+    app_obj.template_filter("human_date")(human_date)
 
     @app_obj.context_processor
     def content_processor():
@@ -550,3 +555,26 @@ def human_list(values: list[str], oxford: bool = True) -> str:
     if not rest:
         return last
     return (", and " if oxford else " and ").join([", ".join(rest), last])
+
+
+def human_time(dt: datetime) -> str:
+    # e.g 10am
+    timestr = dt.strftime("%H%P")
+    if timestr == "12pm":
+        return "midday"
+    if timestr == "12am":
+        return "midnight"
+    return timestr
+
+
+def human_day(dt: datetime) -> str:
+    # e.g. Monday
+    return dt.strftime("%A")
+
+
+def human_date(dt: datetime) -> str:
+    # eg. 1st January
+    def suffix(d):
+        return "th" if 11 <= d <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(d % 10, "th")
+
+    return f"{dt.day}{suffix(dt.day)} {dt.strftime('%B')}"

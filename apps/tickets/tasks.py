@@ -5,7 +5,7 @@ import googleapiclient.errors
 from flask import current_app as app
 from flask import render_template
 from flask_mailman import EmailMessage
-from sqlalchemy import func
+from sqlalchemy import func, select
 
 from apps.common import feature_enabled, walletpass
 from apps.common.receipt import RECEIPT_TYPES, attach_tickets, set_tickets_emailed
@@ -426,7 +426,8 @@ def email_transfer_reminders():
 
 
 @tickets.cli.command("email_tickets")
-def email_tickets():
+@click.option("-u", "--user-id", type=int, required=False, help="Email only a specific user")
+def email_tickets(user_id: int | None) -> None:
     """Email tickets to those who haven't received them"""
     ctx = app.test_request_context()
     ctx.push()
@@ -435,18 +436,25 @@ def email_tickets():
         app.logger.warning("Not emailing tickets as ISSUE_TICKETS is disabled")
         return
 
-    users_purchase_counts = (
-        Purchase.query.filter_by(is_paid_for=True)
-        .join(PriceTier)
-        .join(Product)
-        .join(ProductGroup)
-        .filter(ProductGroup.type.in_(RECEIPT_TYPES))
-        .filter(Purchase.ticket_issued == False)
-        .join(Purchase.owner)
-        .with_entities(User, func.count(Purchase.id))
-        .group_by(User)
+    # This results in the count of un-issued tickets per user.
+    # I think this is what we want, but bear in mind that we're
+    # going to include their previously-emailed tickets as well.
+    query = (
+        select(User, func.count(Purchase.id))
+        .select_from(User)
+        .join(User.owned_purchases)
+        .where(
+            Purchase.ticket_issued == False,
+            Purchase.is_paid_for == True,
+            Purchase.product.has(Product.parent.has(ProductGroup.type.in_(RECEIPT_TYPES))),
+        )
+        .group_by(User.id)
         .order_by(User.id)
     )
+    if user_id is not None:
+        query = query.where(User.id == user_id)
+
+    users_purchase_counts = list(db.session.execute(query).unique())
 
     for user, purchase_count in users_purchase_counts:
         plural = (purchase_count != 1 and "s") or ""

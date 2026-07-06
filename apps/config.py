@@ -55,6 +55,14 @@ class EMFConfig:
         return self.get_date("EVENT_END")
 
     @property
+    def gate_opened(self) -> datetime:
+        return self.get_date("GATE_OPENED")
+
+    @property
+    def gate_closed(self) -> datetime:
+        return self.get_date("GATE_CLOSED")
+
+    @property
     def event_days(self) -> Iterator[date]:
         """Iterator of a date object for event days"""
         for day_idx in range((config.event_end - config.event_start).days + 1):
