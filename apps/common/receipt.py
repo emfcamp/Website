@@ -4,6 +4,7 @@ from collections import namedtuple
 from typing import IO, Any
 
 import segno
+from flask import current_app as app
 from flask import render_template
 from markupsafe import Markup
 from playwright.async_api import async_playwright
@@ -117,6 +118,17 @@ def attach_tickets(msg, user):
     pdf = render_pdf(url, page)
 
     msg.attach(f"EMF{config.event_year}.pdf", pdf.read(), "application/pdf")
+
+    if feature_enabled("ISSUE_APPLE_PKPASS_TICKETS"):
+        # Circular import again
+        from apps.common.walletpass import generate_pkpass, generate_unsigned_pkpass
+
+        if app.config.get("PKPASS_SIGNER_CERT_FILE"):
+            pkpass = generate_pkpass(user)
+        else:
+            pkpass = generate_unsigned_pkpass(user)
+
+        msg.attach(f"EMF{config.event_year}.pkpass", pkpass.read(), "application/vnd.apple.pkpass")
 
 
 def set_tickets_emailed(user):

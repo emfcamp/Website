@@ -174,5 +174,13 @@ def pkpass_ticket():
         generate_pkpass(current_user),
         "application/vnd.apple.pkpass",
         as_attachment=True,
-        download_name="emf_ticket.pkpass",
+        download_name=f"EMF{config.event_year}.pkpass",
     )
+
+
+@users.route("/account/google-wallet-pass")
+@login_required
+def google_wallet_ticket():
+    if not feature_enabled("ISSUE_GOOGLE_WALLET_TICKETS"):
+        abort(403)
+    return redirect(current_user.google_wallet_pass_url)

@@ -9,6 +9,7 @@ Your friend {{ from_user.name }} has transferred a purchase to you from the Elec
 {% endif -%}
 
 {% if feature_enabled('ISSUE_TICKETS') -%}
+{% set user = to_user %}
 {% include 'emails/receipt-blurb.txt' %}
 {% elif new_user %}
 We've created an account for you. We'll email you important information nearer the event.
