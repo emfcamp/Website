@@ -93,9 +93,9 @@ def test_occurrence_time_blocks(user, db):
     assert time_blocks[0].venue == venue3
     assert all(block.automatic is False for block in time_blocks)
 
-    occurrence.allowed_venues = []
     # Set the time and the "manually_scheduled" flag. Now this occurrence is pinned
     # to occur in the manual timeblock.
+    occurrence.allowed_venues = [venue3]
     occurrence.scheduled_time = parse("2026-07-17 15:00:00")
     occurrence.manually_scheduled = True
     db.session.commit()
@@ -158,6 +158,7 @@ def test_occurrence_allowed_times(user, db):
     # Now we manually schedule this occurrence.
     # This is scheduled outside the speaker's availability, but the manually-scheduled time takes priority.
     occurrence.manually_scheduled = True
+    occurrence.allowed_venues = [venue3]
     occurrence.scheduled_venue = venue3
     occurrence.scheduled_time = parse("2026-07-16 11:00:00")
     db.session.commit()
