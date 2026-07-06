@@ -7,6 +7,7 @@ from flask_mailman import EmailMessage
 from Levenshtein import jaro, ratio
 from wtforms import SubmitField
 
+from apps.common.walletpass import update_gwallet_pass_if_needed
 from main import db, get_or_404
 from models.payment import BankPayment, BankTransaction
 
@@ -154,6 +155,9 @@ def transaction_reconcile(txn_id, payment_id):
                 attach_tickets(msg, payment.user)
 
             msg.send()
+
+            if feature_enabled("ISSUE_TICKETS") and feature_enabled("ISSUE_GOOGLE_WALLET_TICKETS"):
+                update_gwallet_pass_if_needed(payment.user)
 
             flash(f"Payment ID {payment.id} marked as paid")
             return redirect(url_for("admin.transactions"))

@@ -8,8 +8,9 @@ from prometheus_client import Counter
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
+from apps.common import walletpass
 from main import db, mail
-from models import naive_utcnow
+from models import User, naive_utcnow
 from models.email import EmailJob, EmailJobRecipient
 from models.scheduled_task import scheduled_task
 
@@ -94,3 +95,22 @@ def send_email(conn: Any, rec: EmailJobRecipient) -> int:
         db.session.commit()
 
     return sent_count
+
+
+@scheduled_task(minutes=60)
+def update_gwallet_passes() -> None:
+    ctx = app.test_request_context()
+    ctx.push()
+
+    client = walletpass.gwallet_api_client()
+
+    old_passes_by_user_id = walletpass.get_all_gwallet_passes(client)
+    user_query = db.select(User).options(db.joinedload(User.buildup_volunteer))
+    users = (
+        db.session.execute(user_query.filter(User.id.in_(old_passes_by_user_id.keys()))).unique().scalars()
+    )
+
+    for user in users:
+        for old_pass in old_passes_by_user_id[user.id]:
+            new_pass = walletpass.generate_gwallet_pass(user)
+            walletpass.update_gwallet_pass(client, user, old_pass, new_pass)

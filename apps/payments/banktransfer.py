@@ -9,6 +9,7 @@ from flask_mailman import EmailMessage
 from wtforms import HiddenField, SubmitField
 from wtforms.validators import AnyOf, DataRequired
 
+from apps.common.walletpass import update_gwallet_pass_if_needed
 from apps.payments.common import get_user_payment_or_abort, lock_user_payment_or_abort
 from main import db
 from models import Currency, naive_utcnow
@@ -243,3 +244,6 @@ def send_confirmation(payment: BankPayment) -> None:
 
     msg.send()
     db.session.commit()
+
+    if feature_enabled("ISSUE_TICKETS") and feature_enabled("ISSUE_GOOGLE_WALLET_TICKETS"):
+        update_gwallet_pass_if_needed(payment.user)

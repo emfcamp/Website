@@ -46,6 +46,7 @@ from ..common.receipt import (
     render_receipt,
     set_tickets_emailed,
 )
+from ..common.walletpass import update_gwallet_pass_if_needed
 from ..config import config
 from .forms import TicketTransferForm
 
@@ -176,6 +177,10 @@ def transfer(ticket_id):
         )
 
         msg.send()
+
+        if feature_enabled("ISSUE_TICKETS") and feature_enabled("ISSUE_GOOGLE_WALLET_TICKETS"):
+            update_gwallet_pass_if_needed(current_user)
+            update_gwallet_pass_if_needed(to_user)
 
         flash("Your purchase was transferred.")
         return redirect(url_for("users.purchases"))
