@@ -27,6 +27,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from wtforms import SubmitField
 
+from apps.common.walletpass import update_gwallet_pass_if_needed
 from apps.payments.common import lock_user_payment_or_abort
 from main import db, get_stripe_client
 from models.payment import StripePayment
@@ -311,6 +312,9 @@ def stripe_payment_paid(payment: StripePayment) -> None:
 
     msg.send()
     db.session.commit()
+
+    if feature_enabled("ISSUE_TICKETS") and feature_enabled("ISSUE_GOOGLE_WALLET_TICKETS"):
+        update_gwallet_pass_if_needed(payment.user)
 
 
 def stripe_payment_refunded(payment: StripePayment) -> None:

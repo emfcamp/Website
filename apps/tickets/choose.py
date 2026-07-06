@@ -19,6 +19,7 @@ from markupsafe import Markup
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
+from apps.common.walletpass import update_gwallet_pass_if_needed
 from main import db
 from models.basket import Basket
 from models.exc import CapacityException
@@ -315,6 +316,9 @@ def handle_free_tickets(flow: str, view: ProductView, basket: Basket) -> Respons
         attach_tickets(msg, current_user)
 
     msg.send()
+
+    if feature_enabled("ISSUE_TICKETS") and feature_enabled("ISSUE_GOOGLE_WALLET_TICKETS"):
+        update_gwallet_pass_if_needed(current_user)
 
     if len(basket.purchases) == 1:
         flash("Your ticket has been confirmed")

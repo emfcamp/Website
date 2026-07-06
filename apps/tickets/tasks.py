@@ -22,7 +22,7 @@ from models.product import (
 )
 from models.purchase import Purchase
 from models.scheduled_task import scheduled_task
-from models.user import User, verify_checkin_code
+from models.user import User
 
 from ..config import config
 from . import tickets
@@ -475,6 +475,9 @@ def email_tickets(user_id: int | None) -> None:
 
         db.session.commit()
 
+        if feature_enabled("ISSUE_GOOGLE_WALLET_TICKETS"):
+            walletpass.update_gwallet_pass_if_needed(user)
+
 
 @tickets.cli.group()
 def googlewallet():
@@ -520,99 +523,42 @@ def ticket_url(email):
     click.echo(user.google_wallet_pass_url)
 
 
-_IGNORE_GOOGLE_WALLET_KEYS = frozenset(
-    {
-        "hasUsers",
-        "state",
-        "version",
-        "kind",
-        "classReference",
-    }
-)
-
-
-def _delete_kind_recursively(d):
-    if isinstance(d, dict):
-        if "kind" in d:
-            del d["kind"]
-        for v in d.values():
-            _delete_kind_recursively(v)
-    elif isinstance(d, list):
-        for v in d:
-            _delete_kind_recursively(v)
-
-
 @googlewallet.command()
-@click.option("--email", help="User to build the pass for.")
+@click.option("--email", help="User to update the pass for.")
 @click.option("--all-users", is_flag=True, help="Update all Google Wallet passes.")
-def update_ticket(email, all_users):
-    """Pushes an update to a given user's ticket. Won't create it if it doesn't already exist (i.e. the user hasn't clicked the link)."""
+def update_pass(email, all_users):
+    """Pushes an update to a given user's pass. Won't create it if it doesn't already exist (i.e. the user hasn't clicked the link)."""
     ctx = app.test_request_context()
     ctx.push()
 
-    client = walletpass.gwallet_api_client().eventticketobject()
-
-    user_query = db.select(User).options(db.joinedload(User.buildup_volunteer))
-    users = []
-    old_tickets = {}
-    if email:
-        user = db.session.execute(user_query.filter_by(email=email)).unique().scalar()
-        if user is None:
-            raise click.ClickException(f"No user {email} found.")
-        users = [user]
-    elif all_users:
-        user_ids = []
-        has_next = True
-        next_token = None
-        while has_next:
-            resp = client.list(
-                classId=walletpass.generate_gwallet_class()["id"], token=next_token, maxResults=200
-            ).execute()
-            for ticket in resp["resources"]:
-                checkin_code = ticket["ticketNumber"]
-                uid = verify_checkin_code(app.config.get("SECRET_KEY"), checkin_code)
-                if uid is None:
-                    continue
-                old_tickets[len(user_ids)] = ticket
-                user_ids.append(int(uid))
-
-            next_token = resp.get("pagination", {}).get("nextPageToken", None)
-            has_next = next_token is not None
-        users = db.session.execute(user_query.filter(User.id.in_(user_ids))).unique().scalars()
-    else:
+    if not email and not all_users:
         raise click.ClickException("--email or --all-users must be specified.")
 
-    for n, user in enumerate(users):
-        new_pass = walletpass.generate_gwallet_pass(user)
-        old_pass = old_tickets.get(n)
-        if not old_pass:
-            try:
-                old_pass = client.get(resourceId=new_pass["id"]).execute()
-            except googleapiclient.errors.HttpError as e:
-                if e.resp.status == 404:
-                    click.echo(f"User {user.email} has no ticket in Google Wallet's backend.")
-                    continue
-                app.logger.exception("Fetching pass for user %s", user.email)
-                continue
-        _delete_kind_recursively(old_pass)
-        # Normalise barcode.type
-        if old_pass.get("barcode", {}).get("type", "") == "qrCode":
-            old_pass["barcode"]["type"] = "QR_CODE"
+    client = walletpass.gwallet_api_client()
 
-        differences = {}
-        sentinel = object()
-        for k in (set(old_pass.keys()) | set(new_pass.keys())) - _IGNORE_GOOGLE_WALLET_KEYS:
-            old_value = old_pass.get(k, sentinel)
-            new_value = new_pass.get(k, sentinel)
-            if old_value != new_value:
-                differences[k] = (old_value, new_value)
-        if not differences:
-            app.logger.info(
-                "Skipping updating Google Wallet ticket %s for user %s - new pass is identical to current pass",
-                new_pass["id"],
-                user.email,
-            )
-            continue
-        app.logger.debug("Google Wallet ticket differences for %s: %s", user.email, differences)
-        app.logger.info("Updating Google Wallet ticket %s for user %s", new_pass["id"], user.email)
-        client.update(resourceId=new_pass["id"], body=new_pass).execute()
+    if email:
+        user = User.get_by_email(email)
+        if user is None:
+            raise click.ClickException(f"No user {email} found.")
+
+        new_pass = walletpass.generate_gwallet_pass(user)
+
+        old_pass = walletpass.get_old_gwallet_pass(client, new_pass)
+        if not old_pass:
+            click.echo(f"User {user.email} has no ticket in Google Wallet's backend.")
+
+        walletpass.update_gwallet_pass(client, user, old_pass, new_pass)
+
+    elif all_users:
+        old_passes_by_user_id = walletpass.get_all_gwallet_passes(client)
+        user_query = db.select(User).options(db.joinedload(User.buildup_volunteer))
+        users = (
+            db.session.execute(user_query.filter(User.id.in_(old_passes_by_user_id.keys())))
+            .unique()
+            .scalars()
+        )
+
+        for user in users:
+            for old_pass in old_passes_by_user_id[user.id]:
+                new_pass = walletpass.generate_gwallet_pass(user)
+                walletpass.update_gwallet_pass(client, user, old_pass, new_pass)

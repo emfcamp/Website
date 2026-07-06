@@ -13,6 +13,7 @@ from flask import (
 from flask.typing import ResponseReturnValue
 from flask_mailman import EmailMessage
 
+from apps.common.walletpass import update_gwallet_pass_if_needed
 from main import db, external_url, get_or_404
 from models.exc import CapacityException
 from models.product import Price, PriceTier, Product, ProductGroup
@@ -138,6 +139,9 @@ def tickets_issue_free(email):
 
         msg.send()
         db.session.commit()
+
+        if feature_enabled("ISSUE_TICKETS") and feature_enabled("ISSUE_GOOGLE_WALLET_TICKETS"):
+            update_gwallet_pass_if_needed(user)
 
         flash(f"Allocated {len(basket.purchases)} {ticket_noun}")
         return redirect(url_for(".tickets_issue"))

@@ -4,7 +4,8 @@ import hashlib
 import io
 import json
 import zipfile
-from collections.abc import Iterable
+from collections import defaultdict
+from collections.abc import Iterable, Mapping
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
@@ -28,7 +29,7 @@ from PIL.Image import Palette, Resampling
 from apps.common.receipt import get_purchase_metadata
 from apps.config import config
 from main import static_digest
-from models.user import User
+from models.user import User, verify_checkin_code
 
 if TYPE_CHECKING:
     pass
@@ -687,3 +688,113 @@ def gwallet_api_client() -> googleapiclient._apis.walletobjects.v1.resources.Wal
         googleapiclient.discovery.build("walletobjects", "v1", credentials=credentials)
     )
     return client
+
+
+def get_all_gwallet_passes(
+    client: googleapiclient._apis.walletobjects.v1.resources.WalletobjectsResource,
+) -> Mapping[int, list[googleapiclient._apis.walletobjects.v1.EventTicketObject]]:
+    has_next = True
+    next_token = None
+    # I'm not sure if it's possible for multiple tickets to exist for a specific user,
+    # but let's assume it is for some reason, and that we want to update them all.
+    passes_by_user_id = defaultdict(list)
+    while has_next:
+        # God this interface sucks
+        token: dict[str, str] = {"token": next_token} if next_token else {}
+        resp = (
+            client.eventticketobject()
+            .list(classId=generate_gwallet_class()["id"], maxResults=200, **token)
+            .execute()
+        )
+        for ticket in resp.get("resources", []):
+            checkin_code = ticket["ticketNumber"]
+            uid = verify_checkin_code(app.config.get("SECRET_KEY"), checkin_code)
+            if uid is None:
+                continue
+            passes_by_user_id[int(uid)].append(ticket)
+
+        next_token = resp.get("pagination", {}).get("nextPageToken", "")
+        has_next = bool(next_token)
+
+    return passes_by_user_id
+
+
+def get_old_gwallet_pass(
+    client: googleapiclient._apis.walletobjects.v1.resources.WalletobjectsResource,
+    new_pass: googleapiclient._apis.walletobjects.v1.EventTicketObject,
+) -> googleapiclient._apis.walletobjects.v1.EventTicketObject | None:
+    try:
+        return client.eventticketobject().get(resourceId=new_pass["id"]).execute()
+
+    except googleapiclient.errors.HttpError as e:
+        if e.resp.status == 404:
+            return None
+        raise
+
+
+_IGNORE_GOOGLE_WALLET_KEYS = frozenset(
+    {
+        "hasUsers",
+        "state",
+        "version",
+        "kind",
+        "classReference",
+    }
+)
+
+
+def _delete_kind_recursively(d):
+    if isinstance(d, dict):
+        if "kind" in d:
+            del d["kind"]
+        for v in d.values():
+            _delete_kind_recursively(v)
+    elif isinstance(d, list):
+        for v in d:
+            _delete_kind_recursively(v)
+
+
+def update_gwallet_pass(
+    client: googleapiclient._apis.walletobjects.v1.resources.WalletobjectsResource,
+    user: User,
+    old_pass: googleapiclient._apis.walletobjects.v1.EventTicketObject,
+    new_pass: googleapiclient._apis.walletobjects.v1.EventTicketObject,
+) -> bool:
+    """
+    Updates pass for a user. Returns False if the pass is unchanged.
+    """
+    _delete_kind_recursively(old_pass)
+    # Normalise barcode.type
+    if old_pass.get("barcode", {}).get("type", "") == "qrCode":
+        old_pass["barcode"]["type"] = "QR_CODE"
+
+    differences = {}
+    sentinel = object()
+    for k in (set(old_pass.keys()) | set(new_pass.keys())) - _IGNORE_GOOGLE_WALLET_KEYS:
+        old_value = old_pass.get(k, sentinel)
+        new_value = new_pass.get(k, sentinel)
+        if old_value != new_value:
+            differences[k] = (old_value, new_value)
+    if not differences:
+        app.logger.info(
+            "Skipping updating Google Wallet ticket %s for user %s - new pass is identical to current pass",
+            new_pass["id"],
+            user.email,
+        )
+        return False
+
+    app.logger.debug("Google Wallet ticket differences for %s: %s", user.email, differences)
+    app.logger.info("Updating Google Wallet ticket %s for user %s", new_pass["id"], user.email)
+    client.eventticketobject().update(resourceId=new_pass["id"], body=new_pass).execute()
+
+    return True
+
+
+def update_gwallet_pass_if_needed(user: User) -> None:
+    client = gwallet_api_client()
+
+    new_pass = generate_gwallet_pass(user)
+
+    old_pass = get_old_gwallet_pass(client, new_pass)
+    if old_pass:
+        update_gwallet_pass(client, user, old_pass, new_pass)
