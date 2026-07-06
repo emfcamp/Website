@@ -6,6 +6,7 @@ from flask_login import UserMixin
 from sqlalchemy import ARRAY, Column, ForeignKey, Integer, String, Table, select
 from sqlalchemy.ext.mutable import Mutable, MutableSet
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.sql import or_
 
 from apps.config import config
 from main import db
@@ -123,6 +124,12 @@ class Volunteer(BaseModel, UserMixin):
     @classmethod
     def get_by_email(cls, email_address: str) -> Volunteer | None:
         return db.session.scalar(select(cls).where(cls.volunteer_email == email_address))
+
+    @classmethod
+    def find_by_query(cls, query: str) -> list[Volunteer]:
+        return db.session.scalars(
+            select(cls).where(or_(cls.volunteer_email.ilike(f"%{query}%"), cls.nickname.ilike(f"%{query}%")))
+        ).all()
 
     @classmethod
     def get_for_user(cls, user):

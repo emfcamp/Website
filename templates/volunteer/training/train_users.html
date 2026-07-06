@@ -1,27 +1,39 @@
 {% extends 'base.html' %}
+{% from "_formhelpers.html" import render_field %}
 
 {% block title %}
     Train users
 {% endblock %}
 {% block body %}
     {% include "volunteer/_nav.html" %}
-    <h2>Who have you trained?</h2>
-    <form method="post">
-        {{ form.hidden_tag() }}
+    <h2>{{ role.name }} Training</h2>
+    <div class="well">
+      <h3>Search for volunteers</h3>
+      <p>You can search by nickname or email address, partial matches are supported.</p>
+      <form method="post" class="form-inline">
+        <label for="query" class="sr-only">Email/nickname:</label>
+        <input type="text" class="form-control" value="{{ query }}" name="query">
+        <button type="submit" class="btn btn-default">Search</button>
+      </form>
+    </div>
 
-        {% for field in form.volunteers %}
-            {{ field.hidden_tag() }}
-            <div class="checkbox">
-                <label for="{{ field.trained.name }}">
-                    {{ field.trained()| safe }}
-                    <strong>{{ field._volunteer.nickname }}</strong>
-                </label>
-            </div>
-        {% endfor %}
-
-
-        <div class="form-group">
-            {{ form.submit(class_="btn btn-primary debounce") }}
-        </div>
-    </form>
+    {% if query != "" %}
+        <ul>
+            {% for volunteer in volunteers %}
+                <li>
+                    {% if volunteer in role.trained_volunteers %}
+                        <form method="post" action="{{ url_for('.untrain_user', role_id=role.id, volunteer_id=volunteer.id) }}">
+                            {{ volunteer.nickname }}
+                            <button type="submit" class="btn btn-small btn-danger">Untrain</button>
+                        </form>
+                    {% else %}
+                        <form method="post" action="{{ url_for('.train_user', role_id=role.id, volunteer_id=volunteer.id) }}">
+                            {{ volunteer.nickname }}
+                            <button type="submit" class="btn btn-small btn-primary">Train</button>
+                        </form>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 {% endblock %}
