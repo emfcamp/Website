@@ -381,10 +381,22 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseRetu
 
         assert form.allowed_venue_ids.data is not None
         occurrence.allowed_venues = [venues_dict[v] for v in form.allowed_venue_ids.data]
-        db.session.commit()
-        return redirect(
-            url_for(".update_occurrence", schedule_item_id=schedule_item_id, occurrence_id=occurrence_id)
-        )
+
+        if (
+            occurrence.manually_scheduled
+            and occurrence.scheduled_time is not None
+            and occurrence.scheduled_duration is not None
+            and not occurrence.allowed_times(True)
+        ):
+            flash(
+                f"ERROR: Manually scheduled time outside any '{occurrence.schedule_item.human_type}' Time Blocks in the allowed venues"
+            )
+            db.session.rollback()
+        else:
+            db.session.commit()
+            return redirect(
+                url_for(".update_occurrence", schedule_item_id=schedule_item_id, occurrence_id=occurrence_id)
+            )
 
     if request.method != "POST":
         form.allowed_venue_ids.data = [v.id for v in occurrence.get_allowed_venues()]

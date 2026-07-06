@@ -120,14 +120,26 @@ def schedule() -> ResponseReturnValue:
 def run_scheduler():
     if request.method == "POST" and request.form.get("run"):
         scheduler = Scheduler()
+        result = None
         try:
             result = scheduler.run(AUTO_SCHEDULE_TYPES)
-            db.session.add(result)
-            db.session.commit()
-            return redirect(url_for(".potential_schedule", schedule_id=result.id))
         except slotmachine.Unsatisfiable as e:
             app.logger.exception("Unsatisfiable schedule")
             flash(f"Schedule was unsatisfiable :( {e}")
+        except Exception as e:
+            app.logger.exception("Scheduler failed")
+            flash(f"Scheduler failed: {e}")
+
+        if scheduler.unschedulable:
+            ids = ", ".join(str(o.id) for o in scheduler.unschedulable)
+            flash(
+                f"{len(scheduler.unschedulable)} occurrences unschedulable due to lack of times. May be manually scheduled outside a timeblock, or there are no automatic timeblocks of that type. Occurrence IDs: {ids}"
+            )
+
+        if result is not None:
+            db.session.add(result)
+            db.session.commit()
+            return redirect(url_for(".potential_schedule", schedule_id=result.id))
 
     return render_template("cfp_review/schedule/schedule_run.html")
 

@@ -34,8 +34,11 @@
                             {{ render_dl_field(form.scheduled_duration) }}
 
                             {{ render_dl_field(form.allowed_venue_ids) }}
+                            <dd><p class="help-block">The scheduler will only place this Occurrence in these venues. If you want to have this Occurrence in a specific venue, ensure it is the only one selected.</p></dd>
                             {{ render_dl_field(form.scheduled_venue_id) }}
                             {{ render_dl_field(form.scheduled_time) }}
+                            {{ render_dl_field(form.manually_scheduled) }}
+                            <dd><p class="help-block">Setting manually scheduled will disallow the scheduler from automatically moving this Occurrence to another time.</p></dd>
                         </dl>
                     </div>
                 </div>

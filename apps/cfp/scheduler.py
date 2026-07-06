@@ -31,6 +31,8 @@ class Scheduler:
     def __init__(self):
         self.occurrences = {}
         self.venues = {}
+        # Occurrences that we couldn't feed to the scheduler because they're lacking information
+        self.unschedulable: list[Occurrence] = []
 
     def get_schedulable_occurrences(self, types: list[ScheduleItemType]) -> list[Occurrence]:
         """Fetch a list of Occurrences that the automatic scheduler should consider
@@ -119,12 +121,11 @@ class Scheduler:
                 ]
 
                 if len(venue_times) == 0:
-                    # FIXME: this happens when an Occurrence is constrained to a manually-scheduled venue, but
-                    # has not been assigned a time yet.
-                    # Manually-scheduled talks should still be sent to the automatic scheduler to take speaker
-                    # availability into account.
-                    # We should surface the number/list of these occurrences to the user who's running the scheduler.
+                    # This happens when things are manually scheduled outside
+                    # of a timeblock, or when we have no timeblocks of this
+                    # type set to be automatically schedulable.
                     app.logger.warning(f"Skipping scheduling occurrence {occurrence} - no allowed times.")
+                    self.unschedulable.append(occurrence)
                     continue
 
                 ## tag diversity currently disabled due to performance degredation

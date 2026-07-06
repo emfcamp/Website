@@ -610,15 +610,20 @@ class Occurrence(BaseModel):
         This takes into account whether the Occurrence has been manually scheduled, but it doesn't
         take into account speaker availability.
         """
-        if self.manually_scheduled and self.scheduled_venue and self.scheduled_time:
-            # Occurrence is manually scheduled, so we only return the TimeBlock which it's scheduled in
-            for timeblock in self.scheduled_venue.time_blocks:
-                if timeblock.type == self.schedule_item.type and (
-                    timeblock.start <= self.scheduled_time < timeblock.end
-                ):
-                    yield timeblock
-                    break
-
+        if self.manually_scheduled and self.scheduled_time:
+            # Occurrence is manually scheduled at a specific time, so we only
+            # return TimeBlocks in venues that have a suitable timeblock at
+            # this time.
+            for venue in self.get_allowed_venues():
+                for timeblock in venue.time_blocks:
+                    if (
+                        timeblock.type == self.schedule_item.type
+                        and self.scheduled_end_time is not None
+                        and timeblock.start <= self.scheduled_time
+                        and self.scheduled_end_time <= timeblock.end
+                    ):
+                        yield timeblock
+                        break
         else:
             for venue in self.get_allowed_venues():
                 for timeblock in venue.time_blocks:
@@ -633,13 +638,21 @@ class Occurrence(BaseModel):
         """
         assert self.schedule_item.official_content
 
-        if self.manually_scheduled and self.scheduled_venue and self.scheduled_time:
-            # Manually scheduled - return a single time range which encompasses the scheduled time.
-            assert self.scheduled_end_time
-            return {self.scheduled_venue: [(self.scheduled_time, self.scheduled_end_time)]}
-
         result: dict[Venue, list[tuple[datetime, datetime]]] = defaultdict(list)
         for time_block in self.time_blocks():
+            if self.manually_scheduled and self.scheduled_time:
+                assert self.scheduled_end_time
+
+                # Manually scheduled - return a single time range which
+                # encompasses the scheduled time.
+                #
+                # If someone wants to restrict the venue, they do this by setting
+                # allowed_venues - this means we can restrict a talk to be at a
+                # specific time but allow for freedom of venue movement if
+                # nessecary to avoid over-constraining the problem.
+                result[time_block.venue].append((self.scheduled_time, self.scheduled_end_time))
+                continue
+
             if time_block.automatic != automatic:
                 continue
 
