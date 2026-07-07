@@ -11,7 +11,13 @@
         {{ render_field(form.end) }}
         {{ render_field(form.type) }}
         {{ render_field(form.automatic) }}
+        <p class="help-block">
+        Allow the automatic scheduler to place things in this block. If this is not checked, only manually scheduled content will be allowed in this block.
+        </p>
         {{ render_field(form.default) }}
+        <p class="help-block">
+        Use this block as a default for this type of content when automatically scheduling. If this is not checked, content will only be placed in this block by the automatic scheduler when this block is explicitly permitted - such as by setting Allowed Venues on a Schedule Item.
+        </p>
         <div class="btn-group">
             {{ form.submit(class_="btn btn-success") }}
             {{ form.delete(class_="btn btn-danger") }}
