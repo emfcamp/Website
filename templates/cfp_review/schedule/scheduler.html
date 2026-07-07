@@ -31,6 +31,13 @@
     {%- if not loop.last %} / {% endif %}
   {% endfor %}
 </p>
+<p>
+  Show Venue:
+  {% for venue_name in emf_venues | sort %}
+    <a href="{{ url_for('cfp_review.scheduler', venue=venue_name) }}">{{ venue_name }}</a>
+    {%- if not loop.last %} / {% endif %}
+  {% endfor %}
+</p>
 
 <div id="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
     <div class="dhx_cal_navline">
