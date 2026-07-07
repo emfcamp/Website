@@ -409,6 +409,7 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseRetu
     form.scheduled_time.render_kw = {
         "min": config.event_start.strftime("%Y-%m-%dT%H:%M"),
         "max": config.event_end.strftime("%Y-%m-%dT%H:%M"),
+        "step": 600,
     }
 
     valid_allowed_venues = set(occurrence.valid_allowed_venues)
