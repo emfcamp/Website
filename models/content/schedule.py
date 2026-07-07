@@ -88,7 +88,7 @@ EVENT_SPACING = {
     "performance": 0,
     "familyworkshop": 3,
     "installation": 0,
-    "film": 2,
+    "film": 0,
     "music": 0,
     "djset": 0,
     "meetup": 0,
@@ -600,18 +600,23 @@ class Occurrence(BaseModel):
         return self.schedule_item.availability
 
     def get_allowed_venues(self) -> set[Venue]:
-        """Get the allowed venues for this Occurrence, defaulting to venues with automatic TimeBlocks if none are set."""
+        """Get the allowed venues for this Occurrence, defaulting to the default venues for its
+        content type if none are set."""
         if self.allowed_venues:
             return set(self.allowed_venues)
 
-        return set(
-            db.session.scalars(
-                select(Venue)
-                .join(Venue.time_blocks)
-                .where(TimeBlock.type == self.schedule_item.type, TimeBlock.automatic)
-                .group_by(Venue.id)
-            )
+        query = (
+            select(Venue)
+            .join(Venue.time_blocks)
+            .where(TimeBlock.type == self.schedule_item.type)
+            .group_by(Venue.id)
         )
+        # Manually scheduled occurrences can be placed in any venue of the right type,
+        # not just default ones.
+        if not self.manually_scheduled:
+            query = query.where(TimeBlock.default)
+
+        return set(db.session.scalars(query))
 
     @property
     def valid_allowed_venues(self) -> set[Venue]:
@@ -649,7 +654,11 @@ class Occurrence(BaseModel):
         else:
             for venue in self.get_allowed_venues():
                 for timeblock in venue.time_blocks:
-                    if timeblock.type == self.schedule_item.type:
+                    # The default filter only applies to plain items - manual scheduling
+                    # and explicit allowed_venues both opt out of it.
+                    if timeblock.type == self.schedule_item.type and (
+                        self.manually_scheduled or self.allowed_venues or timeblock.default
+                    ):
                         yield timeblock
 
     def allowed_times(self, automatic: bool) -> dict[Venue, list[tuple[datetime, datetime]]]:
@@ -688,6 +697,7 @@ class Occurrence(BaseModel):
                     result[time_block.venue].append(
                         (max(availability.start, time_block.start), min(availability.end, time_block.end))
                     )
+
         return result
 
     def overlaps_with(self, other: Self) -> bool:

@@ -25,6 +25,7 @@ from wtforms import FormField
 
 from apps.cfp.views import TimeRangesHandler
 from apps.common import title_add
+from apps.config import config
 from main import db, get_or_404
 from models.content import (
     SCHEDULE_ITEM_INFOS,
@@ -404,6 +405,11 @@ def update_occurrence(schedule_item_id: int, occurrence_id: int) -> ResponseRetu
 
     Form = get_update_occurrence_type_form(occurrence.schedule_item.type)
     form = Form(obj=occurrence)
+
+    form.scheduled_time.render_kw = {
+        "min": config.event_start.strftime("%Y-%m-%dT%H:%M"),
+        "max": config.event_end.strftime("%Y-%m-%dT%H:%M"),
+    }
 
     valid_allowed_venues = set(occurrence.valid_allowed_venues)
     # We don't block saving an occurrence if the valid list has changed

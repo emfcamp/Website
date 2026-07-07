@@ -128,8 +128,16 @@ class TimeBlock(BaseModel):
     #: The type of item which can be scheduled in this TimeBlock
     type: Mapped[ScheduleItemType]
 
-    #: Whether this block should be considered by the automatic scheduler
+    #: Whether the automatic scheduler may place items in this block. If this
+    #: is false, the only way content can be placed in this block is via manual
+    #: scheduling.
     automatic: Mapped[bool]
+
+    #: Whether this is a default for its content type when automatically
+    #: scheduling. If false, the scheduler will only automatically schedule in
+    #: this timeblock when it is forced to, either via allowed_venues being
+    #: overridden or another mechanism that whitelists this Time Block.
+    default: Mapped[bool] = mapped_column(default=True, server_default="true")
 
     start: Mapped[datetime]
     end: Mapped[datetime]

@@ -150,13 +150,22 @@ class Scheduler:
                 # proposal = occurrence.schedule_item.proposal
                 # tags = set(proposal.tags) if proposal else set()
 
+                # Manually scheduled content in a non-automatically scheduled timeblock
+                # doesn't need changeover time because we placed it there
+                if occurrence.manually_scheduled and any(
+                    not block.automatic for block in occurrence.time_blocks()
+                ):
+                    minutes_after = 0
+                else:
+                    minutes_after = total_minutes(occurrence.changeover_time)
+
                 talk = Talk(
                     id=occurrence.id,
                     duration=occurrence.scheduled_duration,
                     speakers={speaker.id for speaker in occurrence.schedule_item.presenters},
                     venue_times=venue_times,
                     # tags=tags, # tag diversity currently disabled due to performance degredation
-                    minutes_after=total_minutes(occurrence.changeover_time),
+                    minutes_after=minutes_after,
                 )
 
                 if occurrence.scheduled_venue:

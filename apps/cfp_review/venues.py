@@ -134,7 +134,8 @@ def edit_venue(venue_id: int) -> ResponseReturnValue:
 class TimeBlockForm(Form):
     start = TimeField("Start time")
     end = TimeField("End time")
-    automatic = BooleanField("Allow automatic scheduling")
+    automatic = BooleanField("Available for automatic scheduling", default=True)
+    default = BooleanField("Default for this content type when automatically scheduling", default=True)
     type = SelectField("Content type", choices=get_args(ScheduleItemType))
 
     submit = SubmitField("Save")
@@ -170,6 +171,7 @@ def venue_timeblocks(venue_id: int) -> ResponseReturnValue:
             time_block.end = content_timestamp(date, new_form.end.data)
             time_block.type = new_form.type.data
             time_block.automatic = new_form.automatic.data
+            time_block.default = new_form.default.data
             venue.time_blocks += [time_block]
             created += 1
 
@@ -227,6 +229,7 @@ def timeblock_edit(venue_id: int, time_block_id: int) -> ResponseReturnValue:
             time_block.start = content_timestamp(day, form.start.data)
             time_block.end = content_timestamp(day, form.end.data)
             time_block.automatic = form.automatic.data
+            time_block.default = form.default.data
             time_block.type = form.type.data
             flash("Time block updated")
 

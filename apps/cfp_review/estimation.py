@@ -4,7 +4,7 @@ from typing import Literal
 
 import pendulum
 from pendulum import Duration
-from sqlalchemy.sql import not_
+from sqlalchemy.sql import and_, not_
 
 from main import db
 from models.content import (
@@ -36,9 +36,9 @@ def get_blocks_for_type(type: ScheduleItemType, estimate_type: EstimateType) -> 
     blocks_query = db.session.query(TimeBlock).where(TimeBlock.type == type)
     match estimate_type:
         case "manual":
-            blocks_query = blocks_query.where(not_(TimeBlock.automatic))
+            blocks_query = blocks_query.where(not_(and_(TimeBlock.automatic, TimeBlock.default)))
         case "automatic":
-            blocks_query = blocks_query.where(TimeBlock.automatic)
+            blocks_query = blocks_query.where(and_(TimeBlock.automatic, TimeBlock.default))
 
     return blocks_query.all()
 
@@ -77,12 +77,10 @@ def get_cfp_estimate(schedule_item_type: ScheduleItemType, estimate_type: Estima
             if occurrence.cancelled:
                 continue
 
-            # If an occurrence is allowed to be placed in *any* automatic timeblock,
-            # we count it as automatically scheduled.
-            #
-            # Items in manually-scheduled venues should have their allowed_venues set correctly.
+            # An occurrence counts as automatically scheduled if it can be placed in any timeblock
+            # that is both a default venue for its content type and marked as automatic.
             can_be_automatically_scheduled = any(
-                time_block.automatic for time_block in occurrence.time_blocks()
+                time_block.automatic and time_block.default for time_block in occurrence.time_blocks()
             )
 
             if (can_be_automatically_scheduled and estimate_type == "manual") or (
@@ -104,9 +102,13 @@ def get_cfp_estimate(schedule_item_type: ScheduleItemType, estimate_type: Estima
     )
     match estimate_type:
         case "automatic":
-            available_venues_query = available_venues_query.filter(TimeBlock.automatic)
+            available_venues_query = available_venues_query.filter(
+                and_(TimeBlock.automatic, TimeBlock.default)
+            )
         case "manual":
-            available_venues_query = available_venues_query.filter(not_(TimeBlock.automatic))
+            available_venues_query = available_venues_query.filter(
+                not_(and_(TimeBlock.automatic, TimeBlock.default))
+            )
 
     available_venues = available_venues_query.group_by(Venue.id).all()
     available_time = get_available_proposal_time(schedule_item_type, estimate_type)
