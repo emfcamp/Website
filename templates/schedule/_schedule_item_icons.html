@@ -1,6 +1,6 @@
 {# reusable icons #}
 {% macro schedule_item_icons(schedule_item) %}
-  {% if schedule_item.video_privacy == 'none' %}
+  {% if schedule_item.video_privacy in ('none', 'review') %}
   <span style="padding-left: 10px;" title="This {{ schedule_item.human_type }} will not be recorded"><img src="{{ static_url_for('static', filename='images/icons/not-recorded.svg') }}" width="24" height="24"></span>
   {% endif %}
   {% if schedule_item.type in ('talk', 'workshop', 'familyworkshop') %}
