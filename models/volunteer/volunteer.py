@@ -165,6 +165,17 @@ class Volunteer(BaseModel, UserMixin):
         return role_ids
 
     @property
+    def administered_roles(self) -> Sequence[Role]:
+        from models.volunteer.role import Role
+
+        if self.user.has_permission("volunteer:manager") or self.user.has_permission("volunteer:admin"):
+            return db.session.scalars(select(Role).order_by(Role.name)).all()
+
+        return db.session.scalars(
+            select(Role).where(Role.id.in_(self.administered_role_ids)).order_by(Role.name)
+        ).all()
+
+    @property
     def administered_team_ids(self) -> set[int]:
         """Team IDs this user can administer."""
         return {t.id for t in self.administered_teams}
