@@ -34,7 +34,7 @@ class Scheduler:
         # Occurrences that we couldn't feed to the scheduler because they're lacking information
         self.unschedulable: list[Occurrence] = []
 
-    def get_schedulable_occurrences(self, types: list[ScheduleItemType]) -> list[Occurrence]:
+    def get_schedulable_occurrences(self) -> list[Occurrence]:
         """Fetch a list of Occurrences that the automatic scheduler should consider
 
         The scheduler needs to consider all official content, even content which is manually scheduled,
@@ -46,7 +46,6 @@ class Scheduler:
                 not_(Occurrence.cancelled),
                 Occurrence.schedule_item.has(
                     and_(
-                        ScheduleItem.type.in_(types),
                         ScheduleItem.official_content,
                         ScheduleItem.state != "cancelled",
                     )
@@ -60,10 +59,11 @@ class Scheduler:
 
         return list(occurrences)
 
-    def get_schedule_problem(self, types: list[ScheduleItemType] | None = None) -> SchedulingProblem:
-        if types is None:
-            types = ["talk", "workshop", "familyworkshop"]
-        occurrences = self.get_schedulable_occurrences(types)
+    def get_schedule_problem(self, types: list[ScheduleItemType]) -> SchedulingProblem:
+        # "types" are the content types to auto-schedule. All other types are
+        # fixed in place as if manually scheduled and present only for speaker
+        # conflict avoidance
+        occurrences = self.get_schedulable_occurrences()
 
         occurrences_by_type: dict[ScheduleItemType, list[Occurrence]] = defaultdict(list)
         for occurrence in occurrences:
@@ -89,7 +89,11 @@ class Scheduler:
                 key=lambda k: capacity_by_type[type][k],
                 reverse=True,
             )
-            split_count = int(len(occurrences_by_type[type]) / len(capacity_by_type[type]))
+            split_count = (
+                int(len(occurrences_by_type[type]) / len(capacity_by_type[type]))
+                if capacity_by_type[type]
+                else 0
+            )
 
             count = 0
             for occurrence in occurrences:
@@ -105,27 +109,41 @@ class Scheduler:
                 # capacity venue, because variable venue weightings cause
                 # serious performance degredation in slotmachine at this scale
 
-                current_venues = [
-                    v
-                    for v in ordered_venues
-                    if self.venues[v].capacity == self.venues[ordered_venues[0]].capacity
-                ]
-                allowed_times = occurrence.allowed_times(True)
-                venue_times = [
-                    VenueTimes(
-                        venue=venue.id,
-                        times=times,
-                        venue_weight=5 if venue.id in current_venues else 0,
-                    )
-                    for venue, times in allowed_times.items()
-                ]
+                if type in types:
+                    current_venues = [
+                        v
+                        for v in ordered_venues
+                        if self.venues[v].capacity == self.venues[ordered_venues[0]].capacity
+                    ]
+                    allowed_times = occurrence.allowed_times(True)
+                    venue_times = [
+                        VenueTimes(
+                            venue=venue.id,
+                            times=times,
+                            venue_weight=5 if venue.id in current_venues else 0,
+                        )
+                        for venue, times in allowed_times.items()
+                    ]
+                elif (
+                    occurrence.scheduled_venue and occurrence.scheduled_time and occurrence.scheduled_end_time
+                ):
+                    # Not being auto-scheduled: pin to its current venue and time.
+                    venue_times = [
+                        VenueTimes(
+                            venue=occurrence.scheduled_venue.id,
+                            times=[(occurrence.scheduled_time, occurrence.scheduled_end_time)],
+                        )
+                    ]
+                else:
+                    venue_times = []
 
                 if len(venue_times) == 0:
-                    # This happens when things are manually scheduled outside
-                    # of a timeblock, or when we have no timeblocks of this
-                    # type set to be automatically schedulable.
-                    app.logger.warning(f"Skipping scheduling occurrence {occurrence} - no allowed times.")
-                    self.unschedulable.append(occurrence)
+                    if type in types:
+                        # This happens when things are manually scheduled outside
+                        # of a timeblock, or when we have no timeblocks of this
+                        # type set to be automatically schedulable.
+                        app.logger.warning(f"Skipping scheduling occurrence {occurrence} - no allowed times.")
+                        self.unschedulable.append(occurrence)
                     continue
 
                 ## tag diversity currently disabled due to performance degredation
@@ -154,7 +172,7 @@ class Scheduler:
                     user_faves[user.id].append(occurrence)
 
                 # Shift to the next venue when we hit the division
-                if count > split_count:
+                if ordered_venues and count > split_count:
                     count = 0
                     ordered_venues.pop(0)
                 else:

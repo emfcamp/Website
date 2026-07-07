@@ -8,10 +8,22 @@
     <p>The scheduler may take a little while to run, but it's limited to 30 seconds.</p>
 </div>
 <form method="POST">
+    <fieldset style="margin-bottom: 2em;">
+        <h4>Content types to auto-schedule</h4>
+        <p class="help-block">
+            Checked types will be auto-scheduled, unchecked types are pinned in their current times/venues for conflict avoidance.
+        </p>
+        {% for opt in type_options %}
+        <label class="checkbox-inline">
+            <input type="checkbox" name="auto_type" value="{{ opt.type }}" {% if opt.checked %}checked{% endif %}>
+            {{ opt.label | capitalize }}
+        </label>
+        {% endfor %}
+    </fieldset>
     <button name="run" value="1" class="btn btn-primary">Run scheduler</button>
+    <button formaction="{{ url_for('.run_scheduler_export') }}" formmethod="get" class="btn">Download problem JSON</button>
 </form>
-<p class="help-block" style="margin-top: 2em;">
-    For debugging, you can
-    <a href="{{ url_for('.run_scheduler_export') }}">download the current scheduling problem as JSON</a> (<code>python -m slotmachine slotmachine-problem.json</code>).
+<p class="help-block" style="margin-top: 2em">
+    "Download problem JSON" exports the current scheduling problem for debugging with slotmachine (<code>python -m slotmachine slotmachine-problem.json</code>).
 </p>
 {% endblock %}
