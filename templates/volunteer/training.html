@@ -17,17 +17,13 @@
        information attached so you can either complete the training or revisit it.</p>
 
     <ul>
-        {% if include_bar %}
-            <li>
-                <a href="{{ url_for('.bar_training') }}">Bar</a>
-                {% if trained_roles.all() | selectattr("uses_bar_training") | list %}
-                    - Trained
-                {% endif %}
-            </li>
-        {% endif %}
         {% for role in roles %}
             <li>
-                <a href="{{ url_for('.training', role_id=role.id) }}">{{ role.name }}</a>
+                {% if role.uses_bar_training %}
+                    <a href="{{ url_for('.bar_training') }}">{{ role.name }}</a>
+                {% else %}
+                    <a href="{{ url_for('.training', role_id=role.id) }}">{{ role.name }}</a>
+                {% endif %}
                 {% if role in trained_roles %} - Trained{% endif %}
             </li>
         {% endfor %}

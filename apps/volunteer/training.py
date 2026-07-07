@@ -17,24 +17,27 @@ from . import v_user_required, volunteer
 def training_index() -> ResponseReturnValue:
     volunteer: Volunteer = current_user.volunteer
 
-    # We filter out roles that use bar training and just link that once because otherwise there'll
-    # be repeated roles that all link to the same training.
-    roles = (
-        volunteer.interested_roles.filter(  # type: ignore
-            or_(
-                Role.training_notes.is_(None),
-                Role.training_notes != "",
-                and_(Role.requires_training == True, Role.uses_bar_training == False),
-            )
-        )
-        .order_by(Role.name)
-        .all()
-    )
+    if volunteer.is_volunteer_admin:
+        all_roles = volunteer.administered_roles
+    else:
+        all_roles = volunteer.interested_roles
+
+    roles = [
+        role
+        for role in all_roles
+        if (role.training_notes is not None and role.training_notes != "")
+        or (role.requires_training and not role.uses_bar_training)
+    ]
+
+    if volunteer.over_18:
+        bar_roles = [role for role in all_roles if role.uses_bar_training]
+        if bar_roles:
+            roles.append(bar_roles[0])
+
     return render_template(
         "volunteer/training.html",
-        roles=roles,
-        include_bar=volunteer.over_18,
-        trained_roles=volunteer.trained_roles,
+        roles=sorted(roles, key=lambda r: r.name),
+        trained_roles=volunteer.trained_roles.all(),  # type: ignore
     )
 
 
