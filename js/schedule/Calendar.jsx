@@ -25,7 +25,7 @@ function NoRecordingIcon({ noRecording }) {
 
   return (
     <div className="no-recording">
-      <Icon name="device-camera" className="camera" size="16" />
+      <Icon name="device-camera-video" className="camera" size="16" />
       <Icon
         name="circle-slash"
         className="slash"
@@ -84,7 +84,7 @@ function UsesLotteryIcon({ usesLottery }) {
   );
 }
 
-function EventIcons({
+function OccurrenceIcons({
   noRecording,
   isFavourite,
   isFamilyFriendly,
@@ -108,7 +108,7 @@ function EventIcons({
   );
 }
 
-function FavouriteButton({ event, toggleFavourite, authenticated }) {
+function FavouriteButton({ schedule_item, toggleFavourite, authenticated }) {
   if (!authenticated) {
     return (
       <p>
@@ -117,22 +117,27 @@ function FavouriteButton({ event, toggleFavourite, authenticated }) {
     );
   }
 
-  let label = event.is_fave ? "Remove From Favourites" : "Add to Favourites";
+  let label = schedule_item.is_fave
+    ? "Remove From Favourites"
+    : "Add to Favourites";
 
   return (
-    <button className="btn btn-warning" onClick={() => toggleFavourite(event)}>
+    <button
+      className="btn btn-warning"
+      onClick={() => toggleFavourite(schedule_item)}
+    >
       {label}
     </button>
   );
 }
 
-function TicketButton({ event, authenticated }) {
-  if (!authenticated || !event.uses_lottery) {
+function TicketButton({ occurrence, authenticated }) {
+  if (!authenticated || !occurrence.uses_lottery) {
     return null;
   }
 
   return (
-    <a href={event.link} className="btn btn-primary">
+    <a href={occurrence.schedule_item.link} className="btn btn-primary">
       Request Tickets
     </a>
   );
@@ -155,28 +160,21 @@ function AdditionalInformation({ label, value }) {
   );
 }
 
-function Event({ event, toggleFavourite, authenticated }) {
+function Occurrence({ occurrence, toggleFavourite, authenticated }) {
   let [expanded, setExpanded] = useState(false);
-
-  function humanTypeName(type) {
-    if (type == "familyworkshop") {
-      return "Family Workshop";
-    }
-
-    return type.charAt(0).toUpperCase() + type.slice(1);
-  }
+  const schedule_item = occurrence.schedule_item;
 
   let metadata = [
-    `${event.startTime.toFormat("HH:mm")} to ${event.endTime.toFormat("HH:mm")}`,
-    event.venue,
-    humanTypeName(event.type),
+    `${occurrence.startTime.toFormat("HH:mm")} to ${occurrence.endTime.toFormat("HH:mm")}`,
+    occurrence.venue,
+    schedule_item.humanReadableType,
   ]
     .filter((i) => {
       return i !== null && i !== "";
     })
     .join(" | ");
 
-  function eventDetails() {
+  function occurrenceDetails() {
     if (!expanded) {
       return null;
     }
@@ -185,36 +183,49 @@ function Event({ event, toggleFavourite, authenticated }) {
       <div className="event-details">
         <AdditionalInformation
           label="Maximum attendees"
-          value={event.participant_count}
+          value={schedule_item.participant_count}
         />
         <AdditionalInformation
           label="Content warning"
-          value={event.content_note}
+          value={schedule_item.content_note}
         />
-        <AdditionalInformation label="Age range" value={event.age_range} />
-        <AdditionalInformation label="Cost" value={event.participant_cost} />
+        <AdditionalInformation
+          label="Age range"
+          value={schedule_item.age_range}
+        />
+        <AdditionalInformation
+          label="Cost"
+          value={schedule_item.participant_cost}
+        />
         <AdditionalInformation
           label="Required equipment"
-          value={event.participant_equipment}
+          value={schedule_item.participant_equipment}
         />
 
         <p>
+          {schedule_item.description}
+          {/*
           <Linkify options={{ target: "blank" }}>
-            {nl2br(event.description)}
+            {nl2br(schedule_item.description)}
           </Linkify>
+          */}
         </p>
         <p>
-          <a href={event.link} target="_blank" class="btn btn-default">
+          <a
+            href={schedule_item.link}
+            target="_blank"
+            className="btn btn-default"
+          >
             <Icon name="link" size="16" /> Details
           </a>
           &nbsp;
           <FavouriteButton
-            event={event}
+            schedule_item={schedule_item}
             toggleFavourite={toggleFavourite}
             authenticated={authenticated}
           />
           &nbsp;
-          <TicketButton event={event} authenticated={authenticated} />
+          <TicketButton occurrence={occurrence} authenticated={authenticated} />
         </p>
       </div>
     );
@@ -224,26 +235,28 @@ function Event({ event, toggleFavourite, authenticated }) {
     setExpanded(!expanded);
   }
 
-  const cfpClass = event.is_from_cfp ? "cfp" : "user-submitted";
+  const cfpClass = schedule_item.official_content ? "cfp" : "user-submitted";
 
   return (
     <div className={["schedule-event", cfpClass].join(" ")}>
       <div className="event-synopsis" onClick={toggleExpanded}>
         <div className="event-data">
-          <h3 title={event.title}>{event.title}</h3>
+          <h3 title={schedule_item.title}>{schedule_item.title}</h3>
           <p>
-            {metadata} | <span className="speaker">{event.speaker}</span>
+            {metadata} | <span className="speaker">{schedule_item.names}</span>
           </p>
         </div>
-        <EventIcons
-          noRecording={event.noRecording}
-          isFavourite={event.is_fave}
-          isFamilyFriendly={event.is_family_friendly}
-          hasContentWarning={event.content_note && event.content_note != ""}
-          usesLottery={event.uses_lottery}
+        <OccurrenceIcons
+          noRecording={schedule_item.noRecording}
+          isFavourite={schedule_item.is_fave}
+          isFamilyFriendly={schedule_item.is_family_friendly}
+          hasContentWarning={
+            schedule_item.content_note && schedule_item.content_note != ""
+          }
+          usesLottery={occurrence.uses_lottery}
         />
       </div>
-      {eventDetails()}
+      {occurrenceDetails()}
     </div>
   );
 }
@@ -257,10 +270,10 @@ function Hour({ hour, content, toggleFavourite, authenticated }) {
     <div className="schedule-hour">
       <h3 id={hour.toISO()}>{hour.toFormat("HH:mm")}</h3>
       <div className="schedule-events-container">
-        {content.map((event) => (
-          <Event
-            key={event.id}
-            event={event}
+        {content.map((occurrence) => (
+          <Occurrence
+            key={occurrence.key}
+            occurrence={occurrence}
             toggleFavourite={toggleFavourite}
             authenticated={authenticated}
           />

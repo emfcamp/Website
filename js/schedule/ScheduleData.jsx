@@ -18,67 +18,73 @@ class ScheduleData {
 
     this.allFinished = true;
 
+    let count = 0;
     this.rawSchedule.forEach((row) => {
-      let e = this.parseEvent(row);
+      let sid = this.parseScheduleItem(row);
 
-      if (e.age_range === undefined || e.age_range == "") {
-        e.age_range = "Unspecified";
-      }
+      this.addEventType(sid.type, sid.humanReadableType);
+      this.addAgeRange(sid.age_range);
 
-      this.addVenue(e.venue, e.officialEvent);
-      this.addEventType(e.type, e.humanReadableType);
-      this.addAgeRange(e.age_range);
+      for (const od of sid.occurrences) {
+        // Apply filtering
 
-      if (e.endTime >= options.currentTime) {
-        this.allFinished = false;
-      } else if (!options.includeFinished) {
-        return null;
-      }
+        if (od.endTime >= options.currentTime) {
+          this.allFinished = false;
+        } else if (!options.includeFinished) {
+          continue;
+        }
 
-      if (
-        options.selectedVenues &&
-        options.selectedVenues.indexOf(e.venue) === -1
-      ) {
-        return null;
-      }
-      if (
-        options.selectedEventTypes &&
-        options.selectedEventTypes.indexOf(e.type) === -1
-      ) {
-        return null;
-      }
-      if (
-        options.selectedAgeRanges &&
-        options.selectedAgeRanges.indexOf(e.age_range) === -1
-      ) {
-        return null;
-      }
-      if (options.onlyFavourites && !e.is_fave) {
-        return null;
-      }
-      if (options.onlyFamilyFriendly && !e.is_family_friendly) {
-        return null;
-      }
-      if (options.onlyNoRecording && !e.noRecording) {
-        return null;
-      }
-      if (options.onlyLottery && !e.uses_lottery) {
-        return null;
-      }
+        this.addVenue(od.venue, sid.officialEvent);
 
-      let startHour = e.startTime.startOf("hour");
-      if (e.startTime <= options.currentTime && !options.includeFinished) {
-        /* Put ongoing events under the current time slot to avoid
-         * having to make one up or include multiple earlier ones */
-        startHour = options.currentTime.startOf("hour");
-      }
-      let isoHour = startHour.toISO();
+        if (
+          options.selectedVenues &&
+          options.selectedVenues.indexOf(od.venue) === -1
+        ) {
+          continue;
+        }
 
-      if (this.scheduleByHour[isoHour] === undefined) {
-        this.hoursWithContent.push(startHour);
-        this.scheduleByHour[isoHour] = [];
+        if (options.onlyLottery && !od.uses_lottery) {
+          continue;
+        }
+
+        if (
+          options.selectedEventTypes &&
+          options.selectedEventTypes.indexOf(sid.type) === -1
+        ) {
+          continue;
+        }
+        if (
+          options.selectedAgeRanges &&
+          options.selectedAgeRanges.indexOf(sid.age_range) === -1
+        ) {
+          continue;
+        }
+        if (options.onlyFavourites && !sid.is_fave) {
+          continue;
+        }
+        if (options.onlyFamilyFriendly && !sid.is_family_friendly) {
+          continue;
+        }
+        if (options.onlyNoRecording && !od.noRecording) {
+          continue;
+        }
+
+        // We can now add this occurrence to our schedule
+
+        let startHour = od.startTime.startOf("hour");
+        if (od.startTime <= options.currentTime && !options.includeFinished) {
+          /* Put ongoing events under the current time slot to avoid
+           * having to make one up or include multiple earlier ones */
+          startHour = options.currentTime.startOf("hour");
+        }
+        let isoHour = startHour.toISO();
+
+        if (this.scheduleByHour[isoHour] === undefined) {
+          this.hoursWithContent.push(startHour);
+          this.scheduleByHour[isoHour] = [];
+        }
+        this.scheduleByHour[isoHour].push(od);
       }
-      this.scheduleByHour[isoHour].push(e);
     });
 
     this.venuePriority = (venue) => {
@@ -156,6 +162,7 @@ class ScheduleData {
 
   addVenue(name, official) {
     if (this.venuesSeen.has(name)) {
+      // FIXME: we can now use Venue.official_venue
       // More nasty hacks to handle venues with mixed content not being marked
       // as one of our's if the first event in that venue is attendee content.
       if (official) {
@@ -192,25 +199,39 @@ class ScheduleData {
     return events;
   }
 
-  parseEvent(event) {
-    let e = structuredClone(event);
+  parseScheduleItem(schedule_item) {
+    // FIXME we shouldn't need to do this much parsing
+    let sid = structuredClone(schedule_item);
 
-    e.startTime = DateTime.fromSQL(e.start_date, { locale: "en-GB" });
-    e.endTime = DateTime.fromSQL(e.end_date, { locale: "en-GB" });
-    e.officialEvent = e.is_from_cfp;
+    sid.officialEvent = sid.official_content;
 
-    e.noRecording =
-      e.video_privacy === "none" &&
-      e.officialEvent &&
-      (e.type === "talk" || e.type === "performance");
+    for (const od of sid.occurrences) {
+      od.startTime = DateTime.fromSQL(od.start_date, { locale: "en-GB" });
+      od.endTime = DateTime.fromSQL(od.end_date, { locale: "en-GB" });
+      od.key = `${sid.id}-${od.occurrence_num}`;
+      od.noRecording =
+        od.video_privacy === "none" &&
+        sid.officialEvent &&
+        (sid.type === "talk" || sid.type === "performance");
 
-    if (e.type === "familyworkshop") {
-      e.humanReadableType = "Family Workshop";
-    } else {
-      e.humanReadableType = e.type.charAt(0).toUpperCase() + e.type.slice(1);
+      // Let's hope this doesn't come back to leak on us
+      od.schedule_item = sid;
     }
 
-    return e;
+    if (sid.type === "familyworkshop") {
+      sid.humanReadableType = "Family Workshop";
+    } else if (sid.type === "djset") {
+      sid.humanReadableType = "DJ";
+    } else {
+      sid.humanReadableType =
+        sid.type.charAt(0).toUpperCase() + sid.type.slice(1);
+    }
+
+    if (sid.age_range === undefined || sid.age_range == "") {
+      sid.age_range = "Unspecified";
+    }
+
+    return sid;
   }
 }
 

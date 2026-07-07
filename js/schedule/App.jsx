@@ -103,8 +103,8 @@ function App() {
     }
   });
 
-  function toggleFavourite(event) {
-    fetch(`/api/proposal/${event.id}/favourite`, {
+  function toggleFavourite(schedule_item) {
+    fetch(`/api/schedule-item/${schedule_item.id}/favourite`, {
       headers: { Authorization: apiToken, "Content-Type": "application/json" },
       method: "put",
       body: "{}",
@@ -112,13 +112,13 @@ function App() {
       .then((response) => response.json())
       .then((data) => {
         let schedule = JSON.parse(JSON.stringify(rawSchedule));
-        let idx = schedule.findIndex((e) => e.id === event.id);
+        let idx = schedule.findIndex((sid) => sid.id === schedule_item.id);
         schedule[idx].is_fave = data.is_favourite;
 
         setRawSchedule(schedule);
       })
       .catch((error) => {
-        console.error("Error toggling favourite:", event, error);
+        console.error("Error toggling favourite:", schedule_item, error);
       });
   }
 
