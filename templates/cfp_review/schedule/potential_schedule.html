@@ -4,16 +4,18 @@
 <div class="col-md-10">
 <div class="panel panel-default">
     <div class="panel-heading">
-    <h3 class="panel-title">Automatic scheduler stats</h3>
+    <h3 class="panel-title">{% if potential_schedule.scheduler_stats.source == 'schedule_tweaker' %}Manually tweaked schedule{% else %}Automatic scheduler stats{% endif %}</h3>
     </div>
     <div class="panel-body">
         <dl class="dl-horizontal">
             <dt>Date</dt><dd>{{potential_schedule.created}}</dd>
-            <dt>Solution type</dt><dd>{{potential_schedule.scheduler_stats.solution_type}}</dd>
             <dt>Total items</dt><dd>{{potential_schedule.scheduled_occurrences|length}}</dd>
+            {% if potential_schedule.scheduler_stats.source != 'schedule_tweaker' %}
+            <dt>Solution type</dt><dd>{{potential_schedule.scheduler_stats.solution_type}}</dd>
             <dt>Variables</dt><dd>{{potential_schedule.scheduler_stats.variables}}</dd>
             <dt>Solve time</dt><dd>{{potential_schedule.scheduler_stats.timings.solve}} s</dd>
             <dt>Total time</dt><dd>{{potential_schedule.scheduler_stats.timings.total}} s</dd>
+            {% endif %}
         </dl>
     </div>
 </div>
@@ -28,7 +30,11 @@
         <form method="POST">
             <div class="btn-group btn-group-vertical">
                 {% if potential_schedule.state == 'new' %}
+                {% if can_apply %}
                 <button class="btn btn-primary" name="apply" value="true">Apply schedule</button>
+                {% else %}
+                <p class="text-muted">A more recent schedule exists.</p>
+                {% endif %}
                 <button class="btn btn-danger" name="discard" value="true">Discard</button>
                 {% endif %}
                 <a href="{{url_for('.schedule')}}" class="btn btn-default">Back</a>

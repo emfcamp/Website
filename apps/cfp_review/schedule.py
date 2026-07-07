@@ -9,24 +9,24 @@ from typing import Any, get_args
 
 import slotmachine
 from flask import current_app as app
-from flask import flash, redirect, render_template, request, send_file, url_for
+from flask import flash, jsonify, redirect, render_template, request, send_file, url_for
 from flask.typing import ResponseReturnValue
 from scipy.stats import false_discovery_control, hypergeom
-from sqlalchemy import and_, select
+from sqlalchemy import and_, not_, select
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import desc
 
 from apps.cfp.scheduler import Scheduler
 from apps.cfp_review.email import send_email_for_proposal
 from apps.cfp_review.estimation import get_cfp_estimate
+from apps.config import config
 from main import db, get_or_404
 from models.content import (
     Occurrence,
-    Proposal,
     ScheduleItem,
     Venue,
 )
-from models.content.potential_schedule import PotentialSchedule
+from models.content.potential_schedule import PotentialSchedule, PotentialScheduleOccurrence
 from models.content.schedule import SCHEDULE_ITEM_INFOS, ScheduleItemInfo, ScheduleItemState, ScheduleItemType
 
 from . import cfp_review, schedule_required
@@ -165,10 +165,41 @@ def run_scheduler_export() -> ResponseReturnValue:
 def potential_schedule(schedule_id: int) -> ResponseReturnValue:
     potential_schedule = get_or_404(db, PotentialSchedule, schedule_id)
 
+    # We don't allow you to apply a potential schedule older than the most
+    # recent one
+    latest = db.session.scalars(
+        select(PotentialSchedule)
+        .where(PotentialSchedule.state != "discarded")
+        .order_by(desc(PotentialSchedule.created))
+        .limit(1)
+    ).first()
+
+    can_apply = (
+        potential_schedule.state == "new" and latest is not None and latest.id == potential_schedule.id
+    )
+
     if request.method == "POST":
         if request.form.get("apply") == "true":
+            if not can_apply:
+                flash("Only the most recent potential schedule can be applied!")
+                return redirect(url_for(".potential_schedule", schedule_id=schedule_id))
+
             potential_schedule.apply()
+
+            # Potential schedules are derived from each other, so if we have
+            # older ones when we apply a schedule we should mark them as
+            # applied
+            others = db.session.scalars(
+                select(PotentialSchedule).where(
+                    PotentialSchedule.state == "new",
+                    PotentialSchedule.id != potential_schedule.id,
+                )
+            )
+            for other in others:
+                other.state = "applied"
+
             flash("Potential schedule applied")
+
         if request.form.get("discard") == "true":
             potential_schedule.state = "discarded"
 
@@ -176,8 +207,61 @@ def potential_schedule(schedule_id: int) -> ResponseReturnValue:
         return redirect(url_for(".schedule"))
 
     return render_template(
-        "cfp_review/schedule/potential_schedule.html", potential_schedule=potential_schedule
+        "cfp_review/schedule/potential_schedule.html",
+        potential_schedule=potential_schedule,
+        can_apply=can_apply,
     )
+
+
+def latest_new_schedules() -> tuple[PotentialSchedule | None, PotentialSchedule | None]:
+    draft = None
+    automatic = None
+    for candidate in db.session.scalars(
+        select(PotentialSchedule)
+        .where(PotentialSchedule.state == "new")
+        .order_by(desc(PotentialSchedule.created))
+    ):
+        is_manual = candidate.scheduler_stats.get("source") == "schedule_tweaker"
+        if is_manual and draft is None:
+            draft = candidate
+        elif not is_manual and automatic is None:
+            automatic = candidate
+        if draft is not None and automatic is not None:
+            break
+
+    return draft, automatic
+
+
+def staged_occurrence(schedule: PotentialSchedule, occurrence_id: int) -> PotentialScheduleOccurrence | None:
+    return next((so for so in schedule.scheduled_occurrences if so.occurrence_id == occurrence_id), None)
+
+
+def get_or_create_tweaker_schedule() -> PotentialSchedule:
+    """Return the current Schedule Tweaker draft, creating one if none exists.
+
+    If the previous draft is an automatic schedule, we copy that for tweaking
+    rather than directly changing it.
+    """
+    draft, automatic = latest_new_schedules()
+    if draft is not None:
+        return draft
+
+    draft = PotentialSchedule(scheduler_stats={"source": "schedule_tweaker"})
+    db.session.add(draft)
+
+    if automatic:
+        for so in automatic.scheduled_occurrences:
+            db.session.add(
+                PotentialScheduleOccurrence(
+                    potential_schedule=draft,
+                    occurrence=so.occurrence,
+                    venue=so.venue,
+                    start_time=so.start_time,
+                )
+            )
+
+    db.session.flush()
+    return draft
 
 
 @cfp_review.route("/scheduler")
@@ -186,24 +270,22 @@ def scheduler() -> ResponseReturnValue:
     occurrences: list[Occurrence] = list(
         db.session.scalars(
             select(Occurrence)
-            .where(Occurrence.scheduled_duration.isnot(None))
             .where(
-                Occurrence.proposal.has(
+                not_(Occurrence.cancelled),
+                Occurrence.schedule_item.has(
                     and_(
-                        # FIXME: are these needed?
-                        Proposal.state.in_({"accepted", "finalised"}),
-                        Proposal.type.in_({"talk", "workshop", "familyworkshop", "performance"}),
+                        ScheduleItem.official_content,
+                        ScheduleItem.state != "cancelled",
                     )
-                )
+                ),
+                Occurrence.scheduled_duration.isnot(None),
             )
             .options(joinedload(Occurrence.schedule_item).joinedload(ScheduleItem.proposal))
         )
     )
 
-    shown_venues = [
-        {"key": v.id, "label": v.name}
-        for v in db.session.scalars(select(Venue).order_by(Venue.priority.desc()))
-    ]
+    venues = list(db.session.scalars(select(Venue).order_by(Venue.priority.desc())))
+    shown_venues = [{"key": v.id, "label": v.name} for v in venues]
 
     venues_to_show = request.args.getlist("venue")
     if venues_to_show:
@@ -211,50 +293,52 @@ def scheduler() -> ResponseReturnValue:
 
     venue_ids = [venue["key"] for venue in shown_venues]
 
+    timeblock_ranges: dict[str, dict[int, list[dict[str, str]]]] = defaultdict(lambda: defaultdict(list))
+    for venue in venues:
+        for time_block in venue.time_blocks:
+            timeblock_ranges[time_block.type][venue.id].append(
+                {"start": str(time_block.start), "end": str(time_block.end)}
+            )
+
+    venue_name_by_id = {venue.id: venue.name for venue in venues}
+    venues_by_type = {
+        content_type: [venue_name_by_id[venue_id] for venue_id in venue_ids]
+        for content_type, venue_ids in timeblock_ranges.items()
+    }
+
+    # Overlay positions from the current draft if one exists
+    draft, automatic = latest_new_schedules()
+    source_schedule = draft or automatic
+    source_positions: dict[int, PotentialScheduleOccurrence] = (
+        {so.occurrence_id: so for so in source_schedule.scheduled_occurrences} if source_schedule else {}
+    )
+
     occurrence_data = []
     for occurrence in occurrences:
-        if occurrence.schedule_item.proposal:
-            speakers = [occurrence.schedule_item.proposal.user.id]
-        else:
-            app.logger.warning(f"Occurrence {occurrence.id} has no associated speakers")
-            speakers = []
-
-        # FIXME rename these fields, they're all out of date,
-        # and maybe add some proper typing
-        # See also cfp.scheduler.Scheduler.get_schedule_data
-
         export: dict[str, Any] = {
             "id": occurrence.id,
-            "duration": occurrence.scheduled_duration,
             "is_potential": False,
             "is_attendee": not occurrence.schedule_item.official_content,
-            "speakers": speakers,
             "text": occurrence.schedule_item.title,
-            "valid_venues": [v.id for v in occurrence.allowed_venues or occurrence.valid_allowed_venues],
-            # "valid_time_ranges": [
-            #    {"start": str(p.start), "end": str(p.end)}
-            #    for p in occurrence.get_allowed_time_periods_with_default()
-            # ],
+            "valid_venue_times": timeblock_ranges.get(occurrence.schedule_item.type, {}),
         }
 
-        if occurrence.scheduled_venue:
-            export["venue"] = occurrence.scheduled_venue_id
-        if occurrence.potential_venue:
-            export["venue"] = occurrence.potential_venue.id
-            export["is_potential"] = True
+        slot_venue = occurrence.scheduled_venue
+        start_time = occurrence.scheduled_time
 
-        if occurrence.scheduled_time:
-            export["start_date"] = occurrence.scheduled_time
-        if occurrence.potential_time:
-            export["start_date"] = occurrence.potential_time
-            export["is_potential"] = True
+        if occurrence.id in source_positions:
+            staged = source_positions[occurrence.id]
+            slot_venue = staged.venue
+            start_time = staged.start_time
+            export["is_potential"] = staged.has_changed()
 
-        if "start_date" in export:
+        if slot_venue:
+            export["venue"] = slot_venue.id
+        if start_time:
             # We filter on Occurrence.scheduled_duration.isnot(None)) above
             assert occurrence.scheduled_duration is not None
-            export["end_date"] = export["start_date"] + timedelta(minutes=occurrence.scheduled_duration)
-            export["start_date"] = str(export["start_date"])
-            export["end_date"] = str(export["end_date"])
+            export["start_date"] = str(start_time)
+            export["end_date"] = str(start_time + timedelta(minutes=occurrence.scheduled_duration))
 
         # We can't show things that are not yet in a slot!
         # FIXME: Show them somewhere
@@ -267,35 +351,61 @@ def scheduler() -> ResponseReturnValue:
 
         occurrence_data.append(export)
 
-    ## FIXME: TimeBlock migration
-    # venue_names_by_type = Venue.emf_venue_names_by_type()
-
     return render_template(
         "cfp_review/schedule/scheduler.html",
         shown_venues=shown_venues,
+        venues_by_type=venues_by_type,
         occurrence_data=occurrence_data,
-        default_venues={},
+        draft=draft,
+        auto_schedule=automatic,
+        event_start=config.event_start,
+        event_end=config.event_end,
     )
 
 
-# AJAX update endpoint for JS-based scheduler
-# @cfp_review.route("/scheduler-update", methods=["GET", "POST"])
-# @admin_required
-# def scheduler_update() -> ResponseReturnValue:
-#    occurrence = get_or_404(db, Occurrence, int(request.form["id"]))
-#    occurrence.potential_time = dateutil.parser.parse(request.form["time"]).replace(tzinfo=None)
-#    occurrence.potential_venue_id = int(request.form["venue"])
-#
-#    changed = True
-#    if occurrence.potential_time == occurrence.scheduled_time and str(occurrence.potential_venue_id) == str(
-#        occurrence.scheduled_venue_id
-#    ):
-#        occurrence.potential_time = None
-#        occurrence.potential_venue = None
-#        changed = False
-#
-#    db.session.commit()
-#    return jsonify({"changed": changed})
+@cfp_review.route("/scheduler-update", methods=["POST"])
+@schedule_required
+def scheduler_update() -> ResponseReturnValue:
+    occurrence = get_or_404(db, Occurrence, int(request.form["id"]))
+    venue = get_or_404(db, Venue, int(request.form["venue"]))
+    start_time = datetime.fromisoformat(request.form["time"]).replace(tzinfo=None)
+
+    if not occurrence.is_valid_slot(start_time, venue):
+        return jsonify({"error": "Invalid slot"}), 400
+
+    changed = start_time != occurrence.scheduled_time or venue != occurrence.scheduled_venue
+
+    draft: PotentialSchedule | None
+    if changed:
+        draft = get_or_create_tweaker_schedule()
+        existing = staged_occurrence(draft, occurrence.id)
+        if existing:
+            existing.start_time = start_time
+            existing.venue = venue
+        else:
+            db.session.add(
+                PotentialScheduleOccurrence(
+                    potential_schedule=draft,
+                    occurrence=occurrence,
+                    venue=venue,
+                    start_time=start_time,
+                )
+            )
+    else:
+        # Dragged back to its current slot
+        draft, _ = latest_new_schedules()
+        if draft:
+            existing = staged_occurrence(draft, occurrence.id)
+            if existing:
+                db.session.delete(existing)
+
+            # And if the draft is now empty, nuke it
+            changes_remaining = [x for x in draft.changed_occurrences() if x != existing]
+            if not changes_remaining:
+                db.session.delete(draft)
+
+    db.session.commit()
+    return jsonify({"changed": changed})
 
 
 @cfp_review.route("/clashfinder")
