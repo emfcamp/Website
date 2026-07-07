@@ -47,8 +47,10 @@
         </ul>
         <div class="tab-content">
             <div id="estimates-auto" class="tab-pane fade in active">
-                <p>This covers <strong>automatically scheduled items only</strong>. Items are considered automatically scheduled by default
-                    until they are manually scheduled or their allowed_venues are set to venues with manually-scheduled TimeBlocks.
+                <p>This covers <strong>automatically scheduled items only</strong>. An item is
+                    counted as automatically scheduled if it can be placed in a timeblock that is
+                    both a default venue for its content type and marked as available for automatic
+                    scheduling.
                 </p>
                 {% with estimates=estimates_auto %}
                     {% include "cfp_review/_schedule_time_estimates.html" %}

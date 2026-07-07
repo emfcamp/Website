@@ -5,7 +5,7 @@ from dateutil.parser import parse as parse_date
 from sqlalchemy import select
 from wtforms import (
     BooleanField,
-    DateTimeField,
+    DateTimeLocalField,
     FieldList,
     FloatField,
     FormField,
@@ -474,7 +474,7 @@ class UpdateOccurrenceForm(Form):
     # allowed_venues is an association so we need to assign Venues
     allowed_venue_ids = SelectMultipleField("Allowed venues", coerce=int)
     scheduled_venue_id = SelectField("Scheduled venue", coerce=coerce_optional(int))
-    scheduled_time = DateTimeField("Scheduled time", [Optional(strip_whitespace=True)])
+    scheduled_time = DateTimeLocalField("Scheduled time", [Optional()], format="%Y-%m-%dT%H:%M")
 
     c3voc_url = StringField("C3VOC video URL")
     youtube_url = StringField("YouTube URL")

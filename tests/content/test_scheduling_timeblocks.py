@@ -41,12 +41,14 @@ venue3 = Venue(
             end=parse("2026-07-16 18:00:00"),
             type="talk",
             automatic=False,
+            default=False,
         ),
         TimeBlock(
             start=parse("2026-07-17 10:00:00"),
             end=parse("2026-07-17 18:00:00"),
             type="talk",
             automatic=False,
+            default=False,
         ),
     ],
 )
