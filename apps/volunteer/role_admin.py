@@ -112,7 +112,7 @@ class RoleForm(Form):
         "Training notes",
         [Optional()],
         widget=TextArea(),
-        description="Details to be shown when a volunteer goes to the training page. If you allow self training a button declaring they've understood will be shown underneath, otherwise provide directions on how to get approved. (supports markdown)",
+        description="Details to be shown when a volunteer goes to the training page. If you allow self training a button declaring they've understood will be shown underneath, otherwise they can just read them. (supports markdown)",
     )
     over_18_only = BooleanField(
         "Over 18 only",

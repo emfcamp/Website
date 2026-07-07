@@ -20,7 +20,13 @@ def training_index() -> ResponseReturnValue:
     # We filter out roles that use bar training and just link that once because otherwise there'll
     # be repeated roles that all link to the same training.
     roles = (
-        volunteer.interested_roles.filter(Role.requires_training, Role.uses_bar_training == False)  # type: ignore
+        volunteer.interested_roles.filter(  # type: ignore
+            or_(
+                Role.training_notes.is_(None),
+                Role.training_notes != "",
+                and_(Role.requires_training == True, Role.uses_bar_training == False),
+            )
+        )
         .order_by(Role.name)
         .all()
     )
@@ -36,7 +42,7 @@ def training_index() -> ResponseReturnValue:
 @v_user_required
 def training(role_id: int) -> ResponseReturnValue:
     role = Role.get_by_id(role_id)
-    if not role.requires_training:
+    if not role.requires_training and (role.training_notes is None or role.training_notes.strip() == ""):
         flash(f"{role.name} doesn't require any training.")
         return redirect(url_for(".choose_role"))
 

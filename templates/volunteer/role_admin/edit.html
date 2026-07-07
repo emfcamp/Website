@@ -20,8 +20,8 @@
                 <div id="training-only">
                     {% call render_field(form.uses_bar_training, horizontal=9) %}{{ form.uses_bar_training.description }}{% endcall %}
                     {% call render_field(form.allows_self_training, horizontal=9) %}{{ form.allows_self_training.description }}{% endcall %}
-                    {% call render_field(form.training_notes, horizontal=9, style="height: 20em") %}{{ form.training_notes.description }}{% endcall %}
                 </div>
+                {% call render_field(form.training_notes, horizontal=9, style="height: 20em") %}{{ form.training_notes.description }}{% endcall %}
 
                 {% call render_field(form.role_notes, horizontal=9, style="height: 20em") %}{{ form.role_notes.description }}{% endcall %}
                 {% call render_field(form.instructions_url, horizontal=9) %}{{ form.instructions_url.description }}{% endcall %}
