@@ -3,6 +3,7 @@ from datetime import timedelta
 from itertools import combinations
 
 from flask import current_app as app
+from scipy.stats import false_discovery_control, hypergeom
 from slotmachine import Conflict, SchedulingProblem, SchedulingSolution, SlotMachine, Talk, VenueTimes
 from sqlalchemy import and_, not_, select
 from sqlalchemy.orm import joinedload
@@ -31,6 +32,64 @@ DEFAULT_CONFLICT_TYPES: list[ScheduleItemType] = [
 
 def total_minutes(delta: timedelta) -> int:
     return int(delta.total_seconds() / 60)
+
+
+def compute_clashes(
+    user_faves: dict[int, list[Occurrence]],
+) -> list[tuple[Occurrence, Occurrence, int, int]]:
+    """Identify pairs of occurrences that are favourited together more than chance.
+
+    Given a mapping of user id to the occurrences they've favourited, this finds
+    pairs of talks that are statistically more commonly co-favourited than noise.
+
+    Because some people just favourite everything, a pure pairwise count flags up
+    pairs as common clashes when people are really just loving everything we do. We
+    correct for this by identifying pairs that are statistically more common than
+    noise, and apply a correction to handle people who love too much.
+    """
+    # ignore pairs co-favourited by fewer people than this
+    MIN_PEOPLE = 5
+    # only consider clashes that are 1.5x higher than noise
+    MIN_LIFT = 1.5
+    # and have a q-value no larger than this
+    MAX_QVALUE = 0.05
+
+    population = len(user_faves)
+    fans: Counter[Occurrence] = Counter()
+    popularity: Counter[tuple[Occurrence, Occurrence]] = Counter()
+    for occurrences in user_faves.values():
+        unique = set(occurrences)
+        fans.update(unique)
+        for o1, o2 in combinations(sorted(unique, key=lambda o: o.id), 2):
+            # We don't care about clashes with other occurrences of the same
+            # proposal, we have a hard constraint preventing them clashing
+            if o1.proposal == o2.proposal:
+                continue
+            popularity[(o1, o2)] += 1
+
+    candidates: list[tuple[tuple[Occurrence, Occurrence], int]] = []
+    a_fans = []
+    b_fans = []
+    for (a, b), count in popularity.items():
+        if count < MIN_PEOPLE:
+            continue
+        candidates.append(((a, b), count))
+        a_fans.append(fans[a])
+        b_fans.append(fans[b])
+
+    ranked: list[tuple[Occurrence, Occurrence, int, int]] = []
+    if candidates:
+        expected = [na * nb / population for na, nb in zip(a_fans, b_fans, strict=True)]
+        pvalues = hypergeom.sf([count - 1 for _, count in candidates], population, a_fans, b_fans)
+        qvalues = false_discovery_control(pvalues, method="bh")
+
+        for ((o1, o2), count), mean, qvalue in zip(candidates, expected, qvalues, strict=True):
+            if count < MIN_LIFT * mean or qvalue > MAX_QVALUE:
+                continue
+            ranked.append((o1, o2, count, max(1, round(count - mean))))
+        ranked.sort(key=lambda r: r[3], reverse=True)
+
+    return ranked
 
 
 class Scheduler:
@@ -74,6 +133,7 @@ class Scheduler:
         self,
         types: list[ScheduleItemType],
         conflict_types: list[ScheduleItemType] | None = None,
+        max_clashes: int = 1000,
     ) -> SchedulingProblem:
         # "types" are the content types to auto-schedule. All other types are
         # fixed in place as if manually scheduled and present only for speaker
@@ -213,21 +273,13 @@ class Scheduler:
                 else:
                     count += 1
 
-        # Calculate the top 1000 most commonly co-starred occurrences
-        # and flag them as conflicts
-        popularity: Counter[tuple[Occurrence, Occurrence]] = Counter()
-        for occurrences in user_faves.values():
-            for o1, o2 in combinations(sorted(occurrences, key=lambda o: o.id), 2):
-                # We don't care about clashes with other occurrences of the
-                # same proposal, we have a hard constraint preventing them
-                # clashing
-                if o1.proposal == o2.proposal:
-                    continue
-                popularity.update([(o1, o2)])
-
-        conflicts = []
-        for (o1, o2), count in popularity.most_common()[:1000]:
-            conflicts.append(Conflict(talks={o1.id, o2.id}, weight=max(1, count)))
+        # Avoid statistically-significant co-favourited pairs as conflicts
+        # weighted by the number of people who would likely be forced to choose
+        # between them. Uses the same model as the clashfinder.
+        conflicts = [
+            Conflict(talks={o1.id, o2.id}, weight=weight)
+            for o1, o2, _count, weight in compute_clashes(user_faves)[:max_clashes]
+        ]
 
         return SchedulingProblem(
             talks=scheduler_talks, conflicts=conflicts, slot_duration=total_minutes(SLOT_DURATION)
@@ -256,8 +308,9 @@ class Scheduler:
         self,
         types: list[ScheduleItemType],
         conflict_types: list[ScheduleItemType] | None = None,
+        max_clashes: int = 1000,
     ) -> PotentialSchedule:
-        problem = self.get_schedule_problem(types, conflict_types)
+        problem = self.get_schedule_problem(types, conflict_types, max_clashes)
         if len(problem.talks) == 0:
             raise Exception("No talks to schedule")
 
