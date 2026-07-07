@@ -741,8 +741,8 @@ class Occurrence(BaseModel):
 
     @property
     def potential_slot(self) -> PotentialScheduleOccurrence | None:
-        if len(self.potential_scheduled_slots) > 0:
-            return sorted(list(self.potential_scheduled_slots), reverse=True)[0]
+        if self.potential_scheduled_slots:
+            return max(self.potential_scheduled_slots, key=lambda so: so.id)
         return None
 
     @property

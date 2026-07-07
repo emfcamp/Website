@@ -22,12 +22,13 @@
 <p>
   Show Venues:
   <a href="{{ url_for('cfp_review.scheduler') }}">All</a> /
-  <a href="{{ url_for('cfp_review.scheduler', venue=emf_venues) }}">EMF Venues</a> /
-  {% for type, stages in default_venues.items() %}
-    {% if stages %}
-    <a href="{{ url_for('cfp_review.scheduler', venue=stages) }}">{{ type|capitalize }}</a>
-      {% if not loop.last %}/{% endif %}
-    {% endif %}
+  <a href="{{ url_for('cfp_review.scheduler', venue=emf_venues) }}">EMF Venues</a>
+</p>
+<p>
+  Show Type:
+  {% for content_type, venue_names in venues_by_type.items() if venue_names %}
+    <a href="{{ url_for('cfp_review.scheduler', venue=venue_names) }}">{{ content_type | capitalize }}</a>
+    {%- if not loop.last %} / {% endif %}
   {% endfor %}
 </p>
 
@@ -56,18 +57,15 @@ var emf_scheduler = {};
   var scheduleData = {{ occurrence_data | tojson }},
     venues = {{ shown_venues | tojson }},
     is_anonymous = {% if current_user.is_anonymous -%} true {%- else -%} false {%- endif %},
-    // THE MONTH ON THESE DATE OBJECTS IS OFFSET BY MINUS ONE
-    // WHAT THE FUCK
-    // HEY THE END DAY NEEDS TO BE +1 TOO (as not included)
-    // WHAT THE FUCK
-    start_date = new Date(2024, 4, 31),
-    end_date = new Date(2024, 5, 3),
+    start_date = new Date({{ event_start.year }}, {{ event_start.month - 1 }}, {{ event_start.day }}),
+    end_date = new Date({{ event_end.year }}, {{ event_end.month - 1 }}, {{ event_end.day + 1 }}),
     venue_dict = {},
     day_format = "%D, %j",   // e.g. Friday, 5th
     day_formatter = scheduler.date.date_to_str(day_format),
     time_formatter = scheduler.date.date_to_str("%H:%i"), // e.g. 22:33
     debounce = false;
 
+  var event_days = Math.round((end_date - start_date) / (1000 * 60 * 60 * 24));
 
   // Easily retrieve venue name from its ID
   for(var i = 0; i<venues.length; i++){
@@ -103,18 +101,18 @@ var emf_scheduler = {};
     name:"emf_weekend",
     property:"venue",
     list:venues,
-    days: 3,
+    days: event_days,
   });
 
   scheduler.config.separate_short_events = true;
 
   // Make sure in weekend view you can't scroll away
   scheduler.date.add_emf_weekend = function (date,inc) {
-    return scheduler.date.add(start_date, venues.length*3 ,"day");
+    return scheduler.date.add(start_date, venues.length*event_days ,"day");
   };
 
   scheduler.date.get_emf_weekend_end = function (date) {
-    return scheduler.date.add(start_date, venues.length*3 ,"day");
+    return scheduler.date.add(start_date, venues.length*event_days ,"day");
   };
 
   scheduler.date.get_emf_weekend_start = function (date) {
@@ -168,7 +166,7 @@ var emf_scheduler = {};
   }
 
   scheduler.attachEvent("onDblClick",function (id){
-    window.open('{{ url_for("cfp_review.proposals") }}/' + id);
+    window.open('/admin/cfp-review/schedule-items/0/occurrences/' + id);
     return false;// block further actions
   });
 
@@ -190,17 +188,14 @@ var emf_scheduler = {};
     }
 
     var range_valid = false;
-    for (let range of ev.valid_time_ranges) {
+    var venue_ranges = ev.valid_venue_times[ev.venue] || [];
+    for (let range of venue_ranges) {
       var start = new Date(range.start)
       var end = new Date(range.end)
 
       if (ev.start_date >= start && ev.end_date <= end) {
         range_valid = true;
       }
-    }
-
-    if (ev.valid_venues.indexOf(ev.venue) == -1) {
-      range_valid = false;
     }
 
     if (range_valid == true) {
