@@ -214,10 +214,8 @@ class FakeDataGenerator:
 
         if isinstance(proposal.attributes, ProposalWorkshopAttributes):
             proposal.attributes.participant_count = str(random.randint(5, 50))
-            proposal.attributes.drop_in = random_bool(0.5)
         elif isinstance(proposal.attributes, ProposalFamilyWorkshopAttributes):
             proposal.attributes.participant_count = str(random.randint(5, 50))
-            proposal.attributes.drop_in = True
 
         if state in {"accepted", "finalised"}:
             # See Proposal.accept
@@ -354,6 +352,9 @@ class FakeDataGenerator:
             schedule_item.attributes.content_note = self.fake.sentence(nb_words=10, variable_nb_words=True)
             if isinstance(schedule_item.attributes, WorkshopAttributes):
                 schedule_item.attributes.family_friendly = random_bool(0.2)
+                schedule_item.attributes.drop_in = random_bool(0.5)
+            elif isinstance(schedule_item.attributes, FamilyWorkshopAttributes):
+                schedule_item.attributes.drop_in = True
 
         elif isinstance(schedule_item.attributes, InstallationAttributes):
             schedule_item.attributes.size = self.fake.text(max_nb_chars=40)

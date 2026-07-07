@@ -68,6 +68,7 @@ class ScheduleItemDict(TypedDict):
     equipment: NotRequired[str]
     age_range: NotRequired[str]
     attendees: NotRequired[str | None]
+    drop_in: NotRequired[bool]
 
     occurrences: list[OccurrenceDict]
 
@@ -121,6 +122,7 @@ def _get_schedule_item_dict(filter: ScheduleFilter, schedule_item: ScheduleItem)
         sid["equipment"] = (schedule_item.attributes.participant_equipment or "").strip()
         sid["age_range"] = (schedule_item.attributes.age_range or "").strip()
         # participant_count is only on proposals
+        sid["drop_in"] = schedule_item.attributes.drop_in
 
     if isinstance(schedule_item.attributes, TalkAttributes | WorkshopAttributes):
         sid["family_friendly"] = schedule_item.attributes.family_friendly

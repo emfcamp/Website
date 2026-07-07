@@ -173,8 +173,6 @@ class ScheduleItemForm(Form):
         coerce=lambda v: v == "official",
     )
 
-    drop_in = BooleanField("Drop-in")
-
     video_privacy = SelectField(
         "Recording",
         choices=[

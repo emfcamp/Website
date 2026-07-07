@@ -131,6 +131,16 @@
     <td>{{ schedule_item.attributes.participant_equipment }}</td>
   <tr>
   {% endif %}
+  <tr>
+    <td><b>Drop-in</b></td>
+    <td>
+      {% if schedule_item.attributes.drop_in %}
+      Drop-in workshop
+      {% else %}
+      Not a drop-in workshop
+      {% endif %}
+    </td>
+  <tr>
   </table>
 {% endif %}
 </div>
