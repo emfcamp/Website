@@ -16,7 +16,7 @@ from sqlalchemy import and_, not_, select
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import desc
 
-from apps.cfp.scheduler import Scheduler
+from apps.cfp.scheduler import DEFAULT_CONFLICT_TYPES, Scheduler
 from apps.cfp_review.email import send_email_for_proposal
 from apps.cfp_review.estimation import get_cfp_estimate
 from apps.config import config
@@ -124,12 +124,22 @@ def run_scheduler():
         for t in get_args(ScheduleItemType)
     ]
 
+    conflict_type_options = [
+        {
+            "type": t,
+            "label": SCHEDULE_ITEM_INFOS[t].human_type if t in SCHEDULE_ITEM_INFOS else t,
+            "checked": t in DEFAULT_CONFLICT_TYPES,
+        }
+        for t in get_args(ScheduleItemType)
+    ]
+
     if request.method == "POST" and request.form.get("run"):
         types = request.form.getlist("auto_type")
+        conflict_types = request.form.getlist("conflict_type")
         scheduler = Scheduler()
         result = None
         try:
-            result = scheduler.run(types)
+            result = scheduler.run(types, conflict_types)
         except slotmachine.Unsatisfiable as e:
             app.logger.exception("Unsatisfiable schedule")
             flash(f"Schedule was unsatisfiable :( {e}")
@@ -148,7 +158,11 @@ def run_scheduler():
             db.session.commit()
             return redirect(url_for(".potential_schedule", schedule_id=result.id))
 
-    return render_template("cfp_review/schedule/schedule_run.html", type_options=type_options)
+    return render_template(
+        "cfp_review/schedule/schedule_run.html",
+        type_options=type_options,
+        conflict_type_options=conflict_type_options,
+    )
 
 
 @cfp_review.route("/schedule/run-scheduler/export.json")
@@ -156,7 +170,10 @@ def run_scheduler():
 def run_scheduler_export() -> ResponseReturnValue:
     # Export the scheduling problem as JSON for debugging with slotmachine
     types = cast("list[ScheduleItemType]", request.args.getlist("auto_type")) or DEFAULT_AUTO_SCHEDULE_TYPES
-    problem = Scheduler().get_schedule_problem(types)
+    conflict_types = (
+        cast("list[ScheduleItemType]", request.args.getlist("conflict_type")) or DEFAULT_CONFLICT_TYPES
+    )
+    problem = Scheduler().get_schedule_problem(types, conflict_types)
     json_str = json.dumps(problem.to_dict(), sort_keys=True, indent=4, separators=(",", ": "))
 
     now = datetime.now().isoformat()

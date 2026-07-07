@@ -17,6 +17,17 @@ from models.content import (
 from models.content.potential_schedule import PotentialSchedule, PotentialScheduleOccurrence
 from models.content.schedule import SLOT_DURATION
 
+# Default types considered to use for speaker/slot conflict detection, even if
+# they are not being auto-scheduled
+DEFAULT_CONFLICT_TYPES: list[ScheduleItemType] = [
+    "talk",
+    "workshop",
+    "familyworkshop",
+    "performance",
+    "music",
+    "djset",
+]
+
 
 def total_minutes(delta: timedelta) -> int:
     return int(delta.total_seconds() / 60)
@@ -59,10 +70,20 @@ class Scheduler:
 
         return list(occurrences)
 
-    def get_schedule_problem(self, types: list[ScheduleItemType]) -> SchedulingProblem:
+    def get_schedule_problem(
+        self,
+        types: list[ScheduleItemType],
+        conflict_types: list[ScheduleItemType] | None = None,
+    ) -> SchedulingProblem:
         # "types" are the content types to auto-schedule. All other types are
         # fixed in place as if manually scheduled and present only for speaker
-        # conflict avoidance
+        # conflict avoidance.
+        #
+        # "conflict_types" are the content types to consider when they are not
+        # being auto-scheduled but we want to consider them for speaker and
+        # slot conflict detection
+        if conflict_types is None:
+            conflict_types = DEFAULT_CONFLICT_TYPES
         occurrences = self.get_schedulable_occurrences()
 
         occurrences_by_type: dict[ScheduleItemType, list[Occurrence]] = defaultdict(list)
@@ -81,6 +102,11 @@ class Scheduler:
         user_faves: dict[int, list[Occurrence]] = defaultdict(list)
         scheduler_talks = []
         for type, occurrences in occurrences_by_type.items():
+            # Skip types which are neither being auto-scheduled nor checked for
+            # conflicting slots or speakers
+            if type not in types and type not in conflict_types:
+                continue
+
             # We assign the largest venues as being preferred for the most popular talks
             # Occurrences are already sorted into popularity, so we just shift through the list
             # of venues in order of size, equally split
@@ -226,8 +252,12 @@ class Scheduler:
         ]
         return potential_schedule
 
-    def run(self, types: list[ScheduleItemType]) -> PotentialSchedule:
-        problem = self.get_schedule_problem(types)
+    def run(
+        self,
+        types: list[ScheduleItemType],
+        conflict_types: list[ScheduleItemType] | None = None,
+    ) -> PotentialSchedule:
+        problem = self.get_schedule_problem(types, conflict_types)
         if len(problem.talks) == 0:
             raise Exception("No talks to schedule")
 
