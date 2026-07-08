@@ -75,14 +75,20 @@ def schedule() -> ResponseReturnValue:
             if occurrence.scheduled:
                 schedule_state["auto_scheduled"] += 1
             else:
-                if len(occurrence.schedule_item.availability) == 0:
+                if (
+                    len(occurrence.schedule_item.availability) == 0
+                    and not occurrence.schedule_item.availability_overrides
+                ):
                     schedule_state["auto_missing_availability"] += 1
                 else:
                     schedule_state["auto_unscheduled"] += 1
 
         if occurrence.scheduled:
             schedule_state_by_type[occurrence.schedule_item.type]["scheduled"] += 1
-        elif len(occurrence.schedule_item.availability) == 0:
+        elif (
+            len(occurrence.schedule_item.availability) == 0
+            and not occurrence.schedule_item.availability_overrides
+        ):
             schedule_state_by_type[occurrence.schedule_item.type]["missing_availability"] += 1
         else:
             schedule_state_by_type[occurrence.schedule_item.type]["unscheduled"] += 1

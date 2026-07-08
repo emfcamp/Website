@@ -27,6 +27,10 @@ class Attributes:
     #: Ask the automatic scheduler to place an item's occurrences on different days.
     spread_occurrences_across_days: bool = False
 
+    #: If set, replaces speaker availability.
+    #: A list of [start, end] ISO datetimes.
+    availability_overrides: list[list[str]] | None = None
+
 
 # Attributes used by both Proposal and ScheduleItem
 

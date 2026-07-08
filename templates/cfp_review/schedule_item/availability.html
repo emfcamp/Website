@@ -1,5 +1,20 @@
 {% from "_formhelpers.html" import render_field, render_dl_field, render_radio_field %}
 {% set active='availability' %}
+
+{% macro override_row(entry) %}
+<div class="form-inline override-row{% if entry.errors %} has-error{% endif %}" style="margin-bottom: 5px">
+    {{ entry.start.label(class_="sr-only") }}
+    {{ entry.start(class_="form-control") }}
+    &ndash;
+    {{ entry.end.label(class_="sr-only") }}
+    {{ entry.end(class_="form-control") }}
+    <button type="button" class="btn btn-danger remove-override-btn">Remove</button>
+    {% for error in entry.start.errors + entry.end.errors %}
+    <span class="help-block">{{ error }}</span>
+    {% endfor %}
+</div>
+{% endmacro %}
+
 {% extends "cfp_review/schedule_item/_base.html" %}
 {% block title %}{{ schedule_item.title }}{% endblock %}
 {% block schedule_item_body %}
@@ -60,6 +75,29 @@
 
             </div>
 
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="overridesPanelHeading">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" href="#overridesPanel" aria-expanded="true" aria-controls="overridesPanel">
+                            Availability overrides
+                        </a>
+                    </h4>
+                </div>
+                <div id="overridesPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="overridesPanelHeading">
+                    <div class="panel-body">
+                        <p class="help-block">
+                            If set, these will override the speaker's availability - Use with caution! Blank entries are ignored.
+                        </p>
+                        <div id="override-rows">
+                            {% for entry in form.availability_overrides %}
+                            {{ override_row(entry) }}
+                            {% endfor %}
+                        </div>
+                        <button type="button" class="btn btn-default" id="add-override-btn">Add override</button>
+                    </div>
+                </div>
+            </div>
+
         </div>
         {{ form.update(class_="btn btn-primary debounce", tabindex=1) }}
     </div>
@@ -83,4 +121,45 @@
     </div>
 </form>
 
+{% endblock %}
+
+{% block foot %}
+{{ super() }}
+<template id="override-row-template">
+    {{ override_row(override_template) }}
+</template>
+
+{# Nicked from the volunteer system #}
+<script nonce="{{csp_nonce}}">
+(() => {
+  // After a failed validation the server re-renders rows under their original,
+  // possibly non-contiguous indices, so continue from the highest one
+  let nextIndex = 1 + Math.max(-1, ...Array.from(
+    document.querySelectorAll("#override-rows input"),
+    (el) => parseInt(el.name.split("-")[1], 10)));
+
+  const bindRemove = (btn) => {
+    btn.addEventListener("click", () => {
+      btn.closest(".override-row").remove();
+    });
+  };
+
+  document.getElementById("add-override-btn").addEventListener("click", () => {
+    const tmpl = document.getElementById("override-row-template");
+    const clone = document.importNode(tmpl.content, true);
+    clone.querySelectorAll("input").forEach((el) => {
+      el.name = el.name.replace("__index__", nextIndex);
+      el.id = el.id.replace("__index__", nextIndex);
+    });
+    clone.querySelectorAll("label").forEach((el) => {
+      el.htmlFor = el.htmlFor.replace("__index__", nextIndex);
+    });
+    nextIndex++;
+    bindRemove(clone.querySelector(".remove-override-btn"));
+    document.getElementById("override-rows").appendChild(clone);
+  });
+
+  document.querySelectorAll(".remove-override-btn").forEach(bindRemove);
+})();
+</script>
 {% endblock %}

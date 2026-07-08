@@ -4,6 +4,7 @@ Admin views relating to ScheduleItems and Occurrences
 
 import csv
 import json
+from datetime import timedelta
 from http import HTTPStatus
 from io import BytesIO, StringIO
 
@@ -41,6 +42,7 @@ from models.user import User
 from . import admin_required, bool_qs, cfp_review, sort_schedule_items
 from .forms import (
     UPDATE_SCHEDULE_ITEM_ATTRIBUTES_FORM_TYPES,
+    AvailabilityOverrideForm,
     CancelOccurrenceForm,
     ChangeScheduleItemOwner,
     ConvertScheduleItemForm,
@@ -236,26 +238,49 @@ def update_schedule_item(schedule_item_id: int) -> ResponseReturnValue:
 def schedule_item_availability(schedule_item_id: int) -> ResponseReturnValue:
     schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
 
-    form = UpdateAvailabilityForm()
+    form = UpdateAvailabilityForm(obj=schedule_item)
     time_ranges = TimeRangesHandler(schedule_item)
 
     if form.validate_on_submit() and time_ranges.validate():
         availability_changed = time_ranges.save()
+
+        overrides = sorted(
+            (entry.start.data, entry.end.data)
+            for entry in form.availability_overrides
+            if entry.start.data and entry.end.data
+        )
+        overrides_changed = overrides != schedule_item.availability_overrides
+        if overrides_changed:
+            schedule_item.availability_overrides = overrides
+
         has_been_through_scheduler = any(
             o.potential_time or o.scheduled_time for o in schedule_item.occurrences
         )
-        if availability_changed and has_been_through_scheduler:
+        if (availability_changed or overrides_changed) and has_been_through_scheduler:
             flash("You need to run the scheduler again to take account of availability changes")
 
         db.session.commit()
 
         return redirect(url_for(".schedule_item_availability", schedule_item_id=schedule_item_id))
 
+    override_template = AvailabilityOverrideForm(prefix="availability_overrides-__index__-")
+
+    time_range_kw = {
+        "min": config.event_start.strftime("%Y-%m-%dT%H:%M"),
+        # Late-night time blocks can run past EVENT_END - see AvailabilityOverrideForm.validate_end
+        "max": ((config.event_end + timedelta(days=1)).replace(hour=2, minute=0)).strftime("%Y-%m-%dT%H:%M"),
+        "step": 600,
+    }
+    for entry in [*form.availability_overrides, override_template]:
+        entry.start.render_kw = time_range_kw
+        entry.end.render_kw = time_range_kw
+
     return render_template(
         "cfp_review/schedule_item/availability.html",
         schedule_item=schedule_item,
         form=form,
         time_ranges=time_ranges,
+        override_template=override_template,
     )
 
 

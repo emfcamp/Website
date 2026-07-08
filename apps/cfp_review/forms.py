@@ -1,3 +1,4 @@
+from datetime import timedelta
 from itertools import chain
 from typing import get_args
 
@@ -18,6 +19,7 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional, ValidationError
 
+from apps.config import config
 from main import db
 from models.content import (
     PROPOSAL_INFOS,
@@ -188,6 +190,27 @@ class ScheduleItemForm(Form):
     spread_occurrences_across_days = BooleanField("Spread occurrences across days")
 
 
+class AvailabilityOverrideForm(Form):
+    start = DateTimeLocalField("Start", [Optional()], format="%Y-%m-%dT%H:%M")
+    end = DateTimeLocalField("End", [Optional()], format="%Y-%m-%dT%H:%M")
+
+    def validate_start(form, field):
+        if field.data and not form.end.data:
+            raise ValidationError("Both a start and end time are required")
+
+    def validate_end(form, field):
+        if field.data and not form.start.data:
+            raise ValidationError("Both a start and end time are required")
+        if not field.data or not form.start.data:
+            return
+        if field.data <= form.start.data:
+            raise ValidationError("End must be after start")
+        # Late-night time blocks can run past EVENT_END until 2am
+        latest = (config.event_end + timedelta(days=1)).replace(hour=2, minute=0, second=0, microsecond=0)
+        if form.start.data < config.event_start or field.data > latest:
+            raise ValidationError("Must be within the event")
+
+
 class UpdateScheduleItemForm(ScheduleItemForm):
     update = SubmitField("Update")
 
@@ -198,6 +221,7 @@ class ConvertScheduleItemForm(Form):
 
 
 class UpdateAvailabilityForm(Form):
+    availability_overrides = FieldList(FormField(AvailabilityOverrideForm))
     update = SubmitField("Update")
 
 
