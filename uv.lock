@@ -2297,7 +2297,7 @@ wheels = [
 [[package]]
 name = "slotmachine"
 version = "0.0.7"
-source = { git = "https://github.com/emfcamp/slotmachine.git#ced76065ee2e43a21f2ee4c8418082fb90b55cbb" }
+source = { git = "https://github.com/emfcamp/slotmachine.git#658e1ee95e02b4381d9e4e05152db153321ef1ef" }
 dependencies = [
     { name = "ortools" },
     { name = "python-dateutil" },
