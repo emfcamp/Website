@@ -185,6 +185,8 @@ class ScheduleItemForm(Form):
 
     contact_telephone = StringField("Telephone")
 
+    spread_occurrences_across_days = BooleanField("Spread occurrences across days")
+
 
 class UpdateScheduleItemForm(ScheduleItemForm):
     update = SubmitField("Update")
