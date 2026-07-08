@@ -12,6 +12,7 @@ from wtforms import StringField
 from wtforms.fields.datetime import DateTimeLocalField
 
 from main import db, external_url
+from models.user import User
 from models.volunteer.buildup import (
     BuildupSignupKey,
     BuildupVolunteer,
@@ -213,11 +214,15 @@ volunteer_admin.add_view(
 class DietaryRequirementsView(VolunteerBaseView):
     @expose("/")
     def index(self):
-        query = db.session.query(BuildupVolunteer)
+        query = (
+            db.session.query(BuildupVolunteer)
+            .order_by(BuildupVolunteer.arrival_date)
+            .options(db.selectinload(BuildupVolunteer.user).selectinload(User.volunteer))
+        )
 
         days_data = []
         is_just_after_event = False
-        earliest_buildup = query.order_by(BuildupVolunteer.arrival_date).first()
+        earliest_buildup = query.first()
         if earliest_buildup is None:
             start = buildup_start()
         else:
