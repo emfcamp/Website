@@ -112,6 +112,7 @@ class Scheduler:
         """
         occurrences = db.session.scalars(
             select(Occurrence)
+            .join(Occurrence.schedule_item)
             .where(
                 not_(Occurrence.cancelled),
                 Occurrence.schedule_item.has(
