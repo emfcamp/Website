@@ -167,21 +167,9 @@ class Scheduler:
             if type not in types and type not in conflict_types:
                 continue
 
-            # We assign the largest venues as being preferred for the most popular talks
-            # Occurrences are already sorted into popularity, so we just shift through the list
-            # of venues in order of size, equally split
-            ordered_venues = sorted(
-                capacity_by_type[type],
-                key=lambda k: capacity_by_type[type][k],
-                reverse=True,
-            )
-            split_count = (
-                int(len(occurrences_by_type[type]) / len(capacity_by_type[type]))
-                if capacity_by_type[type]
-                else 0
-            )
+            max_favourites = max((len(o.schedule_item.favourited_by) for o in occurrences), default=0)
+            largest_venue = max(capacity_by_type[type].values(), default=0)
 
-            count = 0
             for occurrence in occurrences:
                 assert occurrence.scheduled_duration
 
@@ -191,22 +179,21 @@ class Scheduler:
                 # Per-venue allowed time ranges: the intersection of the speaker's availability
                 # and each venue's TimeBlocks for this content type.
                 #
-                # We add the same weight to all venues of the current max
-                # capacity venue, because variable venue weightings cause
-                # serious performance degredation in slotmachine at this scale
-
+                # Weight each venue for this talk from its relative popularity
+                # within the range of favourites against the capacity
                 if type in types:
-                    current_venues = [
-                        v
-                        for v in ordered_venues
-                        if self.venues[v].capacity == self.venues[ordered_venues[0]].capacity
-                    ]
+                    expected_audience = 0
+                    if max_favourites > 0:
+                        expected_audience = (
+                            len(occurrence.schedule_item.favourited_by) * largest_venue // max_favourites
+                        )
+
                     allowed_times = occurrence.allowed_times(True)
                     venue_times = [
                         VenueTimes(
                             venue=venue.id,
                             times=times,
-                            venue_weight=20 if venue.id in current_venues else 0,
+                            venue_weight=min(expected_audience, venue.capacity or 0),
                         )
                         for venue, times in allowed_times.items()
                     ]
@@ -265,13 +252,6 @@ class Scheduler:
                 # For conflict detection
                 for user in occurrence.schedule_item.favourited_by:
                     user_faves[user.id].append(occurrence)
-
-                # Shift to the next venue when we hit the division
-                if ordered_venues and count > split_count:
-                    count = 0
-                    ordered_venues.pop(0)
-                else:
-                    count += 1
 
         # Avoid statistically-significant co-favourited pairs as conflicts
         # weighted by the number of people who would likely be forced to choose
