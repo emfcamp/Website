@@ -76,7 +76,7 @@
   <p>The full list of attendees will be available after {{ show_list_after }}
      and for the duration of the {{ schedule_item.human_type }}.</p>
 {% endif %}
-{% if not time_locked or config.get("DEBUG") %}
+{% if not time_locked or config.get("DEBUG") or current_user.has_permission('admin') %}
   <form class="ticket-codes" data-url="{{ url_for(".workshop_steward_occurrence_checkin", occurrence_id=occurrence.id) }}">
   <table class="table">
     {% for entry in lottery.entries %}
