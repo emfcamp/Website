@@ -167,8 +167,8 @@ class Scheduler:
             if type not in types and type not in conflict_types:
                 continue
 
-            max_favourites = max((len(o.schedule_item.favourited_by) for o in occurrences), default=0)
-            largest_venue = max(capacity_by_type[type].values(), default=0)
+            ranked_capacities = sorted(set(capacity_by_type[type].values()))
+            capacity_rank = {capacity: rank for rank, capacity in enumerate(ranked_capacities, start=1)}
 
             for occurrence in occurrences:
                 assert occurrence.scheduled_duration
@@ -179,21 +179,18 @@ class Scheduler:
                 # Per-venue allowed time ranges: the intersection of the speaker's availability
                 # and each venue's TimeBlocks for this content type.
                 #
-                # Weight each venue for this talk from its relative popularity
-                # within the range of favourites against the capacity
+                # Weight each venue by its capacity rank in the available
+                # venues scaled by the talk's favourites. Raw capacity numbers
+                # don't matter, we just want to put more popular things in
+                # bigger venues and this is easier for the solver
                 if type in types:
-                    expected_audience = 0
-                    if max_favourites > 0:
-                        expected_audience = (
-                            len(occurrence.schedule_item.favourited_by) * largest_venue // max_favourites
-                        )
-
+                    favourites = max(1, len(occurrence.schedule_item.favourited_by))
                     allowed_times = occurrence.allowed_times(True)
                     venue_times = [
                         VenueTimes(
                             venue=venue.id,
                             times=times,
-                            venue_weight=min(expected_audience, venue.capacity or 0),
+                            venue_weight=favourites * capacity_rank[venue.capacity or 1],
                         )
                         for venue, times in allowed_times.items()
                     ]
