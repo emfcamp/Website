@@ -142,7 +142,7 @@ def run_scheduler():
             result = scheduler.run(types, conflict_types, max_clashes, runtime)
         except slotmachine.Unsatisfiable as e:
             app.logger.exception("Unsatisfiable schedule")
-            flash(f"Schedule was unsatisfiable :( {e}")
+            flash(f"Schedule was unsatisfiable :( ({e.status})")
         except Exception as e:
             app.logger.exception("Scheduler failed")
             flash(f"Scheduler failed: {e}")
