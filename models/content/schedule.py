@@ -100,6 +100,8 @@ SLOT_DURATION = timedelta(minutes=10)
 
 cfp_period = namedtuple("cfp_period", "start end")
 
+TimeRange = namedtuple("TimeRange", "start end")
+
 
 # This is a function rather than a constant so we can lean on the configuration
 # for event start & end times rather than hard coding stuff
@@ -368,6 +370,17 @@ class ScheduleItem(BaseModel):
     @property
     def has_lottery(self) -> bool:
         return any(occurrence.lottery for occurrence in self.occurrences)
+
+    @property
+    def availability_overrides(self) -> list[TimeRange]:
+        raw = self.attributes.availability_overrides or []
+        return [TimeRange(datetime.fromisoformat(start), datetime.fromisoformat(end)) for start, end in raw]
+
+    @availability_overrides.setter
+    def availability_overrides(self, value: Iterable[tuple[datetime, datetime]]) -> None:
+        self.attributes.availability_overrides = [
+            [start.isoformat(), end.isoformat()] for start, end in value
+        ]
 
     @property
     def attributes(self) -> Attributes:
@@ -677,8 +690,11 @@ class Occurrence(BaseModel):
             which is the input into the automatic scheduler.
 
         This is the intersection of speaker availability and the allowed TimeBlocks for this content type.
+        Admin-set availability overrides replace speaker availability if present.
         """
         assert self.schedule_item.official_content
+
+        ranges = self.schedule_item.availability_overrides or self.availability
 
         result: dict[Venue, list[tuple[datetime, datetime]]] = defaultdict(list)
         for time_block in self.time_blocks():
@@ -698,12 +714,12 @@ class Occurrence(BaseModel):
             if time_block.automatic != automatic:
                 continue
 
-            if not self.availability:
+            if not ranges:
                 # No availability provided, return all available timeblocks
                 result[time_block.venue].append((time_block.start, time_block.end))
                 continue
 
-            for availability in self.availability:
+            for availability in ranges:
                 if availability.start <= time_block.end and availability.end >= time_block.start:
                     result[time_block.venue].append(
                         (max(availability.start, time_block.start), min(availability.end, time_block.end))
