@@ -199,7 +199,7 @@ class Volunteer(BaseModel, UserMixin):
         if self.registered_for_buildup:
             return (buildup.buildup_start(), buildup.teardown_end())
 
-        if self.user.is_checked_in and datetime.now() <= config.event_start:
+        if self.user.has_redeemed_tickets and datetime.now() <= config.event_start:
             # Checked-in attendees are on site from Day 0 at the earliest.
             return (config.event_start - timedelta(days=1), config.event_end)
 

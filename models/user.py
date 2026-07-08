@@ -516,8 +516,8 @@ class User(BaseModel, UserMixin):
         return self.admission_tickets_held > 0
 
     @property
-    def is_checked_in(self) -> bool:
-        """Whether the user has checked in an admission ticket at the gate."""
+    def has_redeemed_tickets(self) -> bool:
+        """Whether any of the user's tickets have been redeemed."""
         return any(t.redeemed for t in self.get_owned_tickets(paid=True, type="admission_ticket"))
 
     def check_will_have_ticket(self) -> bool:
