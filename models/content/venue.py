@@ -84,11 +84,11 @@ class Venue(BaseModel):
 
     @property
     def is_official(self):
-        return self.village_id is not None
+        return self.official_venue
 
     @classmethod
     def official_venues(cls):
-        return list(db.session.scalars(select(Venue).where(Venue.village_id.is_(None))))
+        return list(db.session.scalars(select(Venue).where(Venue.official_venue == True)))
 
     @classmethod
     def get_by_name(cls, name):
