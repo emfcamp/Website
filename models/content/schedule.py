@@ -380,6 +380,17 @@ class ScheduleItem(BaseModel):
     def attributes(self, value: Attributes) -> None:
         self.attributes_json = dataclasses.asdict(value)
 
+    # Exposed as a top-level field so the scheduling checkbox can live in the
+    # main schedule item form; the value itself is stored in the attributes JSON
+    # to avoid a schema migration.
+    @property
+    def spread_occurrences_across_days(self) -> bool:
+        return bool(self.attributes.spread_occurrences_across_days)
+
+    @spread_occurrences_across_days.setter
+    def spread_occurrences_across_days(self, value: bool) -> None:
+        self.attributes.spread_occurrences_across_days = value
+
 
 validate_state_transitions(ScheduleItem.state, SCHEDULE_ITEM_STATE_TRANSITIONS)
 

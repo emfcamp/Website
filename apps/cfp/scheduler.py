@@ -1,5 +1,5 @@
 from collections import Counter, defaultdict
-from datetime import timedelta
+from datetime import datetime, time, timedelta
 from itertools import combinations
 
 from flask import current_app as app
@@ -8,6 +8,7 @@ from slotmachine import Conflict, SchedulingProblem, SchedulingSolution, SlotMac
 from sqlalchemy import and_, not_, select
 from sqlalchemy.orm import joinedload
 
+from apps.config import config
 from main import db
 from models.content import (
     Occurrence,
@@ -278,6 +279,29 @@ class Scheduler:
         conflicts = [
             Conflict(talks={o1.id, o2.id}, weight=weight)
             for o1, o2, _count, weight in compute_clashes(user_faves)[:max_clashes]
+        ]
+
+        # Encourage occurrences of items flagged "spread across days" onto
+        # different days by spreading them across the event's day ranges
+        event_day_ranges = {
+            (datetime.combine(day, time.min), datetime.combine(day + timedelta(days=1), time.min))
+            for day in config.event_days
+        }
+        scheduled_ids = {talk.id for talk in scheduler_talks}
+        occurrences_by_item: dict[int, list[int]] = defaultdict(list)
+        for occurrence_id in scheduled_ids:
+            occurrence = self.occurrences[occurrence_id]
+            if occurrence.schedule_item.spread_occurrences_across_days:
+                occurrences_by_item[occurrence.schedule_item_id].append(occurrence_id)
+
+        conflicts += [
+            Conflict(
+                talks=set(occurrence_ids),
+                weight=50,
+                spread_across=event_day_ranges,
+            )
+            for occurrence_ids in occurrences_by_item.values()
+            if 2 <= len(occurrence_ids) <= len(event_day_ranges)
         ]
 
         return SchedulingProblem(

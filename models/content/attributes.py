@@ -24,7 +24,8 @@ from typing import Any
 
 @dataclass
 class Attributes:
-    pass
+    #: Ask the automatic scheduler to place an item's occurrences on different days.
+    spread_occurrences_across_days: bool = False
 
 
 # Attributes used by both Proposal and ScheduleItem

@@ -60,6 +60,10 @@
 
                             {{ render_dl_field(form.video_privacy) }}
                         </dl>
+                        {% if schedule_item.occurrences | length > 1 %}
+                        {{ render_dl_field(form.spread_occurrences_across_days) }}
+                        <p class="help-block">Setting this will cause the automatic scheduler to try and place each occurence on a different day.</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
