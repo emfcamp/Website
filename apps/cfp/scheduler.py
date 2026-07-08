@@ -170,22 +170,14 @@ class Scheduler:
             ranked_capacities = sorted(set(capacity_by_type[type].values()))
             capacity_rank = {capacity: rank for rank, capacity in enumerate(ranked_capacities, start=1)}
 
-            # We assign the largest venues as being preferred for the most popular talks
-            # Occurrences are already sorted into popularity, so we just shift through the list
-            # of venues in order of size, equally split
-            ordered_venues = sorted(
-                capacity_by_type[type],
-                key=lambda k: capacity_by_type[type][k],
-                reverse=True,
-            )
-            split_count = (
-                int(len(occurrences_by_type[type]) / len(capacity_by_type[type]))
-                if capacity_by_type[type]
-                else 0
-            )
+            # Distinct venue capacities, largest first. Tthe window slides from
+            # largest to smallest as we work down the occurrences in popularity
+            # order, so more popular talks prefer the larger venues, with each
+            # venue getting two preferences except the lowest ranked venues
+            # which get one.
+            tiers = sorted(set(capacity_by_type[type].values()), reverse=True)
 
-            count = 0
-            for occurrence in occurrences:
+            for i, occurrence in enumerate(occurrences):
                 assert occurrence.scheduled_duration
 
                 # Save the occurrence by ID so we can quickly look it up from the result
@@ -194,19 +186,31 @@ class Scheduler:
                 # Per-venue allowed time ranges: the intersection of the speaker's availability
                 # and each venue's TimeBlocks for this content type.
                 #
-                # We work through talks in popularity order, shifting the
-                # largest venues off over time and weighing each remaining
-                # venue still in the pool by the talk's favourites scaled by
-                # capacity rank.
+                # Weight only the talk's first and second preference venue,
+                # scaled by the talk's favourites and capacity rank. Every
+                # other venue gets 0.
                 if type in types:
                     favourites = max(1, len(occurrence.schedule_item.favourited_by))
                     allowed_times = occurrence.allowed_times(True)
+
+                    # Slides the window from largest to smallest, assigning
+                    # first and second preference venues
+                    first = min(i * len(tiers) // len(occurrences), len(tiers) - 1) if tiers else 0
+                    preferred = set(tiers[first : first + 2])
+
+                    # If none of the allowed venues are in the windows, fall
+                    # back to the talks own smallest available venue so we
+                    # always weight one of them
+                    allowed_capacities = {venue.capacity or 0 for venue in allowed_times}
+                    if allowed_capacities and preferred.isdisjoint(allowed_capacities):
+                        preferred = {min(allowed_capacities)}
+
                     venue_times = [
                         VenueTimes(
                             venue=venue.id,
                             times=times,
                             venue_weight=favourites * capacity_rank[venue.capacity or 1]
-                            if venue.id in ordered_venues
+                            if venue.capacity in preferred
                             else 0,
                         )
                         for venue, times in allowed_times.items()
@@ -266,13 +270,6 @@ class Scheduler:
                 # For conflict detection
                 for user in occurrence.schedule_item.favourited_by:
                     user_faves[user.id].append(occurrence)
-
-                # Shift to the next venue when we hit the division
-                if ordered_venues and count > split_count:
-                    count = 0
-                    ordered_venues.pop(0)
-                else:
-                    count += 1
 
         # Avoid statistically-significant co-favourited pairs as conflicts
         # weighted by the number of people who would likely be forced to choose
