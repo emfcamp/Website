@@ -172,13 +172,6 @@ class Scheduler:
             ranked_capacities = sorted(set(capacity_by_type[type].values()))
             capacity_rank = {capacity: rank for rank, capacity in enumerate(ranked_capacities, start=1)}
 
-            # Distinct venue capacities, largest first. Tthe window slides from
-            # largest to smallest as we work down the occurrences in popularity
-            # order, so more popular talks prefer the larger venues, with each
-            # venue getting two preferences except the lowest ranked venues
-            # which get one.
-            tiers = sorted(set(capacity_by_type[type].values()), reverse=True)
-
             for i, occurrence in enumerate(occurrences):
                 assert occurrence.scheduled_duration
 
@@ -187,33 +180,18 @@ class Scheduler:
 
                 # Per-venue allowed time ranges: the intersection of the speaker's availability
                 # and each venue's TimeBlocks for this content type.
-                #
-                # Weight only the talk's first and second preference venue,
-                # scaled by the talk's favourites and capacity rank. Every
-                # other venue gets 0.
                 if type in types:
-                    favourites = max(1, len(occurrence.schedule_item.favourited_by))
+                    # We ignore the actual favourite count and use the position
+                    # in the sorted favourites list to indicate how popular it
+                    # is, multiplied by venue capacity rank to weight it
+                    fav_rank = 10 - (i * 10 // len(occurrences))
                     allowed_times = occurrence.allowed_times(True)
-
-                    # Slides the window from largest to smallest, assigning
-                    # first and second preference venues
-                    first = min(i * len(tiers) // len(occurrences), len(tiers) - 1) if tiers else 0
-                    preferred = set(tiers[first : first + 2])
-
-                    # If none of the allowed venues are in the windows, fall
-                    # back to the talks own smallest available venue so we
-                    # always weight one of them
-                    allowed_capacities = {venue.capacity or 0 for venue in allowed_times}
-                    if allowed_capacities and preferred.isdisjoint(allowed_capacities):
-                        preferred = {min(allowed_capacities)}
 
                     venue_times = [
                         VenueTimes(
                             venue=venue.id,
                             times=times,
-                            venue_weight=favourites * capacity_rank[venue.capacity or 1]
-                            if venue.capacity in preferred
-                            else 0,
+                            venue_weight=fav_rank * capacity_rank[venue.capacity or 1],
                         )
                         for venue, times in allowed_times.items()
                     ]
