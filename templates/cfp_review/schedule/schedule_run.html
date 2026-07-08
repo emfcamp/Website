@@ -5,7 +5,7 @@
 <div class="alert alert-info">
     <p>Please confirm you'd like to run the automatic scheduler.</p>
     <p>This will create a provisional schedule which you can then review before applying, or discard.</p>
-    <p>The scheduler may take a little while to run, but it's limited to 30 seconds.</p>
+    <p>The scheduler may take a little while to run, up to the runtime selected below.</p>
 </div>
 <form method="POST">
     <fieldset style="margin-bottom: 2em;">
@@ -39,6 +39,20 @@
         </p>
         <label>
             <input type="number" name="max_clashes" value="1000" min="0" class="form-control" style="width: auto;">
+        </label>
+    </fieldset>
+    <fieldset style="margin-bottom: 2em;">
+        <h4>Thinking time</h4>
+        <p class="help-block">
+            How long the scheduler can run before giving you the best schedule it's found so far or giving up. Longer is better.
+        </p>
+        <label>
+            <select name="runtime" class="form-control" style="width: auto;">
+                <option value="30">30 seconds</option>
+                <option value="60">60 seconds</option>
+                <option value="90">90 seconds</option>
+                <option value="120">120 seconds</option>
+            </select>
         </label>
     </fieldset>
     <button name="run" value="1" class="btn btn-primary">Run scheduler</button>

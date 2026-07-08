@@ -206,7 +206,7 @@ class Scheduler:
                         VenueTimes(
                             venue=venue.id,
                             times=times,
-                            venue_weight=5 if venue.id in current_venues else 0,
+                            venue_weight=20 if venue.id in current_venues else 0,
                         )
                         for venue, times in allowed_times.items()
                     ]
@@ -309,12 +309,13 @@ class Scheduler:
         types: list[ScheduleItemType],
         conflict_types: list[ScheduleItemType] | None = None,
         max_clashes: int = 1000,
+        runtime: int = 30,
     ) -> PotentialSchedule:
         problem = self.get_schedule_problem(types, conflict_types, max_clashes)
         if len(problem.talks) == 0:
             raise Exception("No talks to schedule")
 
         sm = SlotMachine(problem)
-        solution = sm.solve()
+        solution = sm.solve(max_time_in_seconds=runtime)
 
         return self.generate_potential_schedule(solution)

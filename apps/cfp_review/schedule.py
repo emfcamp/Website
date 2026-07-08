@@ -135,10 +135,11 @@ def run_scheduler():
         types = request.form.getlist("auto_type")
         conflict_types = request.form.getlist("conflict_type")
         max_clashes = request.form.get("max_clashes", 1000, type=int)
+        runtime = request.form.get("runtime", 30, type=int)
         scheduler = Scheduler()
         result = None
         try:
-            result = scheduler.run(types, conflict_types, max_clashes)
+            result = scheduler.run(types, conflict_types, max_clashes, runtime)
         except slotmachine.Unsatisfiable as e:
             app.logger.exception("Unsatisfiable schedule")
             flash(f"Schedule was unsatisfiable :( {e}")
