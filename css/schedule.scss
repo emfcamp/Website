@@ -8,11 +8,10 @@
   }
 }
 .filters {
-  background-color: $brand-2026-light-blue;
+  background-color: $highlight-background;
   margin-top: 1em;
 
   h3 {
-    color: black;
     margin-top: 0;
     font-size: 1.2em;
   }
@@ -20,12 +19,12 @@
   .panel-title {
     display: flex;
     justify-content: space-between;
-    background-color: $brand-2026-light-blue;
+    background-color: $highlight-2-background;
     border: none;
   }
 
   .panel-heading {
-    background-color: $brand-2026-light-blue;
+    background-color: $highlight-2-background;
     border: none;
   }
 }
