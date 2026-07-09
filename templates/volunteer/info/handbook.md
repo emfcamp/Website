@@ -8,16 +8,18 @@ familiarise yourself with the contents of this handbook. It contains information
 on how to volunteer, and guidance on how to respond to incidents you might be
 informed of while volunteering.
 
+### EMF 2028 Ticket Vouchers
+
+<strong>Anyone who does two or more shifts will be sent a pre-sale voucher to buy tickets
+for EMF 2028.</strong> Some shifts that are particularly short, particularly long, or
+just not very desirable (looking at you 7am shift moving bins around) will have
+a multiplier applied to them for this purpose. You'd need to do 4 0.5x shifts,
+but only one 2x shift to qualify for a voucher.
+
 ## How to volunteer
 
-Our volunteer system splits the work that needs to be done to make EMF happen
-into roles, each of which has a number of shifts across the event. In most cases
-you can pick any shift that doesn't have enough volunteers yet and sign up to
-fill it. In a few cases you'll need to complete a training session before you
-can take shifts.
-
 1. Select some [roles](/volunteer/choose-roles) you're interested in.
-2. Complete any [training](/volunteers/training) required.
+2. Complete any [training](/volunteer/training) required.
 3. Register for some [shifts](/volunteer/schedule).
 4. Check in when you arrive, either with a team lead or via the self check-in QR code.
 5. Do your shift.
@@ -34,9 +36,9 @@ can be found in all structures, or you can use a DECT phone if you have one.
 | Team | Phone | What they can help with |
 |---|:---:|---|
 | First Aid | 1090 | People who are injured or physically unwell. |
-| Welfare | ? | People who need non-medical support. |
+| Welfare | 1095 | People who need non-medical support. |
 | Help Desk | 1001 | Information for attendees, lost property, and generally helping people out. |
-| Volunteer Desk | 1009 | Guidance on your shift, the next volunteer not relieving you. |
+| Volunteer Desk | 1009 | Guidance on your shift, or the next volunteer not relieving you. |
 | Conduct | 1234 | Code of Conduct complaints |
 | Security | Radio | Incidents of violence, or if you believe someone is at risk of violence |
 | Event Operations | 1000 | Any non-emergencies not covered above |
@@ -44,15 +46,14 @@ can be found in all structures, or you can use a DECT phone if you have one.
 
 ## Things to recognise
 
-The following passes identify members of the event organising team (often referred
-to as "orga"), if in doubt you can ask people carrying them for guidance, and instructions from them should generally be followed.
+Members of the event organising team (often referred to as "orga") will have EMF passes
+with their name and role on them. You can expect to see Site Manager, Conduct, and Team Lead
+passes. If in doubt you can ask people carrying them for guidance, and instructions from them
+should generally be followed.
 
-TODO: Flesh this out once we know what these things look like.
-
-- Site Manager pass
-- Team lead pass
-- SIA license
-- Orga wristband (are these considered relevant, or just for food purposes?)
+Security can be recognised by the armband with an SIA license they will be wearing. You should
+also follow instructions from security, but they may also ask you for assistance as
+they're less familiar with the event than our own team.
 
 ## Emergencies & Vulnerable People
 
