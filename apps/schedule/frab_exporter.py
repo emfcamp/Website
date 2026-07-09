@@ -96,7 +96,7 @@ class FrabExporter:
         filter = ScheduleFilter()
 
         data = {}
-        index = 0
+        index = 1
         for schedule_item in self.schedule_items:
             sid = _get_schedule_item_dict(filter, schedule_item)
             for occurrence in schedule_item.occurrences:
