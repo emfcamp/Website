@@ -210,9 +210,14 @@ class ScheduleData {
       od.endTime = DateTime.fromSQL(od.end_date, { locale: "en-GB" });
       od.key = `${sid.id}-${od.occurrence_num}`;
       od.noRecording =
-        od.video_privacy === "none" &&
+        od.video_privacy !== "public" &&
         sid.officialEvent &&
         (sid.type === "talk" || sid.type === "performance");
+
+      // recording is only set on the schedule level anyway
+      if (od.noRecording) {
+        sid.noRecording = true;
+      }
 
       // Let's hope this doesn't come back to leak on us
       od.schedule_item = sid;
