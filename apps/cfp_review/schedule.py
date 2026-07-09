@@ -15,12 +15,13 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import desc
 
 from apps.cfp.scheduler import DEFAULT_CONFLICT_TYPES, Scheduler, compute_clashes
-from apps.cfp_review.email import send_email_for_proposal
+from apps.cfp_review.email import ProposalEmailReason, send_email_for_proposal
 from apps.cfp_review.estimation import get_cfp_estimate
 from apps.config import config
 from main import db, get_or_404
 from models.content import (
     Occurrence,
+    Proposal,
     ScheduleItem,
     Venue,
 )
@@ -216,6 +217,18 @@ def potential_schedule(schedule_id: int) -> ResponseReturnValue:
                 flash("Only the most recent potential schedule can be applied!")
                 return redirect(url_for(".potential_schedule", schedule_id=schedule_id))
 
+            # Work out who to notify before applying, while each occurrence
+            # still has its previous slot. An item with no prior slot is newly
+            # scheduled, one with an existing slot has moved.
+            notify: dict[int, tuple[Proposal, bool]] = {}
+            for potential in potential_schedule.changed_occurrences():
+                proposal = potential.occurrence.schedule_item.proposal
+                if proposal is None:
+                    continue
+                was_scheduled = potential.occurrence.scheduled_time is not None
+                _, previously_scheduled = notify.get(proposal.id, (proposal, False))
+                notify[proposal.id] = (proposal, previously_scheduled or was_scheduled)
+
             potential_schedule.apply()
 
             # Potential schedules are derived from each other, so if we have
@@ -229,6 +242,10 @@ def potential_schedule(schedule_id: int) -> ResponseReturnValue:
             )
             for other in others:
                 other.state = "applied"
+
+            for proposal, previously_scheduled in notify.values():
+                reason: ProposalEmailReason = "slot-moved" if previously_scheduled else "slot-scheduled"
+                send_email_for_proposal(proposal, reason=reason)
 
             flash("Potential schedule applied")
 

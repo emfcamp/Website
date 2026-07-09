@@ -48,8 +48,13 @@ class PotentialSchedule(BaseModel):
     scheduler_stats: Mapped[dict[str, Any]] = mapped_column(JSON)
 
     def changed_occurrences(self) -> Iterator[PotentialScheduleOccurrence]:
-        """Iterate through occurrences where the scheduled slot is different from the current slot."""
-        yield from (so for so in self.scheduled_occurrences if so.has_changed())
+        """Iterate through occurrences where the scheduled slot is different from the current slot.
+
+        Cancelled occurrences are excluded, so they aren't shown, applied or notified.
+        """
+        yield from (
+            so for so in self.scheduled_occurrences if not so.occurrence.cancelled and so.has_changed()
+        )
 
     def apply(self) -> list[Occurrence]:
         """Apply this potential schedule to the main schedule, returning a list of
@@ -58,16 +63,15 @@ class PotentialSchedule(BaseModel):
 
         changed = []
 
-        for potential in self.scheduled_occurrences:
-            if potential.has_changed():
-                occurrence = potential.occurrence
-                log.info(
-                    f'Moved "{occurrence.schedule_item.title}": '
-                    f'"{occurrence.scheduled_venue}" at "{occurrence.scheduled_time}" -> '
-                    f'"{potential.venue}" at "{potential.start_time}"'
-                )
-                occurrence.set_slot(potential.start_time, potential.venue)
-                changed.append(occurrence)
+        for potential in self.changed_occurrences():
+            occurrence = potential.occurrence
+            log.info(
+                f'Moved "{occurrence.schedule_item.title}": '
+                f'"{occurrence.scheduled_venue}" at "{occurrence.scheduled_time}" -> '
+                f'"{potential.venue}" at "{potential.start_time}"'
+            )
+            occurrence.set_slot(potential.start_time, potential.venue)
+            changed.append(occurrence)
 
         self.state = "applied"
 
