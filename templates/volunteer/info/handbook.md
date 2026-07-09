@@ -36,7 +36,7 @@ can be found in all structures, or you can use a DECT phone if you have one.
 | Team | Phone | What they can help with |
 |---|:---:|---|
 | First Aid | 1090 | People who are injured or physically unwell. |
-| Welfare | 1095 | People who need non-medical support. |
+| Welfare | 1953 | People who need non-medical support. |
 | Help Desk | 1001 | Information for attendees, lost property, and generally helping people out. |
 | Volunteer Desk | 1009 | Guidance on your shift, or the next volunteer not relieving you. |
 | Conduct | 1234 | Code of Conduct complaints |
