@@ -190,7 +190,7 @@ class Scheduler:
                     venue_times = [
                         VenueTimes(
                             venue=venue.id,
-                            times=times,
+                            times=[(start, end) for start, end in times],
                             venue_weight=fav_rank * capacity_rank[venue.capacity or 1],
                         )
                         for venue, times in allowed_times.items()

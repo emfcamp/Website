@@ -8,6 +8,7 @@ from sqlalchemy.orm import selectinload
 
 from main import db
 from models.content import Occurrence, ScheduleItem, ScheduleItemType
+from models.content.schedule import merge_time_ranges
 
 from ..config import config
 from . import cfp_review, review_required
@@ -109,30 +110,54 @@ def not_sensible_reasons(
                 f"{note} is scheduled between 2am and 9am ({t.strftime(human_format)})"
             )
 
-        # -- Occurrence lies outside the allowed time periods.
-        if occurrence.schedule_item.official_content:
-            allowed_ranges = [
-                period
-                for automatic in (True, False)
-                for ranges in occurrence.allowed_times(automatic).values()
-                for period in ranges
-            ]
-            permitted_time = False
-            for start, end in allowed_ranges:
-                if t >= start and t <= end:
-                    permitted_time = True
-
-            if not permitted_time:
-                reasons[f"{reason_key}_outside_allowed_times"] = (
-                    f"{note} is outside allowed occurrence time periods"
-                )
-
     _check_timing(occurrence.potential_time, "Proposed start", "proposed_start")
     _check_timing(occurrence.scheduled_time, "Scheduled start", "scheduled_start")
     _check_timing(occurrence.potential_end_time, "Proposed end", "proposed_end")
     _check_timing(occurrence.scheduled_end_time, "Scheduled end", "scheduled_end")
 
-    # -- Occurrence overlaps another one by the same user.
+    # -- Occurrence is not in a valid slot in this venues timeblocks
+    if occurrence.scheduled_duration is not None:
+        for slot_key, slot_note, slot_time, slot_venue in (
+            ("proposed_slot_invalid", "Proposed", occurrence.potential_time, occurrence.potential_venue),
+            ("scheduled_slot_invalid", "Scheduled", occurrence.scheduled_time, occurrence.scheduled_venue),
+        ):
+            if slot_time and slot_venue and not occurrence.is_valid_slot(slot_time, slot_venue):
+                reasons[slot_key] = (
+                    f"{slot_note} slot ({slot_time.strftime(human_format)} in "
+                    f'"{slot_venue.name}") is outside the venue\'s '
+                    f"{occurrence.schedule_item.type} time blocks"
+                )
+
+    # -- Occurrence is outside the speaker's availability
+    availability = merge_time_ranges(
+        occurrence.schedule_item.availability_overrides or occurrence.schedule_item.availability
+    )
+    if availability:
+        for avail_key, avail_note, avail_start, avail_end in (
+            (
+                "proposed_outside_availability",
+                "Proposed",
+                occurrence.potential_time,
+                occurrence.potential_end_time,
+            ),
+            (
+                "scheduled_outside_availability",
+                "Scheduled",
+                occurrence.scheduled_time,
+                occurrence.scheduled_end_time,
+            ),
+        ):
+            if (
+                avail_start
+                and avail_end
+                and not any(r.start <= avail_start and avail_end <= r.end for r in availability)
+            ):
+                reasons[avail_key] = (
+                    f"{avail_note} time ({avail_start.strftime(human_format)} > "
+                    f"{avail_end.strftime(human_format)}) is outside speaker availability"
+                )
+
+    # -- Occurrence overlaps another one by the same presenter
     def get_occurrence_ranges(occurrence: Occurrence) -> dict[str, tuple[datetime, datetime]]:
         ranges = {}
         if occurrence.potential_time and occurrence.potential_end_time:
@@ -142,7 +167,12 @@ def not_sensible_reasons(
         return ranges
 
     occurrence_ranges = get_occurrence_ranges(occurrence)
-    for other_occurrence in occurrences_by_speaker[occurrence.schedule_item.user_id]:
+    other_occurrences = {
+        other
+        for presenter in occurrence.schedule_item.presenters
+        for other in occurrences_by_speaker[presenter.id]
+    }
+    for other_occurrence in other_occurrences:
         if other_occurrence == occurrence:
             continue
         other_ranges = get_occurrence_ranges(other_occurrence)
@@ -152,7 +182,7 @@ def not_sensible_reasons(
                     # Overlap.
                     reasons[f"{this_type}_overlap_{other_occurrence.id}_{other_type}"] = (
                         f"The {this_type} time ({this_start} > {this_end}) overlaps with a "
-                        f"{other_occurrence.schedule_item.type} by same user: {other_occurrence.schedule_item.title}'s "
+                        f"{other_occurrence.schedule_item.type} by same presenter: {other_occurrence.schedule_item.title}'s "
                         f"{other_type} time ({other_start} > {other_end})"
                     )
 
@@ -196,7 +226,8 @@ def sense_check():
 
     occurrences_by_speaker = defaultdict(set)
     for occurrence in occurrences_for_overlap:
-        occurrences_by_speaker[occurrence.schedule_item.user_id].add(occurrence)
+        for presenter in occurrence.schedule_item.presenters:
+            occurrences_by_speaker[presenter.id].add(occurrence)
 
     not_sensible_occurrences = []
     for occurrence in occurrences:

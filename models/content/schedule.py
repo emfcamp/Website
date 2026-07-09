@@ -109,20 +109,15 @@ def get_days_map():
     return {ed.strftime("%a").lower(): ed for ed in config.event_days}
 
 
-# Reduces the time periods to the smallest contiguous set we can
-def make_periods_contiguous(time_periods):
-    if not time_periods:
-        return []
-
-    time_periods.sort(key=lambda x: x.start)
-    contiguous_periods = [time_periods.pop(0)]
-    for time_period in time_periods:
-        if time_period.start <= contiguous_periods[-1].end and contiguous_periods[-1].end < time_period.end:
-            contiguous_periods[-1] = cfp_period(contiguous_periods[-1].start, time_period.end)
-            continue
-
-        contiguous_periods.append(time_period)
-    return contiguous_periods
+def merge_time_ranges(ranges: Iterable[TimeRange | ScheduleItemAvailability]) -> list[TimeRange]:
+    """Merge overlapping or adjacent time ranges, matching the scheduler's internal behaviour."""
+    merged: list[TimeRange] = []
+    for r in sorted(ranges, key=lambda r: (r.start, r.end)):
+        if merged and r.start <= merged[-1].end:
+            merged[-1] = TimeRange(merged[-1].start, max(merged[-1].end, r.end))
+        else:
+            merged.append(TimeRange(r.start, r.end))
+    return merged
 
 
 ScheduleItemType = Literal[
@@ -685,7 +680,7 @@ class Occurrence(BaseModel):
                     ):
                         yield timeblock
 
-    def allowed_times(self, automatic: bool) -> dict[Venue, list[tuple[datetime, datetime]]]:
+    def allowed_times(self, automatic: bool) -> dict[Venue, list[TimeRange]]:
         """Return a mapping of Venue -> time range for when this occurrence is allowed to be scheduled,
             which is the input into the automatic scheduler.
 
@@ -694,9 +689,9 @@ class Occurrence(BaseModel):
         """
         assert self.schedule_item.official_content
 
-        ranges = self.schedule_item.availability_overrides or self.availability
+        ranges = merge_time_ranges(self.schedule_item.availability_overrides or self.availability)
 
-        result: dict[Venue, list[tuple[datetime, datetime]]] = defaultdict(list)
+        result: dict[Venue, list[TimeRange]] = defaultdict(list)
         for time_block in self.time_blocks():
             if self.manually_scheduled and self.scheduled_time:
                 assert self.scheduled_end_time
@@ -708,7 +703,7 @@ class Occurrence(BaseModel):
                 # allowed_venues - this means we can restrict a talk to be at a
                 # specific time but allow for freedom of venue movement if
                 # nessecary to avoid over-constraining the problem.
-                result[time_block.venue].append((self.scheduled_time, self.scheduled_end_time))
+                result[time_block.venue].append(TimeRange(self.scheduled_time, self.scheduled_end_time))
                 continue
 
             if time_block.automatic != automatic:
@@ -716,16 +711,20 @@ class Occurrence(BaseModel):
 
             if not ranges:
                 # No availability provided, return all available timeblocks
-                result[time_block.venue].append((time_block.start, time_block.end))
+                result[time_block.venue].append(TimeRange(time_block.start, time_block.end))
                 continue
 
             for availability in ranges:
                 if availability.start <= time_block.end and availability.end >= time_block.start:
                     result[time_block.venue].append(
-                        (max(availability.start, time_block.start), min(availability.end, time_block.end))
+                        TimeRange(
+                            max(availability.start, time_block.start), min(availability.end, time_block.end)
+                        )
                     )
 
-        return result
+        # Adjacent timeblocks (or availability ranges split across them) can produce
+        # adjacent result ranges, so merge again per venue.
+        return {venue: merge_time_ranges(ranges) for venue, ranges in result.items()}
 
     def overlaps_with(self, other: Self) -> bool:
         this_start = self.potential_time or self.scheduled_time

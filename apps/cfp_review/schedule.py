@@ -26,7 +26,13 @@ from models.content import (
     Venue,
 )
 from models.content.potential_schedule import PotentialSchedule, PotentialScheduleOccurrence
-from models.content.schedule import SCHEDULE_ITEM_INFOS, ScheduleItemInfo, ScheduleItemState, ScheduleItemType
+from models.content.schedule import (
+    SCHEDULE_ITEM_INFOS,
+    ScheduleItemInfo,
+    ScheduleItemState,
+    ScheduleItemType,
+    merge_time_ranges,
+)
 
 from . import cfp_review, schedule_required
 
@@ -211,10 +217,22 @@ def potential_schedule(schedule_id: int) -> ResponseReturnValue:
         potential_schedule.state == "new" and latest is not None and latest.id == potential_schedule.id
     )
 
+    # Flag new slots which are no longer valid, because the schedule will fail to apply
+    invalid_slots = {
+        potential.occurrence_id
+        for potential in potential_schedule.changed_occurrences()
+        if potential.occurrence.scheduled_duration is not None
+        and not potential.occurrence.is_valid_slot(potential.start_time, potential.venue)
+    }
+
     if request.method == "POST":
         if request.form.get("apply") == "true":
             if not can_apply:
                 flash("Only the most recent potential schedule can be applied!")
+                return redirect(url_for(".potential_schedule", schedule_id=schedule_id))
+
+            if invalid_slots:
+                flash("This schedule contains invalid slots and cannot be applied!")
                 return redirect(url_for(".potential_schedule", schedule_id=schedule_id))
 
             # Work out who to notify before applying, while each occurrence
@@ -259,6 +277,7 @@ def potential_schedule(schedule_id: int) -> ResponseReturnValue:
         "cfp_review/schedule/potential_schedule.html",
         potential_schedule=potential_schedule,
         can_apply=can_apply,
+        invalid_slots=invalid_slots,
     )
 
 
@@ -421,6 +440,16 @@ def scheduler_update() -> ResponseReturnValue:
 
     if not occurrence.is_valid_slot(start_time, venue):
         return jsonify({"error": "Invalid slot"}), 400
+
+    # is_valid_slot only checks venue TimeBlocks, so also check the slot falls
+    # within the speaker's availability
+    availability = merge_time_ranges(
+        occurrence.schedule_item.availability_overrides or occurrence.availability
+    )
+    if availability and occurrence.scheduled_duration is not None:
+        end_time = start_time + timedelta(minutes=occurrence.scheduled_duration)
+        if not any(r.start <= start_time and end_time <= r.end for r in availability):
+            return jsonify({"error": "Outside speaker availability"}), 400
 
     changed = start_time != occurrence.scheduled_time or venue != occurrence.scheduled_venue
 

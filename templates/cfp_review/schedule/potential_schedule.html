@@ -49,6 +49,9 @@
 {% if potential_schedule.state != 'new' %}
     <p>Note that this is showing the difference from the current schedule. If another proposed schedule has been applied, this will be wrong.</p>
 {% endif %}
+{% if invalid_slots %}
+    <p class="text-danger">{{ invalid_slots|length }} new slots no longer fall within a valid time block for the venue.</p>
+{% endif %}
 <table class="table table-default table-condensed">
     <tr>
         <th colspan="5"></th>
@@ -86,7 +89,7 @@
     </tr>
 {% for potential in potential_schedule.changed_occurrences() %}
     {% set occurrence = potential.occurrence %}
-    <tr>
+    <tr{% if potential.occurrence_id in invalid_slots %} class="danger"{% endif %}>
         <td>{{ occurrence.schedule_item.human_type | capitalize_add }}</td>
         <td>{{ occurrence.scheduled_duration or '--' }}</td>
         <td>
@@ -109,6 +112,7 @@
         </td>
         <td style="text-wrap:nowrap">
             {{ occurrence.potential_venue.name }}
+            {% if potential.occurrence_id in invalid_slots %}<span class="label label-danger">Invalid slot</span>{% endif %}
         </td>
         <td>
             {{ occurrence.potential_time.strftime('%A') }}
