@@ -50,43 +50,50 @@
       {% endif %}
 
       {% if schedule_item.type_info.supports_lottery and feature_enabled("WORKSHOP_LOTTERY") %}
-        {% set occurrence_form = occurrence_forms[occurrence.id] %}
-        <form method="post" class="form-inline">
-        {{ occurrence_form.hidden_tag() }}
-
-        {% set lottery = occurrence.lottery %}
-        {% if not lottery %}
-          <p>This {{ schedule_item.human_type }} does not require a lottery ticket.</p>
-
-        {% elif lottery.state == "allow-entry" %}
-          {% set entry = current_user.get_lottery_entry_for_occurrence(occurrence) %}
-          {% if lottery.get_lottery_capacity() > 0 %}
-            {{ occurrence_form.ticket_count.label() }}
-            {{ occurrence_form.ticket_count(class_="form-control") }}
-            {{ occurrence_form.enter_lottery(class_="btn btn-primary") }}
-            {% if entry and entry.state != "cancelled" %}
-              {{ occurrence_form.leave_lottery(class_="btn btn-danger") }}
+        {% if current_user.is_authenticated %}
+          {% set occurrence_form = occurrence_forms[occurrence.id] %}
+          <form method="post" class="form-inline">
+          {{ occurrence_form.hidden_tag() }}
+  
+          {% set lottery = occurrence.lottery %}
+          {% if not lottery %}
+            <p>This {{ schedule_item.human_type }} does not require a lottery ticket.</p>
+  
+          {% elif lottery.state == "allow-entry" %}
+            {% set entry = current_user.get_lottery_entry_for_occurrence(occurrence) %}
+            {% if lottery.get_lottery_capacity() > 0 %}
+              {{ occurrence_form.ticket_count.label() }}
+              {{ occurrence_form.ticket_count(class_="form-control") }}
+              {{ occurrence_form.enter_lottery(class_="btn btn-primary") }}
+              {% if entry and entry.state != "cancelled" %}
+                {{ occurrence_form.leave_lottery(class_="btn btn-danger") }}
+              {% endif %}
+            {% else %}
+              <p>This {{ schedule_item.human_type }} does not have any tickets available via lottery.</p>
             {% endif %}
-          {% else %}
-            <p>This {{ schedule_item.human_type }} does not have any tickets available via lottery.</p>
+  
+          {% elif lottery.state == "sign-up-list" %}:
+            {% if lottery.get_all_ticket_capacity() > 0 %}
+              {{ occurrence_form.ticket_count.label() }}
+              {{ occurrence_form.ticket_count(class_="form-control") }}
+              {{ occurrence_form.get_ticket(class_="btn btn-primary") }}
+            {% else %}
+              <p>This {{ schedule_item.human_type }} is now full. If any tickets become available they will be visible here.</p>
+            {% endif %}
+  
+          {% elif lottery.state == "complete" %}
+            <p>The lottery for this {{ schedule_item.human_type }} is currently closed.
+               Remaining space in this workshop will be available on a first-come, first-served basis
+               to people arriving at the workshop venue 15 minutes before the workshop start time.</p>
+  
           {% endif %}
-
-        {% elif lottery.state == "sign-up-list" %}:
-          {% if lottery.get_all_ticket_capacity() > 0 %}
-            {{ occurrence_form.ticket_count.label() }}
-            {{ occurrence_form.ticket_count(class_="form-control") }}
-            {{ occurrence_form.get_ticket(class_="btn btn-primary") }}
-          {% else %}
-            <p>This {{ schedule_item.human_type }} is now full. If any tickets become available they will be visible here.</p>
+          </form>
+        {% else %}{# Not logged in #}
+          {% if occurrence.lottery %}
+            <p>To enter the lottery for this {{ schedule_item.human_type }}, please
+               <a href="{{ url_for('users.login', next=request.path) }}">log in</a>.</p>
           {% endif %}
-
-        {% elif lottery.state == "complete" %}
-          <p>The lottery for this {{ schedule_item.human_type }} is currently closed.
-             Remaining space in this workshop will be available on a first-come, first-served basis
-             to people arriving at the workshop venue 15 minutes before the workshop start time.</p>
-
         {% endif %}
-        </form>
       {% endif %}
 
       {% if occurrence.video_recording_lost %}
