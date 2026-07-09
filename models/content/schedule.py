@@ -542,6 +542,18 @@ class Occurrence(BaseModel):
     proposal: AssociationProxy[Proposal | None] = association_proxy("schedule_item", "proposal")
     user: AssociationProxy[User] = association_proxy("schedule_item", "user")
 
+    def uses_lottery(self) -> bool:
+        if not isinstance(self.schedule_item.attributes, WorkshopAttributes):
+            return False
+
+        if self.schedule_item.attributes.drop_in:
+            return False
+
+        if self.lottery:
+            return self.lottery.state != "closed"
+
+        return False
+
     @validates("scheduled_duration")
     def validate_scheduled_duration(self, key: str, value: int | None) -> int | None:
         """SQLAlchemy validator to ensure duration is a multiple of the slot duration."""
