@@ -145,7 +145,7 @@ class FrabExporter:
         for day in data.values():
             day["rooms"] = sorted(
                 day["rooms"].values(),
-                key=lambda room: -room["priority"] if room["priority"] else room["name"],
+                key=lambda room: (-room["priority"], room["name"]),
             )
         return data.values()
 
