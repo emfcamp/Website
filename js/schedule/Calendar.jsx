@@ -249,7 +249,7 @@ function Occurrence({ occurrence, toggleFavourite, authenticated }) {
         <OccurrenceIcons
           noRecording={schedule_item.noRecording}
           isFavourite={schedule_item.is_fave}
-          isFamilyFriendly={schedule_item.is_family_friendly}
+          isFamilyFriendly={schedule_item.family_friendly}
           hasContentWarning={
             schedule_item.content_note && schedule_item.content_note != ""
           }

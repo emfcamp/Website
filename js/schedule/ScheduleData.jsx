@@ -62,7 +62,7 @@ class ScheduleData {
         if (options.onlyFavourites && !sid.is_fave) {
           continue;
         }
-        if (options.onlyFamilyFriendly && !sid.is_family_friendly) {
+        if (options.onlyFamilyFriendly && !sid.family_friendly) {
           continue;
         }
         if (options.onlyNoRecording && !od.noRecording) {
