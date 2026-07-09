@@ -149,7 +149,12 @@ def attributes_proxy(attributes_cls: type[Attributes], store: dict[str, Any]) ->
         def __setattr__(self, name: str, value: Any) -> None:
             if name not in self.__dataclass_fields__:
                 raise AttributeError(name)
-            if self._store.get(name, MISSING) != value:
+            stored_value = self._store.get(name, MISSING)
+            if stored_value is MISSING and value == self.__dataclass_fields__[name].default:
+                # If we don't have the value in the store and we're setting it back to the default,
+                # then don't cause a set operation against the store.
+                pass
+            elif stored_value != value:
                 self._store[name] = value
             else:
                 # MutableDict counts this as a mutation
