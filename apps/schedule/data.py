@@ -223,7 +223,11 @@ def get_schedule_items(filter: ScheduleFilter) -> list[ScheduleItem]:
         .where(
             ScheduleItem.state == "published",
         )
-        .options(selectinload(ScheduleItem.occurrences))
+        .options(
+            selectinload(ScheduleItem.occurrences),
+            selectinload(ScheduleItem.occurrences, Occurrence.lottery),
+            selectinload(ScheduleItem.occurrences, Occurrence.scheduled_venue),
+        )
     )
 
     if filter.user and filter.is_favourite:
