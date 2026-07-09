@@ -16,7 +16,6 @@ function App() {
   const [selectedEventTypes, setSelectedEventTypes] = useState([]);
   const [selectedAgeRanges, setSelectedAgeRanges] = useState([]);
   const [onlyFavourites, setOnlyFavourites] = useState(false);
-  const [onlyFamilyFriendly, setOnlyFamilyFriendly] = useState(false);
   const [onlyNoRecording, setOnlyNoRecording] = useState(false);
   const [onlyLottery, setOnlyLottery] = useState(false);
   const [includeFinished, setIncludeFinished] = useState(false);
@@ -69,7 +68,6 @@ function App() {
     let newSchedule = new ScheduleData(rawSchedule, {
       currentTime,
       onlyFavourites,
-      onlyFamilyFriendly,
       onlyNoRecording,
       onlyLottery,
       includeFinished,
@@ -81,7 +79,6 @@ function App() {
   }, [
     currentTime,
     onlyFavourites,
-    onlyFamilyFriendly,
     onlyNoRecording,
     onlyLottery,
     includeFinished,
@@ -130,8 +127,6 @@ function App() {
     schedule,
     onlyFavourites,
     setOnlyFavourites,
-    onlyFamilyFriendly,
-    setOnlyFamilyFriendly,
     onlyNoRecording,
     setOnlyNoRecording,
     onlyLottery,

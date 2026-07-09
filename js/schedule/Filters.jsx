@@ -22,8 +22,6 @@ function Filters({
   schedule,
   onlyFavourites,
   setOnlyFavourites,
-  onlyFamilyFriendly,
-  setOnlyFamilyFriendly,
   onlyNoRecording,
   setOnlyNoRecording,
   onlyLottery,
@@ -64,12 +62,6 @@ function Filters({
           </Checkbox>
           <Checkbox checked={onlyLottery} onChange={setOnlyLottery}>
             Ticketed only
-          </Checkbox>
-          <Checkbox
-            checked={onlyFamilyFriendly}
-            onChange={setOnlyFamilyFriendly}
-          >
-            Family friendly only
           </Checkbox>
           <Checkbox checked={onlyNoRecording} onChange={setOnlyNoRecording}>
             No Recording only
