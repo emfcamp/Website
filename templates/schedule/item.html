@@ -14,7 +14,7 @@
 </h2>
 
 {% if feature_enabled("SCHEDULE") %}
-{% for occurrence in schedule_item.occurrences %}
+{% for occurrence in schedule_item.occurrences if not occurrence.cancelled %}
   <div class="panel panel-default">
     {% if schedule_item.occurrences | length > 1 %}
     <div class="panel-heading">
