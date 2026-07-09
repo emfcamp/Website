@@ -50,6 +50,11 @@
       {% endif %}
 
       {% if schedule_item.type_info.supports_lottery and feature_enabled("WORKSHOP_LOTTERY") %}
+        {% if current_user.is_anonymous %}
+        <p>Please
+          <a href="{{ url_for('users.login', next=url_for('.item', year=event_year, schedule_item_id=schedule_item.id, slug=schedule_item.slug)) }}">log in</a>
+          to enter the lottery for this {{ schedule_item.human_type }}.</p>
+        {% else %}
         {% set occurrence_form = occurrence_forms[occurrence.id] %}
         <form method="post" class="form-inline">
         {{ occurrence_form.hidden_tag() }}
@@ -83,6 +88,7 @@
 
         {% endif %}
         </form>
+        {% endif %}
       {% endif %}
 
       {% if occurrence.video_recording_lost %}
