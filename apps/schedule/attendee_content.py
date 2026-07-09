@@ -153,7 +153,7 @@ class AttendeeContentForm(Form):
     # FIXME move attributes to another form
     # FIXME why do we ask for this?
     # attendees = IntegerField("Attendees", [Optional(), NumberRange(min=0)])
-    participant_cost = DecimalField("Cost per attendee", [Optional(), NumberRange(min=0)], places=2)
+    participant_cost = StringField("Cost per attendee")
     participant_equipment = StringField("Attendee equipment")
     age_range = SelectField("Age range", choices=AGE_RANGE_OPTIONS)
 
@@ -311,7 +311,7 @@ def attendee_content_edit(schedule_item_id: int) -> ResponseReturnValue:
         if form.type.data == "workshop":
             # HACK: this should look more like the CfP system's method of dealing with per-type attributes.
             attributes = cast(WorkshopAttributes, schedule_item.attributes)
-            attributes.participant_cost = str(form.participant_cost.data)
+            attributes.participant_cost = form.participant_cost.data
             attributes.age_range = form.age_range.data
             attributes.participant_equipment = form.participant_equipment.data
 
