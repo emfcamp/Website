@@ -1,6 +1,7 @@
 """Views for attendees to manage their own content."""
 
 from datetime import datetime, timedelta
+from typing import cast
 
 from flask import current_app as app
 from flask import (
@@ -35,6 +36,9 @@ from models.content import (
     ScheduleItem,
     ScheduleItemType,
     Venue,
+)
+from models.content.attributes import (
+    WorkshopAttributes,
 )
 from models.user import User
 
@@ -277,7 +281,15 @@ def attendee_content_edit(schedule_item_id: int) -> ResponseReturnValue:
     if schedule_item.user != current_user and not in_user_managed_venue:
         return redirect(url_for("schedule.attendee_content"))
 
-    form = AttendeeContentForm(obj=schedule_item)
+    # HACK: this should look more like the CfP system's method of dealing with per-type attributes
+    extra_data = {}
+    if schedule_item.type == "workshop":
+        attributes: WorkshopAttributes = cast(WorkshopAttributes, schedule_item.attributes)
+        extra_data["participant_cost"] = attributes.participant_cost
+        extra_data["age_range"] = attributes.age_range
+        extra_data["participant_equipment"] = attributes.participant_equipment
+
+    form = AttendeeContentForm(obj=schedule_item, **extra_data)
     form.load_choices(schedule_item=schedule_item)
 
     occurrence_dict = {o.id: o for o in schedule_item.occurrences}
@@ -295,6 +307,13 @@ def attendee_content_edit(schedule_item_id: int) -> ResponseReturnValue:
             _convert_schedule_item(schedule_item, form.type.data)
 
         form.populate_obj(schedule_item)
+
+        if form.type.data == "workshop":
+            # HACK: this should look more like the CfP system's method of dealing with per-type attributes.
+            attributes = cast(WorkshopAttributes, schedule_item.attributes)
+            attributes.participant_cost = str(form.participant_cost.data)
+            attributes.age_range = form.age_range.data
+            attributes.participant_equipment = form.participant_equipment.data
 
         conflicts = [c for o in schedule_item.occurrences for c in o.get_conflicting_content()]
         if any(conflicts) and form.acknowledge_conflicts.data is not True:
