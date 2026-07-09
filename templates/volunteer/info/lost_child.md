@@ -5,40 +5,36 @@ page_template: "volunteer/handbook.html"
 
 This process covers children (anyone under the age of 18), and Adults at Risk (AR, anyone over the age of 18 who has become separated from their carer). Nipperbout, who run the crêche, provide lost child services.
 
-The lost child area can be found at the [crêche](https://map.emfcamp.org/#20.88/52.0408421/-2.3781232), near Stage C. <!-- TODO: Confirm location -->
+The lost child area can be found at the [crêche](https://map.emfcamp.org/#20.88/52.0408421/-2.3781232), near Stage C. Outside the creche's operating hours the lost child area is first aid, located near the food traders
+behind the creche.
 
-When reporting over the radio, never give a lost child’s name, and be clear whether a child or AR is found or missing.
+![Lost Child flowchart](/static/images/about/lost_child.png)
+
+Where a particular thing to say appears in bold use exactly that phrasing. In particular be clear whether you
+have <strong>found</strong> a child, or whether a child has been reported <strong>lost</strong>. Being
+clear on this will avoid people believing there's another lost child when you have in fact found them.
 
 ## If you find a child/AR
 
-1. Notify the Duty Site Manager via either radio or phone (1010) that you have a “Child Found” or “AR Found”, and then immediately escort the child/AR to the lost child area.
-2. Upon arrival at the lost child area you will be asked to complete some paperwork about where the child/AR was found, and to give contact details.
+1. Reassure them. Explain you are going to take them to the people who can help.
+2. Call the Creche on 1040, or First Aid on 1090 if they're clsoed, and notify them you have found a child and are on your way to them. <strong>DO NOT RADIO</strong>.
+3. Ask the person who found them to come with you to the creche. If you found the child find another volunteer to come with you. Do not take them anywhere by yourself.
+4. Escort the child to the creche immediately.
+5. Notify the site manage "We have a <strong>found</strong> child, send any adults look to the creche".
 
-If you find the child/AR’s carer on your way to the lost child area, ask them to come with you to complete the paperwork.
+If you find the child’s carer on your way to the lost child area, ask them to come with you to complete the paperwork.
 
-It is likely the carer will not want to come to the lost child area, especially if they were only separated for a short time. In this case you ask the child/AR & their carer a security question. Ask the child/AR and carer this question  separately and see if their answers match.
-
-This question could be a teacher’s name, pet name, or where they went on holiday last. In the event the child/AR does not speak, the child’s nappy brand or sock colour would suffice. In addition you should ask the carer for a form of ID.
-
-The aim is to check, to the best of your ability, that the child is safe to leave with the adult (that the adult really is this person’s parent/carer).
-
-If you have returned the child/AR to their carer, notify the Duty Site Manager via 
-radio or phone.
-
-## If you find a child/AR who has been reported missing
-
-1. Notify HQ via either radio or phone (1011) “Child Missing is now Found, escorting to Lost Child area”, or “AR Missing is now Found, escorting to Lost Child area”.
-2. Escort the child/AR to the lost child area.
-3. Nipperbout will take over once you reach them.
+It is likely the carer will not want to come to the lost child area, you should insist that they do. It is not your responsibility to verify that the child belongs with that adult, while the creche and first aid teams are trained in doing so.
 
 ## If an adult reports a child/AR missing to you
 
-1. Reassure the adult, notify HQ via either radio or phone (1011) that you have a “Child Missing” or “AR Missing”, and then escort the adult to the lost child area.
-2. Nipperbout will take over once you reach them.
+1. Reassure them. Keep them with you even if they want to go looking. If they properly report the child missing we can better assist in finding them.
+2. Keep the adult with you, accompany them to the creche to give further details. The creche or first aid team will take over once you get there.
+3. Notify the site manager "We have a <strong>lost</strong> child".
+4. At all points remain vigilant for the lost child and follow any instructions from the site manager.
 
 ## If a child reports a child missing to you
 
-1. Notify HQ via either radio or phone (1011) that you have a “Found Child, seeking a Missing Child”.
-2. You should also treat the child who reported as a missing child, and escort them to the lost child area.
+The child making the report should be treated as a lost child, follow the process above for "If you find a child" and also report that there is an additional lost child.
 
 [Back to handbook](./)
