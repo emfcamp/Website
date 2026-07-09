@@ -16,7 +16,6 @@ from flask_login import current_user, login_required
 from sqlalchemy import or_, select
 from wtforms import (
     BooleanField,
-    DecimalField,
     FieldList,
     FormField,
     IntegerField,
@@ -26,7 +25,7 @@ from wtforms import (
     TextAreaField,
     TimeField,
 )
-from wtforms.validators import DataRequired, NumberRange, Optional
+from wtforms.validators import DataRequired, NumberRange
 
 from apps.common.fields import HiddenIntegerField
 from main import db, get_or_404
