@@ -59,10 +59,14 @@
           <p>This {{ schedule_item.human_type }} does not require a lottery ticket.</p>
 
         {% elif lottery.state == "allow-entry" %}
+          {% set entry = current_user.get_lottery_entry_for_occurrence(occurrence) %}
           {% if lottery.get_lottery_capacity() > 0 %}
             {{ occurrence_form.ticket_count.label() }}
             {{ occurrence_form.ticket_count(class_="form-control") }}
             {{ occurrence_form.enter_lottery(class_="btn btn-primary") }}
+            {% if entry and entry.state != "cancelled" %}
+              {{ occurrence_form.leave_lottery(class_="btn btn-danger") }}
+            {% endif %}
           {% else %}
             <p>This {{ schedule_item.human_type }} does not have any tickets available via lottery.</p>
           {% endif %}

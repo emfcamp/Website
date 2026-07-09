@@ -241,6 +241,7 @@ class OccurrenceForm(Form):
     occurrence_id = HiddenIntegerField("Occurrence ID", [InputRequired()])
     get_ticket = SubmitField("Get ticket")
     enter_lottery = SubmitField("Enter lottery")
+    leave_lottery = SubmitField("Leave lottery")
     ticket_count = SelectField("How many tickets?", coerce=int, default=1)
 
 
@@ -338,7 +339,12 @@ def item_current(year: int, schedule_item_id: int, slug: str | None = None) -> R
             msg = None
             if lottery_entry:
                 assert occurrence.lottery
-                if occurrence_form.enter_lottery.data:
+                if occurrence_form.leave_lottery.data:
+                    if occurrence.lottery.state != "allow-entry":
+                        abort(400)
+                    lottery_entry.cancel()
+                    msg = f'Removed you from the lottery for "{schedule_item.title}"'
+                elif occurrence_form.enter_lottery.data:
                     if occurrence.lottery.state != "allow-entry":
                         abort(400)
                     if lottery_entry.state == "cancelled":
