@@ -2,26 +2,23 @@
 {% extends "emails/base.txt" %}
 {% block body %}
 {% set schedule_item = proposal.schedule_item %}
-Hi {{ proposal.user.name }},
+Dear {{ proposal.user.name }},
 
-Unfortunately we have had to move your EMF {{ schedule_item.human_type }} '{{ schedule_item.title }}' due to the availability of other speakers. We've done our best to minimise the amount of hassle it will cause you.
-
+Unfortunately we have had to move your {{ schedule_item.human_type }} '{{ schedule_item.title }}' due to the availability of other speakers. We've done our best to minimise the amount of hassle it will cause you.
 {% if schedule_item.occurrences | length == 1 %}
-{% for occurrence in schedule_item.occurrences %}
-You now have a {{ occurrence.scheduled_duration }} minute slot in {{ occurrence.scheduled_venue.name }} on {{ occurrence.scheduled_time.strftime('%A at %-I:%M %p') }}. If this is not suitable, please let us know as soon as possible.
-{% endfor %}
+{%- for occurrence in schedule_item.occurrences %}
+You now have a {{ occurrence.scheduled_duration }} minute slot in {{ occurrence.scheduled_venue.name }} on {{ occurrence.scheduled_time.strftime('%A at %-I:%M %p') }}. If this time is not suitable, please let us know as soon as possible.
+{%- endfor %}
 {% else %}
-You now have slots at the following times:
+We have rescheduled your {{ schedule_item.human_type }} at the following times:
 {% for occurrence in schedule_item.occurrences %}
-  {% if occurrence.scheduled %}
+  {%- if occurrence.scheduled %}
   {{ occurrence.occurrence_num }}: {{ occurrence.scheduled_duration }} minute slot in {{ occurrence.scheduled_venue.name }} on {{ occurrence.scheduled_time.strftime('%A at %-I:%M %p') }}
-  {% else %}
-  {{ occurrence.occurrence_num }}: Not scheduled yet
-  {% endif %}
-{% endfor %}
-If this is not suitable, please let us know as soon as possible.
+  {%- endif %}
+{%- endfor %}
+
+If these times are not suitable, please let us know as soon as possible.
+
 {% endif %}
-
-{% include "emails/_cfp-slot-blurb.txt" %}
-
+{%- include "emails/_cfp-slot-blurb.txt" %}
 {% endblock %}
