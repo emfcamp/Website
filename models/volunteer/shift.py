@@ -69,8 +69,10 @@ class ShiftEntry(BaseModel):
     __tablename__ = "volunteer_shift_entry"
     __versioned__: dict[str, str] = {}
 
-    shift_id: Mapped[int] = mapped_column(ForeignKey("volunteer_shift.id"), primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
+    shift_id: Mapped[int] = mapped_column(
+        ForeignKey("volunteer_shift.id", ondelete="CASCADE"), primary_key=True
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
 
     #: Indicates whether a volunteer has arrived for/completed a shift.
     state: Mapped[ShiftEntryState] = mapped_column(default=ShiftEntryState.SIGNED_UP)
