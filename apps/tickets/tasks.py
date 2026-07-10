@@ -437,8 +437,12 @@ def email_tickets(user_id: int | None) -> None:
         return
 
     # This results in the count of un-issued tickets per user.
-    # I think this is what we want, but bear in mind that we're
-    # going to include their previously-emailed tickets as well.
+    # This is what we want for the email subject, but we'll include
+    # their previously-emailed tickets in the e-ticket as well.
+    # FIXME: this is slightly wrong because it treats merch and hires as
+    # a "ticket", but we no longer call those tickets in the actual receipt.
+    # We do still want to send out the emails, but we should
+    # split out users without admissions tickets and send a different email.
     query = (
         select(User, func.count(Purchase.id))
         .select_from(User)
