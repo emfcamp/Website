@@ -116,8 +116,12 @@ def init_workshop_shifts():
                 else:
                     venue = VolunteerVenue.query.filter_by(name=occurrence.scheduled_venue.name).first()
                     if venue is None:
-                        location = to_shape(occurrence.scheduled_venue.location)
-                        mapref = f"https://map.emfcamp.org/#20.82/{location.y}/{location.x}"
+                        if venue.location:
+                            location = to_shape(occurrence.scheduled_venue.location)
+                            mapref = f"https://map.emfcamp.org/#20.82/{location.y}/{location.x}"
+                        else:
+                            mapref = "https://map.emfcamp.org/"
+
                         slug = occurrence.scheduled_venue.name.lower().replace("\s+", "-")
                         venue = VolunteerVenue(name=occurrence.scheduled_venue.name, slug=slug, mapref=mapref)
                         db.session.add(venue)
