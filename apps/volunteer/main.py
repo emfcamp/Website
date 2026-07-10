@@ -17,6 +17,7 @@ from models.volunteer import (
     Volunteer,
     VolunteerVenue,
 )
+from models.volunteer.shift import event_tz
 
 from ..common import feature_enabled, feature_flag
 from . import init_data, v_admin_required, volunteer
@@ -84,7 +85,7 @@ def init_workshop_shifts():
             .where(ScheduleItem.type == "workshop")
             .where(ScheduleItem.state == "published")
             .where(ScheduleItem.official_content == True)
-            .where(ScheduleItem.occurrences.any(Occurrence.has(Occurrence.lottery)))
+            .where(ScheduleItem.occurrences.any(Occurrence.lottery.has()))
         )
     )
 
@@ -94,6 +95,9 @@ def init_workshop_shifts():
     with db.session.no_autoflush:
         for schedule_item in schedule_items:
             for occurrence in schedule_item.occurrences:
+                if not occurrence.scheduled_venue:
+                    continue
+
                 # This is terrible, and should be rewritten. If you're reading this it presumably hasn't been, and you
                 # need to create some workshop shifts anyway, so here's what's happening.
                 #
@@ -114,7 +118,8 @@ def init_workshop_shifts():
                     if venue is None:
                         location = to_shape(occurrence.scheduled_venue.location)
                         mapref = f"https://map.emfcamp.org/#20.82/{location.y}/{location.x}"
-                        venue = VolunteerVenue(name=occurrence.scheduled_venue.name, mapref=mapref)
+                        slug = occurrence.scheduled_venue.name.lower().replace("\s+", "-")
+                        venue = VolunteerVenue(name=occurrence.scheduled_venue.name, slug=slug, mapref=mapref)
                         db.session.add(venue)
                     venues[occurrence.scheduled_venue.name] = venue
 
@@ -122,8 +127,8 @@ def init_workshop_shifts():
                 if shift is None:
                     shift = Shift(occurrence=occurrence, role=workshop_steward_role, venue=venue)
 
-                shift.start = occurrence.scheduled_time - time_before_start
-                shift.end = occurrence.scheduled_time + time_after_start
+                shift.start = event_tz.localize(occurrence.scheduled_time - time_before_start)
+                shift.end = event_tz.localize(occurrence.scheduled_time + time_after_start)
                 shift.min_needed = 1
                 shift.max_needed = 1
 
