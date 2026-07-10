@@ -5,7 +5,7 @@ Hello {{ user.name }}!
 With Electromagnetic Field fast approaching, here are your tickets
 and some more details about the event. The gates will open at {{ gate_opened | human_time }} on
 {{ gate_opened | human_day }} {{ gate_opened | human_date }} to allow you to set up and get comfortable, and our
-programme of content kicks off at {{ event_start | human_time }} on {{ event_start | human_day }}.
+programme of content kicks off at 10am on Friday.{# This is not event_start, but the time of the opening ceremony #}
 
 Unless you're helping out with teardown, you should aim to leave by
 {{ gate_closed | human_time }} on {{ gate_closed | human_day }} {{ gate_closed | human_date }}.
