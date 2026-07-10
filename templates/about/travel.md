@@ -14,13 +14,15 @@ EMF is close (5 km) to Ledbury station which is around [three hours](https://tra
 The station at Ledbury has short platforms, so if you are on one of the long 9-coach trains direct
 from Paddington, you will need to be in the front three coaches to get off the train.
 
-### Shuttle bus
+### Shuttle Bus ###
 
-We will be providing a free shuttle bus service between Ledbury station and the EMF site during the event.
+We will be providing a free shuttle bus service between Ledbury station and EMF during the event. Buses are timed to coincide with rail services, and (in theory!) you should not have to wait more than half an hour for a bus to take you from Ledbury railway station to EMF.
 
-Buses are roughly hourly, and are timed to conincide with rail services from and to Birmingham. There will be an additional bus on Thursday, Friday, Sunday, and Monday morning to meet services to and from London (which are not hourly).
+The shuttle bus service is operated by Buchanan's of Hereford.
 
-The shuttle bus service will operate between the following times. A full schedule and live tracking will be available shortly.
+The service operates throughout the weekend with an hourly frequency, and will stop at Tesco in Ledbury on request. If you want to go to Tesco, let the driver know as you board. On the way back, just flag the bus down from the bus stop opposite Tesco (same side of the road as Texaco).
+
+#### Hours of Operation ####
 
 <table class="table table-striped">
   <thead>
@@ -34,6 +36,16 @@ The shuttle bus service will operate between the following times. A full schedul
     <tr><td>Monday 20th July</td><td>09:00</td><td>16:00</td></tr>
   </tbody>
 </table>
+
+#### Important ####
+
+While the service is scheduled to coincide with rail services, there is a lot of demand on Monday and the bus meeting your specific train might be full. You should allow plenty of time to get from EMF to the railway station.
+
+Service frequency is a goal and not guaranteed, as traffic or delays in setting down or picking up will disrupt the schedule.
+
+#### Live Tracking ####
+
+You can check the location of the buses via [GTCTrack](https://www.gtctrack.com/s/HB77).
 
 ## By Car
 If you plan to drive, you will need to [buy a parking ticket or live-in vehicle ticket](/tickets/other).
