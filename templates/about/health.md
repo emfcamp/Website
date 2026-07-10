@@ -9,7 +9,7 @@ While you're at EMF, our medical team will be available to assist you if you're 
 
 If you have an *urgent* medical issue, head to the first aid tent, call 1099 on the phone system, or ask any volunteer with a radio. Only dial 999 as a last resort &mdash; we have paramedics on site who will get to you quicker.
 
-If you don't think you have a medical issue but you're not feeling great, head to the welfare tent (1095 on the phone system) where volunteers will help you out, offering safe and relaxing shelter, hydration, and friendly ear to talk to - it's our recuperation space.
+If it's not a medical issue but you just don't feel great, head to the Welfare tent (1095 on the phone system) where volunteers will help you out, offering safe and relaxing shelter, hydration, and friendly ear to talk to - it's our recuperation space.
 
 ## Refund policy
 
@@ -65,7 +65,7 @@ If you do find yourself in need of help, contact your Village, First Aid or Welf
 Camping gas accidents can cause serious burns. Never change gas canisters in or near a tent and make sure the canister is threaded properly before lighting.
 
 ## Hearing damage
-Exposure to loud music can cause damage to your hearing &mdash; we provide free earplugs at the Info desk and at NullSector. Please use them if you don't have your own!
+Exposure to loud music can cause damage to your hearing &mdash; we provide free earplugs at the Info tent and at NullSector. Please use them if you don't have your own!
 
 ## Tick bites
 EMF is held in a deer park, which increases the risk of tick bites, although in our experience this is rare. Familiarise yourself with the information on [this UKHSA poster (PDF)](https://assets.publishing.service.gov.uk/media/642bec397de82b000c31352d/Tick-awareness-poster-April-2023.pdf) which includes the symptoms of [Lyme disease](https://www.nhs.uk/conditions/lyme-disease/). Some ticks are smaller than you might think.
