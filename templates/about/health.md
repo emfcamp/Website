@@ -5,9 +5,11 @@ title: Staying healthy at EMF
 !!! info "This page applies to Electromagnetic Field 2026"
 	It may be updated before the event but any commitments made in this policy will not be weakened.
 
-While you're at EMF, our medical team will be available to assist you if you're injured or ill, or if you just need some suncream &mdash; just drop by the first aid tent.
+While you're at EMF, our medical team will be available to assist you if you're injured or ill &mdash; just drop by the first aid tent.
 
-If you have an urgent medical issue, head to the first aid tent, call 1099 on the phone system, or ask any volunteer with a radio. Only dial 999 as a last resort &mdash; we have paramedics on site who will get to you quicker.
+If you have an *urgent* medical issue, head to the first aid tent, call 1099 on the phone system, or ask any volunteer with a radio. Only dial 999 as a last resort &mdash; we have paramedics on site who will get to you quicker.
+
+If you don't think you have a medical issue but you're not feeling great, head to the welfare tent (1095 on the phone system) where volunteers will help you out, offering safe and relaxing shelter, hydration, and friendly ear to talk to - it's our recuperation space.
 
 ## Refund policy
 
@@ -57,6 +59,8 @@ Please don't take illegal drugs at EMF. If you do, be aware that crowded festiva
 
 Never get so intoxicated that you can't take care of yourself. Our [code of conduct](/code-of-conduct) applies to everyone, and intoxication is never an excuse for bad behaviour.
 
+If you do find yourself in need of help, contact your Village, First Aid or Welfare.
+
 ## Burns
 Camping gas accidents can cause serious burns. Never change gas canisters in or near a tent and make sure the canister is threaded properly before lighting.
 
@@ -64,9 +68,9 @@ Camping gas accidents can cause serious burns. Never change gas canisters in or 
 Exposure to loud music can cause damage to your hearing &mdash; we provide free earplugs at the Info desk and at NullSector. Please use them if you don't have your own!
 
 ## Tick bites
-EMF is held in a deer park, which increases the risk of tick bites, although in our experience this is rare.
+EMF is held in a deer park, which increases the risk of tick bites, although in our experience this is rare. Familiarise yourself with the information on [this UKHSA poster (PDF)](https://assets.publishing.service.gov.uk/media/642bec397de82b000c31352d/Tick-awareness-poster-April-2023.pdf) which includes the symptoms of [Lyme disease](https://www.nhs.uk/conditions/lyme-disease/). Some ticks are smaller than you might think.
 
-Tick bites can carry [Lyme disease](https://www.nhs.uk/conditions/lyme-disease/). If you are bitten by a tick, please visit the First Aid tent to have it removed, and be aware of the symptoms of Lyme disease.
+If you are bitten by a tick, or are concerned about a potential bite, please visit the First Aid tent.
 
 ## Weather
 Please come prepared for all weather! The English weather can be hot and sunny, or cold and rainy, often within hours of each other.
