@@ -188,8 +188,13 @@ def role_admin(role_id):
     else:
         now = datetime.now()
 
-    limit = int(request.args.get("limit", "5"))
-    offset = int(request.args.get("offset", "0"))
+    try:
+        limit = int(request.args.get("limit", "5"))
+        offset = int(request.args.get("offset", "0"))
+    except ValueError:
+        limit = 5
+        offset = 0
+
     role = get_or_404(db, Role, role_id)
     cutoff = now - timedelta(minutes=30)
 
