@@ -70,7 +70,7 @@
   {% for shift in shifts %}
     <div class="role-admin-shift well content-well">
       <h4 id="shift-{{ shift.id }}">
-        {{ shift.start.strftime("%a %H:%M") }} - {{ shift.end.strftime("%H:%M") }} - {{shift.venue.name }}
+        {{ shift.local_start.strftime("%a %H:%M") }} - {{ shift.local_end.strftime("%H:%M") }} - {{shift.venue.name }}
         {% if shift.multiplier != 1 %}
             {{ shift.multiplier }}×
         {% endif %}
