@@ -111,14 +111,14 @@
             {% if occurrence.scheduled_time %}{{ occurrence.scheduled_time.strftime('%H:%M') }}{% endif %}
         </td>
         <td style="text-wrap:nowrap">
-            {{ occurrence.potential_venue.name }}
+            {{ potential.venue.name }}
             {% if potential.occurrence_id in invalid_slots %}<span class="label label-danger">Invalid slot</span>{% endif %}
         </td>
         <td>
-            {{ occurrence.potential_time.strftime('%A') }}
+            {{ potential.start_time.strftime('%A') }}
         </td>
         <td>
-            {{ occurrence.potential_time.strftime('%H:%M') }}
+            {{ potential.start_time.strftime('%H:%M') }}
         </td>
     </tr>
 {% else %}

@@ -100,7 +100,7 @@ class PotentialScheduleOccurrence(BaseModel):
         )
 
     def __eq__(self, other: Any) -> Any:
-        return self.id == other.id
+        return isinstance(other, PotentialScheduleOccurrence) and self.id == other.id
 
     def __lt__(self, other: Any) -> Any:
         return self.id < other.id
