@@ -1,13 +1,14 @@
 We've attached {% if already_emailed %}an updated{% else %}a{% endif %} PDF{% if config.get("ISSUE_APPLE_PKPASS_TICKETS") %} and an Apple Wallet-compatible .pkpass{% endif %} to this email.
+{%- if user.has_admission_ticket %}
+You can show either of these at the front entrance when you arrive.
+{% endif %}
 {%- if config.get("ISSUE_GOOGLE_WALLET_TICKETS") %}
 If you have an Android phone, you can use a third party .pkpass reader app,
 or add your pass directly to Google Wallet using this link:
 
   {{ external_url('users.google_wallet_ticket') }}
 {%- endif %}
-{% if user.has_admission_ticket %}
-Admissions tickets can be shown on your phone, or you can print them out.
-{% else %}
+{% if not user.has_admission_ticket %}
 Your account has no associated entrance tickets. This ticket will not
 allow you to enter the event. If someone else bought your ticket, you
 should ask them to transfer it to you.
