@@ -14,36 +14,38 @@ EMF is close (5 km) to Ledbury station which is around [three hours](https://tra
 The station at Ledbury has short platforms, so if you are on one of the long 9-coach trains direct
 from Paddington, you will need to be in the front three coaches to get off the train.
 
-### Shuttle Bus ###
+### Shuttle Bus
 
-We will be providing a free shuttle bus service between Ledbury station and EMF during the event. Buses are timed to coincide with rail services, and (in theory!) you should not have to wait more than half an hour for a bus to take you from Ledbury railway station to EMF.
+We will be providing a free shuttle bus service between Ledbury station and EMF during the event. Buses are scheduled to coincide with rail services, and (in theory!) you should not have to wait long for a bus to take you from Ledbury railway station to EMF.
 
 The shuttle bus service is operated by Buchanan's of Hereford.
 
-The service operates throughout the weekend with an hourly frequency, and will stop at Tesco in Ledbury on request. If you want to go to Tesco, let the driver know as you board. On the way back, just flag the bus down from the bus stop opposite Tesco (same side of the road as Texaco).
+#### Important
 
-#### Hours of Operation ####
-
-<table class="table table-striped">
-  <thead>
-    <tr><th>Day</th><th>Start</th><th>End</th></tr>
-  </thead>
-  <tbody>
-    <tr><td>Thursday 16th July</td><td>10:00</td><td>20:00</td></tr>
-    <tr><td>Friday 17th July</td><td>09:00</td><td>22:00</td></tr>
-    <tr><td>Saturday 18th July</td><td>09:00</td><td>22:00</td></tr>
-    <tr><td>Sunday 19th July</td><td>09:00</td><td>22:00</td></tr>
-    <tr><td>Monday 20th July</td><td>09:00</td><td>16:00</td></tr>
-  </tbody>
-</table>
-
-#### Important ####
-
-While the service is scheduled to coincide with rail services, there is a lot of demand on Monday and the bus meeting your specific train might be full. You should allow plenty of time to get from EMF to the railway station.
+While the service is timed to coincide with rail services, there is a lot of demand on Thursday, Friday and Monday, so the bus meeting your specific train might be full and you will have to wait for the next one. Please allow plenty of time to get from EMF to the railway station, particularly if you have booked an advance train ticket and have to travel on a specific train.
 
 Service frequency is a goal and not guaranteed, as traffic or delays in setting down or picking up will disrupt the schedule.
 
-#### Live Tracking ####
+#### Hours of Operation
+
+<table class="table table-striped">
+  <thead>
+    <tr><th>Day</th><th>Start</th><th>End</th><th>Frequency (approximate)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Thursday 16th July</td><td>10:10</td><td>20:45</td><td>30 minutes</td></tr>
+    <tr><td>Friday 17th July</td><td>09:30</td><td>22:45</td><td>30 minutes</td></tr>
+    <tr><td>Saturday 18th July</td><td>09:10</td><td>22:50</td><td>Hourly</td></tr>
+    <tr><td>Sunday 19th July</td><td>09:00</td><td>21:45</td><td>30 minutes</td></tr>
+    <tr><td>Monday 20th July</td><td>09:15</td><td>15:30</td><td>Hourly</td></tr>
+  </tbody>
+</table>
+
+#### Tesco
+
+The service operates throughout the weekend and will stop at Tesco in Ledbury on request. If you want to go to Tesco, let the driver know as you board. On the way back, just flag the bus down from the bus stop opposite Tesco (same side of the road as the petrol station).
+
+#### Live Tracking
 
 You can check the location of the buses via [GTCTrack](https://www.gtctrack.com/s/HB77).
 
