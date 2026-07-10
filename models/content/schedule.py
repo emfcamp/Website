@@ -790,8 +790,10 @@ class Occurrence(BaseModel):
 
     @property
     def potential_slot(self) -> PotentialScheduleOccurrence | None:
-        if self.potential_scheduled_slots:
-            return max(self.potential_scheduled_slots, key=lambda so: so.id)
+        """This occurrence's latest slot in a "new" potential schedule, if it has one."""
+        slots = [so for so in self.potential_scheduled_slots if so.potential_schedule.state == "new"]
+        if slots:
+            return max(slots, key=lambda so: so.id)
         return None
 
     @property
