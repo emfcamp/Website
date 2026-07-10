@@ -72,7 +72,7 @@
            If you&rsquo;re arriving at the entrance gate together, you only need this copy.
         </p>
         {% for t in transferred_tickets %}
-        <div class="ticket-transfer">{{ t.to_user.name }}: {{ t.purchase.product.checkin_display_name }}</div>
+        <div class="ticket-transfer">{{ t.to_user.email }}: {{ t.purchase.product.checkin_display_name }}</div>
         {% endfor %}
         {% endif %}
 
