@@ -1,5 +1,5 @@
 const { verified } = require("@primer/octicons");
-const filterStorageKey = "volunteer-filters:v6";
+const filterStorageKey = "volunteer-filters:v7";
 
 function saveFilters() {
   localStorage.setItem(filterStorageKey, JSON.stringify(getFilters()));
@@ -18,7 +18,7 @@ function loadFilters() {
       show_past: false,
       signed_up: true,
       hide_full: true,
-      hide_staffed: true,
+      hide_staffed: false,
       hide_conflicting: true,
       hide_unfinalised: false,
     });
