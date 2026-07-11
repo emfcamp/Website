@@ -116,7 +116,7 @@ def init_workshop_shifts():
                 else:
                     venue = VolunteerVenue.query.filter_by(name=occurrence.scheduled_venue.name).first()
                     if venue is None:
-                        if venue.location:
+                        if occurrence.scheduled_venue.location:
                             location = to_shape(occurrence.scheduled_venue.location)
                             mapref = f"https://map.emfcamp.org/#20.82/{location.y}/{location.x}"
                         else:
