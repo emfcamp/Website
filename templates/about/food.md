@@ -31,7 +31,7 @@ You can check the opening hours and see what the bar is currently serving by vis
 
 #}
 
-The bars will be serving both alcoholic nad non-alcoholic drinks, snacks, and ice creams.
+The bars will be serving both alcoholic and non-alcoholic drinks, snacks, and ice creams.
 
 Drinks from the bars are served in reusable plastic cups. We don't charge a deposit for these, but we need your help to return them to us before the end of the event. Please do not throw them away!
 
@@ -41,7 +41,7 @@ Both bars are entirely run by EMF volunteers, and any surplus is reinvested back
 Our pub, the Robot Arms, is southwest of Stage B. It sells a wide selection of soft drinks, wine, cider, spirits, and beer. We also have chilled tap water available for you to fill your own bottles.
 
 ### Cybar
-The rebels have taken over NullSector’s Cybar and are now serving draught beers, soft drinks and even water.
+The rebels have taken over NullSector’s Cybar and are serving draught beers, soft drinks and even water.
 
 ## Water
 
