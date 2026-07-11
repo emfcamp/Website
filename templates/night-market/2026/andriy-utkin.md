@@ -4,4 +4,4 @@ days:
 ---
 Small-scale outsourced manufacturing of interesting OSHW
 
- - Codeberg: https://codeberg.org/oseiler/CO2Monitor/src/branch/main/pcb/CO2%20Monitor%20V0.1%20PCBA
+ - Codeberg: [CO2 Monitor](https://codeberg.org/oseiler/CO2Monitor/src/branch/main/pcb/CO2%20Monitor%20V0.1%20PCBA)
