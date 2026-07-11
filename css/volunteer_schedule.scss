@@ -270,14 +270,8 @@ ul.key {
           padding-bottom: 15px;
         }
 
-        // This is used to provide a heading for each start time.
         td.start_time {
-          font-size: 1.2em;
-          padding-left: 0px;
-          padding-bottom: 5px;
-          background-color: $main-background;
-          color: $main-background-header;
-          font-family: $header-font-stack;
+          display: none;
         }
 
         // Hide discrete end time column in favour of showing "from X to Y"

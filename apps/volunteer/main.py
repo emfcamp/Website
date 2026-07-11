@@ -95,7 +95,7 @@ def init_workshop_shifts():
     with db.session.no_autoflush:
         for schedule_item in schedule_items:
             for occurrence in schedule_item.occurrences:
-                if occurrence.cancelled or not occurrence.scheduled:
+                if not occurrence.scheduled:
                     continue
 
                 # This is terrible, and should be rewritten. If you're reading this it presumably hasn't been, and you
@@ -135,6 +135,7 @@ def init_workshop_shifts():
                 shift.end = event_tz.localize(occurrence.scheduled_time + time_after_start)
                 shift.min_needed = 1
                 shift.max_needed = 1
+                shift.multiplier = 0.5
 
                 db.session.add(shift)
                 db.session.commit()
