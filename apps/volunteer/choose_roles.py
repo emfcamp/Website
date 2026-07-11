@@ -60,6 +60,7 @@ def choose_role():
         roles = Role.query.filter_by(over_18_only=False)
     else:
         roles = Role.query
+    roles = roles.filter_by(shifts_finalised=True)
 
     form.add_roles(roles.order_by(Role.name).all())
 
