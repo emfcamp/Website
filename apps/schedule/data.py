@@ -126,6 +126,8 @@ def _get_schedule_item_dict(filter: ScheduleFilter, schedule_item: ScheduleItem)
 
     if isinstance(schedule_item.attributes, TalkAttributes | WorkshopAttributes):
         sid["family_friendly"] = schedule_item.attributes.family_friendly
+    elif isinstance(schedule_item.attributes, FamilyWorkshopAttributes):
+        sid["family_friendly"] = True
 
     if isinstance(schedule_item.attributes, TalkAttributes | WorkshopAttributes | FamilyWorkshopAttributes):
         sid["content_note"] = schedule_item.attributes.content_note

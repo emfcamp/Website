@@ -69,7 +69,7 @@ function Filters({
             checked={onlyFamilyFriendly}
             onChange={setOnlyFamilyFriendly}
           >
-            Family friendly only
+            Family friendly
           </Checkbox>
           <Checkbox checked={onlyNoRecording} onChange={setOnlyNoRecording}>
             No Recording only
