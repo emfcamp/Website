@@ -36,7 +36,7 @@ function loadFilters() {
     filters.hide_conflicting;
 
   // Only admins have that button.
-  hide_unfinalised = document.getElementById("hide_unfinalised");
+  let hide_unfinalised = document.getElementById("hide_unfinalised");
   if (hide_unfinalised) {
     document.getElementById("hide_unfinalised").checked =
       filters.hide_unfinalised;
@@ -46,6 +46,9 @@ function loadFilters() {
 }
 
 function getFilters() {
+  // Only admins have that button.
+  let hide_unfinalised_field = document.getElementById("hide_unfinalised");
+
   let filters = {
     role_ids: Array.from(
       document.querySelectorAll("input[data-role-id]:checked"),
@@ -55,7 +58,7 @@ function getFilters() {
     hide_full: document.getElementById("hide_full").checked,
     hide_staffed: document.getElementById("is_understaffed").checked,
     hide_conflicting: document.getElementById("hide_conflicting").checked,
-    hide_unfinalised: document.getElementById("hide_unfinalised").checked,
+    hide_unfinalised: hide_unfinalised_field && hide_unfinalised_field.checked,
   };
   return filters;
 }
@@ -191,10 +194,13 @@ function init_volunteer_schedule() {
     "hide_conflicting",
     "hide_unfinalised",
   ].forEach((id) => {
-    document.getElementById(id).addEventListener("change", () => {
-      saveFilters();
-      updateRowDisplay();
-    });
+    let input = document.getElementById(id);
+    if (input) {
+      input.addEventListener("change", () => {
+        saveFilters();
+        updateRowDisplay();
+      });
+    }
   });
 
   ["filters", "roles"].forEach((panel) => {
@@ -258,9 +264,10 @@ function init_volunteer_schedule() {
       saveFilters();
       updateRowDisplay();
     });
-  document
-    .getElementById("select-owned-roles")
-    .addEventListener("click", () => {
+
+  let owned_roles_field = document.getElementById("select-owned-roles");
+  if (owned_roles_field) {
+    owned_roles_field.addEventListener("click", () => {
       document
         .querySelectorAll("input[data-role-id]")
         .forEach(
@@ -270,6 +277,7 @@ function init_volunteer_schedule() {
       saveFilters();
       updateRowDisplay();
     });
+  }
   document.getElementById("select-day").addEventListener("change", (ev) => {
     document.location.replace(ev.target.value);
   });
