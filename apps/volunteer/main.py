@@ -95,7 +95,7 @@ def init_workshop_shifts():
     with db.session.no_autoflush:
         for schedule_item in schedule_items:
             for occurrence in schedule_item.occurrences:
-                if not occurrence.scheduled_venue:
+                if occurrence.cancelled or not occurrence.scheduled:
                     continue
 
                 # This is terrible, and should be rewritten. If you're reading this it presumably hasn't been, and you
