@@ -30,7 +30,7 @@ def main():
 
     volunteer = Volunteer.get_for_user(current_user)
     if volunteer is None:
-        return redirect(url_for(".handbook"))
+        return redirect(url_for(".info"))
 
     if feature_enabled("VOLUNTEERS_SCHEDULE") and volunteer.interested_roles.count() > 0:
         return redirect(url_for(".schedule"))
