@@ -94,7 +94,7 @@ def public_dashboard():
             Shift.start < now + timedelta(days=days),
         )
         .order_by(Shift.start, Shift.venue_id)
-        .all()
+        .limit(100)
     )
 
     return render_template(
