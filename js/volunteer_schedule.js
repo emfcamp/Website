@@ -34,8 +34,14 @@ function loadFilters() {
   document.getElementById("is_understaffed").checked = filters.hide_staffed;
   document.getElementById("hide_conflicting").checked =
     filters.hide_conflicting;
-  document.getElementById("hide_unfinalised").checked =
-    filters.hide_unfinalised;
+
+  // Only admins have that button.
+  hide_unfinalised = document.getElementById("hide_unfinalised");
+  if (hide_unfinalised) {
+    document.getElementById("hide_unfinalised").checked =
+      filters.hide_unfinalised;
+  }
+
   updateRowDisplay();
 }
 
