@@ -41,7 +41,6 @@ title: What to Bring
 * A few gold and silver space blankets and clothes pins to cover your tent and prevent it from turning into an oven in the morning sun
 * Ear plugs — there is an on-site supply, If you want music-safe plugs that protect your hearing without blocking across the frequencies, options like ACS Pacato 16s are popular and recommended
 * An electric blanket — several EMF regulars swear by these for cold nights
-* Cash, some workshops will have a small fee to cover materials, this will need to be paid in cash to the organiser (there are ATMs in Ledbury if you need to get cash).
 
 ## Advice for Villages/Large Groups
 * A small camping kettle may come in handy (larger kettles require care). We have food and drink vendors on site.
