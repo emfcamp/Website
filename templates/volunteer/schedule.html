@@ -8,8 +8,11 @@
     </li>
 {% endmacro %}
 {% macro staffing_icon(shift) %}
-    {% set icon = "staffed" if shift.current_count >= shift.min_needed else "understaffed" %}
-    <span class="staffing-icon staffing-icon-{{ icon }}"></span>
+    {% if shift.current_count >= shift.max_needed %}
+        <span class="staffing-icon staffing-icon-staffed"></span>
+    {% elif shift.current_count < shift.min_needed %}
+        <span class="staffing-icon staffing-icon-understaffed"></span>
+    {% endif %}
 {% endmacro %}
 
 {% set date_format = "%a %d" if buildup_volunteer else "%A" %}
@@ -110,7 +113,7 @@
                                             </form>
                                         {%- elif not shift.role.shifts_finalised -%}
                                             <button class="btn btn-block btn-danger" disabled>Unfinalised</button>
-                                        {%- elif shift.conflicts_with != "volunteer_shift"  -%}
+                                        {%- elif shift.conflicts_with != "volunteer_shift" and shift.current_count < shift.max_needed  -%}
                                             <form method="post" action="{{ url_for('.shift_sign_up', shift_id=shift.id, next=url_for('.schedule', day=active_day)) }}">
                                                 <button class="btn btn-block btn-success">Sign Up</button>
                                             </form>

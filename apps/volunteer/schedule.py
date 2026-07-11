@@ -254,7 +254,7 @@ def shift_sign_up(shift_id):
     if shift.current_count >= shift.max_needed:
         return redirect_next_or_schedule("This shift is already full. You have not been signed up.")
 
-    if shift.role.requires_training and shift.role not in Volunteer.get_for_user(current_user).trained_roles:
+    if shift.role.requires_training and shift.role not in Volunteer.get_for_user(user).trained_roles:
         return redirect_next_or_schedule("You must complete training before you can sign up for this shift.")
 
     for shift_entry in user.shift_entries:
