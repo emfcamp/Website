@@ -1,6 +1,6 @@
 from collections import defaultdict
 from collections.abc import Sequence
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 
 from flask import (
     Response,
@@ -85,7 +85,7 @@ def redirect_next_or_schedule(message: str | None = None) -> ResponseReturnValue
 def public_dashboard():
     days = int(request.args.get("days", 1))
     refresh = int(request.args.get("refresh", 0))
-    now = datetime.now()
+    now = datetime.now(UTC)
     shifts = (
         db.session.query(Shift)
         .where(
