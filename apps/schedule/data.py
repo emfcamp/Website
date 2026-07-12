@@ -24,6 +24,12 @@ from models.user import User
 from ..config import config
 from . import event_tz
 
+_drop_in_info = (
+    "<p>This is a drop-in workshop, so you can arrive at it any point during "
+    "the scheduled time to do something that will not take less time than "
+    "this workshop's scheduled length.</p>"
+)
+
 
 class OccurrenceDict(TypedDict):
     occurrence_num: int
@@ -102,7 +108,7 @@ def _get_schedule_item_dict(filter: ScheduleFilter, schedule_item: ScheduleItem)
         names=schedule_item.names or "",
         pronouns=schedule_item.pronouns,
         title=schedule_item.title,
-        description=schedule_item.description or "",
+        description=(schedule_item.description or "") + (_drop_in_info if schedule_item.drop_in else ""),
         short_description=schedule_item.short_description or "",
         video_privacy=schedule_item.video_privacy,
         is_fave=schedule_item.id in favourites_ids,
