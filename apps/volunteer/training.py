@@ -50,7 +50,8 @@ def training(role_id: int) -> ResponseReturnValue:
         return redirect(url_for(".choose_role"))
 
     if request.method == "GET":
-        return render_template("volunteer/role_training.html", role=role)
+        trained = current_user.volunteer in role.trained_volunteers
+        return render_template("volunteer/role_training.html", role=role, trained=trained)
 
     if not role.allows_self_training:
         flash("Nice try. This role doesn't allow self training.")
