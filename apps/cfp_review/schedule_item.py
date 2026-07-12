@@ -145,6 +145,7 @@ def export_schedule_items(format: str) -> ResponseReturnValue:
         # "equipment_required",
         # "funding_required",
         "favourite_count",
+        "uses_lottery",
     ]
 
     # Do not call this with untrusted field values

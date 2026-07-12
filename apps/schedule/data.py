@@ -151,7 +151,7 @@ def _get_occurrence_dict(filter: ScheduleFilter, occurrence: Occurrence) -> Occu
         venue=occurrence.scheduled_venue.name,
         latlon=occurrence.scheduled_venue.latlon,
         map_link=occurrence.scheduled_venue.map_link,
-        uses_lottery=occurrence.uses_lottery(),
+        uses_lottery=occurrence.uses_lottery,
         video_privacy=occurrence.video_privacy,
         recording_lost=occurrence.video_recording_lost,
     )

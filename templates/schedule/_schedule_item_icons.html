@@ -14,7 +14,7 @@
     <span style="padding-left: 10px;" title="This {{ schedule_item.human_type }} is family friendly">👪</span>
     {% endif %}
   {% endif %}
-  {% if schedule_item.has_lottery %}
+  {% if schedule_item.uses_lottery %}
     <span style="padding-left: 10px;" title="This {{ schedule_item.human_type }} requires you sign up for a ticket">🎟</span>
   {% endif %}
 {% endmacro %}

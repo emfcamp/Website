@@ -363,8 +363,8 @@ class ScheduleItem(BaseModel):
         return self.type_info.human_type_a
 
     @property
-    def has_lottery(self) -> bool:
-        return any(occurrence.lottery for occurrence in self.occurrences)
+    def uses_lottery(self) -> bool:
+        return any(occurrence.uses_lottery for occurrence in self.occurrences)
 
     @property
     def availability_overrides(self) -> list[TimeRange]:
@@ -542,6 +542,7 @@ class Occurrence(BaseModel):
     proposal: AssociationProxy[Proposal | None] = association_proxy("schedule_item", "proposal")
     user: AssociationProxy[User] = association_proxy("schedule_item", "user")
 
+    @property
     def uses_lottery(self) -> bool:
         if not isinstance(self.schedule_item.attributes, WorkshopAttributes):
             return False
