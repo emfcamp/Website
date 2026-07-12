@@ -677,16 +677,15 @@ def greenroom() -> ResponseReturnValue:
     )
     arrived_form.speakers.choices = [
         (
-            occurrence.schedule_item.id,
-            occurrence.schedule_item.names or f"Speaker(s) for {occurrence}",
+            f"{occurrence.schedule_item.names} for '{occurrence.schedule_item.title}'",
+            occurrence.schedule_item.names or f"Speaker(s) for {occurrence.schedule_item.title}",
         )
         for occurrence in upcoming
     ]
 
     if arrived_form.arrived.data:
         if arrived_form.validate_on_submit():
-            app.logger.info(f"{arrived_form.speakers.data} arrived.")
-            msg = greenroom_message(f"{arrived_form.speakers.data} arrived.")
+            msg = greenroom_message(f"{arrived_form.speakers.data} has arrived.")
             db.session.add(msg)
             db.session.commit()
 
