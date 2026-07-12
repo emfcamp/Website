@@ -57,7 +57,7 @@ def _get_conflicts(shift: Shift, calendar: Sequence[CalendarEntry]) -> tuple[str
     each conflicting event.
     """
     conflicts = sorted(
-        [event for event in calendar if event.overlaps_with(shift.start, shift.end)],
+        [event for event in calendar if event.overlaps_with(shift.local_start, shift.local_end)],
         key=lambda c: c.conflict_priority,
     )
     if not conflicts:
