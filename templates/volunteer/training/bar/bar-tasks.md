@@ -8,7 +8,7 @@ Between busy periods or as needed, you can prepare for the next rush by performi
 ## Restocking the Fridge
 Restocking is often easier in pairs. Write down what product you need and collect it from the fridge. 
 
-!!! danger "Don't injury your back"
+!!! danger "Don't injure your back"
 	Don’t be a hero, save your back and an injury.
 
 	Use a trolley or avoid carrying more than 1 large or 2 small boxes at a time.

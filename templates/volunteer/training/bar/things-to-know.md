@@ -12,7 +12,7 @@ People come to the bar asking for this with various regional pronunciations.
 This is another word for Thimble, which refers to the measures used to pour wines and spirits on the back bar.
 
 ## Tschunk
-Pronounced [sh-un-k], tschunk is a cocktail popular with our German hacker crowd, particularly on the last night of EMF.
+Pronounced [ˈtʃʊŋk], tschunk is a cocktail popular with our German hacker crowd, particularly on the last night of EMF.
 To prepare Tschunk:
 
 1. Add a teaspoon of brown sugar.
