@@ -8,7 +8,7 @@
     <span style="padding-left: 10px;" title="There is a content note on this {{ schedule_item.human_type }}">⚠️</span>
     {% endif %}
   {% endif %}
-{#
+
   {% if schedule_item.type in ('talk', 'workshop') %}
     {% if schedule_item.attributes.family_friendly %}
     <span style="padding-left: 10px;" title="This {{ schedule_item.human_type }} is family friendly">👪</span>
@@ -17,5 +17,4 @@
   {% if schedule_item.has_lottery %}
     <span style="padding-left: 10px;" title="This {{ schedule_item.human_type }} requires you sign up for a ticket">🎟</span>
   {% endif %}
-#}
 {% endmacro %}
