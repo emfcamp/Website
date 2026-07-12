@@ -177,6 +177,7 @@ def schedule():
         all_shifts=by_time,
         dates=dates,
         active_day=active_day,
+        day_one=config.event_start.date(),
         untrained_roles=untrained_roles,
         buildup_volunteer=current_volunteer.registered_for_buildup,
         is_admin=current_volunteer.is_volunteer_admin,

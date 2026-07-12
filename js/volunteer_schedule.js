@@ -1,5 +1,5 @@
 const { verified } = require("@primer/octicons");
-const filterStorageKey = "volunteer-filters:v7";
+const filterStorageKey = "volunteer-filters:v8";
 
 function saveFilters() {
   localStorage.setItem(filterStorageKey, JSON.stringify(getFilters()));
@@ -11,7 +11,7 @@ function loadFilters() {
     let interestedRoles = Array.from(
       document.querySelectorAll("input[data-role-id]"),
     )
-      .filter((box) => box.getAttribute("data-interested") == "True")
+      // .filter((box) => box.getAttribute("data-interested") == "True")
       .map((box) => box.getAttribute("data-role-id"));
     savedFilters = JSON.stringify({
       role_ids: interestedRoles,
@@ -76,6 +76,7 @@ function getNodeData(node) {
     current_staff: parseInt(node.getAttribute("data-current-staff")),
     conflicts_with: node.getAttribute("data-conflicts-with"),
     finalised: node.getAttribute("data-finalised") == "True",
+    notice: node.getAttribute("data-notice") == "True",
   };
 }
 
@@ -83,6 +84,10 @@ function shouldDisplayNode(node_data, filters, node) {
   // If the signed up shifts filter is active, or we're not set to show shifts
   // in the past then those take precedence over all others and we short
   // circuit everything else.
+  if (node_data["notice"]) {
+    return true;
+  }
+
   if (!filters["show_past"]) {
     let now = new Date().toISOString();
     if (now > node_data["end"]) {
@@ -128,8 +133,10 @@ function shouldDisplayNode(node_data, filters, node) {
 function spanStartTimeCell(firstNodeOfHour, rowCount) {
   if (firstNodeOfHour !== null) {
     let start_time_cell = firstNodeOfHour.querySelector(".start_time");
-    start_time_cell.setAttribute("rowspan", rowCount);
-    start_time_cell.classList.remove("hidden");
+    if (start_time_cell) {
+      start_time_cell.setAttribute("rowspan", rowCount);
+      start_time_cell.classList.remove("hidden");
+    }
   }
 }
 
