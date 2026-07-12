@@ -7,8 +7,13 @@
     Export <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
+    <li role="presentation" class="dropdown-header">Schedule items</li>
     <li><a href="{{ url_for('.export_schedule_items', format='csv', **new_qs) }}">CSV</a></li>
     <li><a href="{{ url_for('.export_schedule_items', format='json', **new_qs) }}">JSON</a></li>
+    <li role="separator" class="divider"></li>
+    <li role="presentation" class="dropdown-header">Occurrences</li>
+    <li><a href="{{ url_for('.export_occurrences', format='csv', **new_qs) }}">CSV</a></li>
+    <li><a href="{{ url_for('.export_occurrences', format='json', **new_qs) }}">JSON</a></li>
   </ul>
 </div>
 <h2>Schedule Items</h2>

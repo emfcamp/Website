@@ -184,6 +184,72 @@ def export_schedule_items(format: str) -> ResponseReturnValue:
     )
 
 
+@cfp_review.route("/occurrences.<format>")
+@admin_required
+def export_occurrences(format: str) -> ResponseReturnValue:
+    fields = [
+        "id",
+        "schedule_item.id",
+        "occurrence_num",
+        "schedule_item.proposal_id",
+        "schedule_item.type",
+        "schedule_item.state",
+        "schedule_item.names",
+        "schedule_item.pronouns",
+        "schedule_item.title",
+        "schedule_item.description",
+        "schedule_item.short_description",
+        "schedule_item.official_content",
+        "schedule_item.contact_telephone",
+        "cancelled",
+        "scheduled_time",
+        "scheduled_venue_id",
+        "c3voc_url",
+        "youtube_url",
+        "thumbnail_url",
+        "video_recording_lost",
+        "uses_lottery",
+    ]
+
+    # Do not call this with untrusted field values
+    def get_field(occurrence, field_path):
+        val = occurrence
+        for field in field_path.split("."):
+            val = getattr(val, field)
+        return val
+
+    # There's no separate "occurrences list" page
+    schedule_items, _ = filter_schedule_item_request()
+    occurrences = [o for s in schedule_items for o in s.occurrences]
+    if format == "csv":
+        mime = "text/csv"
+        buf = StringIO()
+        w = csv.writer(buf)
+        # Header row
+        w.writerow(fields)
+        for o in occurrences:
+            cells = []
+            for field in fields:
+                cell = get_field(o, field)
+                cells.append(cell)
+            w.writerow(cells)
+        out = buf.getvalue()
+    elif format == "json":
+        mime = "application/json"
+        out = json.dumps(
+            [{a: get_field(o, a) for a in fields} for o in occurrences],
+            default=str,
+        )
+    else:
+        abort(HTTPStatus.BAD_REQUEST, "Unsupported export format")
+    return send_file(
+        BytesIO(out.encode()),
+        mime,
+        as_attachment=True,
+        download_name=f"occurrences.{format}",
+    )
+
+
 @cfp_review.route("/schedule-items/<int:schedule_item_id>")
 @admin_required
 def schedule_item(schedule_item_id: int) -> ResponseReturnValue:
