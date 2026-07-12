@@ -25,9 +25,9 @@ from ..config import config
 from . import event_tz
 
 _drop_in_info = (
-    "<p>This is a drop-in workshop, so you can arrive at it any point during "
+    "\n\nThis is a drop-in workshop, so you can arrive at it any point during "
     "the scheduled time to do something that will not take less time than "
-    "this workshop's scheduled length.</p>"
+    "this workshop's scheduled length."
 )
 
 
