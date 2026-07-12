@@ -107,7 +107,8 @@ def _get_schedule_item_dict(filter: ScheduleFilter, schedule_item: ScheduleItem)
         names=schedule_item.names or "",
         pronouns=schedule_item.pronouns,
         title=schedule_item.title,
-        description=(schedule_item.description or "") + (_drop_in_info if schedule_item.drop_in else ""),
+        description=(schedule_item.description or "")
+        + (_drop_in_info if schedule_item.attributes.drop_in else ""),
         short_description=schedule_item.short_description or "",
         video_privacy=schedule_item.video_privacy,
         is_fave=schedule_item.id in favourites_ids,
