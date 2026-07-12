@@ -129,7 +129,7 @@ def _get_schedule_item_dict(filter: ScheduleFilter, schedule_item: ScheduleItem)
         # participant_count is only on proposals
         sid["drop_in"] = schedule_item.attributes.drop_in
         if schedule_item.attributes.drop_in:
-            sid.description += _drop_in_info
+            sid["description"] += _drop_in_info
 
     if isinstance(schedule_item.attributes, TalkAttributes | WorkshopAttributes):
         sid["family_friendly"] = schedule_item.attributes.family_friendly
