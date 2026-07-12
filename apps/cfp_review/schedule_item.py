@@ -140,7 +140,6 @@ def export_schedule_items(format: str) -> ResponseReturnValue:
         "description",
         "short_description",
         "official_content",
-        "contact_telephone",
         # Attributes
         # "equipment_required",
         # "funding_required",
@@ -149,8 +148,8 @@ def export_schedule_items(format: str) -> ResponseReturnValue:
     ]
 
     # Do not call this with untrusted field values
-    def get_field(proposal, field_path):
-        val = proposal
+    def get_field(schedule_item, field_path):
+        val = schedule_item
         for field in field_path.split("."):
             val = getattr(val, field)
         return val
