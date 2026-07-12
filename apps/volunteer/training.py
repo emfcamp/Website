@@ -72,23 +72,6 @@ def train_users(role_id: int) -> ResponseReturnValue:
     if request.method == "POST" and request.form["query"] != "":
         volunteers = Volunteer.find_by_query(request.form["query"])
 
-    # if form.validate_on_submit():
-    #     changes = 0
-    #     for v in form.volunteers:
-    #         if v.trained.data and v._volunteer not in role.trained_volunteers:
-    #             changes += 1
-    #             role.trained_volunteers.append(v._volunteer)
-
-    #         elif not v.trained.data and v._volunteer in role.trained_volunteers:
-    #             changes += 1
-    #             role.trained_volunteers.remove(v._volunteer)
-
-    #     db.session.commit()
-    #     flash(f"Trained {changes} volunteers")
-    #     app.logger.info(f"Trained {changes} volunteers")
-
-    #     return redirect(url_for(".train_users", role_id=role_id))
-
     return render_template(
         "volunteer/training/train_users.html",
         role=role,
@@ -103,8 +86,9 @@ def train_user(role_id: int, volunteer_id: int) -> ResponseReturnValue:
     role = Role.get_by_id(role_id)
     volunteer = Volunteer.get_by_id(volunteer_id)
 
-    role.trained_volunteers.append(volunteer)
-    db.session.commit()
+    if role not in volunteer.trained_roles:
+        role.trained_volunteers.append(volunteer)
+        db.session.commit()
 
     flash(f"Marked {volunteer.nickname} trained")
     return redirect(url_for(".train_users", role_id=role_id))
@@ -116,8 +100,9 @@ def untrain_user(role_id: int, volunteer_id: int) -> ResponseReturnValue:
     role = Role.get_by_id(role_id)
     volunteer = Volunteer.get_by_id(volunteer_id)
 
-    role.trained_volunteers.remove(volunteer)
-    db.session.commit()
+    if role in volunteer.trained_roles:
+        role.trained_volunteers.remove(volunteer)
+        db.session.commit()
 
     flash(f"Marked {volunteer.nickname} untrained")
     return redirect(url_for(".train_users", role_id=role_id))
