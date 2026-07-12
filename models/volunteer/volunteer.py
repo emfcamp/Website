@@ -201,9 +201,10 @@ class Volunteer(BaseModel, UserMixin):
 
         if self.user.has_redeemed_tickets and datetime.now() <= config.event_start:
             # Checked-in attendees are on site from Day 0 at the earliest.
-            return (config.event_start - timedelta(days=1), config.event_end)
+            return (config.event_start - timedelta(days=1), config.event_end + timedelta(days=1))
 
-        return (config.event_start, config.event_end)
+        # Everyone should be able to see Monday shifts.
+        return (config.event_start, config.event_end + timedelta(days=1))
 
 
 """

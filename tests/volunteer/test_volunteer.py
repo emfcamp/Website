@@ -43,7 +43,7 @@ def buy_admission_ticket(tier, user, *, redeem):
 
 
 def test_permitted_shift_times_default(volunteer):
-    assert volunteer.permitted_shift_times == (config.event_start, config.event_end)
+    assert volunteer.permitted_shift_times == (config.event_start, config.event_end + timedelta(days=1))
 
 
 def test_permitted_shift_times_buildup(db, user, volunteer):
@@ -60,14 +60,14 @@ def test_permitted_shift_times_checked_in(admission_tier, user, volunteer):
 
     assert volunteer.permitted_shift_times == (
         config.event_start - timedelta(days=1),
-        config.event_end,
+        config.event_end + timedelta(days=1),
     )
 
 
 def test_permitted_shift_times_not_checked_in(admission_tier, user, volunteer):
     buy_admission_ticket(admission_tier, user, redeem=False)
 
-    assert volunteer.permitted_shift_times == (config.event_start, config.event_end)
+    assert volunteer.permitted_shift_times == (config.event_start, config.event_end + timedelta(days=1))
 
 
 def test_permitted_shift_times_buildup_and_checked_in(db, admission_tier, user, volunteer):
@@ -84,4 +84,4 @@ def test_permitted_shift_times_checked_in_after_event_start(admission_tier, user
     buy_admission_ticket(admission_tier, user, redeem=True)
 
     with freeze_time(config.event_start + timedelta(hours=1)):
-        assert volunteer.permitted_shift_times == (config.event_start, config.event_end)
+        assert volunteer.permitted_shift_times == (config.event_start, config.event_end + timedelta(days=1))
