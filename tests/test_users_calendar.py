@@ -98,7 +98,7 @@ def test_fetch_events_with_owned_content(user: User, owned_occurrence: Occurrenc
 
 def test_events_are_sorted_by_start_time(user: User) -> None:
     assert [entry.type for entry in fetch_events(user, START_DATE, END_DATE)] == [
-        "volunteer_shift",
         "favourited_content",
         "owned_content",
+        "volunteer_shift",
     ]

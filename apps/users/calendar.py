@@ -3,11 +3,11 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Literal, TypedDict
 
-import pytz
 from sqlalchemy import cast, select
 from sqlalchemy.dialects.postgresql import INTERVAL
 from sqlalchemy.orm import InstrumentedAttribute, with_parent
 
+from apps.schedule import event_tz
 from main import db
 from models.content.schedule import Occurrence, ScheduleItem
 from models.user import User
@@ -46,10 +46,8 @@ class CalendarEntry:
             "human_type": self.human_type,
             "title": self.title,
             "conflict_priority": self.conflict_priority,
-            "start_time": pytz.timezone("Europe/London")
-            .localize(self.start_time)
-            .strftime("%Y-%m-%dT%H:%M:00"),
-            "end_time": pytz.timezone("Europe/London").localize(self.end_time).strftime("%Y-%m-%dT%H:%M:00"),
+            "start_time": self.start_time.strftime("%Y-%m-%dT%H:%M:00"),
+            "end_time": self.end_time.strftime("%Y-%m-%dT%H:%M:00"),
             "venue_name": self.venue_name,
             "venue_mapref": self.venue_mapref,
         }
@@ -66,8 +64,8 @@ class VolunteerShiftCalendarEntry(CalendarEntry):
         self.shit_entry = shift_entry
         self.shift = shift_entry.shift
         self.title = shift_entry.shift.role.name
-        self.start_time = self.shift.start
-        self.end_time = self.shift.end
+        self.start_time = self.shift.local_start
+        self.end_time = self.shift.local_end
         self.venue_name = self.shift.venue.name
         self.venue_mapref = self.shift.venue.mapref
 
@@ -82,8 +80,8 @@ class OccurrenceCalendarEntry(CalendarEntry):
 
         self.occurrence = occurrence
         self.title = occurrence.schedule_item.title
-        self.start_time = occurrence.scheduled_time  # type: ignore
-        self.end_time = occurrence.scheduled_end_time  # type: ignore
+        self.start_time = event_tz.localize(occurrence.scheduled_time)  # type: ignore
+        self.end_time = event_tz.localize(occurrence.scheduled_end_time)  # type: ignore
         self.venue_name = occurrence.scheduled_venue.name
         self.venue_mapref = occurrence.scheduled_venue.map_link
 
