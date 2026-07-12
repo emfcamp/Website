@@ -26,8 +26,7 @@ from . import event_tz
 
 _drop_in_info = (
     "\n\nThis is a drop-in workshop, so you can arrive at any point during "
-    "the scheduled time to do something that will take less time than "
-    "this workshop's scheduled length."
+    "the session to complete a short activity."
 )
 
 
