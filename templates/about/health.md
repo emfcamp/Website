@@ -78,3 +78,7 @@ Please come prepared for all weather! The English weather can be hot and sunny, 
 Make sure you drink plenty of water &mdash; there are water points across the site and free water is provided at the bars. Bring sunscreen, wear it, and re-apply regularly, even if it's cloudy.
 
 Bring plenty of warm clothing and layers as it can get surprisingly cold at night.
+
+## Medicine storage
+
+[Cold/frozen storage](/about/accessibility#coldfrozen-storage) is available for medicines and medically necessary cooling packs; all items must be clearly labelled. Please note that we provide this storage on a best-effort basis: fridges/freezers may need to be frequently accessed, and there may be power interruptions.
