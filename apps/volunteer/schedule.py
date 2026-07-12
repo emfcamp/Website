@@ -216,8 +216,8 @@ def schedule_ical():
         cal_event.add("uid", f"{config.event_year}-{shift.id}")
         cal_event.add("summary", f"{shift.role.name} at {shift.venue.name}")
         cal_event.add("location", shift.venue.name)
-        cal_event.add("dtstart", event_tz.localize(shift.start))
-        cal_event.add("dtend", event_tz.localize(shift.end))
+        cal_event.add("dtstart", shift.local_start)
+        cal_event.add("dtend", shift.local_end)
         cal.add_component(cal_event)
 
     return Response(cal.to_ical(), mimetype="text/calendar")
