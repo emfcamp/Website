@@ -28,6 +28,15 @@
         </div>
     </noscript>
 
+    {% if feature_enabled("VOLUNTEERS_FULL") %}
+        <div class="alert alert-warning">
+            <h3>Most volunteer shifts are now full</h3>
+            <p>We'll be releasing more shifts over the coming days, and during the weekend
+               there will be cancellations and capacity adjustments so keep an eye out when you
+               have a spare moment.</p>
+        </div>
+    {% endif %}
+
     {% if untrained_roles %}
         <div class="alert alert-danger">
             <h3>You still need training before starting a shift for the following roles:</h3>
@@ -68,6 +77,11 @@
                     <th></th>
                 </tr></thead>
                 <tbody id="tbody-{{ active_day }}">
+                    {% if active_day == day_one %}
+                        <tr data-notice="True">
+                            <td colspan="7">Please take your arrival time into account when selecting shifts. You will not be permitted to enter the site early or jump the queue to make a volunteer shift.</td>
+                        </tr>
+                    {% endif %}
                     {% for hour in all_shifts %}
                         {% for shift in all_shifts[hour] %}
                             <tr id="shift-{{ shift.id }}" data-role-id="{{ shift.role.id }}" data-shift-start="{{ hour }}" data-shift-end="{{ shift.end }}" data-staffed="{{ shift.current_count >= shift.min_needed }}" data-full="{{ shift.current_count >= shift.max_needed }}" data-signed-up="{{ shift.is_user_shift }}" data-min-staff="{{ shift.min_needed }}" data-max-staff="{{ shift.max_needed }}" data-current-staff="{{ shift.current_count }}" data-conflicts-with="{{ shift.conflicts_with }}" data-conflicts-detail="{{ shift.conflicts_detail | tojson | forceescape }}" data-finalised="{{ shift.role.shifts_finalised }}">
