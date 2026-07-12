@@ -132,27 +132,19 @@ def schedule_items() -> ResponseReturnValue:
 def export_schedule_items(format: str) -> ResponseReturnValue:
     fields = [
         "id",
+        "type",
         "state",
         "names",
         "pronouns",
-        "type",
         "title",
         "description",
         "short_description",
-        "duration",
-        "arrival_period",
-        "departure_period",
-        "available_times",
-        "contact_telephone",
-        "contact_eventphone",
         "official_content",
-        "equipment_required",
-        "funding_required",
-        "notice_required",
-        "additional_info",
-        # FIXME: do we need any of these?
-        # "tags",
-        # "favourite_count",
+        "contact_telephone",
+        # Attributes
+        # "equipment_required",
+        # "funding_required",
+        "favourite_count",
     ]
 
     # Do not call this with untrusted field values
@@ -188,7 +180,7 @@ def export_schedule_items(format: str) -> ResponseReturnValue:
         BytesIO(out.encode()),
         mime,
         as_attachment=True,
-        download_name=f"proposals.{format}",
+        download_name=f"schedule_items.{format}",
     )
 
 
