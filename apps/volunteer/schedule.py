@@ -16,6 +16,7 @@ from flask import current_app as app
 from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from icalendar import Calendar, Event
+from markupsafe import Markup
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload, with_parent
 
@@ -255,7 +256,11 @@ def shift_sign_up(shift_id):
         return redirect_next_or_schedule("This shift is already full. You have not been signed up.")
 
     if shift.role.requires_training and shift.role not in Volunteer.get_for_user(user).trained_roles:
-        return redirect_next_or_schedule("You must complete training before you can sign up for this shift.")
+        return redirect_next_or_schedule(
+            Markup(
+                f'You must complete training before you can sign up for this shift. See <a href="{url_for(".training", role_id=shift.role_id)}">the training page</a> for more details.'
+            )
+        )
 
     for shift_entry in user.shift_entries:
         if shift.is_clash(shift_entry.shift):
