@@ -3,7 +3,7 @@ page_template: "volunteer/handbook.html"
 ---
 # Volunteer Handbook - Lost Children or Vulnerable Adults
 
-This process covers children (anyone under the age of 18), and vulnerable adults (anyone over the age of 18 who has become separated from their carer). Nipperbout, who run the crêche, provide lost child services.
+This process covers children (anyone under the age of 18), and vulnerable adults (anyone over the age of 18 who has become separated from their carer).
 
 The lost child area can be found at the [crêche](https://map.emfcamp.org/#20.88/52.0408421/-2.3781232), near Stage C. Outside the creche's operating hours the lost child area is first aid, located near the food traders
 behind the creche.
