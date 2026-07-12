@@ -10,11 +10,17 @@ informed of while volunteering.
 
 ### EMF 2028 Ticket Vouchers
 
-<strong>Anyone who does two or more shifts will be sent a pre-sale voucher to buy tickets
+<strong>Anyone who does two or more full shifts will be sent a pre-sale voucher to buy tickets
 for EMF 2028.</strong> Some shifts that are particularly short, particularly long, or
 just not very desirable (looking at you 7am shift moving bins around) will have
-a multiplier applied to them for this purpose. You'd need to do 4 0.5x shifts,
-but only one 2x shift to qualify for a voucher.
+a multiplier applied to them for this purpose.
+
+Any shift not marked with a multiplier in the schedule counts as one full shift, while
+shifts with something like "0.5x" next to them count as half a shift, "2x" counts as
+two shifts, and so on. You'd need 4 0.5x shifts to qualify for a voucher, but only
+one 2x shift. All shifts qualify for one meal token (except kitchen shifts, where
+they're engaging in nepotism and giving everyone two, so sign up for them if you
+like free food)!
 
 ## How to volunteer
 
