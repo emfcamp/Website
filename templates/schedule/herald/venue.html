@@ -19,12 +19,13 @@
 
   <div>&nbsp;</div>
   <div class="col-sm-6 col-sm-offset-6">
-    {{ form.talk_id() }}
+    {{ form.occurrence_id() }}
     {{ render_field(form.video_privacy) }}
     <input type="submit" name="{{form.update.name}}" value="{{form.update.label.text}}" class="btn btn-success debounce pull-right"/>
   </div>
   <div style="clear: both"></div>
 {% endmacro %}
+
 {% extends "base.html" %}
 {% block title %}Herald for {{ venue_name }}{% endblock %}
 {% block body %}
@@ -32,12 +33,12 @@
   <form method="post">
     {{ form.hidden_tag() }}
     {% if now %}
-    {{ render_schedule_item("Now", form.now, now) }}
+    {{ render_occurrence("Now", form.now, now) }}
     <p>&nbsp;</p>
     {% endif %}
 
     {% if next %}
-    {{ render_schedule_item("Next", form.next, next) }}
+    {{ render_occurrence("Next", form.next, next) }}
     <p>&nbsp;</p>
     {% endif %}
 
