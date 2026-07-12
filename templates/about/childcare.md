@@ -17,3 +17,6 @@ Operating hours will be announced closer to the event.
 We also have a range of workshops for families in a separate workshop tent.
 
 Not all of the content in the main schedule will be suitable for children or younger teenagers, but they are welcome to attend at your discretion.
+
+## Milk refrigeration
+If you have formula or breast milk for infants that requires refrigeration (or freezing), we can provide best-effort storage for it: see the [Accessibility](/about/accessibility#coldfrozen-storage) page for details.
