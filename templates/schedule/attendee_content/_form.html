@@ -1,3 +1,4 @@
+## FIXME this should be updated to use _formhelpers' render_field etc.
 <form method="post" action="{{ action }}" id="user_content_form">
     {% if conflicts %}
         <div class="alert alert-danger conflicts">
@@ -177,6 +178,15 @@
             {% if form.age_range.errors %}
                 {% for error in form.age_range.errors %}
                     <p class="help-block" id="help-block-age_range">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="form-group col-md-4 {%- if form.drop_in.errors %} has-error {%- endif %}">
+            <label for="drop_in">Drop-in workshop?</label>
+            {{ form.drop_in }}
+            {% if form.drop_in.errors %}
+                {% for error in form.drop_in.errors %}
+                    <p class="help-block" id="help-block-drop_in">{{ error }}</p>
                 {% endfor %}
             {% endif %}
         </div>

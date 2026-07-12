@@ -155,6 +155,7 @@ class AttendeeContentForm(Form):
     participant_cost = StringField("Cost per attendee")
     participant_equipment = StringField("Attendee equipment")
     age_range = SelectField("Age range", choices=AGE_RANGE_OPTIONS)
+    drop_in = BooleanField("Drop in?")
 
     acknowledge_conflicts = BooleanField("Acknowledge conflicts")
 
@@ -236,6 +237,14 @@ def attendee_content() -> ResponseReturnValue:
             schedule_item=schedule_item,
         )
 
+        if form.type.data == "workshop":
+            # HACK: this should look more like the CfP system's method of dealing with per-type attributes.
+            attributes = cast(WorkshopAttributes, schedule_item.attributes)
+            attributes.participant_cost = form.participant_cost.data
+            attributes.age_range = form.age_range.data
+            attributes.participant_equipment = form.participant_equipment.data
+            attributes.drop_in = form.drop_in.data
+
         form.populate_obj(schedule_item)
 
         conflicts = occurrence.get_conflicting_content()
@@ -287,9 +296,11 @@ def attendee_content_edit(schedule_item_id: int) -> ResponseReturnValue:
         extra_data["participant_cost"] = attributes.participant_cost
         extra_data["age_range"] = attributes.age_range
         extra_data["participant_equipment"] = attributes.participant_equipment
+        extra_data["drop_in"] = str(attributes.drop_in)
 
     form = AttendeeContentForm(obj=schedule_item, **extra_data)
     form.load_choices(schedule_item=schedule_item)
+    app.logger.info(f"drop in value is '{form.drop_in}'")
 
     occurrence_dict = {o.id: o for o in schedule_item.occurrences}
     for field in form.occurrences:
@@ -313,6 +324,7 @@ def attendee_content_edit(schedule_item_id: int) -> ResponseReturnValue:
             attributes.participant_cost = form.participant_cost.data
             attributes.age_range = form.age_range.data
             attributes.participant_equipment = form.participant_equipment.data
+            attributes.drop_in = form.drop_in.data
 
         conflicts = [c for o in schedule_item.occurrences for c in o.get_conflicting_content()]
         if any(conflicts) and form.acknowledge_conflicts.data is not True:
