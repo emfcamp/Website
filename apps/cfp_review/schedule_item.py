@@ -141,6 +141,7 @@ def export_schedule_items(format: str) -> ResponseReturnValue:
         "description",
         "short_description",
         "official_content",
+        "video_privacy",
         # Attributes
         # "equipment_required",
         # "funding_required",
@@ -205,6 +206,7 @@ def export_occurrences(format: str) -> ResponseReturnValue:
         "cancelled",
         "scheduled_time",
         "scheduled_venue_id",
+        "video_privacy",
         "c3voc_url",
         "youtube_url",
         "thumbnail_url",
