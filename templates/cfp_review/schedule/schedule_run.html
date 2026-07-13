@@ -61,4 +61,14 @@
 <p class="help-block" style="margin-top: 2em">
     "Download problem JSON" exports the current scheduling problem for debugging with slotmachine (<code>python -m slotmachine slotmachine-problem.json</code>).
 </p>
+<h3>Upload local scheduler results</h3>
+<p class="help-block">
+    If you've run slotmachine locally on a downloaded problem file you can upload the solution to create a potential schedule (<code>python -m slotmachine slotmachine-problem.json solution.json</code>).
+</p>
+<form method="POST" action="{{ url_for('.run_scheduler_import') }}" enctype="multipart/form-data">
+    <fieldset style="margin-bottom: 1em;">
+        <input type="file" name="solution" accept=".json,application/json" required>
+    </fieldset>
+    <button class="btn btn-primary">Upload solution</button>
+</form>
 {% endblock %}

@@ -199,6 +199,48 @@ def run_scheduler_export() -> ResponseReturnValue:
     )
 
 
+@cfp_review.route("/schedule/run-scheduler/import", methods=["POST"])
+@schedule_required
+def run_scheduler_import() -> ResponseReturnValue:
+    # Import a solution JSON produced by running slotmachine locally
+    file = request.files.get("solution")
+    if file is None or file.filename == "":
+        flash("Please select a solution JSON file to upload")
+        return redirect(url_for(".run_scheduler"))
+
+    try:
+        talks = [slotmachine.Talk.from_dict(t) for t in json.load(file)["talks"]]
+    except Exception as e:
+        flash(f"Could not parse solution file: {e}")
+        return redirect(url_for(".run_scheduler"))
+
+    potential_schedule = PotentialSchedule(scheduler_stats={"source": "local_import"})
+    errors = []
+    for talk in talks:
+        occurrence = db.session.get(Occurrence, talk.id)
+        venue = db.session.get(Venue, talk.venue) if talk.venue is not None else None
+        if occurrence is None:
+            errors.append(f"unknown occurrence ID {talk.id}")
+        elif talk.start_time is None or venue is None:
+            errors.append(f"occurrence {talk.id} is missing a time or venue")
+        else:
+            potential_schedule.scheduled_occurrences.append(
+                PotentialScheduleOccurrence(
+                    occurrence=occurrence,
+                    venue=venue,
+                    start_time=talk.start_time,
+                )
+            )
+
+    if errors:
+        flash(f"Import failed: {'; '.join(errors[:10])}")
+        return redirect(url_for(".run_scheduler"))
+
+    db.session.add(potential_schedule)
+    db.session.commit()
+    return redirect(url_for(".potential_schedule", schedule_id=potential_schedule.id))
+
+
 @cfp_review.route("/schedule/potential_schedule/<int:schedule_id>", methods=["GET", "POST"])
 @schedule_required
 def potential_schedule(schedule_id: int) -> ResponseReturnValue:
