@@ -296,7 +296,7 @@ def attendee_content_edit(schedule_item_id: int) -> ResponseReturnValue:
         extra_data["participant_cost"] = attributes.participant_cost
         extra_data["age_range"] = attributes.age_range
         extra_data["participant_equipment"] = attributes.participant_equipment
-        extra_data["drop_in"] = str(attributes.drop_in)
+        extra_data["drop_in"] = attributes.drop_in  # type: ignore
 
     form = AttendeeContentForm(obj=schedule_item, **extra_data)
     form.load_choices(schedule_item=schedule_item)
