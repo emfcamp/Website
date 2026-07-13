@@ -22,6 +22,7 @@ def validate_state_transitions[TState](column: Any, allowed_transitions: dict[TS
 
 
 from .cfp import *  # noqa: F403
+from .lightning_talk import *  # noqa: F403
 from .lottery import *  # noqa: F403
 from .potential_schedule import *  # noqa: F403
 from .round import *  # noqa: F403
