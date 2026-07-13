@@ -30,6 +30,7 @@ from .volunteer.shift import ShiftEntry
 if TYPE_CHECKING:
     from .admin_message import AdminMessage
     from .content.cfp import ProposalMessage, ProposalVote
+    from .content.lightning_talks import LightningTalk
     from .content.lottery import LotteryEntry
     from .content.schedule import Occurrence, ScheduleItem, ScheduleItemPresenter
     from .content.tagging import Tag
@@ -296,6 +297,10 @@ class User(BaseModel, UserMixin):
     )
     presented_schedule_items: AssociationProxy[list[ScheduleItem]] = association_proxy(
         "schedule_item_presenters", "schedule_item"
+    )
+
+    lightning_talks: Mapped[list[LightningTalk]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
     )
 
     favourites: Mapped[list[ScheduleItem]] = relationship(

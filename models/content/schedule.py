@@ -54,6 +54,7 @@ from .attributes import (
     WorkshopAttributes,
     attributes_proxy,
 )
+from .lightning_talk import LightningTalk
 from .lottery import Lottery
 
 if typing.TYPE_CHECKING:
@@ -541,6 +542,8 @@ class Occurrence(BaseModel):
 
     proposal: AssociationProxy[Proposal | None] = association_proxy("schedule_item", "proposal")
     user: AssociationProxy[User] = association_proxy("schedule_item", "user")
+
+    lightning_talks: Mapped[list[LightningTalk]] = relationship(back_populates="occurrence")
 
     @property
     def uses_lottery(self) -> bool:
