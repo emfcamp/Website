@@ -24,7 +24,9 @@
     <a href="{{ url_for('.role_volunteers', role_id=role.id) }}" class="btn btn-primary">All Volunteers</a>
     <a href="{{ url_for('.role_edit', role_id=role.id) }}" class="btn btn-primary">Edit</a>
     <a href="{{ url_for('.train_users', role_id=role.id) }}" class="btn btn-primary">Training</a>
-    <a href="{{ url_for('.role_shift_templates', role_id=role.id) }}" class="btn btn-primary">Shift Configuration</a>
+    {% if not role.shifts_finalised %}
+        <a href="{{ url_for('.role_shift_templates', role_id=role.id) }}" class="btn btn-primary">Shift Configuration</a>
+    {% endif %}
     <a href="{{ url_for('.team_admin', team_id=role.team_id) }}" class="btn btn-primary">Team Admins</a>
   </p>
   {% if venues | length > 1 %}
