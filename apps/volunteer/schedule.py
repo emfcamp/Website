@@ -21,7 +21,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload, with_parent
 
 from apps.cfp.date import CONTENT_DAY_START
-from apps.users.calendar import CalendarDict, CalendarEntry, fetch_events
+from apps.users.calendar import CalendarDict, CalendarEntry, VolunteerShiftCalendarEntry, fetch_events
 from main import db, get_or_404
 from models.user import User, generate_api_token
 from models.volunteer.role import Role
@@ -50,6 +50,25 @@ def _get_roles_with_user_data(user):
     return res
 
 
+def _is_adjacent_shift(shift: Shift, ce: CalendarEntry) -> bool:
+    """
+    Special exception: you can overlap the same role in the same place for 15
+    minutes or less. This is to allow for handover times.
+    """
+    if not isinstance(ce, VolunteerShiftCalendarEntry):
+        return False
+    _, overlap_start, overlap_end, _ = sorted(
+        (shift.local_start, shift.local_end, ce.start_time, ce.end_time)
+    )
+    if shift.role != ce.shift.role:
+        return False
+    if shift.venue != ce.shift.venue:
+        return False
+    if overlap_end - overlap_start > timedelta(minutes=15):
+        return False
+    return True
+
+
 def _get_conflicts(shift: Shift, calendar: Sequence[CalendarEntry]) -> tuple[str, list[CalendarDict]]:
     """Return (primary_conflict_type, conflict_details) for a shift.
 
@@ -58,9 +77,15 @@ def _get_conflicts(shift: Shift, calendar: Sequence[CalendarEntry]) -> tuple[str
     each conflicting event.
     """
     conflicts = sorted(
-        [event for event in calendar if event.overlaps_with(shift.local_start, shift.local_end)],
+        [
+            event
+            for event in calendar
+            if event.overlaps_with(shift.local_start, shift.local_end)
+            and not _is_adjacent_shift(shift, event)
+        ],
         key=lambda c: c.conflict_priority,
     )
+
     if not conflicts:
         return "", []
 
