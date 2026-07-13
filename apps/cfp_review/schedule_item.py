@@ -132,6 +132,7 @@ def schedule_items() -> ResponseReturnValue:
 def export_schedule_items(format: str) -> ResponseReturnValue:
     fields = [
         "id",
+        "proposal_id",
         "type",
         "state",
         "names",
