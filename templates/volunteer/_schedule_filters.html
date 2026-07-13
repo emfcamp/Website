@@ -9,18 +9,20 @@
     </div>
     <div class="panel-body" id="roles-body" style="display: none">
         {% for r in roles %}
-            <div class="role-selector">
-                <input
-                    type="checkbox"
-                    class="role"
-                    id="role-{{r.id}}"
-                    data-role-id="{{ r.id }}"
-                    data-trained="{{ r.is_trained }}"
-                    data-interested="{{ r.is_interested }}"
-                    data-owned="{{ r.id in owned_roles }}"
-                />
-                <label for="role-{{r.id}}" id="role-{{r.id}}-label">{{ r.name }}</label>
-            </div>
+            {% if role.shifts_finalised %}
+                <div class="role-selector">
+                    <input
+                        type="checkbox"
+                        class="role"
+                        id="role-{{r.id}}"
+                        data-role-id="{{ r.id }}"
+                        data-trained="{{ r.is_trained }}"
+                        data-interested="{{ r.is_interested }}"
+                        data-owned="{{ r.id in owned_roles }}"
+                    />
+                    <label for="role-{{r.id}}" id="role-{{r.id}}-label">{{ r.name }}</label>
+                </div>
+            {% endif %}
         {% endfor %}
         <hr />
         <p>
