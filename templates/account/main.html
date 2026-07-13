@@ -25,8 +25,13 @@
             <div class="btn-group">
                 {% if not bv.recorded_on_site %}
                 <a class="btn btn-primary" href="{{ url_for("volunteer.buildup_amend") }}">Update details</a>
-                {% elif config['BUILDUP_SIGNAL_GROUP'] %}
-                    <a class="btn btn-primary" href="{{config['BUILDUP_SIGNAL_GROUP']}}" target="_blank">Buildup chat (Signal)</a>
+                {% else %}
+                  {% if config['BUILDUP_SIGNAL_GROUP'] %}
+                  <a class="btn btn-primary" href="{{config['BUILDUP_SIGNAL_GROUP']}}" target="_blank">Buildup chat (Signal)</a>
+                  {% endif %}
+                  {% if config['BUILDUP_OFFTOPIC_GROUP'] %}
+                  <a class="btn btn-primary" href="{{config['BUILDUP_OFFTOPIC_GROUP']}}" target="_blank">Buildup offtopic chat (Signal)</a>
+                  {% endif %}
                 {% endif %}
                 {% if config['BUILDUP_ALERTS_GROUP'] %}
                     <a class="btn btn-primary" href="{{config['BUILDUP_ALERTS_GROUP']}}" target="_blank">Buildup alerts (Signal)</a>

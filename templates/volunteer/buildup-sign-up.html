@@ -25,8 +25,13 @@
         {% if config['BUILDUP_ALERTS_GROUP'] %}
             <a class="btn btn-primary btn-lg" href="{{config['BUILDUP_ALERTS_GROUP']}}">Buildup Alerts (Signal)</a>
         {% endif %}
-        {% if current_user.buildup_volunteer.recorded_on_site and config['BUILDUP_SIGNAL_GROUP'] %}
-            <a class="btn btn-primary btn-lg" href="{{config['BUILDUP_SIGNAL_GROUP']}}">Buildup Chat (Signal)</a>
+        {% if current_user.buildup_volunteer.recorded_on_site %}
+            {% if config['BUILDUP_SIGNAL_GROUP'] %}
+                <a class="btn btn-primary btn-lg" href="{{config['BUILDUP_SIGNAL_GROUP']}}">Buildup Chat (Signal)</a>
+            {% endif %}
+            {% if config['BUILDUP_OFFTOPIC_GROUP'] %}
+                <a class="btn btn-primary btn-lg" href="{{config['BUILDUP_OFFTOPIC_GROUP']}}">Buildup Offtopic Chat (Signal)</a>
+            {% endif %}
         {% endif %}
     </div>
     {% endif %}
