@@ -25,7 +25,7 @@ from wtforms import (
     TextAreaField,
     TimeField,
 )
-from wtforms.validators import DataRequired, NumberRange
+from wtforms.validators import DataRequired, NumberRange, ValidationError
 
 from apps.common.fields import HiddenIntegerField
 from main import db, get_or_404
@@ -71,6 +71,21 @@ class OccurrenceForm(Form):
     scheduled_time_day = SelectField("Day", [DataRequired()])
     scheduled_time_time = TimeField("Start time", [DataRequired()])
     scheduled_venue_id = SelectField("Venue", [DataRequired()], coerce=int)
+
+    def validate_scheduled_duration(form, field):
+        if field.data is None or not form.scheduled_time_day.data or form.scheduled_time_time.data is None:
+            return
+        try:
+            start = datetime.fromisoformat(
+                f"{form.scheduled_time_day.data}T{form.scheduled_time_time.data.strftime('%H:%M')}"
+            )
+        except ValueError:
+            return
+
+        # Allow people to go 12 hours past the end of the event, for late night
+        # fun and monday morning breakfasts
+        if start + timedelta(minutes=field.data) + timedelta(hours=12) > config.event_end:
+            raise ValidationError("Events can't finish after the festival ends")
 
     def day_choices(self):
         d = config.event_start.date()
