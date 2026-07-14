@@ -203,15 +203,19 @@ def checkin(user_id, source=None):
             # Only allow bulk completion, not undoing
             try:
                 p.redeem()
-            except CheckinStateException:
-                failed.append(p)
+            except CheckinStateException as e:
+                failed.append((p, e))
 
         db.session.commit()
 
         if failed:
-            failed_str = ", ".join(str(p.id) for p in failed)
+            failed_dl = Markup("").join(Markup("<dt>{}</dt><dd>{}</dd>").format(p.id, e) for p, e in failed)
             success_count = len(purchases) - len(failed)
-            flash(f"Checked in {success_count} purchases. Already checked in: {failed_str}")
+            flash(
+                Markup("Checked in {} purchases. Failed check-in: <dl>{}</dl>").format(
+                    success_count, failed_dl
+                )
+            )
 
             return redirect(url_for(".checkin", user_id=user.id))
 
