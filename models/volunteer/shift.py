@@ -421,7 +421,7 @@ class Shift(BaseModel):
         """
         next_day = day + timedelta(days=1)
         start = event_tz.localize(datetime.strptime(f"{day} 03:59:00", "%Y-%m-%d %H:%M:%S"))
-        end = event_tz.localize(datetime.strptime(f"{next_day} 04:00:00", "%Y-%m-%d %H:%M:%S"))
+        end = event_tz.localize(datetime.strptime(f"{next_day} 05:00:00", "%Y-%m-%d %H:%M:%S"))
 
         query = (
             select(cls)
