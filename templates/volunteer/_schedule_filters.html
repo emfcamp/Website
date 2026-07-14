@@ -9,7 +9,7 @@
     </div>
     <div class="panel-body" id="roles-body" style="display: none">
         {% for r in roles %}
-            {% if r.shifts_finalised %}
+            {% if is_admin or r.shifts_finalised %}
                 <div class="role-selector">
                     <input
                         type="checkbox"
