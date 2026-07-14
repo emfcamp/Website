@@ -31,6 +31,10 @@ __all__ = [
 
 event_tz = pytz.timezone("Europe/London")
 
+# TODO: Share this with the CFP's CONTENT_DAY_START - doing so causes a circular
+# import I don't really have the time to go and fix right now.
+DAY_START = time(5)
+
 
 class ShiftEntryState(enum.StrEnum):
     SIGNED_UP = "signed_up"
@@ -412,22 +416,21 @@ class Shift(BaseModel):
     def get_all_for_day(cls, day: date, *, include_unfinalised: bool = False) -> Sequence[Self]:
         """Return all shifts for the requested day.
 
-        For the purposes of shifts we consider a day to run from 04:00-03:59 so
+        For the purposes of shifts we consider a day to run from 05:00-04:59 so
         that late night shifts get shown in the context of the day leading up to
         them.
 
         If `include_unfinalised` is True than all shifts will be returned, otherwise
         only those from finalised roles will be returned.
         """
-        next_day = day + timedelta(days=1)
-        start = event_tz.localize(datetime.strptime(f"{day} 03:59:00", "%Y-%m-%d %H:%M:%S"))
-        end = event_tz.localize(datetime.strptime(f"{next_day} 05:00:00", "%Y-%m-%d %H:%M:%S"))
+        start = event_tz.localize(datetime.combine(day, DAY_START) - timedelta(seconds=1))
+        end = event_tz.localize(datetime.combine(day + timedelta(days=1), DAY_START))
 
         query = (
             select(cls)
             .join(Shift.venue)
             .where(Shift.start >= start)
-            .where(Shift.end <= end)
+            .where(Shift.start <= end)
             .order_by(Shift.start, Shift.end, VolunteerVenue.name)
         )
 
