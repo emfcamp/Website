@@ -30,7 +30,7 @@ from .volunteer.shift import ShiftEntry
 if TYPE_CHECKING:
     from .admin_message import AdminMessage
     from .content.cfp import ProposalMessage, ProposalVote
-    from .content.lightning_talks import LightningTalk
+    from .content.lightning_talk import LightningTalk
     from .content.lottery import LotteryEntry
     from .content.schedule import Occurrence, ScheduleItem, ScheduleItemPresenter
     from .content.tagging import Tag

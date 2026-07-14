@@ -199,13 +199,14 @@ class EditLightningTalkForm(LightningTalkForm):
 
 
 def get_occurrence_time_remaining(occurrence: Occurrence) -> int:
-    length_of_current_slots = LIGHTNING_TALK_LENGTH * len(occurrence.lightning_talks)
-    return occurrence.scheduled_duration - length_of_current_slots
+    allocated_time = LIGHTNING_TALK_LENGTH * len(occurrence.lightning_talks)
+    total_duration = 0 if not occurrence.scheduled_duration else occurrence.scheduled_duration
+    return total_duration - allocated_time
 
 
-def get_days_with_slots() -> list:
+def get_days_with_slots() -> list[tuple[str, int]]:
     schedule_item = (
-        db.session.query(ScheduleItem).filter(ScheduleItem.title == "Lightning Talk").one_or_none()
+        db.session.query(ScheduleItem).filter(ScheduleItem.title == "Lightning Talks").one_or_none()
     )
     if not schedule_item:
         return []
@@ -213,9 +214,13 @@ def get_days_with_slots() -> list:
     days_with_slots = []
     for occurrence in schedule_item.occurrences:
         remaining_time = get_occurrence_time_remaining(occurrence)
+        scheduled_time = occurrence.scheduled_time
+
+        if not scheduled_time:
+            continue
 
         if remaining_time > 0:
-            day_of_week = occurrence.scheduled_time.strftime("%A")  # e.g. -> "Friday"
+            day_of_week = scheduled_time.strftime("%A")  # e.g. -> "Friday"
             days_with_slots.append((day_of_week, occurrence.id))
 
     return days_with_slots
