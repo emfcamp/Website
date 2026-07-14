@@ -87,13 +87,13 @@ our non-profit festival in the UK this summer.{% endblock %}
         {{ proposal_type_menu('performance', ' A performance of music, art, dance, or film', 'CFP_PERFORMANCES_CLOSED', ignore_closed) }}
         {{ proposal_type_menu('installation', ' A creation for attendees to admire or interact with', 'CFP_INSTALLATIONS_CLOSED', ignore_closed) }}
 
-        {# Lightning talks will go straight in as schedule items, they need their own logic
-        {%- if feature_enabled('LIGHTNING_TALKS') and not lightning_talks_closed %}
+        {# Lightning talks will go straight in as schedule items, they need their own logic #}
+        {%- if feature_enabled('LIGHTNING_TALKS') and not lightning_talks_full %}
           <a href="{{ url_for('cfp.create_lightning_talk') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Lightning Talk</strong> &ndash; A quick-fire (5m) presentation</a>
-        {%- elif feature_enabled('LIGHTNING_TALKS') and lightning_talks_closed %}
+        {%- elif feature_enabled('LIGHTNING_TALKS') and lightning_talks_full %}
           <span class="list-group-item"><strong>Lightning Talk</strong> &ndash; A quick-fire (5m) presentation. These are now full.</span>
         {% endif %}
-        #}
+
     </div>
 
     {% if current_user.is_authenticated %}

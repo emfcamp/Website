@@ -1,0 +1,31 @@
+{% from "_formhelpers.html" import render_field %}
+{% from "cfp/_proposal_type_menu.html" import proposal_type_menu with context %}
+{% extends "base.html" %}
+{% block title %}Call for Participation{% endblock %}
+{% block description %}Electromagnetic Field is looking for lightning talks for
+our non-profit festival in the UK this summer.{% endblock %}
+{% block body %}
+    <div class="well" id="cfp-errors">
+        <p>
+            <b>Lightning Talks</b> are short (5minutes) talks presented all together.
+            Each talk may have slides but the slides will automatically advance.
+        </p>
+        <p>
+            These can be on any topic, deep or shallow, funny or fast. The only
+            stipulation is that you only get 5minutes.
+        </p>
+        <p>
+            You can choose which session you'd like to do but slots are allocated
+            first come first served. Please make sure you turn up early.
+        </p>
+
+        <form action={{ url_for('cfp.edit_lightning_talk', lightning_talk_id=lightning_talk.id) }} method="post" class="form-horizontal cfp-form" role="form">
+            {{ render_field(form.title) }}
+            {{ render_field(form.description) }}
+            {{ render_field(form.slide_link) }}
+            <p>You selected the {{ lightning_talk.occurrence.scheduled_time.strftime("%A") }} slot</p>
+            {{ render_field(form.submit) }}
+            {{ form.cancel(class_="btn-primary") }}
+        </form>
+    </div>
+{% endblock %}
