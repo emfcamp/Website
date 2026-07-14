@@ -27,6 +27,8 @@ from models.content import (
     AGE_RANGE_OPTIONS,
     DURATION_OPTIONS,
     PROPOSAL_INFOS,
+    LightningTalk,
+    Occurrence,
     Proposal,
     ProposalMessage,
     ProposalType,
@@ -42,6 +44,8 @@ from ..common.forms import DiversityForm, Form
 from ..common.mattermost import mattermost_notify
 from ..config import config
 from . import cfp
+
+LIGHTNING_TALK_LENGTH = 5  # in minutes
 
 
 class ProposalForm(Form):
@@ -171,38 +175,50 @@ def get_proposal_type_form(proposal_type: ProposalType) -> type[ProposalForm]:
 
 # FIXME placeholder for new form
 class LightningTalkForm(Form):
-    name = StringField("Name", [DataRequired()])
-    email = EmailField("Email", [DataRequired()])
     title = StringField("Title", [DataRequired()])
     description = TextAreaField("Description", [DataRequired()])
 
     slide_link = StringField("Link to your slides (PDF only)", [DataRequired(), URL()])
+
+    submit = SubmitField("Submit")
+
+
+class CreateLightningTalkForm(LightningTalkForm):
     session = SelectField("Choose the session you'd like to present at")
 
-    def set_session_choices(self, remaining_lightning_slots):
+    def set_session_choices(self):
         self.session.choices = []
-        # for day_id, day_count in remaining_lightning_slots.items():
-        raise NotImplementedError
-
-    def validate_email(form, field):
-        if current_user.is_anonymous and User.does_user_exist(field.data):
-            field.was_duplicate = True
-            cfp_url = url_for("cfp.main")  # FIXME
-
-            msg = Markup(
-                render_template_string(
-                    """You already have an account.
-                Please <a href="{{ url }}" target="_new">click here</a> to log in.""",
-                    url=url_for("users.login", next=cfp_url, email=field.data),
-                )
-            )
-
-            raise ValidationError(msg)
+        for day, occurrence_id in get_days_with_slots():
+            self.session.choices.append((occurrence_id, day))
 
 
-# FIXME: orphan lightning talk implementation, awaiting the slot refactor
-def get_days_with_slots():
-    return {}
+class EditLightningTalkForm(LightningTalkForm):
+    # Skip the session stuff because it is too late to deal with dropdowns
+    # instead give a cancel option and they can re-submit
+    cancel = SubmitField("Cancel submission")
+
+
+def get_occurrence_time_remaining(occurrence: Occurrence) -> int:
+    length_of_current_slots = LIGHTNING_TALK_LENGTH * len(occurrence.lightning_talks)
+    return occurrence.scheduled_duration - length_of_current_slots
+
+
+def get_days_with_slots() -> list:
+    schedule_item = (
+        db.session.query(ScheduleItem).filter(ScheduleItem.title == "Lightning Talk").one_or_none()
+    )
+    if not schedule_item:
+        return []
+
+    days_with_slots = []
+    for occurrence in schedule_item.occurrences:
+        remaining_time = get_occurrence_time_remaining(occurrence)
+
+        if remaining_time > 0:
+            day_of_week = occurrence.scheduled_time.strftime("%A")  # e.g. -> "Friday"
+            days_with_slots.append((day_of_week, occurrence.id))
+
+    return days_with_slots
 
 
 @cfp.route("/cfp")
@@ -215,7 +231,7 @@ def main() -> ResponseReturnValue:
     if feature_enabled("CFP_CLOSED") and not ignore_closed:
         return render_template("cfp/closed.html")
 
-    lightning_talks_closed = all([i <= 0 for i in get_days_with_slots().values()])
+    lightning_talks_full = len(get_days_with_slots()) == 0
 
     proposal_infos_open = []
     proposal_infos_closed = []
@@ -231,7 +247,7 @@ def main() -> ResponseReturnValue:
         ignore_closed=ignore_closed,
         proposal_infos_open=proposal_infos_open,
         proposal_infos_closed=proposal_infos_closed,
-        lightning_talks_closed=lightning_talks_closed,
+        lightning_talks_full=lightning_talks_full,
     )
 
 
@@ -240,6 +256,74 @@ def main() -> ResponseReturnValue:
 @feature_flag("CFP")
 def create_youthworkshop_proposal_redirect() -> ResponseReturnValue:
     return redirect(url_for(".create_proposal", proposal_type="familyworkshop"))
+
+
+@cfp.route("/cfp/lightning-talk", methods=["GET", "POST"])
+@feature_flag("CFP")
+def create_lightning_talk() -> ResponseReturnValue:
+    if not feature_enabled("LIGHTNING_TALKS"):
+        return render_template("cfp/closed.html", proposal_type="lightning-talk")
+
+    if not current_user.is_authenticated:
+        return redirect(url_for("users.login", next=request.path))
+    form = CreateLightningTalkForm()
+    form.set_session_choices()
+
+    if form.validate_on_submit():
+        occurrence_id = form.session.data
+        occurrence = get_or_404(db, Occurrence, occurrence_id)
+
+        if get_occurrence_time_remaining(occurrence) <= 0:
+            flash("Sorry that session is now full.")
+            return redirect(url_for(".create_lightning_talk"))
+
+        talk = LightningTalk(user_id=current_user.id, occurrence_id=occurrence_id)
+
+        form.populate_obj(talk)
+
+        db.session.add(talk)
+        db.session.commit()
+        app.logger.info(f"Added new lightning-talk '{talk.title}'")
+        flash("Thank you for submitting a lightning talk!")
+        return redirect(url_for(".edit_lightning_talk", lightning_talk_id=talk.id))
+
+    return render_template("cfp/create_lightning_talk.html", form=form)
+
+
+@cfp.route("/cfp/lightning-talk/<int:lightning_talk_id>", methods=["GET", "POST"])
+@feature_flag("CFP")
+def edit_lightning_talk(lightning_talk_id: int) -> ResponseReturnValue:
+    if not feature_enabled("LIGHTNING_TALKS"):
+        return render_template("cfp/closed.html", proposal_type="lightning-talk")
+
+    if not current_user.is_authenticated:
+        return redirect(url_for("users.login", next=request.path))
+
+    form = EditLightningTalkForm()
+    lightning_talk = get_or_404(db, LightningTalk, lightning_talk_id)
+
+    if current_user.id != lightning_talk.user_id:
+        return redirect(url_for("users.account"))
+
+    if form.validate_on_submit():
+        if form.cancel.data:
+            db.session.delete(lightning_talk)
+            db.session.commit()
+            app.logger.info(f"Deleted lightning-talk '{lightning_talk.title}'")
+            flash(f"Cancelled lightning talk, '{lightning_talk.title}'")
+            return redirect(url_for(".main"))
+
+        form.populate_obj(lightning_talk)
+        db.session.commit()
+        app.logger.info(f"Edited lightning-talk '{lightning_talk.title}'")
+        flash("Updated")
+        return redirect(url_for(".edit_lightning_talk", lightning_talk_id=lightning_talk.id))
+
+    form.title.data = lightning_talk.title
+    form.description.data = lightning_talk.description
+    form.slide_link.data = lightning_talk.slide_link
+
+    return render_template("cfp/edit_lightning_talk.html", form=form, lightning_talk=lightning_talk)
 
 
 @cfp.route("/cfp/<string:proposal_type>", methods=["GET", "POST"])
