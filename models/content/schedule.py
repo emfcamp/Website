@@ -558,8 +558,8 @@ class Occurrence(BaseModel):
     @validates("scheduled_duration")
     def validate_scheduled_duration(self, key: str, value: int | None) -> int | None:
         """SQLAlchemy validator to ensure duration is a multiple of the slot duration."""
-        if value is None:
-            return value
+        if value is None or value == 0:
+            return None
 
         # When creating an occurrence, the schedule_item isn't available so we can't run this check here
         # Attendee content does not need to conform to the slot duration.
