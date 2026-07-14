@@ -69,6 +69,21 @@
 </div>
 {% endfor %}
 
+<h2>Your Lightning talks</h2>
+
+{% for l_talk in lightning_talks %}
+    <div class="well">
+        <div><h3>{{l_talk.title}}</h3></div>
+        <div class="col-md-9">
+            <p>Session: {{ l_talk.occurrence.scheduled_time.strftime("%A %H:%M") }} on {{ l_talk.occurrence.scheduled_venue.name }}</p>
+        </div>
+        <div class="col-md-3">
+            <div class="pull-right"><a href="{{ url_for("cfp.edit_lightning_talk", lightning_talk_id=l_talk.id) }}" class="btn btn-info">Edit</a></div>
+        </div>
+        &nbsp;
+    </div>
+{% endfor %}
+
 <div class="pull-right">
   <a href="{{ url_for('cfp.main') }}" class="btn btn-success">Submit a new proposal</a>
 </div>
