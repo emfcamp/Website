@@ -316,8 +316,8 @@ def edit_lightning_talk(lightning_talk_id: int) -> ResponseReturnValue:
         form.populate_obj(lightning_talk)
         db.session.commit()
         app.logger.info(f"Edited lightning-talk '{lightning_talk.title}'")
-        flash("Updated")
-        return redirect(url_for(".edit_lightning_talk", lightning_talk_id=lightning_talk.id))
+        flash(f"Updated lightning-talk '{lightning_talk.title}'")
+        return redirect(url_for(".proposals", lightning_talk_id=lightning_talk.id))
 
     form.title.data = lightning_talk.title
     form.description.data = lightning_talk.description
@@ -456,10 +456,11 @@ def complete() -> ResponseReturnValue:
 @login_required
 def proposals() -> ResponseReturnValue:
     proposals = current_user.proposals
-    if not proposals:
+    lightning_talks = current_user.lightning_talks
+    if not proposals or not lightning_talks:
         return redirect(url_for(".main"))
 
-    return render_template("cfp/proposals.html", proposals=proposals)
+    return render_template("cfp/proposals.html", proposals=proposals, lightning_talks=lightning_talks)
 
 
 @cfp.route("/cfp/proposals/<int:proposal_id>/edit", methods=["GET", "POST"])
