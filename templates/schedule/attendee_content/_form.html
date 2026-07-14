@@ -132,6 +132,7 @@
     <div class="form-group {%- if form.description.errors %} has-error {%- endif %}">
         <label for="description">Description</label>
         <textarea class="form-control" id="description" name="description">{%- if form.data.description %}{{ form.data.description }}{%- endif %}</textarea>
+        <p class="help-block">Please also include details of how people can join your session - do they need to sign up in advance, or can they just turn up?</p>
         {% if form.description.errors %}
             {% for error in form.description.errors %}
                 <p class="help-block" id="help-block-description">{{ error }}</p>
