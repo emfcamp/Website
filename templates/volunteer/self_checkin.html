@@ -42,7 +42,7 @@
                     <td class="start_time">{{ shift.local_start.strftime("%H:%M") }}</td>
                     <td class="end_time">{{ shift.local_end.strftime("%H:%M") }}</td>
                     <td class="time mobile-only">
-                        {{ shift.local_local_start.strftime("%H:%M") }}{% if shift.local_end %} to {{ shift.local_end.strftime("%H:%M") }}{% endif %}
+                        {{ shift.local_start.strftime("%H:%M") }}{% if shift.local_end %} to {{ shift.local_end.strftime("%H:%M") }}{% endif %}
                     </td>
                     <td class="role">{{ shift.role.name }}</td>
                     <td class="button">
