@@ -23,6 +23,7 @@ from apps.common import get_next_url
 from apps.common.email import enqueue_emails
 from main import db, external_url, get_or_404
 from models.content import (
+    LightningTalk,
     Occurrence,
     Proposal,
     ProposalMessage,
@@ -587,19 +588,11 @@ def get_total_lightning_talk_slots():
 @cfp_review.route("/lightning-talks")
 @schedule_required
 def lightning_talks():
-    filter_query = {"type": "lightning"}
-    if "day" in request.args:
-        filter_query["session"] = request.args["day"]
-
-    proposals = ScheduleItem.query.filter_by(**filter_query).filter(ScheduleItem.state != "withdrawn").all()
-
-    remaining_lightning_slots = get_remaining_lightning_slots()
+    lightning_talks = db.session.query(LightningTalk)
 
     return render_template(
         "cfp_review/lightning_talks_list.html",
-        proposals=proposals,
-        remaining_lightning_slots=remaining_lightning_slots,
-        total_slots=get_total_lightning_talk_slots(),
+        lightning_talks=lightning_talks,
     )
 
 
