@@ -3,30 +3,6 @@
 {% block body %}
 <h2>Lightning Talks</h2>
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h4 class="panel-title">
-            <a role="button" data-toggle="collapse" data-target="#searchPanel"
-                aria-controls="searchPanel" aria-expanded="true">
-                Filter by day ({{ remaining_lightning_slots.values() | sum | int }} of {{ total_slots.values() | sum | int }} slots remain)
-            </a>
-        </h4>
-    </div>
-    <div class="panel-body collapse
-    {%- if filtered %}in{% endif %}
-        " id="searchPanel">
-        <ul>
-            <li><a href="{{ url_for('.lightning_talks', day='fri') }}">Friday ({{ remaining_lightning_slots['fri'] | int }} of {{ total_slots['fri'] | int }}  slots remain)</a></li>
-            <li><a href="{{ url_for('.lightning_talks', day='sat') }}">Saturday ({{ remaining_lightning_slots['sat'] | int }} of {{ total_slots['sat'] | int }} slots remain)</a></li>
-            <li><a href="{{ url_for('.lightning_talks', day='sun') }}">Sunday ({{ remaining_lightning_slots['sun'] | int }} of {{ total_slots['sun'] | int }} slots remain)</a></li>
-        </ul>
-    </div>
-</div>
-<div>
-    There may be withdrawn lightning talks, you can see them <a href="{{ url_for('.proposals', state='withdrawn', type='lightning') }}">here</a>
-</div>
-<div>&nbsp;</div>
-
 
 <table class="table table-condensed">
     <tr>
@@ -40,12 +16,12 @@
         <th>Title</th>
         <th>Slides</th>
     </tr>
-    {% for proposal in proposals | sort(attribute='session,user.name')%}
+    {% for talk in lightning_talks | sort(attribute='occurrence_id')%}
         <tr>
-            <td>{{ proposal.session }}</td>
-            <td><a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id ) }}">{{ proposal.user.name }}</a></td>
-            <td><a href="{{ url_for('.proposal', proposal_id=proposal.id, **full_qs) }}">{{ proposal.title }}</a></td>
-            <td><a href="{{ proposal.slide_link }}">{{ proposal.slide_link }}</a></td>
+            <td>{{ talk.occurrence.scheduled_time.strftime("%A %H:%M") }}</td>
+            <td><a href="{{ url_for('cfp_review.cfp_user', user_id=talk.user.id ) }}">{{ talk.user.name }}</a></td>
+            <td>{{ talk.title }}</td>
+            <td><a href="{{ talk.slide_link }}">{{ talk.slide_link }}</a></td>
         </tr>
     {% else %}
         <tr><td colspan="5" class="text-center">No proposals found</td></tr>
