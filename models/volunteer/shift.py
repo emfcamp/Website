@@ -321,7 +321,11 @@ class Shift(BaseModel):
 
     current_count = column_property(
         select(func.count(ShiftEntry.shift_id))
-        .where(ShiftEntry.shift_id == id)
+        .where(
+            ShiftEntry.shift_id == id,
+            ShiftEntry.state != ShiftEntryState.NO_SHOW,
+            ShiftEntry.state != ShiftEntryState.ABANDONED,
+        )
         .correlate_except(ShiftEntry)
         .scalar_subquery()
     )
