@@ -462,7 +462,7 @@ def complete() -> ResponseReturnValue:
 def proposals() -> ResponseReturnValue:
     proposals = current_user.proposals
     lightning_talks = current_user.lightning_talks
-    if not proposals or not lightning_talks:
+    if not proposals and not lightning_talks:
         return redirect(url_for(".main"))
 
     return render_template("cfp/proposals.html", proposals=proposals, lightning_talks=lightning_talks)
