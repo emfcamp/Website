@@ -227,12 +227,14 @@ def schedule_ical():
 
 @volunteer.route("/shift/<shift_id>", methods=["GET"])
 @feature_flag("VOLUNTEERS_SCHEDULE")
-@v_admin_required
+@v_user_required
 def shift(shift_id):
     shift = get_or_404(db, Shift, shift_id)
     all_volunteers = Volunteer.query.order_by(Volunteer.nickname).all()
-
-    return render_template("volunteer/shift.html", shift=shift, all_volunteers=all_volunteers)
+    is_user_shift = current_user in shift.volunteers
+    return render_template(
+        "volunteer/shift.html", shift=shift, all_volunteers=all_volunteers, is_user_shift=is_user_shift
+    )
 
 
 @volunteer.route("/shift/<shift_id>/sign-up", methods=["POST"])
