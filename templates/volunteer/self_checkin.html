@@ -39,7 +39,7 @@
             {% for shift_entry in open_shift_entries %}
                 {% set shift = shift_entry.shift %}
                 <tr id="shift-{{ shift_entry.id }}">
-                    <td class="start_time">{{ shift.local_local_start.strftime("%H:%M") }}</td>
+                    <td class="start_time">{{ shift.local_start.strftime("%H:%M") }}</td>
                     <td class="end_time">{{ shift.local_end.strftime("%H:%M") }}</td>
                     <td class="time mobile-only">
                         {{ shift.local_local_start.strftime("%H:%M") }}{% if shift.local_end %} to {{ shift.local_end.strftime("%H:%M") }}{% endif %}
