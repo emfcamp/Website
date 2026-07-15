@@ -22,9 +22,9 @@ We do not tolerate abuse, harassment, or discriminatory behaviour of any form. S
 
 If you are being harassed or witness a breach of this code of conduct, you can get in touch with us by:
 
-* Filling out our [contact form](https://forms.gle/P6NAYsWzZuViDrud9).
+* Filling out our [contact form](https://report.emf.camp).
+* Calling us on **1234** (from a phone on site) or **0114 501 1234** (event time only).
 * Sending us an email at [conduct@emfcamp.org](mailto:conduct@emfcamp.org).
-* Calling us on **1234** (from a phone on site) or **0333 112 2944**.
 * Finding a member of event staff (they'll be clearly identifiable) and let them know. All our volunteer staff will be briefed on how to handle reports.
 
 ## Our response
