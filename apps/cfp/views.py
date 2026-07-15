@@ -213,6 +213,9 @@ def get_days_with_slots() -> list[tuple[str, int]]:
 
     days_with_slots = []
     for occurrence in schedule_item.occurrences:
+        if occurrence.cancelled:
+            continue
+
         remaining_time = get_occurrence_time_remaining(occurrence)
         scheduled_time = occurrence.scheduled_time
 
@@ -220,7 +223,7 @@ def get_days_with_slots() -> list[tuple[str, int]]:
             continue
 
         if remaining_time > 0:
-            day_of_week = scheduled_time.strftime("%A")  # e.g. -> "Friday"
+            day_of_week = scheduled_time.strftime("%A %H:%M")  # e.g. -> "Friday"
             days_with_slots.append((day_of_week, occurrence.id))
 
     return days_with_slots
@@ -273,6 +276,10 @@ def create_lightning_talk() -> ResponseReturnValue:
         return redirect(url_for("users.login", next=request.path))
     form = CreateLightningTalkForm()
     form.set_session_choices()
+
+    if len(get_days_with_slots()) == 0:
+        flash("Sorry all lightning talk sessions are now full")
+        return redirect(url_for(".main"))
 
     if form.validate_on_submit():
         occurrence_id = form.session.data
