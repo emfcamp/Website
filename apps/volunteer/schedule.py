@@ -230,6 +230,9 @@ def schedule_ical():
 @v_user_required
 def shift(shift_id):
     shift = get_or_404(db, Shift, shift_id)
+    if not shift.role.shifts_finalised:
+        abort(404)
+
     all_volunteers = Volunteer.query.order_by(Volunteer.nickname).all()
     is_user_shift = current_user in shift.volunteers
 
