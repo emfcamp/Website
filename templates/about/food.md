@@ -23,7 +23,7 @@ You are welcome to bring your own food and drink if you'd prefer. Please keep in
 There'll be a shop on site offering a range of camping friendly food and drink, and if you need a larger resupply there's a Tesco in Ledbury, which is a five minute drive away, and easily accessible via the shuttle bus.
 
 ## Drink
-The bars accept cards, cash, and contactless payments. During the event, there will be a page listing the opening hours and what the bar is currently serving.
+The bars accept cards, cash, and contactless payments.
 
 You can check the opening hours and see what the bar is currently serving by visiting [bar.emf.camp](https://bar.emf.camp).
 
