@@ -43,7 +43,14 @@ from ..config import config
 from . import admin_required, bool_qs, cfp_review, schedule_required, sort_proposals
 from .email import send_email_for_proposal
 from .estimation import get_cfp_estimate
-from .forms import AcceptanceForm, CloseRoundForm, InviteSpeakerForm, ReversionForm, SendMessageForm
+from .forms import (
+    AcceptanceForm,
+    CloseRoundForm,
+    DeleteLightningTalkForm,
+    InviteSpeakerForm,
+    ReversionForm,
+    SendMessageForm,
+)
 from .majority_judgement import calculate_max_normalised_score
 
 
@@ -587,12 +594,35 @@ def get_total_lightning_talk_slots():
 
 @cfp_review.route("/lightning-talks")
 @schedule_required
-def lightning_talks():
+def lightning_talks() -> ResponseReturnValue:
     lightning_talks = db.session.query(LightningTalk)
 
     return render_template(
         "cfp_review/lightning_talks_list.html",
         lightning_talks=lightning_talks,
+    )
+
+
+@cfp_review.route("/lightning-talks/<int:lightning_talk_id>", methods=["GET", "POST"])
+@schedule_required
+def lightning_talk_detail(lightning_talk_id: int) -> ResponseReturnValue:
+    lightning_talk = get_or_404(db, LightningTalk, lightning_talk_id)
+
+    form = DeleteLightningTalkForm()
+
+    if form.validate_on_submit() and form.delete.data:
+        db.session.delete(lightning_talk)
+        db.session.commit()
+
+        msg = f"Deleted lightning talk {lightning_talk.id}: '{lightning_talk.title}'"
+        flash(msg)
+        app.logger.info(msg)
+        return redirect(url_for(".lightning_talks"))
+
+    return render_template(
+        "cfp_review/lightning_talks_detail.html",
+        lightning_talk=lightning_talk,
+        form=form,
     )
 
 

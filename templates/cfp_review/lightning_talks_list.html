@@ -34,7 +34,7 @@
         <tr>
             <td>{{ talk.occurrence.scheduled_time.strftime("%A %H:%M") }}</td>
             <td><a href="{{ url_for('cfp_review.cfp_user', user_id=talk.user.id ) }}">{{ talk.user.name }}</a></td>
-            <td>{{ talk.title }}</td>
+            <td><a href="{{ url_for('.lightning_talk_detail', lightning_talk_id=talk.id) }}">{{ talk.title }}</a></td>
             <td><a href="{{ talk.slide_link }}">{{ talk.slide_link }}</a></td>
         </tr>
     {% else %}

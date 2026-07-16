@@ -1,0 +1,17 @@
+{% extends "cfp_review/base.html" %}
+{% block title %}Lightning Talks{% endblock %}
+{% block body %}
+<h2>Lightning Talk</h2>
+
+<dl>
+    <dt>ID</dt><dd>{{ lightning_talk.id }}</dd>
+    <dt>Title</dt><dd>{{ lightning_talk.title }}</dd>
+    <dt>Description</dt><dd>{{ lightning_talk.description }}</dd>
+    <dt>Session</dt><dd>{{ lightning_talk.occurrence.scheduled_time.strftime("%A %H:%M") }}</dd>
+</dl>
+<form method="post">
+    {{ form.hidden_tag() }}
+    {{ form.delete(class_="btn btn-danger") }}
+    <a class="btn btn-success" href="{{ url_for(".lightning_talks") }}">Cancel</a>
+</form>
+{% endblock %}
