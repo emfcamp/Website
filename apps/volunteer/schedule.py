@@ -232,6 +232,7 @@ def shift(shift_id):
     shift = get_or_404(db, Shift, shift_id)
     all_volunteers = Volunteer.query.order_by(Volunteer.nickname).all()
     is_user_shift = current_user in shift.volunteers
+
     return render_template(
         "volunteer/shift.html", shift=shift, all_volunteers=all_volunteers, is_user_shift=is_user_shift
     )
@@ -286,7 +287,8 @@ def shift_sign_up(shift_id):
 @v_user_required
 def shift_cancel(shift_id):
     shift = get_or_404(db, Shift, shift_id)
-
+    if not Shift.role.shifts_finalised and not Volunteer.get_for_user(current_user).is_volunteer_admin:
+        abort(404)
     user = current_user
     shift_entry = ShiftEntry.query.filter_by(user_id=user.id, shift_id=shift.id).first()
     if shift_entry:
