@@ -84,7 +84,7 @@ class OccurrenceForm(Form):
 
         # Allow people to go 12 hours past the end of the event, for late night
         # fun and monday morning breakfasts
-        if start + timedelta(minutes=field.data) + timedelta(hours=12) > config.event_end:
+        if start + timedelta(minutes=field.data) > config.event_end + timedelta(hours=12):
             raise ValidationError("Events can't finish after the festival ends")
 
     def day_choices(self):
