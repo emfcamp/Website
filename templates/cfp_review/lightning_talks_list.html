@@ -3,6 +3,20 @@
 {% block body %}
 <h2>Lightning Talks</h2>
 
+<table class="table table-condensed">
+    <tr>
+        <th>Session</th>
+        <th>Count</th>
+    </tr>
+    {% for _, talk_list in lightning_talks | groupby(attribute='occurrence_id') | sort(attribute='occurrence_id') %}
+        <tr>
+            <td>{{ talk_list[0].occurrence.scheduled_time.strftime("%A %H:%M") }}</td>
+            <td>{{ talk_list | length }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<p>&nbsp;</p>
 
 <table class="table table-condensed">
     <tr>
@@ -16,7 +30,7 @@
         <th>Title</th>
         <th>Slides</th>
     </tr>
-    {% for talk in lightning_talks | sort(attribute='occurrence_id')%}
+    {% for talk in lightning_talks | sort(attribute='occurrence_id') %}
         <tr>
             <td>{{ talk.occurrence.scheduled_time.strftime("%A %H:%M") }}</td>
             <td><a href="{{ url_for('cfp_review.cfp_user', user_id=talk.user.id ) }}">{{ talk.user.name }}</a></td>
