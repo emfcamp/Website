@@ -69,7 +69,7 @@
   </div>
 
   <h3>Upcoming Shifts</h3>
-  {% for shift in shifts %}
+  {% for shift in upcoming_shifts %}
     <div class="role-admin-shift well content-well">
       <h4 id="shift-{{ shift.id }}">
         {{ shift.local_start.strftime("%a %H:%M") }} - {{ shift.local_end.strftime("%H:%M") }} - {{shift.venue.name }}
@@ -100,6 +100,38 @@
           <button type="submit" class="btn btn-primary">Update</button>
         </div>
       </form>
+      <div class="clearfix"></div>
+      <ul class="shift-status" id="shift-status-{{ shift.id }}">
+        <li><strong>Minimum:</strong> {{ shift.min_needed }}</li>
+        <li><strong>Maximum:</strong> {{ shift.max_needed }}</li>
+        <li><strong>Current:</strong> {{ shift.entries | count }}</li>
+        <li><a href="#shift-status-{{ shift.id }}" class="shift-status-edit" data-shift-id="{{ shift.id }}">Edit</a></li>
+      </ul>
+      {% if shift.notes %}
+        <p><strong>Notes:</strong><br>{{ shift.notes }}</p>
+      {% endif %}
+      {% for se in shift.entries|sort(attribute="user_id") %}
+        <div class="volunteer">
+          <p>
+            <strong>{{ se.user.volunteer.nickname }}</strong>
+            {% if se.user.volunteer.volunteer_phone %}({{ se.user.volunteer.volunteer_phone }}){% endif %}<br />
+            {% if not se.user.volunteer.completed_shift(role) %}First shift<br />{% endif %}
+          </p>
+          {{ state_selector(se) }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+
+  <h3>Past Shifts</h3>
+  {% for shift in past_shifts %}
+      <div class="role-admin-shift well content-well">
+      <h4 id="shift-{{ shift.id }}">
+          {{ shift.local_start.strftime("%a %H:%M") }} - {{ shift.local_end.strftime("%H:%M") }} - {{shift.venue.name }}
+          {% if shift.multiplier != 1 %}
+              {{ shift.multiplier }}×
+          {% endif %}
+      </h4>
       <div class="clearfix"></div>
       <ul class="shift-status" id="shift-status-{{ shift.id }}">
         <li><strong>Minimum:</strong> {{ shift.min_needed }}</li>

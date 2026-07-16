@@ -189,7 +189,7 @@ def role_admin(role_id):
         now = datetime.now()
 
     try:
-        limit = int(request.args.get("limit", "5"))
+        limit = int(request.args.get("limit", "500"))
         offset = int(request.args.get("offset", "0"))
     except ValueError:
         limit = 5
@@ -221,6 +221,15 @@ def role_admin(role_id):
         shift_entries_query = shift_entries_query.where(Shift.venue_id == selected_venue_id)
 
     shifts = db.session.scalars(shift_query).all()
+    past_shifts = []
+    upcoming_shifts = []
+
+    for shift in shifts:
+        if shift.end <= now:
+            past_shifts.append(shift)
+        else:
+            upcoming_shifts.append(shift)
+
     active_shift_entries = db.session.scalars(
         shift_entries_query.where(ShiftEntry.state == ShiftEntryState.ARRIVED)
     ).all()
@@ -237,6 +246,8 @@ def role_admin(role_id):
         venues=venues,
         selected_venue_id=selected_venue_id,
         shifts=shifts,
+        past_shifts=past_shifts,
+        upcoming_shifts=upcoming_shifts,
         active_shift_entries=active_shift_entries,
         pending_shift_entries=pending_shift_entries,
         now=now,
