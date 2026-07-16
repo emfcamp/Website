@@ -530,3 +530,7 @@ class LotteryForm(Form):
     total_tickets = IntegerField("Capacity", validators=[Optional()])
     reserved_tickets = IntegerField("Reserved (non-lottery) tickets", validators=[Optional()])
     max_tickets_per_entry = IntegerField("Max tickets per user", validators=[Optional()])
+
+
+class DeleteLightningTalkForm(Form):
+    delete = SubmitField("Delete permanently?")
