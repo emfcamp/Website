@@ -411,10 +411,6 @@ def _gwallet_image_url(static_filename: str) -> googleapiclient._apis.walletobje
 def generate_gwallet_class() -> googleapiclient._apis.walletobjects.v1.EventTicketClass:
     """Generates the base class from which tickets will be derived."""
     start, end = _event_datetimes()
-    pkpass_locations = _get_and_validate_locations()
-    locations: list[googleapiclient._apis.walletobjects.v1.MerchantLocation] = [
-        {"latitude": loc["latitude"], "longitude": loc["longitude"]} for loc in pkpass_locations
-    ]
 
     return {
         "id": _gwallet_class_id(),
@@ -459,7 +455,6 @@ def generate_gwallet_class() -> googleapiclient._apis.walletobjects.v1.EventTick
                 "body": _format_date_range(start, end),
             },
         ],
-        "merchantLocations": locations,
         "classTemplateInfo": {
             "cardTemplateOverride": {
                 # Overrides what we display on the main 'card' view, when you click on the pass
@@ -588,6 +583,7 @@ def generate_gwallet_class() -> googleapiclient._apis.walletobjects.v1.EventTick
 def generate_gwallet_pass(user: User) -> googleapiclient._apis.walletobjects.v1.EventTicketObject:
     start, end = _event_datetimes()
     meta = get_purchase_metadata(user)
+    admission_redeemed = any(t.redeemed for t in meta.admissions)
     n_admission = len(meta.admissions)
     n_parking = len(meta.parking_tickets)
     n_campervan = len(meta.campervan_tickets)
@@ -626,6 +622,12 @@ def generate_gwallet_pass(user: User) -> googleapiclient._apis.walletobjects.v1.
                 "body": str(n_merch),
             }
         )
+    locations: list[googleapiclient._apis.walletobjects.v1.MerchantLocation] = []
+    pkpass_locations = _get_and_validate_locations()
+    if n_admission > 0 and not admission_redeemed:
+        # We only include the locations for non-redeemed passes, to avoid repeatedly spamming people with
+        # "[Electromagnetic Field] Nearby" notifications.
+        locations = [{"latitude": loc["latitude"], "longitude": loc["longitude"]} for loc in pkpass_locations]
 
     return {
         "id": f"{config.get('GOOGLE_WALLET_ISSUER_ID')}.{user.checkin_code}",
@@ -638,6 +640,7 @@ def generate_gwallet_pass(user: User) -> googleapiclient._apis.walletobjects.v1.
         },
         "ticketNumber": user.checkin_code,
         "textModulesData": text_modules,
+        "merchantLocations": locations,
         "validTimeInterval": {
             "start": {"date": pass_valid_start.isoformat()},
             "end": {"date": end.isoformat()},
