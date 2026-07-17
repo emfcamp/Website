@@ -64,7 +64,7 @@ class ExternalMetrics:
         )
         gauge_groups(
             emf_checked_in_purchases,
-            Purchase.query.join(Product),
+            Purchase.query.join(Product).filter(Purchase.is_paid_for),
             Product.name,
             Purchase.type,
             cast(Purchase.redeemed, String),
