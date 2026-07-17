@@ -258,7 +258,13 @@ def get_upcoming(filter: ScheduleFilter, per_venue_limit: int = 2) -> dict[str, 
 
     # TODO: surely now/next could come straight from the DB? I can't believe we need wrangle this structure
     now = pendulum.now(event_tz)  # type: ignore[arg-type]
-    flat_sids = [flat_sid for flat_sid in flat_sids if flat_sid["occurrences"][0]["start_date"] > now]
+    # Drop-in items stay visible until they end, as people can still join them
+    flat_sids = [
+        flat_sid
+        for flat_sid in flat_sids
+        if flat_sid["occurrences"][0]["start_date"] > now
+        or (flat_sid.get("drop_in") and flat_sid["occurrences"][0]["end_date"] > now)
+    ]
     flat_sids = sorted(flat_sids, key=lambda flat_sid: flat_sid["occurrences"][0]["start_date"])
 
     _fix_up_times_horribly(flat_sids)
