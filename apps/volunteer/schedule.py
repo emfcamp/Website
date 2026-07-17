@@ -290,7 +290,7 @@ def shift_sign_up(shift_id):
 @v_user_required
 def shift_cancel(shift_id):
     shift = get_or_404(db, Shift, shift_id)
-    if not Shift.role.shifts_finalised and not Volunteer.get_for_user(current_user).is_volunteer_admin:
+    if not shift.role.shifts_finalised and not Volunteer.get_for_user(current_user).is_volunteer_admin:
         abort(404)
     user = current_user
     shift_entry = ShiftEntry.query.filter_by(user_id=user.id, shift_id=shift.id).first()
