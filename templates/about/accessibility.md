@@ -30,6 +30,10 @@ The accessible camping area is located at the quiet end of the site, close to th
 
 As with everywhere on site, [power will be available](/about/power). However, we're unable to guarantee the 24/7 availability of power for medical devices such as CPAP machines.
 
+## Text description of the map
+
+A text description of the site map as it appears in the information booklets is available on the [Map page](/about/map#text-description-of-the-map).
+
 ## Accessible toilets/showers
 
 Our two main toilet/shower locations will have fully accessible toilet/shower cabins which can be accessed with a [RADAR key](https://www.disabilityrightsuk.org/radar-keys). Please talk to the Info and Help team during the event if you require a key.
