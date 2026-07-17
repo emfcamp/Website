@@ -73,7 +73,7 @@ Here are the intended operating hours as a table:
       <th>NullSector</th>
       <td>-</td>
       <td>19:30 - 00:00</td>
-      <td>00:00 - 00:00</td>
+      <td>00:00 - 24:00</td>
       <td>00:00 - 25:00</td>
     </tr>
   </tbody>
