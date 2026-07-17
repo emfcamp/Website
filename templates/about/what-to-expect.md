@@ -12,76 +12,27 @@ Firstly, EMF is a festival with live music, and a fully operational nightclub th
 
 ### Noise sensitivity?
 
-The largest amount of noise should be from Stage D and NullSector. You can see these on the noise prediction layer on the map:
+The site is laid out so that the noisiest parts are generally at the far (i.e. northern) end. You can see what this looks like on the noise prediction layer of the map:
 
 <a href="https://map.emfcamp.org/#///a,b,i,p,t" class="btn btn-primary">See the noise map</a>
 
-All the stages may overrun their hours slightly as sometimes performances can overrun. The site noise curfew is 00:30 Thursday and Sunday, and 02:00 Friday and Saturday, but most stages will close before then.
+Late nights are often the noisiest time, but there is a site-wide curfew on amplified sound: this begins at 00:30 on Thursday evening, 02:00 on Friday and Saturday, and 00:30 on Sunday. Many villages, as well as Stage D and NullSector, will continue operating right up to those times on most days. Other stages will finish earlier in the evening, but may overrun slightly if their schedules are delayed.
 
-<div id="about-what-to-expect-stage-timings-text">
-<p>
-Stage A is for talks, and will finish at 9pm on Friday and Saturday, and 7pm on Sunday. Stage B is for performances and is due to finish at 11pm Thursday-Saturday, and 6pm Sunday. Stage C is the film tent, and will be running until 11pm Thursday night, 1am Friday and Saturday night, and midnight Sunday night. Stage D is music and will be running until 11pm Thursday, 1am Friday and Saturday, and midnight Sunday night.
-</p>
+Here's a summary of the stages (and NullSector) and their planned noise-making hours:
 
-<p>
-Stage C, the film tent, will start making noise from 8am Friday to Sunday. NullSector should only start making noise from 11am Friday to Sunday.
-</p>
-</div>
+* **Stage A (Talks)**: Thursday not operating; Friday 10am - 9pm; Saturday 10am - 9pm; Sunday 10am - 7pm
+* **Stage B (Performances)**: Thursday 4pm - 11pm; Friday 10am - 11pm; Saturday 10am - 11pm; Sunday 10am - 6pm
+* **Stage C (Films/Talks)**: Thursday 7pm - 11pm; Friday 8am - 1am; Saturday 8am - 1am; Sunday 8am - midnight
+* **Stage D (Music)**: Thursday 7pm - 11pm; Friday 2pm - 1am; Saturday 2pm - 1am; Sunday 2pm - midnight
+* **NullSector**: Thursday not operating; Friday 11am - 2am; Saturday 11am - 2am; Sunday 11am - 0.30am
 
-Here are the intended operating hours as a table:
+Other sources of noise include:
+* Children (especially near family camping and in the early mornings)
+* Generators (the large metal boxes, potentially at any time of day/night)
+* Toilets (when the waste collection truck visits)
+* Ducks (especially near the lake, around dawn)
 
-<table class="table about-what-to-expect-stage-timings table-striped" aria-describedby="about-what-to-expect-stage-timings-text">
-  <thead>
-    <tr>
-      <th>Stage</th>
-      <th>Thursday</th>
-      <th>Friday</th>
-      <th>Saturday</th>
-      <th>Sunday</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Stage A</th>
-      <td>-</td>
-      <td>10:00 - 21:00</td>
-      <td>10:00 - 21:00</td>
-      <td>10:00 - 19:00</td>
-    </tr>
-    <tr>
-      <th>Stage B<br/>(Performance)</th>
-      <td>16:00 - 23:00</td>
-      <td>10:00 - 23:00</td>
-      <td>10:00 - 23:00</td>
-      <td>10:00 - 18:00</td>
-    </tr>
-    <tr>
-      <th>Stage C<br/>(Film)</th>
-      <td>19:00 - 23:00</td>
-      <td>08:00 - 10:00 Film<br>10:00 - 18:00 Talks<br>18:00 - 01:00 Film</td>
-      <td>08:00 - 10:00 Film<br>10:00 - 18:00 Talks<br>18:00 - 01:00 Film</td>
-      <td>08:00 - 10:00 Film<br>10:00 - 18:00 Talks<br>18:00 - 00:00 Film</td>
-    </tr>
-    <tr>
-      <th>Stage D<br/>(Music)</th>
-      <td>19:00 - 23:00</td>
-      <td>14:00 - 01:00</td>
-      <td>14:00 - 01:00</td>
-      <td>14:00 - 00:00</td>
-    </tr>
-    <tr>
-      <th>NullSector</th>
-      <td>-</td>
-      <td>11:00 - 02:00</td>
-      <td>11:00 - 02:00</td>
-      <td>11:00 - 00:30</td>
-    </tr>
-  </tbody>
-</table>
-
-However, the quieter end of the site comes with its own noise makers. Family camping will contain babies, toddlers, all sizes of small humans, who tend to go to bed early and wake up early. The lake contains ducks, who wake up at dawn and quack incessantly. The big metal blocks are generators, and although we're using a number of electric batteries this time, some of them will make noise at random times of the day and night. Although it may be convenient to be near the loos, the Poo Truck makes a lot of noise and the occasional smell.
-
-Finally, there is some form of noise everywhere on site. It just depends what's making it. Even down the bottom of the site you will hear wubwubwub until a maximum of 2am (the amplified noise curfew).
+Be aware that no part of the site is truly noiseless, and that the noisiest areas are at least somewhat audible from everywhere (especially when the bass kicks in). Free disposable earplugs are available at the Info and Help tent and from dispensers around the site.
 
 ### Smell sensitivity?
 
