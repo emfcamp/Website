@@ -31,16 +31,30 @@ Service frequency is a goal and not guaranteed, as traffic or delays in setting 
 
 #### Hours of Operation
 
+Times refer to the first and last departures from Ledbury Station and EMF. The times are best-effort; traffic and delays in picking up or setting down can cause actual times to shift. Please leave plenty of time on Monday to get from EMF to the station.
+
+Thursday, Friday and Saturday
+
 <table class="table table-striped">
   <thead>
-    <tr><th>Day</th><th>Start</th><th>End</th><th>Frequency (approximate)</th></tr>
+    <tr><th>Day</th><th>Start (Ledbury)</th><th>Start (EMF)</th><th>End (EMF)</th><th>End (Ledbury)</th></th><th>Frequency (approximate)</th></tr>
   </thead>
   <tbody>
-    <tr><td>Thursday 16th July</td><td>10:10</td><td>20:45</td><td>30 minutes</td></tr>
-    <tr><td>Friday 17th July</td><td>09:30</td><td>22:45</td><td>30 minutes</td></tr>
-    <tr><td>Saturday 18th July</td><td>09:10</td><td>22:50</td><td>Hourly</td></tr>
-    <tr><td>Sunday 19th July</td><td>09:00</td><td>21:45</td><td>30 minutes</td></tr>
-    <tr><td>Monday 20th July</td><td>09:15</td><td>15:30</td><td>Hourly</td></tr>
+    <tr><td>Thursday 16th July</td><td>10:10</td><td>10:55</td><td>20:00</td><td>20:15</td><td>30 minutes</td></tr>
+    <tr><td>Friday 17th July</td><td>09:30</td><td>09:55</td><td>22:30</td><td>22:45</td><td>30 minutes</td></tr>
+    <tr><td>Saturday 18th July</td><td>09:10</td><td>09:50</td><td>22:20</td><td>22:35</td><td>Hourly</td></tr>
+  </tbody>
+</table>
+
+Sunday and Monday
+
+<table class="table table-striped">
+  <thead>
+    <tr><th>Day</th><th>Start (EMF)</th><th>Start (Ledbury)<th>End (Ledbury)</th><th>End (EMF)</th></th><th>Frequency (approximate)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Sunday 19th July</td><td>09:00</td><td>09:15</td><td>21:30</td><td>21:45</td><td>30 minutes</td></tr>
+    <tr><td>Monday 20th July</td><td>09:15</td><td>09:30</td><td>14:45</td><td>15:30</td><td>Hourly</td></tr>
   </tbody>
 </table>
 
