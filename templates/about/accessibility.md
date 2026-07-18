@@ -32,7 +32,7 @@ As with everywhere on site, [power will be available](/about/power). However, we
 
 ## Text description of the map
 
-A text description of the site map as it appears in the information booklets is available on the [Map page](/about/map#text-description-of-the-map).
+A text description of the site map as it appears in the information booklets is available on the [Map page](/about/map).
 
 ## Accessible toilets/showers
 
