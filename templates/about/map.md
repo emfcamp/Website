@@ -10,7 +10,7 @@ Maps of the EMF site can be found in the information booklets, on boards around 
 
 ## Text description of the map
 
-Map of the EMF Camp 2026 site, an elongated area running roughly north–south, with a lake and wooded area along the whole west edge.  
+Map of the EMF 2026 site, an elongated area running roughly north–south, with a string of lakes and a wooded area along the whole west edge.  
   
 **South end ("Quieter End")**: The main entrance sits at the bottom of the site, near the car park and the bus stop. Family camping "S2" on the west and quiet camping "S3" on the east are just inside the entrance. Stage A is north of them, on the west side near the lake. Stage C is further north and more central, and is surrounded by accessible camping, family and general camping "S1", and camping for live-in vehicles. In the evenings, Stage C becomes the site's cinema, showing films. The southeastern part of the site, aside from "S3", is marked as "No Entry".
 
@@ -18,7 +18,7 @@ Map of the EMF Camp 2026 site, an elongated area running roughly north–south, 
 
 **East side**: The numbered workshop tents (1–6) run along the eastern part of the site, from the centre to the northern end. Amongst them are camping areas "C1", "C2", "C3", "N2", and "N3". In the evenings, Workshop 6 becomes a karaoke venue.
 
-**Central section**: Stages B and D and the main bar, "The Robot Arms", are in the centre of the site. Around and amongst them, from south to north, are the Family zone, the Arts tent, the Planetarium, the Q&A area, the Green Room, and the Information tent. In the evenings, Stage B is a performance venue and Stage D is a live music venue.
+**Central section**: Stages B and D and the main bar, "The Robot Arms", are in the centre of the site. Around and amongst them, from south to north, are the Family zone, the Arts tent, the Planetarium, the Q&A area, the Green Room, and the Info & Volunteering tent. In the evenings, Stage B is a performance venue and Stage D is an outdoor music stage.
 
 **North end ("Noisier End")**: The NullSector is in the north-western corner of the site, along with a bar, the Overbrewed game, and some arts installations. Just south of it is camping area "N1". In the evenings, NullSector hosts the Night Market. Along the rest of the northern edge of the site are camping areas for live-in vehicles.
   
