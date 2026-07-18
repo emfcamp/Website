@@ -1,6 +1,6 @@
 [![Deploy Status](https://github.com/emfcamp/Website/workflows/Deploy/badge.svg)](https://github.com/emfcamp/Website/actions?query=workflow%3ADeploy)
 
-This is the [emfcamp.org](https://www.emfcamp.org) web site, built with Flask & Postgres by the
+This is the [emfcamp.org](https://www.emfcamp.org) website, built with Flask & Postgres by the
 Electromagnetic Field web team. This website handles ticket sales, Call for Participation,
 scheduling, village registration, and more.
 
