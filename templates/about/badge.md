@@ -98,7 +98,7 @@ Around the outside of the hexagon shape of the Tildagon are some little plug soc
 
 ## Where do I get Hexpansions?
 
-There will be a market in NullSector on Saturday 2-4pm and Sunday 10am-12pm for people who have made Hexpansions to bring and sell or swap them and for other attendees to buy or swap for them.
+There will be a market on the dance floor in NullSector on Saturday 2-4pm and Sunday 10am-12pm for people who have made Hexpansions to bring and sell or swap them and for other attendees to buy or swap for them.
 
 You might also meet other attendees around the festival site who are carrying Hexpansions with them as little tokens to swap - perhaps you may be able to swap for some of your own stickers, token coins, or other home-made goods (think treasures a magpie would love and you're mostly there).
 
