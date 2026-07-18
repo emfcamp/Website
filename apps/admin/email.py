@@ -1,5 +1,3 @@
-from typing import Literal
-
 from flask import flash, redirect, render_template, url_for
 from flask.typing import ResponseReturnValue
 from sqlalchemy import select
@@ -10,6 +8,7 @@ from wtforms.widgets import TextArea
 from main import db
 from models.content import Proposal
 from models.payment import Payment
+from models.product import Product
 from models.purchase import Purchase
 from models.user import User
 from models.village import VillageMember
@@ -28,23 +27,42 @@ from . import admin
 class EmailComposeForm(Form):
     subject = StringField("Subject", [DataRequired()])
     text = StringField("Text", [DataRequired()], widget=TextArea())
-    destination = SelectField(
-        "Send to:",
-        choices=[
-            ("ticket", "Ticketholders"),
-            ("purchasers", "Users who made payments"),
-            ("cfp", "Accepted CfP"),
-            ("ticket_and_cfp", "Ticketholders & Accepted CfP"),
-            ("villages", "Village owners"),
-        ],
-    )
+    destination = SelectField("Send to:")
     preview = SubmitField("Preview Email")
     send_preview_address = StringField("Preview Email Address")
     send_preview = SubmitField("Send Preview Email")
     send = SubmitField("Send Email")
 
+    def populate_destination_choices(self) -> None:
+        static_choices = [
+            ("ticket", "Ticketholders"),
+            ("purchasers", "Users who made payments"),
+            ("cfp", "Accepted CfP"),
+            ("ticket_and_cfp", "Ticketholders & Accepted CfP"),
+            ("villages", "Village owners"),
+        ]
 
-def get_users(dest: Literal["ticket", "cfp", "purchasers", "villages"]) -> list[User]:
+        all_products = db.session.execute(select(Product)).scalars()
+        claimable_products = sorted(
+            (p for p in all_products if p.get_attribute("is_redeemable")), key=lambda p: p.name
+        )
+        unclaimed_choices = []
+        for product in claimable_products:
+            unclaimed_choices.append(
+                (f"unclaimed:{product.name}", f"Users who have unclaimed Product {product.display_name}")
+            )
+        self.destination.choices = static_choices + unclaimed_choices
+
+
+def product_from_dest(dest: str) -> Product:
+    product_slug = dest[len("unclaimed:") :]
+    product = db.session.execute(select(Product).where(Product.name == product_slug)).scalar_one_or_none()
+    if product is None:
+        raise ValueError(f"No such product {product_slug}")
+    return product
+
+
+def get_users(dest: str) -> list[User]:
     query = select(User)
     if dest == "ticket":
         query = (
@@ -58,6 +76,15 @@ def get_users(dest: Literal["ticket", "cfp", "purchasers", "villages"]) -> list[
         query = query.join(User.proposals).where(Proposal.state.in_({"accepted", "finalised"}))
     elif dest == "villages":
         query = query.join(User.village_membership).where(VillageMember.admin == True)
+    elif dest.startswith("unclaimed:"):
+        product = product_from_dest(dest)
+        query = (
+            query.join(User.owned_purchases)
+            .where(
+                Purchase.product_id == product.id, Purchase.is_paid_for == True, Purchase.redeemed == False
+            )
+            .group_by(User.id)
+        )
     else:
         raise ValueError(f"Invalid email destination set: {dest}")
 
@@ -78,6 +105,9 @@ def get_email_reason(dest: str) -> str:
         return (
             f"You're receiving this email because you have a ticket or a talk/workshop accepted for {event}."
         )
+    if dest.startswith("unclaimed:"):
+        product = product_from_dest(dest)
+        return f"You're receiving this email because you have purchased {product.display_name} but have not yet redeemed your purchase."
     raise ValueError(f"Invalid email destination set: {dest}")
 
 
@@ -85,6 +115,7 @@ def get_email_reason(dest: str) -> str:
 def email() -> ResponseReturnValue:
     # This function is almost identical to apps.villages.admin.admin_email_owners, consider updating there too
     form = EmailComposeForm()
+    form.populate_destination_choices()
     if form.validate_on_submit():
         users: list[User]
         if form.destination.data == "ticket_and_cfp":
