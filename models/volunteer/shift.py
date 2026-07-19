@@ -119,6 +119,23 @@ class ShiftEntry(BaseModel):
         )
 
 
+    def __repr__(self) -> str:
+        user = getattr(self, "user", None)
+        user_bit = getattr(user, "name", None) or getattr(user, "email", None) or self.user_id
+        shift = getattr(self, "shift", None)
+        if shift is not None:
+            role = getattr(getattr(shift, "role", None), "name", None) or shift.role_id
+            venue = getattr(getattr(shift, "venue", None), "name", None) or shift.venue_id
+            shift_bit = f"{role}@{venue}#{shift.id}"
+        else:
+            shift_bit = self.shift_id
+        return f"<ShiftEntry user={user_bit!r} shift={shift_bit!r} state={self.state!r}>"
+
+    def __str__(self) -> str:
+        return self.__repr__()
+
+
+
 class ShiftTemplateExport(TypedDict):
     role_slug: str
     venue_slug: str
