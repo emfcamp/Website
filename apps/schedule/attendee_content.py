@@ -315,7 +315,6 @@ def attendee_content_edit(schedule_item_id: int) -> ResponseReturnValue:
 
     form = AttendeeContentForm(obj=schedule_item, **extra_data)
     form.load_choices(schedule_item=schedule_item)
-    app.logger.info(f"drop in value is '{form.drop_in}'")
 
     occurrence_dict = {o.id: o for o in schedule_item.occurrences}
     for field in form.occurrences:
