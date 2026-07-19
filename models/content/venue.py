@@ -48,6 +48,8 @@ class Venue(BaseModel):
     # FIXME after 2026: make this not-null
     allows_attendee_content: Mapped[bool | None]
 
+    captions_url: Mapped[str | None]
+
     village: Mapped[Village] = relationship(
         back_populates="venues",
         primaryjoin="Village.id == Venue.village_id",

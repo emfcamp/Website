@@ -34,6 +34,7 @@ class OccurrenceDict(TypedDict):
     map_link: str | None
     uses_lottery: bool
 
+    captions_url: str | None
     video_privacy: str
     ccc_url: NotRequired[str]
     youtube_url: NotRequired[str]
@@ -151,6 +152,7 @@ def _get_occurrence_dict(filter: ScheduleFilter, occurrence: Occurrence) -> Occu
         venue=occurrence.scheduled_venue.name,
         latlon=occurrence.scheduled_venue.latlon,
         map_link=occurrence.scheduled_venue.map_link,
+        captions_url=occurrence.scheduled_venue.captions_url,
         uses_lottery=occurrence.uses_lottery,
         video_privacy=occurrence.video_privacy,
         recording_lost=occurrence.video_recording_lost,

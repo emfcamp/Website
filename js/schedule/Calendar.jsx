@@ -131,6 +131,16 @@ function FavouriteButton({ schedule_item, toggleFavourite, authenticated }) {
   );
 }
 
+function CaptionsButton({ occurrence }) {
+  debugger;
+  if (!occurrence.captions_url) return null;
+  return (
+    <a class="btn btn-primary" href={occurrence.captions_url}>
+      Live captions
+    </a>
+  );
+}
+
 function TicketButton({ occurrence, authenticated }) {
   if (!authenticated || !occurrence.uses_lottery) {
     return null;
@@ -224,6 +234,8 @@ function Occurrence({ occurrence, toggleFavourite, authenticated }) {
             toggleFavourite={toggleFavourite}
             authenticated={authenticated}
           />
+          &nbsp;
+          <CaptionsButton occurrence={occurrence} />
           &nbsp;
           <TicketButton occurrence={occurrence} authenticated={authenticated} />
         </p>

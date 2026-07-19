@@ -28,7 +28,7 @@ from wtforms import (
     SubmitField,
 )
 from wtforms.fields import TimeField
-from wtforms.validators import DataRequired, Optional
+from wtforms.validators import URL, DataRequired, Optional
 
 from main import db, get_or_404
 from models.content import SCHEDULE_ITEM_INFOS, Occurrence, Venue
@@ -53,6 +53,7 @@ class VenueForm(Form):
     location_lat = FloatField("Latitude", validators=[Optional()])
     location_lon = FloatField("Longitude", validators=[Optional()])
     capacity = IntegerField("Capacity", validators=[Optional()])
+    captions_url = StringField("Captions URL", validators=[URL(), Optional()])
     submit = SubmitField("Save")
     delete = SubmitField("Delete")
 

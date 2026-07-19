@@ -43,6 +43,10 @@
         {% endif %}
       </p>
 
+      {% if occurrence.scheduled_venue.captions_url %}
+      <p><a class="btn btn-primary" href="{{ occurrence.scheduled_venue.captions_url }}">Live captions</a></p>
+      {% endif %}
+
       {% else %}
 
       <p>Currently unscheduled</p>
