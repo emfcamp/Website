@@ -145,7 +145,7 @@ def phones() -> ResponseReturnValue:
 
 @base.route("/feedback")
 def feedback() -> ResponseReturnValue:
-    return render_template("feedback.html")
+    return redirect("https://grist.orga.emfcamp.org/forms/cL1XSkUvtqR6pceGvHejo5/4")
 
 
 @base.route("/sponsors")
