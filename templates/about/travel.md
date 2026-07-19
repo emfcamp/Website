@@ -54,7 +54,7 @@ Sunday and Monday
   </thead>
   <tbody>
     <tr><td>Sunday 19th July</td><td>09:00</td><td>09:15</td><td>21:30</td><td>21:45</td><td>30 minutes</td></tr>
-    <tr><td>Monday 20th July</td><td>09:15</td><td>09:30</td><td>14:45</td><td>15:30</td><td>Hourly</td></tr>
+    <tr><td>Monday 20th July</td><td>09:15</td><td>09:30</td><td>14:45</td><td>15:30</td><td>30 minutes until 12:30, then hourly</td></tr>
   </tbody>
 </table>
 
