@@ -50,7 +50,7 @@
         <p>
           <strong>{{ active.user.volunteer.nickname }}</strong> {{ active.shift.local_start.strftime("%a %H:%M") }}&ndash;{{ active.shift.local_end.strftime("%H:%M") }}
           {% if now > active.shift.end %}
-              <br /><span class="overtime">{{ now - active.shift.end }} over</span>
+              <br /><span class="overtime">{{ (now - active.shift.end)|duration_hm }} over</span>
           {% endif %}
         </p>
         {{ state_selector(active) }}
