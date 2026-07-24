@@ -2,4 +2,4 @@
 
 npm install --no-audit
 
-exec npx rsbuild watch
+exec npx rsbuild --mode dev
