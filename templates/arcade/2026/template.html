@@ -1,0 +1,63 @@
+{% macro view(title, view_name) -%}
+  <li class="{{ 'active' if request.endpoint == view_name }}">
+    <a href="{{url_for(view_name, year=2026)}}">{{title}}</a>
+  </li>
+{%- endmacro %}
+{% macro page(title, target_page) -%}
+  <li class="{{ 'active' if request.endpoint == 'base.arcade_page' and page_name==target_page }}">
+    <a href="{{url_for('base.arcade_page', page_name=target_page, year=2026)}}">{{title}}</a>
+  </li>
+{%- endmacro %}
+{% extends "base.html" %}
+{% set main_class = "arcade" %}
+{% block title %}{{title}}{% endblock %}
+{% block secondary_nav %}
+  <ul role="navigation list" aria-label="Arcade">
+    {{view("EMF Arcade", "base.arcade")}}
+    <summary>Games</summary>
+    {{page("868-Back", "868_Back")}}
+    {{page("_chase_me", "_chase_me")}}
+    {{page("AttinyArcade", "AttinyArcade")}}
+    {{page("AVE on a receipt", "AVE_on_a_receipt")}}
+    {{page("Battle Lines: Arcade Machine", "Battle_Lines_Arcade_Machine")}}
+    {{page("Caves of Qud", "Caves_of_Qud")}}
+    {{page("Cliffhangers", "Cliffhangers")}}
+    {{page("Crab Sticks", "Crab_Sticks")}}
+    {{page("Dawnfolk", "Dawnfolk")}}
+    {{page("Delivery Dash", "Delivery_Dash")}}
+    {{page("Frogzilla", "Frogzilla")}}
+    {{page("Frustration", "Frustration")}}
+    {{page("Gameboys", "Gameboys")}}
+    {{page("Hotspot Earth", "Hotspot_Earth")}}
+    {{page("Kaizen Pachinko", "Kaizen_Pachinko")}}
+    {{page("Kaizen: A Factory Story", "Kaizen_A_Factory_Story")}}
+    {{page("Kuiper Cargo", "Kuiper_Cargo")}}
+    {{page("Luanti", "Luanti")}}
+    {{page("Lumines Arise", "Lumines_Arise")}}
+    {{page("Lunar Lander", "Lunar_Lander")}}
+    {{page("Mage Mail", "Mage_Mail")}}
+    {{page("Mathsteroids", "Mathsteroids")}}
+    {{page("Missile Command Delta", "Missile_Command_Delta")}}
+    {{page("MORSE", "MORSE")}}
+    {{page("Peasant Pact", "Peasant_Pact")}}
+    {{page("Pelagia", "Pelagia")}}
+    {{page("PhotoSYNTH : Smile Powered Synthesizer", "PhotoSYNTH")}}
+    {{page("Rez Infinite", "Rez_Infinite")}}
+    {{page("Runes & Rites", "Runes_Rites")}}
+    {{page("Samurai Fight", "Samurai_Fight")}}
+    {{page("Sektori", "Sektori")}}
+    {{page("Shaderland", "Shaderland")}}
+    {{page("Space Invaders 64", "Space_Invaders_64")}}
+    {{page("Steps to the Stars", "Steps_to_the_Stars")}}
+    {{page("Super Video Golf", "Super_Video_Golf")}}
+    {{page("Tetris Effect: Connected", "Tetris_Effect_Connected")}}
+    {{page("The Abbess Garden", "The_Abbess_Garden")}}
+    {{page("The Big Con", "The_Big_Con")}}
+    {{page("Tildenstein 3D", "Tildenstein_3D")}}
+    {{page("U.V.S Nirmana", "UVS_Nirmana")}}
+    {{page("Valued Goose Game", "Valued_Goose_Game")}}
+  </ul>
+{% endblock %}
+{% block body %}
+  {{content}}
+{% endblock %}
