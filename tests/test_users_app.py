@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-login_link_re = r"(https?://[^\s/]*/login[^\s]*)"
+from tests._utils import login_link_re
 
 
 def test_login(user, client, outbox):

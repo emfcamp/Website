@@ -195,10 +195,7 @@ def add_favourite() -> ResponseReturnValue:
 
     schedule_item_id = int(request.form["fave"])
     schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
-    if schedule_item in current_user.favourites:
-        current_user.favourites.remove(schedule_item)
-    else:
-        current_user.favourites.append(schedule_item)
+    current_user.toggle_favourite(schedule_item)
 
     db.session.commit()
     return redirect(url_for(".main_year", year=config.event_year) + f"#schedule-item-{schedule_item.id}")
@@ -210,10 +207,7 @@ def favourites() -> ResponseReturnValue:
     if (request.method == "POST") and current_user.is_authenticated:
         schedule_item_id = int(request.form["fave"])
         schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
-        if schedule_item in current_user.favourites:
-            current_user.favourites.remove(schedule_item)
-        else:
-            current_user.favourites.append(schedule_item)
+        current_user.toggle_favourite(schedule_item)
 
         db.session.commit()
         return redirect(url_for(".favourites") + f"#schedule-item-{schedule_item.id}")
@@ -318,12 +312,10 @@ def item_current(year: int, schedule_item_id: int, slug: str | None = None) -> R
         if schedule_item_form.validate_on_submit():
             msg = None
             if schedule_item_form.toggle_favourite.data:
-                if is_fave:
-                    current_user.favourites.remove(schedule_item)
-                    msg = f'Removed "{schedule_item.title}" from favourites'
-                else:
-                    current_user.favourites.append(schedule_item)
+                if current_user.toggle_favourite(schedule_item):
                     msg = f'Added "{schedule_item.title}" to favourites'
+                else:
+                    msg = f'Removed "{schedule_item.title}" from favourites'
 
             db.session.commit()
             if msg:

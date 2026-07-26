@@ -3,6 +3,8 @@ from io import BytesIO
 from cairosvg import svg2png
 from PIL import Image
 
+login_link_re = r"(https?://[^\s/]*/login[^\s]*)"
+
 
 def render_svg(svg):
     # pyzbar fails to decode qr codes under 52x52 and epc qr codes under 72x72
