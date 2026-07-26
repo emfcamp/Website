@@ -89,18 +89,13 @@ class FavouriteScheduleItem(Resource):
             abort(401)
 
         schedule_item = get_or_404(db, ScheduleItem, schedule_item_id)
-        current_state = schedule_item in current_user.favourites
 
         data = request.get_json()
         if data.get("state") is not None:
             new_state = bool(data["state"])
+            current_user.set_favourite(schedule_item, new_state)
         else:
-            new_state = not current_state
-
-        if new_state and not current_state:
-            current_user.favourites.append(schedule_item)
-        elif current_state and not new_state:
-            current_user.favourites.remove(schedule_item)
+            new_state = current_user.toggle_favourite(schedule_item)
 
         db.session.commit()
 

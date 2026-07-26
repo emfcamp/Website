@@ -3,9 +3,11 @@
 import datetime
 import os
 import os.path
+import re
 import shutil
 
 import pytest
+from flask import g, has_app_context
 from flask_mailman import Mail
 from freezegun import freeze_time
 from sqlalchemy import text
@@ -16,6 +18,7 @@ from main import create_app
 from main import db as db_obj
 from models.site_state import SiteState
 from models.user import User
+from tests._utils import login_link_re
 
 
 @pytest.fixture(scope="module")
@@ -103,6 +106,14 @@ def app_factory(cache):
     freezer.stop()
 
 
+@pytest.fixture(autouse=True)
+def reset_login_cache():
+    """Clear flask-login's cached user, so it does not leak between tests."""
+    if has_app_context():
+        g.pop("_login_user", None)
+    yield
+
+
 @pytest.fixture
 def client(app):
     "Yield a test HTTP client for the app"
@@ -141,3 +152,14 @@ def outbox(app):
     mail = Mail(app)
     mail.get_connection()
     yield mail.outbox
+
+
+@pytest.fixture
+def logged_in_client(client, user, outbox):
+    """Yield a test HTTP client logged in as the test user"""
+    client.post("/login", data={"email": user.email})
+    match = re.search(login_link_re, outbox[0].body)
+    assert match is not None
+    client.get(match.group(0))
+
+    yield client

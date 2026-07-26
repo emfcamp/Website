@@ -14,7 +14,8 @@ from typing import TYPE_CHECKING, Literal, cast
 from flask import current_app as app
 from flask import session
 from flask_login import AnonymousUserMixin, UserMixin
-from sqlalchemy import Column, ForeignKey, Index, Integer, Table, func, select, text
+from sqlalchemy import Column, ForeignKey, Index, Integer, Table, delete, func, select, text
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.associationproxy import AssociationProxy, association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -541,6 +542,30 @@ class User(BaseModel, UserMixin):
                 return entry
         return None
 
+    def set_favourite(self, schedule_item: ScheduleItem, state: bool) -> None:
+        """Add or remove a ScheduleItem from this user's favourites."""
+        if state:
+            # Upsert to avoid integrity errors on concurrent requests
+            db.session.execute(
+                insert(FavouriteScheduleItem)
+                .values(user_id=self.id, schedule_item_id=schedule_item.id)
+                .on_conflict_do_nothing()
+            )
+        else:
+            db.session.execute(
+                delete(FavouriteScheduleItem).where(
+                    FavouriteScheduleItem.c.user_id == self.id,
+                    FavouriteScheduleItem.c.schedule_item_id == schedule_item.id,
+                )
+            )
+        db.session.expire(self, ["favourites"])
+
+    def toggle_favourite(self, schedule_item: ScheduleItem) -> bool:
+        """Toggle whether a ScheduleItem is in this user's favourites, returning the new state."""
+        new_state = schedule_item not in self.favourites
+        self.set_favourite(schedule_item, new_state)
+        return new_state
+
     @property
     def google_wallet_pass_url(self) -> str:
         # Avoid circular import
@@ -600,5 +625,5 @@ def load_anonymous_user():
 
 
 from .content.cfp import Proposal
-from .content.schedule import ScheduleItem
+from .content.schedule import FavouriteScheduleItem, ScheduleItem
 from .product import ProductView, Voucher
