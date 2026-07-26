@@ -33,6 +33,10 @@ def valid_auth_headers():
     return {"Authorization": "Bearer video-api-test-token"}
 
 
+def fahrplan_id(occurence):
+    return occurence.schedule_item.id * 100 + occurence.occurrence_num
+
+
 def test_denies_request_without_api_key(client, app, occurrence):
     rv = client.post(
         "/api/occurrence/c3voc-publishing-webhook",
@@ -40,7 +44,7 @@ def test_denies_request_without_api_key(client, app, occurrence):
             "is_master": True,
             "fahrplan": {
                 "conference": "emf1970",
-                "id": occurrence.id,
+                "id": fahrplan_id(occurrence),
             },
             "voctoweb": {
                 "enabled": False,
@@ -61,7 +65,7 @@ def test_denies_request_no_master(client, app, occurrence, valid_auth_headers):
             "is_master": False,
             "fahrplan": {
                 "conference": "emf1970",
-                "id": occurrence.id,
+                "id": fahrplan_id(occurrence),
             },
             "voctoweb": {
                 "enabled": False,
@@ -82,7 +86,7 @@ def test_denies_request_wrong_year(client, app, occurrence, valid_auth_headers):
             "is_master": True,
             "fahrplan": {
                 "conference": "emf1970",
-                "id": occurrence.id,
+                "id": fahrplan_id(occurrence),
             },
             "voctoweb": {
                 "enabled": False,
@@ -103,7 +107,7 @@ def test_request_none_unchanged(client, app, db, occurrence, valid_auth_headers)
             "is_master": True,
             "fahrplan": {
                 "conference": f"emf{config.event_year}",
-                "id": occurrence.id,
+                "id": fahrplan_id(occurrence),
             },
             "voctoweb": {
                 "enabled": False,
@@ -131,7 +135,7 @@ def test_update_voctoweb_with_correct_url(client, app, db, occurrence, valid_aut
             "is_master": True,
             "fahrplan": {
                 "conference": f"emf{config.event_year}",
-                "id": occurrence.id,
+                "id": fahrplan_id(occurrence),
             },
             "voctoweb": {
                 "enabled": True,
@@ -163,7 +167,7 @@ def test_denies_voctoweb_with_wrong_url(client, app, db, occurrence, valid_auth_
             "is_master": True,
             "fahrplan": {
                 "conference": f"emf{config.event_year}",
-                "id": occurrence.id,
+                "id": fahrplan_id(occurrence),
             },
             "voctoweb": {
                 "enabled": True,
@@ -194,7 +198,7 @@ def test_clears_voctoweb(client, app, db, occurrence, valid_auth_headers):
             "is_master": True,
             "fahrplan": {
                 "conference": f"emf{config.event_year}",
-                "id": occurrence.id,
+                "id": fahrplan_id(occurrence),
             },
             "voctoweb": {
                 "enabled": True,
@@ -220,7 +224,7 @@ def test_update_thumbnail_with_url(client, app, db, occurrence, valid_auth_heade
             "is_master": True,
             "fahrplan": {
                 "conference": f"emf{config.event_year}",
-                "id": occurrence.id,
+                "id": fahrplan_id(occurrence),
             },
             "voctoweb": {
                 "enabled": True,
@@ -251,7 +255,7 @@ def test_denies_thumbnail_not_ccc(client, app, db, occurrence, valid_auth_header
             "is_master": True,
             "fahrplan": {
                 "conference": f"emf{config.event_year}",
-                "id": occurrence.id,
+                "id": fahrplan_id(occurrence),
             },
             "voctoweb": {
                 "enabled": True,
@@ -280,7 +284,7 @@ def test_clears_thumbnail(client, app, db, occurrence, valid_auth_headers):
             "is_master": True,
             "fahrplan": {
                 "conference": f"emf{config.event_year}",
-                "id": occurrence.id,
+                "id": fahrplan_id(occurrence),
             },
             "voctoweb": {
                 "enabled": True,
@@ -309,7 +313,7 @@ def test_update_from_youtube_with_correct_url(client, app, db, occurrence, valid
             "is_master": True,
             "fahrplan": {
                 "conference": f"emf{config.event_year}",
-                "id": occurrence.id,
+                "id": fahrplan_id(occurrence),
             },
             "voctoweb": {
                 "enabled": False,
@@ -342,7 +346,7 @@ def test_denies_youtube_update_with_existing_url(client, app, db, occurrence, va
             "is_master": True,
             "fahrplan": {
                 "conference": f"emf{config.event_year}",
-                "id": occurrence.id,
+                "id": fahrplan_id(occurrence),
             },
             "voctoweb": {
                 "enabled": False,
@@ -375,7 +379,7 @@ def test_denies_youtube_update_with_wrong_url(client, app, db, occurrence, valid
             "is_master": True,
             "fahrplan": {
                 "conference": f"emf{config.event_year}",
-                "id": occurrence.id,
+                "id": fahrplan_id(occurrence),
             },
             "voctoweb": {
                 "enabled": False,
@@ -407,7 +411,7 @@ def test_clears_youtube(client, app, db, occurrence, valid_auth_headers):
             "is_master": True,
             "fahrplan": {
                 "conference": f"emf{config.event_year}",
-                "id": occurrence.id,
+                "id": fahrplan_id(occurrence),
             },
             "voctoweb": {
                 "enabled": False,
