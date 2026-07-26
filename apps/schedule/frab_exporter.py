@@ -219,6 +219,7 @@ class FrabJsonExporter(FrabExporter):
                                                 f"""emf{config.event_year}-event-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}""",
                                             )
                                         ),
+                                        # When changing this logic remember to also adjust the c3voc webhook logic and the tests.
                                         "id": flat_sid["id"] * 100
                                         + flat_sid["occurrences"][0]["occurrence_num"],
                                         "date": flat_sid["occurrences"][0]["start_date"].isoformat(),
@@ -325,6 +326,7 @@ class FrabXmlExporter(FrabExporter):
 
     def add_event(self, room: Element, room_name: str, flat_sid: ScheduleItemDict) -> Element:
         event_guid_key = f"""emf{config.event_year}-event-{flat_sid["id"]}-{flat_sid["occurrences"][0]["occurrence_num"]}"""
+        # When changing this logic remember to also adjust the c3voc webhook logic and the tests.
         event = etree.SubElement(
             room,
             "event",

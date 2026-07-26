@@ -161,7 +161,12 @@ class OccurrenceC3VOCPublishingWebhook(Resource):
 
         try:
             conference = payload["fahrplan"]["conference"]
-            occurrence_id = payload["fahrplan"]["id"]
+
+            # fahrplan_id is generated using "cfp_id*100+occurence_id" so we have to extract them again here
+            # When changing this logic remember to also adjust the frab exporter logic and the tests.
+            fahrplan_id = payload["fahrplan"]["id"]
+            cfp_id = int(fahrplan_id / 100)
+            occurrence_id = fahrplan_id % 100
 
             if not payload["is_master"]:
                 # c3voc *should* only send us information about the master
@@ -175,7 +180,12 @@ class OccurrenceC3VOCPublishingWebhook(Resource):
                     message="The request did not reference the current event year, and has not been processed.",
                 )
 
-            occurrence: Occurrence = get_or_404(db, Occurrence, occurrence_id)
+            occurrence: Occurrence = db.one_or_404(
+                select(Occurrence).filter(
+                    Occurrence.schedule_item_id == cfp_id,
+                    Occurrence.occurrence_num == occurrence_id,
+                )
+            )
 
             if payload["voctoweb"]["enabled"]:
                 if payload["voctoweb"]["frontend_url"]:
