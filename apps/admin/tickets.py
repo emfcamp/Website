@@ -302,6 +302,7 @@ def convert_ticket(ticket_id, price_tier_id=None):
                         "new_product": new_tier.parent,
                     },
                 )
+                ticket.payment.state = "partrefunded"
                 db.session.add(refund)
                 flash("Created part refund", "success")
 
