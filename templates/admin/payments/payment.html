@@ -29,6 +29,28 @@
 {% endif %}
 </div>
 
+{% if payment.refunds %}
+<h3>Refunds</h3>
+<table class="table table-condensed table-striped">
+<thead>
+    <tr>
+        <th>Timestamp</th>
+        <th>Provider</th>
+        <th>Amount</th>
+    </tr>
+</thead>
+<tbody>
+{% for refund in payment.refunds %}
+<tr>
+    <td>{{refund.timestamp}}</td>
+    <td>{{refund.provider}}</td>
+    <td>{{refund.amount|price(payment.currency)}}</td>
+</tr>
+{% endfor %}
+<tbody>
+</table>
+{% endif %}
+
 <h3>History</h3>
 
 <table class="table table-condensed table-striped">
