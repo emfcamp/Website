@@ -261,7 +261,7 @@ def convert_ticket(ticket_id, price_tier_id=None):
     if form.validate_on_submit():
         if form.convert.data:
             app.logger.info(
-                "Converting ticket %s to %s (tier %s, product %s) (old price %s, new price %s, changing? %s)",
+                "Converting ticket %s to %s (tier %s) (old price %s, new price %s, changing? %s)",
                 ticket.id,
                 new_tier.id,
                 new_tier.parent.name,
