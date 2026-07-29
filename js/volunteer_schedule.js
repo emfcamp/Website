@@ -81,9 +81,9 @@ function getNodeData(node) {
 }
 
 function shouldDisplayNode(node_data, filters, node) {
-  // If the signed up shifts filter is active, or we're not set to show shifts
-  // in the past then those take precedence over all others and we short
-  // circuit everything else.
+  // Always show shifts the user is signed up for, and don't hide shifts
+  // in the past if the show_past filter is active. These take precedence
+  // over all other filters.
   if (node_data["notice"]) {
     return true;
   }
@@ -95,7 +95,7 @@ function shouldDisplayNode(node_data, filters, node) {
     }
   }
 
-  if (filters["signed_up"] && node_data["signed_up"]) {
+  if (node_data["signed_up"]) {
     return true;
   }
 
