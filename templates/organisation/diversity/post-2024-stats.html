@@ -1,0 +1,82 @@
+{% extends "organisation/template.html" %}
+{% block title %}Diversity stats {{year}}{% endblock %}
+{% block body %}
+{% macro stats_table(data, key, title) %}
+<h3>{{ title }}</h3>
+
+<table class="table">
+  <thead><tr>
+    <th></th>
+    <th>All Attendees</th>
+    <th>CfP Reviewers</th>
+    <th>Speakers</th>
+    <th>Invited Speakers</th>
+  </tr></thead>
+  <tbody>
+    {% for category in data["users"][key] if category != "" %}
+      <tr>
+        <td>{{ category }}</td>
+        {% for segment in ["users", "reviewers", "speakers", "invited_speakers"] %}
+          {% set value = data[segment][key][category] %}
+          <td>{{ value }} ({{ (100*value / data[segment]["total_with_diversity"]) | round(1) }}%)</td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+    <tr>
+      <th>Total</th>
+        {% for segment in ["users", "reviewers", "speakers", "invited_speakers"] %}
+          <th>{{ data[segment]["total_with_diversity"] }}</th>
+        {% endfor %}
+    </tr>
+    <tr></tr>
+      <th>Response rate</th>
+        {% for segment in ["users", "reviewers", "speakers", "invited_speakers"] %}
+          <th>{{ (100 - 100*data[segment][key][""]/data[segment]["total_with_diversity"]) | round(1) }}%</th>
+        {% endfor %}
+    </tr>
+  </tbody>
+</table>
+<p>&nbsp;</p>
+{% endmacro %}
+
+<h2>Diversity stats for {{year}}</h2>
+
+<h3>Note on limitations</h3>
+
+<p>All questions were optional so totals may not be consistent between categories.</p>
+
+<p>The "All Attendees" column refers to users that responded to the diversity form.</p>
+
+<h3>Totals</h3>
+
+<table class="table">
+  <thead><tr>
+    <th></th>
+    <th>All Attendees</th>
+    <th>CfP Reviewers</th>
+    <th>Speakers</th>
+    <th>Invited Speakers</th>
+  </tr></thead>
+  <tbody>
+    <tr>
+      <td>Total</td>
+      {% for segment in ["users", "reviewers", "speakers", "invited_speakers"] %}
+        <td>{{ data[segment]["total"] }}</td>
+      {% endfor %}
+    </tr>
+    <tr>
+      <td>Total who gave any diversity data</td>
+      {% for segment in ["users", "reviewers", "speakers", "invited_speakers"] %}
+        <td>{{ data[segment]["total_with_diversity"] }}</td>
+      {% endfor %}
+    </tr>
+  </tbody>
+</table>
+
+<p>&nbsp;</p>
+{{ stats_table(data, "gender", "Gender") }}
+{{ stats_table(data, "ethnicity", "Ethnicity") }}
+{{ stats_table(data, "age", "Age") }}
+{{ stats_table(data, "sexuality", "Sexuality") }}
+
+{% endblock %}
