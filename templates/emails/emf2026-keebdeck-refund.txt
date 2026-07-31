@@ -1,0 +1,28 @@
+{% extends "emails/base.txt" %}
+{% block body %}
+Hi {{ user.name }},
+
+{% if refund_type == "complex" %}
+You have been given a refund totalling {{ refund_total }} for your
+keyboard hexpansion purchases. If you collected a keyboard hexpansion without the keyboard and dome
+sheet, then you can buy it from solderparty @ https://www.lectronz.com/products/keebdeck-keyboard.
+{% elif refund_type == "full" %}
+Your keyboard hexpansion purchase{% if refund_count > 1 %}s have{% else %} has{% endif %} been fully refunded for {{ refund_total }},
+since {% if refund_count > 1 %}they were{% else %}it was{% endif %} uncollected.
+{% else %}
+Your keyboard hexpansion purchase{% if refund_count > 1 %}s have{% else %} has{% endif %} been partly refunded by {{ refund_total }},
+since you were given {% if refund_count == 1 %}an {% endif %}incomplete hexpansion{% if refund_count > 1 %}s{% endif %}.
+
+You can buy the silicone keyboard and dome sheet from solderparty @ https://www.lectronz.com/products/keebdeck-keyboard to complete your purchase.
+{% endif %}
+
+{% if is_stripe %}
+This has been refunded via stripe to the original form of payment. The money should be with you shortly.
+{% endif %}
+
+You can confirm the status of your account by visiting {{ url_for('users.purchases', _external=True) }}
+
+Love,
+
+All the EMF team
+{% endblock %}
