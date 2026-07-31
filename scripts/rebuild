@@ -1,0 +1,4 @@
+#!/bin/bash
+
+docker pull ghcr.io/emfcamp/website-base-dev
+docker compose build --no-cache app
