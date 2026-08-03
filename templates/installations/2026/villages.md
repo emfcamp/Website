@@ -24,3 +24,4 @@ Installations to find among the various villages on site.
 - [The Knitted Dome](128)
 - [The Oracle Temple of H.A.C.K.](278)
 - [Trinket trade](822)
+- [World’o’SeaBass](200)
