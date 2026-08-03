@@ -20,7 +20,7 @@ A full list of food vendors will be available closer to the event.
 ### Bringing Your Own Food
 You are welcome to bring your own food and drink if you'd prefer. Please keep in mind that no open fires are allowed on the grass. If you can, please avoid bringing glass containers - broken glass is a pain to clear up.
 
-There'll be a shop on site offering a range of camping friendly food and drink, and if you need a larger resupply there's a Tesco in Ledbury, which is a five minute drive away, and easily accessible via the shuttle bus.
+There'll be a shop on site offering a range of camping friendly food and drink, and if you need a larger resupply there's a Tesco in Ledbury, which is a ten minute drive away, and easily accessible via the shuttle bus.
 
 ## Drink
 The bars accept cards, cash, and contactless payments.
