@@ -14,7 +14,7 @@ Inside the Robot Arms.
 - [Snapper - a mechanical arcade machine](811)
 - [Star reader](844)
 - [StickerPhones](796)
-- [Stop The Clock Game](797)
+- [Stop The Clock & Frustration](797)
 - [Teletext Insertomatic 6000 + FPGA Teletext Decoder](630)
 - [The Friend Finder 5000](67)
 - [The Inspir-O-Matic](753)
