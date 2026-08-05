@@ -16,21 +16,26 @@ class ScheduleData {
     this.ageRanges = [];
     this.ageRangesSeen = new Set();
 
-    this.allFinished = true;
+    let scheduleItems = this.rawSchedule.map((row) =>
+      this.parseScheduleItem(row),
+    );
+
+    // Once the event is over, we include finished talks by default,
+    // to avoid showing an entirely empty schedule
+    this.allFinished = scheduleItems.every((sid) =>
+      sid.occurrences.every((od) => od.endTime < options.currentTime),
+    );
+    let includeFinished = options.includeFinished || this.allFinished;
 
     let count = 0;
-    this.rawSchedule.forEach((row) => {
-      let sid = this.parseScheduleItem(row);
-
+    scheduleItems.forEach((sid) => {
       this.addEventType(sid.type, sid.humanReadableType);
       this.addAgeRange(sid.age_range);
 
       for (const od of sid.occurrences) {
         // Apply filtering
 
-        if (od.endTime >= options.currentTime) {
-          this.allFinished = false;
-        } else if (!options.includeFinished) {
+        if (od.endTime < options.currentTime && !includeFinished) {
           continue;
         }
 
@@ -72,7 +77,7 @@ class ScheduleData {
         // We can now add this occurrence to our schedule
 
         let startHour = od.startTime.startOf("hour");
-        if (od.startTime <= options.currentTime && !options.includeFinished) {
+        if (od.startTime <= options.currentTime && !includeFinished) {
           /* Put ongoing events under the current time slot to avoid
            * having to make one up or include multiple earlier ones */
           startHour = options.currentTime.startOf("hour");
