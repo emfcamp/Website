@@ -22,7 +22,7 @@
     {%- if item.is_paid_for %}
     Paid
     {%- elif item.state == 'refunded' %}
-    Refunded
+    Refunded{% if item.purchaser != current_user %} to original purchaser{% endif %}
     {%- elif item.payment and item.payment.expired %}
     Unpaid
     {%- else %}
