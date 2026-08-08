@@ -535,7 +535,8 @@ def emf2026_refund_keebdecks_emailtest() -> None:
 @click.option(
     "--dry-run", is_flag=True, help="If set, don't actually refund/change the database, just simulate it."
 )
-def emf2026_refund_keebdecks(dry_run: bool = True) -> None:
+@click.option("--single-user", help="Email address of a single user to process.")
+def emf2026_refund_keebdecks(dry_run: bool = True, single_user: str = "") -> None:
     """Perform refunds/part refunds for keebdecks.
 
     For uncollected keebdecks we provide a full refund.
@@ -561,9 +562,12 @@ def emf2026_refund_keebdecks(dry_run: bool = True) -> None:
         assert price
         keebless_price[currency] = price
 
+    query = select(User)
+    if single_user:
+        app.logger.info("%sFiltering refunds to just user %s", dry_run_prefix, single_user)
+        query = query.where(User.email == single_user)
     query = (
-        select(User)
-        .join(User.owned_purchases)
+        query.join(User.owned_purchases)
         .where(
             Purchase.is_paid_for == True,
             Purchase.product.has(Product.name == keebdeck_product_name),
