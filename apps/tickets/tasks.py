@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import date, timedelta
 from decimal import Decimal
 
@@ -486,6 +486,51 @@ def email_tickets(user_id: int | None) -> None:
             walletpass.update_gwallet_pass_if_needed(user)
 
 
+@tickets.cli.command("emf2026_refund_keebdecks_emailtest")
+def emf2026_refund_keebdecks_emailtest() -> None:
+    """Renders the refund email in a variety of different ways."""
+    ctx = app.test_request_context()
+    ctx.push()
+
+    test_user = db.session.execute(select(User)).unique().scalar()
+    assert test_user
+    test_user.name = "John Appleseed"
+
+    gbp = {
+        Currency.GBP: Decimal("12.34"),
+    }
+    eur = {
+        Currency.EUR: Decimal("12.34"),
+    }
+    gbp_eur = {
+        Currency.GBP: Decimal("12.34"),
+        Currency.EUR: Decimal("3.00"),
+    }
+
+    for purchaser_type in ["owner", "other", "complex"]:
+        for refund_type in ["full", "part", "complex"]:
+            for refund_count in [1, 100]:
+                for total_amounts_by_currency in [gbp, eur, gbp_eur]:
+                    refund_total_formatted = " and ".join(
+                        f"{currency.symbol}{price:.2f}"
+                        for currency, price in total_amounts_by_currency.items()
+                    )
+                    app.logger.info(
+                        f"{purchaser_type=} {refund_type=} {refund_count=} {total_amounts_by_currency=}"
+                    )
+                    app.logger.info(
+                        render_template(
+                            "emails/emf2026-keebdeck-refund.txt",
+                            user=test_user,
+                            purchaser_type=purchaser_type,
+                            refund_type=refund_type,
+                            refund_count=refund_count,
+                            refund_total=refund_total_formatted,
+                            is_stripe=True,
+                        )
+                    )
+
+
 @tickets.cli.command("emf2026_refund_keebdecks")
 @click.option(
     "--dry-run", is_flag=True, help="If set, don't actually refund/change the database, just simulate it."
@@ -557,6 +602,15 @@ def emf2026_refund_keebdecks(dry_run: bool = True) -> None:
         if refund_count == 0:
             continue
 
+        purchaser_types = [
+            "owner" if purchase.purchaser == user else "other"
+            for purchase in part_redeemed_purchases + uncollected_purchases
+        ]
+        purchaser_counter = Counter(purchaser_types)
+        purchaser_type, common = purchaser_counter.most_common(1)[0]
+        if common != purchaser_counter.total():
+            purchaser_type = "complex"
+
         if len(uncollected_purchases) == len(keebdeck_purchases):
             refund_type = "full"
         elif len(part_redeemed_purchases) == len(keebdeck_purchases):
@@ -609,7 +663,7 @@ def emf2026_refund_keebdecks(dry_run: bool = True) -> None:
             payment_refund_amount = Decimal(0)
             for purchase in part_redeemed_in_payment:
                 assert purchase.price.currency == payment.currency
-                payment_refund_amount += purchase.price.value - keebless_price[payment.currency]
+                payment_refund_amount += purchase.price.value - keebless_price[payment.currency].value
                 new_price = keebless_price[payment.currency]
                 purchase.price = new_price
                 purchase.price_tier = new_price.price_tier
@@ -624,8 +678,8 @@ def emf2026_refund_keebdecks(dry_run: bool = True) -> None:
                 dry_run_prefix,
                 user.email,
                 payment_id,
-                len(part_redeemed_purchases),
-                len(uncollected_purchases),
+                len(part_redeemed_in_payment),
+                len(uncollected_in_payment),
                 payment_refund_amount,
                 payment.currency,
             )
@@ -660,9 +714,11 @@ def emf2026_refund_keebdecks(dry_run: bool = True) -> None:
         msg.body = render_template(
             "emails/emf2026-keebdeck-refund.txt",
             user=user,
+            purchaser_type=purchaser_type,
             refund_type=refund_type,
             refund_count=refund_count,
             refund_total=refund_total_formatted,
+            is_stripe=True,  # this year, it was all stripe
         )
 
         app.logger.info("%sEmailing %s keebdeck refund notification", dry_run_prefix, user.email)
