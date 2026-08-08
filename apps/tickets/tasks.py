@@ -578,6 +578,8 @@ def emf2026_refund_keebdecks(dry_run: bool = True, single_user: str = "") -> Non
 
     users = list(db.session.execute(query).unique().scalars())
 
+    summary_total_amounts_by_currency: dict[Currency, Decimal] = defaultdict(Decimal)
+
     def _redeemed_by_badge_on_sunday(purchase: Purchase) -> bool:
         """https://chat.orga.emfcamp.org/emf/pl/wamc3u9kgjfd7nre78w3od98nw"""
         if not purchase.redeemed:
@@ -728,6 +730,16 @@ def emf2026_refund_keebdecks(dry_run: bool = True, single_user: str = "") -> Non
         app.logger.info("%sEmailing %s keebdeck refund notification", dry_run_prefix, user.email)
         if not dry_run:
             msg.send()
+
+        for currency, value in total_amounts_by_currency.items():
+            summary_total_amounts_by_currency[currency] += value
+    app.logger.info(
+        "%sTotal refund value: %s",
+        dry_run_prefix,
+        " and ".join(
+            f"{currency.symbol}{price:.2f}" for currency, price in summary_total_amounts_by_currency.items()
+        ),
+    )
 
 
 @tickets.cli.group()
