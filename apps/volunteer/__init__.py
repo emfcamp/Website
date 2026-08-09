@@ -78,17 +78,32 @@ from flask import Blueprint, abort, redirect, request, url_for
 from flask import current_app as app
 from flask_login import current_user
 
+from apps.common import feature_enabled
 from models.volunteer import Volunteer
 
 volunteer = Blueprint("volunteer", __name__)
 
 
-# This is like require_permission but redirects to volunteer sign-up
+# To be enabled once I'm happy the recap page is working.
+# @volunteer.before_app_request
+# def check_site_state() -> ResponseReturnValue | None:
+#     if request.blueprint != "volunteer" or "recap" in request.path:
+#         return None
+
+#     if get_site_state() == "after-event" and not Volunteer.get_for_user(current_user).is_volunteer_admin:
+#         return redirect(url_for(".recap"))
+
+
+# This is like require_permission but redirects to volunteer sign-up/info depending
+# on feature flags.
 def require_volunteer_permission(permission):
     def call(f, *args, **kwargs):
         if current_user.is_authenticated:
             if not Volunteer.get_for_user(current_user):
-                return redirect(url_for("volunteer.sign_up", next=request.path))
+                if feature_enabled("VOLUNTEERS_SIGNUP"):
+                    return redirect(url_for("volunteer.sign_up", next=request.path))
+
+                return redirect(url_for("base.page", page_name="volunteering"))
             if current_user.has_permission(permission):
                 return f(*args, **kwargs)
             abort(404)
@@ -115,6 +130,7 @@ from . import (
     buildup,  # noqa: F401
     choose_roles,  # noqa: F401
     main,  # noqa: F401
+    recap,  # noqa: F401
     role_admin,  # noqa: F401
     schedule,  # noqa: F401
     sign_up,  # noqa: F401
