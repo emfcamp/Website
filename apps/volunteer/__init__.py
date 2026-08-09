@@ -76,22 +76,27 @@ menu item will redirect people to some static content about volunteering.
 from decorator import decorator
 from flask import Blueprint, abort, redirect, request, url_for
 from flask import current_app as app
+from flask.typing import ResponseReturnValue
 from flask_login import current_user
 
 from apps.common import feature_enabled
+from models.site_state import get_site_state
 from models.volunteer import Volunteer
 
 volunteer = Blueprint("volunteer", __name__)
 
 
-# To be enabled once I'm happy the recap page is working.
-# @volunteer.before_app_request
-# def check_site_state() -> ResponseReturnValue | None:
-#     if request.blueprint != "volunteer" or "recap" in request.path:
-#         return None
+@volunteer.before_app_request
+def check_site_state() -> ResponseReturnValue | None:
+    if request.blueprint != "volunteer" or "recap" in request.path:
+        return None
 
-#     if get_site_state() == "after-event" and not Volunteer.get_for_user(current_user).is_volunteer_admin:
-#         return redirect(url_for(".recap"))
+    if get_site_state() == "after-event" and current_user:
+        volunteer = current_user.volunteer
+        if volunteer and not volunteer.is_volunteer_admin:
+            return redirect(url_for(".recap"))
+
+    return None
 
 
 # This is like require_permission but redirects to volunteer sign-up/info depending
