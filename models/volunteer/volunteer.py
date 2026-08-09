@@ -1,5 +1,7 @@
 from collections import defaultdict
 from datetime import datetime, timedelta
+from decimal import Decimal
+from functools import reduce
 from typing import TYPE_CHECKING, TypeVar
 
 from flask_login import UserMixin
@@ -205,6 +207,16 @@ class Volunteer(BaseModel, UserMixin):
 
         # Everyone should be able to see Monday shifts.
         return (config.event_start, config.event_end + timedelta(days=1))
+
+    @property
+    def shift_count_for_vouchers(self) -> Decimal:
+        return reduce(
+            lambda x, y: x + y, [entry.voucher_contribution for entry in self.user.shift_entries], Decimal(0)
+        )
+
+    @property
+    def qualifies_for_voucher(self) -> bool:
+        return self.registered_for_buildup or self.shift_count_for_vouchers >= 2
 
 
 """

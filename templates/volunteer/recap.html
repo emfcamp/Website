@@ -5,22 +5,22 @@
 
 {% block body %}
 <h2>Volunteering Recap - {{ volunteer.nickname }}</h2>
-{% if registered_for_build %}
+{% if volunteer.registered_for_buildup %}
     <div class="alert alert-success">
         <p>
             You have qualified for an EMF 2028 pre-sale voucher by helping with build or teardown, many thanks!
-            {% if total_shifts > 0 %}
-                You also completed {{ total_shifts }} qualifying shifts.
+            {% if volunteer.shift_count_for_vouchers > 0 %}
+                You also completed {{ volunteer.shift_count_for_vouchers }} qualifying shifts.
             {% endif %}
         </p>
     </div>
-{% elif qualifies_for_voucher %}
+{% elif volunteer.qualifies_for_voucher %}
     <div class="alert alert-success">
-        <p>You have qualified for an EMF 2028 pre-sale ticket voucher with {{ total_shifts }} qualifying shifts.</p>
+        <p>You have qualified for an EMF 2028 pre-sale ticket voucher with {{ volunteer.shift_count_for_vouchers }} qualifying shifts.</p>
     </div>
 {% else %}
     <div class="alert alert-danger">
-        <p>Sorry, you have not qualified for an EMF 2028 pre-sale ticket voucher with {{ total_shifts }} qualifying shifts.</p>
+        <p>Sorry, you have not qualified for an EMF 2028 pre-sale ticket voucher with {{ volunteer.shift_count_for_vouchers }} qualifying shifts.</p>
         <p>If you think this is in error please contact us at <a href="mailto:volunteer@emfcamp.org">volunteer@emfcamp.org</a> letting us know why and we'll do our best to resolve it.</p>
     </div>
 {% endif %}
