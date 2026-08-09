@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}
+    EMF Volunteer Recap
+{% endblock %}
+
+{% block body %}
+<h2>Volunteering Recap - {{ volunteer.nickname }}</h2>
+{% if registered_for_build %}
+    <div class="alert alert-success">
+        <p>
+            You have qualified for an EMF 2028 pre-sale voucher by helping with build or teardown, many thanks!
+            {% if total_shifts > 0 %}
+                You also completed {{ total_shifts }} qualifying shifts.
+            {% endif %}
+        </p>
+    </div>
+{% elif qualifies_for_voucher %}
+    <div class="alert alert-success">
+        <p>You have qualified for an EMF 2028 pre-sale ticket voucher with {{ total_shifts }} qualifying shifts.</p>
+    </div>
+{% else %}
+    <div class="alert alert-danger">
+        <p>Sorry, you have not qualified for an EMF 2028 pre-sale ticket voucher with {{ total_shifts }} qualifying shifts.</p>
+        <p>If you think this is in error please contact us at <a href="mailto:volunteer@emfcamp.org">volunteer@emfcamp.org</a> letting us know why and we'll do our best to resolve it.</p>
+    </div>
+{% endif %}
+
+<p>
+    Qualifying for a voucher required completion of 2 full volunteer shifts. Some shifts have multipliers applied
+    meaning that they might count as more or less than one shift. Shifts only qualify if you were recorded as having
+    arrived for the shift, and not having abandoned it before completion.
+</p>
+<table class="table table-striped responsive-table">
+    <thead>
+        <tr>
+            <th>Day</th>
+            <th>Time</th>
+            <th>Role</th>
+            <th>State</th>
+            <th>Multiplier</th>
+            <th>Contribution</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in shift_entries %}
+            <tr>
+                <td>{{ entry.shift.local_start.strftime("%a %d") }}</td>
+                <td>{{ entry.shift.local_start.strftime("%H:%M") }} to {{ entry.shift.local_end.strftime("%H:%M") }}</td>
+                <td>{{ entry.shift.role.name }}</td>
+                <td>{{ entry.state | replace("_", " ") | capitalize }}</td>
+                <td>{{ entry.shift.multiplier.normalize() }}x</td>
+                <td>{{ entry.voucher_contribution }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -84,6 +84,13 @@ class ShiftEntry(BaseModel):
     user: Mapped[User] = relationship(back_populates="shift_entries")
     shift: Mapped[Shift] = relationship(back_populates="entries")
 
+    @property
+    def voucher_contribution(self) -> Decimal:
+        if self.state not in (ShiftEntryState.SIGNED_UP, ShiftEntryState.NO_SHOW, ShiftEntryState.ABANDONED):
+            return self.shift.multiplier
+
+        return Decimal(0)
+
     def set_state(self, state: str | ShiftEntryState) -> None:
         if isinstance(state, str):
             try:
