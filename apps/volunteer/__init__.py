@@ -91,7 +91,7 @@ def check_site_state() -> ResponseReturnValue | None:
     if request.blueprint != "volunteer" or "recap" in request.path:
         return None
 
-    if get_site_state() == "after-event" and current_user:
+    if get_site_state() == "after-event" and current_user.is_authenticated:
         volunteer = current_user.volunteer
         if volunteer and not volunteer.is_volunteer_admin:
             return redirect(url_for(".recap"))
