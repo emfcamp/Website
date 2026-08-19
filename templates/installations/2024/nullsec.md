@@ -1,14 +1,14 @@
-title: Null Sector Installations
+title: NullSector Installations
 ---
-# Null Sector
+# NullSector
 
-## On the way to Null Sector
+## On the way to NullSector
 
 - [Interactive Musical Roots](/schedule/2024/446)
 - [Speczilla](/schedule/2024/226)
 - [sunDome_001](/schedule/2024/367)
 
-## In Null Sector
+## In NullSector
 
 - [Analogue is nicer](/schedule/2024/98)
 - [TV Turnoff Bot](/schedule/2024/391)
