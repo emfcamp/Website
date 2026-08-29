@@ -4950,7 +4950,6 @@
     "start_time": "21:00",
     "end_time": "22:00"
   },
-  ,
   {
     "id": 341,
     "slug": "the-problem-with-medical-influencers",
@@ -10336,35 +10335,6 @@
     "requires_ticket": false,
     "start_time": "08:00",
     "end_time": "09:30"
-  },
-  {
-    "id": 722,
-    "slug": "safe-sound-street-awareness-personal-safety-for-beginners",
-    "start_date": "2024-05-31 11:00:00",
-    "end_date": "2024-05-31 11:45:00",
-    "venue": "Lounge",
-    "latlon": [52.04147, -2.37644],
-    "map_link": "https://map.emfcamp.org/#18.5/52.04147/-2.37644/m=52.04147,-2.37644",
-    "title": "Safe & Sound - Street Awareness & Personal Safety for beginners",
-    "speaker": "Dean",
-    "pronouns": "he/him",
-    "user_id": 2620,
-    "description": "Let's meet outside the Lounge.\r\n\r\nWe'll try to be outside, weather permitting. If we meet by the entrance to the Lounge - we'll find some outside space.\r\n\r\nThankfully crime in a public space is rare. But it\u2019s common for an adult or child to be worried, anxious or even frightened when walking around on their own, or engaging socially outside their home, especially during winter evenings. For some, these feelings have been compounded by isolation during lockdown. Although difficult situations seldom arise, the unexpected can happen.\r\n\r\nI offer an interactive workshop, designed for adults and children -  over 10 years old who are beginning to experience greater independence from their parents or guardians. This newfound freedom comes with some risk, which can be substantially reduced using some straightforward preparation and techniques.\r\n\r\nMy workshop empowers and encourages adults and children to take responsibility for their own safety, giving them confidence.\r\n\r\nAs a father of three I know the incredible confidence kids experience when they feel able to navigate our world - and the reassurance that can give to parents and carers. I\u2019d love to pass my knowledge and advice to you and your children.\r\n\r\nI focus on spatial awareness, avoiding uncomfortable situations and confrontation, simple planning, safe conduct whilst on the street, and what to do in an emergency situation. Key areas covered:\r\n\r\n- Preparing yourself: planning/clothing/valuables/bags\r\n\r\n- On the move: street awareness/danger areas/safe areas/what to do in an emergency\r\n\r\n- Mobile phone security: IMEI/contacts/emergency calls\r\n\r\n- Travelling on a bus/train: planning journeys/safety at bus stop/station and on bus/train\r\n\r\nI have current DBS clearance, Safe Guarding Level 1 and First Aid qualifications. Get in touch with Leo for more info at emf.wilkin.xyz\r\n",
-    "type": "workshop",
-    "video_privacy": "public",
-    "is_fave": false,
-    "is_family_friendly": true,
-    "is_from_cfp": false,
-    "content_note": "Might be references to violence and abuse, but this talk has been delivered to primary school children with no issues.",
-    "source": "database",
-    "link": "https://www.emfcamp.org/schedule/2024/722-safe-sound-street-awareness-personal-safety-for-beginners",
-    "cost": "",
-    "equipment": "Suitable clothing for outside & potentially to move about",
-    "age_range": "10+",
-    "attendees": "30",
-    "requires_ticket": false,
-    "start_time": "11:00",
-    "end_time": "11:45"
   },
   {
     "id": 203,
