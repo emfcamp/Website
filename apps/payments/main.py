@@ -60,28 +60,9 @@ class RefundRequestForm(Form):
             raise ValidationError("Please choose some tickets to refund")
 
 
-def wise_validate(endpoint, **args):
-    res = requests.get(f"https://api.transferwise.com/v1/validators/{endpoint}", args)
-    data = res.json()
-    if data.get("validation") != "success":
-        app.logger.info(f"Bank validation for {endpoint} failed: {repr(data)}")
-        return False
-
-    return True
-
-
 def validate_bank_details(form, currency):
     app.logger.info("Validating bank details")
-    if currency == "GBP":
-        if not wise_validate("sort-code", sortCode=form.sort_code.data):
-            return False
-
-        if not wise_validate("sort-code-account-number", accountNumber=form.account.data):
-            return False
-
-    elif currency == "EUR":
-        if not wise_validate("bic", bic=form.swiftbic.data, iban=form.iban.data):
-            return False
+    return False  # TODO: restore validation logic (previously provided by Wise endpoint)
 
     app.logger.info("Bank validation succeeded")
     return True

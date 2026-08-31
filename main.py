@@ -32,8 +32,6 @@ from werkzeug.exceptions import HTTPException
 from apps.config import config
 from loggingmanager import create_logging_manager, set_user_id
 
-# import pywisetransfer
-
 # If we have logging handlers set up here, don't touch them.
 # This is especially problematic during testing as we don't
 # want to overwrite nosetests' handlers. Note: if anything
@@ -118,7 +116,6 @@ mail = Mail()
 login_manager = LoginManager()
 static_digest = FlaskStaticDigest()
 toolbar = DebugToolbarExtension()
-wise = None
 
 
 def get_stripe_client(config: Config) -> stripe.StripeClient:
@@ -229,13 +226,6 @@ def create_app(dev_server=False, config_override=None):
         return user
 
     login_manager.anonymous_user = load_anonymous_user
-
-    # global wise
-    # wise = pywisetransfer.Client(
-    #     api_key=app.config["TRANSFERWISE_API_TOKEN"],
-    #     environment=app.config["TRANSFERWISE_ENVIRONMENT"],
-    #     private_key_file=app.config.get("TRANSFERWISE_PRIVATE_KEY_FILE"),
-    # )
 
     @app.before_request
     def load_per_request_state():
