@@ -16,20 +16,6 @@
 {% endfor %}
 </ul>
 
-{% if wise %}
-<h3>Wise</h3>
-<ul>
-{% for success, message in transferwise %}
-  <li>{% if success %}✅{% else %}❌<strong>{% endif %}
-      {{message}}{% if not success %}</strong>{% endif %}</li>
-{% endfor %}
-</ul>
-
-<h4>Manual tasks:</h4>
-<ul>
-  <li>Ensure a webhook is configured for the URL <code>{{external_url('payments.wise_webhook')}}</code></li>
-</ul>
-
 <h3>Bank Accounts</h3>
 <form method="post" action="{{url_for('.activate_payment_config')}}">
   <table class="table table-condensed">
@@ -64,7 +50,4 @@
 {{ form.hidden_tag() }}
 {{ form.import_accounts(class_="btn btn-success") }}
 </form>
-{% else %}
-<p>Wise payments are disabled.</p>
-{% endif %}
 {% endblock %}
