@@ -515,7 +515,7 @@ class Price(BaseModel):
     price_int: Mapped[int]
 
     purchases: Mapped[list[Purchase]] = relationship(back_populates="price")
-    price_tier: Mapped[list[PriceTier]] = relationship(back_populates="prices")
+    price_tier: Mapped[PriceTier] = relationship(back_populates="prices")
 
     def __init__(self, currency, value=None, **kwargs):
         super().__init__(currency=currency.upper(), **kwargs)

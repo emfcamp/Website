@@ -1,4 +1,6 @@
-from datetime import timedelta
+from collections import Counter, defaultdict
+from datetime import date, timedelta
+from decimal import Decimal
 
 import click
 import googleapiclient.errors
@@ -9,9 +11,10 @@ from sqlalchemy import func, select
 
 from apps.common import feature_enabled, walletpass
 from apps.common.receipt import RECEIPT_TYPES, attach_tickets, set_tickets_emailed
+from apps.payments.refund import create_stripe_refund
 from main import db
-from models import naive_utcnow
-from models.payment import Payment
+from models import Currency, naive_utcnow
+from models.payment import Payment, StripePayment
 from models.product import (
     Price,
     PriceTier,
@@ -481,6 +484,262 @@ def email_tickets(user_id: int | None) -> None:
 
         if feature_enabled("ISSUE_GOOGLE_WALLET_TICKETS"):
             walletpass.update_gwallet_pass_if_needed(user)
+
+
+@tickets.cli.command("emf2026_refund_keebdecks_emailtest")
+def emf2026_refund_keebdecks_emailtest() -> None:
+    """Renders the refund email in a variety of different ways."""
+    ctx = app.test_request_context()
+    ctx.push()
+
+    test_user = db.session.execute(select(User)).unique().scalar()
+    assert test_user
+    test_user.name = "John Appleseed"
+
+    gbp = {
+        Currency.GBP: Decimal("12.34"),
+    }
+    eur = {
+        Currency.EUR: Decimal("12.34"),
+    }
+    gbp_eur = {
+        Currency.GBP: Decimal("12.34"),
+        Currency.EUR: Decimal("3.00"),
+    }
+
+    for purchaser_type in ["owner", "other", "complex"]:
+        for refund_type in ["full", "part", "complex"]:
+            for refund_count in [1, 100]:
+                for total_amounts_by_currency in [gbp, eur, gbp_eur]:
+                    refund_total_formatted = " and ".join(
+                        f"{currency.symbol}{price:.2f}"
+                        for currency, price in total_amounts_by_currency.items()
+                    )
+                    app.logger.info(
+                        f"{purchaser_type=} {refund_type=} {refund_count=} {total_amounts_by_currency=}"
+                    )
+                    app.logger.info(
+                        render_template(
+                            "emails/emf2026-keebdeck-refund.txt",
+                            user=test_user,
+                            purchaser_type=purchaser_type,
+                            refund_type=refund_type,
+                            refund_count=refund_count,
+                            refund_total=refund_total_formatted,
+                            is_stripe=True,
+                        )
+                    )
+
+
+@tickets.cli.command("emf2026_refund_keebdecks")
+@click.option(
+    "--dry-run", is_flag=True, help="If set, don't actually refund/change the database, just simulate it."
+)
+@click.option("--single-user", help="Email address of a single user to process.")
+def emf2026_refund_keebdecks(dry_run: bool = True, single_user: str = "") -> None:
+    """Perform refunds/part refunds for keebdecks.
+
+    For uncollected keebdecks we provide a full refund.
+
+    For 'part collected' keebdecks (those signed out on Sunday by
+    badge@emfcamp.org), we downgrade them to the keebdeck-without-keyboard
+    product and provide a part refund.
+
+    We also send appropriate emails to people to let them know what's happened.
+    """
+    dry_run_prefix = "[DRYRUN] " if dry_run else ""
+
+    ctx = app.test_request_context()
+    ctx.push()
+
+    keebdeck_product_name = "badge-keebdeck"
+    keebless_name = "badge-keebdeck-without-keyboard"
+    keebless = db.session.execute(select(Product).where(Product.name == keebless_name)).scalar_one_or_none()
+    assert keebless is not None
+    keebless_price: dict[Currency, Price] = {}
+    for currency in Currency:
+        price = keebless.get_cheapest_price(currency)
+        assert price
+        keebless_price[currency] = price
+
+    query = select(User)
+    if single_user:
+        app.logger.info("%sFiltering refunds to just user %s", dry_run_prefix, single_user)
+        query = query.where(User.email == single_user)
+    query = (
+        query.join(User.owned_purchases)
+        .where(
+            Purchase.is_paid_for == True,
+            Purchase.product.has(Product.name == keebdeck_product_name),
+        )
+        .group_by(User.id)
+        .order_by(User.id)
+    )
+
+    users = list(db.session.execute(query).unique().scalars())
+
+    summary_total_amounts_by_currency: dict[Currency, Decimal] = defaultdict(Decimal)
+
+    def _redeemed_by_badge_on_sunday(purchase: Purchase) -> bool:
+        """https://chat.orga.emfcamp.org/emf/pl/wamc3u9kgjfd7nre78w3od98nw"""
+        if not purchase.redeemed:
+            return False
+        redemption_version = purchase.redemption_version()
+        assert redemption_version
+        redeemer_user: User = redemption_version.transaction.user
+        if redeemer_user.email != "badge@emfcamp.org":
+            return False
+        issued_at_date: date = redemption_version.transaction.issued_at.date()
+        return date(2026, 7, 19) == issued_at_date
+
+    for user in users:
+        keebdeck_purchases = [
+            purchase
+            for purchase in user.owned_purchases
+            if purchase.is_paid_for and purchase.product.name == keebdeck_product_name
+        ]
+        part_redeemed_purchases = [
+            purchase
+            for purchase in keebdeck_purchases
+            if purchase.redeemed and _redeemed_by_badge_on_sunday(purchase)
+        ]
+        uncollected_purchases = [purchase for purchase in keebdeck_purchases if not purchase.redeemed]
+        refund_count = len(part_redeemed_purchases) + len(uncollected_purchases)
+        if refund_count == 0:
+            continue
+
+        purchaser_types = [
+            "owner" if purchase.purchaser == user else "other"
+            for purchase in part_redeemed_purchases + uncollected_purchases
+        ]
+        purchaser_counter = Counter(purchaser_types)
+        purchaser_type, common = purchaser_counter.most_common(1)[0]
+        if common != purchaser_counter.total():
+            purchaser_type = "complex"
+
+        if len(uncollected_purchases) == len(keebdeck_purchases):
+            refund_type = "full"
+        elif len(part_redeemed_purchases) == len(keebdeck_purchases):
+            refund_type = "part"
+        else:
+            refund_type = "complex"
+
+        total_amounts_by_currency: dict[Currency, Decimal] = defaultdict(Decimal)
+
+        app.logger.info(
+            "%sRefunding %s for %d keebdecks (%d part-redeemed, %d uncollected)",
+            dry_run_prefix,
+            user.email,
+            refund_count,
+            len(part_redeemed_purchases),
+            len(uncollected_purchases),
+        )
+
+        # Group everything together by payment.
+        purchases_by_payment_id: dict[int, tuple[list[Purchase], list[Purchase]]] = defaultdict(
+            lambda: ([], [])
+        )
+        for purchase in part_redeemed_purchases:
+            assert purchase.payment_id is not None
+            purchases_by_payment_id[purchase.payment_id][0].append(purchase)
+        for purchase in uncollected_purchases:
+            assert purchase.payment_id is not None
+            purchases_by_payment_id[purchase.payment_id][1].append(purchase)
+        for payment_id, (part_redeemed_in_payment, uncollected_in_payment) in purchases_by_payment_id.items():
+            payment = db.session.execute(select(Payment).where(Payment.id == payment_id)).scalar_one_or_none()
+            assert payment
+            if not isinstance(payment, StripePayment):
+                app.logger.info(
+                    "%sCannot refund %s (payment ID %d) -- not a Stripe payment",
+                    dry_run_prefix,
+                    user.email,
+                    payment_id,
+                )
+                continue
+            payment.lock()
+            if not payment.is_refundable(ignore_event_refund_state=True):
+                app.logger.info(
+                    "%sCannot refund %s (payment ID %d) -- payment state is %s",
+                    dry_run_prefix,
+                    user.email,
+                    payment_id,
+                    payment.state,
+                )
+                continue
+            payment_refund_amount = Decimal(0)
+            for purchase in part_redeemed_in_payment:
+                assert purchase.price.currency == payment.currency
+                payment_refund_amount += purchase.price.value - keebless_price[payment.currency].value
+                new_price = keebless_price[payment.currency]
+                purchase.price = new_price
+                purchase.price_tier = new_price.price_tier
+                purchase.product = keebless
+            for purchase in uncollected_in_payment:
+                assert purchase.price.currency == payment.currency
+                payment_refund_amount += purchase.price.value
+                purchase.set_state("refunded")
+            total_amounts_by_currency[payment.currency] += payment_refund_amount
+            app.logger.info(
+                "%sRefunding %s (payment ID %d) for %d part-redeemed, %d uncollected keebdecks -- refunding %s %s",
+                dry_run_prefix,
+                user.email,
+                payment_id,
+                len(part_redeemed_in_payment),
+                len(uncollected_in_payment),
+                payment_refund_amount,
+                payment.currency,
+            )
+            if not dry_run:
+                refund = create_stripe_refund(
+                    payment,
+                    payment_refund_amount,
+                    {
+                        "type": "keebdeck-refund",
+                        "part-redeemed": ",".join(str(p.id) for p in part_redeemed_in_payment),
+                        "uncollected": ",".join(str(p.id) for p in uncollected_in_payment),
+                    },
+                )
+                db.session.add(refund)
+            payment.state = "refunded" if payment_refund_amount == payment.amount else "partrefunded"
+
+        if dry_run:
+            db.session.rollback()
+        else:
+            db.session.commit()
+
+        msg = EmailMessage(
+            "Your Electromagnetic Field Keyboard Hexpansion Refund",
+            from_email=config.from_email("TICKETS_EMAIL"),
+            to=[user.email],
+        )
+
+        refund_total_formatted = " and ".join(
+            f"{currency.symbol}{price:.2f}" for currency, price in total_amounts_by_currency.items()
+        )
+        assert refund_total_formatted
+        msg.body = render_template(
+            "emails/emf2026-keebdeck-refund.txt",
+            user=user,
+            purchaser_type=purchaser_type,
+            refund_type=refund_type,
+            refund_count=refund_count,
+            refund_total=refund_total_formatted,
+            is_stripe=True,  # this year, it was all stripe
+        )
+
+        app.logger.info("%sEmailing %s keebdeck refund notification", dry_run_prefix, user.email)
+        if not dry_run:
+            msg.send()
+
+        for currency, value in total_amounts_by_currency.items():
+            summary_total_amounts_by_currency[currency] += value
+    app.logger.info(
+        "%sTotal refund value: %s",
+        dry_run_prefix,
+        " and ".join(
+            f"{currency.symbol}{price:.2f}" for currency, price in summary_total_amounts_by_currency.items()
+        ),
+    )
 
 
 @tickets.cli.group()

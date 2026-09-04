@@ -19,10 +19,12 @@
 <td>{{ item.price_tier.parent.display_name }}</td>
 <td>{{ item.price.value | price(item.price.currency) }}</td>
 <td>
-    {%- if item.is_paid_for %}
+    {%- if item.redeemed %}
+    Collected
+    {%- elif item.is_paid_for %}
     Paid
     {%- elif item.state == 'refunded' %}
-    Refunded
+    Refunded{% if item.purchaser != current_user %} to original purchaser{% endif %}
     {%- elif item.payment and item.payment.expired %}
     Unpaid
     {%- else %}

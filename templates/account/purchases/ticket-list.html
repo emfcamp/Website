@@ -34,7 +34,9 @@
 <td>{{ t.price_tier.parent.display_name }}</td>
 <td>{{ t.price.value | price(t.price.currency) }}</td>
 <td>
-    {%- if t.is_paid_for %}
+    {%- if t.redeemed %}
+    Checked in
+    {%- elif t.is_paid_for %}
     Paid
     {%- elif t.refund %}
     Refunded
