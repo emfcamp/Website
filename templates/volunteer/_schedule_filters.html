@@ -55,6 +55,7 @@
                 />
                 Show shifts in the past
             </label>
+            {% if not is_admin %}
             <label class="checkbox">
                 <input
                     type="checkbox"
@@ -62,6 +63,7 @@
                 />
                 Show my shifts
             </label>
+            {% endif %}
             <label class="checkbox">
                 <input
                     type="checkbox"
