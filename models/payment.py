@@ -1,9 +1,9 @@
 import random
 import re
-import typing
 from collections.abc import Iterable, Sequence
 from datetime import datetime, timedelta
 from decimal import Decimal
+from typing import TYPE_CHECKING, Any, Literal
 
 from sqlalchemy import ForeignKey, Index, Numeric, column, event, func, select
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
@@ -12,7 +12,7 @@ from sqlalchemy_continuum.utils import transaction_class, version_class
 from stdnum import iso11649
 from stdnum.iso7064 import mod_97_10
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from .purchase import Purchase
     from .user import User
 
@@ -53,6 +53,11 @@ class StateException(Exception):
     pass
 
 
+PaymentState = Literal[
+    "new", "inprogress", "paid", "refund-requested", "refunding", "partrefunded", "refunded", "cancelled"
+]
+
+
 class Payment(BaseModel):
     __tablename__ = "payment"
     __versioned__: dict[str, str] = {}
@@ -64,7 +69,7 @@ class Payment(BaseModel):
     currency: Mapped[Currency]
     amount_int: Mapped[int]
 
-    state: Mapped[str] = mapped_column(default="new")
+    state: Mapped[PaymentState] = mapped_column(default="new")
     reminder_sent_at: Mapped[datetime | None]
 
     created: Mapped[NaiveDT] = mapped_column(default=naive_utcnow)
@@ -580,7 +585,7 @@ class Refund(BaseModel):
         self.amount = amount
 
     @classmethod
-    def get_export_data(cls) -> dict[str, typing.Any]:
+    def get_export_data(cls) -> dict[str, Any]:
         if cls.__name__ == "Refund":
             # Export stats for each refund type separately
             return {}
@@ -670,6 +675,6 @@ class PaymentSequence(BaseModel):
     value: Mapped[int]
 
     @classmethod
-    def get_export_data(cls) -> dict[str, typing.Any]:
+    def get_export_data(cls) -> dict[str, Any]:
         rows = db.session.scalars(select(cls))
         return {"public": {r.name: r.value for r in rows}}
