@@ -400,6 +400,13 @@ class ScheduleItem(BaseModel):
     def spread_occurrences_across_days(self, value: bool) -> None:
         self.attributes.spread_occurrences_across_days = value
 
+    @property
+    def has_any_published_video(self):
+        for occurrence in self.occurrences:
+            if occurrence.c3voc_url or occurrence.youtube_url:
+                return True
+        return False
+
 
 validate_state_transitions(ScheduleItem.state, SCHEDULE_ITEM_STATE_TRANSITIONS)
 
