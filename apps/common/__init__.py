@@ -385,6 +385,14 @@ def archive_file(year: int, *path: str, raise_404: bool = True) -> Path | None:
     """Return the path to a given file within the archive.
     Optionally raise 404 if it doesn't exist.
     """
+    # `year` becomes a path component, so only a plain run of digits may pass:
+    # a value with slashes or dots could otherwise select another directory
+    # under exports/ (see #1779).
+    if isinstance(year, bool) or not re.fullmatch(r"[0-9]+", str(year)):
+        if raise_404:
+            abort(404)
+        return None
+
     EXPORT_ROOT = (Path(__file__) / ".." / ".." / ".." / "exports").resolve()
     file_path = (EXPORT_ROOT / str(year) / Path(*path)).resolve()
 
