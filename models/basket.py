@@ -253,7 +253,7 @@ class Basket(MutableMapping[PriceTier, int]):
         # Insert the purchases right away, as column_property and
         # polymorphic columns are reloaded from the DB after insert
         db.session.add_all(purchases_to_flush)
-        db.session.flush(purchases_to_flush)
+        db.session.flush()
 
     def ensure_purchase_capacity(self):
         """

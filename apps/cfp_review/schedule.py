@@ -102,7 +102,7 @@ def schedule() -> ResponseReturnValue:
 
     potential_schedules = list(
         db.session.query(PotentialSchedule)
-        .order_by(desc(PotentialSchedule.created))
+        .order_by(PotentialSchedule.created.desc())
         .filter(PotentialSchedule.state.in_(["new", "applied"]))
         .limit(10)
     )

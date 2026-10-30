@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 from markdown import markdown
 from markupsafe import Markup
 from sqlalchemy import Column, ForeignKey, Integer, Table, Text, func, select
-from sqlalchemy.orm import Mapped, contains_eager, mapped_column, noload, relationship
+from sqlalchemy.orm import Mapped, contains_eager, mapped_column, relationship
 
 from main import db, get_or_404
 
@@ -208,7 +208,6 @@ class Role(BaseModel):
             .outerjoin(shift_counts_q)
             .group_by(Role, shift_counts_q.c.shift_count)
             .order_by(Role.id)
-            .options(noload(Role.team))
         )
 
         interested_volunteers_q = (

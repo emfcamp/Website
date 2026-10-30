@@ -67,6 +67,7 @@ class VenueForm(Form):
     def populate(self, venue: Venue) -> None:
         if venue.location is not None:
             latlon = to_shape(venue.location)
+            assert isinstance(latlon, Point)
             self.location_lat.data = latlon.y
             self.location_lon.data = latlon.x
 

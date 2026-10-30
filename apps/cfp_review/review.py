@@ -39,7 +39,7 @@ def _split_by_review_count(proposals: list[Proposal], well_reviewed_threshold: i
 
 @cfp_review.route("/review", methods=["GET", "POST"])
 @review_required
-def review_list() -> ResponseReturnValue:
+def review_list():
     form = ReviewListForm()
 
     if form.validate_on_submit():

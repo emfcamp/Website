@@ -111,6 +111,7 @@ class AdminVillageForm(VillageForm):
             self.location_lon.data = None
         else:
             latlon = to_shape(village.location)
+            assert isinstance(latlon, Point)
             self.location_lat.data = latlon.y
             self.location_lon.data = latlon.x
 

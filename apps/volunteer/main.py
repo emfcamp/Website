@@ -122,7 +122,7 @@ def init_workshop_shifts():
                         else:
                             mapref = "https://map.emfcamp.org/"
 
-                        slug = occurrence.scheduled_venue.name.lower().replace("\s+", "-")
+                        slug = occurrence.scheduled_venue.name.lower().replace(r"\s+", "-")
                         venue = VolunteerVenue(name=occurrence.scheduled_venue.name, slug=slug, mapref=mapref)
                         db.session.add(venue)
                     venues[occurrence.scheduled_venue.name] = venue

@@ -98,7 +98,7 @@ def send_email(conn: Any, rec: EmailJobRecipient) -> int:
 
 
 @scheduled_task(minutes=60)
-def update_gwallet_passes() -> None:
+def update_gwallet_passes():
     ctx = app.test_request_context()
     ctx.push()
 

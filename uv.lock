@@ -3088,7 +3088,7 @@ requires-dist = [
     { name = "faker" },
     { name = "flask", specifier = "<3.2" },
     { name = "flask-admin", specifier = "<3.0" },
-    { name = "flask-caching", specifier = "~=2.0" },
+    { name = "flask-caching", specifier = "~=2.5" },
     { name = "flask-cors", specifier = "<6.2" },
     { name = "flask-debugtoolbar" },
     { name = "flask-login", specifier = "~=0.6" },

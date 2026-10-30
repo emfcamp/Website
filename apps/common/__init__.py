@@ -369,7 +369,7 @@ def feature_enabled(feature: str) -> bool:
     otherwise fall back to the config setting.
     """
     # the cache decorator doesn't pass through types, so we have to cast here
-    db_flags = cast(dict[str, bool], get_db_flags())
+    db_flags = get_db_flags()
 
     if feature in db_flags:
         return db_flags[feature]

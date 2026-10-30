@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from flask import render_template
 
+from main import db
 from models.product import PriceTier, Product, ProductGroup
 from models.purchase import Purchase
 
@@ -12,13 +13,14 @@ from . import admin
 @admin.route("/reports/reconcile")
 def report_reconcile():
     data = {}
-    for pg in ProductGroup.query.all():
+    for pg in db.session.query(ProductGroup).all():
         if not pg.products:
             continue
         paid = defaultdict(Decimal)
         pending = defaultdict(Decimal)
         q = (
-            Purchase.query.join(PriceTier)
+            db.session.query(Purchase)
+            .join(PriceTier)
             .join(Product)
             .join(ProductGroup)
             .filter(ProductGroup.id == Product.group_id)

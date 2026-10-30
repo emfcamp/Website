@@ -315,17 +315,13 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
 
     @property
     def purchase_count_by_state(self) -> dict[str, int]:
-        states = (
-            db.session.execute(
-                select(Purchase.state, func.count(Purchase.id))
-                .join(PriceTier)
-                .join(Product)
-                .where(Product.id == self.id)
-                .group_by(Purchase.state)
-            )
-            .tuples()
-            .all()
-        )
+        states = db.session.execute(
+            select(Purchase.state, func.count(Purchase.id))
+            .join(PriceTier)
+            .join(Product)
+            .where(Product.id == self.id)
+            .group_by(Purchase.state)
+        ).all()
 
         return dict(states)
 
@@ -429,16 +425,12 @@ class PriceTier(BaseModel, CapacityMixin):
 
     @property
     def purchase_count_by_state(self) -> dict[str, int]:
-        states = (
-            db.session.execute(
-                select(Purchase.state, func.count(Purchase.id))
-                .join(PriceTier)
-                .where(PriceTier.id == self.id)
-                .group_by(Purchase.state)
-            )
-            .tuples()
-            .all()
-        )
+        states = db.session.execute(
+            select(Purchase.state, func.count(Purchase.id))
+            .join(PriceTier)
+            .where(PriceTier.id == self.id)
+            .group_by(Purchase.state)
+        ).all()
 
         return dict(states)
 

@@ -15,7 +15,7 @@ from flask import current_app as app
 from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from flask_mailman import EmailMessage
-from sqlalchemy import desc, func, select
+from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy_continuum.utils import version_class
 
@@ -460,7 +460,7 @@ def rank(round_id: int) -> ResponseReturnValue:
     most_recent_round = (
         db.session.query(Round)
         .where(Round.proposal_type == round.proposal_type)
-        .order_by(desc(Round.created))
+        .order_by(Round.created.desc())
         .first()
     )
 
