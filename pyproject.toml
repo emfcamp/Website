@@ -62,7 +62,6 @@ dependencies = [
     "wtforms-sqlalchemy<0.5",
     "wtforms<3.3",
     "google-api-python-client>=2.198.0",
-    "google-api-python-client-stubs>=1.37.0",
     "psycopg>=3.3.6",
 ]
 
@@ -177,5 +176,8 @@ module = [
     "scipy.*",
     "sqlalchemy_continuum.*",
     "wtforms_sqlalchemy.*",
+    # googleapiclient does have stubs but they're so large that it's not worth the time penalty
+    "googleapiclient",
+    "googleapiclient.*",
 ]
 ignore_missing_imports = true

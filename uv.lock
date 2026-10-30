@@ -854,19 +854,6 @@ wheels = [
 ]
 
 [[package]]
-name = "google-api-python-client-stubs"
-version = "1.40.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "google-api-python-client" },
-    { name = "types-httplib2" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/b5/90/6cbfac1e3270b8a51cf81db89ce9a0f543bc6382ed7c99613761d548b77e/google_api_python_client_stubs-1.40.0.tar.gz", hash = "sha256:2a573b1ee80502e9d226fa4dcdad21765ef709264ea6c2f72ef1a88f920e295a", size = 2851868, upload-time = "2026-08-22T20:28:56.708Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/af/c3/f0d47e2ef666fd0c8804cd4e9bdcc873454ebec93ee893665cfbf9e76d2d/google_api_python_client_stubs-1.40.0-py3-none-any.whl", hash = "sha256:aa2b6cf8ea354970f1100e189ac176ae096d7d22846083a9a086d0f7f4a1858e", size = 3870340, upload-time = "2026-08-22T20:28:54.739Z" },
-]
-
-[[package]]
 name = "google-auth"
 version = "2.62.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2756,15 +2743,6 @@ wheels = [
 ]
 
 [[package]]
-name = "types-httplib2"
-version = "0.32.1.20261029"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/0b/e8/d848bff57950c6cc142c603c6529f9acc14cc8a5b3972a9b7bf46f2397c6/types_httplib2-0.32.1.20261029.tar.gz", hash = "sha256:b1dbb861ecd4644e2097b7aa1d9046217f985792f6dc9a9d3397e7f079f52718", size = 12003, upload-time = "2026-10-29T07:44:30.203Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b9/7a/74077271ef44c2bd1dcf3d2b9ddbbe84d13472f028c71243873cd9c92c73/types_httplib2-0.32.1.20261029-py3-none-any.whl", hash = "sha256:fe4ac38d6f2879afd944dea6b5c2cee6ee29e71f09ee5ad34c345614dd2c187f", size = 11511, upload-time = "2026-10-29T07:44:29.327Z" },
-]
-
-[[package]]
 name = "types-icalendar"
 version = "6.3.2.20260712"
 source = { registry = "https://pypi.org/simple" }
@@ -3025,7 +3003,6 @@ dependencies = [
     { name = "freezegun" },
     { name = "geoalchemy2" },
     { name = "google-api-python-client" },
-    { name = "google-api-python-client-stubs" },
     { name = "gunicorn" },
     { name = "icalendar" },
     { name = "iso8601" },
@@ -3125,7 +3102,6 @@ requires-dist = [
     { name = "freezegun", specifier = ">=1.1.0,<2" },
     { name = "geoalchemy2", specifier = "~=0.20" },
     { name = "google-api-python-client", specifier = ">=2.198.0" },
-    { name = "google-api-python-client-stubs", specifier = ">=1.37.0" },
     { name = "gunicorn", specifier = "~=23.0" },
     { name = "icalendar", specifier = "~=6.3" },
     { name = "iso8601" },
