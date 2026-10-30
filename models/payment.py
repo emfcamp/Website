@@ -377,7 +377,6 @@ class BankAccount(BaseModel):
     address: Mapped[str]
     swift: Mapped[str | None]
     iban: Mapped[str | None]
-    wise_balance_id: Mapped[int | None]
 
     transactions: Mapped[list[BankTransaction]] = relationship(back_populates="account")
 
@@ -392,7 +391,6 @@ class BankAccount(BaseModel):
         address,
         swift,
         iban,
-        wise_balance_id=None,
     ):
         self.sort_code = sort_code
         self.acct_id = acct_id
@@ -403,7 +401,6 @@ class BankAccount(BaseModel):
         self.address = address
         self.swift = swift
         self.iban = iban
-        self.wise_balance_id = wise_balance_id
 
     @classmethod
     def get(cls, sort_code, acct_id):
@@ -435,7 +432,6 @@ class BankTransaction(BaseModel):
     type: Mapped[str]
     amount_int: Mapped[int]
     fit_id: Mapped[str | None] = mapped_column(index=True)  # allegedly unique, but don't trust it
-    wise_id: Mapped[str | None] = mapped_column(index=True)
     payee: Mapped[str]  # this is what OFX calls it. it's really description
     payment_id: Mapped[int | None] = mapped_column(ForeignKey("payment.id"))
     suppressed: Mapped[bool] = mapped_column(default=False)
@@ -443,14 +439,13 @@ class BankTransaction(BaseModel):
     account: Mapped[BankAccount] = relationship(back_populates="transactions")
     payment: Mapped[BankPayment | None] = relationship(back_populates="transactions")
 
-    def __init__(self, account_id, posted, type, amount, payee, fit_id=None, wise_id=None):
+    def __init__(self, account_id, posted, type, amount, payee, fit_id=None):
         self.account_id = account_id
         self.posted = posted
         self.type = type
         self.amount = amount
         self.payee = payee
         self.fit_id = fit_id
-        self.wise_id = wise_id
 
     def __repr__(self) -> str:
         return f"<BankTransaction: {self.amount}, {self.payee}>"

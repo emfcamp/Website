@@ -1,9 +1,6 @@
 [![CI Status](https://github.com/emfcamp/Website/workflows/CI/badge.svg)](https://github.com/emfcamp/Website/actions?query=workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/github/emfcamp/Website/badge.svg?branch=main)](https://coveralls.io/github/emfcamp/Website?branch=main)
 
-## Wise
-This can only be tested with their live environment. See `docs/wise.md` for details.
-
 ## Stripe
 This is the easiest method to "pay" for a ticket when you're developing. The details for a successful payment are:
 
