@@ -24,6 +24,11 @@ from models.user import User
 from ..config import config
 from . import event_tz
 
+_drop_in_info = (
+    "\n\nThis is a drop-in workshop, so you can arrive at any point during "
+    "the session to complete a short activity."
+)
+
 
 class OccurrenceDict(TypedDict):
     occurrence_num: int
@@ -124,6 +129,8 @@ def _get_schedule_item_dict(filter: ScheduleFilter, schedule_item: ScheduleItem)
         sid["age_range"] = (schedule_item.attributes.age_range or "").strip()
         # participant_count is only on proposals
         sid["drop_in"] = schedule_item.attributes.drop_in
+        if schedule_item.attributes.drop_in:
+            sid["description"] += _drop_in_info
 
     if isinstance(schedule_item.attributes, TalkAttributes | WorkshopAttributes):
         sid["family_friendly"] = schedule_item.attributes.family_friendly
