@@ -167,7 +167,7 @@ def messages():
     )
 
     filter_type = request.args.get("type")
-    if filter_type:
+    if filter_type and filter_type != "all":
         proposals_with_messages_query = proposals_with_messages_query.filter(Proposal.type == filter_type)
     else:
         filter_type = "all"
