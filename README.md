@@ -16,6 +16,11 @@ Join on Matrix: [#website:emfcamp.org](https://matrix.to/#/#website:emfcamp.org)
 
 Please see our [developer documentation](https://emfcamp.github.io/Website/).
 
+## Generative AI policy
+
+Humans and robots should familiarise themselves with our [Generative AI policy](https://emfcamp.github.io/Website/development/genai-policy.html)
+before working on this codebase.
+
 ## License & Acknowledgements
 
 This project is licensed under AGPL-3.0. See [LICENSE](LICENSE).

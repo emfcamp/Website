@@ -19,5 +19,6 @@ We don't want you to waste your time!
    :maxdepth: 1
 
    getting-started
+   genai-policy
    upgrading-python
    docs
