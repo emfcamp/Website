@@ -38,12 +38,6 @@ from ..common.forms import Form
 from ..payments.stripe import stripe_validate
 from .products import product_views, products
 
-# from ..payments.wise import (
-#     wise_business_profile,
-#     wise_retrieve_accounts,
-#     wise_validate,
-# )
-
 admin = Blueprint("admin", __name__)
 
 admin_required = require_permission("admin")  # Decorator to require admin permissions
@@ -209,10 +203,6 @@ def site_states():
     return render_template("admin/site-states.html", form=form)
 
 
-class BankAccountRefreshForm(Form):
-    import_accounts = SubmitField("Import new Wise accounts")
-
-
 @admin.route("/payment-config/activate", methods=["POST"])
 def activate_payment_config():
     if request.form.get("activate"):
@@ -229,42 +219,9 @@ def activate_payment_config():
 
 @admin.route("/payment-config", methods=["GET", "POST"])
 def payment_config_verify():
-    form = BankAccountRefreshForm()
-
-    if form.validate_on_submit():
-        profile_id = None  # wise_business_profile()
-
-        if not profile_id:
-            flash("Cannot identify Wise profile", "warning")
-            return redirect(url_for(".payment_config_verify"), 303)
-
-        accounts = []  # wise_retrieve_accounts(profile_id)
-        for account in accounts:
-            existing_account = BankAccount.query.filter_by(
-                wise_balance_id=account.wise_balance_id,
-                currency=account.currency,
-            ).first()
-            if existing_account:
-                continue
-            db.session.add(account)
-
-        if db.session.new:
-            flash("New Wise bank accounts have been imported", "info")
-        else:
-            flash("No new Wise bank accounts have been imported", "warning")
-
-        db.session.commit()
-        return redirect(url_for(".payment_config_verify"), 303)
-
-    if feature_enabled("BANK_TRANSFER"):
-        wise_state = None  # wise_validate()
-    else:
-        wise_state = None
-
     return render_template(
         "admin/payment-config-verify.html",
         stripe=stripe_validate(),
-        transferwise=wise_state,
         bank_accounts=BankAccount.query.order_by(
             BankAccount.active.desc(), BankAccount.currency.desc()
         ).all(),
