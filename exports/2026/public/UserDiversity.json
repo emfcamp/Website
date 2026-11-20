@@ -1,0 +1,150 @@
+{
+  "users": {
+    "total": 3534,
+    "total_with_diversity": 2059,
+    "age": {
+      "": 243,
+      "0-15": 5,
+      "16-25": 215,
+      "26-35": 535,
+      "36-45": 554,
+      "46-55": 335,
+      "56-65": 136,
+      "66+": 36
+    },
+    "gender": {
+      "": 281,
+      "female": 460,
+      "male": 1088,
+      "non-binary": 198,
+      "other": 32
+    },
+    "ethnicity": {
+      "": 325,
+      "arab": 3,
+      "asian": 47,
+      "black": 6,
+      "mixed": 49,
+      "other": 33,
+      "white": 1596
+    },
+    "sexuality": {
+      "": 489,
+      "bisexual-or-pansexual": 431,
+      "gay-or-lesbian": 229,
+      "other": 98,
+      "straight-or-heterosexual": 812
+    }
+  },
+  "reviewers": {
+    "total": 47,
+    "total_with_diversity": 31,
+    "age": {
+      "": 1,
+      "0-15": 0,
+      "16-25": 0,
+      "26-35": 5,
+      "36-45": 15,
+      "46-55": 9,
+      "56-65": 1,
+      "66+": 0
+    },
+    "gender": {
+      "": 1,
+      "female": 9,
+      "male": 15,
+      "non-binary": 6,
+      "other": 0
+    },
+    "ethnicity": {
+      "": 1,
+      "arab": 0,
+      "asian": 0,
+      "black": 0,
+      "mixed": 1,
+      "other": 0,
+      "white": 29
+    },
+    "sexuality": {
+      "": 5,
+      "bisexual-or-pansexual": 8,
+      "gay-or-lesbian": 2,
+      "other": 2,
+      "straight-or-heterosexual": 14
+    }
+  },
+  "speakers": {
+    "total": 344,
+    "total_with_diversity": 316,
+    "age": {
+      "": 18,
+      "0-15": 0,
+      "16-25": 17,
+      "26-35": 63,
+      "36-45": 114,
+      "46-55": 78,
+      "56-65": 25,
+      "66+": 1
+    },
+    "gender": {
+      "": 18,
+      "female": 83,
+      "male": 146,
+      "non-binary": 68,
+      "other": 1
+    },
+    "ethnicity": {
+      "": 23,
+      "arab": 0,
+      "asian": 4,
+      "black": 4,
+      "mixed": 12,
+      "other": 8,
+      "white": 265
+    },
+    "sexuality": {
+      "": 55,
+      "bisexual-or-pansexual": 74,
+      "gay-or-lesbian": 28,
+      "other": 18,
+      "straight-or-heterosexual": 141
+    }
+  },
+  "invited_speakers": {
+    "total": 27,
+    "total_with_diversity": 16,
+    "age": {
+      "": 1,
+      "0-15": 0,
+      "16-25": 0,
+      "26-35": 5,
+      "36-45": 4,
+      "46-55": 4,
+      "56-65": 2,
+      "66+": 0
+    },
+    "gender": {
+      "": 1,
+      "female": 7,
+      "male": 6,
+      "non-binary": 2,
+      "other": 0
+    },
+    "ethnicity": {
+      "": 1,
+      "arab": 0,
+      "asian": 3,
+      "black": 1,
+      "mixed": 0,
+      "other": 1,
+      "white": 10
+    },
+    "sexuality": {
+      "": 2,
+      "bisexual-or-pansexual": 5,
+      "gay-or-lesbian": 1,
+      "other": 0,
+      "straight-or-heterosexual": 8
+    }
+  }
+}

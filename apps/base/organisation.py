@@ -44,8 +44,17 @@ def yearly_diversity_stats(year: int) -> ResponseReturnValue:
             data = json.load(raw_data)
 
         return render_template(
-            "about/diversity/pre-2024-stats.html",
+            "organisation/diversity/pre-2024-stats.html",
             year=year,
             data=data["diversity"],
         )
-    return render_template_markdown(f"about/diversity/{year}.md")
+    if year == 2026:
+        with open(f"exports/{year}/public/UserDiversity.json") as raw_data:
+            data = json.load(raw_data)
+
+        return render_template(
+            "organisation/diversity/post-2024-stats.html",
+            year=year,
+            data=data,
+        )
+    return render_template_markdown(f"organisation/diversity/{year}.md")
